@@ -51,6 +51,10 @@ class ConferenceWorkflowAndUiTest(unittest.TestCase):
 
         self.assertIn("conference-paper-retrieval.yml", runner)
         self.assertIn("runConferenceRetrieval", runner)
+        self.assertIn("/api/local/workflows/dispatch", runner)
+        self.assertIn("DPR_LOCAL_API_BASE", runner)
+        self.assertTrue((root / "src" / "local_debug_server.py").exists())
+        self.assertTrue((root / "scripts" / "local_debug.sh").exists())
         self.assertIn("run_rerank: 'true'", runner)
         self.assertIn("run_llm_refine: 'true'", runner)
         self.assertIn("reranker_profile", runner)

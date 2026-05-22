@@ -144,6 +144,44 @@ https://<你的用户名>.github.io/daily-paper-reader
 
 完成以上步骤后，后续大多数日常使用和配置都可以直接在网页端完成。后续教程参考：[daily-paper-reader 指引](https://ziwenhahaha.github.io/daily-paper-reader/#/tutorial/README)
 
+## 🧪 本地调试模式
+
+如果你在本机开发，不想点击按钮后触发 GitHub Actions，可以启动本地调试后端：
+
+```bash
+scripts/local_debug.sh
+```
+
+也可以手动指定监听地址和端口：
+
+```bash
+python src/local_debug_server.py --host 127.0.0.1 --port 8000
+```
+
+然后访问：
+
+```text
+http://127.0.0.1:8000
+```
+
+在 `localhost / 127.0.0.1` 页面里点击“触发工作流”时，前端会自动调用本地后端 `/api/local/workflows/dispatch`，把 `daily-paper-reader.yml`、`conference-paper-retrieval.yml` 等映射为本地 Python 子进程执行，不会上 GitHub，也不会要求启用 Actions。运行日志会显示在工作流面板里，并保存在 `.local-runs/`。
+
+如果前端和本地后端不是同一个地址，可以在页面加载前设置：
+
+```html
+<script>
+  window.DPR_LOCAL_API_BASE = 'http://127.0.0.1:8000';
+</script>
+```
+
+如果要部署到自己的服务器上调试，请同时启动这个后端，并对内网或受信任网络开放端口：
+
+```bash
+DPR_LOCAL_HOST=0.0.0.0 DPR_LOCAL_PORT=8000 scripts/local_debug.sh
+```
+
+然后访问 `http://<服务器地址>:8000`。这样页面和后端同源，点击触发按钮会在服务器本机执行工作流命令，而不是调用 GitHub Actions。
+
 ## ❓ FAQ
 
 ### 💻 需要服务器吗？

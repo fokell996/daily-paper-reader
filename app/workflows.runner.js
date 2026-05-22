@@ -201,6 +201,109 @@ window.DPRWorkflowRunner = (function () {
     return res;
   };
 
+  const isLocalDebugPage = () => {
+    if (window.DPR_LOCAL_API_BASE) return true;
+    const host = String((window.location && window.location.hostname) || '').toLowerCase();
+    return host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0';
+  };
+
+  const getLocalApiUrl = (path) => {
+    const base = String(window.DPR_LOCAL_API_BASE || '').trim().replace(/\/$/, '');
+    if (!base) return path;
+    return `${base}${path}`;
+  };
+
+  const localApiFetch = async (path, init) => {
+    const res = await fetch(getLocalApiUrl(path), {
+      ...(init || {}),
+      headers: {
+        'Content-Type': 'application/json',
+        ...(init && init.headers ? init.headers : {}),
+      },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) {
+      throw new Error((data && data.error) || `本地调试后端请求失败：HTTP ${res.status}`);
+    }
+    return data;
+  };
+
+  const renderLocalRun = (run, logText) => {
+    if (!runsEl || !run) return;
+    const status = run.status || '';
+    const conclusion = run.conclusion || '';
+    const badgeColor =
+      conclusion === 'success'
+        ? '#2e7d32'
+        : conclusion === 'failure'
+          ? '#c00'
+          : status === 'in_progress'
+            ? '#1565c0'
+            : '#666';
+    const command = Array.isArray(run.command) ? run.command.join(' ') : '';
+    const logHtml = logText
+      ? `<pre style="white-space:pre-wrap; max-height:360px; overflow:auto; background:#111; color:#ddd; padding:10px; border-radius:6px; font-size:12px;">${escapeHtml(logText)}</pre>`
+      : '<div style="color:#999;">暂无日志。</div>';
+    runsEl.innerHTML = `
+      <div style="margin-bottom:8px;">
+        <div style="font-weight:600;">本地运行 #${escapeHtml(run.run_number || run.id)}</div>
+        <div style="color:#666; margin-top:2px;">
+          <span style="display:inline-block; padding:1px 6px; border-radius:999px; background:rgba(0,0,0,0.06); color:${badgeColor};">
+            ${escapeHtml(formatRunBadgeText(status, conclusion))}
+          </span>
+          <span style="margin-left:8px;">${escapeHtml(formatRunTime(run.created_at))}</span>
+        </div>
+      </div>
+      <div style="font-size:12px; color:#666; margin-bottom:8px;">${escapeHtml(command)}</div>
+      ${logHtml}
+    `;
+  };
+
+  const refreshLocalRun = async (runId) => {
+    try {
+      const data = await localApiFetch(`/api/local/runs/${encodeURIComponent(runId)}/log`);
+      const run = data.run || {};
+      renderLocalRun(run, data.log || '');
+      if (run.status === 'completed') {
+        stopPolling();
+        setStatus(
+          `本地运行已结束：${run.conclusion || 'completed'}`,
+          run.conclusion === 'success' ? '#080' : '#c00',
+        );
+      } else {
+        setStatus('本地运行中：每 5 秒自动刷新...', '#1565c0', { waiting: true });
+      }
+    } catch (e) {
+      console.error(e);
+      setStatus(`刷新本地运行失败：${e.message || e}`, '#c00');
+    }
+  };
+
+  const dispatchLocalAndMonitor = async (wf, workflowFile, dispatchInputs) => {
+    stopPolling();
+    activeRun = null;
+    setStatus(`正在触发本地调试任务：${wf.name || workflowFile} ...`, '#666', { waiting: true });
+    runsEl.innerHTML = '<div style="color:#999;">正在请求本地后端，请稍候...</div>';
+    const data = await localApiFetch('/api/local/workflows/dispatch', {
+      method: 'POST',
+      body: JSON.stringify({
+        workflowKey: wf.key || '',
+        workflowFile,
+        inputs: dispatchInputs || {},
+      }),
+    });
+    const run = data.run || {};
+    activeRun = { local: true, runId: run.id };
+    selectedRun = activeRun;
+    setStatus(`本地运行已创建：run_id=${run.id}`, '#080', { waiting: true });
+    await refreshLocalRun(run.id);
+    refreshTimer = setInterval(() => {
+      const r = selectedRun || activeRun;
+      if (!r || !r.local) return;
+      refreshLocalRun(r.runId);
+    }, 5000);
+  };
+
   const resolveWorkflowRunInputs = async (owner, repo, token, runId) => {
     if (!owner || !repo || !runId || !token) return null;
     const runUrl = `https://api.github.com/repos/${owner}/${repo}/actions/runs/${runId}`;
@@ -542,6 +645,27 @@ window.DPRWorkflowRunner = (function () {
       setStatus('工作流配置缺失，无法触发。', '#c00');
       return;
     }
+    const dynamicInputs = { ...(wf.dispatchInputs || {}) };
+    const rerankerProfile = loadRerankerProfile();
+    if (
+      rerankerProfile &&
+      (workflowFile === 'daily-paper-reader.yml' ||
+        workflowFile === 'conference-paper-retrieval.yml')
+    ) {
+      dynamicInputs.reranker_profile = rerankerProfile;
+    }
+    const dispatchInputs = combineInputs(dynamicInputs, extraInputs);
+    if (isLocalDebugPage()) {
+      try {
+        return await dispatchLocalAndMonitor(wf, workflowFile, dispatchInputs);
+      } catch (e) {
+        console.error(e);
+        const msg = e.message || String(e);
+        setStatus(`本地触发失败：${msg}`, '#c00');
+        runsEl.innerHTML = `<div style="color:#c00;">${escapeHtml(msg)}<br/>请确认本地后端已启动：<code>scripts/local_debug.sh</code> 或 <code>python src/local_debug_server.py --port 8000</code></div>`;
+        return;
+      }
+    }
     const token = loadGithubToken();
     if (!token) {
       setStatus('未检测到 GitHub Token：请在“密钥配置”或“GitHub Token”处完成配置。', '#c00');
@@ -602,16 +726,6 @@ window.DPRWorkflowRunner = (function () {
       const dispatchUrl = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/${encodeURIComponent(
         workflowFile,
       )}/dispatches`;
-      const dynamicInputs = { ...(wf.dispatchInputs || {}) };
-      const rerankerProfile = loadRerankerProfile();
-      if (
-        rerankerProfile &&
-        (workflowFile === 'daily-paper-reader.yml' ||
-          workflowFile === 'conference-paper-retrieval.yml')
-      ) {
-        dynamicInputs.reranker_profile = rerankerProfile;
-      }
-      const dispatchInputs = combineInputs(dynamicInputs, extraInputs);
       const dispatchBody = {
         ref: String(repoContext.defaultBranch || 'main'),
       };

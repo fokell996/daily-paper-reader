@@ -1386,7 +1386,7 @@
           summaryApiKey: apiKey,
           summaryBaseUrl: getDefaultDeepSeekBaseUrl(),
           summaryModel: model,
-          chatModels: defaultDeepSeekModels,
+          chatModels: getDefaultDeepSeekChatModels(),
           skipRerank: false,
           reranker: {
             ...reranker,
