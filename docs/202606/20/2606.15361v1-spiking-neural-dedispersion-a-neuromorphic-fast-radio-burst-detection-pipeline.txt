@@ -1,0 +1,830 @@
+Title: Spiking Neural Dedispersion: A Neuromorphic Fast Radio Burst Detection Pipeline
+
+URL Source: https://arxiv.org/pdf/2606.15361v1
+
+Published Time: Tue, 16 Jun 2026 00:54:00 GMT
+
+Number of Pages: 35
+
+Markdown Content:
+# Spiking Neural Dedispersion: A Neuromorphic Fast Radio Burst Detection Pipeline 
+
+## Alessio Magro 1* 1* Institute of Space Sciences and Astronomy, University of Malta, Msida, MSD 2080, Malta. Corresponding author(s). E-mail(s): alessio.magro@um.edu.mt; 
+
+Abstract 
+
+Real-time FRB detection at next-generation radio telescopes is increasingly dom-inated in cost and footprint by the real-time dedispersion backend. We present a complete neuromorphic FRB detection pipeline built on the Spiking Neural Dedispersion (SND) algorithm, a hierarchical delay-and-add tree that performs incoherent dedispersion on spike-encoded filterbank data, supporting arbitrary trial-DM grids and configurable branching factors. Three operating modes are evaluated, spanning a resource–sensitivity trade-off from binary thresholded accumulation to full float32 precision. Validated against Heimdall on synthetic Northern Cross filterbanks, float SND matches Heimdall at 99 .3 % detection completeness ( 244 mW per beam), graded mode achieves 89 .3 % at 61 mW, and binary mode reaches 59 .4 % overall ( 1.75 mW), retaining 91 % sensitivity for bright, narrow events. The full pipeline fits on a single SpiNNaker 2 chip across all three modes; binary mode fits entirely within on-chip SRAM, while graded and float require external DRAM for the history buffer. On a deployed 48-chip system, total power projects to approximately 100 –112 W, a reduction of order 
+
+10 –40 × over an equivalent GPU deployment, with 48 simultaneous beams per board. 
+
+Keywords: fast radio bursts, neuromorphic computing, dedispersion, spiking neural networks, SpiNNaker, Loihi 
+
+1
+
+> arXiv:2606.15361v1 [astro-ph.IM] 13 Jun 2026
+
+# 1 Introduction 
+
+Fast radio bursts (FRBs) are millisecond-duration radio transients of cosmological origin, first identified by Lorimer et al. [1], and now established as a heteroge-neous population of one-off and repeating sources spanning nearly four decades in luminosity [2–4]. Several thousand individual bursts have been catalogued, with the CHIME/FRB collaboration [5] providing the largest sample. Their host galaxies span a range of star-formation rates and metallicities [6]; the population includes both extragalactic sources and at least one Galactic magnetar [7, 8]; and their dispersion measures sample the warm-hot intergalactic medium with a precision now competitive with conventional cosmological probes [9]. The science programme around FRBs has consequently broadened from individual-source astrophysics to cosmological surveys, with applications including independent measurements of the diffuse baryon content of the Universe [9, 10], dark-energy and Hubble-tension constraints [11], and detailed studies of magnetar emission physics [12, 13]. All of these programmes share an oper-ational requirement: continuous, real-time, sensitive single-pulse search across a wide dispersion-measure (DM) range, in commensal mode alongside other observations. The instrumentation landscape for FRB science is in a period of rapid expan-sion. Wide-field transit arrays such as CHIME [14], CHORD [15], and BURSTT [16] couple very large fields of view to dense beamforming. Long-baseline arrays such as DSA-2000 [17] and the Square Kilometre Array [18] propose continuous all-sky FRB monitoring as a design driver. Existing facilities are upgrading to keep pace: the MeerTRAP backend on MeerKAT [19] and the CRACO upgrade on ASKAP [20] sub-stantially expand the dedispersion search volume, typically by factors of several to an order of magnitude in combined beam count, DM trials, and time resolution rela-tive to their direct predecessors. In all of these systems the dedispersion stage is the dominant cost driver of the real-time backend, scaling as O(NbNf NDM /∆t) for Nb
+
+beams, Nf frequency channels, NDM trial DMs, and time resolution ∆ t. Operational FRB pipelines in the current generation demand dedicated compute nodes drawing several kilowatts to process groups of simultaneous beams, with aggregate power bud-gets reaching the megawatt scale on the largest systems, making power an increasingly primary constraint in FRB backend design [21]. The Northern Cross, a T-shaped transit array operated by INAF at the Medic-ina Radio Observatory (Bologna, Italy), is one of the instruments that has recently undergone a major digital backend upgrade targeting real-time FRB detection [22–24]. Operating at 408 MHz with 16 MHz bandwidth and 1024 channels at 0.138 ms time resolution, it provides a representative operational configuration for a neuromorphic backend: thousands of DM trials, a fine time resolution that stresses the dispersive sweep at high DM, and a transit-mode observing strategy. All numerical results in this paper use the Northern Cross instrument parameters unless stated otherwise. FRB search is well-matched to neuromorphic event-driven processing. Astrophysi-cal pulses are rare; a search pipeline operates predominantly on noise, and a threshold encoder applied to noise produces a sparse spike raster with typical fire-rate fractions of 10 −1–10 −2 per channel-sample at detection-calibrated thresholds. Neuromorphic processors are event-driven, integer-arithmetic chips; Intel Loihi 2 [25, 26] and SpiN-Naker 2 [27, 28] are the leading examples deployed in scientific computing. Compute 2units are inactive in the absence of input spikes, so energy consumption scales with spike activity rather than with the size of the search problem. Hala Point [29], Intel’s largest Loihi 2 deployment, supports more than one billion neurons in a 2.6 kW power envelope, while commercial SpiNNcloud SpiNNaker 2 boards aggregate approximately 7.3 million neurons per 48-chip board. Both architectures support graded-payload spikes, in which a small integer value accompanies the routing event, permitting intermediate computations to propagate partial sums without sacrificing event-driven execution. Neuromorphic computing in radio astronomy is a recent but rapidly growing field. Pritchard et al. [30] have demonstrated spiking neural network (SNN)-based radio-frequency interference (RFI) detection in radio astronomy data with sensitiv-ity competitive with established methods at substantially lower power. A companion feasibility study [31] extends the analysis to FRB detection and 21-cm cosmology on multiple instruments, including the SKA, MWA [32], ngVLA [33], and ASKAP [34], projecting power-consumption ratios of one to two orders of magnitude lower in favour of neuromorphic processing. Deterministic signal-processing operations have previ-ously been implemented on spiking substrates, including fast Fourier transforms [35] and graph algorithms [36]. The present work moves from the observatory-level feasibil-ity analysis of Pritchard et al. to a concrete algorithmic implementation of a complete, validated neuromorphic incoherent dedispersion pipeline. A general FRB search pipeline consists of several stages: incoherent dedispersion across a trial-DM grid, matched filtering of each dedispersed time series against a range of pulse widths, and candidate detection and clustering. The matched filter reduces to a running boxcar sum across multiple widths. This operation can in princi-ple be mapped onto a leaky integrate-and-fire (LIF) neuron with an appropriate decay constant, where threshold crossings serve as detection events; in this work matched filtering is implemented as a classical DM-scaled cumulative-sum operation imme-diately following dedispersion. Incoherent dedispersion, by contrast, requires careful algorithmic design. A direct implementation costs O(Nf ) operations per trial DM per timestep, and at operational scales requires large neuron and synapse budgets together with a substantial history buffer to hold the dispersive sweep across all channels. Clas-sical fast algorithms such as the Taylor tree [37] and the Fast Dispersion Measure Transform (FDMT) [38] reduce the computational cost to O(Nf log Nf ) per trial DM by sharing partial sums across a hierarchical structure; however, direct spike-domain implementations inherit several constraints: the Taylor tree is restricted to power-of-two channel pairings and rigid DM grids; and FDMT requires a correction to its standard initialisation when applied to spike-encoded inputs (Methods 4.6). The Spiking Neural Dedispersion (SND) algorithm, introduced in this work, belongs to a broader class of event-driven delay-transform algorithms in which a sparse multichannel spike stream is aligned and accumulated over a parameter grid using programmable synaptic delays. Unlike classical delay-and-add architectures, compu-tation occurs only in response to input events, so the energy cost scales with signal activity rather than with the search parameter space. SND instantiates this design for the incoherent dedispersion problem, where the parameter grid is the trial-DM space and each per-synapse delay implements the dispersive shift for a channel–DM pair. 3This paper makes the following contributions. 1. We introduce the SND algorithm and a multi-rate extension. SND performs inco-herent dedispersion on a hierarchical delay-and-add tree that supports arbitrary DM grids and configurable branching factors. 2. We derive the cascade noise statistics governing binary-mode operation and characterise the two sensitivity limitations of practical deployment. 3. We map the full pipeline onto SpiNNaker 2 and Loihi 2 and validate it on synthetic Northern Cross filterbanks. 
+
+# 2 Results 
+
+The complete pipeline, described in detail in Methods, was characterised on synthetic Northern Cross filterbanks. Figure 1 shows the full pipeline architecture. We report SND performance, cascade noise statistics, hardware resource requirements and power consumption estimates, and validation against the Heimdall reference pipeline. Unless stated otherwise, all numerical results in this section use the Northern Cross instru-ment parameters ( Nf = 1024, ∆ t = 0 .138 ms, fc = 408 MHz, 16 MHz bandwidth, DM 
+
+∈ [10 , 3000] pc cm −3); a full listing is given in Supplementary Table S1. 
+
+## 2.1 SND algorithm 
+
+Practical neuromorphic dedispersion evolves through a sequence of classical approaches, each addressing the limitations of its predecessor. Direct dedispersion scales as O(Nf ) per DM trial and is architecturally straightforward on a spiking sub-strate, but the total neuron and synapse cost grows prohibitively with the number of DM trials. The Taylor tree [37] reduces this to O(Nf log Nf ) by recursive pair-combination, but imposes a strict binary channel pairing and a power-of-two DM grid. FDMT [38] achieves the same complexity without binary-pairing constraints, but its standard cumulative-sum initialisation was designed for analog radio data and is unsuitable for spike-domain inputs; we observed a sensitivity loss of approximately a factor of two relative to brute-force dedispersion, which a corrected no-smear initiali-sation (Methods 4.6) recovers at no additional cost. The structural constraints on the DM grid remain. SND (Methods 4.7) lifts both of these remaining constraints: arbi-trary trial-DM grids are supported, the branching factor B is a free parameter matched to the target hardware’s synapse-to-neuron ratio, and signal integrity is preserved at every tree level. Figure 2 shows the SND architecture. In float-mode propagation SND recovers detection sensitivity equivalent to brute-force dedispersion across all tested DM and S/N combinations; DM-time planes are numerically invariant under any branching factor B, confirming that B is a pure hardware-mapping parameter with no effect on sensitivity. Larger B is preferred on both SpiNNaker 2 and Loihi 2, where synapse-to-neuron capacity ratios of 10 2–10 3 favour wide, shallow trees over narrow, deep ones. The multi-rate extension (Methods 4.8) partitions the DM range into indepen-dently time-scrunched bands. At high DM the intra-channel dispersive smearing τsmear 
+
+4Filterbank 
+
+chunk 
+
+N₀ × n ₜ
+
+> (float32)
+
+Pre-processing 
+
+& Encoding • Robust z-score • σ-clipping • Channel flagging 
+
+δ-Encoder  
+
+> threshold θ
+> spike raster (binary / graded)
+
+Input Output 
+
+Multi-rate SND Pipeline    
+
+> independently time-scrunched bands — one SND tree per band
+> Scrunch SND Tree Boxcar MF CCL mode A / B / C — same for all bands
+
+S = 1   
+
+> Δtₜ=Δt
+
+SND Tree 
+
+> C clusters, B-ary levels
+
+Boxcar MF 
+
+> DM-scaled
+
+CCL   
+
+> S/N ≥Θ
+
+# ⋮
+
+S = S ₖ 
+
+> Δtₜ= S ₖ·Δt
+
+SND Tree 
+
+> C clusters, B-ary levels
+
+Boxcar MF 
+
+> DM-scaled
+
+CCL   
+
+> S/N ≥Θ
+
+# ⋮
+
+S = S ₙ 
+
+> Δtₜ= S ₙ·Δt
+
+SND Tree 
+
+> C clusters, B-ary levels
+
+Boxcar MF 
+
+> DM-scaled
+
+CCL   
+
+> S/N ≥Θ
+
+Candidate Merge 
+
+> |ΔDM|, | Δt| cluster
+
+Cand. List     
+
+> .cand format
+> SND history-buffer bit-width (tree activation mode — same for all bands):
+> Mode A (binary) — 1 bit / entry Mode B (graded) — 8 bits / entry Mode C (float) — 32 bits / entry
+> Band colour indicates scrunch factor S (low DM →high DM). Mode is a pipeline-wide setting, not per-band.
+
+Fig. 1 Full architecture of the neuromorphic FRB detection pipeline. Raw filterbank chunks are normalised and thresholded by per-channel delta encoders to produce a binary spike raster. The raster enters the SND hierarchical tree, which produces a DM-time output plane for each scrunch band in the multi-rate variant. A DM-scaled boxcar matched filter converts each DM-time row into a per-cell S/N, and connected-component labelling on the thresholded S/N plane extracts candidate events. History-buffer bit-widths differ by mode: 1 bit (Mode A, binary), 8 bits (Mode B, graded), 32 bits (Mode C, float). 
+
+is comparable to or larger than the native sample interval, so a pulse of intrinsic width 
+
+Wms spans only WS = Wms /(S · ∆t) scrunched samples at scrunch factor S. Running each DM band at a time resolution matched to τsmear ensures that narrow pulses span at least one scrunched sample, preserving the cascade sensitivity at every DM. A sec-ondary benefit is memory reduction: scrunching by S reduces the ring-buffer depth at each tree level by the same factor, so the high-DM bands that would otherwise require 5Input Channels  
+
+> N₀channels, cluster size C
+
+Leaf Level L0   
+
+> one neuron per unique delay pattern
+> (N_DM trials →n_pat unique patterns)
+
+Level 1 L1   
+
+> B inputs / node
+> Cluster 1
+> ch ₁
+> ch ₂
+> ⋮
+> ch C
+
+⋮        
+
+> Clusters 2 … N ₀/C
+> N₀/C clusters total
+> δ1(d)
+> δ2(d)
+> δC(d)
+> n1
+> n2
+
+⋮⋮
+
+> …
+> δ(d)
+> ×B
+> inputs
+
+L1 
+
+> node
+
+⋮
+
+> …
+> N₀/(C·B) nodes
+> δ(d)
+> ×B
+> inputs
+
+Level 2 L2 
+
+> B inputs / node
+
+Root L ₘ 
+
+> B₀inputs
+
+DM-time Output  
+
+> N_DM × n ₜplane
+
+L2 
+
+> node
+
+⋮
+
+> …
+> N₀/(C·B²) nodes
+> δ(d)
+> ×B ₀
+> (root fan-in)
+
+Root 
+
+> Lₘ
+> True DM time (samples) DM trial
+> N_DM × n ₜ
+
+Fig. 2 Architecture of the SND dedispersion tree for a single scrunch band. Channels are grouped into leaf clusters of size C; each cluster node accumulates its C channel inputs after applying per-synapse delays that implement the intra-cluster dispersive shift. Because neighbouring trial DMs share the same integer-delay configuration within a narrow channel span, the number of unique leaf neurons per cluster is much smaller than NDM . Above the leaf level, a B-ary tree combines cluster outputs with per-synapse delays that implement the inter-cluster dispersive shift. History buffers (ring buffers) at each level store the delay-line state. 
+
+very deep buffers are kept within a manageable envelope. In binary mode (Mode A), the 4.6 MB total history buffer fits within the 19 MB on-chip SRAM of a single SpiN-Naker 2 chip; graded (36.3 MB) and float (145 MB) modes exceed this limit and require external DRAM. 
+
+## 2.2 Spike encoding statistics and cascade noise analysis 
+
+The sensitivity and false-positive rate of the pipeline depend on the encoder threshold 
+
+θ and the tree activation mode. All three modes use a delta encoder, in which each channel is z-score normalised and thresholded. The modes differ only in how the SND 6tree accumulates the resulting spike values: 1-bit quorum (Mode A), 8-bit capped unsigned integer (Mode B), or float32 (Mode C). For Gaussian-normalised inputs the per-channel fire probability under the delta encoder is 
+
+p(θ) = 12 erfc  θ/ √2. (1) At the binary and float mode operating threshold θ = 1 .5σ, this yields p = 6 .68 × 10 −2
+
+theoretically and 7 .78 × 10 −2 measured on Northern Cross data. Raw filterbank power follows a chi-squared distribution with a heavy right tail; a two-pass sigma-clipping normalisation (Methods 4.4) approximately restores Gaussian statistics, recovering this value to within 1–2 percentage points. The measured rate exceeds the theoretical value at θ ≥ 1.5σ, consistent with the slightly heavier-than-Gaussian tails of the RFI-affected NC noise distribution. In binary tree mode (Mode A) two thresholds govern the cascade: the leaf threshold 
+
+KL, applied at the cluster level, and the internal threshold KI , applied at every level above. A node fires if and only if the number of simultaneously active inputs meets or exceeds its threshold. The noise fire rate propagates as 
+
+p1 = P (Bin( C, p 0) ≥ KL) ,pℓ+1 = P (Bin( B, p ℓ) ≥ KI ) , ℓ = 1 , 2, . . . (2) where p0 is the per-channel encoder fire rate. KL and KI are independent parameters: a permissive leaf threshold ( KL = 1, any one channel fires the cluster) can be com-bined with a strict internal threshold, or vice versa. The effective operating constraint is KI ≤ Broot −1 = 3: the root has Broot = 4 inputs, and KI = Broot requires all inputs to fire simultaneously. Integer-delay quantisation systematically distributes signal con-tributions across adjacent scrunched time slots, making the all-inputs-simultaneous condition unreachable even for arbitrarily bright or wide pulses; KI = Broot is there-fore excluded. Table 1 sweeps the resulting ( KL, K I ) space for the Northern Cross tree, reporting the root-level noise fire rate, the predicted worst-case matched-filter S/N, and the measured S/N at one representative operating point per multi-rate band. The matched-filter S/N in binary mode exhibits a pulse-width-dependent sensitiv-ity floor. Treating the root output as a Bernoulli variable with signal rate proot ,sig and noise rate proot ,noise , a boxcar matched filter of width W samples gives SNR A(W ) = √W proot ,sig − proot ,noise 
+
+pproot ,noise (1 − proot ,noise ) . (3) In noise-suppressing configurations ( proot ,noise ≈ 0) the denominator is small and the SNR is large; the sensitivity limit is therefore not set by noise propagation. It is set by proot ,sig < 1: for narrow pulses ( WS = 1) quantisation scatter distributes channel contributions across adjacent time slots, partially silencing the cascade regardless of signal brightness. Each cascade level requires a quorum of KI or more simultaneously active inputs. A pulse of intrinsic width Wms spans Wms /(S·∆t) scrunched samples; for narrow high-DM FRBs in high-scrunch bands this collapses to W = 1 scrunched sample. The entire 7signal must trigger the cascade in a single time slot. However, the SND tree applies integer-quantised per-channel delays, introducing rounding errors of up to ± 12 native samples per channel. For a W = 1 pulse, this scatter distributes channel contributions across two adjacent scrunched samples: some arrive one slot early, the rest one slot late. At each affected time slot, fewer inputs are simultaneously active, and if the active count falls below KI at any level the cascade produces zero output for that slot. The result is proot ,sig < 1 even for arbitrarily bright pulses, and the S/N degrades in proportion. For wider pulses ( W ≥ 2) the rounding error affects only the leading and trailing edges of the pulse window, and the intermediate samples drive the cascade reliably; 
+
+proot ,sig ≈ 1 and the full √W gain is recovered. Figure 3 shows the predicted SNR A(W )curve from equation (3) alongside the four measured S/N points for each viable (KL, K I ) configuration; the ≈20 × gap between the predicted curve and the measured 
+
+WS =1 marker for the recommended point directly visualises the cascade failure. In float and graded modes no quorum is required: every channel’s fractional con-tribution passes through at every level regardless of timing offsets, so rounding errors reduce the amplitude slightly but never silence the output entirely. The recovered S/N after DM-scaled matched filtering is therefore independent of W in these modes, as follows analytically from the absence of a quorum condition; they serve as the sensi-tivity ceiling. Figure 4 shows DM-time planes and 1-D S/N slices for all three modes at a single representative DM and width. Table 1 reports the full sweep. The configuration KL = 4, KI = 1 yields the highest measured S/N for a single bright WS = 1 pulse: with KI = 1 any single branch satisfies the quorum, so quantisation scatter cannot silence the cascade. Con-figurations ( KL, K I ) ∈ { (2 , 3) , (3 , 2) , (4 , 2) } produce zero measured S/N at all WS :the combined leaf and internal quorum is so strict that neither noise nor signal can satisfy it simultaneously, and the cascade is silenced by over-suppression rather than scatter. However, the full-population parameter sweep (Methods 4.12) selects KL = 2, 
+
+KI = 2 as the recommended operating point: requiring two-out-of-four at the leaf and two-out-of-eight at internal levels provides sufficient noise suppression for the overall false-positive budget while retaining sensitivity to the broader injection population. At the recommended KL = 2, KI = 2 point, Table 1 shows a measured pipeline S/N of 1 .9 for the single bright test pulse at DM 400. This figure characterises a single test injection at a fixed width and DM; it does not directly predict band complete-ness. In the S2 validation population (DM 289–578 pc cm −3), intrinsic pulse widths are drawn log-uniformly from [0 .5, 130] ms. At S = 2, wider pulses span many more scrunched samples—for example Wms = 16 ms gives WS = 16 /(2 × 0.138) ≈ 58 samples—and the cascade is reliably triggered over those samples. Those wider events are recovered at high completeness, driving the band total to 47 .6 %. The cascade fail-ure for WS = 1 pulses in the high-scrunch bands ( S = 8, S = 16) similarly reduces per-band completeness, while wider pulses in the same bands are recovered at close to 100 % because the multi-sample window provides simultaneous quorum candidates despite rounding. On the full injection population, binary mode reaches approximately 60 % aggregate completeness; float mode reaches 99 .3 % and graded mode 89 .3 %, reflecting the sensitivity advantage of unthresholded accumulation (graded mode 8approaches float sensitivity in the low-DM bands (S1–S4, ≳ 90 %); the larger deficit in the S8 and S16 bands reflects limited dynamic headroom where the noise baseline (≈ 232 counts) approaches the 8-bit accumulation cap of 255, reducing sensitivity to low-S/N events at DM ≳ 1157 pc cm −3).                  
+
+> Table 1 Binary threshold sweep for the Northern Cross SND pipeline. Each cell: pipeline S/N for a bright injected pulse (S/N in = 20) at one representative DM per band: DM 50 ( WS=36, S=1), DM 400 ( WS=7, S=2), DM 800 ( WS=2, S=4), DM 2000 ( WS=1, S=8). pnoise : analytic root-level noise fire rate. ˆS(W=1): predicted worst-case S/N (Eq. 3). always fires :pnoise ≥0.99; zero S/N: structural cascade failure. Bold : recommended operating point (Methods 4.12). Reference rows (graded, float): sensitivity ceilings in mode-native statistics.
+
+KL KI pnoise ˆS(W = 1) Measured pipeline S/N DM 50 DM 400 DM 800 DM 2000 1 1 1.000 — always fires 
+
+1 2 1.000 — always fires 
+
+1 3 2.4 × 10 −1 1.8 6.5 3.8 3.5 3.9 2 1 ≈ 1 — always fires 
+
+2 2 2.2 × 10 −4 67.5 5.6 1.9 3.1 3.5 
+
+2 3 < 10 −15 ∞ 0.0 0.0 0.0 0.0 3 1 2.5 × 10 −1 1.7 4.4 3.6 3.5 3.5 3 2 7.7 × 10 −15 > 10 7 0.0 0.0 0.0 0.0 3 3 < 10 −15 ∞ 0.0 0.0 0.0 0.0 4 1 5.1 × 10 −3 14.0 7.2 3.5 5.5 6.6 4 2 < 10 −15 ∞ 0.0 0.0 0.0 0.0 4 3 < 10 −15 ∞ 0.0 0.0 0.0 0.0 graded, θ = 0 .75 σ — — 4.9 3.9 3.8 3.6 float, θ = 1 .5σ — — 9.0 3.6 3.6 3.9 
+
+## 2.3 Resource mapping onto neuromorphic hardware 
+
+Table 2 gives the per-component resource budget for the Northern Cross pipeline. The dominant resource cost is the history ring-buffer, whose size depends on the tree activation mode. The entire pipeline fits on a single neuromorphic chip in terms of neuron and synapse count (144 000 neurons, 1 007 880 synapses); the SpiNNaker 2 chip capacity of ≈152 000 neurons leaves a 5 .5 % margin, but is consistent with published large-network deployments on this platform [27]. The binding constraint is therefore memory. In binary mode the 4.6 MB history buffer fits within the 19 MB on-chip SRAM of a single SpiNNaker 2 chip, enabling a fully on-chip deployment with one beam per chip. On a 48-chip SpiNNaker 2 board this translates directly to 48 simultaneous beams in binary mode without any external memory. Graded (36.3 MB) and float (145 MB) modes exceed the on-chip SRAM limit and require DRAM access for the history buffer; the resulting memory-access power dominates the total power budget for these modes (Section 2.4). 91
+
+> (DM 2000)
+> 2
+> (DM 800)
+> 7
+> (DM 400)
+> 36
+> (DM 50)
+
+Scrunched pulse width WS (samples)                                  
+
+> 0.3
+> 1
+> 3
+> 10
+> 30
+> 100
+> 300
+> Pipeline S/N  (S/N in  = 20 , = 1.5  )
+> WS= 1
+> zone
+> marginal S/N
+> S/N = 0 total cascade failure
+> Predicted S(1) W, rec. point (eq. 3)
+> (KL2, KI3) or (KL3, KI2) : S/N = 0
+> KL= 1, KI= 3
+> KL= 2, KI= 2 (rec.)
+> KL= 3, KI= 1
+> KL= 4, KI= 1
+> Graded ( = 0.75 )
+> Float ( = 1.5 )
+> cascade
+> failure
+> 20×
+> S(WS= 1) = 67.5
+
+Fig. 3 Width-dependent sensitivity floor for binary-mode SND. Dashed curve : theoretical SNR A(W )for the recommended operating point ( KL=2, KI =2, blue). Solid markers : measured pipeline S/N for a bright injection (S/N in =20) at one representative DM per scrunch band. Grey markers : cas-cade over-suppression; measured S/N is zero at all WS . For the recommended point, the theoretical prediction at WS =1 far exceeds the measured value, revealing cascade failure caused by integer-delay scatter distributing channel contributions across adjacent time slots. For KI =1 configurations (brown: KL=3; pink: KL=4), any single branch satisfies the quorum under scatter and measured S/N remains above threshold. Reference rows (graded θ=0 .75 σ, orange; float θ=1 .5σ, green) show no cascade failure. 
+
+## 2.4 Power consumption estimate 
+
+All power estimates in this section characterise the SND computation core only, exclud-ing board-level overhead, and represent the dedispersion compute stage in isolation rather than a whole-system figure. The power model (Methods 4.2) is evaluated at the recommended operating points for each mode. All SND estimates use SpiNNaker 2 energy parameters [27]. The static term, covering neuron leakage and per-timestep SRAM state access, sums to 0 .42 mW across all five bands and is identical for all tree modes. The dynamic 
+
+term depends on the mean fire rate at each level. In float mode, the root produces a non-zero output on virtually every timestep (encoder fire rate 7 .8 % per channel, root output rate 96 .9 %), giving a dynamic contribution of 4 .9 mW. In binary mode with KL=2, KI =2, the quorum thresholds suppress most noise events, reducing the measured dynamic contribution to 0 .331 mW. 10 375 400 425                         
+
+> Time (ms)
+> 196
+> 198
+> 200
+> 202
+> 204
+> DM (pc cm  3)
+> Float (= 1.5 )
+> 375 400 425
+> Time (ms)
+> 196
+> 198
+> 200
+> 202
+> 204
+> DM (pc cm  3)
+> Graded (= 0.75 , cap=255)
+> 375 400 425
+> Time (ms)
+> 196
+> 198
+> 200
+> 202
+> 204
+> DM (pc cm  3)
+> Binary (KL= 2 ,KI= 2 ,= 1.5 )
+> 375 400 425
+> Time (ms)
+> 0
+> 5
+> 10
+> 15
+> S/N
+> Peak S/N = 17.0
+> 375 400 425
+> Time (ms)
+> 0
+> 5
+> 10
+> 15
+> S/N
+> Peak S/N = 15.1
+> 375 400 425
+> Time (ms)
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> S/N
+> Peak S/N = 10.0
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> 7
+> S/N
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> S/N
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> S/N
+> tpeak = 403 ms (expected dedispersed time)
+
+Fig. 4 SND tree activation mode comparison on a synthetic bright pulse (Nf = 64, DM = 200 pc cm −3, S/N in = 25). Top : DM-time matched-filter S/N planes for float (Mode C, θ = 1 .5σ), graded (Mode B, cap 255, θ = 0 .75 σ), and binary (Mode A, KL = 2, KI = 2, θ = 1 .5σ). Bottom :1-D S/N slice at the true DM. All three modes recover a localised peak at the correct DM and time. S/N values are in mode-native statistics and are not directly comparable across modes; per-mode completeness is in Table 4. 
+
+The history-buffer term is the dominant cost in float and graded modes. Float mode requires DRAM access at a bandwidth of 19 .5 GB/s, contributing 243 mW. Graded mode requires 4 .9 GB/s, contributing 60 .8 mW. Binary mode fits entirely on-chip SRAM, reducing this term to 0 .61 mW. The history-buffer term applies equally to a Loihi 2 deployment, as it depends only on memory technology. Grand totals are: float ≈244 mW, graded ≈61 mW, and binary ≈1.75 mW (the-oretical) or ≈1.36 mW (from measured fire rates). These are algorithmic projections derived from published chip energy parameters, pending hardware validation. The full per-stage breakdown is in Supplementary Table S2, and a system-level comparison with a GPU reference is given in the Discussion. 
+
+## 2.5 Validation against the Heimdall operational reference 
+
+The validation campaign is described in Methods 4.13: 950 synthetic Northern Cross filterbanks with a total of 12,350 injected FRBs (SGB profile, DM log-uniform in [20 , 3000] pc cm −3, S/N uniform in [3 , 13]). The comparison is intended to characterise the sensitivity of the dedispersion stage; SND is run with the components needed for 11 Table 2 Resource budget and chip mapping for the Northern Cross multi-rate SND pipeline. 
+
+Upper panel : per-band breakdown; encoder neurons (1024 per band) included in total; history buffer given for all three tree modes. Lower panel : chip mapping for the total pipeline (144 000 neurons, 1 007 880 synapses, 6.05 MB synapse memory). Values from the hardware resource model.                                                                     
+
+> SDM range SND nAll nSyn. Hist. buf. (MB) (pc cm −3)Float Graded Binary 110–289 59 580 60 604 439 744 46.04 11.51 1.46 2290–578 23 231 24 255 166 576 29.84 7.46 0.94 4579–1156 23 475 24 499 168 440 30.14 7.54 0.95 81158–2311 23 562 24 586 169 144 30.29 7.58 0.96 16 2313–3002 9 032 10 056 63 976 8.98 2.24 0.29
+> Total 138 880 144 000 1 007 880 145.3 36.3 4.60
+> Chip mapping
+> Binary (Mode A) Graded (Mode B) Float (Mode C) SpiNNaker 2 Loihi 2 SpiNNaker 2 Loihi 2 Both History buffer 4.60 MB 36.3 MB 145.3 MB Total memory (hist.+syn.+state) 10.8 MB 42.8 MB 152.5 MB Fits in chip SRAM? Yes No No No No
+
+this characterisation: a delta encoder, the multi-rate SND dedispersion tree, per-band DM-scaled matched filters, candidate detection by connected-component labelling, and cross-band candidate merging. In float mode, SND detects 12,269 of 12,350 injections (99.34 %), compared to 12,270 for Heimdall (99.35 %). Among matched candidates, DM residuals have a median of +0 .017 % and an interquartile range of 0 .55 %; arrival-time residuals have a median of −0.14 ms and an interquartile range of 1 .66 ms. In graded mode, SND detects 11,022 of 12,350 injections (89.3 %). Figure 5 shows completeness as a func-tion of injected S/N, width, and DM for all three modes, and the DM recovery for matched detections. In binary mode at the recommended operating point, SND achieves a mean per-file detection completeness of 59 .4 %, compared to Heimdall’s 99 .4 %. Table 3 reports completeness by scrunch band for all three modes. Table 4 summarises the three operating points across all key metrics. The main sensitivity limitation in binary mode is per-sample encoder under-excitation: for a pulse of intrinsic width W ms, the per-sample amplitude before dedispersion scales as W −1/2. At S /N = 7 and W = 64 ms in the S1 band, the pulse spans 64 /0.138 ≈ 464 samples, giving a per-sample flux of 7 /√464 ≈ 0.33 σ—well below the 1 .5σ encoder threshold—so effectively no signal enters the tree. For bright (S /N ≥ 7), narrow ( W ≲ 8 ms) events, binary SND retains 91% of float-mode sensi-tivity. A secondary DM-dependent structure is also visible: completeness in the DM 100–289 range, the upper portion of the S1 band, falls to ∼ 35%, lower than in S2– S8. At these DMs the intra-channel dispersive smearing ( τsmear ≈ 0.5–2 .0 samples) begins to spread channel contributions across adjacent time slots even at S1 resolu-tion, reducing the coherent addition efficiency of the delta-encoded tree beyond what the cascade and encoder-floor analyses alone predict. 12 5.0 7.5 10.0 12.5 
+
+Injected S/N 
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Completeness
+
+(a) Completeness vs S/N   
+
+> Heimdall
+> SND float
+> SND graded
+> SND binary
+> 10 010 110 2
+
+Injected width (ms) 
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Completeness
+> encoder
+> floor
+
+(b) Completeness vs width  
+
+> 10 210 3
+
+Injected DM (pc cm 3)
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Completeness
+
+(c) Completeness vs DM   
+
+> 10 010 110 2
+
+Injected width (ms)                               
+
+> 4
+> 6
+> 8
+> 10
+> 12
+> Injected S/N
+> 16% 20% 23% 17% 18% 16% 13%
+> 54% 62% 59% 46% 36% 28% 31%
+> 80% 90% 93% 72% 56% 46% 34%
+> 81% 95% 99% 95% 81% 61% 43%
+> 92% 96% 99% 97% 93% 76% 55%
+
+(d) Binary: S/N × width sensitivity  
+
+> 10 210 3
+
+Injected DM (pc cm 3)
+
+> 5
+> 4
+> 3
+> 2
+> 1
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> DM / DM (%)
+
+(e) DM recovery accuracy    
+
+> float
+> graded
+> binary
+> Heimdall float graded binary
+> 10
+> 100
+> 1000
+> False positives per file
+
+(f) False-positive rate 
+
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> 1.00
+> Completeness
+
+Fig. 5 SND pipeline validation against Heimdall on 950 synthetic Northern Cross filterbanks (12,350 injected FRBs). Modes: float (Mode C), graded (Mode B), binary (Mode A). (a) Detection complete-ness vs. injected S/N for each pipeline mode and Heimdall. (b) Detection completeness vs. injected pulse width. Dashed line: binary-mode encoder floor ( ∼16 ms, S1 band). (c) Detection complete-ness vs. injected DM. Dashed lines: band boundaries. (d) Binary-mode completeness as a function of injected S/N and width. (e) DM-recovery residual (%) vs. injected DM. Shaded band: 16th–84th percentile. (f ) False-positive count per file. 
+
+Table 3 Detection completeness by scrunch band on the NC validation set across SND tree activation modes. “All S/N” includes all injected S /N ∈ [3 , 13]. Float mode matches Heimdall ( > 99% in every band) to within 0 .01 percentage points overall. Heimdall detects 
+
+> 99% in every band. 
+
+SND completeness (all S/N) Band DM range (pc cm −3) Ninj Float Graded Binary Heimdall S1 [10 , 289] 6602 99.6% 94.4% 67.5% 99.3% S2 [289 , 578] 1706 99.6% 95.3% 47.6% 99.4% S4 [578 , 1157] 1678 99.2% 90.0% 49.2% 99.4% S8 [1157 , 2313] 1757 99.1% 75.4% 55.3% 99.5% S16 [2313 , 3000] 607 97.2% 54.0% 45.5% 99.8% 
+
+Total 12,350 99.3% 89.3% 59.4% 99.4% 
+
+13 Table 4 SND pipeline operating-point summary on the NC validation set. All modes use the delta encoder; graded uses θ = 0 .75 σ, binary and float use θ = 1 .5σ; modes differ only in tree accumulation. Power is per-beam SND core estimate on SpiNNaker 2. Completeness is mean per-file fraction of injections matched. 
+
+Mode Tree accumulation Power Memory Completeness Binary 1-bit quorum ( KL=2, KI =2) 1.75 mW 4.6 MB 59.4% Graded 8-bit cap ( N =255) 61 mW 36.3 MB 89.3% Float Float32 244 mW 145 MB 99.3% Heimdall GPU reference 18,940 mW — 99.4% 
+
+The false-positive rate reflects each mode’s noise suppression. Binary SND produces a mean of 78 .6 candidates per file (median 68), comparable to Heimdall’s 77 .1 (median 69). Graded and float modes yield means of 143 .0 and 483 .8 respectively, as the absence of a quorum threshold allows more noise fluctuations to propagate through the tree. All rates are obtained with only basic RFI mitigation applied: windowed channel flagging via median absolute deviation [39] and optional zero-DM subtraction, with no learned classifier. These figures therefore represent a pipeline floor; in practice either post-processing stage would substantially reduce the graded and float false-positive counts. 
+
+# 3 Discussion 
+
+The following sections discuss the multi-rate memory architecture, the power– sensitivity trade-off, board-level deployment, timestep constraints, and future direc-tions. 
+
+## Multi-rate architecture and memory 
+
+Without time-scrunching, the history buffer for the full DM range in float mode would require 707 MB per beam, far exceeding the on-chip SRAM of any single SpiNNaker 2 or Loihi 2 chip and making on-chip deployment impossible in any mode. The multi-rate extension partitions the DM search range into bands where each band’s time resolution is matched to the intra-channel dispersive smearing at its lowest DM. This brings the float-mode history buffer down to 145 MB and the binary-mode buffer to 4.6 MB, the latter fitting entirely within the on-chip SRAM of a single SpiNNaker 2 chip. The band partition criterion (equation 8) ensures that the integer-delay quantisation error at each band boundary remains within the pulse width, so the multi-rate structure introduces no sensitivity loss. As a secondary benefit, the per-band trees in high-DM bands operate at proportionally lower clock rates, reducing dynamic power by the corresponding scrunch factor. 
+
+## Power-sensitivity trade-off across activation modes 
+
+The three tree activation modes span a continuous trade-off between memory, power, and detection completeness. Binary mode minimises both: a single-chip on-SRAM 14 deployment, an estimated 1 .75 mW per beam (theoretical), and full compatibility with 48 simultaneous beams on a single SpiNNaker 2 board. The cost is a completeness ceiling of approximately 60 % on the mixed-width injection population, driven by two complementary mechanisms. First, the WS = 1 cascade failure affects narrow pulses in the high-scrunch bands, where integer-delay scatter distributes channel contributions across adjacent time slots, preventing the quorum condition from being met. Second, the wide-pulse encoder floor affects pulses broader than approximately 16 ms in the S1 band, where the per-sample signal amplitude falls below the 1 .5σ encoder threshold regardless of the aggregate S/N. Float mode recovers full sensitivity at the cost of 145 MB DRAM history-buffer access per beam, giving an estimated 244 mW per beam. Graded mode uses the same delta encoder as binary and float, differing only in the tree accumulation: 8-bit capped integer instead of a 1-bit quorum or float32. Removing the quorum condition eliminates cascade failures, lifting overall completeness from 59 .4 % (binary) to 89 .3 % (graded) at 61 mW. The improvement is largest in the low-DM bands ( ≥ 90 % for S1–S4), where cascade failures dominated binary-mode sensitivity losses. In the high-DM bands (S8, S16), graded completeness drops to 75 % and 54 % respectively: the noise baseline (≈232 counts) approaches the 8-bit cap of 255, leaving limited headroom for low-S/N signal detection even after MAD normalisation. Wide-pulse sensitivity (encoder floor) is shared with binary mode and is unchanged. 
+
+## Board-level power and deployment 
+
+The per-beam SND power estimates (Section 2.4) characterise the SNN core compu-tation only. A realistic deployment requires accounting for the board-level baseline. The SpiNNcloud 48-chip SpiNNaker 2 board draws approximately 100 W [27], inde-pendent of neural activity. Since the full pipeline for one beam fits within the neuron and synapse budget of a single chip, and binary mode fits in one chip’s on-chip SRAM, the natural allocation is one beam per chip, giving 48 beams per board. The marginal power added by SND computation for 48 beams is ≈ 84 mW in binary mode (0 .08 % of the board baseline), ≈ 2.9 W in graded mode (2 .9 %), and 
+
+≈ 11 .7 W in float mode (11 .7 %). In all three modes the board baseline dominates. Upgrading from binary to float mode, which recovers the ≈40 % completeness gap, adds 11 .7 W above the 100 W board baseline. The raw filterbank data rate per beam is approximately 32 MB/s (at 16 bits per value), giving an aggregate input rate of ≈ 1.54 GB/s for 48 beams. This stream is ingested by a front-end processor, which performs normalisation and spike encoding before injection into the neuromorphic system. The resulting spike rate is ≈ 578 k events/s per beam, or ≈ 27 .7 M events/s for 48 beams. Although each encoded spike value can be represented using 16 bits, the transported event stream must also encode, or otherwise infer from block metadata, the event address and timing. Assuming batched transport and a compact 4–8 byte event representation, this corresponds to 
+
+≈ 2.3–4 .6 MB/s per beam, or ≈ 111–222 MB/s ( ≈ 0.89–1 .78 Gbps) for all 48 beams combined, before Ethernet/IP/UDP framing overheads. Batching many events per network packet amortises the transport overhead, but the aggregate rate remains close to, or above, the practical capacity of a single 1 GbE SpiNNaker 2 ingress link. The 15 ingress bandwidth would therefore need to be verified experimentally, or mitigated by further event compression, or applying additional upstream rate reduction. An equivalent GPU deployment for 48 beams requires an estimated 12 RTX 6000 Ada GPUs (four beams per GPU, extrapolated from the measured single-beam throughput), hosted across three four-GPU servers. The single-beam measurement gives an active-window draw of 81 W at 23 .4 % duty cycle; at four simul-taneous beams the GPU operates near full utilisation ( ≈ 93 .6 % duty cycle), drawing power approaching its TDP of approximately 300 W. With ≈ 250 W average sus-tained draw per GPU card, four GPUs per server consume approximately 1 kW in GPU power alone; including CPU, memory, networking, and power-supply overhead the realistic total per server is ≳ 1.5 kW, giving ≳ 4.5 kW for three servers. The 48-beam SpiNNaker 2 board at 100–112 W therefore suggests a potential system-level power reduction of order 10–40 × over the GPU cluster in float mode, depending on GPU occupancy, server infrastructure overhead, and the achievable beams-per-GPU operating point. These system-level estimates compare measured GPU infrastructure against projected SND board power. The per-beam SND compute figures in Section 2.4 are algorithmic projections from published chip parameters, not hardware-measured values, and represent order-of-magnitude estimates pending hardware deployment. 
+
+## Timestep constraints and deployment architecture 
+
+The 0.138 ms native sampling interval of the Northern Cross is approximately one order of magnitude shorter than the minimum simulation timestep of current neuro-morphic chips in large-scale configurations. This reflects a hardware constraint of the current chip generation rather than a fundamental barrier; future chip generations are expected to support sub-millisecond timesteps natively. In the near term, a hybrid front-end can bridge the gap. A dedicated processor—implemented on an FPGA, GPU, or host CPU—performs per-channel sigma-clipping normalisation and delta encoding at the native sample rate, then injects spike events into the neuromorphic fabric via the available board interface (e.g., the SPIF interface [40] for SpiNNaker 2). All five multi-rate bands with S ≥ 8 (DM ≳ 1157 pc cm −3) require timesteps of only ≈ 1 ms and are already compatible with current SpiNNaker 2 hardware without a dedicated front-end. Without any front-end averaging, the pipeline could instead operate on hardware-averaged data. Averaging by a factor of Shw = 8 brings the effective sample rate to 1 .1 ms; for DMs where the intra-channel dispersive smearing satisfies τsmear (d) ≥
+
+Shw · ∆t, this is consistent with the multi-rate design and introduces no additional sensitivity loss. For lower DMs ( d ≲ 1157 pc cm −3 for the Northern Cross), however, the coarser rate underresolves the dispersive smearing, degrading sensitivity to narrow FRBs. The processing chain divides naturally into three layers. A front-end processor han-dles incoming data, applies per-channel normalisation, and drives the encoder layer. The SND dedispersion tree runs entirely on-chip, producing a sparse stream of DM-time candidates at a rate orders of magnitude below the input. The matched filter and candidate detection operate on this sparse stream and can run on the embedded 16 ARM Cortex-M4F processors on the same SpiNNaker 2 board or be forwarded to a host CPU. 
+
+## Future work 
+
+We identify several directions for future work. 
+
+Encoding strategies. All three validated modes use the delta encoder, which fires on single-sample excursions above the per-mode threshold. Multi-scale within-band encoding (generating time-averaged copies at 4 × and 8 × integration within each band before the encoder) would bring sub-threshold wide pulses above the firing threshold at the cost of additional SND trees per band. Alternatively, a multi-threshold encoder (thermometer code, or separate streams at different θ values) can provide graded amplitude information within a binary firing framework. A pre-SND amplification layer—for example, a learned matched filter operating on the raw z-scored filterbank before spike conversion—could amplify signals before they enter the tree, shifting the encoder floor. 
+
+Candidate detection. Connected-component labelling on the thresholded S/N plane is a simple and robust method but may not be optimal for all pulse morphologies, particularly in the presence of structured RFI or multi-component bursts. Alternative approaches include hierarchical clustering in the (DM, time, width) space, matched-template clustering tuned to the expected dispersive signature, or a lightweight learned classifier operating directly on S/N-plane crops around candidate peaks. 
+
+Hardware validation. The power and resource estimates are derived from published chip characterisations; operational measurements on deployed neuromorphic hardware are needed to validate the projections and quantify system-level overheads, including inter-board communication, host-side preprocessing, and DRAM access patterns under realistic spike traffic. 
+
+# 4 Methods 
+
+## 4.1 Pipeline overview 
+
+The complete pipeline processes a raw filterbank stream in four sequential stages. (1) Encoding : each channel is sigma-clip normalised, z-scored and thresholded to pro-duce a binary or graded spike raster (Methods 4.4). (2) Dedispersion : the spike raster is passed through the SND tree to produce a DM-time plane (Methods 4.7). For the multi-rate pipeline, Nbands independent trees operate on time-scrunched copies of the raster in parallel (Methods 4.8). (3) Matched filtering : a DM-scaled box-car matched filter computes a per-cell S/N (Methods 4.9). (4) Candidate detection :connected-component labelling on the thresholded S/N plane extracts candidate events (Methods 4.10). All processing is performed in a streaming, chunk-by-chunk fashion. Consecutive chunks overlap by δmax + 1 samples, where δmax is the dispersive sweep at the maxi-mum trial DM; this ensures every output sample has a fully loaded delay-line history. Candidates from the overlap region of each non-first chunk are discarded to prevent duplicates. 17 4.2 Neuromorphic hardware platforms 
+
+The pipeline is mapped onto two contemporary neuromorphic platforms: SpiNNaker 2 and Loihi 2. Key specifications are summarised in Supplementary Table S3. 
+
+SpiNNaker 2 [27, 28, 41] was developed at TU Dresden and the University of Manchester. Each chip integrates 152 ARM Cortex-M4F processing elements (PEs), each with 128 KB of private SRAM, for a total of approximately 19 MB of on-chip SRAM per die. Spike communication is packet-based: each event carries a routing key and a 32-bit payload, enabling graded-value propagation through the tree. Axonal delays are supported at single-timestep resolution via the routing schedule, directly implementing the dispersive shift δc(d) without additional circuitry. Per-spike energy consumption on this process node is estimated at Espike ≈ 10 pJ [27]. The SpiNNcloud commercial board aggregates 48 chips at a board-level power of approximately 100 W, supporting approximately 7.3 million neurons per board at typical software neuron densities. 
+
+Loihi 2 [26] [42] is Intel’s second-generation neuromorphic research chip. Each chip contains 128 neuromorphic cores, each supporting up to 8192 neuron compartments, giving a total capacity of approximately 1 million neurons per chip. Per-synapse delays are configurable in integer timestep increments up to 63 timesteps; this limit applies to direct synaptic connections between adjacent tree nodes, not to the full dispersive sweep. In SND the long-range delays are implemented as ring-buffer read offsets in neuron compartment SRAM, so the 63-timestep constraint does not cap the maxi-mum processable DM. Spike messages carry a programmable integer payload of up to 32 bits; the cores are integer-only, so float-mode propagation (Mode C) on Loihi 2 requires a large-cap graded mode (Section 4.7). The chip draws approximately 1 W in typical operating configurations at a 1 ms timestep; a per-synaptic-operation energy of 
+
+≈10–12 pJ has been reported for a sensor-fusion benchmark [43], though a direct per-spike figure analogous to SpiNNaker 2’s packet-energy measurement is not available. The Hala Point system [29], deployed at Sandia National Laboratories, aggregates 1152 Loihi 2 chips within a 2.6 kW power envelope to provide more than one billion neurons. Unlike SpiNNaker 2’s single shared SRAM pool, Loihi 2 SRAM is distributed per neurocore: each of the 128 cores on a chip holds approximately 8 KB of local com-partment and synapse RAM, giving a total of roughly 1 MB per chip. No pipeline mode fits within this budget for the Northern Cross configuration, so history-buffer DRAM access is unavoidable on Loihi 2 regardless of the activation mode selected. Both platforms provide the three hardware capabilities on which the SND mapping relies. (i) Per-synapse programmable integer delays : each synaptic connection carries a delay that offsets the spike’s effective arrival time by the corresponding number of timesteps, natively realising the dispersive shift δc(d) for each channel and trial DM. (ii) Multicast routing : a single neuron’s output spike is delivered simultaneously to an arbitrary set of downstream subscribers, so each channel encoder drives all DM-trial neurons at the appropriate delay without explicit packet replication. (iii) Graded payloads : integer or floating-point partial sums are propagated between tree levels in Modes B and C, preserving accumulation precision through the full tree depth. 18 4.3 The neuromorphic dedispersion neuron 
+
+The dedispersion problem at trial DM d is to compute the channel-aligned sum 
+
+yd(t) = 
+
+> Nf
+
+X
+
+> c=1
+
+xc
+
+ t − δc(d), (4) where xc(t) is the channel-c input and δc(d) is the integer dispersive delay. In the spike-based setting, the continuous channel power xc(t) is replaced by a binary or graded spike stream produced by a channel-level encoder. Each summing operation in the algorithm is implemented as a LIF neuron whose input synapses carry programmable per-connection delays: 
+
+v(t) = X
+
+> i
+
+wi · si
+
+ t − δi
+
+, (5) with si(·) the spike train from input i and synaptic weight wi (unity for dedisper-sion). The neuron emits an output spike when v(t) crosses a configurable threshold; in graded-mode propagation the partial sum is forwarded directly without thresholding, preserving exact arithmetic. 
+
+## 4.4 Input encoding 
+
+The encoding layer converts the raw per-channel power spectrogram Pc(t) into a spike raster xc(t) before entering the SND tree. Raw filterbank power follows an approximately exponential (chi-squared) distribution. A two-pass sigma-clipping nor-malisation is applied before encoding: (1) compute initial μ0, σ 0 per channel; (2) clip 
+
+Pc to [ μ0 − 5σ0, μ 0 + 5 σ0]; (3) recompute μ, σ from the clipped values; (4) apply clipped statistics to the original data. This recovers the theoretical fire rates quoted in Section 2.2 to within ∼2–3 % on real Northern Cross data. All three pipeline modes use a delta encoder: each channel is z-score normalised and thresholded, 
+
+xc(t) = 1[zc(t) > θ ] , zc(t) = Pc(t) − μc
+
+σc
+
+. (6) For zero-mean Gaussian z, the per-sample fire probability is p(θ) = 12 erfc( θ/ √2). 
+
+## 4.5 Incoherent dedispersion 
+
+The cold-plasma dispersive delay between two channels at frequencies fi and fj (in MHz) at dispersion measure DM (in pc cm −3) is ∆tij (DM) = KDM · DM · (f −2 
+
+> i
+
+− f −2 
+
+> j
+
+), (7) with KDM ≈ 4.149 × 10 6 MHz 2 ms pc −1 cm 3 [44]. Incoherent dedispersion at trial DM 
+
+d produces the channel-aligned time series yd(t) = PNf 
+
+> c=1
+
+Pc(t + δc(d)), where Pc(t) is the power in channel c and δc(d) = ⌊∆tc,c ref (d)/∆t⌉ is the integer per-channel sample delay relative to a reference channel. A burst is detected by applying a multi-width 19 matched filter to yd(t) and thresholding the result. Trial DMs are spaced on a quasi-geometric grid following Heimdall, with adjacent trial separation set by the DM step at which the total dispersive broadening across the band remains within a tolerance factor τ of the intrinsic pulse width; we use τ = 1 .05 throughout to match the Heimdall configuration. 
+
+## 4.6 Classical dedispersion algorithms 
+
+The Taylor tree [37] operates bottom-up by recursive pair-combination of adjacent channels. After log 2 Nf levels the root produces one dedispersed time series per trial DM. Its structural constraint is that it operates on a strict binary pairing of adjacent channels, and the natively supported trial DMs are those whose integer pair-delays form a base-2 ladder; arbitrary DM grids require re-gridding at the leaves. FDMT [38] avoids the binary-pairing constraint by merging adjacent sub-bands iteratively, computing the dispersive shift across each sub-band from the f −2 scaling law. After log 2 Nf iterations the root produces one dedispersed time series per output 
+
+δ. The standard FDMT initialisation sets slab[ c, δ, t ] = Pδk=0 input[ c, t +k] (cumulative sum), acting as a matched filter for within-channel dispersive smearing in analog radio data. When applied to spike-encoded inputs, which carry no intra-channel smearing in the analog sense, this cumulative-sum step redistributes each discrete spike across multiple δ-bins, reducing peak sensitivity by approximately a factor of two relative to brute-force dedispersion. The no-smear initialisation sets slab[ c, δ, t ] = input[ c, t ] for all δ; the downstream recursion is unchanged and full sensitivity is recovered. Neither the Taylor tree nor the corrected FDMT supports fully arbitrary trial-DM grids or configurable branching factors matched to the hardware’s synapse-to-neuron ratio; these are the motivations for SND. 
+
+## 4.7 The Spiking Neural Dedispersion algorithm 
+
+The Taylor and FDMT ports establish feasibility for spike-domain dedispersion, but neither fully exploits the freedoms of the neuromorphic substrate. On a GPU, the deep memory hierarchy and the cost of irregular memory access shape the algorithm: channel pairing must be regular to enable coalesced reads, and DM grids must be struc-tured to enable shared partial-sum reuse. Neuromorphic hardware imposes neither constraint. Per-synapse programmable delays mean that any integer time alignment is equally cheap; multicast routing means that a single neuron’s output can be deliv-ered to an arbitrary set of downstream subscribers. There is therefore no architectural reason to restrict the dedispersion tree to a binary pairing of adjacent channels or to require a power-of-two DM grid. SND accepts an arbitrary trial-DM grid as input and constructs a dedispersion plan in three stages. 
+
+Leaf clusters 
+
+Channels are partitioned into contiguous clusters of size C. Within each cluster, the per-channel dispersive delay δc(d) − δc0 (d) relative to the cluster’s reference channel 
+
+c0 is computed for each trial DM d. The distinct integer-delay patterns within a 20 cluster are enumerated; each unique pattern becomes one leaf neuron, which sums the C delay-aligned channel inputs. For typical configurations the number of unique patterns per cluster is much smaller than NDM because nearby trial DMs share the same integer-delay pattern at small channel spans. 
+
+Tree levels 
+
+Above the leaves, a B-ary tree combines cluster outputs with inter-cluster delay align-ment for each trial DM. At each level, a node combines the outputs of B children spanning adjacent sub-bands; the per-child delay is the integer inter-band delay for that trial DM. The total number of internal levels is L = ⌈log B (Nf /C )⌉. Unique sub-DM patterns at each internal node are enumerated as at the leaves; each distinct pattern becomes one neuron at that node. 
+
+Tree activation modes 
+
+Three activation modes govern how each node combines its B child inputs and how the root output is normalised before the matched filter; all three use the delta encoder and differ only in tree accumulation precision (full operating points are listed in Supplementary Table S1). 
+
+• Mode A — binary (configurable per-level quorum thresholds KL, KI ): each node emits {0, 1} by thresholding its accumulated input count. History buffers require 1 bit per entry. The viable operating window and sensitivity floor are analysed in Section 2.2. 
+
+• Mode B — graded (integer accumulation, cap N , no thresholding): each node’s output is clipped to [0 , N ]. The required bit width is ⌈log 2(N + 1) ⌉ rounded to hardware-natural widths. For N = 255 (full unsigned 8-bit), history buffers require 8 bits per entry. No root normalisation; the matched filter’s per-row MAD adapts to the bounded statistics. When the encoder fire rate p is too high, the mean node output at a given level can accumulate until the cap is reached, making signal and noise indistinguishable. For the four-level Northern Cross tree, Monte Carlo simulation shows the root mean approaches saturation at N = 15 for θ ≲ 2.25 σ
+
+(Section 2.2); cap = 255 avoids this for all practical thresholds. 
+
+• Mode C — float : full float32 accumulation at every level. The root output is divided by pNf to produce per-channel-equivalent units. History buffers require 32 bits per entry. In graded-mode propagation SND is mathematically invariant under the choice of 
+
+B; DM-time planes are numerically identical for B ∈ { 2, 4, 8, 16 } on the same input. Increasing B reduces tree depth and total neuron count while increasing per-node fan-in; both SpiNNaker 2 and Loihi 2 maintain synapse-to-neuron ratios in the range 10 2–10 3, so larger B is generally preferred. 21 4.8 Multi-rate extension 
+
+The DM range is partitioned into bands ( dℓ, d ℓ+1 ) by the criterion that the scrunch factor S at the lower band edge satisfies 
+
+S · ∆t ≤ τsmear (dℓ) = KDM dℓ
+
+∆ff 3
+
+> c
+
+, (8) where ∆ f is the per-channel bandwidth and fc is the centre frequency. Concretely, 
+
+τsmear is the intra-channel dispersive smearing at the band’s lowest DM: the max-imum time broadening of a delta-function pulse within a single frequency channel. The criterion ensures that the scrunched sample interval does not exceed this natu-ral smearing width, so time-averaging by factor S removes only information that is already blurred by dispersion. Equivalently, the SND integer-delay quantisation error (±S/ 2 native samples), which scales with S, remains within the pulse width at each band boundary. For the Northern Cross (Supplementary Table S1) this criterion pro-duces five bands: S = 1 for d ≲ 289 pc cm −3, S = 2 for 289 ≲ d ≲ 578 pc cm −3,
+
+S = 4 for 578 ≲ d ≲ 1157 pc cm −3, S = 8 for 1157 ≲ d ≲ 2313 pc cm −3, and S = 16 for d ≳ 2313 pc cm −3. Each band runs an independent SND tree with an instrument descriptor using S · ∆t as its effective sample interval. After per-band candidate detection, candidates from all bands are merged by clustering in (DM, time): two candidates are merged if |∆DM | ≤ 20 pc cm −3 and 
+
+|∆t| ≤ 200 ms, retaining the highest-S/N representative. 
+
+## 4.9 Matched filtering 
+
+A DM-scaled boxcar matched filter [45] is applied to each row of the DM-time plane. The set of boxcar widths at row k is 
+
+W(dk) = Wbase ∪ { w ∈ { 16 , 32 , 64 , . . . , 1024 } : w ≤ α · τsweep (dk)/∆t} , (9) where Wbase = {1, 2, 4, 8} and α = 0 .1 compensates for accumulated integer-delay rounding in the tree. Each boxcar is evaluated in O(nt) time using a precomputed cumulative-sum array. The per-cell S/N is SNR( k, t, W ) = 
+
+Pt+W −1 
+
+> t′=t
+
+ydk (t′) − μk Wσk
+
+√W , (10) where μk and σk are estimated per row from the mean and standard deviation of valid samples. For binary and graded planes, where the natural per-row σk ∼pproot (1 − proot ) ≪ 1, a noise floor σmin = 0 .15 is applied to prevent isolated single-fire events from producing artificially large S/N: with this floor a single fire in a 
+
+W = 64 boxcar yields SNR ≈ 0.8, while a cluster of ∼25 fires in the same window yields SNR ≈ 21. 22 4.10 Candidate detection 
+
+Candidate events are extracted from the S/N plane by: (1) thresholding at a config-urable detection S/N Θ (default 6.0–10.0); (2) applying a binary closing operation with a 9 ×9 structuring element to bridge single-pixel gaps between adjacent peaks; (3) run-ning connected-component labelling (CCL) on the closed mask using 8-connectivity; (4) reporting one candidate per connected island, with S/N and (DM, t) taken from the peak pixel. Islands with fewer than Nmin pixels (default 10) are discarded to suppress isolated noise spikes that pass the S/N threshold in sparse binary planes. This approach differs from the standard Heimdall clustering, which groups candi-dates by proximity in the (DM, time) plane and selects the peak. The CCL approach used here is well-suited to the SND output because binary and graded planes can produce sparse, multi-pixel islands with irregular shapes; the closing operation con-solidates them before labelling. The small-island filter ( Nmin ) replaces Heimdall’s member-count threshold. The equivalence of CCL and Heimdall’s clustering on float-mode SND output is confirmed by the near-identical detection completeness of float SND (99 .3 %) and Heimdall (99 .4 %) reported in Table 4. 
+
+## 4.11 Hardware mapping and power modelling 
+
+For a pipelined SND implementation, each level-ℓ neuron must hold a ring buffer of past output values so that level-( ℓ+1) parents can read them at an integer time offset. Let dn,m denote the minimum ring-buffer depth (in scrunched samples) for node n at DM configuration m; this is the maximum shift any parent node requests from node 
+
+n, precomputed during plan construction. Input channels additionally require a spike ring buffer of depth din , the maximum intra-cluster delay across all DM configurations. The total history-buffer memory for one scrunch band is 
+
+Mband =
+
+ Nf · din · bin 
+
+8
+
+
+
++
+
+> L−1
+
+X
+
+> ℓ=0
+
+X
+
+> n
+
+X
+
+> m
+
+ dn,m · bout 
+
+8
+
+
+
+, (11) where bin = 1 bit/sample (encoder output is always binary), bout is the inter-level bit width (1 bit for Mode A, 8 bits for Mode B, 32 bits for Mode C), and the ceiling is applied per DM configuration m rather than once over the aggregate: each DM config-uration has its own ring-buffer pointer and size, so allocations cannot share padding bytes across configurations. The total across all bands is Mhist = P 
+
+> bands
+
+Mband . For the Northern Cross 5-band configuration this gives Mhist = 145 .3 MB (Mode C), 36 .3 MB (Mode B), and 4 .6 MB (Mode A). Without multi-rate scrunching the float history buffer reaches 707 MB, dominated by deep ring buffers at high DM (the dis-persive sweep at DM = 3000 spans ≈42 500 native samples); multi-rate scrunching reduces this by a factor of approximately 5 × across all modes. Per-band resource figures are tabulated in Table 2. Power estimates follow the model: 
+
+Pdyn = N · r · fS · Espike , (12) 
+
+Pstatic = N · fS · (Eleak + ESRAM ), (13) 23 Phist = Wbuf · fS · Emem , (14) where N is the number of neurons in the band, r is the mean fire rate, fS = 1 /∆tS is the scrunched sample rate, and 
+
+Wbuf = ( Nsyn + Nneu + Nenc ) max(1 , B hist /8) 2 (15) is the aggregate number of ring-buffer accesses per timestep in 16-bit word equivalents. Here Nsyn is the total number of SND synapses (each contributes one ring-buffer read 
+
+per timestep), Nneu is the number of SND neurons (each contributes one ring-buffer 
+
+write per timestep), Nenc is the number of encoder channels (one write per channel per timestep into the input spike buffer), and Bhist ∈ { 1, 8, 32 } bits is the storage width per ring-buffer value. The factor max(1 , B hist /8) /2 converts from bytes per access to 16-bit word equivalents. The aggregate ring-buffer bandwidth requirement is BW = Wbuf ×2×fS bytes/s; this must not exceed the hardware memory bus capacity. 
+
+Emem is 25 pJ per 16-bit word for LPDDR4 DRAM [46] or 0 .25 pJ/word for on-chip SRAM. All SND power estimates use SpiNNaker 2 energy parameters: Espike =10 pJ, Eleak = 0 .2 pJ/neuron/timestep, and ESRAM = 0 .5 pJ/neuron/timestep [27]. The history-buffer term Phist depends only on memory technology (DRAM or on-chip SRAM) and applies equally to a Loihi 2 deployment. Static and history-buffer power are purely model-derived. The static term evalu-ates to Pstatic = 0 .42 mW for all modes. The history-buffer term evaluates to 0 .61 mW (Mode A, on-chip SRAM), 60 .8 mW (Mode B, DRAM, 4 .9 GB/s), and Phist = 243 mW (Mode C, DRAM, 19 .5 GB/s bandwidth). Both DRAM modes are within the SpiN-Naker 2 LPDDR4 bandwidth limit of 25 .6 GB/s [27]. The dynamic term Pdyn depends on per-level mean fire rates measured from the validation data; these values are reported in Section 2.4. The GPU reference power is measured from Heimdall running on an RTX 6000 Ada GPU, averaged over 30 Northern Cross filterbanks (130 s each). With a mean active-window draw of 81 .0 ± 2.2 W and a duty cycle of 23 .4 %, the duty-cycle-adjusted real-time power is 18 .94 W. This figure covers the full active-window draw of a pro-duction GPU system; the SND estimates above cover only the SNN computation core, excluding board-level overhead. The power comparison is therefore between the dedispersion compute stages of each system, not between complete backends. 
+
+## 4.12 Operating-point selection 
+
+The parameter sweep is conducted on a single representative Northern Cross filter-bank (13 injections with fixed parameters spanning the expected FRB population). The recommended operating point is subsequently validated on the full 950-filterbank dataset (Section 4.13). The binary-mode parameter space has five degrees of free-dom: encoder threshold θ, leaf threshold KL, internal threshold KI , detection S/N threshold Θ, and matched-filter noise floor σmin (Section 4.9). For the Northern Cross configuration, the sweep covers five values of θ ∈ { 0.75 , 1.0, 1.25 , 1.5, 2.0} σ (encoder thresholds ≥ 2.5σ produce negligible sensitivity in binary mode on NC data and are 24 excluded), eight ( KL, K I ) pairs drawn from the viable operating window (Table 1) (KL ∈ { 1, 2, 3, 4}, KI ∈ { 1, 2}; KI ≥ 3 produces zero completeness across all injec-tion configurations and is excluded), five detection thresholds Θ ∈ { 6, 7, 8, 9, 10 }, and four noise-floor values σmin ∈ { 0, 0.1, 0.15 , 0.2}, for a total of 800 binary-mode param-eter combinations. Graded and float modes add a further 25 combinations each (no noise-floor dimension; σmin is not applied to non-binary planes). The DM-time output plane is determined solely by ( θ, K L, K I ); varying Θ or σmin 
+
+affects only the downstream matched-filter and candidate-detection stages. The sweep is therefore organised as a two-stage procedure: a single encode-plus-SND run for each (θ, K L, K I ) triple, followed by replaying the matched filter and candidate detection over the cached DM-time planes for all (Θ , σ min ) combinations. Each result row records aggregate completeness and false-positive-per-injection count together with per-band completeness {CS1 , C S2 , C S4 , C S8 , C S16 }: the fraction of injected events whose DM falls within each scrunch band that are matched to a detected candidate. The per-band breakdown is essential because the cascade failure mechanism (Section 2.2) affects high-S bands selectively; a configuration with high aggregate completeness may still produce zero completeness at S = 8 or S = 16. The recommended operating point is selected by maximising aggregate completeness subject to a false-positive budget, with the additional constraint that per-band com-pleteness must be non-zero for all five bands. Graded and float operating points are selected by the same criterion with no noise-floor sweep. 
+
+## 4.13 Validation methodology 
+
+Synthetic filterbanks are constructed from 30 real Northern Cross observation sessions, each contributing approximately 30–35 filterbank files of 130 s duration, for a total of 950 filterbanks. Thirteen FRBs are injected at random times within each filterbank (minimum separation 5 s to prevent overlap), yielding 12,350 injections in total. Each injection uses the scattered Gaussian burst (SGB) profile with a single spectral com-ponent, no spectral index modulation, and no sub-pulse drift. Injection parameters are drawn independently: DM log-uniformly from [20 , 3000] pc cm −3; intrinsic width log-uniformly from [0 .5, 130] ms; and peak S/N uniformly from [3 , 13] in Heimdall matched-filter units. SND operating points depend on the tree activation mode and are listed in Supple-mentary Table S1 in brief, binary and float modes use the delta encoder at θ = 1 .5σ
+
+with detection threshold Θ = 7; binary mode additionally applies quorum thresh-olds KL = 2, KI = 2 with σmin = 0 .20; graded mode uses the delta encoder at 
+
+θ = 0 .75 σ with cap N = 255 and KL = KI = 0. Heimdall is run with minimum DM = 10 pc cm −3, maximum DM = 3000 pc cm −3, and DM tolerance τ = 1 .05 to match the SND trial-DM grid. Candidates from each pipeline are matched to injec-tions by greedy one-to-one assignment in descending S/N order, accepting a match if |∆DM | ≤ 10 pc cm −3 and |∆t| ≤ 0.5 Weff , where Weff is the effective pulse width at the injection DM. Detection completeness is computed as the fraction of injections matched by at least one candidate. 25 Acknowledgments. The Northern Cross filterbank dataset used for validation was acquired and provided by Andrea Geminardi (IUSS Pavia; University of Trento; INAF, Osservatorio Astronomico di Cagliari). The author thanks the Northern Cross team at the Medicina Radio Observatory for access to the observing infrastructure. 
+
+# Declarations 
+
+Author contributions. A.M. conceived and developed the Spiking Neural Dedis-persion algorithm and multi-rate pipeline, designed and implemented the hardware resource model and power estimation framework, performed all numerical experiments, generated all figures, and wrote the manuscript in its entirety. The Northern Cross fil-terbank dataset used for validation was generated by A.G. (Andrea Geminardi, IUSS Pavia; University of Trento; INAF, Osservatorio Astronomico di Cagliari). 
+
+Availability of data and materials. The data supporting the findings of this study are available from the corresponding author upon reasonable request. The SND pipeline software is publicly available at https://github.com/lessju/NeuroFRB. 
+
+Competing interests. The author declares no competing interests. 
+
+Funding. Not applicable. 
+
+# References 
+
+[1] Lorimer, D.R., Bailes, M., McLaughlin, M.A., Narkevic, D.J., Craw-ford, F.: A bright millisecond radio burst of extragalactic origin. Science 318 (5851), 777–780 (2007) https://doi.org/10.1126/science.1147532 https://www.science.org/doi/pdf/10.1126/science.1147532 [2] Petroff, E., Hessels, J.W.T., Lorimer, D.R.: Fast radio bursts. The Astronomy and Astrophysics Review 27 (1), 4 (2019) https://doi.org/10.1007/s00159-019-0116-6 [3] Petroff, E., Hessels, J.W.T., Lorimer, D.R.: Fast radio bursts at the dawn of the 2020s. The Astronomy and Astrophysics Review 30 (1), 2 (2022) https://doi.org/ 10.1007/s00159-022-00139-w [4] Cordes, J.M., Chatterjee, S.: Fast radio bursts: An extragalactic enigma. Annual Review of Astronomy and Astrophysics 57 , 417–465 (2019) https://doi.org/10. 1146/annurev-astro-091918-104501 [5] Collaboration, T.C., Amiri, M., Andersen, B.C., Bandura, K., Berger, S., Bhard-waj, M., Boyce, M.M., Boyle, P.J., Brar, C., Breitman, D., Cassanelli, T., Chawla, P., Chen, T., Cliche, J.-F., Cook, A., Cubranic, D., Curtin, A.P., Deng, M., Dobbs, M., (Adam) Dong, F., Eadie, G., Fandino, M., Fonseca, E., Gaensler, B.M., Giri, U., Good, D.C., Halpern, M., Hill, A.S., Hinshaw, G., Josephy, A., Kaczmarek, J.F., Kader, Z., Kania, J.W., Kaspi, V.M., Landecker, T.L., Lang, D., Leung, C., Li, D., Lin, H.-H., Masui, K.W., Mckinven, R., Mena-Parra, J., Merryfield, M., Meyers, B.W., Michilli, D., Milutinovic, N., Mirhosseini, A., 26 M¨ unchmeyer, M., Naidu, A., Newburgh, L., Ng, C., Patel, C., Pen, U.-L., Petroff, E., Pinsonneault-Marotte, T., Pleunis, Z., Rafiei-Ravandi, M., Rahman, M., Ran-som, S.M., Renard, A., Sanghavi, P., Scholz, P., Shaw, J.R., Shin, K., Siegel, S.R., Sikora, A.E., Singh, S., Smith, K.M., Stairs, I., Tan, C.M., Tendulkar, S.P., Van-derlinde, K., Wang, H., Wulf, D., Zwaniga, A.V.: The first chime/frb fast radio burst catalog. The Astrophysical Journal Supplement Series 257 (2), 59 (2021) https://doi.org/10.3847/1538-4365/ac33ab [6] Heintz, K.E., Prochaska, J.X., Simha, S., Platts, E., Fong, W.-f., Tejos, N., Ryder, S.D., Aggerwal, K., Bhandari, S., Day, C.K., Deller, A.T., Kilpatrick, C.D., Law, C.J., Macquart, J.-P., Mannings, A., Marnoch, L.J., Sadler, E.M., Shannon, R.M.: Host galaxy properties and offset distributions of fast radio bursts: Implications for their progenitors. The Astrophysical Journal 903 (2), 152 (2020) https://doi. org/10.3847/1538-4357/abb6fb [7] Andersen, B.C., Bandura, K.M., Bhardwaj, M., Bij, A., Boyce, M.M., Boyle, P.J., Brar, C., Cassanelli, T., Chawla, P., Chen, T., Cliche, J.-F., Cook, A., Cubranic, D., Curtin, A.P., Denman, N.T., Dobbs, M., Dong, F.Q., Fandino, M., Fonseca, E., Gaensler, B.M., Giri, U., Good, D.C., Halpern, M., Hill, A.S., Hinshaw, G.F., H¨ ofer, C., Josephy, A., Kania, J.W., Kaspi, V.M., Landecker, T.L., Leung, C., Li, D.Z., Lin, H.-H., Masui, K.W., McKinven, R., Mena-Parra, J., Merryfield, M., Meyers, B.W., Michilli, D., Milutinovic, N., Mirhosseini, A., M¨ unchmeyer, M., Naidu, A., Newburgh, L.B., Ng, C., Patel, C., Pen, U.-L., Pinsonneault-Marotte, T., Pleunis, Z., Quine, B.M., Rafiei-Ravandi, M., Rahman, M., Ransom, S.M., Renard, A., Sanghavi, P., Scholz, P., Shaw, J.R., Shin, K., Siegel, S.R., Singh, S., Smegal, R.J., Smith, K.M., Stairs, I.H., Tan, C.M., Tendulkar, S.P., Tretyakov, I., Vanderlinde, K., Wang, H., Wulf, D., Zwaniga, A.V., Collaboration, T.C.: A bright millisecond-duration radio burst from a galactic magnetar. Nature 
+
+587 (7832), 54–58 (2020) [8] Bochenek, C.D., Ravi, V., Belov, K.V., Hallinan, G., Kocz, J., Kulkarni, S.R., McKenna, D.L.: A fast radio burst associated with a galactic magnetar. Nature 
+
+587 (7832), 59–62 (2020) https://doi.org/10.1038/s41586-020-2872-x [9] Macquart, J.-P., Prochaska, J.X., McQuinn, M., Bannister, K.W., Bhandari, S., Day, C.K., Deller, A.T., Ekers, R.D., James, C.W., Marnoch, L., Oslowski, S., Phillips, C., Ryder, S.D., Scott, D.R., Shannon, R.M., Tejos, N.: A census of baryons in the universe from localized fast radio bursts. Nature 581 (7809), 391– 395 (2020) https://doi.org/10.1038/s41586-020-2300-2 [10] James, C.W., Prochaska, J.X., Macquart, J.-P., North-Hickey, F.O., Bannis-ter, K.W., Dunning, A.: The z–dm distribution of fast radio bursts. Monthly Notices of the Royal Astronomical Society 509 (4), 4775–4802 (2022) https: //doi.org/10.1093/mnras/stab3051 https://academic.oup.com/mnras/article-pdf/509/4/4775/41695367/stab3051.pdf 27 [11] Hagstotz, S., Reischke, R., Lilow, R.: A new measurement of the Hubble con-stant using fast radio bursts. Monthly Notices of the Royal Astronomical Society 
+
+511 (1), 662–667 (2022) https://doi.org/10.1093/mnras/stac077 [12] Hessels, J.W.T., Spitler, L.G., Seymour, A.D., Cordes, J.M., Michilli, D., Lynch, R.S., Gourdji, K., Archibald, A.M., Bassa, C.G., Bower, G.C., Chatterjee, S., Connor, L., Crawford, F., Deneva, J.S., Gajjar, V., Kaspi, V.M., Keimpema, A., Law, C.J., Marcote, B., McLaughlin, M.A., Paragi, Z., Petroff, E., Ransom, S.M., Scholz, P., Stappers, B.W., Tendulkar, S.P.: Frb 121102 bursts show complex time–frequency structure. The Astrophysical Journal Letters 876 (2), 23 (2019) https://doi.org/10.3847/2041-8213/ab13ae [13] Nimmo, K., Hessels, J.W.T., Kirsten, F., Keimpema, A., Cordes, J.M., Snelders, M.P., Hewitt, D.M., Karuppusamy, R., Archibald, A.M., Bezrukovs, V., Bhard-waj, M., Blaauw, R., Buttaccio, S.T., Cassanelli, T., Conway, J.E., Corongiu, A., Feiler, R., Fonseca, E., Forss´ en, O., Gawro´ nski, M., Giroletti, M., Kharinov, M.A., Leung, C., Lindqvist, M., Maccaferri, G., Marcote, B., Masui, K.W., McKinven, R., Melnikov, A., Michilli, D., Mikhailov, A.G., Ng, C., Orbidans, A., Ould-Boukattine, O.S., Paragi, Z., Pearlman, A.B., Petroff, E., Rahman, M., Scholz, P., Shin, K., Smith, K.M., Stairs, I.H., Surcis, G., Tendulkar, S.P., Vlemmings, W., Wang, N., Yang, J., Yuan, J.P.: Burst timescales and luminosities as links between young pulsars and fast radio bursts. Nature Astronomy 6(3), 393–401 (2022) https://doi.org/10.1038/s41550-021-01569-9 [14] Collaboration, T.C., Amiri, M., Bandura, K., Berger, P., Bhardwaj, M., Boyce, M.M., Boyle, P.J., Brar, C., Burhanpurkar, M., Chawla, P., Chowdhury, J., Cliche, J.-F., Cranmer, M.D., Cubranic, D., Deng, M., Denman, N., Dobbs, M., Fandino, M., Fonseca, E., Gaensler, B.M., Giri, U., Gilbert, A.J., Good, D.C., Guliani, S., Halpern, M., Hinshaw, G., H¨ ofer, C., Josephy, A., Kaspi, V.M., Landecker, T.L., Lang, D., Liao, H., Masui, K.W., Mena-Parra, J., Naidu, A., Newburgh, L.B., Ng, C., Patel, C., Pen, U.-L., Pinsonneault-Marotte, T., Pleunis, Z., Ravandi, M.R., Ransom, S.M., Renard, A., Scholz, P., Sigurdson, K., Siegel, S.R., Smith, K.M., Stairs, I.H., Tendulkar, S.P., Vanderlinde, K., Wiebe, D.V.: The chime fast radio burst project: System overview. The Astrophysical Journal 863 (1), 48 (2018) https://doi.org/10.3847/1538-4357/aad188 [15] Vanderlinde, K., Liu, A., Gaensler, B., Bond, D., Hinshaw, G., Ng, C., Chiang, C., Stairs, I., Brown, J.-A., Sievers, J., Mena, J., Smith, K., Bandura, K., Masui, K., Spekkens, K., Belostotski, L., Dobbs, M., Turok, N., Boyle, P., Rupen, M., Landecker, T., Pen, U.-L., Kaspi, V.: The Canadian Hydrogen Observatory and Radio-transient Detector (CHORD). White paper, Canadian Long Range Plan for Astronomy and Astrophysics White Papers (oct 2019). https://doi.org/10.5281/ zenodo.3765414 . White paper identifier W028. https://doi.org/10.5281/zenodo. 3765414 [16] Lin, H.-H., Lin, K.-y., Li, C.-T., Tseng, Y.-H., Jiang, H., Wang, J.-H., Cheng, 28 J.-C., Pen, U.-L., Chen, M.-T., Chen, P., Chen, Y., Goto, T., Hashimoto, T., Hwang, Y.-J., King, S.-K., Kubo, D., Kuo, C.-Y., Mills, A., Nam, J., Oshiro, P., Shen, C.-S., Tseng, H.-C., Wang, S.-H., Wu, V.F.-S., Bower, G., Chang, S.-H., Chen, P.-A., Chen, Y.-C., Chiang, Y.-K., Fedynitch, A., Gusinskaia, N., Ho, S.C.-C., Hsiao, T.Y.-Y., Hu, C.-P., Huang, Y.D., J´ auregui Garc´ ıa, J.M., Kim, S.J., Kuo, C.-Y., Ling, D.F.-J., On, A.Y.L., Peterson, J.B., R. Raquel, B.J., Su, S.-C., Uno, Y., Wu, C.K.-W., Yamasaki, S., Zhu, H.-M.: Burstt: Bustling universe radio survey telescope in taiwan. Publications of the Astronomical Society of the Pacific 134 (1039), 094106 (2022) https://doi.org/10.1088/1538-3873/ac8f71 [17] Hallinan, G., Ravi, V., Weinreb, S., Kulkarni, S., Kocz, J., McKenna, D., Belov, K., Hallinan, G., Ravi, V.: The DSA-2000 – A Radio Survey Camera (2019). https://doi.org/10.48550/arXiv.1907.07648 . https://arxiv.org/abs/1907.07648 [18] Braun, R., Bourke, T.L., Green, J.A., Keane, E., Wagg, J.: Advancing astro-physics with the square kilometre array. In: Proceedings of Advancing Astro-physics with the Square Kilometre Array. PoS(AASKA14), p. 174. SISSA Medialab, Trieste, Italy (2015). https://doi.org/10.22323/1.215.0174 . https:// pos.sissa.it/215/174 [19] Sanidas, S., Caleb, M., Driessen, L., Morello, V., Rajwade, K., Stappers, B.W.: Meertrap: A pulsar and fast transients survey with meerkat. Proceedings of the International Astronomical Union 13 (S337), 406–407 (2017) https://doi.org/10. 1017/S1743921317009310 [20] Wang, Z., Bannister, K.W., Gupta, V., Deng, X., Pilawa, M., Tuthill, J., Bun-ton, J.D., Flynn, C., Glowacki, M., Jaini, A., al.: The craft coherent (craco) upgrade i: System description and results of the 110-ms radio transient pilot survey. Publications of the Astronomical Society of Australia 42 , 005 (2025) https://doi.org/10.1017/pasa.2024.107 [21] Pritchard, N.J., Wicenec, A., Dodson, R., Bennamoun, M., Muir, D.R.: Neuro-morphic Astronomy: An End-to-End SNN Pipeline for RFI Detection Hardware (2025). https://arxiv.org/abs/2511.16060 [22] Naldi, G., Mattana, A., Pastore, S., Alderighi, M., Zarb Adami, K., Schillir` o, F., Aminaei, A., Baker, J., Belli, C., Comoretto, G., Chiarucci, S., Chiello, R., D’Angelo, S., Dalle Mura, G., De Marco, A., Halsall, R., Magro, A., Monari, J., Roberts, M., Perini, F., Poloni, M., Pupillo, G., Rusticelli, S., Schiaffino, M., Zaccaro, E.: The digital signal processing platform for the low frequency aperture array: Preliminary results on the data acquisition unit. Journal of Astronomical Instrumentation 06 (01), 1641014 (2017) https://doi.org/10.1142/ S2251171716410142 [23] Pelliciari, D., Bernardi, G., Pilia, M., Naldi, G., Maccaferri, G., Verrecchia, F., Casentini, C., Perri, M., Kirsten, F., Bianchi, G., Bortolotti, C., Bruno, L., Dal-lacasa, D., Esposito, P., Geminardi, A., Giarratana, S., Giroletti, M., Lulli, R., 29 Maccaferri, A., Magro, A., Mattana, A., Perini, F., Pupillo, G., Roma, M., Schi-affino, M., Setti, G., Tavani, M., Trudu, M., Zanichelli, A.: The northern cross fast radio burst project - iv. multi-wavelength study of the actively repeating frb 20220912a. A&A 690 , 219 (2024) https://doi.org/10.1051/0004-6361/202450271 [24] Naldi, G., Magro, A., Fiori, F., Mattana, A., Perini, F., Ragno, N., Schiaffino, M., Camilleri, H., De Barro, A., Bugeja, K., Beduzzi, L., Bernardi, G., Bianchi, G., Bruno, L., De Luca, M.A., Lizia, P.D., Fiorentini, M., Geminardi, A., Massari, M., Montaruli, M.F., Orlati, A., Pelliciari, D., Pilia, M., Poli, A., Trudu, M.: The design of a new digital signal processing system for the upgraded northern cross radio telescope. In: 2025 URSI Asia-Pacific Radio Science Meeting (AP-RASC), pp. 1–4 (2025). https://doi.org/10.46620/URSIAPRASC25/ORKX6710 [25] Davies, M., Srinivasa, N., Lin, T.-H., Chinya, G., Cao, Y., Choday, S.H., Dimou, G., Joshi, P., Imam, N., Jain, S., Liao, Y., Lin, C.-K., Lines, A., Liu, R., Math-aikutty, D., McCoy, S., Paul, A., Tse, J., Venkataramanan, G., Weng, Y.-H., Wild, A., Yang, Y., Wang, H.: Loihi: A neuromorphic manycore processor with on-chip learning. IEEE Micro 38 (1), 82–99 (2018) https://doi.org/10.1109/MM. 2018.112130359 [26] Davies, M., Wild, A., Orchard, G., Sandamirskaya, Y., Guerra, G.A.F., Joshi, P., Plank, P., Risbud, S.R.: Advancing neuromorphic computing with loihi: A survey of results and outlook. Proceedings of the IEEE 109 (5), 911–934 (2021) https://doi.org/10.1109/JPROC.2021.3067593 [27] H¨ oppner, S., Yan, Y., Dixius, A., Scholze, S., Partzsch, J., Stolba, M., Kelber, F., Vogginger, B., Neum¨ arker, F., Ellguth, G., Hartmann, S., Schiefer, S., Hocker, T., Walter, D., Liu, G., Garside, J., Furber, S., Mayr, C.: The SpiNNaker 2 Pro-cessing Element Architecture for Hybrid Digital Neuromorphic Computing. arXiv preprint; last revised August 2022. Published PE-architecture characterisation for SpiNNaker 2 (22 nm FD-SOI); source for Espike , LPDDR4 bandwidth, and on-chip SRAM figures used in this work. (2022). https://arxiv.org/abs/2103.08392 [28] Gonzalez, H.A., Huang, J., Kelber, F., Nazeer, K.K., Langer, T., Liu, C., Lohrmann, M., Rostami, A., Sch¨ one, M., Vogginger, B., Wunderlich, T.C., Yan, Y., Akl, M., Mayr, C.: SpiNNaker2: A Large-Scale Neuromorphic System for Event-Based and Asynchronous Machine Learning. Workshop on Machine Learn-ing with New Compute Paradigms, NeurIPS 2023. System-level overview of the deployed SpiNNaker2 platform. (2024). https://arxiv.org/abs/2401.04491 [29] Intel Corporation: Hala Point: Large-Scale Neuromorphic Sys-tem. Intel Newsroom Technical Announcement. Accessed: 2026-05-14 (2024). https://newsroom.intel.com/artificial-intelligence/ intel-builds-worlds-largest-neuromorphic-system-to-enable-more-sustainable-ai/ [30] Pritchard, N.J., Wicenec, A., Bennamoun, M., Dodson, R.: Spiking neural 30 networks for radio frequency interference detection in radio astronomy. Commu-nications Physics 8(1), 517 (2025) https://doi.org/10.1038/s42005-025-02420-7 [31] Pritchard, N.J., Dodson, R., Wicenec, A.: The Potential Impact of Neuromor-phic Computing on Radio Telescope Observatories (2026). https://arxiv.org/abs/ 2601.07130 [32] Tingay, S.J., Goeke, R., Bowman, J.D., Emrich, D., Ord, S.M., Mitchell, D.A., Morales, M.F., Booler, T., Crosse, B., Wayth, R.B., Lonsdale, C.J., Trem-blay, S.E., Pallot, D., Colegate, T., Wicenec, A., Kudryavtseva, N., et al. : The murchison widefield array: The square kilometre array precursor at low radio fre-quencies. Publications of the Astronomical Society of Australia 30 , 007 (2013) https://doi.org/10.1017/pasa.2012.007 [33] Selina, R.J., Murphy, E.J., McKinnon, M., Beasley, A., Butler, B., Carilli, C., Clark, B., Erickson, A., Grammer, W., Jackson, J., Kent, B., Mason, B., Morgan, M., Ojeda, O., Shillue, W., Sturgis, S., Urbain, D.: The next generation very large array: A technical overview. arXiv e-prints (2018) arXiv:1806.08405 [astro-ph.IM] [34] Hotan, A.W., Bunton, J.D., Chippendale, A.P., Whiting, M., Tuthill, J., Moss, V.A., McConnell, D., Amy, S.W., Huynh, M.T., Allison, J.R., Anderson, C.S., Bannister, K.W., Bastholm, E., Beresford, R., Bock, D.C.-J., Bolton, R., Chap-man, J.M., Chow, K., Collier, J.D., Cooray, F.R., Cornwell, T.J., Diamond, P.J., Edwards, P.G., Feain, I.J., Franzen, T.M.O., George, D., Gupta, N., Hampson, G.A., Harvey-Smith, L., Hayman, D.B., Heywood, I., Jacka, C., Jackson, C.A., Jackson, S., Jeganathan, K., Johnston, S., Kesteven, M., Kleiner, D., Koribal-ski, B.S., Lee-Waddell, K., Lenc, E., Lensson, E.S., Mackay, S., Mahony, E.K., McClure-Griffiths, N.M., McConigley, R., Mirtschin, P., Ng, A.K., Norris, R.P., Pearce, S.E., Phillips, C., Pilawa, M.A., Raja, W., Reynolds, J.E., Roberts, P., Roxby, D.N., Sadler, E.M., Shields, M., Schinckel, A.E.T., Serra, P., Shaw, R.D., Sweetnam, T., Troup, E.R., Tzioumis, A., Voronkov, M.A., Westmeier, T.: Aus-tralian square kilometre array pathfinder: I. system description. Publications of the Astronomical Society of Australia 38 , 009 (2021) https://doi.org/10.1017/ pasa.2021.1 [35] Lopez-Randulfe, J., Reeb, N., Karimi, N., Liu, C., Gonzalez, H.A., Dietrich, R., Vogginger, B., Mayr, C., Knoll, A.: Time-coded spiking fourier transform in neu-romorphic hardware. IEEE Transactions on Computers 71 (11), 2792–2802 (2022) https://doi.org/10.1109/tc.2022.3162708 [36] Aimone, J.B., Ho, Y., Parekh, O., Phillips, C.A., Pinar, A., Severa, W., Wang, Y.: Provable advantages for graph algorithms in spiking neural networks. In: Proceedings of the 33rd ACM Symposium on Parallelism in Algorithms and Architectures. SPAA ’21, pp. 35–47. Association for Computing Machinery, New York, NY, USA (2021). https://doi.org/10.1145/3409964.3461813 . https: //doi.org/10.1145/3409964.3461813 31 [37] Taylor, J.H.: A sensitive method for detecting dispersed radio emission. Astron-omy and Astrophysics Supplement Series 15 , 367–375 (1974) [38] Zackay, B., Ofek, E.O.: An accurate and efficient algorithm for detection of radio bursts with an unknown dispersion measure, for single-dish telescopes and interferometers. The Astrophysical Journal 835 (1), 11 (2017) https://doi.org/10. 3847/1538-4357/835/1/11 [39] Eatough, R.P., Keane, E.F., Lyne, A.G.: An interference removal technique for radio pulsar searches. Monthly Notices of the Royal Astronomical Society 395 (1), 410–415 (2009) https://doi.org/10.1111/j.1365-2966.2009.14524.x [40] Painkras, E., Plana, L.A., Garside, J., Temple, S., Galluppi, F., Patterson, C., Lester, D.R., Brown, A.D., Furber, S.B.: SpiNNaker: A 1-W 18-core system-on-chip for massively-parallel neural network simulation. IEEE Journal of Solid-State Circuits 48 (8), 1943–1953 (2013) https://doi.org/10.1109/JSSC.2013.2259038 . Original SpiNNaker chip paper (presented ISSCC 2012). Used here as the primary SpiNNaker architecture reference; the SPIF spike-injection peripheral is a later addition — if a SPIF-specific citation is available, replace this entry. [41] Mayr, C., Hoeppner, S., Furber, S.: SpiNNaker 2: A 10 Million Core Processor System for Brain Simulation and Machine Learning (2019). https://arxiv.org/ abs/1911.02385 [42] Intel Corporation: Taking Neuromorphic Computing to the Next Level with Loihi 2. Intel Technology Brief. Accessed: 2026-06-03. Primary hardware reference for the Loihi 2 chip: 128 neuromorphic cores, Intel 4 (7 nm EUV) process, integer-payload spike routing. (2021). https://www.intel.com/content/dam/www/ central-libraries/us/en/documents/neuromorphic-computing-loihi-2-brief.pdf [43] Isik, M., Tiwari, K., Eryilmaz, M.B., Dikmen, I.C.: Accelerating Sensor Fusion in Neuromorphic Computing: A Case Study on Loihi-2 (2024). https://arxiv.org/ abs/2408.16096 [44] Lorimer, D.R., Kramer, M.: Handbook of Pulsar Astronomy. Cambridge Observ-ing Handbooks for Research Astronomers. Cambridge University Press, Cam-bridge, UK (2004). https://ui.adsabs.harvard.edu/abs/2004hpa..book.....L [45] Cordes, J.M., McLaughlin, M.A.: Searches for fast radio transients. The Astro-physical Journal 596 (2), 1142–1154 (2003) https://doi.org/10.1086/378231 [46] JEDEC Solid State Technology Association: LPDDR4: Low Power Double Data Rate 4 SDRAM Standard (JESD209-4D). JEDEC Standard (2020). https://www. jedec.org/standards-documents/docs/jesd209-4d 32 Supplementary Information 
+
+## Towards Neuromorphic Fast Radio Burst Detection: A Spiking Neural Detection Pipeline 
+
+# Supplementary Tables 
+
+This file contains supplementary tables associated with the main manuscript. Tables are num-bered independently from the main text as Supplementary Tables S1–S3. 1Supplementary Table S1. Northern Cross instrument and SND pipeline parameters used throughout this work. 
+
+Parameter Value 
+
+Instrument 
+
+Centre frequency fc 408 MHz Bandwidth 16 MHz Number of channels Nf 1024 Per-channel bandwidth ∆ f 15.6 kHz Sampling interval ∆ t 0.138 ms 
+
+DM search 
+
+DM range [10 , 3000] pc cm −3
+
+Number of DM trials 3435 (Heimdall-spaced, τ = 1 .05) 
+
+SND tree 
+
+Cluster size C 4Branching factor B 8Root branching factor Broot 4Number of tree levels 4 (leaf + L1 + L2 + root) 
+
+Multi-rate bands 
+
+S = 1 DM ∈ [10 , 289] pc cm −3, ∆ tS = 0 .138 ms 
+
+S = 2 DM ∈ [290 , 578] pc cm −3, ∆ tS = 0 .276 ms 
+
+S = 4 DM ∈ [579 , 1156] pc cm −3, ∆ tS = 0 .552 ms 
+
+S = 8 DM ∈ [1158 , 2311] pc cm −3, ∆ tS = 1 .104 ms 
+
+S = 16 DM ∈ [2313 , 3000] pc cm −3, ∆ tS = 2 .208 ms 
+
+Operating points by mode Mode A — binary 
+
+Encoder delta, θ = 1 .5 σ
+
+Tree thresholds KL = 2, KI = 2 Noise floor σmin 0.20 Detection threshold Θ 7.0 Zero-DM threshold γzdm 5.0 
+
+Mode B — graded 
+
+Encoder delta, θ = 0 .75 σ
+
+Tree thresholds KL = 0, KI = 0 (accumulate, no quorum) Graded cap N 255 (unsigned 8-bit) Detection threshold Θ 7.0 Zero-DM threshold γzdm 5.0 
+
+Mode C — float 
+
+Encoder delta, θ = 1 .5 σ
+
+Tree thresholds KL = 0, KI = 0 (accumulate, no quorum) Detection threshold Θ 7.0 Zero-DM threshold γzdm 5.0 
+
+2Supplementary Table S2. Estimated power budget for the SND multi-rate pipeline on the Northern Cross instrument. Dynamic terms are from measured firing rates; static and history-buffer terms are modelled as described in the Methods section of the main manuscript. SND estimates use SpiNNaker 2 energy parameters ( Espike = 10 pJ, Eleak = 0 .2 pJ/neuron/timestep, 
+
+ESRAM = 0 .5 pJ/neuron/timestep); the history-buffer term applies equally to Loihi 2. Binary operating point: KL=2, KI =2. All figures are algorithmic projections from published chip energy parameters, excluding board-level baseline power; hardware validation is required. 
+
+Stage Float (mW) Graded (mW) Binary (mW) Encoder (dynamic) 0.011 0.004 0.011 SND leaf L0 (dynamic) 0.230 0.010 0.000 SND internal L1–L2 (dyn) 4.487 0.020 0.015 SND root L3 (dynamic) 0.146 0.003 0.007 Total dynamic 4.875 0.037 0.033 Leakage 0.119 0.119 0.119 State SRAM access 0.298 0.298 0.298 History buffer (DRAM/SRAM) 243 60.8 0.61 
+
+Grand total 244 61 1.75 
+
+Supplementary Table S3. Key specifications of the neuromorphic hardware platforms used for pipeline mapping in this work. The per-spike energy for Loihi 2 is taken from a sensor-fusion benchmark; no direct packet-energy equivalent to the SpiNNaker 2 measurement is available in the literature. Memory-access power estimates assume LPDDR4 DRAM at 25 pJ/16-bit word for off-chip accesses, or on-chip SRAM at 0 .25 pJ/16-bit word. 
+
+Specification SpiNNaker 2 Loihi 2 Fabrication process GF 22 nm FD-SOI Intel 4 (7 nm EUV) Neurons per chip ≈152 000 ≈1 000 000 On-chip SRAM 19 MB (shared pool) ≈1 MB ( ≈8 KB per core, distributed) External memory LPDDR4, 25.6 GB/s LPDDR4 (Oheo Gulch board) SRAM access energy ≈0.25 pJ/16-bit word ≈0.25 pJ/16-bit word DRAM access energy ≈25 pJ/16-bit word (LPDDR4) ≈25 pJ/16-bit word (LPDDR4) Minimum timestep 1 ms (typical) 1 ms (typical) Spike payload 32-bit int or float32 32-bit integer only Per-spike energy ≈10 pJ ≈10–12 pJ Max synaptic delay Routing schedule (no fixed cap) 63 timesteps SND mode C (float) ARM Cortex-M4F FPU (native) Large-cap int32 (cap = 2 31 − 1) 
+
+3

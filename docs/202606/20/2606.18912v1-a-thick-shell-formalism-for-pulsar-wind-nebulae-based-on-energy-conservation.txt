@@ -1,0 +1,1608 @@
+Title: A thick-shell formalism for pulsar wind nebulae based on energy conservation
+
+URL Source: https://arxiv.org/pdf/2606.18912v1
+
+Published Time: Thu, 18 Jun 2026 00:46:48 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+> arXiv:2606.18912v1 [astro-ph.HE] 17 Jun 2026
+
+Astronomy & Astrophysics manuscript no. article_1 ©ESO 2026 June 18, 2026 
+
+# A thick-shell formalism for pulsar wind nebulae based on energy conservation 
+
+N. Bucciantini 1, 2, 3, ⋆ and B. Olmi 1 
+
+> 1
+
+INAF, Osservatorio Astrofisico di Arcetri, Largo E. Fermi 5, I-50125 Firenze, Italy  
+
+> 2
+
+Dipartimento di Fisica e Astronomia, Università di Firenze, Largo E. Fermi 2, I-50125 Firenze, Italy  
+
+> 3
+
+INFN , Sezione di Firenze, Via G. Sansone 1, I-50019 Sesto Fiorentino (FI), Italy Received XX XX, 20XX 
+
+ABSTRACT 
+
+Context. One of the most powerful approach to model the structural and spectral evolution of wind bubbles and pulsar wind nebulae in particular is based on the so called one-zone thin-shell formalism. By solving a set of simple equations one can relate the spectral properties of these systems to the physical properties of the pulsar and supernova remnant. Due to its predictive power, this approach has been widely used both in fitting existing objects, and in population synthesis. However there are some well known inconsistencies when applied to the Crab nebula, which have never been fully accounted for, but whose implications cast serious doubts on its overall reliability. 
+
+Aims. The introduction of a new and more flexible formalism based on energy conservation that provides a way to reconcile the observed structural and spectral properties of the Crab nebula, solving the known inconsistencies, as well as to model in a more realistic and physically appropriate way the evolution of wind bubbles. 
+
+Methods. The equations of the formalism are presented and discussed in details, together with both simplified solutions, and more complex ones including radiation losses. Implications for the modeling of wind bubbles, and pulsar wind nebulae, are illustrated and discussed. Moreover, we introduce a new high-order upwind-implicit scheme for the evolution of the particle spectrum that ensures high-accuracy in energy conservation, and we include an algebraic-vectorizable approach for self-sychrotron Compton in the full Klein-Nishina regime that avoids time consuming interpolations or integrations. 
+
+Results. We reproduced the Crab nebula structural properties and spectrum, accounting for the di ff erence in the convergence age between the optical filaments and the radio bubble, removing the known inconsistencies. 
+
+Conclusions. The spectral accuracy of our new approach is comparable with the standard one, but it proves superior in its ability to reproduce structural properties, and to account for geometrical e ff ects as the development of a thick layer of mixed material and the lack of an e ffi cient coupling between the wind bubble and the surrounding medium. 
+
+Key words. radiation mechanisms: non-thermal – pulsar: general – method: numerical – ISM: supernova remnants – supernovae: individual: Crab nebula 
+
+1. Introduction 
+
+The one-zone thin-shell (1ZTS) formalism is one of the most used approach for the study of the spectral and dynamical evolution of wind bubbles, and has been successfully ap-plied in the field of pulsar wind nebulae (PWNe) for a long time (Ostriker & Gunn 1971; Reynolds & Chevalier 1984; Gelfand et al. 2009; Bucciantini et al. 2011; Martín et al. 2012). The approach is not without its limitations, especially when applied to old systems (Bandiera et al. 2020, 2023a), and indeed an alternative formalism that still preserve many of the advan-10 
+
+tages of the old ones, while providing a consistent description of the interaction of the PWN with the supernova remnant (SNR), has been recently put forward in Bandiera et al. (2023b). However the lack of viable alternatives (multidimensional fluid models are computationally prohibitive) makes this technique the only one currently available for spectral studies of both young and old systems, especially in population oriented studies (Fiori et al. 2022; De Sarkar et al. 2026). One of the main limitation of all existing thin-shell mod-20  
+
+> ⋆
+
+email: niccolo.bucciantini@inaf.it 
+
+els (but in general of all existing 1D models), is what we can call the complete-coupling of the PWN (or more generally the wind bubble) with the SNR (the ambient medium). By complete-coupling we mean that the SNR material and the PWN are sharply separated by a contact discontinuity (CD), and that the PWN sweeps and keeps outside of this CD all matter it encounters. As such, existing approaches do not allow to treat the development of a thick filamentary layer of swept-up ejecta, or any form of mixing, which is well known to be present (Hester et al. 1996; Fesen et al. 2008; Ma et al. 2016; 30 
+
+Meyer & Torres 2025). This is due to the fact that the canonical equations of the 1ZTS models are based on point-wise momen-tum conservation across the thin-shell itself (e.g. Bandiera et al. 2020). Therefore this limitation is rooted at the very base of these approaches. This also prevents the possibility for the PWN shape to di ff er from a spherical one. While the thin-shell equations can be formulated in order to handle aspherical shapes (Giuliani 1982), and models of axisymmetric wind bubbles adopting them have been presented (Bucciantini et al. 2007), they tend to be unstable and have never been used for PWNe. 40 
+
+Moreover 1ZTS models do not allow to investigate cases where the PWN penetrates through the ejecta, instead of just pushing against them. 
+
+Article number, page 1 A&A proofs: manuscript no. article_1 
+
+Here we want to introduce a new formalism for the evolu-tion of PWNe within the ejecta of SNRs, based on energy conservation. Energy is a scalar quantity for which global conservation holds, such that changes in the energetic content of one component (i.e. the PWN) must be balanced by equivalent changes in the energetic content of another (i.e. the swept 50 
+
+up ejecta). Momentum is a vector quantity, but in a centrally symmetric configuration, as the case for a PWN-SNR system, the global integrated momentum of any component is zero by definition, and in this sense global momentum conservation is useless. If one assumes spherical symmetry, it is in principle possible to frame the problem in terms of radial-momentum conservation. However there are in this case two main issues: what is the radial momentum content of the expanding PWN? How does momentum transfer from one component to another? The answer to the first question requires the knowledge of 60 
+
+the internal velocity structure of the PWN, the second of the stress-coupling with the ejecta, none of which is known. This is where a formalism based on energy conservation proves supe-rior. In the following we will refer to the formalism based on energy conservation as E-formalism, and the one on momentum conservation as M-formalism. We will show that our E-formalism not only allows for a vastly larger degree of flexibility in modeling PWNe, including eff ects not otherwise accountable, while retaining all the com-70 
+
+putational advantages of the canonical M-formalism, but that its application might help to address some long standing issues in the modeling of the Crab nebula, that have never received a due attention, given the role of this object as a test-bed for PWNe in general. In particular we will focus on three related issues: (i) the swept-up mass measured in the filaments of the Crab nebula; (ii) the di ff erent expansion rate of the filaments versus the radio nebula; (iii) the lack of any detectable low density halo surrounding it. Estimates of the mass in the filaments have gone up from 2 .1 M⊙ (Henry & MacAlpine 1982) to 80 
+
+4.6 M⊙ (Fesen et al. 1997) and the more recent value of 7 .0 M⊙
+
+(Owen & Barlow 2015). On the other hand the existing 1ZTS models that fit the Crab nebula spectrum predict that the ejecta mass swept-up by the PWN as it expands (the mass that should correspond to the one in the observed filaments) should be much smaller (by about one order of magnitude): ∼ 0.5 M⊙. Under complete-coupling, the swept-up mass is bound to move with an expansion rate defined as the ratio of the velocity times the age over the radius (in practice a measure of the convergence date -the inferred date of the explosion based on ballistic motion) that 90 
+
+is the same as the one of the non-thermal PWN. However, recent measures show that the two di ff er by about 15%, with the non-thermal PWN being faster (Bietenholz & Nugent 2015). All the existing 1ZTS models of the Crab nebula (Gelfand et al. 2009; Bucciantini et al. 2011; Martín et al. 2012) predict that it should be still expanding well within the central uniform density region of the ejecta, but the attempts to constrain the outer density distribution suggest a much steeper density profile (Fesen et al. 1997; Sankrit & Hester 1997; Lundqvist & Tziamtzis 2012). 
+
+> 100
+
+We will show that such discrepancies cannot be reconciled in the classical 1ZTS formalism by changing either the SNR energy or ejecta mass, and that they are ultimately tied to complete-coupling. Our E-formalism is not constrained by complete-coupling, and can accommodate the correct results. This, however, cast doubts both on the overall reliability of canonical 1ZTS models in the way they are used, and on the interpretation of the origin of the observed filaments themselves. A point that in our opinion need to be clarified. 
+
+> 110
+
+This manuscript is structured as follows: in Sect. 2 we in-troduce the equations of the E-formalism. In Sect. 3 we derive a self-similar solution that can be used to gain some insight into the properties of the model, while in Sect. 4 we discuss more in detail the case of the Crab nebula, and illustrate how the E-formalism allows us to reproduce consistently both the structural and spectral properties of this system. Finally in Sect. 5 we summarize our conclusions. 
+
+2. The equations 
+
+Let us write down the set of full general equations for the E- 120 
+
+formalism. We begin with the evolutionary laws: dEppwn (t)dt = ηp Lpsr (t) − Qloss (t) , (1) dEmpwn (t)dt = ηb Lpsr (t) − Pmpwn (t) dVpwn (t)dt , (2) dWpwn (t)dt = [Pppwn (t) + Pmpwn (t)] dVpwn (t)dt , (3) 
+
+Efil (t) = Wpwn (t) + Eini (t) , (4) where Eppwn (t) is the plasma (particles) energy of the PWN, while Empwn (t) is its magnetic energy. ηp is the fraction of the PSR luminosity Lpsr (t) that goes into particles, and ηb = 1 − ηp
+
+is the one in magnetic field (if one neglects magnetospheric radiation losses, which however can be a non negligible fraction of the total pulsar power especially in young γ-ray bright pulsars (Íñiguez-Pascual et al. 2025)). Qloss (t) represents the total rate of particle losses (adiabatic, radiation, di ff usion) and Vpwn (t)is the PWN volume. Pppwn (t) and Pmpwn (t) are the PWN pressure 130 
+
+of the plasma and magnetic component respectively (their sum is the total PWN pressure), while Wpwn (t) is the work done by the PWN as it expands into the ejecta. In Eq. 4, Efil (t) is the total energy of the filamentary network, including the thin shell bounding the PWN, while Eini (t) is the energy associated to the ejecta that would have been contained inside the PWN volume. Losses due to radiative line emission from the filaments have been neglected. This is justified both by the fact that currently in the Crab nebula they are just a few percent of the work done by the PWN (Davidson & Fesen 1985; Pacini & Salvati 140 
+
+1973), and because, apart from possibly the very faint outer [OIII] skin, the emission of the filaments is well fitted by photo-ionization models, and not shock-heating (Sankrit & Hester 1997; Henry & MacAlpine 1982; MacAlpine & Satterfield 2008; Charlebois et al. 2010; Owen & Barlow 2015), suggest-ing the ultimate source is the optical-UV synchrotron continuum and not the work of the PWN. In the above equations we have assumed, as it is com-monly done, that within the PWN there is no conversion of 150 
+
+magnetic into particle energy. This is not generally true. It might be a good approximation for weakly magnetized systems, but as the magnetization rises, and magnetic energy approaches equipartition with the plasma dissipation of the former into the latter, associated to magnetic instabilities, is likely to be more effi cient. This e ff ect can be included adding coupling term in Eq.s 1-2. 
+
+> Article number, page 2
+
+N. Bucciantini and B. Olmi: A thick-shell formalism for pulsar wind nebulae based on energy conservation 
+
+In order to close the system one needs to provide the fol-lowing constitutive relations: 160 
+
+Eppwn (t) = 3Pppwn (t)Vpwn (t) , (5) 
+
+Empwn (t) = 3Pmpwn (t)Vpwn (t) , (6) 
+
+Eini (t) = 12
+
+Z
+
+> Vpwn (t)
+
+ρej (x, t)
+
+ rt
+
+2
+
+d3 x , (7) that amount to the assumptions that the magnetized plasma in the PWN is relativistic, and that the ejecta are cold and in homolo-gous expansion, with a density profile given by ρej (x, t). Note that in Eq. 6 we have assumed that the magnetic pressure acting at the boundary of the PWN is 1 /3 of the average magnetic en-ergy density. This was shown to be correct both for a fully turbu-lent and fully toroidal magnetic field in Bucciantini et al. (2003). Moreover, a closure for the mass and energy in the filamentary layer must be supplies. We opt for the following: 
+
+Efil (t) = X
+
+2 Mfil (t) ˙ Rpwn (t)2 , (8) 
+
+Mfil (t) =
+
+Z
+
+> Vpwn (t)
+
+ρej (x, t)d3 x , (9) where the parameter X depends on the thickness, geometry and 170 
+
+mass distribution in the filamentary layer, and Rpwn (t) represents the equatorial-radius of the PWN (for a spherical system its ra-dius). Finally one needs to assume a shape for the PWN volume. The simplest option is to assume a spherical nebula (but a prolate ellipsoid is no more di ffi cult, if the prolateness is assumed to be time independent): 
+
+Vpwn (t) = 4π
+
+3 Rpwn (t)3 . (10) This completely closes the system. 
+
+3. Self-Similar Solution 
+
+3.1. Core-Envelope model for the SNR ejecta 
+
+The simplest assumption one can make for the density struc-180 
+
+ture in the homologous expanding ejecta is the so called core-envelope model (Matzner & McKee 1999; Truelove & McKee 1999; Bandiera et al. 2021): 
+
+ρej (r, t) =
+
+
+
+ρc(t) rVct
+
+!−δ
+
+for r < Vct ,ρc(t) rVct
+
+!−ω
+
+for r ≥ Vct ,
+
+(11) where, in terms of the SNR energy Esn and total ejecta mass Mej :
+
+Vc =
+
+s
+
+2(5 − δ)( ω − 5) (3 − δ)( ω − 3) 
+
+Esn 
+
+Mej 
+
+, (12) 
+
+ρc = (3 − δ)( ω − 3) 
+
+ω − δ
+
+Mej 
+
+4π (Vct)−3 . (13) It can be shown that PWNe typically never reach the core-envelope transition at Vct before reverberation begins, unless the PSR luminosity is very high (higher than that of the Crab PSR), or the supernova energy very small. As such, one can safely as-sume that the PWN will always expand in the core region of the ejecta. One can then use the so called core-rescaled quantities: 190 
+
+˜Mej = 4π
+
+Z Vct
+
+> 0
+
+ρej (r, t)r2dr , (14) ˜Esn = 2π
+
+Z Vct
+
+> 0
+
+ρej (r, t)
+
+ rt
+
+2
+
+r2dr , (15) related to the total mass and energy of the ejecta in a core-envelope model by: ˜Mej = ω − 3
+
+ω − δ Mej , ˜Esn = ω − 5
+
+ω − δ Esn , (16) such that: 
+
+Vc =
+
+s
+
+2(5 − δ)3 − δ
+
+˜Esn 
+
+˜Mej 
+
+, (17) 
+
+ρej (r < Vct, t) =
+
+h(3 − δ) ˜ Mej 
+
+i5/2
+
+8π √2 t3 h(5 − δ) ˜ Esn 
+
+i3/2
+
+rVct
+
+!−δ
+
+. (18) If one neglects the radiative losses of the particles in the PWN, then the original equations simplify by introducing the total PWN pressure Ppwn and energy Epwn ; if one does the further assumption that the PWN is spherical, the equations to solve be-come: 
+
+Ppwn (t) = Epwn (t)4πR(t)3 = 14πR(t)4
+
+Z t
+
+> 0
+
+Lpsr (t′)R(t′)dt ′ , (19) 
+
+Efil (t) + Epwn (t) = Eini (t) +
+
+Z t
+
+> 0
+
+Lpsr (t′)dt ′ , (20) with: 
+
+Mfil (t) = ˜Mej 
+
+R(t)
+
+Vct
+
+!3−δ
+
+and Eini (t) = ˜Esn 
+
+R(t)
+
+Vct
+
+!5−δ
+
+. (21) If the PSR luminosity is constant, Lpsr (t) = Lpsr = const , it is 200 
+
+easy to show that the above set of equations admits a self-similar solution in the form: 
+
+R(t) = Ct (6 −δ)/(5 −δ) , (22) with: 
+
+C5−δ =2(5 −δ)/2(5 − δ)(7 −δ)/2(3 − δ)(δ−3) /2(6 − δ)(11 − 2δ) X(6 − δ)2 − (3 − δ)(5 − δ) Lpsr 
+
+s ˜E3−δ
+
+> sn
+
+˜M5−δ
+
+> ej
+
+. (23) One recovers the thin-shell limit by setting X = 1 (see Appendix A for a comparison with the M-formalism). 
+
+3.2. Thick filamentary layer in the E-formalism 
+
+Let us assume that the mass in the filamentary layer is distributed from an inner radius Rin (t) to the nebular outer radius R(t), ac-cording to: ρfil (r, t) ∝ K(t) r−ζ . The case ζ = 0 corresponds to a uniform distribution, while ζ = 2 corresponds to the assumption 210 
+
+that the mass of the filaments is uniformly distributed in radius. The total mass in the filaments will be: 
+
+Mfil (t) = 4π
+
+Z R(t)
+
+> Rin (t)
+
+ρfil (r′, t)r′2dr ′ = 4πK(t)
+
+Z R(t)
+
+> Rin (t)
+
+r′2−ζ dr ′
+
+= 4π
+
+3 − ζ K(t)( R(t)3−ζ − Rin (t)3−ζ ) . (24) 
+
+Article number, page 3 A&A proofs: manuscript no. article_1 
+
+In the Crab nebula there are good evidences that the filaments are in homologous expansion (Martin et al. 2025) with a velocity 
+
+∝ r. So we assume that the velocity of the swept-up mass in the thick-layer is: ( r/R(t)) ˙ R(t), equal to the expansion speed of the nebula ˙ R(t) at R(t). One can define the total energy of the filamentary layer as: 
+
+Efil (t) = 2π
+
+Z R(t)
+
+> Rin (t)
+
+ρfil (r′, t) ˙ R(t)2 r′
+
+R(t)
+
+!2
+
+r′2dr ′ (25) 
+
+= 3 − ζ
+
+2(5 − ζ) Mfil (t) ˙R(t)
+
+R(t)
+
+!2 R(t)5−ζ − Rin (t)5−ζ
+
+R(t)3−ζ − Rin (t)3−ζ , (26) where the mass of the filamentary layer must be the same as the mass of the swept-up ejecta. By comparison with Eq. 8, intro-220 
+
+ducing κ = Rin (t)/R(t), one has: 
+
+X = 3 − ζ
+
+5 − ζ
+
+1 − κ5−ζ
+
+1 − κ3−ζ . (27) In the case of a fully developed ( Rin = 0) and homogeneous (ζ = 0) filamentary layer, the solution simplifies to: 
+
+Efil (t) = 310 Mfil (t) ˙ R2(t) , (28) that is only 0 .6 times less than the case where all the swept up matter is in a thin shell. A thick /homologous distribution reduces kinetic energy at fixed Mfil and ˙ R.One can show that for a fully developed homogeneous fil-amentary layer, choosing δ = 0, the radius of a thick-shell nebula is about 1.26 times larger than that of a thin-shell one, 230 
+
+at the same age. In Bucciantini et al. (2004) it was shown that for a fully developed Rayleigh-Taylor filamentary network, penetrating inward up to about 0.7 times the radius of the PWN, the PWN outer radius was about 10% larger that in the absence of instability. Using our formalism, and setting Rin (t) = 0.7R(t), we find that the radius of a thick-shell nebula is about 1.1 times larger than the same radius of a thin-shell one, in full agreement with those numerical results. Using our approach it is possible to model systems where 240 
+
+a shell still form but a sizable fraction ξfil of the swept-up mass ends in a thick homologous filamentary layer due to the shell fragmentation, by setting X = 1 − 0.4ξfil .
+
+4. The Crab nebula 
+
+The age of the Crab nebula is 971 yr. However, to account for the fact that many of the structural data we are using for com-parison are 10-25 year old, we adopt a fiducial age of 950 yr. Notice that the purpose of this section is to show how our model can account for both the broad emission properties of the PWN and the dynamical properties of the filamentary layer, and not to 250 
+
+provide an optimal fit for this system. The size of the PWN has been measured from the edge of the radio and [OIII] emission skin by Loll et al. (2013). Assuming an inclination on the plane of the sky of 25 ◦, they fitted a prolate ellipsoid with a minor axis of 1.43 pc and a major axis of 2.25 pc for a typical distance of 2 kpc. The radius of a sphere with the same volume, which we take as the fiducial radius of our spherical model, is 1.66 pc. However, more recently Martin et al. (2021), using 3D tomography of the filaments, find that the 3D shape di ff ers from a simple 260 
+
+ellipsoid, with clear indentations. They also find that most of the line emitting material is confined in a layer between 0.5 to 2 pc. Bietenholz & Nugent (2015) have measured the expansion speed and convergence dates for both the radio PWN (1255 ± 27 CE) and the optical filaments (1091 ± 34 CE). The more recent estimate for the mass of the filaments 7 .2 ± 0.5 M⊙ was given by Owen & Barlow (2015). For the PSR spin-down we adopt the standard values typically used in the literature (Martín et al. 2012; Bandiera et al. 2023a) and based on the recent estimate by Lyne et al. (2015): Lpsr (t = 0) = 3 × 10 39 erg s −1 (for a standard 270 
+
+moment of inertia Ins = 10 45 g cm −2), with a spin-down time 
+
+τ = 758 yr and a braking index n = 2.51. We further assume that the outer layer of the ejecta has ω = 12 (Matzner & McKee 1999). Some preliminary studies on the possible range of masses and energetics of the SNR were recently done by Yang & Chevalier (2015) in the non-radiative case, however the full implications of the low mass in the filaments were not properly addressed there and, as we are going to show, radiation losses cannot be neglected. 
+
+> 280
+
+4.1. Adiabatic estimates 
+
+If the PWN age tpwn and its radius Rpwn are known, one can verify under what condition it is possible to assume that the expansion is still within the core region of the ejecta. This sets for the Crab a lower limit on the supernova energy: 
+
+Esn > 3 − δ
+
+2(5 − δ)
+
+ω − 3
+
+ω − 5 Mej 
+
+Rpwn 
+
+tpwn 
+
+!2
+
+(29) 
+
+> 3.73 3 − δ
+
+(5 − δ)
+
+Mej 
+
+M⊙
+
+× 10 49 erg . (30) Unless the supernova was tremendously sub-energetic, then it is fair to assume that the PWN is still inside the core region of the ejecta, even if quite close to its boundary. It is easy to show that in the limit of constant pulsar lu- 290 
+
+minosity, the self similar solution, given by Eq.s-21-22-23, provides a relation for the swept-up mass that is just a function of the pulsar luminosity. One has: 
+
+Lpsr =R5−δ
+
+> pwn
+
+t6−δ
+
+> pwn
+
+(11 − 2δ)hX(6 − δ)2 −(3 − δ)(5 − δ)i
+
+2(5 −δ)/2(5 − δ)(7 −δ)/2(3 − δ)(δ−3) /2(6 − δ)
+
+s ˜M5−δ
+
+> ej
+
+˜E3−δ
+
+> sn
+
+. (31) On the other hand the swept-up mass is: 
+
+Mfil = ˜Mej 
+
+Rpwn 
+
+Vctpwn 
+
+!3−δ
+
+= R3−δ
+
+> pwn
+
+t3−δ
+
+> pwn
+
+s ˜M5−δ
+
+> ej
+
+˜E3−δ
+
+> sn
+
+3 − δ
+
+2(5 − δ)
+
+!(3 −δ)/2
+
+, (32) leading to: 
+
+Mfil =
+
+
+
+6.4 M⊙
+
+Lpsr 
+
+3 × 10 39 erg s −1 for δ = 0 and X = 0.6,
+
+2.0 M⊙
+
+Lpsr 
+
+3 × 10 39 erg s −1 for δ = 0 and X = 1.0.
+
+(33) Note that for a given age and radius of a PWN, the amount of swept-up mass, i.e. the mass in the filaments, is just a function of the pulsar luminosity, and not of the supernova energy or ejecta mass, contrary to naive expectations. Given the accuracy in the timing of the Crab pulsar and the fact that the neutron 300 
+
+star moment of inertia is supposed to vary in a narrow range 
+
+> Article number, page 4
+
+N. Bucciantini and B. Olmi: A thick-shell formalism for pulsar wind nebulae based on energy conservation 10 31       
+
+> 10 32
+> 10 33
+> 10 34
+> 10 35
+> 10 36
+> 10 37
+> L [erg s  1]
+> 10 10 10 13 10 16 10 19 10 22 10 25 10 28
+
+[Hz]           
+
+> 10 710 410 110 210 510 810 11 10 14
+
+E[eV]   
+
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> E2 dN/dE [eV cm  2 s 1]
+> COMPTEL (2001)
+> XMM (2005)
+> LOFAR (2025)
+> RADIO-DH (2023)
+> IR-DL-T (2019)
+> IR-DL-S (2019)
+> OPTICAL VCW-DH (1993)
+> UV Henn-DH (1992)
+> XMM-DH (2023)
+> COMPTEL-DH (2023)
+> FERMI-LAT (2020)
+> HESS (2024)
+> HEGRA (2004)
+> MAGIC (2015)
+> MAGIC (2020)
+> VERITAS (2015)
+> TIBET (2019)
+> HAWK (2019)
+> LHAASO-WCDA (2021)
+> LHAASO-KM2A (2021)
+> SYN+IC
+> SSC
+> CMB
+> FIR
+> MIR
+> NIR
+
+Fig. 1: Spectral energy distribution in the Crab nebula (Aharonian et al. 2024) and thick-shell model. The black solid line rep-resents the expected total flux from the model of Tab 1. Dashed lines are Inverse Compton on: self-synchrotron (SSC, cyan), CMB (magenta), FIR (red), MIR (orange), NIR (olive). LOFAR (Arias et al. 2025); RADIO-DH (compilation of radio data from Dirson & Horns (2023)); IR-DL-T and IR-DL-S (total flux and estimated power-law synchrotron component from De Looze et al. (2019)); OPTICAL-VC-DH (original data from Veron-Cetty & Woltjer (1993) with new extinction from Dirson & Horns (2023)); UV-Henn-DH (original data from Hennessy et al. (1992) with new extinction); XMM (Kirsch et al. 2005); COMPTEL (Kuiper et al. 2001); XMM-DH and COMPTEL-DH (same data but rescaled to NUSTAR and INTEGRAL by Dirson & Horns (2023)); FERMI-LAT (Abdollahi et al. 2020; Aharonian et al. 2024); HESS (Aharonian et al. 2024); HEGRA (Aharonian et al. 2004); MAGIC (Aleksi´ c et al. 2015; MAGIC Collaboration et al. 2020); VERITAS (Meagher & VERITAS Collaboration 2015); TIBET (Amenomori et al. 2019); HAWC (Abeysekara et al. 2019); LHAASO (Lhaaso Collaboration et al. 2021). (Breu & Rezzolla 2016), this implies that there is no margin to adjust the mass in the filaments. It is moreover evident that properly accounting for the for-mation of a filamentary layer is important in order to get a robust estimate of the swept-up mass, given that this can change by about a factor 3, as shown by Eq. 33. In any case however, the luminosities that are required are much higher than the average luminosity of the Crab pulsar, and closer to its initial 310 
+
+one. For δ = 1 the masses are smaller by about 1 /3. This also suggests, again contrary to naive expectations, that placing more mass at inner radii in the ejecta worsen the discrepancy between observations and theory. Assuming a fully developed filamentary network X = 0.6, flat ejecta ( δ = 0) and including the Crab spin-down, it is possible, in the non radiative case (solving the equations of Sect. 2), to reproduce both the PWN radius and the to get 
+
+∼ 7 M⊙ in the filaments by assuming Esn = 3.2 × 10 50 erg, 320 
+
+Mej = 12 M⊙, and increasing the PSR spin-down power by a factor 1.57. These numbers are not totally unreasonable. Higher ejecta masses (higher progenitor masses) seems to be excluded by the composition of the Crab filaments (Fesen et al. 2008; MacAlpine & Satterfield 2008), and ultimately as shown before, do not help much. The moment of inertia of the NS could be closer to 1 .5 × 10 45 g cm 2, if the Crab pulsar was a more massive NS than expected from a low mass progenitor (Sukhbold et al. 2016), but still below 13 M⊙ (Fesen et al. 1997). Adopting a more realistic harmonic density model (Matzner & McKee 330 
+
+1999) makes things worse: to reproduce both the radius and the swept-up mass with no spin-down, one finds the combinations: 
+
+Esn = 3.85 × 10 50 erg, Mej = 12 M⊙, Lpsr = 4.7 × 10 39 erg s −1;or Esn = 1.87 × 10 50 erg, Mej = 9M⊙, Lpsr = 5.8 × 10 39 erg s −1.In the presence of spin-down, for Mej = 12 M⊙, one needs to rise the PSR luminosity by a factor 2.33 over the standard value. 
+
+4.2. Radiative model 
+
+The major problem arises when one tries to include radiation 340 
+
+losses. In the presence of radiation losses, the energy of the PWN cannot be derived following Eq. 19, but must be computed from the full energy distribution. We have for this purpose devel-oped a high-order implicit upwind scheme (see App.s C,D and E for a description of the method) that accounts for adiabatic, sychrotron and IC losses, both on the standard Galactic back-grounds (Porter et al. 2017) and of self-synchrotron in the full Klein-Nishina regime. It is easy to show that radiation losses in-
+
+Article number, page 5 A&A proofs: manuscript no. article_1 
+
+tegrated over the age of the nebula amount to more than half of the nebular energy, and that before ∼ 300 yr half the injected 350 
+
+power was lost to radiation. Neglecting radiation losses can then compromise substantially the overall dynamical estimates. Even adopting the more favorable core-envelope profile for the ejecta, and assuming a standard broken power-law injection (with high and low energy indexes ph = 2.35 and pl = 1.5 respectively, and break at γbr = 5×10 5, Bandiera et al. 2023a), it is not possible to reproduce the net synchrotron luminosity ( ∼ 1×10 38 erg s −1) and the measured swept-up mass, with Mej ≤ 12 M⊙, unless the pul-sar spin-down power is augmented by a factor ≃ 3.3 (to increase the energetics of the PWN), and simultaneously the magnetic 360 
+
+field in the nebula is lowered to values B ∼ 30 μG (to reduce the losses). But in this case, one cannot then reproduce the ob-served spectrum of the Crab nebula: in particular the computed IC component largely overestimates the measured value. It is obvious that there does not seem any way of reproducing both the current spectrum of the Crab nebula, as well as its size and the mass of the filamentary network, once radiation losses are included. Even if one assumes that magnetization was much higher in the past, in order to prevent radiation losses in the very early stages to dominate the energetics (if most of the energy in 370 
+
+the early nebula was in the form of magnetic field, then radiation losses, which only a ff ect particles, would not be so detrimental), it is still not possible to reproduce the spectrum, because initial magnetization must be pushed up so much ( ηp = 0.01), that one ends with a magnetic field ∼ 400 μG at present, and again is unable to reproduce the spectrum. In the standard thin-shell approach (solving the equations presented in Sect. 2 with X = 1) assuming Esn = 10 51 erg, 
+
+Mej = 8.0 M⊙ and adopting a magnetic fraction ηb = 0.02, one 380 
+
+can get the correct radius of 1.66 pc at 950 yr, with a magnetic field ∼ 100 μG, but the mass in the filaments is only 0 .45 M⊙. If one assumes a fully developed filamentary layer ( X = 0.6) then one can reproduce the nebula using the same values as before but just lowering the supernova energy to Esn = 0.47 × 10 51 erg. This lowers the values of Vc according to Eq. 12, and given that, for δ = 0, Mfil ∝ E−3/2sn , this leads to a mass in the filaments of 
+
+∼ 1.4 M⊙.Unfortunately, it is evident that even allowing for a fully 390 
+
+developed filamentary layer, the coupling between the PWN and the ejecta is too strong, and one cannot recover the correct filamentary mass, unless one changes substantially the PSR spin-down power, with major consequences on the spectral fitting. It seems unlikely that the PSR spin-down power was much di ff erent than what we expect at earlier time. The Crab PSR has been timed constantly for 50 years and shows one of the cleanest spin-down history among PSRs; Moreover, since its discovery in the 18th century, there has been no evidence for any major variation in the luminosity of the nebula. 400 
+
+4.3. Decoupling the ejecta from the PWN 
+
+A possible way out is to lower the coupling between the swept-up ejecta and the PWN. In writing Eq. 28, we made the assump-tion that the swept-up ejecta were in homologous expansion with an outer speed equal to the expansion speed of the PWN. How-ever, if coupling is ine ffi cient, their outer expansion speed might be smaller than the expansion speed of the PWN (any value be-tween Vpwn and VcRpwn /Rc is in principle allowed). The idea is that the PWN penetrates the ejecta partially dragging them in-stead of pushing them. We can introduce a dragging coe ffi cient 410 
+
+ξdrag such that for a fully developed filamentary layer one has: ˙R2 = ξ2drag 
+
+10 3
+
+Efil (t)
+
+Mfil (t) . (34) This is consistent with the fact that the filaments are seen to ex-pand slower (have a later convergence time) than the radio PWN. One can get 7 M⊙ in the filaments by setting ξdrag = 1.141, with 
+
+Esn = 0.3 × 10 51 erg and Mej = 12 M⊙. This amount to a relative di ff erence of ∼ 15% in the convergence time between the ra-dio nebula and optical filaments. In practice, the swept-up ejecta have not really been "swept-up" in any meaningful sense, and the non-thermal PWN has simply break through them. Note that what really counts in the evolution of the PWN 420 
+
+are not the value of X and ξdrag separately, but the combination 
+
+X/ξ 2drag . For example the same result of the fully developed fila-mentary layer with ξdrag = 1.141, can be obtained using a layer extended over half of the PWN, X = 0.664, with ξdrag = 1.200. This also suggests that it might be possible to modify the equa-tions of the standard M-formalism by introducing an e ff ective in-ertial mass for the thin-shell in the momentum conservation law, that is smaller than the one derived from the mass conservation law. In this respect the E-formalism can provide a physical inter-pretation, in terms of decoupling, or thickness of such di ff erence. 430 
+
+However, one should not naively think to use the same value of 
+
+X obtained in the E-formalism. Modifying the momentum con-servation law of the M-formalism (e.g. Eq. 2 in Bandiera et al. (2020)) with an e ff ective inertia according to: 
+
+ddt [Xval M(t) ˙ R(t)] == 4πR(t)2
+
+"
+
+Ppwn (t) − ρej (r, t) ˙R(t) − R(t)
+
+t
+
+! R(t)
+
+t
+
+#
+
+, (35) in the limit of constant pulsar spin-down luminosity and assum-ing that ρej (r, t) ∝ r−δ, one can find a relation between the value of X in the E-formalism and Xval :
+
+Xval = 2δ3 − δ2(5 X + 23) + δ(60 X + 86) − 15(12 X + 7) 2( δ − 6) 2(δ − 4) . (36) We have verified that over the typical range of parameters that characterize a PWN-SNR system (e.g. Bandiera et al. 2023a), 440 
+
+as long as radiation losses are neglected, the modification to the M-formalism provided by Eq.s 35-36, give a radial evolution that di ff ers at most by 10% (for X = 0.6, and for very short spin-down times) from the one computed in the correct E-formalism, up to the beginning of the reverberation. In Fig. 1 we show the spectrum computed with our model, as defined in Tab. 1, computed using the naima 1 package (Zabalza 2015). The model assumes a standard broken-power-law for the particle injection. The purpose of this is not to present an optimal fit of the Crab (structural and observational data in the 450 
+
+Crab nebula are typically taken at di ff erent times, and a proper fit done using an evolutionary model, should account for this, something that is typically not done) but to show that a model based on our formalism can perform as satisfactory as any of the existing 1ZTS approaches. The main discrepancies between the data and our model are mostly in two bands. In the μm-mm band, our model suggests the synchrotron component should display a non negligible level of curvature (in part due to the  
+
+> 1https://naima.readthedocs.io/en/latest/
+> Article number, page 6 N. Bucciantini and B. Olmi: A thick-shell formalism for pulsar wind nebulae based on energy conservation
+
+presence of a spectral break in the IR, in part due to evolutionary eff ects), for which there is some evidence in recent James-Webb 460 
+
+Telescope observations (Temim et al. 2024), but which was not considered in the derivation by De Looze et al. (2019). Above 100 TeV our model, if matched to the more recent X-ray data by Dirson & Horns (2023), tends to overpredic the LHAASO fluxes (Lhaaso Collaboration et al. 2021). This comes from the fact that the IC above 100 TeV is mostly due to CMB up-scattered by particles responsible for synchrotron emission in the hard X-ray and MeV range. These particles are typically located in the inner region of the PWN, close to the termination shock, and as such they tend to be embedded in a local magnetic 470 
+
+field higher than the average one. One zone models, that are forced to use an average magnetic filed, tend to over-estimate the number of high-energy particles, and so their contribution to the IC. It is possible to partly balance this using a very soft high-energy injection (our model requires ph = 2.43, while optical observation seems to suggest values closer to 2 .2 − 2.3), but one need to be careful not overshooting the optical synchrotron flux. Recent estimates of the extinction in optical (Dirson & Horns 2023) have lowered the PWN luminosity by about 30%, making this constraint a little more binding than before. 480 
+
+It is interesting to note that the ratio Rpwn /Vctpwn is ∼ 93%, meaning that the PWN has reached the edge of the core region in the ejecta. This is consistent with the lack of any extended flat density halo surrounding the Crab nebula, and with other indications that the system is expanding inside ejecta with a steeper radial profile (Sankrit & Hester 1997; Tziamtzis et al. 2009; Lundqvist & Tziamtzis 2012). 
+
+5. Conclusions 
+
+We have shown that it is possible to formulate the problem of the 490 
+
+evolution of a wind bubble as a one zone object, using energy conservation instead of momentum conservation at the outer boundary. This new energy based formalism allows us to include eff ects like the development of a thick layer of mixed filaments, asphericity or partial dragging. In particular we were able to reproduce the structural properties of the Crab nebula, like the large mass of the filaments, and the di ff erences in convergence age between the radio and the filaments themselves, together with its spectrum. 
+
+> 500
+
+We summarize here the main results: 
+
+– It is not possible with the standard 1ZTS model to reconcile the energetics of the PSR, the inferred mass of the filaments, and the observed spectrum of the Crab nebula. 
+
+– Even allowing for a thick filamentary layer, one must reduce the coupling between the PWN and the filaments to very small values, in order to fit the inferred masses. 
+
+– The E-formalism can easily be extended to include more components (like ions in the PSR winds) or other kind of losses (e.g. di ff usion) that might be relevant for very high 510 
+
+energy particles, as well as other geometrical properties like non-uniform distribution of masses. 
+
+– We show how the e ff ect of partial coupling, or the develop-ment of a thick layer, can be included in the standard 1ZTS models by the introduction of a reduced inertia for the swept-up shell. 
+
+– Our model of the Crab nebula is in agreement with the lack of any flat density halo extending outside the nebula. Table 1: Input and output parameters for the thick-shell radiative model for the Crab nebula shown in Fig. 1 Input Parameter Age 950 yr 
+
+Lpsr (t = 0) 3 × 10 39 erg s −1
+
+τsd 758 yr 
+
+n 2.51 
+
+ηb 0.024 
+
+Mej 12 M⊙
+
+Esn 3 × 10 50 erg 
+
+δ 0
+
+ω 12 
+
+X 0.6 
+
+ξdrag 1.141 
+
+γmin 5
+
+γmax 8 × 10 9
+
+γbr 6 × 10 5
+
+ph 1.5 
+
+pl 2.43 
+
+T (FIR ) 31 K 
+
+U(FIR ) 0.322 eV cm −3
+
+T (MIR ) 350 K 
+
+U(MIR ) 0.051 eV cm −3
+
+T (NIR ) 3650 K 
+
+U(NIR ) 0.441 eV cm −3
+
+Output Parameter 
+
+Rpwn (950 yr) 1.66 pc 
+
+Mfil (950 yr) 7.02 M⊙
+
+Conv. Date (Radio) 1210 CE Conv. Date (Filaments) 1090 CE 
+
+B(950 yr) 107 μG
+
+– In the μm-mm energy range the sychrotron spectrum has cur-vature, and simple power-law models tend to underestimate 520 
+
+its contribution. 
+
+– Emission above 100 TeV in one zone models tends to be overestimated because of the use of an average magnetic field to fit emission in the hard X-ray and MeV range. 
+
+– Care has to be taken in evolving the particle distribution in order to ensure energy conservation, and in this respect stan-dard 1st-order schemes prove quite ine ffi cient. 
+
+– Computation of self-synchrotron-Compton losses can be for-mulated in a fully algebraic-vectorizable way even in the full Klein-Nishina regime, by defining an e ff ective energy den- 530 
+
+sity of the photon-field. The fact that under complete-coupling it is not possible to reproduce the observed mass of the filamentary layer, and that partial dragging must be included, raises the question on the origin of such filaments: if the swept-up ejecta are not swept-up, and fingers do not come from Rayleigh-Taylor in-stability, then a di ff erent picture has to be invoked, questioning the canonical interpretation. A possibility is to assume that the density in the core region of the ejecta, instead of being a smooth power-law, is more stratified, with an inner low 540 
+
+density region, a cavity, and an outer high density region with pre-existing clumps, that the PWN will leave mostly behind as it expands. This agrees with claims about RT fingers being suppressed or strongly altered by the nebular magnetic field 
+
+> Article number, page 7
+
+A&A proofs: manuscript no. article_1 
+
+(Bucciantini et al. 2004; Stone & Gardiner 2007). Another possibility is to invoke some more complex circumstellar envi-ronment (Smith 2013; Meyer et al. 2024; Meyer & Torres 2025). In the light of the present discussion, a related question is the reliability of standard 1ZTS models when used to perform 550 
+
+PWN-SNR population studies, or to infer properties of the progenitor star. The strength of classical 1ZTS models (or any 1D model) is that they allow to relate the PWN evolution to the parent SNR properties in a very simple way (the only parameters that matters are Esn , Mej and the ISM density). As of today 1ZTS models, or even those that use a less approximated evolution of the PWN and SNR shell, as suggested recently in Bandiera et al. (2023b), remain the only way to model the spectral evolution of middle-aged and old system post reverberation. How one should factor in the presence of an extended layer of mixed material 560 
+
+is not clear, and deserve further investigation. In particular, our findings suggest that both the assumption of complete-coupling as well as the thin-shell one, might introduce substantial biases to the point that is not clear how robust is the relation between the parameters Mej or Esn with the actual mass of the true ejecta, or energy of the parent supernova. How this might impact many of recent population models (e.g. Fiori et al. 2022), and if its is or not relevant, rest to be understood. 
+
+Acknowledgements. The authors thanks D. F. Torres for fruitful comments and suggestions on this work. The authors acknowledge partial support by the INAF 570 
+
+Mini-grant HYPNOTIC87A: "Hidden Young Pulsar Nebula Occupying The In-ner Core of 87A" and by the European Union – NextGenerationEU RRF M4C2 1.1 grant PRIN-MUR 2022TJW4EJ. 
+
+References 
+
+Abdollahi, S., Acero, F., Ackermann, M., et al. 2020, ApJS, 247, 33 Abeysekara, A. U., Albert, A., Alfaro, R., et al. 2019, ApJ, 881, 134 Aharonian, F., Ait Benkhali, F., Aschersleben, J., et al. 2024, A&A, 686, A308 Aharonian, F., Akhperjanian, A., Beilicke, M., et al. 2004, ApJ, 614, 897 Aharonian, F. A. & Atoyan, A. M. 1981, Ap&SS, 79, 321 Aleksi´ c, J., Ansoldi, S., Antonelli, L. A., et al. 2015, Journal of High Energy 580 
+
+Astrophysics, 5, 30 Amenomori, M., Bao, Y. W., Bi, X. J., et al. 2019, Phys. Rev. Lett., 123, 051101 Arias, M., Timmerman, R., Sweijen, F., van Weeren, R. J., & Bassa, C. G. 2025, A&A, 699, A319 Bandiera, R., Bucciantini, N., Martín, J., Olmi, B., & Torres, D. F. 2020, MN-RAS, 499, 2051 Bandiera, R., Bucciantini, N., Martín, J., Olmi, B., & Torres, D. F. 2021, MN-RAS, 508, 3194 Bandiera, R., Bucciantini, N., Martín, J., Olmi, B., & Torres, D. F. 2023a, MN-RAS, 520, 2451 590 
+
+Bandiera, R., Bucciantini, N., Olmi, B., & Torres, D. F. 2023b, MNRAS, 525, 2839 Bietenholz, M. F. & Nugent, R. L. 2015, MNRAS, 454, 2416 Breu, C. & Rezzolla, L. 2016, MNRAS, 459, 646 Bucciantini, N., Amato, E., Bandiera, R., Blondin, J. M., & Del Zanna, L. 2004, A&A, 423, 253 Bucciantini, N., Arons, J., & Amato, E. 2011, MNRAS, 410, 381 Bucciantini, N., Blondin, J. M., Del Zanna, L., & Amato, E. 2003, A&A, 405, 617 Bucciantini, N., Quataert, E., Arons, J., Metzger, B. D., & Thompson, T. A. 2007, 600 
+
+MNRAS, 380, 1541 Charlebois, M., Drissen, L., Bernier, A. P., Grandmont, F., & Binette, L. 2010, AJ, 139, 2083 Davidson, K. & Fesen, R. A. 1985, ARA&A, 23, 119 De Looze, I., Barlow, M. J., Bandiera, R., et al. 2019, MNRAS, 488, 164 De Sarkar, A., Torres, D. F., Olmi, B., Bucciantini, N., & Meyer, D. M.-A. 2026, In Preparation Dirson, L. & Horns, D. 2023, A&A, 671, A67 Fesen, R., Rudie, G., Hurford, A., & Soto, A. 2008, ApJS, 174, 379 Fesen, R. A., Shull, J. M., & Hurford, A. P. 1997, AJ, 113, 354 610 
+
+Fiori, M., Olmi, B., Amato, E., et al. 2022, MNRAS, 511, 1439 Gelfand, J. D., Slane, P. O., & Zhang, W. 2009, ApJ, 703, 2051 Giuliani, Jr., J. L. 1982, ApJ, 256, 624 Hennessy, G. S., O’Connell, R. W., Cheng, K. P., et al. 1992, ApJ, 395, L13 Henry, R. B. C. & MacAlpine, G. M. 1982, ApJ, 258, 11 Hester, J. J., Stone, J. M., Scowen, P. A., et al. 1996, ApJ, 456, 225 Íñiguez-Pascual, D., Viganò, D., & Torres, D. F. 2025, A&A, 704, L14 Jun, B.-I. 1998, ApJ, 499, 282 Khangulyan, D., Aharonian, F. A., & Kelner, S. R. 2014, ApJ, 783, 100 Kirsch, M. G., Briel, U. G., Burrows, D., et al. 2005, in Society of Photo-Optical 620 
+
+Instrumentation Engineers (SPIE) Conference Series, Vol. 5898, UV, X-Ray, and Gamma-Ray Space Instrumentation for Astronomy XIV, ed. O. H. W. Siegmund, 22–33 Kuiper, L., Hermsen, W., Cusumano, G., et al. 2001, A&A, 378, 918 Lhaaso Collaboration, Cao, Z., Aharonian, F., et al. 2021, Science, 373, 425 Loll, A. M., Desch, S. J., Scowen, P. A., & Foy, J. P. 2013, ApJ, 765, 152 Lundqvist, P. & Tziamtzis, A. 2012, MNRAS, 423, 1571 Lyne, A. G., Jordan, C. A., Graham-Smith, F., et al. 2015, MNRAS, 446, 857 Ma, Y. K., Ng, C.-Y., Bucciantini, N., et al. 2016, ApJ, 820, 100 MacAlpine, G. M. & Satterfield, T. J. 2008, AJ, 136, 2152 630 
+
+MAGIC Collaboration, Acciari, V. A., Ansoldi, S., et al. 2020, A&A, 635, A158 Martín, J., Torres, D. F., & Rea, N. 2012, MNRAS, 427, 415 Martin, T., Milisavljevic, D., & Drissen, L. 2021, MNRAS, 502, 1864 Martin, T., Milisavljevic, D., Temim, T., et al. 2025, arXiv e-prints, arXiv:2502.19632 Matzner, C. D. & McKee, C. F. 1999, ApJ, 510, 379 Meagher, K. & VERITAS Collaboration. 2015, in International Cosmic Ray Conference, Vol. 34, 34th International Cosmic Ray Conference (ICRC2015), 792 Meyer, D. M.-A., Meliani, Z., & Torres, D. F. 2024, A&A, 692, A207 640 
+
+Meyer, D. M.-A. & Torres, D. F. 2025, MNRAS, 537, 186 Ostriker, J. P. & Gunn, J. E. 1971, ApJ, 164, L95 Owen, P. J. & Barlow, M. J. 2015, ApJ, 801, 141 Pacini, F. & Salvati, M. 1973, ApJ, 186, 249 Porter, T. A., Jóhannesson, G., & Moskalenko, I. V. 2017, ApJ, 846, 67 Press, W. H., Flannery, B. P., & Teukolsky, S. A. 1986, Numerical recipes. The art of scientific computing Reynolds, S. P. & Chevalier, R. A. 1984, ApJ, 278, 630 Sankrit, R. & Hester, J. J. 1997, ApJ, 491, 796 Smith, N. 2013, MNRAS, 434, 102 650 
+
+Stone, J. M. & Gardiner, T. 2007, ApJ, 671, 1726 Sukhbold, T., Ertl, T., Woosley, S. E., Brown, J. M., & Janka, H.-T. 2016, ApJ, 821, 38 Temim, T., Laming, J. M., Kavanagh, P. J., et al. 2024, ApJ, 968, L18 Truelove, J. K. & McKee, C. F. 1999, ApJS, 120, 299 Tziamtzis, A., Schirmer, M., Lundqvist, P., & Sollerman, J. 2009, A&A, 497, 167 Veron-Cetty, M. P. & Woltjer, L. 1993, A&A, 270, 370 Yang, H. & Chevalier, R. A. 2015, ApJ, 806, 153 Zabalza, V. 2015, in International Cosmic Ray Conference, Vol. 34, 34th Inter- 660 
+
+national Cosmic Ray Conference (ICRC2015), 922 
+
+Article number, page 8 N. Bucciantini and B. Olmi: A thick-shell formalism for pulsar wind nebulae based on energy conservation 
+
+Appendix A: Comparison with the M-formalism 
+
+It is not di ffi cult to show that, in the limit of a constant PSR spin-down luminosity, the M-formalism (Bandiera et al. 2020) admits a self-similar solution analogous to the one of the E-formalism (Reynolds & Chevalier 1984): 
+
+R(t) = Ct (6 −δ)(5 −δ) , (A.1) with: 
+
+C5−δ = 2(3 −δ)/2 (5 − δ)(9 −δ)/2
+
+(3 − δ)(3 −δ)/2 (11 − 2δ)(9 − 2δ) Lpsr 
+
+s ˜E3−δ
+
+> sn
+
+˜M5−δ
+
+> ej
+
+. (A.2) This, however, is di ff erent form the one of Eq. 23 in the equiv-alent thin-shell case ( X = 1). The origin of the discrepancy, is due to the fact that the energy in the filaments (or shell) Efil (t)670 
+
+will have both a kinetic and an internal-energy term, while Eq. 8 only accounts for the kinetic component. In the thin-shell limit the thermal component cannot be determined and it is typically neglected. However, it is easy to show that this is not correct. From a physical point of view the assumption that the shell is infinitely thin, is equivalent to the assumption that the ejecta have infinite compressibility, or, stated in other terms, that their adiabatic coe ffi cient Γ → 1. It is not di ffi cult to show (Jun 1998) that the shell thickness scales as R(t)( Γ − 1), while its pressure is ≃ Ppwn (t), almost constant across the shell, and its internal 680 
+
+energy density then scales as ≃ Ppwn (t)/(Γ − 1), such that the integrated internal energy converges to a finite value, scaling as 
+
+Ppwn (t)R(t)3.One can account for this by replacing, in the thin-shell case X = 1, Eq. 23 with: 
+
+Efil (t) = Mfil(t) 
+
+2 ˙R(t)2 + AE pwn (t) , (A.3) where the parameter A can be found by requiring the solution of the E-formalism: 
+
+C5−δ = 2 52 − δ 
+
+> 2
+
+(δ − 5) 72 − δ 
+
+> 2
+
+(δ − 3) δ−32 ((6 − δ) − A(5 − δ)) (2 δ − 11)(4 δ − 21) ×× Lpsr 
+
+s ˜E3−δ
+
+> sn
+
+˜M5−δ
+
+> ej
+
+, (A.4) to match the one of the M-formalism. The matching condition is: 690 
+
+A = 3 − δ
+
+2  2δ2 − 19 δ + 45  , (A.5) with A confined between A = 1/30 at δ = 0 and δ = 2 and A ≃
+
+1/27 .9 at δ = 1.25 ( A = 1/28 at δ = 1). In general setting A = 0leads to errors in the value of the PWN radius that are always 
+
+< 1%. While using a fixed value A = 1/30 gives an error that, at most, is 0 .5% at δ = 1. Now it has been shown that for self-similar expansion of a piston (the PWN) inside ejecta themselves in homologous expansion, the hydrodynamical solution is self-similar (Jun 1998). Then one can compute (as a function of the adiabatic coe ffi cient) the structure of the swept-up shell. Once the structure is known, it is easy to compute its internal energy. 700 
+
+By taking solutions in the limit Γ → 1, one can show that the total internal energy converges to the values derived by matching the solutions in the E- and M-formalism. However, in general, neglecting the thermal contribution leads to negligible deviations in the global radial evolution. 
+
+Appendix B: Prolate nebulae 
+
+One of the main advantages of the E-formalism is that it can easily be extended to account for a non-spherical PWN shape. Here we will briefly illustrate how ellipticity can be included. To a good approximation the shape of a young PWN might be 710 
+
+described by a prolate-ellipsoid: 
+
+R(t, θ )2 = R2eq (t)1 − e2 cos 2 θ , with e2 = R2pol (t) − R2eq (t)
+
+R2pol (t) , (B.1) where the labels eq and pol refer to the the equatorial and polar radii respectively. If one assumes that the ellipticity e remains constant in time, one can easily make use of the following inte-grals: 
+
+Vn = 2π
+
+Z π
+
+> 0
+
+Z R(θ)0
+
+rnr2 sin θdrdθ
+
+= 4π
+
+3 + n 2F1
+
+" 12 , 3 + n
+
+2 , 32 , e2
+
+#
+
+R3+n 
+
+> eq
+
+, (B.2) where 2F1 is the Hypergeometric function (it can be expressed in terms of simpler functions for n multiple of 2, and for all integer 
+
+n ≤ 1). The mass in the filaments, is given by the integral over the PWN volume of the density of the ejecta, and it will be: 
+
+Mfil (t) = 2π
+
+Z π
+
+> 0
+
+Z R(t,θ )
+
+> Rin (t,θ )
+
+ρfil (t, θ, r′)r′2 sin θdθdr ′ . (B.3) Now one can make some simplifying assumptions for the distri- 720 
+
+bution of the density of the filamentary layer. First we assume that the thick-layer is self similar Rin (θ, t) = ξR(θ, t), and that the density in the layer is uniform in both radius and angle, 
+
+ρfil (t, θ, r′) = K(t). Then from Eq. B.2 and Eq. B.3 one has: 
+
+Mfil (t) = 4π
+
+3 2F1
+
+" 12 , 32 , 32 , e2
+
+#
+
+K(t)Req (t)3(1 − ξ3) . (B.4) Analogously the energy in the filamentary layer, assuming ho-mologous expansion, and no relative dragging ( ξdrag = 1), will be given by: 
+
+Efil (t) = π
+
+Z π
+
+> 0
+
+Z R(t,θ )
+
+> Rin (t,θ )
+
+ρfil (t, θ, r′)r′2 ˙R2(θ, t) r′
+
+R(θ, t)
+
+!2
+
+sin θdθdr ′, (B.5) and, under the same assumptions done for the density, one gets: 
+
+Efil (t) = 2π
+
+5 2F1
+
+" 12 , 52 , 32 , e2
+
+#
+
+K(t) ˙Req (t)
+
+Req (t)
+
+!2
+
+Req (t)5(1 − ξ5). (B.6) For a fully developed filamentary layer ( ξ = 0): 
+
+Efil (t) = 310 3 − 2e2
+
+3 − 3e3 Mfil (t) ˙ R2eq (t) , (B.7) Now the mass of the filamentary layer is equal to the swept up 730 
+
+mass of the ejecta, and as long as the PWN is confined to the ejecta core, Eq. B.2 and Eq. 21 give: 
+
+ρc(t)Rc(t)δ 4π
+
+3 − δ 2F1
+
+" 12 , 3 − δ
+
+2 , 32 , e2
+
+#
+
+Req (t)3−δ (B.8) and recalling that: ˜Mej = 4π
+
+3 − δ ρc(t)Rc(t)3 , with Rc(t) = Vct , (B.9) 
+
+> Article number, page 9
+
+A&A proofs: manuscript no. article_1 
+
+one finds for the swept-up mass: ˜Mej 
+
+Req (t)
+
+Vct
+
+!3−δ
+
+> 2
+
+F1
+
+" 12 , 3 − δ
+
+2 , 32 , e2
+
+#
+
+, (B.10) and for the ejecta energy: 
+
+Eini (t) = ˜Esn 
+
+Req (t)
+
+Vct
+
+!5−δ
+
+> 2
+
+F1
+
+" 12 , 5 − δ
+
+2 , 32 , e2
+
+#
+
+. (B.11) Substituting these results into the general equations of Sect. 2, one can show that the equations for the equatorial radius reduce to: dEpwn (t)dt = Lpsr (t) − 4π
+
+33Ppwn (t)R2eq (t)
+
+√1 − e2
+
+d( Req (t)) dt
+
+= Lpsr (t) − Epwn (t)
+
+Req (t)d( Req (t)) dt , (B.12) dW(t)dt = Epwn (t)
+
+Req (t)d( Req (t)) dt . (B.13) In the limit of constant PSR luminosity, and following the same strategy of Sect. 3, one can show that the evolution of the equato-740 
+
+rial radius remains self similar, with the same power-law depen-dence of the spherical case. Now we can introduce the following quantity: 
+
+Y[δ, e] = 35
+
+> 2
+
+F1
+
+h 12 , 52 , 32 , e2i
+
+> 2
+
+F1
+
+h 12 , 32 , 32 , e2i 2F1
+
+h 12 , 3−δ 
+
+> 2
+
+, 32 , e2i
+
+> 2
+
+F1
+
+h 12 , 5−δ 
+
+> 2
+
+, 32 , e2i , (B.14) which can easily be generalized to ξ , 1, or for filamentary layers with a non uniform radial density distribution. Then the evolution will be given by: 
+
+Y[δ, e] ˜ Mej 
+
+2
+
+Req (t)
+
+Vct
+
+!3−δ
+
+˙R2eq (t)2F1
+
+" 12 , 5 − δ
+
+2 , 32 , e2
+
+#
+
+== W(t) + 2F1
+
+" 12 , 5 − δ
+
+2 , 32 , e2
+
+#
+
+˜Esn 
+
+Req (t)
+
+Vct
+
+!5−δ
+
+. (B.15) Assuming that Req (t) = Ct (6 −δ)/(5 −δ) the solution becomes: 
+
+C5−δ = 2 52 − δ 
+
+> 2
+
+(δ − 5) 72 − δ 
+
+> 2
+
+(δ − 3) δ−32 (6 − δ)(2 δ − 11)( Y[δ, e](6 − δ)2 − (3 − δ)(5 − δ)) ×× 1
+
+> 2
+
+F1
+
+h 12 , 5−δ 
+
+> 2
+
+, 32 , e2i Lpsr 
+
+s ˜E3−δ
+
+> sn
+
+˜M5−δ
+
+> ej
+
+. (B.16) 
+
+Y[δ, e] is an increasing function of δ and e, rising from 3 /5 for 
+
+δ = 0 independent of e, and for e = 0 independent of δ, up to 0.66 for δ = 2 and e = 0.8. While 2 F1
+
+h1/2, (5 − δ)/2, 3/2, e2i
+
+> 750
+
+goes from 0 at e = 0, to 2.65 at e = 0.8 and δ = 0 (1.65 at 
+
+e = 0.8 and δ = 2). This corresponds to a change by at most a factor 1.2 in the equatorial radius with respect toa spherical case. 
+
+Appendix C: Second-order upwind implicit solver for the particle evolution 
+
+In the presence of radiative losses, the total particle energy con-tent of the PWN is not computed directly from Eq. 1, but it is derived from the particle distribution function f (γ). The latter, in the one zone model (assuming isotropy and homogeneity), evolves according to the continuity equation in energy-space: 760 
+
+∂ f (γ)
+
+∂t + ∂˙γ f (γ)
+
+∂γ = J(γ) , (C.1) where J(γ) is the injection term, and ˙ γ describe the net ef-fect of losses, adiabatic plus radiative (Gelfand et al. 2009; Bucciantini et al. 2011; Martín et al. 2012). Due to the fact that the timescale for radiative losses can di ff er by many orders of magnitude with respect to the PWN evolutionary timescale, this equation is typically discretized according to the following im-plicit scheme: 
+
+f ni − f n−1
+
+> i
+
+∆t +
+
+˙γi+ 12 f ni+ 12
+
+− ˙γi− 12 f ni− 12
+
+(γi+ 12 − γi− 12 ) = Jni , (C.2) where n is the time step, while i is the index of the energy bin. In this formulation the discretized equation ensures particle con-servation to machine accuracy. However, it does ensure energy 770 
+
+conservation only to interpolation accuracy. This means that, in the absences of radiation losses, the total energy computed from the particle distribution function does not match the one computed according to Eq. 19. Now a first-order upwind definition of the γ-interface fluxes is: ˙γi+ 12 f ni+ 12
+
+=
+
+
+
+˙γi+ 12 f ni for ˙γi+ 12 ≥ 0 ,
+
+˙γi+ 12 f ni+1 for ˙γi+ 12 ≤ 0 , (C.3) and the implicit equation reduces to the solution of a tri-diagonal matrix A with: main = Ai,i =
+
+"
+
+1 + ∆t
+
+∆γi
+
+Max[˙ γi+ 12 , 0] − Min[˙ γi− 12 , 0] #
+
+, (C.4) upper = Ai,i+1 = ∆t
+
+∆γi
+
+Min[˙ γi+ 12 , 0]  , (C.5) lower = Ai,i−1 = − ∆t
+
+∆γi
+
+Max[˙ γi− 12 , 0]  , (C.6) with the following boundary conditions f n 
+
+> max +1
+
+= 0 and 
+
+f n 
+
+> 1/2
+
+= f n 
+
+> 1
+
+(γ1/2/γ 1)p, where p is the low-energy power-law index, 780 
+
+and γ1/2 = γ1 − ∆γ1/2. This tri-diagonal can easily be inverted using a fast Thomas algorithm (Press et al. 1986). However, depending of the injection spectrum, for a typi-cal first order scheme with 150 logarithmically spaced energy bins, in the range γ = 10 − 10 11 , the discrepancy on the energy can be as high as 15%. To get an error smaller than 1% one needs to increase the number of the energy bins by a tenfold. This becomes prohibitive (especially when one wishes to include self-synchrotron-Compton) because implicit schemes 790 
+
+are typically O(N2) with respect to the number of bins. One can use a second-order interpolation to increase accu-racy. To do this, we compute the local power-law slopes of the distribution as: 
+
+pr 
+
+> i
+
+= log ( fi+1/ fi)/ log ( γi+1/γ i) (C.7) 
+
+pl 
+
+> i
+
+= log ( fi/ fi−1)/ log ( γi/γ i−1) (C.8) 
+
+Article number, page 10 N. Bucciantini and B. Olmi: A thick-shell formalism for pulsar wind nebulae based on energy conservation 
+
+and introduce the following central-limited slope: 
+
+pi =
+
+
+
+min[ pr 
+
+> i
+
+, pl
+
+> i
+
+] if pr 
+
+> i
+
+> 0,
+
+max[ pr 
+
+> i
+
+, pl
+
+> i
+
+] if pr 
+
+> i
+
+< 0,
+
+0 if pr 
+
+> i
+
+pl 
+
+> i
+
+≤ 0,
+
+p1 = pr1,
+
+pN = 0,
+
+(C.9) such that: 
+
+fi+ 12 = fi + pi
+
+γi
+
+fi[γi+ 12 − γi] = fi
+
+"
+
+1 + pi
+
+γi+ 12
+
+γi
+
+− 1
+
+!# 
+
+= fi∆ f r 
+
+> i
+
+, (C.10) 
+
+fi− 12 = fi + pi
+
+γi
+
+fi[γi− 12 − γi] = fi
+
+"
+
+1 + pi
+
+γi− 12
+
+γi
+
+− 1
+
+!# 
+
+= fi∆ f l 
+
+> i
+
+, (C.11) where we have introduced the relative increments ∆ f . A second-order upwind definition of the γ-interface fluxes is: ˙γi+ 12 f ni+ 12
+
+=
+
+
+
+˙γi+ 12 f ni ∆ f r 
+
+> i
+
+for ˙γi+ 12 ≥ 0,
+
+˙γi+ 12 f ni+1∆ f l 
+
+> i+1
+
+for ˙γi+ 12 ≤ 0, (C.12) that simplifies into: 800 
+
+˙γi+ 12 f ni+ 12
+
+= Max[˙ γi+ 12 , 0] ∆ f r 
+
+> i
+
+f ni + Min[˙ γi+ 12 , 0] ∆ f l 
+
+> i+1
+
+f ni+1 , (C.13) and the elements of the tridiagonal matrix to invert are: Ai,i =
+
+"
+
+1 + ∆t
+
+∆γi
+
+Max[˙ γi+ 12 , 0] ∆ f r 
+
+> i
+
+− Min[˙ γi− 12 , 0] ∆ f l
+
+> i
+
+#
+
+,
+
+(C.14) Ai,i+1 = ∆t
+
+∆γi
+
+Min[˙ γi+ 12 , 0] ∆ f l
+
+> i+1
+
+ , (C.15) Ai,i−1 = − ∆t
+
+∆γi
+
+Max[˙ γi− 12 , 0] ∆ f r
+
+> i−1
+
+ . (C.16) This second order scheme improves energy conservation with respect to a fist order scheme by a factor 10. 
+
+Appendix D: Discretization of self-synchrotron Compton losses in Klein-Nishina regime 
+
+The most time consuming part in the evolution of the particle distribution function (in general of all the algorithm), is the com-putation of self-synchotron-Compton losses, especially if done in the full Klein-Nishina regime. For this reason, developing op-timized algorithms is quite important. Here we show how to do 810 
+
+it in a fully algebric-vectorization way, without the need of in-terpolations or integrations that can be quite numerically heavy. Aharonian & Atoyan (1981) provide a formula for the IC losses in the full Klein-Nishina (KN) regime for electrons with Lorentz factor γ interacting with a monochromatic radiation field at fre-quency ν according to: 
+
+PIC (γ) = 32 9 πr2o c U ph γ2G(ξ) = 43 cσTG(ξ)Uph γ2 , (D.1) where: 
+
+G(ξ) = 9
+
+ξ3
+
+
+
+6 + ξ
+
+2 + 6
+
+ξ
+
+!
+
+ln (1 + ξ)+
+
+− ln 2 (1 + ξ) − (11 /12) ξ3 + 8ξ2 + 13 ξ + 6(1 + ξ)2 ++ 2
+
+Z 11/(1 +ξ)
+
+ln ( y)1 − y dy 
+
+
+
+, (D.2) with the IC parameter: 
+
+ξ = 4γ hν
+
+mec2 . (D.3) Inspired by Khangulyan et al. (2014), we can approximate the function G(ξ) to get an e ff ective cross section: 820 
+
+σ(ξ) = σT
+
+7.65 
+
+ξ
+
+ln h1 + ξ
+
+> 7.65
+
+i
+
+(1 + 1.6505 ξ) . (D.4) Under the mono-chromatic approximation for synchrotron emis-sion, an emitting particle with Lorentz factor γi will radiate en-ergy at a frequency: 
+
+νi = 0.29 3e
+
+4πmec Bγ2 
+
+> i
+
+(D.5) and for a particle with Lorentz factor γ j the IC parameter will be: 
+
+ξi j = 0.87 
+
+π
+
+he m2 
+
+> e
+
+c3 Bγ2 
+
+> i
+
+γ j , (D.6) Now the synchrotron power emitted at frequency νi will be given by: 
+
+S νi = 43 cσT
+
+B2
+
+8π N(γi)γ2 
+
+> i
+
+. (D.7) and the related radiation field averaged over the volume of the nebula (see App. E) will be: 
+
+⟨Uνi ⟩ = 9413
+
+σT
+
+πR2
+
+B2
+
+8π N(γi)γ2 
+
+> i
+
+= 3 σT
+
+4πR2
+
+B2
+
+8π N(γi)γ2 
+
+> i
+
+. (D.8) It is then possible to define an e ff ective radiation photon field for 830 
+
+particles with Lorentz factor γ j as: 
+
+⟨Uν⟩ j = 34πR2
+
+B2
+
+8π
+
+> n
+
+X
+
+> i=1
+
+σ(ξi j )N(γi)γ2 
+
+> i
+
+, (D.9) such that the energy losses are: 
+
+PSSC IC (γ j) = Rc σ2T
+
+B2
+
+2
+
+> n
+
+X
+
+> i=1
+
+σ(ξi j )
+
+σT
+
+n(γi)γ2 
+
+> i
+
+γ2 
+
+> j
+
+. (D.10) 
+
+Appendix E: Average photon field in an optically thin sphere 
+
+A parcel of isotropically emitting plasma, located at xe, with vol-ume d V and with mono-chromatic emissivity ϵν at frequency ν,will produce an energy flux at a point xo such that the photon density at xo will be given by: 
+
+ϵν
+
+4πD2 dV = nγ(xo)hνc
+
+⇒ Uγ(xo) = nγ(xo)hν = ϵν
+
+4πcD 2 dV , (E.1) where D = p(xo − xe)2, and Uγ is the associated energy density of the radiation field. Let us consider a spherical shell of radius 840 
+
+Article number, page 11 A&A proofs: manuscript no. article_1 
+
+r and thickness d r, and a point located on the z-axis at coordi-nate zo; assuming uniform emissivity, one can compute the total energy density integrating over the shell: 
+
+Uγ(r, zo) = 2π
+
+Z π
+
+> 0
+
+ϵν
+
+4πc
+
+sin θdθ
+
+(r sin θ)2 + (r cos θ − zo)2 dr
+
+= ϵνdr
+
+2c
+
+Z −11
+
+−dμ
+
+r2 + z2o − 2zorμ
+
+= ϵνdr
+
+2c
+
+12zor ln 
+
+" r2 + z2o + 2zorr2 + z2o − 2zor
+
+#
+
+. (E.2) Note that in the limit zo → 0 one finds Uγ = ϵνdr/r2 while for zo → ∞ one has Uγ = ϵνdr/z2o. Integrating over a spherical volume extending from r = 0 to r = R one gets the total radiation field at zo:
+
+Uγ(zo) = ϵν
+
+4cz o
+
+Z R
+
+> 0
+
+r ln 
+
+" r2 + z2o + 2zorr2 + z2o − 2zor
+
+#
+
+dr . (E.3) Now we are interested in the illumination of points inside R. In the limit zo → 0 one finds Uγ(0) = ϵνR/c. On the other hand, for zo → R one has Uγ(R) = ϵνR/(2 c). We can define an average 850 
+
+radiation field if one integrates over zo within a sphere of radius 
+
+R to get: 
+
+⟨Uγ⟩ = 34πR3
+
+Z R
+
+> 0
+
+4πUγ(zo)z2odzo = 34
+
+Rc ϵν (E.4) 
+
+= Re 
+
+" ϵνzo
+
+4c
+
+( 2Rzo
+
+−2ArcTanh Rzo
+
+!
+
++ R2
+
+2z2o
+
+ln 
+
+" (R + zo)2
+
+(R − zo)2
+
+#)# 
+
+.
+
+(E.5) Now, in an optically thin source, one defines the emissivity based on the total emitted power Sν as: Sν = 4πϵ νR3/3. This leads to the following relation: 
+
+⟨Uγ⟩ = 94
+
+Sν
+
+4πR2c . (E.6) 
+
+Article number, page 12
