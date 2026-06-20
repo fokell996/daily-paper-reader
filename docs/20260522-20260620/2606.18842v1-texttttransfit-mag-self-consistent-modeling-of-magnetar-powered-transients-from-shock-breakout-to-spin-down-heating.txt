@@ -1,0 +1,474 @@
+Title: : Self-Consistent Modeling of Magnetar-Powered Transients from Shock Breakout to Spin-Down Heating
+
+URL Source: https://arxiv.org/pdf/2606.18842v1
+
+Published Time: Thu, 18 Jun 2026 00:41:20 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+> Draft version June 18, 2026
+> Typeset using L ATEX twocolumn style in AASTeX7.0.1
+
+TransFit-MAG : Self-Consistent Modeling of Magnetar-Powered Transients from Shock Breakout to Spin-Down Heating 
+
+Jing-Yao Li ,1, 2, 3 Liang-Duan Liu ,1, 2, 3 Yun-Wei Yu ,1, 2, 3 Guang-Lei Wu ,1, 2, 3 and Yu-Hao Zhang 1, 2, 3 
+
+> 1Institute of Astrophysics, Central China Normal University, Wuhan 430079, China; yuyw@ccnu.edu.cn;liuld@ccnu.edu.cn
+> 2Laboratory for Compact Object Astrophysics and Astronomical Technology, Central China Normal University, Wuhan 430079, China
+> 3Education Research and Application Center, National Astronomical Data Center, Wuhan 430079, China
+
+ABSTRACT Magnetar engines are widely invoked to power luminous optical transients, but their early emission depends on the coupled evolution of engine injection, shock heating, adiabatic cooling, and radiative diffusion. We present TransFit-MAG , a time-dependent radiative-diffusion framework for magnetar-powered transients. The model couples the TransFit diffusion solver to the dynamics of a magnetar-inflated pulsar wind nebula (PWN) and its forward shock propagating through homologously expanding ejecta, calculating the internal radiation-energy distribution, photospheric evolution, shock-heating lo-cation, and emergent luminosity self-consistently. For different parameter values, the model naturally produces well-separated double peaks, partially merged peaks, or single broad peaks. These results suggest that early bumps and broad single peaks in engine-powered transients may be understood within a unified engine–shock–diffusion framework, in which the observed diversity reflects the cou-pled evolution of central-engine power, shock propagation, and radiative transport through expanding ejecta. As an illustrative application, we fit the multiband optical light curves of the double-peaked SLSN-I LSQ14bdq. 
+
+Keywords: Supernovae (1668); Magnetars (992); Radiative transfer (1335) 
+
+1. INTRODUCTION High-cadence time-domain surveys have revealed a di-verse population of luminous and rapidly evolving opti-cal transients (E. C. Bellm et al. 2019; ˇZ. Ivezi´ c et al. 2019), including superluminous supernovae (SLSNe; A. Gal-Yam 2019), fast blue optical transients (FBOTs; M. R. Drout et al. 2014; M. Pursiainen et al. 2018), and supernovae associated with gamma-ray bursts (GRBs) (T. J. Galama et al. 1998; J. Hjorth et al. 2003; K. Z. Stanek et al. 2003; S. E. Woosley & J. S. Bloom 2006) or extragalactic fast X-ray transients (H. Sun et al. 2025; W.-X. Li et al. 2025). These events occupy a broad region of luminosity–timescale phase space (C. In-serra 2019) and often show rapid color evolution, early-time excess emission, or multiwavelength counterparts (R. Margutti et al. 2019; A. Y. Q. Ho et al. 2019). The high luminosities, rapid evolution, and short dif-fusion timescales of many of these transients challenge a purely radioactive interpretation due to the decay chain 
+
+> 56
+
+Ni →56 Co →56 Fe. Additional power from a central engine, such as a rapidly rotating magnetar (D. Kasen & L. Bildsten 2010; S. E. Woosley 2010; Y.-W. Yu et al. 2013, 2015; Z.-D. Zhang et al. 2022) or accretion onto a compact object(A. L. Piro & C. D. Ott 2011; J. Dexter & D. Kasen 2013; T. J. Moriya et al. 2019; W. Lin et al. 2021), is therefore often invoked. Magnetar spin-down provides a natural energy reser-voir for powering luminous optical transients (Y.-W. Yu et al. 2017; J.-F. Liu et al. 2022). In the standard pic-ture, the spin-down luminosity is injected into the ex-panding ejecta, thermalized, and released through radia-tive diffusion. However, the early emission depends not only on the instantaneous spin-down power, but also on how this energy is deposited and transported. A mag-netar wind can inflate a hot pulsar-wind nebula (PWN), which acts as a piston and drives a shock into the ho-mologously expanding ejecta (R. A. Chevalier 2005; D. Kasen et al. 2016; K.-J. Chen et al. 2016; A. Suzuki & K. Maeda 2021). The shock converts part of the rel-ative kinetic energy into thermal radiation, while the remaining magnetar/PWN energy is stored in the op-tically thick ejecta and released after a diffusion delay. Recent work has further emphasized that, if the wind bubble reaches the steep outer ejecta before photon dif-fusion becomes efficient, hydrodynamic instabilities may 
+
+> arXiv:2606.18842v1 [astro-ph.HE] 17 Jun 2026
+
+2 Li et al. 
+
+lead to a blowout of the nascent bubble and produce a fast early UV/optical peak (M. Chen et al. 2026). The observed light curve is therefore shaped by the coupled evolution of engine injection, PWN-driven shock heat-ing, adiabatic expansion, and radiative diffusion. This coupling is particularly relevant for hydrogen-poor SLSNe with double-peaked rising light curves. Sev-eral SLSNe-I show an early precursor bump before the broader main peak (G. Leloudas et al. 2012; M. Nicholl et al. 2015; M. Smith et al. 2016). A systematic search by M. Nicholl & S. J. Smartt (2016) found plausible early bumps in 8 of 14 SLSNe with sufficiently early ob-servations, suggesting that such features may be com-mon among SLSNe-I. However, the larger Dark Energy Survey sample shows that early bumps are not ubiqui-tous (C. R. Angus et al. 2019). The presence or absence of an early bump therefore provides a useful diagnostic of the energy-deposition depth, optical-depth evolution, and diffusion efficiency of the ejecta. Despite these observational motivations, magnetar-powered light curves are still commonly modeled with semi-analytic diffusion prescriptions, including Arnett-type solutions (W. D. Arnett 1980, 1982) and their ex-tensions to magnetar heating (D. Kasen & L. Bildsten 2010; E. Chatzopoulos et al. 2012; M. Nicholl et al. 2017). These models are useful for estimating global parameters, but they do not explicitly follow the spa-tially dependent energy deposition and transport in the ejecta. This limitation becomes particularly important when the magnetar inflates a PWN and drives a shock through the expanding ejecta. In this case, the shock radius, the optical depth above the shocked layer, and the local shock-heating rate all evolve with time. An ar-tificial delay between magnetar injection and radiative escape is sometimes introduced to reproduce double-peaked light curves (D. Kasen et al. 2016; L.-D. Liu et al. 2021), but a more self-consistent treatment should instead follow the time-dependent internal-energy distri-bution and its diffusion through the ejecta (P. A. Pinto & R. G. Eastman 2000a,b; S. I. Blinnikov et al. 2006; V. Morozova et al. 2015), ideally guided by radiation-hydrodynamic calculations (L. Dessart et al. 2012; D. Kasen et al. 2016; K.-J. Chen et al. 2016). To address this problem, we previously developed 
+
+TransFit , a time-dependent radiative-diffusion frame-work for homologously expanding ejecta (L.-D. Liu et al. 2025). Rather than adopting an integral diffusion so-lution, TransFit directly solves the diffusion equation and self-consistently calculates the internal-energy pro-file, photospheric evolution, and emergent luminosity. This framework has also been extended to interaction-powered transients by coupling the diffusion solver to ejecta–CSM shock dynamics and time-dependent shock heating (Y.-H. Zhang et al. 2026). In this work, we extend TransFit to magnetar-powered transients. The resulting model, TransFit-MAG , couples magnetar spin-down injection, PWN-driven shock dynamics, local shock heating, and time-dependent radiative diffusion in expanding ejecta, providing a physically motivated tool for interpreting early bumps, shoulders, and broad peaks in engine-powered transients. The paper is organized as follows. In Section 2, we describe the physical framework of TransFit-MAG , in-cluding the homologously expanding ejecta structure, magnetar spin-down input, PWN-driven shock dynam-ics, and the coupled time-dependent radiative-diffusion treatment. In Section 3, we investigate how the com-petition between shock-heated radiation and delayed magnetar/PWN diffusion shapes the bolometric light curve, and we formulate the physical conditions for well-separated double peaks, partially merged peaks, and sin-gle broad peaks. In Section 4, we apply the model to the double-peaked SLSN-I LSQ14bdq and compare the inferred parameters with previous studies. Finally, in Section 5, we summarize our main results, discuss their physical implications, and outline the limitations of the present model.  
+
+> 2.
+
+PHYSICAL FRAMEWORK As an extension of the TransFit framework, 
+
+TransFit-MAG models transients powered by the spin-down of a newly born magnetar embedded in expanding supernova ejecta. The magnetar deposits its rotational energy into the inner ejecta, forming a hot, radiation-dominated PWN, as illustrated in Figure 1. The PWN acts as a piston and drives a forward shock into the homologously expanding ejecta. Part of the PWN en-ergy is converted into mechanical work on the swept-up shell, while the relative kinetic energy across the shock is dissipated locally as shock heating. The resulting ra-diation field is then redistributed within the optically thick ejecta and transported outward by diffusion until it reaches the photosphere, beyond which photons free-stream to form the observed emission. This treatment differs from semi-analytic models that assumes a pre-scribed global response function(D. Kasen et al. 2016; L.-D. Liu et al. 2021; M. Chen et al. 2026). 2.1. Initial Conditions 
+
+We specify the initial ejecta and engine properties adopted in TransFit-MAG . For core-collapse supernovae (CCSNe), the ejecta expand rapidly after shock break-out. When the ejecta radius has increased to several times the progenitor radius, the flow approaches homolo-TransFit-MAG 3PWN bubble 
+
+> shocked ejecta shell
+> inner shallow
+> outer steep
+> Magnetar
+> Rsh,in
+> Rsh
+> Rtr
+> Rph
+> Ldiff
+> Lshock
+> Lwork
+> Lsd
+> Lbol
+> radiative
+> diffusion
+
+Figure 1. Schematic of the coupled PWN–shock–d-iffusion framework in TransFit-MAG . The magnetar spin– down power Lsd inflates a radiation-dominated PWN bub-ble, which drives a forward shock through the homologously expanding ejecta and sweeps material into a shocked shell. The bubble performs mechanical work Lwork on the shell, while shock dissipation produces local heating Lshock near 
+
+Rsh . The deposited radiation diffuses through the optically thick ejecta toward the photosphere Rph , beyond which pho-tons free-stream and contribute to the observed bolometric luminosity Lbol .
+
+gous expansion, with v = r/t . We therefore start the cal-culation at tin , defined as the epoch at which the ejecta are assumed to have reached this homologous stage. The ejecta velocity is limited to the range vmin ≤ v ≤ vmax .The ejecta density is written as 
+
+ρej (r, t ) = ρ0
+
+ ttin 
+
+−3
+
+ηej (x), (1) where ρ0 is the density normalization at tin . The factor (t/t in )−3 describes the density dilution caused by homol-ogous expansion. The dimensionless velocity coordinate is defined as 
+
+x ≡ vvmax 
+
+= rvmax t . (2) The function ηej (x) gives the dimensionless density profile in velocity space. Motivated by hydrodynamic models of CCSN ejecta, we adopt a continuous broken power-law form (R. A. Chevalier & N. Soker 1989; C. D. Matzner & C. F. McKee 1999), 
+
+ηej (x) = 
+
+
+
+(x/x tr )−δ , xmin ≤ x < x tr ,
+
+(x/x tr )−n , xtr ≤ x ≤ 1.
+
+(3) Here xmin = vmin /v max and xtr = vtr /v max . The tran-sition velocity vtr separates the shallow inner ejecta from the steep outer envelope. In homologous expan-sion, this velocity corresponds to the transition radius 
+
+Rtr (t) = vtr t. We adopt δ ≃ 1 and n ≃ 10, typical val-ues for compact progenitor explosions. The normaliza-tion ρ0 and the transition velocity vtr are determined by requiring the density profile to reproduce the adopted ejecta mass Mej and the initial supernova kinetic en-ergy ESN . Here ESN denotes the kinetic energy car-ried by the homologously expanding ejecta at tin , before any subsequent energy injection from the central mag-netar engine. The residual internal energy of the freely expanding ejecta at tin is assumed to be subdominant, because it has been substantially reduced by adiabatic expansion and is rapidly overtaken by the subsequent shock-heating input. The central engine is powered by the spin-down of a newborn magnetar. In the magnetic dipole approxima-tion, the spin-down luminosity is 
+
+Lsd (t) = Em
+
+tsd 
+
+
+
+1 + ttsd 
+
+−2
+
+, (4) where Em is the initial rotational-energy reservoir and 
+
+tsd is the characteristic spin-down timescale (Z. G. Dai & T. Lu 1998; D. Kasen & L. Bildsten 2010). The mag-netar energy Em is therefore distinct from ESN : the for-mer represents the energy reservoir available for central-engine injection, whereas the latter specifies the initial kinetic energy of the homologously expanding ejecta. The injected spin-down power is deposited into the inner ejecta, inflating a hot, radiation-dominated bubble that drives a shock into the surrounding expanding material. 2.2. PWN-driven Shock Dynamics 
+
+The spin-down power of the central magnetar inflates a hot, high-pressure PWN inside the expanding ejecta. The PWN acts as a piston and drives a forward shock into the overlying ejecta (R. A. Chevalier & C. Fransson 1992; R. A. Chevalier 2005). As the shock propagates outward, it sweeps up ejecta material into a compressed shell and converts part of the relative kinetic energy into thermal radiation. Because the shocked layer is expected to remain nar-row compared with the global expansion scale, and be-cause we are primarily interested in the integrated mo-mentum and energy exchange rather than the detailed internal structure of the shocked region, we adopt a thin-shell approximation. We note that multidimensional ef-fects may become important when the PWN-driven shell approaches the steep outer ejecta. In particular, hydro-dynamic instabilities can fragment the shell and lead to a blowout of the nascent wind bubble (M. Chen et al. 2026). These effects are not explicitly modeled here; instead, we use the thin-shell dynamics as an effective description of the angle-averaged momentum and energy exchange. 4 Li et al. 
+
+Within this approximation, the shocked ejecta are characterized by the forward-shock radius Rsh , velocity 
+
+vsh = d Rsh /dt, and swept-up mass Msh . The density of the unshocked ejecta immediately ahead of the shock is ρsh ≡ ρej (Rsh , t ). Because the upstream ejecta ex-pand homologously, their velocity at the shock position is Rsh /t . We therefore define the shock velocity relative to the upstream ejecta as ∆ vsh ≡ vsh − Rsh /t . Only this relative velocity enters the mass flux, ram pressure, and shock-heating terms. The shell evolution follows from mass conservation, radial momentum balance, and the energy budget of the PWN bubble. These equations describe the growth of the swept-up shell, its accelera-tion by the bubble pressure against the upstream ram pressure, and the competition between magnetar input, mechanical work, and radiative diffusion: dMsh 
+
+dt = 4 πR 2sh ρsh ∆vsh , (5) dvsh 
+
+dt = 4πR 2sh 
+
+Msh 
+
+ Pb − ρsh ∆v2sh 
+
+ , (6) dUb
+
+dt = Lsd − Lwork − Ldiff . (7) Here Pb and Ub denote the pressure and internal energy of the radiation-dominated PWN bubble. Using Ub =3PbVb with Vb = 4 πR 3sh /3, we obtain 
+
+Ub = 4 πR 3sh Pb. (8) The mechanical power Lwork represents the net energy transferred from the PWN bubble to the shocked region. It is not simply the time derivative of the shell kinetic energy, because the swept-up ejecta already carry bulk kinetic energy before crossing the shock. We therefore write 
+
+Lwork = dEk,sh 
+
+dt − dEk,ej 
+
+dt + Lshock , (9) where Ek,sh is the kinetic energy of the shocked shell, Ek,sh = 12 Msh v2sh ,and d Ek,ej /dt is the rate at which the pre-existing ki-netic energy of the homologously expanding ejecta is swept into the shell, dEk,ej 
+
+dt = 2 πR 2sh ρsh 
+
+ Rsh 
+
+t
+
+2
+
+∆vsh . (10) The shock-heating luminosity is the dissipation rate of the relative kinetic energy across the shock (D. Kasen et al. 2016; S.-Z. Li & Y.-W. Yu 2016), 
+
+Lshock = 2 πR 2sh ρsh ∆v3sh . (11) The radiation transmitted from the PWN bubble into the shocked ejecta is evolved by radiative diffusion. In the diffusion approximation, the luminosity through a spherical surface at radius r is 
+
+L(r, t ) = −4πr 2 c
+
+3κρ ∂u ∂r , (12) where u(r, t ) is the radiation energy density, κ is the opacity, and ρ is the local mass density in the diffusion region. At the inner boundary of the shocked ejecta, the dif-fusive luminosity supplied by the PWN is limited by the radiation-pressure contrast across the PWN–shell inter-face. We write 
+
+Ldiff = 3 πR 2sh ,in c (Pb − Psh ,in ) , (13) where Pb is the PWN pressure and 
+
+Psh ,in = u(Rsh ,in , t )3 (14) is the radiation pressure at the inner edge of the shocked ejecta. Equation (13) is obtained by multiplying the one-sided diffusive flux driven by the pressure contrast, 
+
+Fdiff ≃ 3c(Pb − Psh ,in )/4, by the interface area 4 πR 2sh ,in .Thus, Ldiff measures the radiative power transported from the PWN bubble into the shocked ejecta, and is coupled to the evolving radiation field at the inner boundary. In the thin-shell approximation, the inner radius of the shocked shell is related to the forward-shock radius by 
+
+Rsh ,in = (1 − ksh )Rsh , (15) where ksh ≡ ∆Rsh /R sh is the fractional shell thickness. For a compressed shell, we adopt 
+
+ksh = 1(3 − δ)χsh 
+
+, (16) with χsh = 7 for the shock compression ratio. At early times, the shock remains in the shallow inner ejecta, the magnetar spin-down luminosity is nearly con-stant ( t ≪ tsd ), and the ejecta are still optically thick. Radiative leakage from the PWN–shocked-ejecta sys-tem is therefore dynamically negligible, and the energy-driven self-similar solution approximately applies. For an inner ejecta density profile ρej ∝ tδ−3r−δ , this gives 
+
+Rsh ∝ t(6 −δ)/(5 −δ) (R. A. Chevalier 2005). After the shock enters the steep outer ejecta, the swept-up mass grows more slowly and approaches the finite mass available above the density break. The dy-namics then approach the limiting case of a pressure-driven shell with an approximately fixed mass. If the injected power remains nearly constant and radiative losses are still subdominant, Ek,sh ∼ Lsd t, yielding TransFit-MAG 510 13       
+
+> 10 15
+> 10 17
+> Rsh  [cm]
+> Rtr
+> Analytic solution
+> Numerical solution
+> (no radiative leakage)
+> This work
+> 10 9
+> 10 10
+> vsh  [cm s  1]
+> vtr vtr
+> 2
+> 4
+> 6
+> Msh  [M ]
+> Mej
+> Min
+> Mej
+> Min
+> 10 210 110 010 110 2
+
+t/tsd 
+
+> 10 0
+> 10 3
+> 10 6
+> 10 9
+> 10 12
+> pb [erg cm  3]
+
+Figure 2. Comparison of the PWN-driven shock evolu-tion from the analytic self-similar solution of R. A. Cheva-lier (2005), a numerical solution without radiative leakage, and the full dynamical–diffusion calculation developed in this work. From top to bottom, the panels show Rsh , vsh , Msh ,and Pb as functions of t/t sd . The dot-dashed lines mark 
+
+Rtr and vtr , and the horizontal lines in the mass panel in-dicate Min and Mej . The calculations adopt Mej = 5 M⊙,
+
+ESN = 10 51 erg, Em = 10 52 erg, and tsd = 3 days. 
+
+vsh ∝ t1/2 and Rsh ∝ t3/2 (D. Kasen et al. 2016). In the full calculation, deviations from this simple scaling arise because Lsd decreases with time and radiative diffusion removes energy from the PWN–shocked-ejecta system. If radiative leakage is neglected, the above dynamical equations form a closed set of ordinary differential equa-tions and can be solved numerically (R. A. Chevalier 2005; D. Kasen et al. 2016; L.-D. Liu et al. 2021). How-ever, as the shock propagates outward and the ejecta ex-pand, the optical depth decreases and radiative diffusion begins to remove energy from the bubble and shocked ejecta. In this regime, the shock dynamics must be coupled to the time-dependent diffusion equation. We therefore solve the full dynamical–diffusion system, in which the radiation field is evolved self-consistently and the resulting diffusive loss feeds back on the PWN pres-sure and shell acceleration. Figure 2 compares the PWN-driven shock evolution obtained from three approaches: the analytic self-similar solution of R. A. Chevalier (2005), a numerical solution of the dynamical equations without radiative leakage (D. Kasen et al. 2016; L.-D. Liu et al. 2021), and the full dynamical–diffusion calculation developed in this work. The three solutions agree well while the shock remains in the shallow inner ejecta. The agreement breaks down when the shock approaches the transition radius Rtr , or equivalently when the homologous ejecta velocity at the shock position, Rsh /t , becomes comparable to vtr . The analytic solution assumes a single power-law ejecta den-sity profile and therefore extrapolates the inner-ejecta self-similar behavior into the outer layers. In contrast, the numerical calculations include the broken power-law ejecta structure. Once the shock enters the steep outer envelope, the mass-loading rate and pressure-driven ac-celeration change, the swept-up mass approaches the available ejecta mass, and the shock velocity deviates from the inner-ejecta self-similar scaling. This departure is already present in the no-leakage numerical solution, indicating that it is mainly caused by the density break rather than by radiative losses. At later times, the full dynamical–diffusion calculation fur-ther deviates from the no-leakage solution because radia-tive diffusion removes part of the magnetar-injected en-ergy from the PWN–shocked-ejecta system. This leak-age reduces the energy retained in the bubble, acceler-ates the decline of Pb, and weakens the late-time driving of the shell. 2.3. Radiative Diffusion and Energy Deposition 
+
+To compute the emergent light curve, we follow the time-dependent thermal evolution of the ejecta under the combined effects of shock heating, PWN energy injection, adiabatic expansion, and radiative diffusion. Unlike semi-analytic models that prescribe the heat-ing as a spatially integrated luminosity, our calculation evolves the radiation energy density u(r, t ) directly. Assuming a radiation-dominated gas, the energy equa-tion is (L.-D. Liu et al. 2025) 1
+
+ρ∂u ∂t − 4u
+
+3ρ2
+
+∂ρ ∂t = c
+
+3r2ρ∂∂r 
+
+ r2
+
+κρ ∂u ∂r 
+
+
+
++ ϵheat , (17) where ρ is the local mass density, κ is the opacity, and 
+
+ϵheat is the specific heating rate. The left-hand side de-6 Li et al. 
+
+scribes the time evolution of the radiation energy den-sity and adiabatic cooling, while the first term on the right-hand side represents radiative diffusion. The shock-heating source is localized near the forward shock and is written as 
+
+ϵheat = Lshock 
+
+4πR 2sh ρsh ,ej 
+
+δ(r − Rsh ), (18) where ρsh ,ej is the effective density of the shocked ejecta. This term represents the local thermalization of the ki-netic energy dissipated at the shock. In the thin-shell approximation, we estimate 
+
+ρsh ,ej ≃ Msh 
+
+4πR 2sh ∆Rsh 
+
+, (19) where ∆ Rsh is the shell thickness. The PWN energy entering the shocked ejecta is treated as an inner boundary flux rather than a volu-metric source term. At the bubble–shell interface Rsh ,in ,the diffusive flux satisfies 
+
+Ldiff 
+
+4πR 2sh ,in 
+
+= − c
+
+3κρ sh ,ej 
+
+∂u ∂r r=Rsh ,in 
+
+. (20) Thus, Ldiff is coupled to the radiation field at the inner edge of the shocked ejecta and is not prescribed inde-pendently. The outer boundary is set at the photosphere Rph , de-fined by τph = 2 /3. Using the Eddington approximation to match the radiation energy density to the diffusive flux, we impose 
+
+u(Rph , t ) = − 43κρ ∂u ∂r r=Rph 
+
+. (21) When the photosphere lies in the unshocked ejecta, we take ρ = ρej (Rph , t ). If the photosphere recedes into the shocked shell, or if the shock has reached the outer ejecta boundary, we instead use ρ = ρsh ,ej . Out-side the photosphere, the diffusion approximation breaks down and photons are assumed to free-stream, so that 
+
+u(r, t ) ∝ r−2.The solution of Equation (17) gives the spatial and temporal evolution of u(r, t ). The bolometric luminosity is evaluated at the photosphere using 
+
+Lbol (t) = 4 πR 2ph (t)σT 4ph (t), (22) with u(Rph , t ) = aT 4ph (t). This provides the connection between the computed radiation-energy profile and the observable light curve.  
+
+> 3.
+
+LIGHT-CURVE MORPHOLOGIES IN TERMS OF TWO CHARACTERISTIC TIMESCALES In TransFit-MAG , bolometric light curves are calcu-lated by coupling the time-dependent radiation-diffusion equation to the dynamical evolution of a magnetar-driven shock. Rather prescribing an Arnett-style re-sponse to the magnetar spin-down luminosity, the model self-consistently tracks the evolving temperature and radiation-energy distributions within the expand-ing ejecta. As the PWN shock propagates outward, it deposits thermal energy at a moving heating front. Ra-diation escaping at early times is primarily generated in the shocked layer near this front, producing a poten-tial shock-powered emission component. Conversely, at later times, radiation deposited by the magnetar deeper within the ejecta diffuses through the bulk mass, pow-ering the broad main peak. This physical picture naturally frames the light-curve morphology around two characteristic timescales: the shock-breakout timescale, tsbo , and the main peak timescale, tsn ,pk . The former marks when photons from the shocked layer can efficiently escape, while the lat-ter dictates when energy deposited in the bulk ejecta emerges as the primary magnetar-powered maximum. The early shock-powered component peaks when the effective breakout condition is met: 
+
+τsbo = cζsbo vsh 
+
+, (23) where vsh is the shock velocity and ζsbo ≃ 2 is a numer-ical calibration factor accounting for the delay between shock heating and the observed luminosity maximum. Combining this optical-depth condition with the shock dynamics and the ejecta density profile yields: 
+
+tsbo ∝
+
+ ESN 
+
+Em
+
+2/3
+
+t1/3d t2/3sd . (24) Thus, tsbo represents a weighted geometric mean of the diffusion and spin-down timescales, modulated by the energy ratio ESN /E m. Within this scaling framework, a larger magnetar energy drives a faster PWN shock, shifting breakout to earlier times, whereas a longer spin-down timescale delays it. Following shock breakout, the deeper magnetar/PWN energy deposition emerges via radiative diffusion. The characteristic timescale for this broad main peak, tsn ,pk ,is governed by the effective diffusion time through the bulk ejecta and scales as: 
+
+tsn ,pk ∝
+
+ κM ej 
+
+vej 
+
+1/2
+
+. (25) This indicates that the main peak is primarily controlled by the ejecta mass, opacity, and characteristic velocity. Increases in Mej or κ delay the main peak, while a higher 
+
+vej enables the stored radiation to escape more rapidly. TransFit-MAG 7To provide a numerical benchmark, we express these timescales in scaled units. The main peak timescale is: 
+
+tsn ,pk ≃ 68 .8 M 3/4ej ,5 E−1/4SN ,51 κ1/20.2 days , (26) where ESN ,51 = ESN /10 51 erg, Mej ,5 = Mej /5M⊙, and 
+
+κ0.2 = κ/ (0 .2 cm 2 g−1). Applying the same normaliza-tion to the shock-breakout timescale yields: 
+
+tsbo ≃ 16 .9 M 1/4ej ,5 E7/12 SN ,51 E−2/3m,51 t2/3sd ,5κ1/60.2 days , (27) where Em,51 = Em/10 51 erg and tsd ,5 = tsd /5 days. The theoretical temporal separation between the early shock-powered peak and the broad magnetar-powered peak is therefore defined by their ratio: 
+
+tsn ,pk 
+
+tsbo 
+
+≃ 4.08 M 1/2ej ,5 E2/3m,51 E−5/6SN ,51 t−2/3sd ,5 κ1/30.2 . (28) In practice, resolving a distinct double-peaked light curve observationally requires a more pronounced delay, parameterized as: 
+
+tsn ,pk 
+
+tsbo 
+
+≳ χt, χt ≃ 3–5 . (29) If this ratio approaches unity, the shock-breakout emis-sion blends with the rising main light curve, manifest-ing only as an early shoulder or kink. Substituting the scaled timescales into this criterion yields the necessary condition for temporal separation: 
+
+Em,51 ≳ 0.63 
+
+ χt
+
+3
+
+3/2
+
+M −3/4ej ,5 E5/4SN ,51 tsd ,5κ−1/20.2 . (30) This condition directly demonstrates that higher mag-netar energy accelerates the PWN shock (triggering ear-lier breakout), while greater ejecta mass or opacity de-lays the main peak. Both effects inflate the tsn ,pk /t sbo 
+
+ratio, thereby favoring a well-separated double-peaked morphology. However, temporal separation alone is insufficient; the shock-powered component must also outshine the under-lying diffusive luminosity at the time of breakout: 
+
+Lsbo ≳ Lsn (tsbo ). (31) The breakout peak need not eclipse the maximum lumi-nosity of the main peak, Lsn ,pk , but it must dominate the rising magnetar-powered component at tsbo . Assum-ing the early evolution of the main component follows a power-law rise, 
+
+Lsn (tsbo ) ≃ fth ,early Lsn ,pk 
+
+ tsbo 
+
+tsn ,pk 
+
+q
+
+, q ≃ 1.5–2 ,
+
+(32) the required luminosity contrast is: 
+
+Lsbo 
+
+Lsn ,pk 
+
+≳ fth ,early 
+
+ tsbo 
+
+tsn ,pk 
+
+q
+
+, (33) where fth ,early ≤ 1 represents the effective early-time thermalization efficiency of the magnetar/PWN input. This condition dictates that even a relatively weak breakout component can manifest as a distinct first peak if it precedes the main maximum significantly. For in-stance, with tsn ,pk /t sbo ∼ 4 and q ≃ 2, a breakout com-ponent reaching just a few percent of the main-peak luminosity remains discernible, provided the early diffu-sive emission is suitably suppressed. Figure 3 illustrates how the above criteria map onto the different light-curve morphologies obtained with 
+
+TransFit-MAG . In the well-separated double-peaked case, the shock breakout occurs sufficiently earlier than the main diffusion maximum, tsbo ≪ tSN ,pk , and the shock-powered luminosity exceeds the rising diffusive component at the breakout time, Lsbo ≳ LSN (tsbo ). The first maximum is therefore produced by radiation re-leased from the shocked outer layers, whereas the sec-ond, broader maximum is powered by magnetar/PWN energy that diffuses out from deeper ejecta layers. The luminosity minimum between the two peaks appears af-ter the shock-heating power has declined but before the main magnetar-powered component reaches its maxi-mum. The middle panel shows an intermediate case in which the two characteristic timescales are less clearly sepa-rated. Although the shock-heating component still mod-ifies the early light curve, the magnetar-powered diffu-sion component rises before a deep luminosity valley can form. The result is a partially merged double peak, or an early shoulder on the rising part of the main peak. This morphology corresponds to cases in which tsbo is only moderately smaller than tSN ,pk , or in which Lsbo is comparable to, but not much larger than, LSN (tsbo ). The bottom panel represents the single-peaked limit. In this case, the shock-powered emission is either too weak or too close in time to the broad diffusion peak to appear as a separate component. Equivalently, the condition Lsbo ≳ LSN (tsbo ) is not satisfied, or the ra-tio tSN ,pk /t sbo is too small. The observed luminosity is then dominated by the main magnetar-powered diffu-sion component, and the breakout signature is hidden in the early rise. This sequence demonstrates that the appearance of a double peak is not determined solely by the absolute value of the shock-heating power. Instead, it is controlled by the competition between the shock-breakout emission and the underlying diffusive luminos-ity at tsbo . A clear double peak requires both a suf-8 Li et al. 10 0 10 1 10 2                
+
+> Time since explosion [day]
+> 10 41
+> 10 42
+> 10 43
+> 10 44
+> 10 45
+> 10 46
+> Bolometric Luminosity [erg s  1]
+> Dark phase
+> Shock-heating
+> Magnetar-heating
+> Ejecta transparency
+> (23)
+> Lbol Lshock Lsd 10 010 110 2
+> Time since explosion [day]
+> 10 40
+> 10 41
+> 10 42
+> 10 43
+> 10 44
+> 10 45
+> Bolometric Luminosity [erg s  1]
+> Dark phase
+> Ejecta transparency
+> (23)
+> Lbol Lshock Lsd
+> Merged double peak 10 010 110 2
+> Time since explosion [day]
+> 10 40
+> 10 41
+> 10 42
+> 10 43
+> 10 44
+> 10 45
+> Bolometric Luminosity [erg s  1]
+> Dark phase
+> Ejecta transparency
+> (23)
+> Lbol Lshock Lsd
+> Only main peak
+
+Figure 3. Representative bolometric light curves from 
+
+TransFit-MAG , illustrating three characteristic light-curve morphologies. From top to bottom, the panels show a well-separated double peak, a partially merged double peak, and a single broad peak. The blue solid curve shows the emergent bolometric luminosity Lbol , while the brown and gold dashed curves show the instantaneous shock-heating power Lshock and the magnetar spin-down luminosity Lsd ,respectively. The shaded regions mark the main evolution-ary stages: the initial dark phase, the shock-heating domi-nated phase, the magnetar/PWN-heating dominated diffu-sion phase, and the late optically thin phase when the bulk ejecta becomes transparent. The transition from a clear dou-ble peak to a single broad peak is controlled mainly by the temporal separation between tsbo and tSN ,pk , together with the luminosity contrast between Lsbo and the underlying dif-fusive luminosity LSN (tsbo ). 
+
+ficiently early and dynamically strong shock breakout and a delayed rise of the main magnetar-powered com-ponent. Conversely, efficient early thermalization of the magnetar power raises LSN (tsbo ), making the breakout component easier to hide and driving the morphology toward a merged or single-peaked light curve. 
+
+4. APPLICATION TO LSQ14BDQ LSQ14bdq provides a useful test case for 
+
+TransFit-MAG , because it exhibits one of the clear-est double-peaked optical light curves among SLSNe-I (M. Nicholl et al. 2015). In particular, LSQ14bdq is well suited for testing whether the temporal separation be-tween the early bump and the main maximum can arise from the evolving optical depth and radiation-energy distribution, rather than from an externally imposed delay between magnetar injection and photon escape. Then, we apply TransFit-MAG to the multiband optical light curves of LSQ14bdq using the data compiled by M. Nicholl et al. (2015). The resulting fit and posterior distributions are shown in Figure 4. In our interpreta-tion, the early bump is produced mainly by the escape of shock-heated radiation from the outer ejecta, whereas the main peak is powered by delayed diffusion of mag-netar/PWN energy deposited deeper inside the ejecta. The luminosity minimum between the two components appears naturally after the shock-heating power has de-clined but before the main magnetar-powered diffusion component reaches its maximum. The best-fit parameters are ESN = 6 .98 × 10 51 erg, 
+
+Mej = 37 .54 M⊙, Em = 2 .51 ×10 52 erg, tsd = 30 .10 days, 
+
+κ = 0 .34 cm 2 g−1, and tshift = 27 .10 days. A key fea-ture of our fit is that no explicit delay time, tdelay , is introduced between magnetar spin-down and radiative escape. Previous semi-analytic treatments often invoke such a delay, or an early suppression of magnetar ther-malization, to separate the early bump from the main peak (e.g., D. Kasen et al. 2016; L.-D. Liu et al. 2021). In TransFit-MAG , the separation is instead generated by the evolving optical depth, shock-heating location, and internal radiation-energy distribution. The large ejecta mass and relatively high opacity increase the effective diffusion time and help broaden the main peak. The large magnetar rotational-energy reservoir provides the energy required for the high luminosity, while the rela-tively long spin-down timescale keeps the central engine active through the rise of the main peak. These param-eters therefore place LSQ14bdq in the regime where an early shock-powered component can be separated from a delayed magnetar-powered diffusion maximum. In applying the model to LSQ14bdq, we find that the assumed ejecta density structure has a significant effect TransFit-MAG 910 2 10 3            
+
+> Time since explosion [day]
+> 14
+> 16
+> 18
+> 20
+> 22
+> 24
+> 26
+> AB magnitude
+> LSQ14bdq
+> g+2
+> r
+> i-2
+> z-4 log( ESN /erg) = 51.844
+> 37.48
+> 37.52
+> 37.56
+> Mej  (M⊙ )
+> Mej = 37.541 M⊙
+> 8.4
+> 9.2
+> 10.0
+> log( Em/erg)
+> log( Em/erg) = 52.400
+> 30.08
+> 30.12
+> tsd  (day)
+> tsd = 30.099 day
+> −4
+> −2
+> 0
+> κ (cm 2 g−1 )
+> κ= 0.340 cm 2g−1
+> 51.84388
+> 51.84392
+> log( ESN /erg)
+> 27.08
+> 27.12
+> tshift  (day)
+> 37.48
+> 37.52
+> 37.56
+> Mej (M⊙)
+> 52.399984
+> 52.399992
+> 52.400000
+> log( Em/erg)
+> 30.08
+> 30.12
+> tsd (day)
+> 0.33996
+> 0.33998
+> 0.34000
+> κ(cm 2g−1 )
+> 27.08
+> 27.12
+> tshift (day)
+> tshift = 27.098 day
+
+Figure 4. Application of TransFit-MAG to the multiband optical light curves of LSQ14bdq. The left panel shows the observed 
+
+g, r, i, and z-band light curves together with the best-fit model. Vertical offsets are applied for clarity. The right panel shows the posterior distributions of the model parameters. The red lines indicate the best-fit values, and the dashed lines mark the marginalized credible intervals. The model reproduces both the early bump and the broad main peak without imposing an explicit delay time between magnetar injection and radiative escape. 
+
+on the early peak. For a standard broken power-law density profile, the shock-heated layer remains buried beneath an optically thick outer envelope during the early phase. A substantial fraction of the deposited ther-mal energy is then degraded by adiabatic expansion and smoothed by diffusion before reaching the photosphere, producing a relatively faint first peak. By contrast, an effective single power-law density profile places the early photosphere closer to the outer ejecta boundary and re-duces the diffusion time of the shock-heated radiation. The early emission is therefore more concentrated in time, making it easier to reproduce the narrow and lu-minous first peak of LSQ14bdq. We emphasize that this treatment should be regarded as an effective description of the density structure relevant for the early photon escape, rather than as a unique reconstruction of the ejecta profile. 
+
+5. CONCLUSION AND DISCUSSIONS We have developed TransFit-MAG , a time-dependent radiative-diffusion framework for engine-powered tran-sients with magnetar-driven shocks. The model cou-ples the TransFit diffusion solver to the dynamics of a magnetar-inflated PWN and its forward shock in homol-ogously expanding ejecta. The spin-down power inflates a hot PWN bubble, which performs mechanical work on the swept-up shell and drives shock heating. The de-posited radiation is then stored, degraded by adiabatic expansion, and released through time-dependent diffu-sion. The shock evolution provides a useful check on the dy-namical treatment. While the shock remains in the shal-low inner ejecta and radiative leakage is negligible, the numerical solution approaches the analytic self-similar behavior. After the shock reaches the density break and enters the steep outer ejecta, the evolution departs from this limit. At later times, radiative diffusion removes energy from the PWN–shocked-ejecta system, reducing the bubble pressure and weakening the shell accelera-tion. The emergent luminosity therefore does not di-rectly follow either the instantaneous spin-down lumi-nosity Lsd or the shock-heating power Lshock , but is de-layed and smoothed by diffusion through the expanding ejecta. Our calculations show that the competition between shock-heated radiation and delayed magnetar/PWN dif-fusion naturally produces a range of light-curve mor-phologies. If the shock-heated radiation escapes early enough and remains sufficiently luminous, the light curve shows a distinct first peak. If this component overlaps with the rising magnetar-powered emission, it appears as a shoulder or partially merged bump. If the shock is weak or deeply embedded, diffusion and adia-batic losses suppress the early component, leaving a sin-gle broad peak. Thus, the presence of an early bump is 10 Li et al. 
+
+not set by the magnetar engine alone, but by the coupled engine–shock–diffusion evolution and the optical-depth structure of the ejecta. This work is complementary to population-level stud-ies of magnetar-powered transients. Such studies suggest that magnetar engines may operate in sev-eral classes of stripped-envelope explosions, including SLSNe, FBOTs, and SNe Ic-BL (Y.-W. Yu et al. 2017; J.-F. Liu et al. 2022; J.-P. Zhu & B. Zhang 2026). While population modeling constrains distributions of ejecta masses, spin periods, magnetic fields, and explosion en-ergies, TransFit-MAG addresses the time-dependent en-ergy transport in individual events. It therefore provides a way to connect spatially separated shock-heated and engine-heated components to the observed early peak, shoulder-like bump, or broad main peak. In summary, TransFit-MAG provides a self-consistent framework for connecting central-engine injection, PWN-driven shock heating, and time-dependent radia-tive diffusion in expanding supernova ejecta. The model shows that early bumps in engine-powered transients can arise naturally from coupled shock–diffusion evolu-tion, without requiring an imposed delay between engine injection and photon escape. Together with population studies, this framework provides a useful tool for in-terpreting early observations from high-cadence surveys and for constraining the physical conditions of engine-powered stripped-envelope explosions. Several limitations remain. First, the model adopts a one-dimensional thin-shell treatment of the PWN-driven shock and does not capture multidimensional instabili-ties, shell fragmentation, or mixing at the bubble–ejecta interface. Such effects can lead to wind-bubble blowout and may modify the early UV/optical emission (M. Chen et al. 2026). Second, we use a gray-opacity diffu-sion approximation, whereas wavelength-dependent ra-diative transfer is required for detailed color and spectral modeling. Third, after the ejecta become optically thin, non-thermal PWN emission may contribute significantly to the late-time radiation. Hard X-ray and gamma-ray emission from embedded PWNe may provide an in-dependent diagnostic of fast-spinning newborn pulsars in stripped-envelope supernovae (K. Kashiyama et al. 2016). Future multiwavelength observations and mul-tidimensional radiation-hydrodynamic simulations will be important for testing the thin-shell approximation, the energy-deposition treatment, and the inferred ejecta properties. ACKNOWLEDGEMENTS This work was supported by the National Natural Science Foundation of China (grant Nos. 12303047 and 12393811), the Natural Science Foundation of Hubei Province (grant No. 2023AFB321), and the National Key R&D Program of China (grant No. 2021YFA0718500). REFERENCES 
+
+> Angus, C. R., Smith, M., Sullivan, M., et al. 2019, MNRAS, 487, 2215, doi: 10.1093/mnras/stz1321 Arnett, W. D. 1980, ApJ, 237, 541, doi: 10.1086/157898 Arnett, W. D. 1982, ApJ, 253, 785, doi: 10.1086/159681 Bellm, E. C., Kulkarni, S. R., Graham, M. J., et al. 2019, PASP, 131, 018002, doi: 10.1088/1538-3873/aaecbe Blinnikov, S. I., R¨ opke, F. K., Sorokina, E. I., et al. 2006, A&A, 453, 229, doi: 10.1051/0004-6361:20054594 Chatzopoulos, E., Wheeler, J. C., & Vinko, J. 2012, ApJ, 746, 121, doi: 10.1088/0004-637x/746/2/121 Chen, K.-J., Woosley, S. E., & Sukhbold, T. 2016, ApJ, 832, 73, doi: 10.3847/0004-637x/832/1/73 Chen, M., Kashiyama, K., & Sato, M. 2026, ApJ, 1001, 59, doi: 10.3847/1538-4357/ae4c58 Chevalier, R. A. 2005, ApJ, 619, 839, doi: 10.1086/426584 Chevalier, R. A., & Fransson, C. 1992, ApJ, 395, 540, doi: 10.1086/171674 Chevalier, R. A., & Soker, N. 1989, ApJ, 341, 867, doi: 10.1086/167545 Dai, Z. G., & Lu, T. 1998, PhRvL, 81, 4301, doi: 10.1103/physrevlett.81.4301 Dessart, L., Hillier, D. J., Waldman, R., Livne, E., & Blondin, S. 2012, MNRAS, 426, L76, doi: 10.1111/j.1745-3933.2012.01329.x Dexter, J., & Kasen, D. 2013, ApJ, 772, 30, doi: 10.1088/0004-637X/772/1/30 Drout, M. R., Chornock, R., Soderberg, A. M., et al. 2014, ApJ, 794, 23, doi: 10.1088/0004-637x/794/1/23 Gal-Yam, A. 2019, ARA&A, 57, 305, doi: 10.1146/annurev-astro-081817-051819 Galama, T. J., Vreeswijk, P. M., van Paradijs, J., et al. 1998, Nature, 395, 670, doi: 10.1038/27150 Hjorth, J., Sollerman, J., Møller, P., et al. 2003, Nature, 423, 847, doi: 10.1038/nature01750 Ho, A. Y. Q., Phinney, E. S., Ravi, V., et al. 2019, ApJ, 871, 73, doi: 10.3847/1538-4357/aaf473 Inserra, C. 2019, Nature Astronomy, 3, 697, doi: 10.1038/s41550-019-0854-4
+
+TransFit-MAG 11 
+
+Ivezi´ c, ˇZ., Kahn, S. M., Tyson, J. A., et al. 2019, ApJ, 873, 111, doi: 10.3847/1538-4357/ab042c Kasen, D., & Bildsten, L. 2010, ApJ, 717, 245, doi: 10.1088/0004-637x/717/1/245 Kasen, D., Metzger, B. D., & Bildsten, L. 2016, ApJ, 821, 36, doi: 10.3847/0004-637x/821/1/36 Kashiyama, K., Murase, K., Bartos, I., Kiuchi, K., & Margutti, R. 2016, ApJ, 818, 94, doi: 10.3847/0004-637X/818/1/94 Leloudas, G., Chatzopoulos, E., Dilday, B., et al. 2012, A&A, 541, A129, doi: 10.1051/0004-6361/201118498 Li, S.-Z., & Yu, Y.-W. 2016, ApJ, 819, 120, doi: 10.3847/0004-637x/819/2/120 Li, W.-X., Zhu, Z.-P., Zou, X.-Z., et al. 2025, arXiv e-prints, arXiv:2504.17034. https://arxiv.org/abs/2504.17034 Lin, W., Wang, X., Wang, L., & Dai, Z. 2021, ApJL, 914, L2, doi: 10.3847/2041-8213/ac004a Liu, J.-F., Zhu, J.-P., Liu, L.-D., Yu, Y.-W., & Zhang, B. 2022, ApJL, 935, L34, doi: 10.3847/2041-8213/ac86d2 Liu, L.-D., Gao, H., Wang, X.-F., & Yang, S. 2021, ApJ, 911, 142, doi: 10.3847/1538-4357/abf042 Liu, L.-D., Zhang, Y.-H., Yu, Y.-W., et al. 2025, ApJ, 992, 20, doi: 10.3847/1538-4357/adfed6 Margutti, R., Metzger, B. D., Chornock, R., et al. 2019, ApJ, 872, 18, doi: 10.3847/1538-4357/aafa01 Matzner, C. D., & McKee, C. F. 1999, ApJ, 510, 379, doi: 10.1086/306571 Moriya, T. J., M¨ uller, B., Chan, C., Heger, A., & Blinnikov, S. I. 2019, ApJ, 880, 21, doi: 10.3847/1538-4357/ab2643 Morozova, V., Piro, A. L., Renzo, M., et al. 2015, ApJ, 814, 63, doi: 10.1088/0004-637x/814/1/63 Nicholl, M., Guillochon, J., & Berger, E. 2017, ApJ, 850, 55, doi: 10.3847/1538-4357/aa9334 Nicholl, M., & Smartt, S. J. 2016, MNRAS, 457, L79, doi: 10.1093/mnrasl/slv210 Nicholl, M., Smartt, S. J., Jerkstrand, A., et al. 2015, ApJL, 807, L18, doi: 10.1088/2041-8205/807/1/L18 Pinto, P. A., & Eastman, R. G. 2000a, ApJ, 530, 744, doi: 10.1086/308376 Pinto, P. A., & Eastman, R. G. 2000b, ApJ, 530, 757, doi: 10.1086/308380 Piro, A. L., & Ott, C. D. 2011, ApJ, 736, 108, doi: 10.1088/0004-637X/736/2/108 Pursiainen, M., Childress, M., Smith, M., et al. 2018, MNRAS, 481, 894, doi: 10.1093/mnras/sty2309 Smith, M., Sullivan, M., D’Andrea, C. B., et al. 2016, ApJL, 818, L8, doi: 10.3847/2041-8205/818/1/L8 Stanek, K. Z., Matheson, T., Garnavich, P. M., et al. 2003, ApJL, 591, L17, doi: 10.1086/376976 Sun, H., Li, W.-X., Liu, L.-D., et al. 2025, Nature Astronomy, 9, 1073, doi: 10.1038/s41550-025-02571-1 Suzuki, A., & Maeda, K. 2021, ApJ, 908, 217, doi: 10.3847/1538-4357/abd54c Woosley, S. E. 2010, ApJL, 719, L204, doi: 10.1088/2041-8205/719/2/l204 Woosley, S. E., & Bloom, J. S. 2006, ARA&A, 44, 507, doi: 10.1146/annurev.astro.43.072103.150558 Yu, Y.-W., Li, S.-Z., & Dai, Z.-G. 2015, ApJL, 806, L6, doi: 10.1088/2041-8205/806/1/L6 Yu, Y.-W., Zhang, B., & Gao, H. 2013, ApJL, 776, L40, doi: 10.1088/2041-8205/776/2/L40 Yu, Y.-W., Zhu, J.-P., Li, S.-Z., L¨ u, H.-J., & Zou, Y.-C. 2017, ApJ, 840, 12, doi: 10.3847/1538-4357/aa6c27 Zhang, Y.-H., Liu, L.-D., Du, Z.-X., et al. 2026, ApJ, 999, 186, doi: 10.3847/1538-4357/ae434a Zhang, Z.-D., Yu, Y.-W., & Liu, L.-D. 2022, ApJ, 936, 54, doi: 10.3847/1538-4357/ac8548 Zhu, J.-P., & Zhang, B. 2026, arXiv e-prints, arXiv:2604.21759, doi: 10.48550/arXiv.2604.21759

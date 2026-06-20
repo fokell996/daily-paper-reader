@@ -1,0 +1,555 @@
+Title: Inferring Neutron-Star Properties from Post-merger Gravitational-wave Spectra with Neural Networks
+
+URL Source: https://arxiv.org/pdf/2605.24145v1
+
+Published Time: Tue, 26 May 2026 00:17:37 GMT
+
+Number of Pages: 25
+
+Markdown Content:
+# Inferring Neutron-Star Properties from Post-merger Gravitational-wave Spectra with Neural Networks 
+
+Dimitrios Pesios 1, ∗ and Nikolaos Stergioulas 1, †
+
+> 1
+
+Department of Physics, Aristotle University of Thessaloniki, GR-54124 Thessaloniki, Greece 
+
+(Dated: May 26, 2026) We present a proof-of-concept study of the inverse problem of inferring neutron-star properties directly from the post-merger gravitational-wave spectrum of equal-mass binary neutron star merg-ers. Using noise-free spectra for equal-mass mergers obtained from numerical relativity simulation catalogs, we train and compare three artificial-neural-network regression models and two algebraic multivariate linear-regression baselines to predict three source properties: the stellar mass, M , and the quadrupolar tidal deformability, κτ 
+
+> 2
+
+, and the local slope of the mass–radius relation, dR/dM .Because the inverse mapping is nonlinear and cannot be obtained by analytically inverting the di-rect neural-network model, we construct dedicated inverse surrogates and train the neural-network models with a two-stage procedure in which residuals from an initial pass are used to define sample weights for a second pass, together with regularization through dropout, Gaussian-noise injection, and early stopping. We find that the neural-network models consistently outperform the linear base-lines, demonstrating that the inverse relation between post-merger spectra and source properties is more effectively captured by nonlinear surrogates than by formal algebraic inversion. The best overall performance is achieved by an ensemble of single-task neural networks, while a multi-task network gives comparable accuracy for the prediction of the mass–radius slope, and a mixture-of-experts architecture provides useful indications about the relative importance of different spectral regions. We further show that the best model reproduces empirical relations between the dominant post-merger frequency and tidal deformability, and also recovers representative equation-of-state-dependent mass–tidal-deformability trends, indicating that the predicted parameters remain phys-ically consistent beyond pointwise regression accuracy. Although the present analysis is restricted to a limited catalog of idealized, noise-free spectra, the results demonstrate that neural-network surrogates can provide a promising complementary route for extracting neutron-star information from post-merger signals with future third-generation detectors. 
+
+I. INTRODUCTION 
+
+Neutron stars (NSs) are among the densest objects in the Universe, with central densities of order 10 15 g/cm 3
+
+[1] that place their interiors well beyond the reach of ter-restrial experiments. Determining the equation of state (EOS) that governs matter at such densities is there-fore one of the central goals of NS physics [2–12], and gravitational-wave (GW) observations of binary neutron star (BNS) mergers have emerged as a uniquely powerful probe of it. While the inspiral phase constrains the EOS through the tidal deformability of cold, beta-equilibrated matter, the post-merger signal carries complementary in-formation about hot, dense matter in regimes that in-spiral measurements cannot access [3, 4, 13, 14]. Ex-tracting this information is a central science target for third-generation (3G) ground-based detectors such as the Einstein Telescope and Cosmic Explorer [15–25], whose improved high-frequency sensitivity is expected to render the post-merger spectrum observable for the first time. Connecting an observed post-merger spectrum to the physical properties of its source is, however, an inverse problem : one is given the frequency-domain signal and asked to infer the parameters that produced it. Tra-  
+
+> ∗dipesios@auth.gr
+> †niksterg@auth.gr
+
+ditional approaches to this problem fall into two broad families. The first relies on empirical or quasi-universal relations between a small number of spectral features— most commonly the dominant post-merger frequency 
+
+fpeak —and bulk neutron-star properties such as com-pactness, radius, or the threshold mass for prompt col-lapse [13, 24, 26]. The second addresses inference through Bayesian parameter estimation against waveform tem-plates or phenomenological spectral models [14, 27–38]; see [39–41] for reviews and complementary perspectives. Our aim here is complementary: we ask whether a non-Bayesian inverse surrogate , trained directly on numerical-relativity spectra, can regress multiple con-tinuous NS properties from the full post-merger spec-trum without committing to a specific phenomenologi-cal template. We do not seek to replace Bayesian PE. Rather, the present study is intended as a pilot investi-gation: given the limited number of available numerical-relativity simulations and the still broad EOS uncertainty left open by current inspiral observations, we ask whether machine-learning-based inverse mappings already pro-duce competitive and physically consistent predictions on the current training catalog. A positive answer would motivate a more ambitious implementation in the future, once larger simulation sets concentrated in a narrower EOS parameter space (constrained by more accurate in-spiral measurements with 3G detectors) become avail-able. Our general approach is depicted in Fig. 1. 
+
+> arXiv:2605.24145v1 [gr-qc] 22 May 2026
+
+21000 1500 2000 2500 3000 3500 4000        
+
+> −24.00
+> −23.50
+> −23.00
+> −22.50
+> −22.00 Original
+> 0.01 0.012 0.014 0.016 0.018 0.02 0.022 0.024 -6.00 -4.00 -2.00 0.00 2.00 4.00 6.00
+> EOS properties
+
+FIG. 1. Schematic of our inverse-surrogate approach. The post-merger BNS time-series waveform is converted to its frequency-domain effective amplitude spectrum, which is then passed to a trained neural network that predicts the local mass–radius slope dR/dM , the component mass M , and the quadrupolar tidal deformability κτ 
+
+> 2
+
+of the (equal-mass) neu-tron stars. A BNS merger using the BHBlp EOS is shown for illustration. 
+
+The NS properties we target are the individual (equal-mass) component mass M , the quadrupolar tidal de-formability κτ 
+
+> 2
+
+, and the local slope of the mass–radius relation dR/dM at the given M . Together these three quantities probe both a bulk source property ( M ) and two EOS-sensitive quantities ( κτ 
+
+> 2
+
+and dR/dM ) that en-code the stiffness and local curvature of the M –R rela-tion in the relevant mass range. Typical NS masses lie between about 1.1 and 2.2 M ⊙, with radii estimated in the range 10 –13 km [23]. All three target properties can, in principle, be constrained by a combination of pre- and post-merger information [42, 43]. Here, we restrict at-tention to post-merger spectra alone, so that the result-ing surrogate can later be combined with inspiral-based inference as an independent cross-check. Since the in-spiral primarily constrains the cold, low-to-intermediate density EOS, a discrepancy between inspiral and post-merger inferences would provide a handle on effects that appear only in the post-merger regime, such as phase transitions at high densities or possible beyond-GR phe-nomena like spontaneous scalarization. Beyond-GR sce-narios [44–50] lie outside the scope of the present study, but the inverse-surrogate framework we develop is ag-nostic to the underlying theory and could in principle be retrained on non-GR simulation catalogs. Several works have proposed direct constraints on the EOS from post-merger signals. In [51], a thorough anal-ysis is provided for pinpointing the NS radius with next-generation networks of ground-based GW detectors. In [32], the authors use an analytic waveform model and empirical relations to predict the prior ranges for post-merger frequencies for PE, based on the methodology in [52]. In [33], a phase-agnostic likelihood model is de-veloped for PE, demonstrating the ability to set upper limits on certain remnant properties. In [34], the incor-poration of post-merger remnant information is explored and how it can enhance the inference of NS properties. In [35], a hierarchical Bayesian method is presented for refining the EOS using data from an ensemble of BNS post-merger remnants, irrespective of signal-to-noise ra-tios (SNRs). In [36], the authors present a comprehensive Bayesian analysis of the full GW spectrum of BNS merg-ers, demonstrating that even a single detection near the post-merger signal-to-noise threshold can constrain the maximum mass and density of neutron stars to within 
+
+∼ 6% and ∼ 10% respectively. In [37], the authors em-ploy the setup of [35] to incorporate a broader set of EOS proxy parameters, demonstrating that upcoming A+ de-tector sensitivities could constrain neutron star radii to within ∼ 0.55 –1 km. Another work [38] proposes a hi-erarchical Bayesian framework to constrain the EOS by stacking sub-threshold post-merger GW signals from a population of BNS mergers, demonstrating that aggre-gating approximately 50 non-detections at A+ sensitiv-ities can resolve fpeak to within ∼ 50 Hz, effectively re-covering astrophysical information from signals otherwise lost due to noise. Further works concentrate on the feasibility of restrict-ing the EOS of NSs in future scenarios. In [53], it is demonstrated that the “long ring-down” of BNS mergers encodes information about the high-density EOS, and that measuring this signal in future detectors could im-prove constraints at extreme densities. In [54], a time-domain model was developed for post-merger gravita-tional waves used to constrain the properties of ultra-dense matter in NS, with its respective follow-up in [55]. In [56], it is investigated how certain physical processes can mask the imprints of the equation of state in BNS merger signals, complicating their interpretation. In [57], an analytic frequency-domain model is presented, which accounts for various oscillation modes of the remnant and its time evolution, to perform detection and infer-ence of NS properties. In [58], a morphology-independent method is presented to determine the fate of the rem-nant, and consequently to gain insights on the EOS. In [59], a study with hyperonic vs nucleonic EOS mod-els is presented, along with their impact on the post-merger BNS signal, concluding that there is a shift in the dominant spectrum frequency fpeak upward by ap-proximately 150 Hz, providing a potential observational signature of hyperons in dense, hot NS merger remnants, see also [60]. The long-term evolution of post-merger os-cillations was initially studied in [61, 62], showing that convectively-driven inertial modes could contribute to the GW spectrum. Their detectability was assessed in [63], while [64] reinforced these results using tabulated finite-temperature EOS. A substantial body of work has used machine learn-ing for post-merger GW analysis, including classification of merger outcomes [65], parametrization of post-merger signals [66], sparse-dictionary approaches [67], K-nearest-neighbor time-domain modeling at fixed EOS [68], and an 3artificial neural network (ANN)-based forward modeling of the post-merger spectrum from source properties [69]; see [70] for a recent review. CLAWDIA [67], in partic-ular, yields physically interpretable representations and targets data-sparse regimes, with classification primar-ily driven by fpeak and achieving encouraging results at modest SNR for next-generation detectors like ET and NEMO. In Pesios et al. [69], the direct precursor of the present work, a methodology for predicting the BNS post-merger spectra was presented, employing an ANN regression-based scheme and using as input a three-component vec-tor of physical properties: the inverse gradient of radius versus mass dR/dM at the specific mass M in the mass– radius relation, the individual neutron star mass M it-self, and the induced tidal deformability κτ 
+
+> 2
+
+. This work had as a starting point the work of Easter et al. [71], who used Multivariate Linear Regression (MLR) and the compactness C instead of dR/dM . In [69], the dataset was extended to 87 waveforms and it was demonstrated that even an imbalanced dataset can be used to train the model. This preceding work successfully utilized both ANNs and MLR to predict the BNS post-merger spectrum (output) given a three-component vector of NS properties (input), demonstrating superior performance of the ANN approach. In the remainder of this work, we will call this problem the direct problem .1 1.5 2 2.5 3 3.5 4
+
+# −24 
+
+# −23.5 
+
+# −23 
+
+# −22.5 
+
+# −22      
+
+> FIG. 2. Collective plot of the effective amplitude spectra
+> ˜h(f)√fof the 77 equal-mass BNS post-merger waveforms used to train and evaluate the inverse surrogates. All spectra are distance-normalized to 50 Mpc and are noise-free. In con-trast to our previous work [69], the spectra are not aligned to a reference frequency.
+
+In the present work we address the corresponding in-verse problem : regressing (dR/dM, M, κ τ 
+
+> 2
+
+) from the post-merger spectrum. The inverse mapping cannot be ob-tained by analytically inverting the trained forward ANN of [69], because the nonlinear activations and dimension-ality changes preclude a closed-form inverse; a dedicated training procedure is therefore required. We compare three ANN architectures: a multi-task network (MT-ANN), an ensemble of single-task networks (ST-ANNs), and a single-task mixture-of-experts (ST-MoE-ANN), against two algebraic baselines derived from multivariate linear regression, including a pseudo-inverse construction (PI-MLR) obtained by formally inverting the direct MLR of [69]. All neural models are trained with a two-stage residual-reweighting scheme, in which residuals from an initial pass are used to define sample weights for a second pass, together with dropout, Gaussian-noise injection, and early stopping to limit effective capacity on the 77-waveform training catalog. Beyond pointwise regression accuracy, we assess whether the predictions remain phys-ically consistent by checking them against quasi-universal 
+
+Mtot fpeak –κτ 
+
+> 2
+
+relations [72, 73] and against representative EOS-specific M –κτ 
+
+> 2
+
+trends. Among the proposed archi-tectures, the ensemble of single-task ANNs (ST-ANNs) yields the best overall results, both compared with the al-gebraic baselines and in reproducing the empirical fitting relations. To our knowledge, this is the first study to regress mul-tiple continuous neutron-star properties directly from the full post-merger gravitational-wave spectrum using dedi-cated inverse surrogates, rather than classifying the EOS or the remnant, or performing inference dominated by in-spiral information. The present pilot study is deliberately restricted to idealized, noise-free, equal-mass spectra. A follow-up study will address detectability under realistic 3G noise curves. This work is organized as follows. In Section II we introduce the datasets, the algebraic inverse-regression baselines, and the ANN architectures, together with the weighted two-stage training procedure and loss functions, as well as deep learning concepts such as invertibility of ANNs and ensemble learning mixture-of-experts (MoE) models. In Section III we present the results of the five models, the chi-squared analysis of the MoE gating, and the validation against empirical and EOS-dependent rela-tions. Finally, in Section VI we make some final remarks and draw conclusions about their performance.  
+
+> II. PREREQUISITES
+
+This section is dedicated to introducing the necessary prerequisites for the rest of the manuscript and the rel-evant nomenclature that we are going to use, as well as the available datasets.  
+
+> A. Dataset descriptions
+
+The data set we employed in this work consisted of 77 Fourier domain representations (or spectra) of BNS post-merger signals in the astrophysical region of inter-est, which lies between [1 − 4] kHz . This dataset is a combination of simulated waveforms coming from CoRe v2 database [75], and the Rezzola and Takami catalogue [74], while sevefal waveforms are from Soultanis et al. [57], see Table I and Fig. 3 for a detailed description. 4
+
+> TABLE I. Training set of 77 equal-mass BNS post-merger waveforms. Columns give, for each EOS, the number of simulations, the source catalog, and the component masses.
+
+EOS Waveforms References Component Masses (in M⊙)ALF2 10 Rezzolla & Takami [74] and CoRe v2 [75] 1.2, 1.225, 1.25, 1.275, 1.3, 1.325, 1.35, 1.3505, 1.375, 1.3755 APR4 7 Rezzolla & Takami [74] 1.2, 1.225, 1.25, 1.275, 1.3, 1.325, 1.35 BHBlp 4 CoRe v2 [75] 1.25, 1.3, 1.35, 1.4 BLh 4 CoRe v2 [75] 1.3, 1.3325, 1.364, 1.4 DD2 7 CoRe v2 [75] 1.2, 1.25, 1.3, 1.35, 1.364, 1.4, 1.5 ENG 1 CoRe v2 [75] 1.3495 GNH3 7 Rezzolla & Takami [74] 1.2, 1.225, 1.25, 1.275, 1.3, 1.325, 1.35 H4 13 Rezzolla & Takami [74] and CoRe v2 [75] 1.2, 1.225, 1.25, 1.275, 1.3, 1.325, 1.3495 1.35, 1.3505, 1.3715, 1.3725, 1.3735, 1.3795 LS220 4 CoRe v2 [75] 1.2, 1.35, 1.364, 1.4 MPA1 8 Soultanis, Bauswein & Stergioulas [57] 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55 SFHo 2 CoRe v2 [75] 1.35, 1.364 SLy 10 Rezzolla & Takami [74] and CoRe v2 [75] 1.2, 1.225, 1.25, 1.275, 1.3, 1.325, 1.35, 1.351, 1.3575, 1.364 
+
+All waveforms were normalized to a common distance of 50 Mpc and cut at their maximum amplitude to separate the inspiral and post-merger phases. In contrast with our previous work [69], we feed every model with the origi-nal misaligned signals that have already been translated into a common frequency grid (meaning that they share the same frequency bins but their peak frequencies are at different locations) and they are shown in Figure 2. Compared to the previous set of 87 spectra used in [69], we excluded 10 cases that are disfavored by the tidal de-formability constraints of GW170817 [6], resulting in 77 waveforms. It is evident that our dataset is imbalanced but still spanning a physically meaningful range, since an ade-quate number of values is covered in the respective ver-tical axes.  
+
+> B. Inverse linear regression
+
+Linear regression is one of the few supervised statisti-cal and machine learning techniques that can be inverted, in that we can consider the output dataset as an input to a new model, the inverse one, with a view to con-structing the input dataset of the direct model, that is, by exchanging regressors with regressands. The assump-tions of attempting to do so, fall into the same ones of direct linear regression as far as multivariate analysis is concerned and they were briefly described in [69]. Thus, we can proceed by applying directly linear re-gression to our dataset or indirectly by using the coef-ficients of the model of our previous work manipulating the generalized inverse matrix, as we are going to see.  
+
+> 1. Direct multivariate linear regression
+
+Direct multivariate linear regression actually emanates from Ordinary Least-Squares (OLS) theory, reduced to multiple dimensions, and can be safely regarded as an op-timization problem, where one attempts to minimize an objective function. This objective function corresponds to calculating the vertically projected distances of the Rn
+
+points from a hyperplane, where n is the dimensionality of the problem at hand. In specific mathematical terms, multivariate linear re-gression is an extension of multiple linear regression al-lowing for more than one output variables, which may be correlated [76, 77]. The multivariate linear model is: 
+
+Y 
+
+> (n×m)
+
+= X 
+
+> (n×l+1)
+
+B 
+
+> (l+1 ×m)
+
++ E 
+
+> (n×m)
+
+, (1) where Y is a matrix of n observations on m response vari-ables (regressands), X is a model (design) matrix with columns for l + 1 regressors, typically including a column of ones for the regression constant, B is a matrix of re-gression coefficients, with one column for each response variable, and E is a matrix of residuals, where the rows 
+
+Ei, i = 1 , . . . , n , have all mean 0 and the same error co-variance matrix, and they are uncorrelated to each other.  
+
+> 2. Pseudo-inverse multivariate linear regression (PI-MLR)
+
+The main equation in inverse linear regression is basi-cally characterized by the same equation (as a specifica-tion) of direct linear regression, see Eq. 1. One can easily derive the specification of the inverse model equation us-ing this equation of the direct model; however, we have to emphasize that the model itself, which coincides with the coefficient matrix Binverted ≡ Γ, can be naturally de-51.2 1.25 1.3 1.35 1.4 1.45 1.5 1.55                     
+
+> ALF2 APR4 BHBlp BLh DD2 ENG GNH3 H4 LS220 MPA1 SFHo SLy SLy4 −0.8 −0.6 −0.4 −0.2 00.2 0.4
+> 100 200 300 400 1.2 1.25 1.3 1.35 1.4 1.45 1.5 1.55
+> −0.8
+> −0.6
+> −0.4
+> −0.2 00.2 0.4 1.2 1.25 1.3 1.35 1.4 1.45 1.5 1.55
+> 100 200 300 400
+
+FIG. 3. Distribution of the 77 training samples across the parameter space. Upper left : component mass M for each EOS, visualizing the dataset composition of Table I. Upper right : tidal deformability κτ 
+
+> 2
+
+against the local mass–radius slope dR/dM .
+
+Lower left : dR/dM against M . Lower right : κτ 
+
+> 2
+
+against M . Each point corresponds to a single post-merger spectrum. Three of the four panels display the target quantities that our inverse surrogates predict. Although the dataset is imbalanced across EOS families, it does span a physically meaningful range in each target variable. .
+
+rived from Bdirect ≡ B only if this matrix is invertible (square and nonsingular). We denote the exchange as Y ←→ X, and our equation specification becomes: 
+
+X 
+
+> (n×l+1)
+
+= Y 
+
+> (n×m)
+
+Γ 
+
+> (m×l+1)
+
++ H 
+
+> (n×l+1)
+
+, (2) where H is the matrix of residuals of the inverse model, having the same properties with the corresponding E
+
+residual matrix of the direct model. By performing the matrix algebraic manipulations in Eq. 1, and in the case of square coefficients matrix, we obtain: 
+
+Γ 
+
+> (m×m)
+
+= B−1(m×m) and H 
+
+> (n×m)
+
+= −E
+
+> (n×m)
+
+B−1(m×m) , (3) since we considered m = l+1 for a square matrix and that the residuals of the direct model have been precalculated. In general, the coefficients matrix B is not a square matrix. Nevertheless, inverse regression can still be for-mulated by employing the concept of the pseudo-inverse matrix, which is a generalization of matrix inversion for matrices with unequal dimensions. We usually denote this matrix using a plus sign (+) notation. To accommodate the intercept (bias) term, the input vector is already augmented with a unity constant, effec-tively adding a row to the design matrix (which corre-spond to the intercepts of individual equations when we analyze the matrix equation into a system of equations) in multivariate regression, since a specific approach would differentiate the matrix equation of the inverse model, as it was previously stated. To be more precise, we consider that the design matrix 
+
+X, which plays the role of the regressands matrix in in-verse linear regression, of direct linear regression contains ones in a column-wise fashion and particularly in the first row. Thus, if A is an arbitrary matrix, its pseudo-inverse is defined as: 
+
+A+ = A′(AA ′)−1 , (4) where A′ is the transpose matrix of A. Here the pseudo-inverse is used solely to obtain a formal algebraic inverse of the direct linear model. The PI-MLR model is in-cluded solely as an algebraic baseline obtained by for-mally inverting the direct MLR and is not intended as a statistically optimal inverse estimator. Using this nota-tion, that is assuming the rows of matrix A are linearly 6independent, Eq. 4 is valid. If the intercepts were rep-resented row-wise, then A+ would be given by a slightly different, but equivalent, algebraic expression. The existence and uniqueness of this matrix can be mathematically guaranteed, and hence, a formal alge-braic inverse can be derived under the stated rank as-sumptions. In this point, and by manipulating Eq. 1, it is obvi-ous that the equation specification of the inverse linear regression model can be directly derived from the direct one, using the following matrix equation: 
+
+X = Y B ′(BB ′)−1 − EB ′(BB ′)−1 , (5) Or, stated differently, taking into account Eq. 2, we ob-tain: 
+
+Γ 
+
+> (m×l+1)
+
+= B+(m×l+1) = B′(BB ′)−1 , (6a) 
+
+H 
+
+> (n×l+1)
+
+= −EB +(n×l+1) 
+
+= −EB ′(BB ′)−1 . (6b) Thus, by applying the least squares theory to the di-rect linear regression problem and finding the estimator coefficients of B, denoted by ˆB, one can directly derive the inverse model from its direct counterpart, that is ˆΓ,using the above set of equations. In this work, the PI-MLR baseline is obtained by reusing the coefficient matrix ˆB of the direct MLR model of [69] and computing its pseudo-inverse ˆΓ = ˆB+ analyt-ically, as described above. As a cross-check, we addi-tionally fit a direct inverse MLR model on our dataset by applying OLS to Eq. 2 (i.e. by taking the exchange 
+
+Y ←→ X relative to [69]). We refer to this simply as MLR and use it to validate the pseudo-inverse con-struction. One caveat should be kept in mind: ˆB was originally fit on spectra that had been aligned to a com-mon reference frequency using an empirical relation. This alignment cannot be reproduced at inference time in the inverse setting, since it would require prior knowledge of the neutron-star properties one is trying to predict. The practical consequences of this limitation for PI-MLR ac-curacy are discussed in Section III.  
+
+> C. Regression methods using Artificial Neural Networks
+
+Artificial Neural Networks (ANNs) generally approx-imate the mapping between input and output variables that was given to them in the process of training [78, 79]. As universal approximators, these structures can derive complex mappings (mathematical functions) by adapting to a particular dataset and learn from data using a large set of training samples, so as to acquire the ability to generalize. The ability to generalize is considered to be the capacity of the model produced to accurately predict the properties of an unseen sample that was presented to them as input, as accurately as possible. If fdirect : X 7 → Y is the function approximated by the network, which in general is non-linear by nature, then in order to define the inverse model all we have to do is to invert the mapping between X and Y , that is, by exchanging and retraining. So, our goal is to derive the function finverse : Y 7 → X. This inverse mapping need not be unique — different parameter combinations can in principle produce similar post-merger spectra, so the inverse relation is one-to-many in general and learning a well-defined conditional inverse is nontrivial. In many circumstances and depending on the applica-tion context, these structures are considered black boxes .The outcome of this assumption is reflected on the com-plexity of the resulted function they represent. Conse-quently, it is intractable to mathematically derive the in-verse model out of the direct one by manipulating equiva-lent algebraic relations. Unlike the linear regression case, the non-linear activations and dimensionality changes in deep neural networks preclude an analytic inversion of 
+
+fdirect to obtain finverse .We employ the same or even different enhancements as in [69] to optimize the model production, such as Learn-ing Rate Schedulers, Gaussian Noise, Dropout and in-put/output Scaling. Also, the logarithmic training rep-resentation of the input is a shared technique.  
+
+> D. Ensemble learning and input partitioning
+
+To improve and investigate predictive robustness, we employ ensemble learning techniques which comply well with the divide-and-conquer paradigm, in that individual models specialize in different parts of the input space. In other words, each expert learns to handle a specific subset of input data and specializes in it. This expertise of each expert in their own dataset, which is generally a subset of the overall dataset according to the application context, is called a subtask in feature-partitioned MoEs terminology. Here, a subtask is a spectral partition. However, MoE models exhibit serious interactions with respect to the bias-variance trade-off compared to simpler models. Since they are a combination of multiple models such as experts and gates, they become more sensitive to data splits leading to the so-called gating instabilities and over-parameterization issues [80, 81]. As far as this work is concerned, this is particularly significant when we use k-fold CV to estimate the per-formance of the model. When k is small the model is trained on less data and the gating function may not fully specialize; when k is large, such as in LOO-CV, we have a low bias and very high variance and the gate behaves differently fold-to-fold taking unstable decisions. So, in order to gain the most of these kind of models, we have to select a moderate value of k to keep a reasonable balance between folds, to reduce variance and obtain a reliable estimate of the performance. Consequently, the value of k = 4 was chosen for our ST-MoE-ANN model, in contrast with the other models where LOO-CV was 7used. In Figure 4 a typical architecture of an MoE model is presented, which comprises three expert models and one gate model. Each expert processes a different spectral partition. The gate network takes the full spectrum as input, pro-duces three Softmax scores, and the expert with the high-est score is selected (top-1 hard routing). Only the se-lected expert’s output is forwarded to the model output. In this work in Section IV, we are going to divide each input spectrum into three different equal-sized parts for three MoE models (as the one depicted in Figure 4) that predict a single physical property of the triplet 
+
+[dR/dM, M, κ τ 
+
+> 2
+
+] which describes a neutron star compo-nent of the binary system. Each part will have the same number of frequency bins and feed each expert of MoE models with its corresponding input. This way, in each MoE model the first expert will specialize in the low fre-quencies, the second one in the middle frequencies, and the third one in the high frequencies regime of frequency range of astrophysical interest, that is, [1 − 4] kHz .Another reason this approach might become useful in the future is that when 3rd generation detectors are con-structed and operate, the visibility (related to the Signal-to-Noise Ratio of the signal) of the entire BNS post-merger signal will not be apparent at once. The SNR of a potentially detected post-merger signals are funda-mentally and quantitatively linked to the detector’s sen-sitivity curve through the matched-filter SNR integral [82]. Firstly, when the main frequency peak will cease to be buried in noise, and as the sensitivity is further improved then, secondly, the other characteristics of the post-merger spectrum will become visible, as the lower frequency secondary peaks which lie one order of magni-tude lower in amplitude. It would be useful to qualita-tively demonstrate to which level improvements should happen with respect to this kind of models, since it can learn to prioritize the robust spectral regions. On the contrary, in Figure 5 we present a different single-task model-approach (ST-ANN) where the whole spectrum is fed into a single ANN without dividing it, and combine (concatenate) the result values into a single vector output. Although this approach is not formally considered an ensemble in strict terms, it can still be uti-lized to draw conclusions comparing it with the former. Here, a relevant investigation will be conducted for identifying which part of spectrum most (if any) affects a specified neutron star property out of three (while the choice might not be unique and more than three in num-ber) using a chi-squared statistical test.  
+
+> E. Weighted regression
+
+Moreover, the aforementioned regression-oriented ap-proaches, specifically for the deep learning ones, can be further enhanced through the incorporation of weighting schemes during model design, thereby improving their 
+
+> FIG. 4. A schematic description of a mixture of experts model (MoE) with three expert models and a gate model. The input is divided into three spectral partitions (subtasks), so each ex-pert is assigned 1/3 of input to gain specialization in it. The gate model, which is trained jointly with the expert models and takes the full spectrum as input, is responsible for se-lecting, via top-1 routing, the expert whose output is used by the overall MoE model. The architecture is instantiated three times, one for each NS property we want to predict.
+> FIG. 5. Schematic illustration of our overall Single-Task ANN model, consisting of an ensemble of three individual ANN models, each trained to predict one neutron-star property. Each model takes the full input spectrum and outputs a single value. The three outputs are then concatenated to form the final three-component prediction vector.
+
+predictive capability. Typically, a two-stage weighting procedure is employed to emphasize accurately predicted samples while penal-izing poorly predicted ones. In the first stage, residuals for all samples are computed by performing an initial in-ference pass of the model. In the second stage, these 8residuals are inverted to derive the weights used in the subsequent training phase. Badly predicted samples are penalized in the sense that their contribution to the loss is reduced via smaller residual-based weights, while well-predicted samples are correspondingly favored. This reflects a deliberate design choice and a trade-off between robustness and emphasis on regions of the training distribution that the model can represent reliably. This approach enables the model to assign higher weights to samples with higher predictive accuracy, thereby yielding an overall improvement in its general predictive performance. Concretely, the second-stage sample weights are defined as inverse residual-based weights, 
+
+wi ∝ 1
+
+|ei| + ϵ , (7) where ei denotes the first-stage residual for sample i, and 
+
+ϵ is a small positive constant introduced for numerical stability. In this way, samples with smaller first-stage er-rors receive larger weights and therefore contribute more strongly to the loss minimized during the second training stage. In terms of the current work, we performed a range search for taking into account sample weights in the sec-ond stage, after normalizing them into a specified inter-val. We investigated normalized ranges r of the form: 
+
+r = (1 , w max ) , where wmax ∈ (2 , 4, 8, 16 , 32) (8) This way, a wmax value indicates how many more times a specific sample i will be included in the training pro-cedure, while our dataset of 77 observations/samples is traversed, compared with samples that are weighted close to one. For MT-ANN model, where a three-component vector is predicted, the weights are calculated as averages of individual property first stage values. The proposed two-stage weighting procedure is applied entirely within each leave-one-out cross-validation (LOO-CV) fold. For a given fold, the held-out sample is ex-cluded from both stages of training. In the first stage, the model is trained solely on the remaining N -1 samples and residuals are computed exclusively for these training samples. The resulting residuals are then used to define sample weights, which are applied in the second-stage training on the same N -1 samples. The held-out sample is used only for final evaluation and does not contribute to the computation of residuals, weights, or model pa-rameters at any point. All preprocessing steps follow the same fold-wise protocol.  
+
+> F. Root Mean Square Error index
+
+While we used Fitting Factors histograms in our pre-vious work [69], it is not relevant to use them again here. Instead, we are going to use a simpler metric to demon-strate the accuracy of our inverse regression methodol-ogy describing the prediction capacity of a single model, which is commonly known as Root Mean Square Error (RMSE). RMSE’s have the advantage that when they are calculated on a specific variable, the result has the same dimensions (units) as that variable and therefore represents a typical error magnitude. Here, given a regressand variable y and a finished k-fold cross-validation (CV) evaluation procedure, the overall RMSE of y ∈ (dR/dM, M, κ τ 
+
+> 2
+
+) for a specific model is in-dicated by a calculation of the predicted values ypredicted 
+
+against its original true values yoriginal , using the follow-ing formula: 
+
+RMSE( y) = 
+
+vuuut
+
+> N
+
+# X
+
+> i=1
+
+(y(i)predicted − y(i)original )2
+
+N , (9) where the summation index i traverses all the observa-tions and, consequently, N = 77 in our case, as we will describe in Subsection II A. The results for our case are depicted in Table VI.  
+
+> G. Optimal Huber loss
+
+Another methodological selection we made regarding the implementation of two of our ANN-based models (MT-ANN and ST-ANN) was introducing a different loss function than the ones we used in [69]. The reason behind this choice, as we see from the scatter plots Figures 10 to 9, is that this loss function demonstrates limited sen-sitivity to outliers. However, the choice of the transition parameter δ must be made carefully: if set too small, gen-uine signal is treated as outlier and down-weighted into a linear regime, potentially preventing the model from fitting the bulk of the data tightly. Huber loss is actually a robust loss function that be-haves like MSE for small errors and like MAE for large errors and it is strongly related to smoothing the L1 met-ric while training. Considering δ as the transition value between quadratic and linear behavior, the loss obtained for sam-ple i is: 
+
+Loss i =
+
+( 12 (Ei)2 , if |Ei| ≤ δ, δ  |Ei| − 12 δ , otherwise (10) where Ei = V (i)predicted − V (i)original is the difference between the original value and the predicted one, that is, the resid-ual Ei.Usually, the choice of the δ parameter is empirical and according to the application context. However, there is a rule-of-thumb that works for the most cases using Me-dian Absolute Deviation (MAD), as a starting point. In 9this work, we calculate the δ value using the following formula: 
+
+δ = 1 .5 × factor × MAD (11) where 
+
+MAD = median i|V (i)original − median j
+
+
+
+V (j)original 
+
+
+
+| (12) and investigate using the following factor values, 
+
+factor ∈ (1 , 2, 3, 4, 5, 6) , (13) while i traverses the set of our 77 sample values, and 
+
+V ∈ (dR/dM, M, κ τ 
+
+> 2
+
+). Here we use the MAD of the tar-get variable as a convenient proxy and treat the multi-plicative factor as a tunable hyperparameter, searched over (1, 2, 3, 4, 5, 6) and selected by validation per-formance. This is a heuristic choice. Its justification is empirical rather than theoretical, and the factor sweep is what compensates for the mismatch between target scale and residual scale. For the sake of our MT-ANN model V is an average of these original values since we have a three-component vector in its output. This way we enforce more aggressive outlier suppression. Huber loss can also be included in the training scheme as a weighted loss function following the prescription we earlier stated. In each stage, we compute the residuals by subtracting the predicted values with the original ones, and invert them to be included in the next stage. We stop this iterative procedure when our validation metric (Huber on a held-out set) barely improves after stage j,so we do not iterate further. This resembles the Itera-tively Reweighted Least Squares (IRLS) statistical prin-ciple [83, 84], but with a Huber loss function in a neural network-based approach.  
+
+> III. APPLICATION OF DIFFERENT REGRESSION METHODS FOR BNS POST-MERGER PARAMETER PREDICTION
+
+Here, in this section, we are going to present the ex-periments carried out using the various neural network models we mentioned above, starting from the simplest to the most complicated one, namely 1) the Multi-Task ANN model ( MT-ANN ), 2) the Single-Task ANN mod-els ( ST-ANNs ), 3) the Single-Task Mixture-of-Experts models ( ST-MoE-ANN ), as well as 4) the Pseudo-Inverse Multivariate Linear Regression model ( PI-MLR ), which essentially emanates from its direct counterpart, and 5) the direct inverse Multivariate Linear Regression model (MLR ) which is basically used for comparison with its pseudo-inverse equivalent. All deep-learning models were trained in two stages, firstly determining the weights and, secondly, using them as input sample weights in the second stage to create stronger learners. Some typical residual vs. predictor scatter plots are depicted in Figure 6 for our best model for all three NS properties, demonstrating that residual trend information, with respect to property value, can be exploited to draw better results. In the second stage, we early stopped the training pro-cedure when a number of epochs was reached. The stop-ping epoch was selected empirically from learning-curve diagnostics, identifying the range beyond which valida-tion performance consistently deteriorated while training loss continued to decrease. We also attempted to apply a weight procedure for our two MLR models, but the re-sults were not satisfactory since the models would not improve.  
+
+> A. The models
+
+Our set of implemented models consists of three deep learning models (using artificial neural networks) that may comprise one or more combined neural networks, and two algebraic models based on multivariate linear regression constructed either indirectly (pseudo-inverse case) or directly (direct case). We employed several enhancement techniques in our deep learning models, as in our previous work [69], that yield better prediction results as we are going to see. We also had to increase the number of training parameters (both the number of layers and the number of nodes in each layer) in each network since the input now is much larger than the input of our previous work (370 instead of 3), and more correlations have to be determined by the various layers. An overview of the training parameters is presented in Table II. Moreover, all three DL models were trained using weighted regression.  
+
+> 1. Multi-task ANN model
+
+The first deep learning model is an implemented ANN used for solving the problem of predicting multiple val-ues using a regression-like scheme with 3 hidden layers. This type of set-up is typical of addressing the problem of prediction using neural networks when data can be represented in tabular form. We feed it with 77 original spectra, each containing 370 values as much as the number of frequency bins, and predict a vector consisting of three values, that is BNS component mass M , the gradient of the individual NS radius versus the mass dR/dM , and induced tidal de-formability κτ 
+
+> 2
+
+.We enhanced the training of this network using a Stan-dard Scaler in the input, by subtracting the average value of all samples and dividing with their standard deviation, an approach similar to that of our first paper. However, before doing that, a base-10 logarithmic representation of the input was calculated so that the network’s weight adjustment can be more seamlessly achieved while train-ing. On the other hand, we used a different scaler for the 10                                  
+
+> Training parameters MT-ANN ST-ANN ST-MoE-ANN
+> NN model used Single Feed-forward Multiple Feed-Forward Multiple Mixture-of-Experts Number of input nodes 370 370 each Experts: 123, 123, and 124; gate: 370 Number of hidden layers 33Experts/gate: 4 Number of output nodes 311Loss function used Huber loss Huber loss MAE/MSE/MSE Training batch size 666Early-stopping epoch 30 40 120 LR scheduling scheme ReduceLROnPlateau ReduceLROnPlateau in each Experts/gate: WarmUpDecay I/O scaling SD/MaxAbs SD/SD (except for dR/dM output) SD/SD (except for dR/dM output) k in k-fold CV evaluation 77 77 4TABLE II. Training parameters of the MT-ANN, ST-ANN, and ST-MoE-ANN models.
+
+3-value vector output, translating each component value so that the maximum absolute value in each individual component set equals 1. This scaler is widely known as MaxAbsScaler , and was introduced as it empirically yielded faster and more accurate convergence, likely due to the specific distribution of the variable. Additionally, during training, a Reduced Learning Rate (RLR) Scheduler was employed, starting from a learning rate value equal to 0.001 and gradually decreas-ing it to two orders of magnitude when there was no significant decrease in training validation loss, which was set as a mean squared value. The batch size was tuned to 6 samples, and the training procedure was completed us-ing early stopping as mention earlier. We also employed a Huber loss function to overcome and eliminate to some extent outliers and achieve smoother training and valida-tion loss curves. After performing the investigations we analyzed in Sections II E and II G, we took into consider-ation wmax = 2 for averaged weights, and factor = 2 for 
+
+delta optimal value in Huber loss function.                                                
+
+> TABLE III. Architecture of the multi-task ANN model, as reported by the summary() function of the TensorFlow library [85]. The number of trainable parameters in each dense layer can be inferred from the numbers of nodes in the previous and current layers, together with the corresponding bias terms. Layer Type Shape Activation #1 GaussianNoise(0.001) (None, 370) -#2 Dense (None, 600) Linear #3 GaussianNoise(0.05) (None, 600) -#4 Dropout(0.15) (None, 600) -#5 Dense (None, 800) Sigmoid #6 GaussianNoise(0.05) (None, 800) -#7 Dropout(0.15) (None, 800) -#8 Dense (None, 800) Sigmoid #9 GaussianNoise(0.05) (None, 800) -#10 Dropout(0.15) (None, 800) -#11 Dense (None, 800) Sigmoid #12 GaussianNoise(0.05) (None, 800) -#13 Dropout(0.15) (None, 800) -#14 Dense (None, 3) Linear
+
+To improve the generalization ability of the overall net-work, we introduced Gaussian noise in the input of each layer as well as dropping out nodes to some extent. The various parameters of this approach and the architecture of the network is depicted in Table III. Evaluation was performed using Leave-One-Out Cross Validation (LOO CV) with the number of folds being equal to the cardinality of our dataset (77), as for the other models (except for the ST-MoE-ANN ones), a pro-cedure that was briefly described in our previous work [69] too.  
+
+> 2. Single-task ANN models
+
+In order to be able to assess the prediction capacity of the previous MT-ANN network, we broke down the prob-lem of predicting the output into three separate neural networks, where each one predicts a single component of the regressand vector while having the same regressors as input. So, we constructed three ANNs that can be used as an ensemble, similar to the one described in Table III, except for the fact that the last output layer has (None, 1) shape, that is predicting a single value; either BNS component mass M , or inverse gradient of NS radius vs its mass dR/dM or, lastly, tidal deformability κτ 
+
+> 2
+
+.We used the same enhancements as in the MT-ANN 
+
+case, but we were slightly differentiated in input/output scaling of each network. To be more precise, the ANNs predicting mass M and tidal deformability κτ 
+
+> 2
+
+were im-plemented using standard scaling (SD) both in input and output, a process that was reversed while predicting with the formulated model, while for inverse gradient of ra-dius versus mass dR/dM a standard scaler was used for input and a MaxAbsScaler for output. We emphasize again that the latter is justified by the fact that dR/dM 
+
+comprises sparse data and zero-centering would destroy sparsity. Lastly, the investigations we analyzed in Sections II E and II G, indicated as best choice values for wmax and 
+
+delta factor, to be equal to 8 and 4, respectively. 11           
+
+> First stage
+> Second stage
+> FIG. 6. Scatter plots of the first-stage (upper panels) and second-stage (lower panels) residuals versus the neutron-star property predicted by the ST-ANN models. The black dashed line denotes an OLS trend line shown for visual guidance only. In the second stage, sample weights are assigned according to wi∝1/(|ei|+ϵ), where eiis the first-stage residual, so that samples with smaller residuals contribute more strongly to the weighted loss. .
+> 3. Single-task Mixture of Experts (MoE) models
+
+The third deep learning model we employed for pre-dicting the specified neutron star properties is an en-semble of mixture-of-experts (MoE) models, one for each property out of three, and is depicted in Figure 4, while we form each spectral partition so as to almost equally comprise the 1/3 of the input spectrum. In other words, we feed during training the first expert of each MoE model with 123 amplitude values equal to the number of frequencies of the lower range, the second expert with the corresponding 123 amplitude values of the middle range and, finally, the third expert with the last 124 amplitude values of the higher range, to predict a single value of the output vector. Overall, across the three target proper-ties, the ST-MoE setup comprises 9 experts and 3 gate networks. The ANN architecture of an expert is described in Ta-ble IV and the one of a gate is described in Table V. In order to implement the custom logic, we used the Layer keras class instead of Dense, in an equivalent fashion. We can see that the experts are essentially similar to the ANN architecture of Table III, consisting of 4 hid-den layers having sigmoid activation functions, whereas the gate has the architecture of a classifier with 4 hid-den layers and ReLU activation functions, notwithstand-ing SoftMax activation for the last output layer. The gate acts as a classifier over the three experts. Its Soft-max scores are converted to a top-1 routing decision via argmax, and the selected expert alone is used to predict the target quantity. We also employed warm-up learning rate scheduling, as in [69], which gradually increases the LR (from a very low value) up to an epoch and then is decreased so that a smoother and better training process is accomplished. The overall training lasted 100 epochs, 15% of which dur-ing warming up. Batch size was set to 6 samples after tuning, as in the other models. As regards the scaling we performed, it is similar to one described for the ST-ANN models. Lastly, this model was trained using k = 4 instead of LOO-CV to avoid potential gating instabilities and variance surges. Lastly, 12                                                      
+
+> TABLE IV. Expert ANN architecture of one MoE model of the ST-MoE-ANN ensemble. The shape (None, 123) corre-sponds to the number of frequency bins in the first and second spectral partition, while for third one is 124 (handled by last expert) due to incomplete division. The Layer class was used instead of Dense class, equivalently. Layer Type Shape Activation #1 Layer (None, 123) Linear #2 GaussianNoise(0.001) (None, 800) -#3 Dropout(0.15) (None, 800) -#4 Layer (None, 800) Sigmoid #5 GaussianNoise(0.05) (None, 800) -#6 Dropout(0.25) (None, 800) -#7 Layer (None, 800) Sigmoid #8 GaussianNoise(0.05) (None, 800) -#9 Dropout(0.25) (None, 800) -#10 Layer (None, 800) Sigmoid #11 GaussianNoise(0.05) (None, 800) -#12 Dropout(0.25) (None, 800) -#13 Layer (None, 800) Sigmoid #14 GaussianNoise(0.05) (None, 800) -#15 Dropout(0.15) (None, 800) -#16 Layer (None, 1) Linear
+
+we normalized input sample weights having as wmax equal to 16.  
+
+> 4. Pseudo-Inverse Multivariate Regression model (PI-MLR)
+
+The first algebraic model we implemented takes ad-vantage of Eq. 6a, as described in II B, where B is the coefficients matrix of the direct model of our previous work, used to formulate the respective coefficients ma-trix Γ of our inverse MLR model. All we have to do in order to calculate a triplet of neutron star properties is to multiply a column vector representing an individual spectrum with this matrix. However, we have to note that coefficients matrix B                                  
+
+> TABLE V. Gate ANN classifier architecture of one MoE model of the ST-MoE-ANN ensemble. The shape (None, 370) corresponds to the overall number of frequency bins in an in-dividual spectrum. Layer Type Shape Activation #1 Layer (None, 370) Linear #2 Dropout(0.001) (None, 600) -#3 Layer (None, 600) ReLU #4 Dropout(0.05) (None, 600) -#5 Layer (None, 600) ReLU #6 Dropout(0.05) (None, 600) -#7 Layer (None, 600) ReLU #8 Dropout(0.05) (None, 600) -#9 Layer (None, 600) ReLU #10 Layer (None, 3) Softmax
+
+was produced after we aligned the BNS spectra (which is currently used as input) to formulate the direct model, something that leads to some implications when we make predictions using Γ in the inverse case. Here, we have to align again the dataset of input spectra into a common reference frequency before feeding them one by one into the inverse model. This alignment should not be based on an empirical relation, because we are not eligible to use one, since the neutron star properties this relation takes into account are not known a priori (because they are the predicted values). On the contrary, we implement a perfect alignment and not a partial one. If we were able to use the same empirical relation, we would have re-produced the partial alignment of the first step of the direct model, something that would yield much more equivalent results when predicting with the resulted PI-MLR inverse model. In the future, when Equation-of-State is further re-stricted and determined to a great extent, the direct model of our previous work, as we have argued, will be much more precise since the optimized empirical relation will lead to perfect alignment, and, consequently, the PI-MLR model for the inverse case will be much more precise also.  
+
+> 5. Multivariate Regression model (MLR)
+
+Apart from the PI-MLR model which takes advantage of the pseudo-inverse approach, we can use the well-known Ordinary Least Squares (OLS) methodology to fit the inverse linear model of Eq. 3, thereby estimating the prediction matrix Γ. That is, to deal with the inverse problem as a direct one to mainly make comparisons with the pseudo-inverse case.  
+
+> B. Prediction accuracy and model comparison
+
+Here, we present the prediction results as combined scatter plots and signed-error histograms for the two groups of models we implemented: the three deep-learning models in Figures 7 to 9, and the two algebraic models in Figures 10 to 12. In each scatter plot, the horizontal axis shows the original value of the predicted property, while the vertical axis shows the correspond-ing predicted value. The best predictions therefore lie close to the diagonal black dashed line. We also depict as a grey-shaded area the central 90% interval of the pre-diction errors, bounded by the 5th and 95th percentiles. The red tilted line is a least-squares approximation to the overall trend of the data points. The corresponding signed errors, defined as the dif-ference between predicted and original values, are also shown as histograms in the same panels. For a given target quantity, the binning is kept fixed across models in order to enable direct visual comparison, although the 13 
+
+Multi-Task ANN 
+
+Single-Task ANN 
+
+Single-Task MoE 
+
+FIG. 7. Prediction results for the three deep-learning models for dR/dM . Each panel shows a scatter plot of predicted versus original values together with the corresponding signed-error histogram. The black dashed line denotes the diagonal, the red line is the least-squares trend line, and the grey-shaded band indicates the central 90% interval of the prediction errors. Among the three models, the MT-ANN achieves the best prediction accuracy for this target. 14 
+
+Multi-Task ANN 
+
+Single-Task ANN 
+
+Single-Task MoE 
+
+FIG. 8. Same as Fig. 7, but for the Mass (M ) property. 15 
+
+Multi-Task ANN 
+
+Single-Task ANN 
+
+Single-Task MoE 
+
+FIG. 9. Same as Fig. 7, but for the tidal deformability κτ 
+
+> 2
+
+property. 16 bin width and number of bins differ between target quan-tities. The signed-error statistics used mainly to interpret the shape, spread, and bias of the prediction errors. For quantitative comparison among models, we pri-marily rely on the root mean square error (RMSE), while the mean signed error μ and the standard deviation σ of the signed errors are used as complementary descriptors of the error distributions shown in the histograms. For approximately unbiased predictions, RMSE is closely re-lated to the standard deviation of the signed errors, since 
+
+RMSE 2 = σ2 + μ2. (14) Thus, when the mean signed error is small, RMSE and 
+
+σ take similar values. The histograms further indicate that, for the best-performing models, the signed-error distributions are reasonably close to Gaussian, so that the interval (μ − σ, μ + σ) contains roughly 68% of the values, in accordance with the empirical rule. The RMSE values for all models and target quantities are reported in Table VI. Among the deep-learning models, the MT-ANN achieves the best performance for the prediction of 
+
+dR/dM , with mean signed error 0.02 and standard devia-tion 0.29 . For the mass M , the ST-ANN model gives the best predictions, with mean signed error 0.00 M⊙ and standard deviation 0.07 M⊙. The ST-ANN model also performs best for the dimensionless tidal deformability parameter κτ 
+
+> 2
+
+, with mean signed error 0.67 and standard deviation 36 .17 . Overall, the ST-ANN ensemble provides the strongest performance across two of the three target quantities, while the MT-ANN remains the best model specifically for dR/dM .The algebraic baselines perform less favorably than the ANN-based models. In particular, the direct inverse MLR model yields the largest RMSE for dR/dM and M ,while the PI-MLR model gives the largest RMSE for κτ 
+
+> 2
+
+.This overall underperformance indicates that the inverse relation between post-merger spectra and neutron-star properties is not captured as effectively by linear surro-gates as by the proposed nonlinear ANN models. The signed-error histograms further show that the two MLR-based models behave qualitatively similarly, although for M their error distributions deviate more clearly from an approximately Gaussian shape. This helps explain the larger mismatch between the standard deviation σ of the signed errors and the corresponding RMSE values in those cases. For the PI-MLR model specifically, the weaker perfor-mance relative to the ANN-based models is not only a consequence of limited predictive flexibility, but also re-flects the fact that it inherits the alignment dependence of the direct model of [69]. In the inverse setting, this alignment procedure cannot be reproduced in the same way without prior knowledge of the target neutron-star properties, which places the PI-MLR baseline at an in-trinsic disadvantage relative to dedicated inverse models trained directly on the original spectra.                    
+
+> TABLE VI. Root mean square errors (RMSE indices) for pre-dicting the corresponding NS property using our dataset and for each implemented model. RMSEs were calculated using LOO CV, except for ST-MoE-ANN group of models.
+> RMSE indices Model dR/dM Mκτ
+> 2
+> MT-ANN 0.286 0.119 43.023 ST-ANNs 0.371 0.064 36.177 ST-MoE-ANN 0.414 0.087 62.244 PI-MLR 0.472 0.178 90.961 MLR 0.894 0.349 86.810
+> IV. GATE-DECISION ANALYSIS OF THE ST-MOE MODELS
+
+The ST-MoE-ANN architecture offers a window into how the model distributes its routing decisions across the three spectral regions. Because the gate selects exactly one expert per sample via top-1 hard routing, the ag-gregate routing statistics reveal which spectral partition the trained gate preferentially consults for each target property. In our dataset, the dominant spectral peak 
+
+fpeak falls exclusively in Region II ( 2–3 kHz) or Region III (3–4 kHz), while Region I ( 1–2 kHz) contains only sub-dominant spectral features. The routing patterns there-fore allow us to characterize whether the gate tends to select the peak-containing region or one of the two re-maining regions. To quantify this, we first construct, for each target property, a 3 × 3 contingency table of gate decision ver-sus true peak location (Table VII). The column marginals are identical across all three properties (0 , 56 , 21) , con-firming that the true peak distribution is determined by the spectra alone and is independent of the target vari-able. The structurally empty first column (no peaks fall below 2 kHz) is a consequence of the expected frequency range of fpeak for the EOS families in our dataset. We then reduce each sample’s gate decision to a binary outcome: whether the gate selected the region containing 
+
+fpeak (“peak”) or one of the two regions that do not (“non-peak”). Under the null hypothesis that the gate routes independently of peak location, the expected non-peak rate is p0 = 2 /3, since two out of three regions do not contain the peak. A significant departure from this rate would indicate that the gate has learned a directional routing preference related to fpeak . We test: 
+
+H0: The probability that the gate selects a non-peak region equals p0 = 2 /3 (no preference). 
+
+H1: The probability differs from 2/3.using a two-sided binomial test (normal approximation), with test statistic: 
+
+z = k − N p 0
+
+pN p 0 (1 − p0) , (15) where k is the observed number of non-peak gate selec-tions out of N = 77 samples. The results are reported in 17 
+
+> MLR
+> Pseudo-Inverse MLR
+> FIG. 10. Same as Fig. 7, but for the algebraic models.
+
+Table VIII. The three target properties exhibit qualitatively dis-tinct routing behaviors. For the mass–radius slope 
+
+dR/dM , the gate selects a non-peak region in 76.6% of cases, compared to the 66.7% expected under random routing ( z = +1 .85 , p = 0 .064 ). For the component mass M , the pattern reverses: the gate selects the peak-containing region 42.9% of the time, above the 33.3% random expectation ( z = −1.77 , p = 0 .077 ). For the tidal deformability κτ 
+
+> 2
+
+, no significant preference is ob-served ( z = −0.32 , p = 0 .75 ). While neither the dR/dM nor the M result reaches the conventional α = 0 .05 significance threshold under the two-sided test, the directions of the two departures are noteworthy and physically suggestive. For M , a ten-dency toward peak tracking is consistent with the known sensitivity of fpeak to the total binary mass, as reflected in the quasi-universal relations that involve Mtot fpeak as a combined variable (see e.g. [72]). For dR/dM , the opposite tendency (routing away from 
+
+fpeak ) raises the possibility that sub-peak spectral fea-tures carry predictive information for the local curvature of the mass–radius relation that is complementary to the dominant frequency. An important caveat must be noted regarding the in-terpretation of these routing statistics. The gate net-work receives the full 370 -bin spectrum as input and makes its routing decision based on the entire spectral shape, not solely on the content of the region it selects. Consequently, when the gate chooses Region I, this does not establish that Region I alone is informative; rather, it indicates that, conditioned on the full spectral mor-phology, the gate determined that the Region I expert would produce the best prediction. Furthermore, top-1 18 
+
+> MLR
+> Pseudo-Inverse MLR
+> FIG. 11. Same as Fig. 8, but for the algebraic models.
+
+hard routing is a discrete winner-take-all decision that does not reveal the margin by which one expert was pre-ferred over another; near-ties and confident selections are treated identically. As a result, two distinct interpretations of the observed routing patterns remain compatible with the data. On one hand, the gate’s preference for non-peak regions when predicting dR/dM may reflect a genuine learned associ-ation between sub-peak spectral features and the mass– radius slope, indicating that the 1–2 kHz region carries independent predictive content not accessible through 
+
+fpeak -based empirical relations. On the other hand, the same pattern could arise from suboptimal gating: the gate may be making imperfect routing decisions, and the fact that the ST-MoE-ANN achieves worse overall RMSE than the ST-ANN (Table VI) is consistent with this pos-sibility. The present analysis cannot definitively distin-guish between these two scenarios. Nevertheless, the observation that routing patterns show opposite tendencies for dR/dM and M, while κτ
+
+> 2
+
+shows no clear preference, is a robust descriptive finding and suggests that the gate does not behave identically across the three targets. If the gate were simply rout-ing randomly or poorly for all properties, one would not expect property-specific directional patterns. This differ-entiation is consistent with the physical expectation that different neutron-star properties are encoded in different aspects of the post-merger spectral morphology. The definitive test of whether non-peak spectral re-gions carry independent predictive information would re-quire a controlled ablation study: comparing the RMSE of the ST-ANN model trained on the full 1–4 kHz spec-trum against the same model trained on only the peak-containing 2–4 kHz band, and separately on only the sub-peak 1–2 kHz band. A significant RMSE degrada-tion when removing Region I would directly demonstrate 19 
+
+> MLR
+> Pseudo-Inverse MLR
+> FIG. 12. Same as Fig. 9, but for the algebraic models.
+
+that the sub-peak region contributes information beyond what fpeak and its immediate spectral environment pro-vide, offering the strongest possible justification for full-spectrum inverse surrogates over fpeak -based empirical relations. We defer this ablation study to future work.  
+
+> V. CONSISTENCY WITH EMPIRICAL AND EOS-DEPENDENT RELATIONS
+
+A useful way to assess the physical consistency of the predicted neutron-star properties is to compare them with relations already established in the literature. In particular, quasi-universal relations are especially valu-able because they are approximately EOS-insensitive and therefore provide a stringent benchmark for any inverse model. Agreement with such relations indicates that the model does not merely reproduce individual target val-ues, but also captures the underlying structure of the post-merger parameter space. As a first consistency test, we consider the empirical re-lation introduced by Vretinaris, Stergioulas & Bauswein [72], specifically their 41st fit, which we also used in our previous work for shifting and recovering the spectra in [69]. This relation differs from the one adopted in Easter et al. [86] and provides a convenient EOS-agnostic ref-erence for our predicted dataset. In Fig. 13, we compare the predicted values with the corresponding ground-truth dataset in the Mtot fpeak –κτ 
+
+> 2
+
+plane, together with the em-pirical fit. The level of agreement between the predicted and reference samples confirms that the predictions of the ST-ANN model are consistent with the global trend encoded by this quasi-universal relation. As a complementary consistency test, in Fig. 14 we ex-20                                                                                       
+
+> TABLE VII. 3×3contingency tables of gate decision (rows) versus true peak location (columns) for each predicted quan-tity. Column marginals are identical across properties, con-firming that the true peak distribution is a property of the spectra alone. Region I is structurally empty (no peaks fall below 2kHz).
+> (I) dR/dM
+> Gate decision Region I Region II Region III Total Region I 033 841 Region II 09413 Region III 014 923 Total 056 21 77
+> (II) M
+> Gate decision Region I Region II Region III Total Region I 011 920 Region II 027 633 Region III 018 624 Total 056 21 77
+> (III) κτ
+> 2
+> Gate decision Region I Region II Region III Total Region I 023 12 35 Region II 022 426 Region III 011 516 Total 056 21 77 TABLE VIII. Gate routing preference for each target prop-erty. The non-peak rate gives the fraction of samples for which the gate selected a region that does not contain fpeak .Under H0(no preference), the expected non-peak rate is
+> 2/3≈66 .7% . The z-statistic and two-sided p-value are com-puted from Eq. (15). Variable Peak Non-peak Non-peak rate zp-value
+> dR/dM 18 59 76.6% +1 .85 0.064
+> M33 44 57.1% −1.77 0.077
+> κτ
+> 227 50 64.9% −0.32 0.75
+
+amine whether the model also preserves EOS-dependent behavior. There, we compare the predicted M –κτ 
+
+> 2
+
+rela-tion with the corresponding ground-truth curves for three representative EOSs, namely APR4, GNH3, and MPA1. This comparison is more demanding than the universal-relation test, since it probes the model’s ability to recover EOS-specific structure rather than only the global behav-ior shared across different EOSs. The level of agreement obtained in this case indicates that the predicted parameters remain physically consis-tent not only at the universal level, but also at the level of individual EOS families. A more detailed comparison with the corresponding ground-truth values is presented in Appendix A. This is a promising result for future work, where a substantially larger training set could enable our method to place direct constraints on the EOS from the post-merger GW spectrum, independently of the EOS in-formation inferred from the inspiral phase. In the case that discrepancies with the EOS inferred from the inspi-ral phase are found, one could examine effects such as phase transitions or spontaneous a scalarization as pos-sible explanations.  
+
+> VI. CONCLUSIONS
+
+In this work, we presented five models that are used for predicting component neutron star properties out of the produced post-merger Binary Neutron Star spectrum, three of them being Deep Learning models and two based on Multivariate Linear Regression algebraic manipula-tions, such as OLS and pseudo-inverse concepts to com-pare with. The best model is the one where we used a individual ANN to predict each property separately in an ensemble fashion, namely ST-ANNs as described above, while the rest deep learning models exhibited comparable results. As for the MLR models, they do not seem to achieve similar behavior as the deep learning ones, with the PI-MLR being currently the worse, due to the fact that our previous work methodology is partially reversible for the particular model, due to the complications we stated in Section III B, since 3rd generation detectors are under construction and we lack observations. The superior performance of the ST-ANN framework indicates that the regression from post-merger spectra to neutron star properties is best captured by special-ized models rather than shared representations. The degradation seen in Multi-Task learning suggests nega-tive transfer, where the spectral features required for re-solving mass may conflict with those needed for tidal de-formability. Furthermore, the under-performance of the frequency-partitioned MoE model highlights the impor-tance of global spectral context; while the dominant peak is crucial, the holistic spectral shape carries auxiliary in-formation that is lost when the input is fragmented into sub-bands. Our current work is a natural extension of our previous work [69], which treated the NS properties as input to a regression-based scheme to predict the BNS spectra, by exchanging input and output. A natural concern is the large nominal number of trainable parameters compared with the 77 available training spectra. We emphasize, however, that the present study is a proof of concept, in-tended to test whether an ANN-based inverse surrogate is feasible and competitive with simpler algebraic base-lines on the currently available catalog. Although the spectra are represented on a 370-bin frequency grid, they are generated by a restricted family of physically struc-tured post-merger signals and are therefore expected to occupy a much smaller effective region of the input space than an arbitrary 370-dimensional dataset. In this set-ting, the network acts primarily as a flexible nonlinear regressor on structured inputs rather than as an uncon-strained fit to generic high-dimensional data. We further limit effective model capacity through dropout, Gaus-21        
+
+> FIG. 13. Validation of the inverse ST-ANN model in the Mtot fpeak –κτ
+> 2plane. Predicted samples (black) and ground-truth samples (red) are shown together with the empirical fit of Vretinaris et al., illustrating that the network predictions recover the global trend followed by the reference data.
+> FIG. 14. Validation of the inverse ST-ANN model in the
+> M–κτ
+> 2plane. Predicted values for three representative EOSs (APR4, GNH3, and MPA1) are compared with the corre-sponding ground-truth curves, showing promising prospects for EOS recovery from post-merger GW spectra, using ANNs.
+
+sian noise injection, and early stopping, and we assess performance strictly in a fold-wise manner under cross-validation. We therefore do not claim that the present dataset is sufficient for definitive population-level gen-eralization; rather, the results indicate that meaningful interpolation within the current simulation set is already possible, while larger future numerical-relativity catalogs will be needed to establish robustness more broadly. Our method could be employed in the future as a way to obtain a fast parameter estimation for mass and tidal deformability, directly from the post-merger spectrum, for potentially discovered post-merger BNS signals us-ing 3G detectors, such as Einstein Telescope or Cosmic Explorer. It assumes that the source properties and the cold EOS properties up to densities encounter in pre-merger neutron stars are already well-constrained from the high-SNR inspiral part. The independent parameter estimation using the post-merger part would then serve as a probe for phase transitions and/or the thermal prop-erties at central densities inaccessible to inspiral studies. Moreover, concerning the results obtained using the ST-MoE-ANN set models, which predict each property separately using a MoE model by examining each time a different part of the spectrum as a partition, there are indications that these properties are distinguishable enough by considering a shorter range of the spectrum which contains the fpeak . As we have mentioned, the post-merger signal will not be visible at once, but grad-ually, when detectors will be improving their sensitivity curve and, therefore, someone can possibly draw some conclusions about the properties by observing the domi-nant feature, if it is distinguishable enough. The choice of the three-component output vector 
+
+[dR/dM, M, κ τ 
+
+> 2
+
+] is not unique; as discussed in [69], alter-native or additional neutron star properties could serve as regression targets, and nonlinear terms could be in-corporated to capture more complex relationships. Sim-ilarly, the post-merger dynamics can be influenced by a range of physical effects not considered here, including magnetic fields, viscosity, neutrino transport, phase tran-sitions, and finite-temperature microphysics [87–112], as well as possible deviations from General Relativity [113– 122]. In this work we deliberately restricted the scope to a basic equal-mass hydrodynamics setting in order to isolate and validate the inverse regression methodology itself; extending the framework to incorporate these ad-ditional effects is a natural direction for future work once larger and more diverse simulation catalogs become avail-able. The present analysis uses noise-free spectra in order to establish the viability of the inverse mapping under ideal conditions; a dedicated follow-up study will address realistic detectability by injecting signals into simulated detector noise curves for specific next-generation instru-22 ments. Ultimately, this work demonstrates that deep learning frameworks can bypass the computational bottlenecks of conventional parameter estimation, offering a viable pathway for real-time analysis of binary neutron star remnants in the next generation of gravitational-wave as-tronomy. 
+
+ACKNOWLEDGMENTS 
+
+We are grateful to Grigorios Papigkiotis, Alexandra Koloniari and Georgios Vardakas for comments. This research work was supported by the Hellenic Foundation for Research and Innovation (HFRI) under the 3rd Call for HFRI PhD Fellowships (Fellowship Number: 6836). Virgo is funded through the European Gravitational Observatory (EGO), by the French Centre National de Recherche Scientifique (CNRS), the Italian Istituto Nazionale di Fisica Nucleare (INFN) and the Dutch Nikhef, with contributions by institutions from Belgium, Germany, Greece, Hungary, Ireland, Japan, Monaco, Poland, Portugal, Spain. Results presented in this work have been produced using the AUTh Computing Infras-tructure and Resources. DP would like to acknowledge the support provided by the Scientific Computing Office throughout the progress of this research work and, especially, during its beginning. 
+
+Appendix A: Additional validation plots and diagnostics 
+
+Figure 15 shows, in addition to the Vretinaris et al. [72] empirical fit, the fit introduced by Chakravarti and Andersson [73]. Its determination coefficient R2 is equal to 0.782 for our predicted dataset compared to 0.905 for the ground truth dataset, slightly better than the 41st relation of [72]. In Figure 16, we show the average loss curves among 77 trained models following a LOO-CV evaluation pro-cess. We can see that the averaged validation loss curves are below the training loss, exhibiting a monotonic behavior, for all three predicted neutron-star properties. Early stopping was enforced to avoid entering the overfitting regime. 
+
+[1] P. Haensel, A. Y. Potekhin, and D. G. Yakovlev, Neu-tron Stars 1: Equation of State and Structure , Astro-physics and Space Science Library, Vol. 326 (Springer, New York, 2007). [2] A. Abac, R. Abramo, S. Albanesi, A. Albertini, A. Agapito, M. Agathos, C. Albertus, N. Andersson, 
+
+et al. , The science of the einstein telescope (2025), arXiv:2503.12263 [gr-qc]. [3] A. Bauswein, N. Stergioulas, and H.-T. Janka, European Physical Journal A 52 , 56 (2016). [4] T. Dietrich, T. Hinderer, and A. Samajdar, Gen. Rela-tivity Gravit. 53 , 27 (2021). [5] B. P. Abbott et al. , Phys. Rev. X 9, 011001 (2019). [6] B. P. Abbott et al. , Phys. Rev. Lett. 121 , 161101 (2018). [7] F. Iacovelli, M. Mancarella, C. Mondal, A. Puecher, T. Dietrich, F. Gulminelli, M. Maggiore, and M. Oertel, Phys. Rev. D 108 , 122006 (2023). [8] J. L. Friedman and N. Stergioulas, International Journal of Modern Physics D 29 , 2041015 (2020). [9] L. Baiotti and L. Rezzolla, Reports on Progress in Physics 80 , 096901 (2017), publisher: IOP Publishing. [10] L. Baiotti, Progress in Particle and Nuclear Physics 
+
+109 , 103714 (2019), _eprint: 1907.08534. [11] Hild S., et al., Classical and Quantum Gravity 28 ,094013 (2011). [12] S. Ascenzi, V. Graber, and N. Rea, Astroparticle Physics 158 , 102935 (2024), _eprint: 2401.14930. [13] A. Bauswein, S. Blacker, V. Vijayan, N. Stergioulas, K. Chatziioannou, J. A. Clark, N.-U. F. Bastian, D. B. Blaschke, M. Cierniak, and T. Fischer, Physi-cal Review Letters 125 , 10.1103/physrevlett.125.141103 (2020), publisher: American Physical Society (APS). [14] C.-J. Haster, K. Chatziioannou, A. Bauswein, and J. A. Clark, Physical Review Letters 125 , 10.1103/phys-revlett.125.261101 (2020), publisher: American Physi-cal Society (APS). [15] B. P. Abbott and others, Phys. Rev. Lett. 116 , 061102 (2016), _eprint: 1602.03837. [16] H. L"uck, J. Smith, and M. Punturo, in Handbook of Gravitational Wave Astronomy (Springer, 2022) pp. 1– 18. [17] L. S. Collaboration and J. Harms, Class. Quantum Gravity 34 , 044001 (2017). [18] D. Reitze, R. X. Adhikari, S. Ballmer, B. Barish, L. Barsotti, G. Billingsley, D. A. Brown, Y. Chen, D. Coyne, R. Eisenstein, et al. , arXiv preprint (2019), arXiv:1907.04833. [19] T. Zhang, H. Yang, D. Martynov, P. Schmidt, and H. Miao, A Gravitational Wave Detector for Post Merger Neutron Stars: Beyond the Quantum Loss Limit of Michelson Fabry Perot Interferometer (2022). [20] Evans M., et al., A Horizon Study for Cosmic Explorer: Science, Observatories, and Community (2021). [21] S. Borhanian and B. S. Sathyaprakash, \prd 110 ,083040 (2024), _eprint: 2202.11048. [22] Ackley K., et al., Publications of the Astronomical Soci-ety of Australia 37 , 10.1017/pasa.2020.39 (2020), pub-lisher: Cambridge University Press (CUP). [23] Branchesi M., et al., Journal of Cosmology and As-troparticle Physics 2023 (07), 068, publisher: IOP Pub-lishing. [24] K. Takami, L. Rezzolla, and L. Baiotti, Phys. Rev. Lett. 
+
+113 , 091104 (2014), publisher: American Physical So-ciety. 23 
+
+FIG. 15. In these figures we depict the fitting of two conceptually different universal neutron star empirical relations, the purple one from Vretinaris et al. work [72] used in [69], and the other red from the Chakravarti and Andersson work [73] which is basically a theoretical power-law assumption. We color the points according to the EOS they belong to (left panels), and according to their mass (right panels). The upper panels show that the predicted dataset of Mtot fpeak versus dimensionless κτ
+
+> 2
+
+agrees well with both empirical relations, which validates the predictions produced by our ANN model. The lower panels show the corresponding ground truth data with respect to the two empirical relations. 
+
+FIG. 16. Averaged validation loss curves and averaged training loss curve, after performing LOO-CV among all folds. Training is halted when they are about to intersect each other to avoid overfitting effects. [25] S. Bernuzzi, F. Magistrelli, M. Jacobi, D. Lo-goteta, A. Perego, and D. Radice, Monthly No-tices of the Royal Astronomical Society 542 , 256 (2025), https://academic.oup.com/mnras/article-pdf/542/1/256/63841147/staf1147.pdf. [26] M. Shibata, Physical Review Letters 94 , 10.1103/phys-revlett.94.201101 (2005), publisher: American Physical Society (APS). [27] M. Breschi, S. Bernuzzi, D. Godzieba, A. Perego, and D. Radice, Physical Review Letters 128 , 10.1103/phys-revlett.128.161102 (2022), publisher: American Physi-cal Society (APS). [28] P. J. Easter, S. Ghonge, P. D. Lasky, A. R. Casey, J. A. Clark, F. Hernandez Vivanco, and K. Chatziioannou, Phys. Rev. D 102 , 043011 (2020). [29] M. Wijngaarden, T. Hinderer, A. Schwenk, et al. , Phys. Rev. D 105 , 044015 (2022). [30] J. A. Clark, A. Bauswein, N. Stergioulas, and D. Shoe-maker, Classical and Quantum Gravity 33 , 085003 (2016), publisher: IOP Publishing. [31] F. Iacovelli, M. Mancarella, C. Mondal, A. Puecher, T. Dietrich, F. Gulminelli, M. Maggiore, and M. Oertel, Physical Review D 108 , 10.1103/physrevd.108.122006 (2023), publisher: American Physical Society (APS). [32] S. Vretinaris, G. Vretinaris, C. Mermigkas, M. Kara-manis, and N. Stergioulas, Robust and fast parameter estimation for gravitational waves from binary neutron star merger remnants (2025), arXiv:2501.11518 [gr-qc]. [33] S. Banagiri, M. W. Coughlin, J. Clark, P. D. Lasky, M. A. Bizouard, C. Talbot, E. Thrane, and V. Mandic, Monthly Notices of the Royal Astronomical Society 492 ,4945–4951 (2020). [34] T. Jain and M. Agathos, arXiv e-prints ,arXiv:2404.12126 (2024), _eprint: 2404.12126. [35] A. W. Criswell, J. Miller, N. Woldemariam, T. Soul-tanis, A. Bauswein, K. Chatziioannou, M. W. Cough-lin, G. Jones, and V. Mandic, Physical Review D 107 ,10.1103/physrevd.107.043021 (2023), publisher: Amer-ican Physical Society (APS). [36] G. Huez, S. Bernuzzi, M. Breschi, and R. Gamba, Phys-ical Review D 113 , 10.1103/2jxk-1bf1 (2026). [37] S. Mitra, P. Tiwari, and A. Pai, Prospect of constrain-ing the eos of neutron stars using post-merger signals (2025), arXiv:2505.21667 [astro-ph.HE]. 24 
+
+[38] F. H. Panther and P. D. Lasky, Careless whispers: Apopulation of sub-threshold post-merger gravitational waves constrains the hot nuclear equation of state (2025), arXiv:2512.08497 [gr-qc]. [39] N. Christensen and R. Meyer, Rev. Mod. Phys. 94 ,025001 (2022). [40] Z. Carson, A. W. Steiner, and K. Yagi, \prd 100 , 023012 (2019), _eprint: 1906.05978. [41] L. Baiotti, Arabian Journal of Mathematics 11 , 105 (2022). [42] M. Wijngaarden, K. Chatziioannou, A. Bauswein, J. A. Clark, and N. J. Cornish, \prd 105 , 104019 (2022), _eprint: 2202.09382. [43] A. Puecher, T. Dietrich, K. W. Tsang, C. Kalaghatgi, S. Roy, Y. Setyawati, and C. Van Den Broeck, \prd 107 ,124009 (2023), _eprint: 2210.09259. [44] M. C. Miller and N. Yunes, Nature 568 , 469 (2019). [45] M. Arimoto and others, Progress of Theoretical and Ex-perimental Physics 2023 , 10A103 (2021). [46] D. M. Eardley, D. L. Lee, and A. P. Lightman, Phys. Rev. D 8, 3308 (1973). [47] R. Abbott et al. , Phys. Rev. D 103 , 122002 (2021). [48] C. M. Will, Living Rev. Relativity 17 , 1 (2014). [49] B. S. Sathyaprakash and B. F. Schutz, Living Rev. Rel-ativity 12 , 2 (2009). [50] M. Maggiore, Phys. Rep. 331 , 283 (2000). [51] R. Huxford, R. Kashyap, S. Borhanian, A. Dhani, I. Gupta, and B. S. Sathyaprakash, \prd 109 , 103035 (2024), _eprint: 2307.05376. [52] P. J. Easter, S. Ghonge, P. D. Lasky, A. R. Casey, J. A. Clark, F. Hernandez Vivanco, and K. Chatziioannou, Phys. Rev. D 102 , 043011 (2020), publisher: American Physical Society. [53] C. Ecker, T. Gorda, A. Kurkela, and L. Rezzolla, arXiv e-prints , arXiv:2403.03246 (2024), _eprint: 2403.03246. [54] M. Breschi, S. Bernuzzi, F. Zappa, M. Agathos, A. Perego, D. Radice, and A. Nagar, \prd 100 , 104029 (2019), _eprint: 1908.11418. [55] M. Breschi, S. Bernuzzi, K. Chakravarti, A. Camilletti, A. Prakash, and A. Perego, Physical Review D 109 ,10.1103/physrevd.109.064009 (2024), publisher: Amer-ican Physical Society (APS). [56] A. Tsokaros, J. Bamber, M. Ruiz, and S. L. Shapiro, arXiv e-prints , arXiv:2411.00939 (2024), _eprint: 2411.00939. [57] T. Soultanis, A. Bauswein, and N. Stergioulas, Physical Review D 105 , 10.1103/physrevd.105.043020 (2022). [58] M. C. Tringali, A. Puecher, C. Lazzaro, R. Ciolfi, M. Drago, B. Giacomazzo, G. Vedovato, and G. A. Prodi, Classical and Quantum Gravity 40 , 225008 (2023), _eprint: 2304.12831. [59] H. Kochankovski, A. Ramos, L. Tolos, S. Blacker, and A. Bauswein, Hyperons in neutron star mergers (2024), arXiv:2411.14978 [hep-ph]. [60] S. Blacker, H. Kochankovski, A. Bauswein, A. Ramos, and L. Tolos, Phys. Rev. D 109 , 043015 (2024). [61] R. De Pietri, A. Feo, J. A. Font, F. Löffler, F. Maione, M. Pasquali, and N. Stergioulas, Phys. Rev. Lett. 120 ,221101 (2018), arXiv:1802.03288 [gr-qc]. [62] R. De Pietri, A. Feo, J. A. Font, F. Löffler, M. Pasquali, and N. Stergioulas, Phys. Rev. D 101 , 064052 (2020), arXiv:1910.04036 [gr-qc]. [63] A. Sasli, N. Karnesis, and N. Stergioulas, Phys. Rev. D 
+
+109 , 043045 (2024), arXiv:2311.10626 [gr-qc]. [64] D. Guerra, M. Ruiz, M. Pasquali, P. Cerdá-Durán, A. Rios, and J. A. Font, On the treatment of thermal effects in the equation of state on neutron star merger remnants (2026), arXiv:2512.05118 [gr-qc]. [65] A. Puecher and T. Dietrich, Physical Review D 110 ,10.1103/physrevd.110.123038 (2024), publisher: Amer-ican Physical Society (APS). [66] T. Whittaker, W. E. East, S. R. Green, L. Lehner, and H. Yang, \prd 105 , 124021 (2022), _eprint: 2201.06461. [67] M. Llorens-Monteagudo, A. Torres-Forné, and J. A. Font, Clawdia: A dictionary learning frame-work for gravitational-wave data analysis (2025), arXiv:2511.16750 [astro-ph.IM]. [68] T. Soultanis, K. Maltsev, A. Bauswein, K. Chatziioan-nou, F. K. Roepke, and N. Stergioulas, Gravitational-wave model for neutron star merger remnants with supervised learning (2024), arXiv:2405.09513 [astro-ph.HE]. [69] D. Pesios, I. Koutalios, D. Kugiumtzis, and N. Ster-gioulas, Phys. Rev. D 110 , 063008 (2024). [70] E. Cuoco, M. Cavaglià, I. S. Heng, D. Keitel, and C. Messenger, Living Reviews in Relativity 28 ,10.1007/s41114-024-00055-8 (2025). [71] P. J. Easter, P. D. Lasky, A. R. Casey, L. Rezzolla, and K. Takami, Phys. Rev. D 100 , 043005 (2019). [72] S. Vretinaris, N. Stergioulas, and A. Bauswein, Phys. Rev. D 101 , 084039 (2020). [73] K. Chakravarti and N. Andersson, Monthly No-tices of the Royal Astronomical Society 497 , 5480 (2020), https://academic.oup.com/mnras/article-pdf/497/4/5480/33695826/staa2342.pdf. [74] L. Rezzolla and K. Takami, Phys. Rev. D 93 , 124051 (2016). [75] A. Gonzalez et al. , (2022), arXiv:2210.16366 [gr-qc]. [76] A. J. Izenman, Multivariate regression, in Modern Mul-tivariate Statistical Techniques: Regression, Classifica-tion, and Manifold Learning (Springer New York, New York, NY, 2008) pp. 159–194. [77] J. Fox and S. Weisberg, An R Companion to Applied Regression , 3rd ed. (Sage, Thousand Oaks CA, 2019). [78] K. Hornik, M. Stinchcombe, and H. White, Neural Net-works 2, 359 (1989). [79] K. Hornik, Neural Networks 4, 251 (1991). [80] S. Mu and S. Lin, A comprehensive survey of mixture-of-experts: Algorithms, theory, and applications (2025), arXiv:2503.07137 [cs.LG]. [81] A. Royer, I. Karmanov, A. Skliar, B. E. Bejnordi, and T. Blankevoort, Revisiting single-gated mixtures of ex-perts (2023), arXiv:2304.05497 [cs.CV]. [82] K. S. Thorne, in Three Hundred Years of Gravitation ,edited by S. W. Hawking and W. Israel (Cambridge Uni-versity Press, Cambridge, UK, 1987) pp. 330–450. [83] P. J. Green, Journal of the Royal Statistical Society, Series B (Methodological) 46 , 149 (1984). [84] A. Rusiecki, Neural Processing Letters 36 , 145 (2012). [85] M. Abadi, A. Agarwal, P. Barham, E. Brevdo, Z. Chen, C. Citro, G. S. Corrado, A. Davis, J. Dean, M. Devin, S. Ghemawat, I. Goodfellow, A. Harp, G. Irving, M. Is-ard, Y. Jia, R. Jozefowicz, L. Kaiser, M. Kudlur, J. Lev-enberg, D. Mané, R. Monga, S. Moore, D. Murray, C. Olah, M. Schuster, J. Shlens, B. Steiner, I. Sutskever, K. Talwar, P. Tucker, V. Vanhoucke, V. Vasudevan, F. Viégas, O. Vinyals, P. Warden, M. Wattenberg, 25 
+
+M. Wicke, Y. Yu, and X. Zheng, TensorFlow: Large-scale machine learning on heterogeneous systems (2015), software available from tensorflow.org. [86] P. J. Easter, P. D. Lasky, A. R. Casey, L. Rezzolla, and K. Takami, Phys. Rev. D 100 , 043005 (2019). [87] K. Kiuchi, K. Kyutoku, Y. Sekiguchi, and M. Shibata, Phys. Rev. D 97 , 124039 (2018). [88] K. Kiuchi, P. Cerdá-Durán, K. Kyutoku, Y. Sekiguchi, and M. Shibata, Phys. Rev. D 92 , 124034 (2015). [89] M. Shibata and K. Kiuchi, Phys. Rev. D 95 , 123003 (2017), arXiv:1705.06142 [astro-ph.HE]. [90] R. Ciolfi, W. Kastaun, J. V. Kalinani, and B. Giaco-mazzo, Phys. Rev. D 100 , 023005 (2019). [91] D. Radice, Astrophys. J. Lett. 838 , L2 (2017). [92] B. Giacomazzo, J. Zrake, P. Duffell, A. I. Mac-Fadyen, and R. Perna, Astrophys. J. 809 , 39 (2015), arXiv:1410.0013 [astro-ph.HE]. [93] K. Kiuchi, K. Kyutoku, Y. Sekiguchi, M. Shibata, and T. Wada, Phys. Rev. D 90 , 041502 (2014). [94] L. Sagunski, J. Zhang, M. C. Johnson, L. Lehner, M. Sakellariadou, S. L. Liebling, C. Palenzuela, and D. Neilsen, Phys. Rev. D 97 , 064016 (2018). [95] S. Blacker, N.-U. F. Bastian, A. Bauswein, D. B. Blaschke, T. Fischer, M. Oertel, T. Soultanis, and S. Typel, \prd 102 , 123023 (2020), _eprint: 2006.03789. [96] C. A. Raithel and V. Paschalidis, \prd 110 , 043002 (2024), _eprint: 2312.14046. [97] A. Prakash, I. Gupta, M. Breschi, R. Kashyap, D. Radice, S. Bernuzzi, D. Logoteta, and B. S. Sathyaprakash, \prd 109 , 103008 (2024), _eprint: 2310.06025. [98] M. Jacobi, F. M. Guercilena, S. Huth, G. Ricigliano, A. Arcones, and A. Schwenk, Monthly Notices of the Royal Astronomical Society 527 , 8812 (2023), pub-lisher: Oxford University Press (OUP). [99] E. R. Most, A. Haber, S. P. Harris, Z. Zhang, M. G. Alford, and J. Noronha, Astrophys. J. Lett. 967 , L14 (2024), _eprint: 2207.00442. [100] D. Suárez-Fontanella, D. Barba-González, C. Alber-tus, and M. Ángeles Pérez-García, arXiv e-prints ,arXiv:2408.05226 (2024), _eprint: 2408.05226. [101] Y. Fujimoto, K. Fukushima, K. Hotokezaka, and K. Kyutoku, Phys. Rev. Lett. 130 , 091404 (2023), _eprint: 2205.03882. [102] G. Rivieccio, D. Guerra, M. Ruiz, and J. A. Font, \prd 
+
+109 , 064032 (2024), _eprint: 2401.06849. [103] A. Bauswein, N.-U. F. Bastian, D. B. Blaschke, K. Chatziioannou, J. A. Clark, T. Fischer, and M. Oer-tel, Phys. Rev. Lett. 122 , 061102 (2019), publisher: American Physical Society. [104] M. Miravet-Tenés, D. Guerra, M. Ruiz, P. Cerdá-Durán, and J. A. Font, arXiv e-prints , arXiv:2401.02493 (2024), _eprint: 2401.02493. [105] V. Vijayan, N. Rahman, A. Bauswein, G. Martínez-Pinedo, and I. L. Arbina, \prd 108 , 023020 (2023), _eprint: 2302.12055. [106] C. A. Raithel and V. Paschalidis, Physical Review D 108 , 10.1103/physrevd.108.083029 (2023), publisher: American Physical Society (APS). [107] E. R. Most, L. Jens Papenfort, V. Dexheimer, M. Hanauske, H. Stoecker, and L. Rezzolla, The Eu-ropean Physical Journal A 56 , 59 (2020), iSBN: 1434-601X. [108] J. Bamber, A. Tsokaros, M. Ruiz, and S. L. Shapiro, arXiv e-prints , arXiv:2411.00943 (2024), _eprint: 2411.00943. [109] P. L. Espino, A. Prakash, D. Radice, and D. Logoteta, Physical Review D 109 , 10.1103/physrevd.109.123009 (2024), publisher: American Physical Society (APS). [110] A. Prakash, D. Radice, D. Logoteta, A. Perego, V. Ne-dora, I. Bombaci, R. Kashyap, S. Bernuzzi, and A. En-drizzi, Phys. Rev. D 104 , 083029 (2021), publisher: American Physical Society. [111] E. R. Most, L. J. Papenfort, V. Dexheimer, M. Hanauske, S. Schramm, H. Stöcker, and L. Rezzolla, Phys. Rev. Lett. 122 , 061101 (2019), publisher: Amer-ican Physical Society. [112] J. Fields, A. Prakash, M. Breschi, D. Radice, S. Bernuzzi, and A. d. S. Schneider, Astrophys. J. Lett. 
+
+952 , L36 (2023), _eprint: 2302.11359. [113] A. Kedia, H. I. Kim, I.-S. Suh, and G. J. Mathews, Phys. Rev. D 106 , 103027 (2022), _eprint: 2203.05461. [114] W. E. East and F. Pretorius, \prd 106 , 104055 (2022), _eprint: 2208.09488. [115] A. T.-L. Lam, H.-J. Kuan, M. Shibata, K. Van Aelst, and K. Kiuchi, \prd 110 , 104018 (2024), _eprint: 2406.05211. [116] H.-J. Kuan, K. Van Aelst, A. T.-L. Lam, and M. Shi-bata, Phys. Rev. D 108 , 064057 (2023), publisher: American Physical Society. [117] M. Shibata, K. Taniguchi, H. Okawa, and A. Buonanno, Phys. Rev. D 89 , 084005 (2014), publisher: American Physical Society. [118] K. V. Staykov, D. D. Doneva, L. Heisenberg, N. Ster-gioulas, and S. S. Yazadjiev, \prd 108 , 024058 (2023), _eprint: 2303.07769. [119] H.-J. Kuan, A. T.-L. Lam, D. D. Doneva, S. S. Yazad-jiev, M. Shibata, and K. Kiuchi, Phys. Rev. D 108 ,063033 (2023), publisher: American Physical Society. [120] C. Palenzuela, E. Barausse, M. Ponce, and L. Lehner, Phys. Rev. D 89 , 044024 (2014), publisher: American Physical Society. [121] L. Sagunski, J. Zhang, M. C. Johnson, L. Lehner, M. Sakellariadou, S. L. Liebling, C. Palenzuela, and D. Neilsen, \prd 97 , 064016 (2018), _eprint: 1709.06634. [122] E. Barausse, C. Palenzuela, M. Ponce, and L. Lehner, Phys. Rev. D 87 , 081506 (2013), publisher: American Physical Society.
