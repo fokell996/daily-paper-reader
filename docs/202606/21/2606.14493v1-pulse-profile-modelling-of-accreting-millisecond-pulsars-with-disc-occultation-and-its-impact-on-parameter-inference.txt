@@ -1,0 +1,473 @@
+Title: Pulse profile modelling of accreting millisecond pulsars with disc occultation and its impact on parameter inference
+
+URL Source: https://arxiv.org/pdf/2606.14493v1
+
+Published Time: Mon, 15 Jun 2026 01:08:56 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+MNRAS 000 , 1–16 (2026) Preprint 15 June 2026 Compiled using MNRAS L ATEX style file v3.3 
+
+# Pulse profile modelling of accreting millisecond pulsars with disc occultation and its impact on parameter inference 
+
+# Ying-Han Mao ,1,2★ Bas Dorsman ,3 Anna L. Watts ,3,4 Tuomo Salmi ,5 Juri Poutanen ,6
+
+# and Xiang-Dong Li 1,2 † 
+
+> 1
+
+School of Astronomy and Space Science, Nanjing University, Nanjing 210023, P. R. China  
+
+> 2
+
+Key Laboratory of Modern Astronomy and Astrophysics (Nanjing University), Ministry of Education, Nanjing 210023, P. R. China  
+
+> 3
+
+Anton Pannekoek Institute for Astronomy, University of Amsterdam, Science Park 904, 1098XH Amsterdam, The Netherlands  
+
+> 4
+
+Gravitation and Astroparticle Physics Amsterdam (GRAPPA), University of Amsterdam, 1098XH Amsterdam, The Netherlands  
+
+> 5
+
+Department of Physics, P.O. Box 64, FI-00014 University of Helsinki, Finland  
+
+> 6
+
+Department of Physics and Astronomy, FI-20014 University of Turku, Finland 
+
+Accepted XXX. Received YYY; in original form ZZZ 
+
+ABSTRACT 
+
+Pulse profile modelling is a relativistic ray-tracing technique used to infer neutron star mass, radius, and surface hotspot properties from X-ray pulsations. Pulse profile modelling has been widely applied to rotation-powered millisecond pulsars, where the local environment is relatively empty. Application to accreting millisecond pulsars is complicated by the geometry of the local accretion flow, including disc occultation of surface emission. In this work, we extend an established pulse profile modelling code, X-PSI, to incorporate accretion disc occultation in accreting millisecond pulsar pulse profile modelling. We quantify how disc occultation depends on system geometry and evaluate its impact on parameter inference. We find that disc occultation is primarily governed by the viewing inclination and can significantly reshape pulse profiles at moderate to high inclinations. Using synthetic Neutron Star Interior Composition Explorer datasets, we investigate parameter recovery for two representative hotspot configurations. For hotspots close to the rotational poles, statistically acceptable fits can yield posteriors that deviate noticeably from the true parameters. In contrast, in a case with hotspots located closer to the equator we find more reliable parameter recovery. We further find that neglecting disc occultation can introduce spurious posterior modes with comparable statistical support, potentially affecting the interpretation of inferred neutron star parameters, suggesting that this effect should be included in accreting millisecond pulsar pulse profile modelling. 
+
+Key words: accretion, accretion discs – equation of state – stars: neutron – X-rays: binaries 
+
+1 INTRODUCTION 
+
+Pulse profile modelling (PPM) is a relativistic ray-tracing technique used to model pulsed emission from X-ray emitting hot spots on the surfaces of neutron stars (NS; see e.g. Pechenick et al. 1983; Miller & Lamb 1998; Poutanen & Gierliński 2003; Morsink et al. 2007; Bogdanov et al. 2019, 2021). It yields information on the NS mass and radius, which depend on the dense matter equation of state, a topic of intense investigation (Chatziioannou et al. 2025). It also provides insight into the properties of the X-ray emitting regions. For rotation-powered millisecond pulsars, sources for which PPM has been enabled by data from the Neutron Star Interior Composition Explorer (NICER; Gendreau et al. 2016), this has delivered mass-radius measurements at the ∼ 10% level and maps of the heated magnetic polar caps (see e.g Salmi et al. 2024; Dittmann et al. 2024; Choudhury et al. 2024a; Mauviard et al. 2025; Kini et al. 2026). PPM can also be applied to accreting NSs, in particular accreting millisecond pulsars (AMPs; Poutanen & Gierliński 2003; Salmi et al.  
+
+> ★
+
+maoyinghan03@gmail.com 
+
+† lixd@nju.edu.cn 
+
+2018). For these sources the magnetic field of the star is strong enough to truncate the inner edge of the accretion disc some distance from the stellar surface (Patruno & Watts 2021; Di Salvo & Sanna 2022). Surface hot spots are formed as material from the inner edge of the accretion disc is channeled onto the magnetic poles (e.g. Romanova et al. 2004). AMPs are interesting targets for PPM because they ex-hibit multiple independent observable phenomena that depend on mass and radius (such as the properties of thermonuclear bursts and burst oscillations, see, for example, Nättilä et al. 2017; Galloway et al. 2024; Kini et al. 2024), allowing us to address modelling systemat-ics. In addition, radiation scattered in the accretion column becomes polarized (Viironen & Poutanen 2004); this provides additional in-formation on the system geometry, helping to break degeneracies (Poutanen 2020). Polarized emission from an AMP has now been observed for the first time (Papitto et al. 2025), using data from the 
+
+Imaging X-ray Polarimetry Explorer (IXPE ; Weisskopf et al. 2022). As part of this effort, the X-ray Pulse Simulation and Inference (X-PSI ) package (Riley et al. 2023), which has been used extensively in PPM studies of rotation-powered millisecond pulsars, has been adapted to support PPM for AMPs. This has involved the implemen-tation of an appropriate atmosphere model (Bobrikova et al. 2023) 
+
+© 2026 The Authors 
+
+> arXiv:2606.14493v1 [astro-ph.HE] 12 Jun 2026
+
+# 2 Y.-H. Mao et al. 
+
+and the capability to simulate polarized radiation (Salmi et al. 2021, 2025). Parameter recovery tests using a number of synthetic data sets have been carried out (Dorsman et al. 2025; Salmi et al. 2025). Dorsman et al. (2026b) used the X-PSI pipeline for a PPM study of the AMP SAX J1808.4 −3658 (hereafter J1808), using NICER data from its 2019 and 2022 outbursts. One additional new aspect that needs to be considered when mod-elling AMPs is the role of the accretion disc. The disc has several important effects, including emitting X-rays, blocking X-rays from the NS surface, reflecting and reprocessing incident radiation. The first of these was studied in Dorsman et al. (2025, 2026b) who consid-ered a geometrically thin accretion disc emitting a multi-temperature blackbody spectrum and also producing a pulse-phase-independent background component that could be marginalised over in the infer-ence. In this paper, we explore the second role of the disc, occulting the NS surface emission. In the standard framework of Shakura & Sunyaev (1973), the accretion disc is geometrically thin and optically thick over a broad range of radii. Under these conditions, the emergent radiation can be approximated as a (modified) blackbody with a radially varying effective temperature. This leads to the well-known multicolour disc description (Mitsuda et al. 1984; Makishima et al. 1986), which has been widely used also in spectral modelling of AMPs (e.g. Illiano et al. 2023; Li et al. 2023; Malacaria et al. 2025, and references therein). This assumption is also adopted in Dorsman et al. (2025). In such a configuration, photons emitted from the NS surface along the trajectory intersecting the disc are absorbed rather than transmitted, leading to geometric obscuration of the surface emission. Previous work has incorporated accretion disc occultation into PPM and directly compared theoretical predictions with observa-tions. Models that include the blocking of one emitting spot (in a configuration where there are two antipodal spots) by the accretion disc have been used to explain several observed properties of J1808 (Poutanen et al. 2009; Ibragimov & Poutanen 2009; Kajava et al. 2011). The same disc occultation framework was later applied by Molkov et al. (2024), who showed that the pulse profiles of SRGA J144459.2 −604207 (hereafter J1444) can be well reproduced when disc occultation is taken into account. More recently, Dorsman et al. (2026a) employed this framework in PPM of NICER and IXPE ob-servations of J1444, using the disc occultation model developed in this work. From a broader perspective, disc obscuration of X-ray emission has also been invoked in non-AMP systems such as Her X-1 (Petterson et al. 1991; Scott et al. 2000). These studies demonstrate that disc occultation can significantly affect observed pulse profiles and therefore should be treated in PPM. The inclusion of disc occultation is a physically self-consistent component of PPM in AMPs. Accreted material from the companion star carries angular momentum and is expected to form an accretion disc around the NS. In accreting states, the inner disc radius 𝑅 in is expected to lie within the corotation radius 
+
+𝑅 co = 31 km (𝑀 /1.4M ⊙ )1/3 ( 𝑓 /400 Hz )−2/3, (1) where 𝑀 is the NS mass and 𝑓 is the pulsar rotational frequency. Systems with 𝑅 in > 𝑅 co enter the propeller regime which suppresses accretion (Illarionov & Sunyaev 1975; Rappaport et al. 2004; Ro-manova et al. 2005; Papitto & Torres 2015). For typical rotation rates of AMPs, 𝑅 co ≃20–40 km and thus is comparable to the NS radius. At such radii, the inner accretion disc can geometrically obscure hotspots located on the southern hemisphere of the NS. Motivated by these considerations, we extend X-PSI to include disc occultation and evaluate its impact on pulse profiles and param-eter inference, enabling the incorporation of more comprehensive physical processes into full Bayesian inference pipelines and facili-tating their application to real observational data. We test the model using synthetic data and quantify the impact of disc occultation on both the pulse profiles and the recovery of source parameters, in order to assess whether its inclusion has a measurable effect. This paper is organized as follows. Section 2 introduces PPM for AMPs and outlines the physical description for including disc obscuration. Sec-tion 3 quantifies the strength of disc occultation across the relevant parameter space. Section 4 presents a parameter inference analysis to evaluate the impact of disc occultation on recovered model pa-rameters. Section 5 discusses the implications of these results, and Section 6 summarises the main conclusions of this work. 
+
+2 MODELLING 
+
+In this work, we use X-PSI , the open-source package for modelling NS X-ray pulse profiles and inferring model parameters. We extend this framework by incorporating accretion disc occultation into the PPM. In the following, we briefly summarise the model adopted for AMPs and describe the physical structure of the disc occultation model. 
+
+2.1 PPM for AMPs 
+
+In PPM of AMPs, we consider two components: the NS surface and the accretion disc. To construct the energy-dependent beaming func-tion of the surface radiation, we adopt the accretion shock model of Bobrikova et al. (2023) who approximated it as a homogeneous plane-parallel slab of hot electrons Comptonizing blackbody radiation from the bottom. This model is characterized by three parameters: the seed photon blackbody temperature 𝑇 bb , the temperature 𝑇 e of the electron gas and the Thomson optical depth 𝜏 across the slab, which controls the probability of scattering and is a dominant factor determining the angular distribution of the escaping radiation. Using this surface emission model, we compute the propagation of photons in the oblate Schwarzschild approximation, accounting for relativistic light bend-ing around a rapidly rotating NS (Miller & Lamb 1998; Poutanen & Gierliński 2003; Morsink et al. 2007; AlGendy & Morsink 2014). The observer inclination 𝑖 is defined as the angle between the spin axis and the line of sight of the observer, which is restricted to be smaller than 90 ◦. For each emitting surface element, we determine whether it is visible to the observer (see e.g. Bogdanov et al. 2019, for details). The observed pulse profile is then obtained by integrating the contributions from all visible photon trajectories as a function of rotational phase. We adopt the ST-U hotspot geometry, consisting of two circu-lar, single-temperature hotspots with unshared parameters. The two hotspots are distinguished by an ordering in colatitude: the hotspot with the smaller colatitude is defined as the primary hotspot, with parameters denoted by the subscript ‘p’, while the other is referred to as the secondary hotspot, with parameters denoted by the subscript ‘s’. Each hotspot is characterized by three geometric parameters: the colatitude 𝜃 p (𝜃 s), the angular radius 𝜁 p (𝜁 s), and the rotational phase 
+
+𝜙 p (𝜙 s). For the second component, the accretion disc, we consider two effects: emission and occultation. The intrinsic disc emission is de-scribed by the diskbb model (Mitsuda et al. 1984; Makishima et al. 1986), which computes the total disc contribution by integrating the emission from individual rings from the inner to the outer disc ra-dius. The free parameters of this model are the inner disc radius 𝑅 in 
+
+and the temperature at the inner radius 𝑇 in . Further details of the disc  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Pulse profile modelling with disc occultation 3
+
+emission and the modelling of AMPs described above can be found in Dorsman et al. (2025). All emission components are subject to absorption by the interstel-lar medium during their propagation to the observer. The attenuation of the X-ray flux is described as 𝐹 obs (𝐸 ) = 𝐹 int (𝐸 ) e− 𝜎 (𝐸 ) 𝑁 H , where 
+
+𝐹 int (𝐸 ) and 𝐹 obs (𝐸 ) are the intrinsic and observed fluxes at photon energy 𝐸 , and 𝜎 (𝐸 ) is the energy-dependent photoelectric cross sec-tion. This attenuation is implemented using the tbnew model (Wilms et al. 2000), with 𝑁 H as a free parameter. 
+
+2.2 Criterion for disc occultation 
+
+We use the approximate formulae given in Beloborodov (2002) and Ibragimov & Poutanen (2009) to determine whether a given light ray is blocked by the disc. In Beloborodov (2002), an approximate expression for the light bending of photons emitted from the NS surface was provided 
+
+𝑟 (𝜓 ) =
+
+ 𝑟 2s (1 − cos 𝜓 )2
+
+4(1 + cos 𝜓 )2 + 𝑏 2
+
+sin 2 𝜓 
+
+1/2
+
+− 𝑟 s (1 − cos 𝜓 )
+
+2(1 + cos 𝜓 ) , (2) where 𝑟 (𝜓 ) gives the radial coordinate of the photon along its tra-jectory as a function the angular coordinate of the photon posi-tion 𝜓 , with 𝜓 = 0 corresponding to the escape direction. Here, 
+
+𝑟 s = 2𝐺 𝑀 /𝑐 2 is the Schwarzschild radius, with 𝐺 the gravitational constant and 𝑐 the speed of light, and 𝑏 the impact parameter, given by 
+
+𝑏 = 𝑅 𝜃 sin 𝛼 
+
+√1 − 𝑢 , 𝑢 = 𝑟 s
+
+𝑅 𝜃 
+
+, (3) which represents the perpendicular distance from the star’s center to the photon’s trajectory as measured at infinity. 𝑅 𝜃 is the local NS radius at the emission colatitude 𝜃 on an oblate stellar surface, and 𝛼 
+
+is the emission angle with respect to the local outward radial vector. The photon trajectories emitted from the surface and propagating to infinity can be derived from this formula and are shown in Fig. 1. To compute the radius at which the light ray intersects the disc plane, 𝑟 (𝜓 d), we use vector algebra to obtain the unit vector d
+
+pointing to the intersection point. Because photon trajectories in Schwarzschild spacetime are planar, this vector lies along the inter-section of the accretion disc plane with the plane defined by the line of sight k and the radius-vector of the emission point r. We define the coordinate system with the 𝑧 -axis along the disc axis and the line-of-sight lying in the 𝑥 -𝑧 plane. We then have 
+
+r = (sin 𝜃 cos 𝜙, sin 𝜃 sin 𝜙, cos 𝜃 ), k = (sin 𝑖, 0, cos 𝑖 ), (4) where 𝑖 is the observer inclination, 𝜃 is the colatitude of the emission point and 𝜙 is the azimuthal angle. The normal to the trajectory plane defined by these two vectors is given by 
+
+N = (sin 𝜃 sin 𝜙 cos 𝑖, cos 𝜃 sin 𝑖 − sin 𝜃 cos 𝜙 cos 𝑖, − sin 𝜃 sin 𝜙 sin 𝑖 ).
+
+(5) The direction vector d along the line of intersection between this plane and the disc plane is given by 
+
+d = (− cos 𝜃 sin 𝑖 + cos 𝑖 sin 𝜃 cos 𝜙, sin 𝜃 cos 𝑖 sin 𝜙, 0)√︁ 
+
+cos 2 𝑖 + cos 2 𝜃 − 2 cos 𝑖 cos 𝜃 cos 𝜓 , (6) where 𝜓 is the angle between k and r with 
+
+cos 𝜓 = k · r = cos 𝑖 cos 𝜃 + sin 𝑖 sin 𝜃 cos 𝜙. (7) Equation (6) follows Ibragimov & Poutanen (2009) (their Eq. C1), and is obtained by taking d ∝ N × z and subsequently normalizing,                     
+
+> Figure 1. Schematic illustration of ray trajectories under disc occultation. Some rays pass through the region interior to the inner disc radius 𝑅 in (𝛼 =
+> 90 ◦), while others are blocked by the disc ( 𝛼 =60 ◦). The remaining rays propagate directly to infinity without intersecting the disc. All vectors indicate directions only; their lengths are used for visualization, while physically they are unit vectors. Note that this is a two-dimensional schematic: the observer, the spin axis, and the vector dare projected onto the plane of the figure and may not be coplanar in three dimensions. Each ray corresponds to a specific value of 𝑟 (𝜓 𝑑 ); the annotation of 𝑟 (𝜓 𝑑 )in the figure highlights only the case with 𝛼 =60 ◦.
+
+where z = (0,0,1) is the disc normal. The angle 𝜓 d between this unit vector and the line of sight direction can then be calculated as 
+
+cos 𝜓 d = d · k = cos 𝑖 cos 𝜓 − cos 𝜃 √︁ 
+
+cos 2 𝑖 + cos 2 𝜃 − 2 cos 𝑖 cos 𝜃 cos 𝜓 . (8) Substituting the resulting 𝜓 d into Eq. (2) gives the radius at which the photon trajectory crosses the disc plane. If the intersection radius is smaller than the inner disc radius 𝑅 in , the photon is assumed to pass through the region inside the disc inner edge without being blocked, as illustrated by the purple curve with 𝛼 = 90 ◦ in Fig. 1. If the photon intersects the disc plane at a radius larger than 𝑅 in , the photon is considered to be occulted by the disc and therefore invisible. We assume that the disc extends to arbitrarily large radii, such that any intersection beyond 𝑅 in leads to occultation. This criterion has been implemented in the X-PSI code as a new condition for determining photon visibility. 1
+
+2.3 Code verification 
+
+To validate the reliability of our code, we performed a direct com-parison with an independent code (hereafter IC) that includes disc            
+
+> 1The X-PSI code includes disc occultation from version v3.2, see https://xpsi-group.github.io/xpsi. MNRAS 000 , 1–16 (2026)
+
+# 4 Y.-H. Mao et al. 
+
+obscuration, described in Poutanen & Gierliński (2003), Poutanen & Beloborodov (2006), and Ibragimov & Poutanen (2009). The same code was also employed in Molkov et al. (2024) to fit the pulse profile of J1444. In order to ensure a fully consistent comparison between the two implementations, we do not adopt the atmosphere model described in the previous sections. Instead, we used the same angular dependence for the radiation intensity as in Molkov et al. (2024): 
+
+𝐼 (𝜇 ) ∝ 1 + ℎ cos 𝛼 ′, (9) where 𝛼 ′ is the emission angle relative to the local normal in the comoving reference frame. We adopt NS mass 1.4 M ⊙ , radius 12 km ,spin frequency 𝜈 = 447 .9 Hz , and assume a spherical NS surface. The observer inclination is 𝑖 = 58 ◦, and we assume a primary circular hotspot centred at colatitude 𝜃 = 14 ◦, an inner disc radius of 𝑅 in =
+
+24 .5 km , and a phase shift of 0.45 . The secondary hotspot is assumed to be antipodal, and both hotspots have angular radius 𝜁 = 33 ◦ and the anisotropy parameter ℎ = −0.65 . Because the physical assumptions and computational logic of X-PSI and the code used in Molkov et al. (2024) are identical, the two implementations are expected to produce nearly indistinguishable results. 2
+
+The comparison is shown in Fig. 2. The black dashed and red dotted-dash curves correspond to the results obtained with X-PSI ,while the light gray solid curve represents the results produced by the IC. The two results are in excellent agreement, with no visually discernible differences. We further quantified the discrepancy by computing 
+
+𝜎 = model XPSI − model IC 
+
+model IC 
+
+, (10) which remains below 0.4% across all phases, as shown in the bot-tom panel. Such small differences are likely attributable to minor implementation details, such as the hotspot surface resolution or the angular resolution used in ray tracing. This is well below the typi-cal Poisson noise level, indicating that our implementation of disc blocking is sufficiently accurate for our current studies (for a related discussion see Choudhury et al. 2024b). 
+
+3 EFFECT OF DISC OCCULTATION ACROSS PARAMETER SPACE 
+
+In this section, we quantify the strength of disc occultation under different geometric conditions and identify the regions of parameter space in which this effect becomes significant. We select the four parameters most relevant to the strength of disc occultation: the inclination angle 0◦ < 𝑖 < 90 ◦, the hotspot colatitude 0◦ < 𝜃 < 180 ◦,the inner disc radius 12 km < 𝑅 in < 30 km , and the hotspot angular radius 0◦ < 𝜁 < 90 ◦. We adopt an oblate star with 𝑀 = 1.4 M ⊙ and 
+
+𝑅 eq = 12 km , with the latter also defining the lower bound of 𝑅 in . To clearly isolate the effects of parameter variations, we consider only a single circular hotspot represented by these parameter combinations. We generate 20000 random combinations by uniformly sampling 
+
+cos 𝑖 ∈ ( 0, 1), cos 𝜃 ∈ (− 1, 1), 𝑅 in ∈ ( 12 , 30 ) km , and 𝜁 ∈ ( 0, 90 ◦),and compute the relative obscuration ( 𝑅𝑂 ) to quantify the degree of disc obscuration. We define 𝑅𝑂 as 
+
+𝑅𝑂 = 𝐹 no − 𝐹 o
+
+𝐹 no 
+
+. (11)        
+
+> 2The qualifier “nearly” reflects possible small deviations arising from nu-merical and geometrical resolution effects.
+> Figure 2. Normalized pulse profiles computed with X-PSI and with the independent code used in Molkov et al. (2024). The X-PSI results are shown with coloured curves, while the independent code (IC) results are displayed as light gray dashed curves in the background. The top panel shows the total pulse profile including disc occultation, together with the contribution from the primary hotspot alone. The middle panel presents the emission from the secondary hotspot, computed both with and without disc occultation. The bottom panel shows the corresponding fractional differences, 𝜎 , for each of the four curves.
+
+Here 𝐹 o and 𝐹 no are the total observed fluxes with and without disc occultation. Samples with 𝐹 no = 0 are excluded, as they correspond to emission fully obscured by the star itself and hence not subject to disc occultation. A larger 𝑅𝑂 corresponds to a higher fraction of disc-eclipsed emission and therefore a stronger disc occultation effect. Fig. 3 presents a multi-parameter projection plot showing the dependence of 𝑅𝑂 on the four parameters. The off-diagonal panels represent the mean 𝑅𝑂 in colour within grid cells defined by each pair of parameters, while the diagonal panels show how the mean 
+
+𝑅𝑂 varies with individual parameters. Fig. 3 reveals a strong sensitivity of disc occultation to the inclina-tion angle 𝑖 . As 𝑖 increases, the obscuration becomes progressively stronger, with a critical transition occurring at 𝑖 ≃ 50 ◦–60 ◦. Beyond this range, the effect of disc occultation becomes important, with 
+
+𝑅𝑂 rising rapidly as the inclination increases. This correlation is physically intuitive, since increasing the inclination angle brings the  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Pulse profile modelling with disc occultation 5        
+
+> Figure 3. Mean relative obscuration fraction as a function of the inclination angle 𝑖 , the hotspot colatitude 𝜃 , the inner disc radius 𝑅 in , and the hotspot angular radius 𝜁 , based on 20000 uniformly sampled points. The colour scale shows the relative obscuration fraction.
+
+line of sight closer to the disc plane. In this geometry, visible photon trajectories intersect the disc plane at larger distances from the NS than in the low-𝑖 case, making it less likely for photons to pass within the inner disc radius. The dependence on the hotspot colatitude 𝜃 is asymmetric be-tween the two hemispheres. Disc occultation primarily affects emis-sion from the southern hemisphere, where it becomes weaker as the hotspot moves from the polar region toward the equator. Emission from the equatorial region intersects the disc plane at smaller radii, corresponding to smaller values of 𝑟 (𝜓 d), and is therefore more likely to escape from within the inner disc radius without being blocked. In contrast, for hotspots in the northern hemisphere, obscuration is essentially absent although it may increase slightly as the hotspot approaches the equator. Surface elements with 𝜃 < 90 ◦ are always visible, such that obscuration in the northern hemisphere arises only when the hotspot extends across the equator (i.e., 𝜃 + 𝜁 > 90 ◦). For the inner disc radius 𝑅 in , a larger value naturally opens a wider region between the NS surface and the disc, allowing a greater fraction of photons to pass through and thus reducing the overall blocking fraction. However, since 𝑖 and 𝜃 induce much larger vari-ations in 𝑟 (𝜓 d), the impact of 𝑅 in is subdominant. Owing to the random sampling of the parameter space, the correlation between the blocking fraction and 𝑅 in remains relatively weak, exhibiting a mild negative trend. The hotspot angular radius 𝜁 shows no clear correlation with 𝑅𝑂 
+
+within the explored parameter range. This indicates that the size of the emitting region has little impact on the relative disc occulta-tion, and that the effect is governed by the global viewing geometry rather than the detailed extent of the hotspot. It appears that as the hotspot size increases, both the obscured and unobscured emission fractions increase in a similar manner, leaving the overall fractional obscuration largely unchanged. Based on these results, we conclude that disc occultation must be treated with particular care when modelling systems viewed at mod-erate to high inclinations. For NSs with 𝑖 ≳ 50 ◦, disc occultation can substantially modify the pulse profiles and should not be neglected in parameter recovery using real observational data. The inclination angle, which may be independently constrained through polarization measurements, therefore plays a critical role in determining whether  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 6 Y.-H. Mao et al. 
+
+disc occultation needs to be included. In contrast, for systems viewed at low inclinations, the effect is likely to be much less important. Based on the analysis in this section, we have quantified the de-gree of disc obscuration and demonstrated that, for certain regions of parameter space, disc blocking cannot be neglected in pulse profile modelling. The resulting differences may have some impact on the recovery of parameters. In the next section, we move on to the sam-pling stage and examine how disc blocking influences the inferred parameters. If neglecting disc blocking leads to biased or incorrect inferences, this would provide strong justification for adopting mod-els that explicitly include disc blocking when analysing observational data. 
+
+4 PARAMETER INFERENCE WITH DISC OCCULTATION 
+
+In this section, we perform Bayesian parameter inference to assess the impact of disc occultation on the recovered model parameters. We analyse synthetic NICER data using models both including and neglecting disc occultation, and compare the resulting posterior dis-tributions to quantify the biases and uncertainties introduced by disc occultation. In Section 4.1, we first describe the Bayesian framework adopted for parameter inference. Section 4.2 presents two parameter config-urations (Scenarios A and B) and their associated priors. Owing to the intrinsic complexity of the ST-U two hotspot model, we adopt a staged approach in our parameter recovery. For each scenario, we first consider a simplified case without a disc, in which neither disc emission nor disc occultation is included, and then progressively ex-tend the analysis to models that include a disc. The results of these analyses are presented in Section 4.3. 
+
+4.1 Parameter Inference 
+
+We adopt a Bayesian framework for parameter inference and employ a nested sampling strategy to explore the resulting posterior distri-butions. Our goal is to quantify how well the model parameters can be recovered from data under different modelling assumptions, and to assess the impact of disc occultation on the inferred results. The posterior probability distribution of the model parameters 𝜃 , given a dataset 𝐷 and a model 𝑀 , is 
+
+𝑃 (𝜃 | 𝐷, 𝑀 ) = 𝑃 (𝐷 | 𝜃, 𝑀 ) 𝑃 (𝜃 | 𝑀 )
+
+𝑃 (𝐷 | 𝑀 ) . (12) Here, 𝑃 (𝐷 | 𝜃, 𝑀 ) is the likelihood function, 𝑃 (𝜃 | 𝑀 ) denotes the prior distribution, and 𝑃 (𝐷 | 𝑀 ) is the Bayesian evidence. In this analysis, the dataset 𝐷 consists of synthetic NICER pulse profiles generated using different sets of input parameters. The likelihood function is constructed assuming Poisson statistics for the NICER count data. We focus on the posterior distributions, and by comparing them with the input parameters, we quantify how accurately the model parameters are constrained by the data. Sampling of the posterior distributions is carried out using a nested sampling approach implemented with MultiNest (Skilling 2004; Feroz et al. 2009; Buchner 2016; Feroz et al. 2019), which is well suited for exploring high-dimensional parameter spaces and identi-fying multiple disconnected regions of high likelihood. In particular, the use of multimodal sampling allows the algorithm to identify dis-tinct parameter vectors that provide comparably good fits to the same dataset. This capability is essential for our analysis, as degeneracies between model parameters can lead to multiple modes in the poste-rior distribution, especially for the intrinsically complex ST-U two hotspot model. We perform a series of sampling runs with varying configura-tions, ranging from simplified setups without a disc to more complex models including disc emission and occultation. In some runs, pa-rameters such as the inclination angle or hotspot colatitude are fixed, to break degeneracies. This choice is based on the fact that polariza-tion measurements may provide strong independent constraints on these parameters in realistic observational scenarios. An overview of the sampling configurations adopted in this work is provided in Ta-ble 1. We discuss the contents of the table in detail in the subsequent sections. 
+
+4.2 Parameter configurations and priors 
+
+We consider two representative parameter configurations (Scenar-ios A and B) to generate synthetic NICER datasets for subsequent parameter inference. The two scenarios share the same underlying stellar, atmosphere, and disc parameters, differing only in hotspot co-latitudes. This setup enables a controlled comparison of the impact of hotspot location on sampling performance. All synthetic datasets assume an exposure time of 132 ks. 
+
+4.2.1 Scenario A: Best fit parameters of J1444 
+
+Scenario A adopts the set of parameters reported by Molkov et al. (2024); their best-fit description of the NICER pulse profile of J1444, which can be described as a parameter vector within our ST-U model. As emphasized in their work, this parameter set is not unique in reproducing the observed pulse profile. However, it corresponds to a configuration in which disc occultation plays a relatively prominent role in shaping the pulse profile due to the large 𝑖 and 𝜃 s, as illustrated in Fig. 3. The input parameters and prior distributions adopted for Scenario A are listed in Table 2. This scenario shows an antipodal hotspot configuration, in which both hotspots are located close to the spin poles. If the hotspots of AMPs are formed by accreting material chan-nelled onto the NS surface, this configuration naturally corresponds to a small magnetic inclination angle, i.e., a small angle between the magnetic and spin axes. Fig. 4 shows a schematic illustration of the geometry and the corresponding bolometric pulse profiles computed with and without disc occultation, exhibiting a clear difference near the flux minimum. We adopt a NS mass of 𝑀 = 1.4 M ⊙ with a uniform prior 
+
+𝑈 (1, 3) M⊙ , and a radius of 𝑅 eq = 12 km with a uniform prior 
+
+𝑈 (3𝑅 g (1), 16 km ), where 𝑅 g (𝑀 /M⊙ ) = (𝑀 /M⊙ )𝐺 M⊙ /𝑐 2 is the gravitational radius. In addition to these explicit bounds, we impose a compactness constraint 𝑅 pole /𝑅 g (𝑀 /M⊙ ) > 2.9, where 𝑅 pole is the polar radius (see e.g. Gandolfi et al. 2012). The source distance follows a Gaussian prior with 8.0 ± 1.0 kpc, truncated at ±5𝜎 . The inclination angle satisfies 𝑖 < 90 ◦, implemented through a uniform prior on cos 𝑖 ∈ ( 0, 1). The spin frequency is fixed at 𝑓 = 447 .9 Hz, corresponding to the frequency of J1444. We assume two hotspots with centre colatitudes 𝜃 p = 14 ◦ and 
+
+𝜃 s = 166 ◦. The priors are uniform in cos 𝜃 (cos 𝜃 ∼ 𝑈 (− 1, 1)), cor-responding to an isotropic surface distribution, with the ordering constraint 𝜃 p < 𝜃 s imposed. The angular radii of both hotspots are 
+
+33 ◦ and drawn from a uniform prior 𝑈 (0.001 ◦, 90 ◦). Hotspot con-figurations that lead to overlapping emitting regions are rejected. The three atmospheric parameters are assumed to be identical for both hotspots, with values listed in Table 2.  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Pulse profile modelling with disc occultation 7                                                                                                                                                                                                              
+
+> Table 1. Summary of sampling runs and model configurations used in the parameter recovery analysis in Scenarios A and B. For a description of the columns see the text. Scenario Run Fix 𝑖 Fix 𝜃 pDisc Emis aOcc (model) bOcc (data) cMultimode Antipode Live points 𝑁 cov 68% d𝑁 cov 90% e𝑁 free f
+> A1✓✓××××✓1000 813 13 A2✓✓×××✓×1000 5/7 g8/11 15 A3✓✓✓×✓××1000 10 13 17 A4✓✓✓✓✓××1000 10 12 17 A5✓×✓×✓××1000 7918 A6✓×✓✓✓××1000 5818 A7××✓✓✓✓×2000 6719 B8✓✓×××××1000 15 15 15 B9✓✓✓×✓××1000 15 15 17 B10 ✓✓✓✓✓××1000 15 16 17 B11 ✓×✓×✓××1000 –h–18 B12 ✓×✓×✓✓×2500 1/14 1/16 18 B13 ✓×✓✓✓✓×1000 13 16 18 B14 ××✓×✓××1000 15 17 19 B15 ××✓✓✓××1000 16 17 19
+> aDisc emission included in model and synthetic data.
+> bDisc occultation included in the model.
+> cDisc occultation included in the synthetic data.
+> dNumber of parameters whose true values lie within the 68% credible interval.
+> eNumber of parameters whose true values lie within the 90% credible interval.
+> fNumber of free parameters in each run.
+> gTwo values are reported because two posterior modes are identified; the left and right values correspond to mode 1 and mode 2, respectively.
+> hThe results under this configuration are seed-dependent; see the main text for further details.
+
+For the accretion disc, we adopt an inner disc temperature of 
+
+𝑇 in = 0.37 keV and assign a uniform prior of 𝑈 (0.01 , 0.6) keV. Under the standard thin-disc framework (Shakura & Sunyaev 1973), this corresponds to an accretion rate of ¤𝑀 ∼ 10 −10 𝑀 ⊙ yr −1, typical for low-mass X-ray binaries (e.g. Galloway et al. 2008). The inner disc radius is 𝑅 in = 24 .5 km, and is expected to lie between the NS radius and the corotation radius given by Eq. (1). We enforce 
+
+𝑅 eq < 𝑅 in < 𝑅 co by rejecting samples outside this range, ensuring the system remains in the accreting regime. The interstellar absorption column density is centred at 𝑁 H = 29 × 10 21 cm −2, following Ng et al. (2024), and is assigned a Gaussian prior with 𝜇 = 29 and 𝜎 = 4,cut-off at ±5𝜎 .
+
+4.2.2 Scenario B: J1444-base parameters with equatorial hotspots 
+
+Scenario B is derived from Scenario A by modifying the hotspot colatitudes, while keeping all other parameters unchanged. We repo-sition the hotspot colatitudes to 𝜃 p = 60 ◦ and 𝜃 s = 120 ◦. This configuration is chosen for two reasons. First, under this geometry, variations in the visibility of the two hotspots lead to pulse profile features that differ significantly from those in Scenario A, poten-tially affecting parameter recovery. Second, Scenario A places the secondary hotspot colatitude close to the boundary of its prior dis-tribution, and parameters near prior boundaries may hinder accurate recovery of the true solution. In Scenario B, both hotspots are lo-cated closer to the stellar equator and well within the interior of the prior. The geometry and pulse profile of this configuration are shown in Fig. 4, a slight difference between the profiles with and without occultation can be seen around phase ∼ 0.4. Except for these two parameters, all other parameter values and prior distributions are identical to those in Scenario A. 
+
+4.3 Parameter recovery results 
+
+In this section, we present Bayesian inference results for the synthetic datasets. For each scenario, we perform a series of sampling runs and compare the inferred posteriors with the true parameters to quantify biases in recovery. 
+
+4.3.1 Inference results in Scenario A 
+
+Table 1 summarises the parameter recovery runs for Scenario A under different configurations. Each column represents a specific setting of the sampling run. A check mark indicates that the condition is applied, while a cross means the opposite. The columns Fix 𝑖 and Fix 𝜃 p denote runs in which the inclination angle 𝑖 and the primary hotspot colatitude 𝜃 p are fixed or free during sampling. In real observations, polarization measurements may con-strain these parameters. The Disc Emis column shows whether disc emission is included in both the synthetic dataset and the sampling model. Occ (model) and Occ (data) specify disc occultation sepa-rately for the model ( 𝑀 ) and dataset ( 𝐷 ), as defined by Eq. (12). The Multimode option, described in Section 4.1, allows the sampler to identify multiple posterior modes for the same dataset. The Antipode column indicates whether the two hotspots are constrained to be an-tipodal during sampling (i.e., 𝜃 s = 180 ◦ − 𝜃 p and 𝜙 s − 𝜙 p = 0.5). Live points gives the number of live points used in the nested sampling. We find that 1000 live points are sufficient in most cases, consistent with previous studies (Dorsman et al. 2025), and supported by tests with larger numbers of live points that yield very similar full posteri-ors. This is considered adequate for sampling the synthetic data used here, with a larger number of live points potentially required to fully ensure robust convergence or for applications to real data. A fixed sampling efficiency of 0.1 is used in all nested sampling runs. 𝑁 cov 68% 
+
+and 𝑁 cov 90% denote the number of parameters for which the true values lie within the 68% and 90% credible intervals (CIs), respectively.  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 8 Y.-H. Mao et al. 
+
+Table 2. Model parameters for Scenarios A and B. For each parameter, the adopted value(s) in the corresponding scenario and the prior distribution used in the Bayesian analysis are listed. A dash (–) indicates that the parameter is the same as in Scenario A. Parameter (unit) Scenario A Scenario B Prior distribution Pulsar 
+
+𝑀 (M⊙ ) 1.4 – 𝑈 (1.0, 3.0)a
+
+𝑅 eq (km) 12 – 𝑈 (3𝑅 g (1), 16 ) b
+
+𝐷 (kpc) 8.0 – 𝑁 (8.0, 1.0)
+
+cos 𝑖 (-) 0.53 – 𝑈 (0, 1)
+
+𝑓 (Hz) 447.9 – fixed Primary hot spot 
+
+𝜙 p (-) 0 - 𝑈 (0, 1)
+
+cos 𝜃 p (-) 0.97 0.5 𝑈 (− 1, 1)c
+
+𝜁 p (deg) 33 – 𝑈 (0.001 , 90 )
+
+𝑇 bb ,p (keV) 1 – 𝑈 (0.5, 1.5)
+
+𝑇 e,p (keV) 50 – 𝑈 (20 , 100 )
+
+𝜏 p (-) 1 – 𝑈 (0.5, 3.5)
+
+Secondary hot spot 
+
+𝜙 s (-) 0 - 𝑈 (0, 1)
+
+cos 𝜃 s (-) −0.97 −0.5 𝑈 (− 1, 1)
+
+𝜁 s (deg) 33 – 𝑈 (0.001 , 90 )
+
+𝑇 bb ,s (keV) 1 – 𝑈 (0.5, 1.5)
+
+𝑇 e,s (keV) 50 – 𝑈 (20 , 100 )
+
+𝜏 s (-) 1 – 𝑈 (0.5, 3.5)
+
+Disc 
+
+𝑇 in (keV) 0.37 – 𝑈 (0.01 , 0.6)
+
+𝑅 in (km) 24.5 – 𝑈 (𝑅, 𝑅 co )d e 
+
+Absorption 
+
+𝑁 H (10 21 cm −2) 29 – 𝑁 (29 .0, 4.0) 
+
+> a
+
+In addition to the explicit bounds, the prior includes hard physical cuts on compactness.  
+
+> b
+
+𝑅 g (1) = 𝐺 𝑀 /𝑐 2 is the gravitational radius for 𝑀 = 1 M ⊙ . 
+
+> c
+
+Additional rejection conditions enforce ordering and non-overlap of the two hot spots.  
+
+> d
+
+Here 𝑅 co is the co-rotation radius, 𝑅 co = (𝐺 𝑀 /4 𝑓 2 𝜋 2 )1/3. 
+
+> e
+
+The priors on 𝑀 , 𝑅 eq , and 𝑅 in are not independent, as samples are rejected when 𝑅 in > 𝑅 co or 𝑅 in < 𝑅 .
+
+Table 3. Credible intervals within which the true value of each parameter is recovered, for all runs listed in Table 1. For each parameter, the reported value denotes the smallest credible interval (68%, 90%, or 95%) that contains the true value, or indicates that the true value lies outside the 95% credible interval. Run 11 is not shown as its results are seed-dependent. Run 𝑀 𝑅 eq 𝐷 cos 𝑖 𝜙 p cos 𝜃 p 𝜁 p 𝑇 bb ,p 𝑇 e,p 𝜏 p 𝜙 s cos 𝜃 s 𝜁 s 𝑇 bb ,s 𝑇 e,s 𝜏 s 𝑅 in 𝑇 in 𝑁 H
+
+1 68 68 68 – 68 – 90 90 90 90 – – 68 68 68 68 – – 90 2 (mode 1) 90 68 68 – 68 – 68 90 95 >95 >95 >95 >95 >95 68 >95 – – 90 2 (mode 2) 68 90 68 – 90 – >95 68 >95 >95 68 90 68 68 68 90 – – 95 3 90 68 68 – 68 – 68 95 68 68 90 >95 95 68 68 95 68 68 90 4 95 68 68 – 68 – 68 >95 68 68 68 >95 >95 68 68 >95 90 68 90 5 95 >95 68 – 90 >95 >95 >95 68 68 68 >95 >95 95 68 90 68 >95 68 6 >95 >95 68 – 90 >95 >95 >95 68 90 68 >95 >95 68 68 95 90 >95 >95 7 >95 >95 68 >95 90 >95 >95 >95 68 68 >95 >95 >95 >95 68 68 >95 >95 68 8 68 68 68 – 68 – 68 68 68 68 68 68 68 68 68 68 – – 68 9 68 68 68 – 68 – 68 68 68 68 68 68 >95 68 68 68 68 68 95 10 68 68 68 – 68 – 68 68 68 68 68 68 90 68 68 68 68 68 >95 12 (mode 1) >95 >95 >95 – >95 >95 >95 >95 >95 >95 >95 >95 >95 >95 >95 >95 68 >95 >95 12 (mode 2) 68 68 68 – 68 90 68 68 68 68 68 90 >95 68 68 68 68 68 95 13 68 68 68 – 68 90 68 68 68 68 68 90 95 68 68 68 68 90 >95 14 68 68 68 68 68 90 68 68 68 68 68 68 >95 90 68 68 68 68 95 15 68 68 68 68 68 90 68 68 68 68 68 68 95 68 68 68 68 68 >95 MNRAS 000 , 1–16 (2026) Pulse profile modelling with disc occultation 9     
+
+> Figure 4. Schematic illustrations of the hotspot geometries and the corre-sponding pulse profiles for Scenario A and Scenario B. The first and second rows show the hotspot geometries for Scenario A and Scenario B. In both cases, the hotspots are antipodal, lying close to the poles in Scenario A and near the equator in Scenario B. The line-of-sight vector is set to (0,1,0.5)
+> for clarity, with the 𝑧 -axis aligned with the spin axis. The third and fourth rows show the corresponding normalized bolometric pulse profiles for two scenarios. The black solid and red dashed curves represent the cases with and without disc occultation, illustrating the impact of disc blocking.
+
+𝑁 free denotes the number of free parameters in each run. In the fol-lowing sections, we refer to individual runs as Run followed by the corresponding row number in Table 1. The quantities 𝑁 cov 68% and 𝑁 cov 90% 
+
+provide useful metrics for assessing parameter recovery. Table 3 lists the smallest CI containing the true value for each parameter (68%, 90%, 95%, or outside 95%). As seen in Tables 1 and 3, Scenario A represents a relatively chal-lenging case for accurate parameter recovery. For Run 1, which has the fewest free parameters, the recovery performance is good: both 
+
+𝑀 and 𝑅 lie within the 68% CI and all parameters fall within the 90% CI. In Run 2, relaxing the antipodal symmetry constraint intro-duces additional freedom and leads to a more complex posterior. The multimodal sampling identifies two posterior modes with compara-ble statistical weight, as illustrated by the posterior distribution in Fig. 5. These two modes correspond to different parameter combina-tions. The difference in local log-evidence between modes 1 and 2 is 0.712, indicating that they cannot be statistically distinguished (Kass & Raftery 1995). Table 3 shows that mode 2 lies closer to the input pa-rameters, with improved recovery of the NS mass 𝑀 and radius 𝑅 eq ,and correctly identifies the secondary hotspot in the southern hemi-sphere. Similar bimodal posterior structures have also been reported in previous sampling studies (e.g., Riley 2019, Figs. 3.5 and 3.6). For Runs 3 and 4, the synthetic data are generated with disc occul-tation included, while the sampling models either include or neglect this effect. The left and right columns in Fig. 6 correspond to Runs 3 and 4, respectively. The top row compares the synthetic bolomet-ric data with the posterior-expected pulse profiles, demonstrating that both models closely reproduce the simulated data. The residuals (fourth row), computed from the data (second row) and the posterior-expected profiles (third row), show no significant structure and are consistent with Poisson noise, indicating statistically acceptable fits. The posterior distributions for Runs 3 and 4 are shown in Fig. 7. Although both models provide acceptable fits, the inferred posteriors show noticeable biases relative to the input parameters. In both runs, the NS mass falls outside the 68% CI, and neither model is able to re-liably constrain the location or angular size of the secondary hotspot. These biases persist in subsequent configurations with increasing model complexity. To assess the impact of increased model complexity, Runs 5 and 6 allow 𝜃 p to vary freely, while Run 7 additionally frees 𝑖 , resulting in all 19 parameters being sampled. With increasing freedom, the number of well-constrained parameters decreases, and key quantities, includ-ing 𝑀 , 𝑅 eq , and the hotspot geometry, become poorly recovered with the input parameters often lying outside the 95% CI. These results suggest that Scenario A corresponds to a regime in which reliable parameter recovery is difficult to achieve. The possible causes of this behaviour will be discussed in Section 5.1. 
+
+4.3.2 Inference results in Scenario B 
+
+As reliable parameter recovery is hard to achieve in Scenario A, we perform a series of additional runs for Scenario B. These runs are summarised in Table 1, and the CI for each parameter is listed in the lower part of Table 3. Overall, Scenario B represents a substantially more favourable configuration for parameter recovery, with most parameters recovered within the 68% CI across all runs. We begin with the simple configuration (Run 8), in which both 𝜃 p
+
+and 𝑖 are fixed and neither disc emission nor occultation is included. In this case, all 15 parameters are recovered within the 68% CI, indi-cating highly accurate parameter recovery. When both disc emission and occultation are included (Runs 9 and 10), the recovery remains comparably robust, with only two parameters falling outside the 68% CI. For configurations with 𝜃 p free, the posterior shows more complex behaviour. In Run 11, disc occultation is included in the synthetic data but neglected in the sampling model. For this setup, we explore three different Poisson-noise realizations of the synthetic data, generated using random seeds 1, 2, and 42, and find that the inferred posteri-ors depend sensitively on the particular seed, with different choices leading to distinct solutions. To further investigate this behaviour, we repeat the same analysis using multimodal sampling in Run 12, which reveals two separated posterior modes (blue and yellow in Fig. 8). The yellow mode closely matches the input parameters, and is consistent with the results obtained in Run 11 with seed 1. By  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 10 Y.-H. Mao et al. 
+
+Figure 5. Posterior distributions for Run 2 listed in Table 1, showing only the six key parameters. The blue and red colours correspond to the two distinct solutions identified by the multimodal sampling. In the diagonal panels, the solid curves represent the one-dimensional marginalised posterior distributions, with the shaded regions indicating the 68 per cent credible intervals, while the dashed curves show the prior distributions. The off-diagonal panels display the two-dimensional posterior distributions, with contours enclosing the 68, 95, and 99.7 per cent credible regions. The black cross lines denote the true input parameter values. Note that the two modes are shown without weighting by their relative evidence. 
+
+contrast, the blue mode is strongly biased, yielding 𝑀 ≃ 2.2 M ⊙
+
+and 𝑅 ≃ 15 .7 km, both significantly offset from the true values; this solution is consistent with the posteriors obtained in Run 11 with seeds 2 and 42. For comparison, we also performed Run 13 using a model that includes disc occultation, again employing multimodal sampling. In this case, no secondary mode is found. The posterior distributions from this run are shown in red in Fig. 8, overlap with mode 2 in Run 12. In these posteriors, all major parameters are well recovered, with both 𝑀 and 𝑅 eq constrained within 68% CI, and with tight poste-rior constraints corresponding to ∼ 3% precision in mass ±0.04 M ⊙
+
+and radius ±0.3 km. Next, we consider Runs 14 and 15, in which all parameters are allowed to vary. For both the occultation and no-occultation models, we obtain good overall recovery of the input parameters. In particular, the no-occultation model does not exhibit a spurious secondary mode. 
+
+MNRAS 000 , 1–16 (2026) Pulse profile modelling with disc occultation 11 
+
+Figure 6. Comparison of the synthetic data, posterior-expected pulse profiles, and the corresponding residuals for Scenario A. Run 3 and Run 4 are represented in the left and right columns, respectively. The top panels show the bolometric pulse profiles of the data and the posterior-expected model. The black curves represent the synthetic data, while the blue shaded regions correspond to the 16–84 per cent credible intervals of the posterior distribution. The second and third rows present the synthetic data and the posterior model predictions, with the former including a Poisson realisation and the latter corresponding to the underlying model expectation. Both are shown with a colour scale indicating the total NICER counts per cycle in each phase–energy bin for a total exposure of 132 ks. The fourth row shows the normalized residuals, computed as (𝑐 ik − 𝑑 ik )/ √𝑐 ik , where 𝑐 ik denotes the posterior expected pulse profile and 𝑑 ik the data. Here, 𝑖 
+
+indexes the energy channels and 𝑘 indexes the phase bins. 
+
+A plausible interpretation is that allowing the inclination angle 𝑖 
+
+to vary reduces the geometric degeneracy present when 𝑖 is fixed, so that the compensating solution no longer appears as a distinct mode. Alternatively, when marginalised over 𝑖 , the statistical weight of the spurious mode may become negligible, preventing it from being identified. From a practical perspective, fixing 𝑖 is unlikely to be realistic for real data, where it is typically constrained rather than fixed. A useful follow-up would therefore be to impose a tight prior on 𝑖 , representative of realistic observational constraints, to test whether a similar spurious mode re-emerges. Such an investigation would help determine whether these modes are a genuine concern in real data analyses and remains to be explored in future work. 
+
+5 DISCUSSION 
+
+In this section, we discuss the main implications of our results for parameter inference. Section 5.1 examines how hotspot geometry affects the pulse profiles and parameter recovery, while Section 5.2 focuses on the role of disc occultation. Section 5.3 then evaluates the overall reliability of the recovery. We also discuss the relevance of our findings for specific sources, including J1808 and J1444, in Section 5.4. Finally, Section 5.5 addresses the computational cost associated with including disc occultation. 
+
+5.1 Geometric dependence of parameter recovery 
+
+The difference in parameter recovery between Scenarios A and B appears to reflect differences in hotspot geometry and the resulting pulse profiles. In Scenario A, the primary hotspot is located very close to the spin axis. From the observer’s perspective, this hotspot 
+
+MNRAS 000 , 1–16 (2026) 12 Y.-H. Mao et al.  
+
+> Figure 7. Posterior distributions for Runs 3 and 4 listed in Table 1, showing the eight key parameters. The definitions of all lines and shaded regions are the same as in Fig. 5. The blue and red colours correspond to the sampling results obtained without and with disc occultation in the model, respectively (the data sets are created with disc occultation included).
+
+remains visible for nearly the entire rotational cycle, with only weak phase-dependent variations in its projected area. As a result, the pulse profile exhibits a single broad peak (see Fig. 6). The contribution from the secondary hotspot overlaps with the flux minimum of the primary, reducing its depth and preventing the formation of a distinct peak. This polar-cap geometry therefore produces a single-peaked pulse profile with limited substructure. In Scenario B, the hotspot is positioned at a moderate colatitude 
+
+𝜃 p = 60 ◦ and 𝜃 s = 120 ◦, with a moderate inclination 𝑖 = 58 ◦. In this configuration, the hotspot moves into and out of the observer’s line of sight during a rotation, producing strong phase-dependent variations in its visible area. The secondary hotspot dominates at the opposite phase and forms a distinct peak. The resulting pulse profile therefore shows two well-separated peaks within a single rotation cycle (see the top panel of Fig. 9). These differences in pulse profile have important consequences for parameter recovery. The 𝜃 p = 60 ◦ configuration provides a richer set of observable features, including two peaks, their separation in phase,  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Pulse profile modelling with disc occultation 13  
+
+> Figure 8. Posterior distributions for Runs 12 and 13 listed in Table 1. The yellow and blue colours correspond to the two modes obtained using the model without disc occultation, while the red colour represents the single solution obtained with the disc occultation model. The datasets are generated with disc occultation included in both cases.
+
+and their relative widths and amplitudes. These features may help to constrain multiple geometric parameters, including the hotspot co-latitudes, sizes, and phase offsets, thereby reducing degeneracies. By contrast, the single-peaked pulse profile produced in Scenario A carries significantly less geometric information. Some combinations of parameters may generate similar pulse shapes. This may cause nested sampling to yield statistically acceptable fits while not stem-ming from the true input parameters. The difference in geometric identifiability is a plausible explanation for the more reliable param-eter recovery observed in Scenario B compared to Scenario A. 
+
+5.2 Impact of disc occultation on parameter recovery 
+
+Motivated by physical self-consistency, we introduce disc occultation into the model and perform a series of runs to assess whether its inclusion affects parameter recovery. In this subsection, we discuss the impact of disc occultation on parameter recovery, in particular its potential to bias the inference or alter the inferred solutions. In Scenario A, we find that including or excluding occultation in the model leads to no clear qualitative change in the recovery results. In Scenario B, when the inclination angle is fixed, the model without occultation exhibits a spurious secondary mode, which disappears when all parameters are allowed to vary freely. Overall, the effect  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 14 Y.-H. Mao et al.  
+
+> Figure 9. Same as Fig. 6, but for Run 13.
+
+of disc occultation on parameter recovery appears to be present but relatively subtle. It remains unclear why the impact on parameter recovery is not stronger, despite the relatively large changes in the pulse profiles caused by occultation. Analyses of additional scenarios and parameter configurations may help to clarify the relationship between (non-)occulted pulse profiles and the success of parameter recovery. Given that including occultation provides a more physically self-consistent description, we recommend incorporating it in future anal-yses of real data, provided that computational resources permit. As discussed in Section 5.5, the associated increase in computational cost remains manageable, further supporting this recommendation. 
+
+5.3 Reliability of parameter recovery 
+
+In this subsection, we assess the robustness of parameter recovery based on the set of runs performed in this work. The ST-U model is intrinsically complex, involving up to 19 free parameters when disc emission and occultation are included, and the robustness of parameter recovery in such a high-dimensional parameter space is therefore a central concern. When the fits to the data are statistically acceptable and the pa-rameter space is sufficiently well sampled, previous studies (e.g., Bogdanov et al. 2021; Holt et al. 2025) have shown that pulse profile modelling can yield unbiased parameter constraints in the absence of an accretion disc. In our analysis, we also perform several runs without including a disc component, specifically Runs 1, 2, and 8. In all three cases, the inferred mass and radius are recovered within the 68% CIs, when not separating the posteriors in different modes. These results appear consistent with previous findings. The situation changes once the accretion disc is included. The ad-dition of disc emission and occultation increases the overall model complexity and introduces additional free parameters. Under these conditions, the success of parameter recovery becomes more sensi-tive to the underlying hotspot geometry. For polar-cap configurations (Scenario A), the true values of 𝑀 and 𝑅 eq no longer lie within the 68% CIs. By contrast, mid-colatitude geometry (Scenario B) allows for substantially more reliable recovery. This contrast suggests that in the presence of a disc, the robustness of parameter recovery may be influenced by the geometric configuration. However, this conclusion is based on only two representative scenarios, and a broader explo-ration of hotspot geometries will be necessary to assess its generality. It should be noted that parameter inferences based on NICER data alone may not always be sufficiently robust to uniquely constrain complex geometric and emission models. This limitation could be alleviated through the inclusion of broader-band X-ray data or joint analyses combining NICER with other observatories. In particu-lar, future missions such as enhanced X-ray Timing and Polarime-try (eXTP ) will provide enhanced spectral, timing, and polarimetric capabilities, offering valuable complementary constraints for PPM of AMPs (Li et al. 2025; Zhang et al. 2025). Such multi-instrument ap-proaches can help to reduce degeneracies and improve the reliability of parameter recovery in models that include an accretion disc. 
+
+5.4 Implications for disc occultation in J1808 and J1444 
+
+An important question arising from our analysis is whether the in-ferred geometries of J1808 and J1444 lie in a regime where disc occultation is expected to play a significant role. For J1808, Dorsman et al. (2025) applied a model including disc emission to NICER observations of the 2019 and 2022 outbursts. Their posterior distributions place the primary hotspot close to the rotational pole, while the inclination spans a relatively broad range of approximately 30 ◦–70 ◦. For J1444, in addition to the parame-ters adopted in Scenario A in this work, Papitto et al. (2025) car-ried out Stokes vector modelling, obtaining a best fit of 𝑖 = 74 .◦1,
+
+𝜃 p = 11 .◦8, and 𝜃 s = 172 .◦6. These parameter combinations imply a high-inclination configuration with a near-polar primary hotspot. In recent joint NICER and IXPE analyses of J1444, Dorsman et al. (2026a) performed pulse profile modelling with disc occultation in 
+
+X-PSI , using the implementation introduced in this work, and ob-tained constraints on the system geometry consistent with this picture. Based on these geometries, both sources are expected to lie in regimes where emission from the secondary hotspot can be partially obscured by the disc, as shown in Fig. 3. For J1808, the wide in-clination range suggests that the system may lie near a transitional regime in which disc occultation may or may not be important, while for J1444, the higher inclination implies that disc blocking is likely to play a more significant role. For parameter recovery, as shown for Scenario A in Section 5.2, including disc occultation has a limited impact on the posterior distributions. For J1808 and J1444, this sug-gests that neglecting occultation may not introduce significant biases, although its inclusion remains preferable for physical consistency.  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Pulse profile modelling with disc occultation 15                                                                                              
+
+> Table 4. Typical runtimes (in hours) and sampling statistics for representative runs using 1000 live points and without multimodal sampling are presented. The
+> Samples column reports the total number of samples for each run, expressed in units of 10 6. The Likelihood column gives the average likelihood evaluation time. The Runtime is reported in CPU core hours. All simulations were performed on the Dutch national supercomputer Snellius a. Each quantity is reported separately for models with and without disc occultation, enabling a direct comparison. The two cases use exactly the same synthetic datasets; the only difference lies in whether disc occultation is included in the sampling model. Fix 𝑖 Fix 𝜃 pScenario Samples (no occ) Samples (occ) Likelihood (no occ) Likelihood (occ) Runtime (no occ) Runtime (occ) [×10 6][×10 6][s] [s] [hr] [hr]
+> ✓✓A∼23 ∼17 ∼0.40 ∼0.43 ∼2500 ∼2100
+> ✓×A∼31 ∼60 ∼0.48 ∼0.51 ∼4100 ∼8500
+> ✓✓B∼50 ∼77 ∼0.35 ∼0.41 ∼4800 ∼8700
+> ✓×B∼80 ∼99 ∼0.43 ∼0.36 ∼9400 ∼9700
+> ××B∼340 ∼650 ∼0.37 ∼0.35 ∼35000 ∼64000
+> ahttps://www.surf.nl/en/services/compute/snellius-the-national-supercomputer
+
+Additional uncertainties may arise from the assumed standard thin disc model itself. For J1808, spectral analyses of NICER data using 
+
+X-PSI suggest that a simple multicolor disc model alone cannot fully reproduce the observed X-ray spectrum, and additional flexibil-ity such as background marginalisation is often required (Dorsman et al. 2025). This indicates that the accretion flow or background emission is more complex than assumed in a standard thin disc pic-ture, and motivates more realistic modelling of accretion emission as an important direction for future work. 
+
+5.5 Computational cost of including disc occultation 
+
+The inclusion of disc occultation in the ST-U model increases the computational cost of parameter inference, making it important to assess whether this additional computational overhead remains ac-ceptable in practice. Table 4 summarises typical runtimes and sam-pling statistics for representative configurations in Scenarios A and B. The reported values correspond to runs performed without multi-modal sampling and using 1000 live points. Across the comparisons, the likelihood evaluation time in the oc-cultation case does not show a consistent increase relative to the no-occultation case. The total runtime is primarily determined by the number of samples required to explore the parameter space. With disc occultation included, more samples are typically required. This is consistent with disc occultation introducing additional structure and complexity into the likelihood surface, which makes it more difficult to explore efficiently. In the configurations explored here, disc occultation leads to lower compute time and fewer samples in the first comparison, while in the remaining comparisons it leads to increases in both the num-ber of samples and the computational cost. In the last four cases, the inclusion of disc occultation increases the number of samples by approximately 20–90 per cent and the computational cost by ap-proximately 3–110 per cent. Although this increase is sometimes not negligible, it remains moderate and does not constitute a prohibitive limitation for targeted parameter studies. 
+
+6 CONCLUSIONS 
+
+In this work, we have extended X-PSI by incorporating accretion disc occultation into the modelling of X-ray pulse profiles from AMPs. Within this framework, we combine a realistic NS atmo-sphere model, relativistic ray tracing, disc emission and occultation in a self-consistent pulse profile calculation. We first explored the geometric dependence of disc occultation by quantifying relative obscuration across a broad parameter space. This analysis shows that disc occultation depends mainly on the inclination angle. For systems viewed at moderate to high inclinations, partic-ularly above 𝑖 ≃ 50 ◦, disc blocking can suppress surface emission and significantly modify the pulse profiles. The hotspot colatitude also contributes, as obscuration begins once the hotspot extends into the southern hemisphere and increases progressively with colatitude. The inner disc radius and hotspot size have only a minor effect on the obscuration fraction. These results help define a criterion for when disc occultation should be included in pulse profile modelling and highlight the importance of independent constraints on inclination, for example from polarization measurements. The impact of disc occultation on parameter recovery is examined through a series of sampling runs with two representative hotspot ge-ometries. We demonstrate that the underlying hotspot configuration on its own already plays an important role in inference performance. Polar-cap geometry can be difficult to constrain, as statistically ac-ceptable fits can still yield biased posteriors and poorly constrained hotspot parameters. Configurations with hotspots closer to the equa-torial region produce pulse profiles with richer structure, which may enable more reliable recovery of the NS mass, radius, and hotspot properties. The impact of neglecting disc occultation was not uni-form, ranging from negligible effects to the introduction of spurious posterior features. Meanwhile, the additional computation cost, due to increased complexity in the likelihood surface, appears to be within acceptable bounds. Overall, future analyses should include disc oc-cultation and previous analyses that have not included it should be revisited. This study is limited to two representative geometries, and the re-sulting conclusions are therefore not exhaustive. Future work should explore a broader range of hotspot geometries and develop more realistic emission and accretion flow models to better assess the re-liability of NS parameter inference in realistic accretion scenarios. 
+
+ACKNOWLEDGEMENTS 
+
+Y.-H. M. and X.-D. L. acknowledge support from the National Key Research and Development Program of China (2021YFA0718500) and the Natural Science Foundation of China under grant No. 12121003. A.L.W. acknowledges support from NWO grant ENW-XL OCENW.XL21.XL21.038 Probing the phase diagram of Quantum Chromodynamics (PI: Watts). T.S. acknowledges funding by the Re-search Council of Finland grant 368807. T.S. and J.P. were partially supported by the Research Council of Finland Centre of Excellence in Neutron-Star Physics (grants 374063 and 374064). We acknowledge  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 16 Y.-H. Mao et al. 
+
+NWO for providing access to Snellius, hosted by SURF through the Computing Time on National Computer Facilities call for proposals. We acknowledge extensive use of NASA’s Astrophysics Data System (ADS) Bibliographic Services and the ArXiv. 
+
+DATA AVAILABILITY 
+
+The data underlying this work will be made publicly available on Zenodo (10.5281/zenodo.20642751) upon acceptance. 
+
+REFERENCES 
+
+AlGendy M., Morsink S. M., 2014, ApJ, 791, 78 Beloborodov A. M., 2002, ApJ, 566, L85 Bobrikova A., Loktev V., Salmi T., Poutanen J., 2023, A&A, 678, A99 Bogdanov S., et al., 2019, ApJ, 887, L26 Bogdanov S., et al., 2021, ApJ, 914, L15 Buchner J., 2016, PyMultiNest: Python interface for MultiNest, Astrophysics Source Code Library, record ascl:1606.005 Chatziioannou K., Cromartie H. T., Gandolfi S., Tews I., Radice D., Steiner A. W., Watts A. L., 2025, Reviews of Modern Physics, 97, 045007 Choudhury D., et al., 2024a, ApJ, 971, L20 Choudhury D., et al., 2024b, ApJ, 975, 202 Di Salvo T., Sanna A., 2022, in Bhattacharyya S., Papitto A., Bhattacharya D., eds, ASSL Vol. 465, Millisecond Pulsars. pp 87–124, doi:10.1007/978-3-030-85198-9_4 Dittmann A. J., et al., 2024, ApJ, 974, 295 Dorsman B., et al., 2025, MNRAS, 538, 2853 Dorsman B., et al., 2026a, arXiv e-prints, p. arXiv:2605.18731 Dorsman B., Salmi T., Watts A. L., Ng M., Bobrikova A., Loktev V., Poutanen J., Wilms J., 2026b, MNRAS, 545, staf1983 Feroz F., Hobson M. P., Bridges M., 2009, MNRAS, 398, 1601 Feroz F., Hobson M. P., Cameron E., Pettitt A. N., 2019, The Open Journal of Astrophysics, 2, 10 Galloway D. K., Muno M. P., Hartman J. M., Psaltis D., Chakrabarty D., 2008, ApJS, 179, 360 Galloway D. K., Goodwin A. J., Hilder T., Waterson L., Cupák M., 2024, MNRAS, 535, 647 Gandolfi S., Carlson J., Reddy S., 2012, Phys. Rev. C, 85, 032801 Gendreau K. C., et al., 2016, in den Herder J.-W. A., Takahashi T., Bautz M., eds, Proc. SPIEVol. 9905, Space Telescopes and Instrumentation 2016: Ultraviolet to Gamma Ray. p. 99051H, doi:10.1117/12.2231304 Holt I. M., Miller M. C., Dittmann A. J., Lamb F. K., 2025, arXiv e-prints, p. arXiv:2511.16759 Ibragimov A., Poutanen J., 2009, MNRAS, 400, 492 Illarionov A. F., Sunyaev R. A., 1975, A&A, 39, 185 Illiano G., et al., 2023, ApJ, 942, L40 Kajava J. J. E., Ibragimov A., Annala M., Patruno A., Poutanen J., 2011, MNRAS, 417, 1454 Kass R. E., Raftery A. E., 1995, Journal of the American Statistical Associ-ation, 90, 773 Kini Y., et al., 2024, MNRAS, 535, 1507 Kini Y., et al., 2026, arXiv e-prints, p. arXiv:2602.23743 Li Z., et al., 2023, ApJ, 958, 177 Li A., et al., 2025, Science China Physics, Mechanics, and Astronomy, 68, 119503 Makishima K., Maejima Y., Mitsuda K., Bradt H. V., Remillard R. A., Tuohy I. R., Hoshi R., Nakagawa M., 1986, ApJ, 308, 635 Malacaria C., et al., 2025, A&A, 699, A288 Mauviard L., et al., 2025, ApJ, 995, 60 Miller M. C., Lamb F. K., 1998, ApJ, 499, L37 Mitsuda K., et al., 1984, PASJ, 36, 741 Molkov S. V., et al., 2024, A&A, 690, A353 Morsink S. M., Leahy D. A., Cadeau C., Braga J., 2007, ApJ, 663, 1244 Nättilä J., Miller M. C., Steiner A. W., Kajava J. J. E., Suleimanov V. F., Poutanen J., 2017, A&A, 608, A31 Ng M., et al., 2024, ApJ, 968, L7 Papitto A., Torres D. F., 2015, ApJ, 807, 33 Papitto A., et al., 2025, A&A, 694, A37 Patruno A., Watts A. L., 2021, in Belloni T. M., Méndez M., Zhang C., eds, ASSL Vol. 461, Timing Neutron Stars: Pulsations, Oscillations and Explosions. pp 143–208 ( arXiv:1206.2727 ), doi:10.1007/978-3-662-62110-3_4 Pechenick K. R., Ftaclas C., Cohen J. M., 1983, ApJ, 274, 846 Petterson J. A., Rothschild R. E., Gruber D. E., 1991, ApJ, 378, 696 Poutanen J., 2020, A&A, 641, A166 Poutanen J., Beloborodov A. M., 2006, MNRAS, 373, 836 Poutanen J., Gierliński M., 2003, MNRAS, 343, 1301 Poutanen J., Ibragimov A., Annala M., 2009, ApJ, 706, L129 Rappaport S. A., Fregeau J. M., Spruit H., 2004, ApJ, 606, 436 Riley T. E., 2019, PhD thesis, University of Amsterdam, Netherlands Riley T. E., et al., 2023, The Journal of Open Source Software, 8, 4977 Romanova M. M., Ustyugova G. V., Koldoba A. V., Lovelace R. V. E., 2004, ApJ, 610, 920 Romanova M. M., Ustyugova G. V., Koldoba A. V., Lovelace R. V. E., 2005, ApJ, 635, L165 Salmi T., Nättilä J., Poutanen J., 2018, A&A, 618, A161 Salmi T., Loktev V., Korsman K., Baldini L., Tsygankov S. S., Poutanen J., 2021, A&A, 646, A23 Salmi T., et al., 2024, ApJ, 974, 294 Salmi T., et al., 2025, MNRAS, 538, 2562 Scott D. M., Leahy D. A., Wilson R. B., 2000, ApJ, 539, 392 Shakura N. I., Sunyaev R. A., 1973, A&A, 24, 337 Skilling J., 2004, in Fischer R., Preuss R., Toussaint U. V., eds, AIP Conf. Ser. Vol. 735, Bayesian Inference and Maximum Entropy Methods in Science and Engineering: 24th International Workshop on Bayesian Inference and Maximum Entropy Methods in Science and Engineering. AIP, Melville, NY, pp 395–405, doi:10.1063/1.1835238 Viironen K., Poutanen J., 2004, A&A, 426, 985 Weisskopf M. C., et al., 2022, JATIS, 8, 026002 Wilms J., Allen A., McCray R., 2000, ApJ, 542, 914 Zhang S.-N., et al., 2025, Science China Physics, Mechanics, and Astronomy, 68, 119502 This paper has been typeset from a TEX/L ATEX file prepared by the author. MNRAS 000 , 1–16 (2026)

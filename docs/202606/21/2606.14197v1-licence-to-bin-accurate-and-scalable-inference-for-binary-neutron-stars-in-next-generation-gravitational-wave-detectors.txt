@@ -1,0 +1,848 @@
+Title: Licence to Bin: Accurate and Scalable Inference for Binary Neutron Stars in Next-Generation Gravitational-Wave Detectors
+
+URL Source: https://arxiv.org/pdf/2606.14197v1
+
+Published Time: Mon, 15 Jun 2026 00:36:24 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+## Licence to Bin: Accurate and Scalable Inference for Binary Neutron Stars in Next-Generation Gravitational-Wave Detectors 
+
+Nir Guttman, 1, 2, ∗ A. Makai Baker, 3 Paul D. Lasky, 1, 2 and Eric Thrane 1, 2 
+
+> 1
+
+School of Physics and Astronomy, Monash University, Vic 3800, Australia 
+
+> 2
+
+OzGrav: The ARC Centre of Excellence for Gravitational Wave Discovery, Clayton VIC 3800, Australia 
+
+> 3
+
+Department of Physics, University of California, Berkeley, Berkeley, CA 94720, USA 
+
+Next-generation gravitational-wave observatories will observe binary neutron-star mergers with much higher signal-to-noise ratios, over much longer durations and across broader frequency bands than current detectors. These long-duration signals present a major computational challenge for Bayesian parameter estimation. Reduced-order quadrature is a promising approach for accelerating inference, but in this regime its standard construction encounters severe memory and accuracy limitations. We present a practical reduced-order quadrature construction for long binary neutron-star signals with time-dependent detector response and full effects of the observatories’ free-spectral range. Our approach combines improved adaptive frequency sampling, disk-backed streaming, and subbanded reduced-order quadrature construction, enabling efficient and accurate reduced-order models for signals that were previously intractable. We demonstrate for the first time reduced-order Bayesian inference on an approximately 2 h binary neutron-star signal extending down to 5 Hz and with signal-to-noise ratio 2090. We show the resulting reduced-order quadrature remains sufficiently accurate for practical inference. The full analysis is carried out in about 48 h using 128 CPU cores. We also find that, when time-dependent detector-response effects are included, a single Cosmic Explorer detector can localize such a signal to a 90% credible sky area of approximately 41deg 2, with important implications for multimessenger astronomy and cosmology. These results demonstrate that reduced-order methods can make next-generation binary neutron-star inference computationally feasible. 
+
+I. INTRODUCTION 
+
+The next generation of ground-based gravitational-wave observatories, including Cosmic Explorer [1] and the Einstein Telescope [2], will transform gravitational-wave astronomy by detecting binary neutron-star merg-ers with unprecedented signal-to-noise ratios (SNRs) and over broader observing bands than current instru-ments [3–5]. Access to low frequencies will keep binary neutron-star signals in band for tens of minutes rather than seconds, enabling dramatically improved measure-ments of properties such as sky position, masses, and spins. This scientific opportunity comes with a major com-putational challenge. Bayesian parameter estimation for gravitational-wave signals [6] is already expensive for cur-rent detectors, and becomes substantially more demand-ing for long-duration, high-SNR signals [7]. Likelihood evaluation requires repeated waveform generation and repeated computation of noise-weighted inner products over a large frequency array, implying analyses can be-come prohibitively expensive. Considerable effort has therefore been devoted to accelerating parameter esti-mation [8–18]. More specifically, a recent study sought to address long-duration, high-SNR binary-neutron-star signals in next-generation detectors, including time-dependent detector-response effects, using relative binning and  
+
+> ∗nir.guttman@monash.edu
+
+multibanding [19]. Heterodyning-based methods such as relative binning rely on a fiducial reference waveform, and their accuracy is expected to be highest in the local region of parameter space where the analyzed waveform remains close to that reference [9]. In Ref. [19], the injected wave-form itself served as the fiducial reference, an idealized choice that is not practical for realistic analyses where the source parameters are not a priori known. The same study also developed and validated a multibanding like-lihood including frequency-dependent detector-response effects, but did not present full parameter-estimation re-sults based on that approximation. Even so, such devel-opments are important for establishing the feasibility of inference in this challenging regime while clarifying the limitations of the available approximation strategies. Reduced-order methods aim to exploit redundancy in waveform families in order to accelerate likelihood eval-uation while preserving accuracy. One first constructs a reduced basis that provides a compressed representa-tion of the waveform family. Empirical interpolation is then used to identify a small set of special frequencies from which the waveform can be reconstructed accu-rately, thereby defining a reduced-order model (ROM). This ROM is subsequently used to construct a reduced-order quadrature (ROQ) rule that replaces the standard likelihood evaluation with a much smaller quadrature. Earlier work showed that this framework can accelerate gravitational-wave inference by orders of magnitude for compact binary coalescence signals [20–22]. For binary neutron stars in next-generation detec-tors, reduced-order methods therefore appeared to of-fer a promising route toward making long-duration infer-
+
+> arXiv:2606.14197v1 [astro-ph.HE] 12 Jun 2026
+
+2ence tractable. Previous studies showed that ROM and ROQ constructions could provide substantial likelihood acceleration for long binary neutron-star signals. Within that framework, Bayesian inference on signals lasting up to roughly 90 minutes was shown to be computation-ally achievable [23], suggesting that ROQ could provide a viable foundation for parameter estimation in the high-SNR regime. However, more recent work has sharpened this picture and exposed deeper difficulties [24]. That study showed that when one fully incorporates the time-dependent de-tector response due to the rotation of the Earth, together with free-spectral-range effects [25–27] that become rele-vant for long-arm detectors such as Cosmic Explorer, the waveform manifold becomes substantially more complex. In this regime, two significant challenges arise. The first is a memory limitation. The size of the re-duced basis required for unbiased inference grows to the point that reduced-order modeling becomes impractical with contemporary computational resources. Although such requirements may still be feasible on some modern systems, they remain a substantial practical constraint. In particular, Ref. [24] showed that a memory require-ment of >
+
+∼ 100 GB effectively prevents analyses below approximately 16 Hz. Since for binary neutron stars, low frequencies account for most of the signal duration, this result points to a genuine bottleneck for astrophysical inference in next-generation observatories. The second is a precision limitation. Smith et al. [22] showed that the empirical interpolation step can degrade the final ROQ accuracy by roughly two orders of magni-tude relative to the reduced-basis accuracy. In principle, however, such degradation may still be acceptable if the underlying basis is sufficiently accurate, even for very high SNRs. By contrast, Baker et al. [24] reported that even when the reduced-basis construction tolerance is set at machine precision, the resulting ROQ accuracy is de-graded enough to impose a maximum SNR above which the ROQ approximation is no longer reliable. In this paper, we solve these two remaining obstacles to ROQ-based inference in the long-duration, high-SNR regime and demonstrate that full Bayesian inference is feasible for next-generation binary neutron-star signals. Our approach substantially reduces the memory burden, improves numerical stability, and enables the construc-tion to be parallelized. As a result, accurate ROQs can be built for signals that include the expected time de-pendence and extend to lower frequencies than was pre-viously achievable, while maintaining sufficient accuracy for high-SNR inference. The rest of the paper is organized as follows. Section II briefly reviews the construction of a standard ROQ. Sec-tion III describes our approach for overcoming the limi-tations discussed above. In Section IV, we demonstrate these ideas using a ∼ 2 h binary neutron-star signal with SNR ≃ 2090. In this extreme regime, we recover the chirp mass with O(10 −6) M⊙ precision and obtain a 90% credible sky area of approximately 41 deg 2 with a single Cosmic Explorer detector, while validating that the ROQ is sufficiently accurate for inference. Finally, Section V presents our conclusions.  
+
+> II. METHOD
+
+Reduced-order modeling and reduced-order quadra-ture are well established in the literature [28, 29]. In this section, we briefly review the construction of reduced-order models and reduced-order quadrature rules for gravitational-wave inference. We do not introduce any new formalism here; rather, we summarize the estab-lished framework that forms the basis for the modifica-tions presented in Section III. The construction proceeds in three steps: first, one builds a reduced basis from a training set of waveforms; second, empirical interpolation is used to identify a small set of special frequencies at which the waveform is evalu-ated in the subsequent step; third, this interpolated rep-resentation is substituted into the likelihood to obtain a reduced-order quadrature (ROQ) rule. We follow the general framework developed in [20, 22].  
+
+> A. Reduced basis and empirical interpolation
+
+Let h(f ; θ) denote a frequency-domain waveform de-pending on source parameters θ, sampled on a frequency grid of size L. The aim of reduced-order modeling is to approximate this waveform family using a much smaller set of basis functions. To this end, one first constructs a reduced basis 
+
+{ei(f )}Nbasis  
+
+> i=1
+
+, (1) where Nbasis denotes the number of basis elements. This basis is chosen such that Nbasis ≪ L and its span accu-rately represents the waveform family over the parameter region of interest. The basis is built from a training set of waveforms us-ing a greedy algorithm. Starting from an empty basis, the algorithm iteratively projects the training-set wave-forms onto the current basis and adds the waveform with the largest projection error. This procedure is repeated until the maximum representation error falls below a pre-scribed tolerance. An important feature of the reduced-basis construction is that it provides direct control over the maximum approximation error, which is essential when the compressed model is later used for inference. A central difficulty in constructing the ROM for long signals is that the underlying frequency grid becomes ex-tremely large. For binary neutron-star signals extending to low frequencies, the signal duration in band can be hours, and the corresponding frequency resolution must be very fine. As a result, the size of the frequency grid can become too large to store and manipulate ef-ficiently in memory. To alleviate this problem, Smith 3
+
+et al. [22] introduced dynamic frequency sampling. In this approach, the full frequency range is divided into a sequence of bands, and each band is assigned its own frequency resolution. The resolution in a given band is determined by the duration of the longest waveform con-tribution expected in that frequency interval, evaluated empirically from the lightest binary system under consid-eration. This duration is rounded up to the next power of two, and the frequency spacing is then taken as its in-verse. In this way, the waveform remains sampled above the Nyquist rate in every band, while avoiding the cost of using a uniformly fine frequency resolution across the full analysis range. Once the reduced basis has been constructed, the wave-form can be represented using empirical interpolation. The empirical interpolation method selects a set of Nbasis 
+
+frequency nodes {FJ }Nbasis  
+
+> J=1
+
+, with one node associated with each basis element, such that the waveform can be reconstructed from its values at those nodes. The result-ing empirical interpolant is 
+
+hROM (f ; θ) = 
+
+> Nbasis
+
+X
+
+> J=1
+
+h(FJ ; θ) BJ (f ), (2) where h(FJ ; θ) is the waveform evaluated with param-eters θ at the frequency nodes FJ . The interpolation functions BJ (f ) are constructed from the reduced basis. Writing the reduced basis as {ei(f )}, the interpolation functions take the form 
+
+BJ (f ) = 
+
+> Nbasis
+
+X
+
+> i=1
+
+ei(f ) ( V −1)iJ , (3) where the interpolation matrix is defined by 
+
+ViJ = ei(FJ ). (4) The reduced-order model is therefore completely speci-fied by the reduced basis and the interpolation nodes. Since the waveform is reconstructed from values at only 
+
+Nbasis special frequencies rather than all L points in the original grid, this representation is highly compressed when Nbasis ≪ L. In contrast to the reduced-basis con-struction, the empirical interpolation stage is carried out on the entire frequency grid. The selected basis vectors are therefore reconstructed on the full grid and orthonor-malized before the interpolation nodes are computed.  
+
+> B. Reduced-order quadrature
+
+The reduced-order model can be used to accelerate likelihood evaluation. For Gaussian noise, the standard frequency-domain natural log-likelihood, up to an addi-tive constant, is log L = ⟨d, h (θ)⟩ − 12 ⟨h(θ), h (θ)⟩ − 12 ⟨d, d ⟩, (5) where d is the detector data and ⟨· , ·⟩ denotes the noise-weighted inner product [30]. Direct evaluation of these inner products is expensive because it requires repeated waveform evaluation and summation over the full fre-quency grid. Substituting the empirical interpolant into the likeli-hood replaces the full sum by a much smaller quadrature rule involving only the interpolation nodes. For the linear term, one obtains 
+
+⟨d, h (θ)⟩ ≈ 
+
+> NL
+
+X
+
+> J=1
+
+ωJ h(FL,J ; θ), (6) where the weights ωJ depend only on the data. The basis functions and the detector noise power spectral density can therefore be precomputed prior to inference. Similarly, the quadratic term can be approximated by 
+
+⟨h(θ), h (θ)⟩ ≈ 
+
+> NQ
+
+X
+
+> I=1
+
+ψI h(FQ,I ; θ) 2, (7) where ψI are quadrature weights for the quadratic part of the likelihood. The prescription for computing these weights can be found in Smith et al. [23]. In general, the linear and quadratic terms may require different reduced bases and therefore different sets of interpolation nodes. Substituting Eqs. 6 and 7 into Eq. 5, we define the reduced-order quadrature likelihood approximation, log LROQ =
+
+> NL
+
+X
+
+> J=1
+
+ωJ h(FL,J ; θ)
+
+− 12
+
+> NQ
+
+X
+
+> I=1
+
+ψI h(FQ,I ; θ) 2 − 12 ⟨d, d ⟩.
+
+(8) Since the approximations in Eqs. 6 and 7 propagate into Eq. 8, the resulting ROQ likelihood must be validated against the standard likelihood in Eq. 5. For a waveform parameter point θ, we therefore define the induced ROQ log-likelihood error as ∆ log LROQ (θ) ≡ | log LROQ (θ) − log L(θ)| . (9) This quantity is evaluated over a set of test waveform parameters and summarized using its distribution across that set. The ROQ computational advantage arises because the cost of likelihood evaluation is reduced from a sum over the full frequency grid to a sum over only NL and NQ
+
+interpolation nodes, with typically NL, N Q ≪ L. In this way, ROQ accelerates the likelihood evaluation by ex-ploiting the low-dimensional structure of the waveform family while preserving the accuracy of the calculation.  
+
+> III. AN ENHANCED CONSTRUCTION STRATEGY FOR ROM AND ROQ
+
+In this section, we revisit the workflow for construct-ing ROMs and ROQs introduced in [20, 22] in the regime 4of long-duration signals with time-dependent detector re-sponse. Our aim is not to alter the underlying formalism, but rather to modify the construction strategy so that it remains both computationally tractable and sufficiently accurate. To this end, we revise the dynamic-sampling procedure, introduce streaming and disk-backed memory management, and divide the full frequency range into subbands in order to control both memory usage and signal complexity. Finally, we define a practical pro-cedure for ROQ construction that changes the way in which the resulting ROQ accuracy is assessed. These developments are implemented in our software package 
+
+gwRombusX , which extends gwRombus [31]. The latter is built on the Rombus framework [32], which provides the software foundation for the modifications described be-low. We make gwRombusX publicly available, together with example scripts and Bilby [33, 34] integration. Ad-ditional implementation details are given in Appendix A. We demonstrate that these modifications enable the construction of ROQs for significantly more complex gravitational-wave signals than was previously practical.  
+
+> A. Accuracy limitation
+
+As noted in Section II A, adaptive frequency sampling was introduced in Smith et al. [22] (their Sec. III.D) as a way to reduce the memory footprint of ROM construc-tion. For very long signals, such a strategy becomes even more important. However, we find that the number of frequency grid points used during the initial ROM con-struction directly affects the accuracy of the final ROQ approximation. This can be understood as follows: if the initial reduced-basis construction is performed on a frequency grid that is too coarse, waveform structure that would otherwise require additional basis elements may not be resolved. When the basis is subsequently reconstructed on the full grid, this missing structure manifests itself as a loss of accuracy in the final ROQ approximation. This becomes especially important in the high-SNR regime, where the tolerance on ROQ errors is particularly strin-gent. We therefore propose an alternative adaptive-sampling procedure that is more closely tailored to compact bi-nary coalescence signals. We find that dividing the fre-quency range uniformly in the variable f −5/6 yields the optimal choice of frequency bands for minimizing the to-tal number of frequency grid points. At leading post-Newtonian order, this follows from the inspiral-time scal-ing t(f ) ∝ f −8/3, which implies that such a banding dis-tributes the accumulated waveform duration, and hence the required frequency resolution more evenly across the frequency range. The derivation is presented in Ap-pendix B. For each band, we compute the time spent in that interval, using the chirp-time estimate for the light-est system under consideration, and define an effective duration ∆ teff . The frequency resolution in the band is 1 2 3 4          
+
+> Enhancement factor (N)
+> 10 6
+> 10 5
+> 10 4
+> | log  ROQ |
+> 5th--95th percentile
+> Median | log ROQ |
+> FIG. 1. The ROQ log-likelihood error (Eq. 9) as a function of the enhancement factor, N(Eq. 10), used in the adaptive-sampling procedure, for an ROQ constructed over the fre-quency range 20–200 Hz with a signal duration of 128 s. The solid black curve shows the median and the shaded region indicates the 5th–95th percentile range over the tested wave-form parameters. No signal is injected in this study. The figure illustrates that increasing the enhancement factor sys-tematically improves the accuracy of the final ROQ.
+
+then set to ∆f = 12N ∆teff 
+
+, (10) where the integer N , referred to here as the enhancement factor, controls how finely the band is sampled. Follow-ing Baker et al. [24], we impose a maximum bin size of 1 Hz. Figure 1 illustrates how the error decreases as the en-hancement factor is increased for a representative con-struction over the frequency range 20–200 Hz with a sig-nal duration of 128 s. The value of the enhancement factor, N , is not unique, and must instead be determined by the required target accuracy. In Section III E, we describe how this choice is made in practice. Thus, the dynamic sampling strategy must be treated as part of the accuracy budget of the ROQ construction, rather than only as a tool for reducing memory usage.  
+
+> B. Memory limitations
+
+The memory challenges identified by Baker et al. [24] stem from two main sources. Long-duration signals lead to extremely fine frequency spacing in the Fourier domain and are therefore represented by very large arrays across a broad band. In addition, including time-dependent detector-response effects leads to a dramatic increase in the complexity of the waveform manifold and hence the number of basis elements needed for an accurate repre-sentation. As a result, the training sets, bases, and inter-5mediate matrices can become prohibitively large to store and manipulate in memory. To overcome this limitation, we adopt three complementary strategies. These consid-erations apply to the construction of both the ROM and the ROQ. First, we replace the high in-memory workload with disk-backed streaming of the data. In practice, this means that large arrays generated during the construc-tion are stored on disk and accessed in blocks, rather than being kept in memory all at once. Examples include the training set, the reduced basis, and intermediate matri-ces required for orthogonalization and empirical interpo-lation. This software-architecture solution required sub-stantial modifications to the gwRombus code and allows us to control memory usage during the construction of both the ROM and the ROQ. In particular, we introduce a user-controlled memory cap that specifies the maximum amount of memory available to the construction proce-dure. Second, as discussed in Section III A, we improve the selection of the basis frequencies. This substantially re-duces the number of frequency grid points while keeping the selected frequencies close to optimal, thereby further lowering the memory requirements. Third, we divide the full frequency range into sub-bands and construct a separate ROQ in each subband. This is justified by the standard assumption of station-ary Gaussian noise, under which the likelihood factorizes across frequency bins [30]. Because each subband ROQ is smaller than one constructed over the full frequency range, this immediately reduces the memory burden dur-ing construction. Moreover, different frequency regions generally require different numbers of basis elements, as we show in Section IV. Treating the full band simultane-ously forces all regions to inherit the complexity of the most demanding one. This is especially problematic for very long signals, where the number of frequency grid points can reach into the millions. More generally, subbanding allows the accuracy of each region to be controlled independently while maintaining a fixed total error budget. In turn, this makes it possible to relax the accuracy requirements in low-SNR regions (see Section III C) and thereby further reduce both memory usage and computational cost. A concrete example of these benefits appear in our implementation, where the reduced basis on the full fre-quency grid is constructed using a Gram–Schmidt or-thogonalization procedure (see Appendix A for further implementation details). In this case, the main computa-tional bottleneck arises from the fact that each candidate vector must be orthogonalized against all previously se-lected basis vectors, so that the cost grows approximately as N 2basis , where Nbasis is the number of basis elements. For long-duration signals, each such operation must be carried out on extremely long vectors, making the con-struction prohibitively expensive. For example, a signal of duration 7500 s corresponds to vectors with approx-imately 1 .5 × 10 7 elements, requiring about 200 MB of memory per vector. By contrast, these enhancements reduce the effective vector length in each construction, lower the cost of each orthogonalization step, and de-crease the number of basis elements required in any one band. In addition, the subbands can be processed inde-pendently, making the construction naturally paralleliz-able and substantially faster, while keeping the memory requirements within the capabilities of standard comput-ing hardware. Although Gram–Schmidt is not essential to the ROQ construction, and alternative algorithms may offer im-proved numerical stability for very long vectors, we ex-pect that any such approach would similarly benefit from reduced vector sizes, both in terms of memory usage and computational cost. Taken together, these modifications provide a practical framework for controlling memory usage throughout the construction, and form the basis of the enhanced ROM and ROQ pipeline described in the remainder of this sec-tion.  
+
+> C. Assessing the ROQ accuracy
+
+Although a tolerance is imposed during the construc-tion of the ROM, the subsequent construction of the ROQ can introduce a larger approximation error [22]. It is therefore necessary to assess the final ROQ accuracy through the log-likelihood error defined in Eq. 9. Follow-ing Morisaki et al. [21], Baker et al. [24], Lindblom et al. 
+
+[35], one may impose the standard requirement ∆ log LROQ 
+
+log L < 1
+
+ρ2 , (11) where ρ is the SNR. This criterion follows from the con-dition that modeling errors remain smaller than the sta-tistical uncertainty of a signal with SNR ρ, so that the ROQ approximation does not introduce appreciable bias into the inference. However, this threshold is overly conservative. Far from the likelihood peak, where log L decreases rapidly, the relative error can become artificially large in regions of little relevance for inference. We therefore compare ∆ log LROQ to a characteristic scale set by the expected distribution of the log-likelihood. Using the result de-rived in Appendix C, the log-likelihood near the peak has mean 12 ρ2opt and fluctuations of order ρopt .Motivated by this scaling, we define the reference quan-tity log Lref ∼ N 
+
+ 12 ρ2opt , ρ 2opt 
+
+
+
+. (12) In practice, for each evaluation of ∆ log LROQ , we draw samples from this reference distribution and compute the normalized-error samples 
+
+ri = ∆ log LROQ 
+
+log Lref ,i 
+
+. (13) 6We then take the 95th percentile of the resulting distri-bution as our summary statistic, 
+
+r95 ≡ perc 95 ({ri}) . (14) This avoids overemphasizing errors in regions where the likelihood is already negligible, while retaining the cor-rect SNR scaling near the peak. Although applying this criterion requires a prior estimate of the target SNR, this does not present a practical difficulty, since an approx-imate SNR is already available from the matched-filter detection pipeline [36]. More generally, the SNR could be estimated iteratively: starting from a fiducial value, one could construct an ROQ, assess its adequacy after an initial inference run, and then tighten the ROQ re-quirements and rebuild if needed. Thus, r95 provides a practical, SNR-aware criterion for determining whether a given ROQ construction is sufficiently accurate for in-ference.  
+
+> D. Distributing the ROQ error budget
+
+Once the full frequency range is divided into subbands, the total allowed ROQ error must be distributed among them. Although the total error budget is fixed by the target SNR (see Eq. 11), its allocation across subbands is not unique. In general, the computational cost of con-structing the ROQ in a given band depends on the num-ber of frequency grid points in that band, the SNR, and the target accuracy assigned to that band. It may also depend on prior expectations about the modeling com-plexity in different frequency regions. For example, in binary neutron-star signals, the low-frequency regime is expected to be more expensive to model because it con-tains long-duration time-dependent effects due to Earth’s rotation. In practice, such effects complexity can be par-tially absorbed into the choice of subbands. For simplicity, however, we adopt the following model. Let ϵi denote the ROQ error assigned to subband i, let 
+
+Ni denote the number of frequency grid points in that band, and let ρi denote the corresponding contribution to the total SNR. We write the total construction cost as 
+
+C ∝ X
+
+> i
+
+N αi ρβi
+
+ϵγi
+
+, (15) where α, β, and γ are positive constants. This expression is intended only as a leading-order proxy for how the cost scales with subband size, signal strength, and target accuracy; it is not meant to represent a unique or exact model of the construction cost. The subband errors are constrained by the total error budget, 
+
+X
+
+> i
+
+ϵ2 
+
+> i
+
+= ϵ2tot , (16) with ϵtot set by the target ROQ accuracy. Minimizing the cost under this constraint, and setting α = β = γ = 1 yields 1
+
+ϵi ∝ (Niρi)1/3. (17) with the proportionality constant fixed by the total-error constraint. The derivation is given in Appendix D. Thus, the error budget is distributed preferentially toward sub-bands that are more expensive to model, while still sat-isfying the fixed total accuracy requirement.  
+
+> E. Construction of the ROQ
+
+Using the subbanding, adaptive-sampling, and memory-management strategies described above, we construct the ROQ iteratively and independently within each frequency subband. The procedure is as follows: 1. Divide the full frequency range into subbands. 2. For each subband, specify a target ROQ accuracy consistent with the total error budget, following Section III D. 3. Choose the adaptive frequency sampling in that subband, i.e., the number of frequency grid points or, equivalently, the enhancement factor N intro-duced in Section III A. 4. Construct the ROM and ROQ for that subband. 5. Build the corresponding likelihood weights and as-sess the ROQ accuracy using the criterion described in Section III C. 6. If the target accuracy is not met, increase the sam-pling density in that subband (step 3) and repeat steps 4–5 until the required accuracy is achieved. This procedure allows the sampling density, basis size, and final ROQ accuracy to be controlled independently in each frequency region. In particular, it makes it pos-sible to allocate finer sampling only where demanded by the modeling complexity, while keeping the overall con-struction computationally tractable.  
+
+> IV. INFERENCE WITH A HIGH-SNR BINARY NEUTRON-STAR SIGNAL
+
+To demonstrate the performance of the method, we carry out Bayesian inference on a representative long-duration, high-SNR binary neutron-star signal observed in a single Cosmic Explorer detector [37]. We adopt a  
+
+> 1The specific choice of cost model is heuristic and is adopted for simplicity. It provides a simple baseline for distributing the error budget across subbands.
+
+7single-detector setup in order to illustrate how the time-dependent detector response, modulated by the Earth’s rotation, can improve sky localization. We first describe the inference setup and the corresponding ROQ construc-tion, and then assess the quality of the approximation through likelihood reweighting.  
+
+> A. Inference setup
+
+We consider a binary neutron-star signal with mini-mum frequency fmin = 5 Hz, maximum frequency fmax =2048 Hz, analyzed within a data stretch of duration T =7500 s. The time-dependent interferometer response in-cludes both the Earth’s rotation and free-spectral-range effects. 2
+
+For the waveform model we use 
+
+IMRPhenomPv2 NRTidal [38, 39]. We adopt stan-dard binary-neutron-star priors [33, 40] on the full 17-dimensional parameter space, with the exception that we impose a restricted prior on the chirp mass, following the strategy of Smith et al. [23], Baker et al. 
+
+[24]. This choice is motivated by the fact that the chirp mass is already well constrained by the detec-tion pipeline, and restricting the prior to a narrow region around the target value substantially reduces the cost of the ROQ construction while remaining well motivated. In addition, Smith et al. [23] notes that, although narrow chirp-mass patches are convenient for individual ROM constructions, broader priors can in principle be covered by combining multiple local bases. For the tidal deformability parameters, we impose the physical constraint Λ 2 ≥ Λ1, assuming the standard mass ordering m1 ≥ m2 [41]. The full prior choices, ranges, and injection values used in this study are listed in Appendix E. We draw the source parameters randomly from the adopted prior, with the exception of the luminosity dis-tance, which we set manually to 20 Mpc in order to obtain an SNR of approximately ρ ≃ 2090 in a single detector. We choose this distance deliberately in order to stress test the ROQ construction in a particularly demanding high-SNR regime. This is comparable to the network SNR expected in a two-detector observation of a GW170817-like event, in which each detector measures ρ ∼ 1500 [40]. We analyze a zero-noise realization of stationary Gaus-sian noise [42]. Statistically, this corresponds to the most likely noise realization, and when combined with suffi-ciently regular priors, the posterior peaks at the injected parameter values. This provides a useful diagnostic check of both the likelihood implementation and the resulting ROQ. We emphasize, however, that this need not hold       
+
+> 2The implementation is described in Baker et al. [24] and is based on the associated Bilby development documented in https:// git.ligo.org/lscsoft/bilby/-/merge_requests/1370 .
+
+exactly in the presence of parameter degeneracies: if dif-ferent parameter combinations yield comparable likeli-hood values, the posterior can remain broad or elongated along the degenerate directions, and the injected values need not coincide precisely with the posterior peak. See Appendix F for further details. We use distance and phase marginalization. In 
+
+Bilby [33], the distance marginalization is implemented using a precomputed lookup table, following the standard likelihood formalism described by Thrane and Talbot [30]. In the current Bilby implementation, this lookup table is constructed using a number of grid points that is suitable for the expected signals of current gravitational-wave detectors [43]. However, find that this is insuffi-cient for the high-SNR regime explored by Cosmic Ex-plorer. In this regime, the likelihood is extremely sharply peaked, so a broad prior together with a fixed lookup-table resolution leads to an insufficiently accurate esti-mate of the marginalization integral. We therefore adopt a more finely sampled lookup table and place the grid in logarithmic distance, which more efficiently resolves the high-SNR regime because the SNR scales approxi-mately as the inverse of the luminosity distance, d−1 
+
+> L
+
+.This ensures a more accurate numerical evaluation of the marginalized integral. Finally, we perform the inference using nested sam-pling [44, 45] with dynesty [46]. Nested sampling for high-SNR signals is computationally demanding. We therefore employ pBilby [47], running on 128 CPU cores with 4000 live points using the acceptance-walk step-ping method with naccept =60. For this extremely chal-lenging inference problem, the combined use of pBilby ,distance and phase marginalization, and ROQ is essen-tial, since direct likelihood evaluation would otherwise be computationally prohibitive. 3 
+
+> B. ROQ construction for the inference run
+
+The ROQ used in this analysis is constructed by divid-ing the full frequency range into a sequence of subbands, each with its own sampling density, basis size, and target accuracy. In the present case, the low-frequency range is nat-urally separated into three main regimes: 5–10 Hz, 10– 30 Hz, and 30–100 Hz. In the first of these, the signal spends the largest amount of time in band, and the effect of the Earth’s rotation is therefore most pronounced. In the second, the signal remains in band for tens of minutes, so time-dependent detector-response effects continue to play an important role. In the third, the impact of the Earth’s rotation is substantially reduced. The remain-ing higher-frequency subbands are listed in Table I (see       
+
+> 3The modified versions of Bilby and pBilby used in this work are available at https://github.com/NirGutt/gwRombusX
+
+8Appendix E). Although this subdivision is not unique, the number of basis elements ( Nbasis ) required in each subband provides a useful diagnostic of both the local model complexity and the effective signal content in that frequency range. For each subband, we divide the frequency range uni-formly in f −5/6 into 100 bins (see Section III A and Ap-pendix B), thereby defining an initial frequency grid. We then adjust the enhancement factor until the result-ing ROQ satisfies the accuracy criteria described in Sec-tions III C and III D. For the initial reduced-basis training set, we follow the prescription of Baker et al. [24]; however, we use 
+
+Ntraining ≈ 4 × 10 5 training waveforms, about an or-der of magnitude fewer than in that work. This choice is intentional, and is meant to emphasize that when 
+
+Nbasis ≪ Ntraining , the training set does not need to be extremely large. In the present case, the most complex subband requires Nbasis ∼ 4000, which is roughly two or-ders of magnitude smaller than the initial training set. This illustrates that, once the training set is comfortably larger than the final basis size, further enlarging it does not necessarily improve the practical quality of the con-struction. For each ROQ construction, the reduced-basis toler-ance is set to 10 −15 . We make this choice for two reasons. First, we find that at 10 −16 , i.e., near machine precision, the algorithm can stagnate and produce artificially large bases. Second, as pointed out by Baker et al. [24], error estimates become unreliable in this regime. We there-fore choose a slightly looser tolerance, while also doing so intentionally in order to demonstrate that the reduced-basis tolerance is not the only parameter controlling the final ROQ accuracy.  
+
+> C. Inference validation
+
+We validate the inference in two ways. First, be-cause the analysis is carried out in a zero-noise realiza-tion, we expect the posterior to peak close to the in-jected parameter values, as discussed in Section IV A. Second, we employ likelihood reweighting using the ROQ posterior as a proposal distribution and the standard gravitational-wave likelihood posterior as the target dis-tribution, following the standard importance-sampling approach of Payne et al. [48]. For posterior samples {θi} drawn from the ROQ anal-ysis, the unnormalized importance weights are defined by 
+
+wi ∝ L(d|θi)
+
+LROQ (d|θi) . (18) The reweighted posterior is then obtained by assigning normalized weights ˆwi = wi/ P 
+
+> j
+
+wj to the ROQ sam-ples. The corresponding evidence under the standard likelihood can be estimated from the same weights as 
+
+Z ≈ ZROQ 
+
+1
+
+N
+
+> N
+
+X
+
+> i=1
+
+wi, (19) so that the shift in log evidence is ∆ log Z ≡ log Z − log ZROQ ≈ log 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+wi
+
+!
+
+. (20) Finally, we quantify the reweighting efficiency through the effective sample size, 
+
+Neff = (P 
+
+> i
+
+wi)2
+
+P 
+
+> i
+
+w2
+
+> i
+
+, (21) and report the efficiency as 
+
+ϵ = Neff 
+
+N . (22) If the ROQ approximation is accurate, we expect both a negligible shift in the log evidence and a reweighting efficiency close to unity.  
+
+> D. Inference results
+
+Figure 2 shows the marginalized posterior distributions for the component masses. The posterior peaks close to the injected parameter values. This provides a first consistency check that the ROQ likelihood reproduces the structure of the standard likelihood in the region of highest posterior support. For these intrinsic parameters, we find that the com-ponent masses are measured with very high precision, with a 90% credible interval width of approximately ∆M 90 1,2 ∼ 4 × 10 −3 M⊙.Figure 3 shows the mass–radius relation implied by the posterior samples, obtained by inferring a poly-tropic equation of state with the eosinference frame-work [49, 50]. The resulting relation is centered around 
+
+R ∼ 12 .2 km. In particular, for M >
+
+∼ 1.3 M⊙, the inferred radius is constrained to better than 1 km at 90% credibil-ity, with the tightest constraint reaching ∆ R90 ∼ 0.5 km near M ∼ 1.6–1 .7 M⊙. This yields sub-kilometer ra-dius constraints over much of the astrophysically relevant neutron-star mass range. Figure 4 shows the corresponding sky localization and distance, with an inset highlighting the highest-posterior-density region. We find a 90% credible sky area of ap-proximately 41 deg 2, consistent with the scale found in previous studies [51, 52]. Such localization from a sin-gle detector is possible because the signal remains in band for a sufficiently long time that the Earth’s rotation modulates the detector response over the course of the observation. This time dependence effectively provides directional information, partially breaking the degener-acy that would otherwise be present in a short-duration 91.369 
+
+> 1.372
+> 1.375
+> 1.378
+
+M1 [M ]
+
+> 1.333
+> 1.336
+> 1.339
+> 1.342
+> M2 [M ]
+> 1.333
+> 1.336
+> 1.339
+> 1.342
+
+M2 [M ]
+
+FIG. 2. Marginalized posterior distributions for the source-frame component masses M1 and M2 of the injected binary neutron-star signal. In the one-dimensional panels, the solid orange lines indicate the injected values and the dashed lines show the ±1σ credible interval about the posterior median. The posteriors peak close to the injected parameters, as ex-pected for the zero-noise realization adopted in this study. 11.5 12.0 12.5 13.0 13.5 14.0 
+
+R [km] 
+
+> 1.0
+> 1.2
+> 1.4
+> 1.6
+> 1.8
+> 2.0
+> 2.2
+> 2.4
+> M [M ]
+
+FIG. 3. Mass–radius relation implied by the posterior on the polytropic equation of state. The orange curve denotes the median relation, and the gray band shows the 90% credible region. 0h 21 h 18 h 15 h 12 h 9h 6h 3h 0h       
+
+> 0°
+> 30°
+> 60° 60°
+> 30°
+> 0°
+> 30°
+> 60° 60°
+> 30° 12 h00 m11 h40 m20 m00 m
+> 20°
+> 15°
+> 10°
+> pos.eq.ra
+> pos.eq.dec 16 20 24
+> dL[Mpc]
+
+FIG. 4. Sky localization for the recovered signal in a single Cosmic Explorer detector. The main panel shows the full posterior sky map, and the inset provides a magnified view of the highest-posterior-density region. The square in the main panel marks the region shown in the inset. The recovered 90% credible sky area is approximately 41 deg 2. The lower-right panel shows the marginalized posterior distribution for the luminosity distance dL, with the solid orange line indicating the injected value. 
+
+single-detector signal, allowing the source position to be constrained far more tightly. Taken together, these results show that, once the time-dependent detector response is properly modeled, a single high-SNR binary-neutron-star observation in a Cosmic Explorer detector can simultaneously yield pre-cise intrinsic-parameter constraints, sub-kilometer mass– radius measurements, and tight sky localization. The remaining source parameters are reported in Ap-pendix E. Further discussion of the parameter degenera-cies underlying the observed posterior shifts in Figure 4 is given in Appendix F. The reweighting analysis yields a negligible shift in the log evidence, ∆ log Z ≃ − 0.2, together with an ef-ficiency close to unity, ϵ ≃ 0.992. This indicates that the ROQ posterior is statistically consistent with the poste-rior obtained from the standard likelihood. The differ-ences between the weighted and unweighted sample dis-tributions are visually negligible, and we therefore omit the reweighted samples from the figures to avoid addi-tional clutter. These results indicate that the subbanded ROQ con-struction remains sufficiently accurate for practical in-ference even in the presence of a long-duration, time-dependent detector response. Finally, the inference required approximately 4 .2 × 10 810 likelihood evaluations and, using 128 CPU cores, took about 48 h. Without the ROQ method, we find that each likelihood evaluation is slower by a factor of ∼ 360, im-plying that without the ROQ the total runtime is roughly 2 years on 128 cores, and of order O(10 2) years on a single CPU.  
+
+> V. CONCLUSIONS AND DISCUSSION
+
+Next-generation gravitational-wave detectors are ex-pected to deliver a substantial improvement in sensitivity. To fully realize their scientific potential, the correspond-ing data-analysis methods must be able to extract in-formation efficiently and accurately from long-duration, high-SNR signals. Studies such as the present one are therefore essential for demonstrating the practical feasi-bility of inference in this regime. In this work, we revise the construction of reduced-order models and reduced-order quadratures for long binary neutron-star signals in the presence of time-dependent detector response. In particular, we address two key limitations of the standard approach: a mem-ory limitation, associated with the large number of fre-quency grid points and basis elements required at low fre-quencies, and an accuracy limitation, associated with the degradation introduced during the ROQ construction. We introduce a modified construction strategy based on improved adaptive sampling, disk-backed streaming, and subbanded ROQ construction. Together, these modifica-tions substantially reduce the memory burden, improve numerical stability, and make the construction naturally parallelizable. Using this framework, we demonstrate Bayesian infer-ence on a binary neutron-star signal in a single Cosmic Explorer detector with SNR exceeding 2000, including time-dependent detector-response effects down to 5 Hz. To our knowledge, this is the first demonstration of ROQ-based inference in this regime including time-dependent effects. The resulting inference remains accurate under reweighting tests against the standard likelihood, indi-cating that the construction is sufficiently reliable even in the high-SNR, long-duration limit considered here. Ex-tending the method to a detector network is straightfor-ward, since the total likelihood is just the product of the individual detector likelihoods. The same ROQ frame-work can therefore be applied to each detector and the resulting likelihood contributions combined in the usual way. A further consequence of long-duration signals is the possibility of significantly improved sky localization, even with a single detector. As the Earth rotates during the observation, the detector response evolves in time and thereby encodes additional directional information. This is reflected in the present analysis by the small 90% cred-ible sky area that we obtain. Such accurate localiza-tion is particularly relevant for multimessenger astron-omy, where it potentially facilitates the identification of electromagnetic counterparts and host galaxies [53], and for standard-siren cosmology, where reliable host associ-ation enables measurements of the Hubble constant [54], while statistical association with galaxy catalogs can be used for dark-siren cosmological inference [55]. The masses of the double pulsar PSR J0737 −3039A/B are among the most precisely measured neutron-star masses known, with uncertainties of order 
+
+O(10 −5) M⊙ [56]. In our analysis, the chirp mass is recov-ered with an uncertainty of order O(10 −6) M⊙, whereas the inferred component masses have uncertainties of or-der ∼ 4 × 10 −3 M⊙. This shows that even with a single detector, long-duration, high-SNR gravitational-wave ob-servations can determine the chirp mass with a precision comparable to that of the best radio-timing mass mea-surements, even though the individual component masses remain less tightly constrained. The inferred equation-of-state constraints provide a further illustration of the scientific reach of such high-SNR observations. From the posterior samples, we in-fer a polytropic equation of state and the correspond-ing mass–radius relation, finding a 90% credible radius width of ∆ R90 <
+
+∼ 1 km for M >
+
+∼ 1.3 M⊙. Such tight constraints are broadly in line with earlier forecasts for third-generation detectors [57]. By comparison, current observational radius constraints are typically at the level of ∼ 1 km or larger; for example, the updated NICER analysis of PSR J0740+6620 reports R = 12 .92 +2 .09  
+
+> −1.13
+
+km at 68% credibility [58]. While our result is based on an idealized high-SNR signal, it highlights the potential of next-generation gravitational-wave detectors to deliver highly precise radius constraints. The present study may also have implications beyond next-generation detectors. Even for current-generation instruments, moderately long signals with durations of order 16–32 s, or longer, may benefit more from careful control of the number of frequency grid points used in the ROQ construction than from enforcing extremely small construction errors. In such cases, one can construct ROQs that are sufficiently accurate for low-to-moderate SNRs while remaining extremely cheap to evaluate. More generally, our results show that the frequency grid design can be used to tune the ROQ construction to the signal regime of interest, trading unnecessary accuracy for sub-stantial computational savings. 
+
+> ACKNOWLEDGMENTS
+
+This work is supported through the Australian Research Council (ARC) Centre of Excellence CE230100016, Discovery Projects DP220101610 and DP230103088, and LIEF Project LE210100002. This material is based upon work supported by NSF’s LIGO Laboratory which is a major facility fully funded by the National Science Foundation. The authors are grateful for computational resources provided by the LIGO Laboratory and supported by National Science 11 Foundation Grants PHY-0757058 and PHY-0823459. We also acknowledge CPU time on OzSTAR, funded by Swinburne University and the Australian Govern-ment. LIGO Laboratory and Advanced LIGO are funded by the United States National Science Foundation (NSF) as well as the Science and Technology Facilities Council (STFC) of the United Kingdom, the Max-Planck-Society (MPS), and the State of Niedersachsen/Germany in sup-port of the construction of Advanced LIGO and con-struction and operation of the GEO600 detector. Addi-tional support for Advanced LIGO was provided by the Australian Research Council. Virgo is funded, through the European Gravitational Observatory (EGO), by the French Centre National de Recherche Scientifique (CNRS), the Italian Istituto Nazionale di Fisica Nucle-are (INFN) and the Dutch Nikhef, with contributions by institutions from Belgium, Germany, Greece, Hun-gary, Ireland, Japan, Monaco, Poland, Portugal, Spain. The construction and operation of KAGRA are funded by Ministry of Education, Culture, Sports, Science and Technology (MEXT), and Japan Society for the Promo-tion of Science (JSPS), National Research Foundation (NRF) and Ministry of Science and ICT (MSIT) in Ko-rea, Academia Sinica (AS) and the Ministry of Science and Technology (MoST) in Taiwan.  
+
+> Appendix A: gwRombusX
+
+Rombus was originally developed as a general frame-work for reduced-order modeling and is publicly avail-able at ADACS Australia [32]. Subsequently, gwRombus 
+
+extended this framework with functionality specific to gravitational-wave applications [31]. Our implementa-tion, gwRombusX , builds on both repositories, with sub-stantial modifications introduced to address the memory and accuracy limitations discussed in the main text. At a high level, gwRombusX workflow used in this work proceeds as follows: 1. Generate a training set of waveforms over the parameter region of interest using the adaptive frequency-sampling strategy described in the main text (see Section II). 2. Construct a reduced basis on the adaptively sam-pled grid using a greedy algorithm. Iteratively refine the basis by identifying poorly represented waveforms, and adding them into the training set. 3. Reconstruct the selected basis waveforms on the full uniform frequency grid and re-orthonormalize them using a Gram–Schmidt procedure. 4. Apply the empirical interpolation method to de-termine the interpolation nodes and thereby con-struct the reduced-order model. This is done itera-tively: the first node is chosen as the frequency at which the first basis element has the largest mag-nitude. Each subsequent node is then chosen from the residual obtained by approximating the next basis element using the nodes already selected, with the new node placed at the frequency where this residual is maximal. 5. Build the ROQ weights for each frequency subband and combine them into the final likelihood rule. 6. Validate the resulting ROQ through direct likeli-hood comparisons and, if necessary, refine the sam-pling and repeat the construction. The main additions introduced in gwRombusX include an updated implementation of the dynamic sampling, disk-backed storage of the reduced basis, streaming and blocked linear-algebra operations for large arrays, sup-port for constructing ROQs over multiple frequency sub-bands, and an updated implementation of the time-dependent ROQ likelihood in Bilby . These changes al-low the construction to remain feasible for significantly longer and more complex signals than was previously practical. The implementation used in this work, together with example configuration files and execution scripts, can be found at gwRombusX 4. These examples illustrate the con-struction of the training set, the reduced basis, the em-pirical interpolant, and the final ROQ likelihood used in the inference studies presented here. 
+
+> Appendix B: Optimal frequency-band spacing
+
+At leading post-Newtonian order, the time to merger of a compact binary from frequency f scales as 
+
+T (f ) = 5256 M−5/3 
+
+> c
+
+(πf )−8/3 ∝ f −8/3, (B1) where Mc is the chirp mass. Consider a decomposition of the full frequency interval [ fmin , f max ] into a sequence of bands with edges {fi}. The time spent in the ith band, bounded by [ fi, f i+1 ], is ∆ti = T (fi) − T (fi+1 ). (B2) Following the dynamic-sampling prescription, the fre-quency resolution in that band scales as ∆fi ∼ 1∆ti
+
+. (B3) The corresponding number of frequency bins in the band is therefore 
+
+ni ∼ fi+1 − fi
+
+∆fi
+
+∼ (fi+1 − fi) [ T (fi) − T (fi+1 )] . (B4)  
+
+> 4https://github.com/NirGutt/gwRombusX
+
+12 The total number of bins is obtained by summing over all bands. To determine the optimal band placement, it is convenient to pass to a continuum description. We introduce a continuous band-index variable x ∈ [0 , 1], where x = 0 corresponds to fmin and x = 1 corresponds to fmax . In practice, for Nband bands, one may think of x = i/N band . The band edges are then described by a monotonic function f (x), and a small interval in 
+
+x corresponds to one band. Defining f ′(x) ≡ df /dx and 
+
+T ′(f ) ≡ dT /df , the band width becomes 
+
+fi+1 − fi → df dx dx = f ′(x) dx, (B5) while the corresponding time spent in the band is 
+
+T (fi) − T (fi+1 ) → − dT (f )
+
+df df dx dx = −T ′(f ) f ′(x) dx. 
+
+(B6) The contribution of one infinitesimal band therefore be-comes 
+
+dn ∝ − T ′(f ) [ f ′(x)] 2 dx. (B7) Since T (f ) ∝ f −8/3, it follows that 
+
+−T ′(f ) ∝ f −11 /3, (B8) and hence minimizing the total number of bins is equiv-alent, up to an overall constant factor, to minimizing the functional 
+
+J[f ] = 
+
+Z 10
+
+f −11 /3(f ′)2 dx. (B9) The associated Euler–Lagrange equation is 
+
+ddx 
+
+
+
+2f −11 /3f ′
+
+−
+
+
+
+− 11 3 f −14 /3(f ′)2
+
+
+
+= 0 , (B10) which simplifies to 11 3 (f ′)2 − 2f f ′′ = 0 . (B11) This equation can be solved by introducing the substitu-tion 
+
+u = f −5/6. (B12) The differential equation then reduces to 
+
+u′′ = 0 , (B13) whose solution is linear in x,
+
+u(x) = x(umax − umin ) + umin , (B14) where 
+
+umin = f −5/6min , umax = f −5/6max . (B15) Transforming back to f , we obtain 
+
+f (x) = 
+
+h
+
+x
+
+
+
+f −5/6max − f −5/6min 
+
+
+
++ f −5/6min 
+
+i−6/5
+
+. (B16) We therefore conclude that the optimal band edges are uniformly spaced in the variable f −5/6. Equivalently, if the full frequency range is divided into Nband subbands, the optimal boundaries are obtained by choosing equal steps in f −5/6 between fmin and fmax .
+
+Appendix C: Scaling of log-likelihood fluctuations 
+
+For data d = h + n, with signal h and stationary Gaus-sian noise n, the log-likelihood can be written, up to an additive constant, as log L = ⟨d, h ⟩ − 12 ⟨h, h ⟩. (C1) Substituting d = h + n gives log L = 12 ⟨h, h ⟩ + ⟨n, h ⟩. (C2) Defining the optimal SNR by 
+
+ρ2sig ≡ ⟨ h, h ⟩, (C3) this becomes log L = 12 ρ2sig + ⟨n, h ⟩. (C4) Defining the normalized waveform ˆh = h/ρ sig , so that 
+
+⟨ˆh, ˆh⟩ = 1. Then 
+
+⟨n, h ⟩ = ρsig ⟨n, ˆh⟩. (C5) A standard result from matched-filtering theory is that the projection of the noise onto any fixed normalized template is itself a Gaussian random variable, assuming Gaussian detector noise [59]. Therefore, 
+
+⟨n, ˆh⟩ ∼ N (0 , 1) , (C6) and hence log L ∼ N 
+
+ 12 ρ2sig , ρ 2sig 
+
+
+
+, (C7) up to an additive constant. Thus, the mean of log L
+
+scales as ρ2sig , while its fluctuations scale as ρsig .
+
+Appendix D: Optimal distribution of the ROQ error budget 
+
+Starting from the cost model in Eq. 15, we derive the optimal allocation of the total ROQ error budget across subbands. The total error budget is constrained by 
+
+X
+
+> i
+
+ϵ2 
+
+> i
+
+= ϵ2tot . (D1) To minimize the total cost under this constraint, we in-troduce a Lagrange multiplier λ and define 
+
+F({ϵi}, λ ) = X
+
+> i
+
+N αi ρβi
+
+ϵγi
+
++ λ X
+
+> i
+
+ϵ2 
+
+> i
+
+− ϵ2tot 
+
+!
+
+. (D2) Taking the derivative with respect to ϵi gives 
+
+∂F
+
+∂ϵ i
+
+= −γ N αi ρβi
+
+ϵγ+1 
+
+> i
+
++ 2 λϵ i = 0 . (D3) 13 Rearranging, we obtain 
+
+ϵγ+2  
+
+> i
+
+= γ
+
+2λ N αi ρβi , (D4) which implies 
+
+ϵi = A
+
+
+
+N αi ρβi
+
+1/(γ+2) 
+
+, (D5) where the constant A is determined by the total-error constraint. Substituting Eq. D5 into this constraint gives 
+
+A2 X
+
+> i
+
+
+
+N αi ρβi
+
+2/(γ+2) 
+
+= ϵ2tot . (D6) Hence, 
+
+A = ϵtot 
+
+rP
+
+> i
+
+
+
+N αi ρβi
+
+2/(γ+2) . (D7) Therefore, the optimal allocation is 
+
+ϵi = ϵtot 
+
+
+
+N αi ρβi
+
+1/(γ+2) 
+
+rP
+
+> j
+
+
+
+N αj ρβj
+
+2/(γ+2) . (D8) For the simple choice α = β = γ = 1, this reduces to 
+
+ϵi ∝ (Niρi)1/3, (D9) which is the expression used in the main text. 
+
+> Appendix E: Long-duration binary neutron-star inference
+
+Table I summarizes the ROQ construction by fre-quency subband, including the enhancement factor, num-ber of basis elements, local SNRs, and assigned accuracy targets. At the lowest frequencies, we find it useful to supple-ment the basic inspiral-based banding of Section III A with two additional refinements. First, to resolve the time dependence of the detector response due to the Earth’s rotation, we require that adjacent frequency sam-ples correspond to no more than 5 s of chirp-time evolu-tion. Second, we impose a local chirp-time refinement: if τ (f ) denotes the time to merger at frequency f , we define ∆ τref (f ) = τ (f ) − τ (f + 1 Hz) and require the chirp-time separation between adjacent frequency sam-ples to be only 1% of this reference value. These re-finements are applied below 15 Hz, where the chirp time varies most rapidly and Earth-rotation effects accumu-late most strongly. In this sense, they play the same role as the enhancement factors introduced in Section III A. We adopted them to be deliberately conservative in the region known to be most sensitive to time-dependent ef-fects and ROQ accuracy degradation [24]. In practice, this corresponds roughly to an effective enhancement fac-tor of N ≈ 7. Table II lists the prior distributions and injection val-ues adopted in the analysis, together with the posterior median and corresponding 90% credible interval for each inferred parameter. Figures 5 and 6 show the marginalized posterior dis-tributions for the source parameters not displayed in the main text. These results complement the representative posteriors shown in Section IV D. 
+
+> Appendix F: Restricted-inference tests of the posterior shift
+
+In the zero-noise inference run presented in Section IV, one might expect the posterior density to be centered near the injected parameter values. In practice, the pos-terior distribution peak shifts slightly away from the in-jection, although the injected values remain inside the high-posterior-density region. To understand this behav-ior, we perform a sequence of restricted inference runs in which selected parameters are fixed to their injected values. We first progressively fix subsets of parameters to iden-tify which degrees of freedom are responsible for the shift. We find that when fixing the spin-orientation angles, ϕJL ,
+
+ϕ12 , θ1, θ2 and the spin magnitudes a1 and a2, the pos-terior recenters on the injection. To further isolate the effect, we compare two restricted runs. When sampling only α, δ, θJN , a1, a2 with tc fixed, the posterior remains close to the injection. When tc is added back to the sampled parameters, the displaced cor-related structure reappears. These runs indicate that the shift is driven by a combined degeneracy involving coales-cence time, sky position, inclination, and spin-dependent waveform effects. Representative examples are shown in Fig. 7. As an additional check, we evaluate the likelihood at both the injected parameters and the maximum-likelihood posterior sample. The maximum-likelihood point is only ∆ log L ≃ 0.2 below the injection point, indicating that the injection is not significantly favored. We therefore interpret the displaced peaks as a posterior-volume effect along this degeneracy, rather than as ROQ or sampler failure. This interpretation is physically plausible for a long-duration signal observed by a single detector. Changes in sky position affect the detector time delay and the Earth-rotation-induced antenna-pattern modulation; changes in tc alter the time and phase alignment; and changes in inclination and spin parameters can compensate the resulting waveform differences. These correlations create a high-likelihood ridge in which nearby parameter combi-nations produce nearly indistinguishable detector-frame signals. 14 
+
+TABLE I. Summary of the ROQ construction by frequency subband. The first column gives the frequency interval of each subband. The second column lists the enhancement factor N used in the adaptive-sampling prescription of Eq. 10. The third column gives the number of basis elements, Nbasis , required in that band. The fourth column shows the SNR accumulated within the corresponding subband. The fifth column reports the target relative accuracy assigned to that band. These target accuracies are computed assuming a total SNR of ρ = 2500, with the complexity of each subband taken to be proportional to the number of frequency bins in the corresponding full-frequency analysis. The sixth column reports the measured accuracy, quantified using the 95th-percentile criterion described in Section III C. The final row shows the corresponding totals over the full frequency range. For the ranges 5–10 Hz and 10–30 Hz, the standard enhancement-factor prescription was supplemented by the low-frequency refinement described in the text; the quoted values N ∼ 7 indicate the approximate effective enhancement corresponding to that modified sampling. Band [Hz] Enhancement factor N N basis Local SNR Target accuracy Measured accuracy ( r95 )5–10 ∼ 7 1936 331 2 × 10 −8 O(10 −10 )10–30 ∼ 7 3728 1564 5 × 10 −8 O(10 −10 )30–100 4 704 1227 8 × 10 −8 O(10 −10 )100–200 5 2640 474 6 × 10 −8 2.6 × 10 −8
+
+200–400 2 128 258 7 × 10 −8 O(10 −11 )400–600 2 96 101 5 × 10 −8 O(10 −13 )600–800 2 96 48 4 × 10 −8 O(10 −14 )800–1000 2 96 26 3 × 10 −8 O(10 −14 )1000–1200 2 112 15 3 × 10 −8 O(10 −15 )1200–1400 2 128 9 3 × 10 −8 O(10 −15 )1400–1600 2 144 6 2 × 10 −8 O(10 −16 )1600–1800 2 141 4 2 × 10 −8 O(10 −16 )1800–2048 2 155 2 2 × 10 −8 O(10 −16 )5–2048 - 10103 ∼ 2090 1.6 × 10 −7 ∼ 3 × 10 −8
+
+TABLE II. Prior distributions, injection values, and inferred 90% credible intervals for the single-detector high-SNR inference study. The parameters are the chirp mass Mc, mass ratio q, dimensionless spin magnitudes a1 and a2, spin tilt angles θ1
+
+and θ2, relative spin azimuth ϕ12 , azimuth of the total angular momentum relative to the orbital angular momentum ϕJL ,luminosity distance dL, declination δ, right ascension α, inclination angle θJN , polarization angle ψ, coalescence phase ϕc,tidal deformabilities Λ 1 and Λ 2, and geocenter coalescence time tc. Angular parameters are given in radians. For non-periodic parameters, the posterior summary is reported as the median together with the 90% credible interval. For periodic parameters, where the posterior may wrap around the boundary of the coordinate range, the result is instead written as an explicit bracketed interval [ a, b ], denoting the smallest 90% credible range on the circle. The UniformSourceFrame prior on dL is the source-frame distance prior implemented in Bilby , corresponding to a distribution uniform in source-frame comoving volume [33]. Parameter Prior Injection Posterior (90% CI) 
+
+Mc[M⊙] Uniform [1.1800, 1.1807] 1.18026510 1 .18026470 +0 .00000046 
+
+> −0.00000050
+
+q Uniform [0.5, 1.0] 0.9724 0.9725 +0 .0028 
+
+> −0.0027
+
+a1 Uniform [0.0, 0.05] 0.036 0.0416 +0 .0072 
+
+> −0.0122
+
+a2 Uniform [0.0, 0.05] 0.041 0.035 +0 .013 
+
+> −0.014
+
+θ1 Sine [0.0, 3.14] 1.98 2.07 +0 .50 
+
+> −0.30
+
+θ2 Sine [0.0, 3.14] 2.18 2.18 +0 .49 
+
+> −0.48
+
+ϕ12 Uniform [0.0, 6.3] 5.8 0.6 [4 .1, 3.4] 
+
+ϕJL Uniform [0.0, 6.3] 0.1 0.0 [6 .1, 0.2] 
+
+dL [Mpc] UniformSourceFrame [1.0, 1000.0] 20.0 20 .7+1 .7
+
+> −2.1
+
+δ Cosine [-1.571, 1.571] 0.173 0.232 +0 .061 
+
+> −0.064
+
+α Uniform [0.0, 6.283] 2.965 3.010 +0 .059 
+
+> −0.073
+
+θJN Sine [0.0, 3.142] 2.016 2.066 +0 .130 
+
+> −0.071
+
+ψ Uniform [0.0, 3.142] 1.678 0.20 [3 .13 , 1.76] 
+
+ϕc Uniform [0.0, 6.3] 2.8 0.4 [4 .3, 2.8] Λ1 Uniform [0.0, 1000.0] 483.2 460 +140 
+
+> −162
+
+Λ2 Uniform [0.0, 1000.0] 771.0 795 +178 
+
+> −154
+
+tc [s] Uniform [-0.1, 0.1] 0.0351 0.0363 +0 .0012 
+
+> −0.0012
+
+15 1.95 
+
+> 2.10
+> 2.25
+> 2.40
+> JN
+> 0.8
+> 1.6
+> 2.4
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> 1
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> 2
+> 2
+> 4
+> 6
+> 12
+> 0.0345
+> 0.0360
+> 0.0375
+> 0.0390
+
+tc [s] 
+
+> 2
+> 4
+> 6
+> JL
+> 1.95
+> 2.10
+> 2.25
+> 2.40
+> JN
+> 0.8
+> 1.6
+> 2.4
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> 1
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> 2
+> 2
+> 4
+> 6
+> 12
+> 2
+> 4
+> 6
+> JL
+
+FIG. 5. Marginalized posterior distributions for the source parameters omitted from the main text. The corner plot shows the time of coalescence tc as well as the angular parameters θ1, θ2, ϕ12 , ϕJL , θJN , and ψ. The solid orange lines indicate the injected values, while the dashed lines in the one-dimensional panels show the ±1σ credible interval around the posterior median. [1] D. Reitze et al. , Bulletin of the AAS 51 (2019). [2] M. Maggiore, C. V. D. Broeck, N. Bartolo, E. Belgacem, D. Bertacca, M. A. Bizouard, M. Branchesi, S. Clesse, S. Foffa, J. Garc´ ıa-Bellido, S. Grimm, J. Harms, T. Hin-derer, S. Matarrese, C. Palomba, M. Peloso, A. Riccia-rdone, and M. Sakellariadou, Journal of Cosmology and Astroparticle Physics 2020 (03), 050. [3] T. L. S. Collaboration, Classical and Quantum Gravity 
+
+32 , 074001 (2015). [4] F. Acernese et al. , Classical and Quantum Gravity 32 ,16 0.969 
+
+> 0.972
+> 0.975
+> 0.978
+> q
+> 0.015
+> 0.030
+> 0.045
+> a1
+> 0.015
+> 0.030
+> 0.045
+> a2
+> 300
+> 450
+> 600
+> 1
+> 4.0
+> 4.5
+> 5.0
+> 5.5
+
+[M ] 
+
+> ×10 6+1.18026
+> 600
+> 750
+> 900
+> 2
+> 0.969
+> 0.972
+> 0.975
+> 0.978
+
+q
+
+> 0.015
+> 0.030
+> 0.045
+
+a1
+
+> 0.015
+> 0.030
+> 0.045
+
+a2
+
+> 300
+> 450
+> 600
+> 1
+> 600
+> 750
+> 900
+> 2
+
+FIG. 6. Marginalized posterior distributions for the source parameters omitted from the main text. The corner plot shows the source-frame chirp mass M, mass ratio q, spin magnitudes a1 and a2, together with the tidal deformabilities Λ 1 and Λ 2.The solid orange lines indicate the injected values, while the dashed lines in the one-dimensional panels show the ±1σ credible interval around the posterior median. 024001 (2014). [5] T. Akutsu et al. , Progress of Theoreti-cal and Experimental Physics 2021 , 05A101 (2021), https://academic.oup.com/ptep/article-pdf/2021/5/05A101/37974994/ptaa125.pdf. [6] J. Veitch, V. Raymond, B. Farr, W. Farr, P. Graff, S. Vitale, B. Aylott, K. Blackburn, N. Christensen, M. Coughlin, W. Del Pozzo, F. Feroz, J. Gair, C.-J. Haster, V. Kalogera, T. Littenberg, I. Mandel, R. O’Shaughnessy, M. Pitkin, C. Rodriguez, C. R¨ over, T. Sidery, R. Smith, M. Van Der Sluys, A. Vecchio, W. Vousden, and L. Wade, Phys. Rev. D 91 , 042003 (2015). [7] Q. Hu and J. Veitch, Phys. Rev. D 112 , 084039 (2025). [8] S. E. Field, C. R. Galley, J. S. Hesthaven, J. Kaye, and M. Tiglio, Phys. Rev. X 4, 031006 (2014). [9] B. Zackay, L. Dai, and T. Venumadhav, Relative bin-ning and fast likelihood evaluation for gravitational wave parameter estimation (2018), arXiv:1806.08792 [astro-ph.IM]. [10] M. Dax, S. R. Green, J. Gair, J. H. Macke, A. Buonanno, and B. Sch¨ olkopf, Phys. Rev. Lett. 127 , 241103 (2021). [11] M. Dax, S. R. Green, J. Gair, N. Gupte, M. P¨ urrer, V. Raymond, J. Wildberger, J. H. Macke, A. Buo-nanno, and B. Sch¨ olkopf, Nature 639 , 49 (2025), arXiv:2407.09602 [gr-qc]. 17 2.925 
+
+> 2.950
+> 2.975
+> 3.000
+> 0.170
+> 0.172
+> 0.174
+> 0.170
+> 0.172
+> 0.174 2.925
+> 2.950
+> 2.975
+> 3.000
+> 0.12
+> 0.16
+> 0.20
+> 0.24
+> 0.12
+> 0.16
+> 0.20
+> 0.24
+
+FIG. 7. Restricted-inference tests for the shifted posterior peaks. Left: sky location posterior when sampling ( α, δ, θ JN , a 1, a 2)with tc fixed. Right: sky location posterior when tc is added to the sampled parameters. The injected values are marked by orange lines. The reappearance of the displaced sky posterior when tc is varied indicates a combined time–sky–inclination–spin degeneracy. [12] Q. Hu, J. Irwin, Q. Sun, C. Messenger, L. Suleiman, I. S. Heng, and J. Veitch, The Astrophysical Journal Letters 
+
+987 , L17 (2025). [13] S. Morisaki, Phys. Rev. D 104 , 044062 (2021). [14] N. J. Cornish, Phys. Rev. D 104 , 104054 (2021). [15] N. Sharma, A. Vijaykumar, and P. Kumar, Rapid in-ference of gravitational-wave signals in the time domain using a heterodyned likelihood (2026), arXiv:2601.11239 [gr-qc]. [16] K. Krishna, A. Vijaykumar, A. Ganguly, C. Tal-bot, S. Biscoveanu, R. N. George, N. Williams, and A. Zimmerman, arXiv e-prints , arXiv:2312.06009 (2023), arXiv:2312.06009 [gr-qc]. [17] K. W. K. Wong, M. Isi, and T. D. P. Edwards, The As-trophysical Journal 958 , 129 (2023). [18] T. Wouters, P. T. H. Pang, T. Dietrich, and C. Van Den Broeck, Phys. Rev. D 110 , 083033 (2024). [19] P. Baral, S. Morisaki, I. Gupta, and J. Creighton, Clas-sical and Quantum Gravity 42 , 215007 (2025). [20] P. Canizares, S. E. Field, J. Gair, V. Raymond, R. Smith, and M. Tiglio, Phys. Rev. Lett. 114 , 071104 (2015). [21] S. Morisaki, R. Smith, L. Tsukada, S. Sachdev, S. Steven-son, C. Talbot, and A. Zimmerman, Phys. Rev. D 108 ,123040 (2023). [22] R. Smith, S. E. Field, K. Blackburn, C.-J. Haster, M. P¨ urrer, V. Raymond, and P. Schmidt, Phys. Rev. D 
+
+94 , 044031 (2016). [23] R. Smith, S. Borhanian, B. Sathyaprakash, F. Hernan-dez Vivanco, S. E. Field, P. Lasky, I. Mandel, S. Morisaki, D. Ottaway, B. J. J. Slagmolen, E. Thrane, D. T¨ oyr¨ a, and S. Vitale, Phys. Rev. Lett. 127 , 081102 (2021). [24] A. M. Baker, P. D. Lasky, E. Thrane, and J. Golomb, Physical Review D 112 , 102004 (2025). [25] A. Virtuoso and E. Milotti, Phys. Rev. D 111 , 064058 (2025). [26] M. Rakhmanov, J. D. Romano, and J. T. Whelan, Clas-sical and Quantum Gravity 25 , 184017 (2008). [27] R. Essick, S. Vitale, and M. Evans, Phys. Rev. D 96 ,084004 (2017). [28] S. E. Field, C. R. Galley, F. Herrmann, J. S. Hesthaven, E. Ochsner, and M. Tiglio, Phys. Rev. Lett. 106 , 221102 (2011). [29] M. Tiglio and A. Villanueva, Living Reviews in Relativity 
+
+25 , 2 (2022). [30] E. Thrane and C. Talbot, Publications of the Astronom-ical Society of Australia 36 , e010 (2019). [31] A. M. Baker, gwrombus: Gravitational-wave reduced-order modeling and quadrature tools (2025), gitHub repository. [32] ADACS Australia, Rombus: Reduced-order modeling and quadrature framework (2023), gitHub repository. [33] G. Ashton, M. H¨ ubner, P. D. Lasky, C. Talbot, K. Ack-ley, S. Biscoveanu, Q. Chu, A. Divakarla, P. J. Easter, B. Goncharov, F. H. Vivanco, J. Harms, M. E. Lower, G. D. Meadors, D. Melchor, E. Payne, M. D. Pitkin, J. Powell, N. Sarin, R. J. E. Smith, and E. Thrane, The Astrophysical Journal Supplement Series 241 , 27 (2019). [34] I. M. Romero-Shaw, C. Talbot, S. Biscoveanu, V. D’Emilio, G. Ashton, C. P. L. Berry, S. Cough-lin, S. Galaudage, C. Hoy, M. H¨ ubner, K. S. Phukon, M. Pitkin, M. Rizzo, N. Sarin, R. Smith, S. Steven-son, A. Vajpeyi, M. Ar` ene, K. Athar, S. Banagiri, N. Bose, M. Carney, K. Chatziioannou, J. A. Clark, M. Colleoni, R. Cotesta, B. Edelman, H. Estell´ es, 18 
+
+C. Garc´ ıa-Quir´ os, A. Ghosh, R. Green, C.-J. Haster, S. Husa, D. Keitel, A. X. Kim, F. Hernandez-Vivanco, I. Maga˜ na Hernandez, C. Karathanasis, P. D. Lasky, N. De Lillo, M. E. Lower, D. Macleod, M. Mateu-Lucena, A. Miller, M. Millhouse, S. Morisaki, S. H. Oh, S. Ossokine, E. Payne, J. Powell, G. Pratten, M. P¨ urrer, A. Ramos-Buades, V. Raymond, E. Thrane, J. Veitch, D. Williams, M. J. Williams, and L. Xiao, Monthly Notices of the Royal Astronomical Society 499 ,3295 (2020), https://academic.oup.com/mnras/article-pdf/499/3/3295/34052625/staa2850.pdf. [35] L. Lindblom, B. J. Owen, and D. A. Brown, Phys. Rev. D 78 , 124020 (2008). [36] C. Messick, K. Blackburn, P. Brady, P. Brockill, K. Can-non, R. Cariou, S. Caudill, S. J. Chamberlin, J. D. E. Creighton, R. Everett, C. Hanna, D. Keppel, R. N. Lang, T. G. F. Li, D. Meacher, A. Nielsen, C. Pankow, S. Priv-itera, H. Qi, S. Sachdev, L. Sadeghian, L. Singer, E. G. Thomas, L. Wade, M. Wade, A. Weinstein, and K. Wies-ner, Phys. Rev. D 95 , 042001 (2017). [37] B. P. Abbott et al. , Classical and Quantum Gravity 34 ,044001 (2017). [38] T. Dietrich, A. Samajdar, S. Khan, N. K. Johnson-McDaniel, R. Dudi, and W. Tichy, Phys. Rev. D 100 ,044003 (2019). [39] M. Hannam, P. Schmidt, A. Boh´ e, L. Haegel, S. Husa, F. Ohme, G. Pratten, and M. P¨ urrer, Phys. Rev. Lett. 
+
+113 , 151101 (2014). [40] B. P. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), Phys. Rev. Lett. 119 , 161101 (2017). [41] S. De, D. Finstad, J. M. Lattimer, D. A. Brown, E. Berger, and C. M. Biwer, Phys. Rev. Lett. 121 , 091102 (2018). [42] C. Pankow, K. Chatziioannou, E. A. Chase, T. B. Litten-berg, M. Evans, J. McIver, N. J. Cornish, C.-J. Haster, J. Kanner, V. Raymond, S. Vitale, and A. Zimmerman, Phys. Rev. D 98 , 084016 (2018). [43] R. Abbott et al. (LIGO Scientific Collaboration, Virgo Collaboration, and KAGRA Collaboration), Phys. Rev. X 13 , 041039 (2023). [44] J. Skilling, in Bayesian Inference and Maximum Entropy Methods in Science and Engineering: 24th International Workshop on Bayesian Inference and Maximum Entropy Methods in Science and Engineering , American Institute of Physics Conference Series, Vol. 735, edited by R. Fis-cher, R. Preuss, and U. V. Toussaint (2004) pp. 395–405. [45] J. Skilling, Bayesian Analysis 1, 833 (2006). [46] J. S. Speagle, Monthly Notices of the Royal Astronomical Society 493 , 3132 (2020), https://academic.oup.com/mnras/article-pdf/493/3/3132/32890730/staa278.pdf. [47] R. J. E. Smith, G. Ashton, A. Vajpeyi, and C. Talbot, Monthly Notices of the Royal Astronomical Society 498 ,4492 (2020), https://academic.oup.com/mnras/article-pdf/498/3/4492/33798799/staa2483.pdf. [48] E. Payne, C. Talbot, and E. Thrane, Phys. Rev. D 100 ,123017 (2019). [49] B. D. Lackey, eosinference: Use neutron star obser-vations to measure the equation of state of nuclear matter, GitHub repository (2017), https://github.com/ benjaminlackey/eosinference .[50] B. D. Lackey and L. Wade, Phys. Rev. D 91 , 043002 (2015). [51] W. Zhao and L. Wen, Phys. Rev. D 97 , 064031 (2018). [52] P. Baral, S. Morisaki, I. M. n. Hernandez, and J. Creighton, Phys. Rev. D 108 , 043010 (2023). [53] M. Nicholl and I. Andreoni, Philosophical Trans-actions of the Royal Society A: Mathematical, Physical and Engineering Sciences 383 , 20240126 (2025), https://royalsocietypublishing.org/rsta/article-pdf/doi/10.1098/rsta.2024.0126/2818577/rsta.2024.0126.pdf. [54] B. P. Abbott et al. , Nature 551 , 85 (2017). [55] J. R. Gair, A. Ghosh, R. Gray, D. E. Holz, S. Mastrogio-vanni, S. Mukherjee, A. Palmese, N. Tamanini, T. Baker, F. Beirnaert, M. Bilicki, H.-Y. Chen, G. D´ alya, J. M. Ezquiaga, W. M. Farr, M. Fishbach, J. Garcia-Bellido, T. Ghosh, H.-Y. Huang, C. Karathanasis, K. Leyde, I. M. Hernandez, J. Noller, G. Pierra, P. Raffai, A. E. Romano, M. Seglar-Arroyo, D. A. Steer, C. Turski, M. P. Vaccaro, and S. A. Vallejo-Pe˜ na, The Astronomical Journal 166 ,22 (2023). [56] M. Kramer, I. H. Stairs, R. N. Manchester, N. Wex, A. T. Deller, W. A. Coles, M. Ali, M. Burgay, F. Camilo, I. Cognard, T. Damour, G. Desvignes, R. D. Ferdman, P. C. C. Freire, S. Grondin, L. Guillemot, G. B. Hobbs, G. Janssen, R. Karuppusamy, D. R. Lorimer, A. G. Lyne, J. W. McKee, M. McLaughlin, L. E. M¨ unch, B. B. P. Per-era, N. Pol, A. Possenti, J. Sarkissian, B. W. Stappers, and G. Theureau, Phys. Rev. X 11 , 041050 (2021). [57] K. Walker, R. Smith, E. Thrane, and D. J. Reardon, Phys. Rev. D 110 , 043013 (2024). [58] A. J. Dittmann, M. C. Miller, F. K. Lamb, I. M. Holt, C. Chirenti, M. T. Wolff, S. Bogdanov, S. Guillot, W. C. G. Ho, S. M. Morsink, Z. Arzoumanian, and K. C. Gendreau, The Astrophysical Journal 974 , 295 (2024). [59] C. Cutler and E. E. Flanagan, Phys. Rev. D 49 , 2658 (1994).

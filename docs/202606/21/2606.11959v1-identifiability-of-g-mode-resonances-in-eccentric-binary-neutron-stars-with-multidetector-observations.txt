@@ -1,0 +1,734 @@
+Title: Identifiability of g mode Resonances in Eccentric Binary Neutron Stars with Multidetector Observations
+
+URL Source: https://arxiv.org/pdf/2606.11959v1
+
+Published Time: Thu, 11 Jun 2026 01:07:25 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+# Identifiability of g mode Resonances in Eccentric Binary Neutron Stars with Multidetector Observations 
+
+Mengfei Sun, 1, 2 Jie Wu, 1, 2 Qianning Hu, 1, 2 Jin Li, 1, 2, 3, ∗ Nan Yang, 2, 4 
+
+Xianghe Ma, 1, 2 Borui Wang, 5 Minghui Zhang, 6 and Yuanhong Zhong 7, †
+
+> 1
+
+Department of Physics, Chongqing University, Chongqing 401331, P.R. China 
+
+> 2
+
+Chongqing Key Laboratory for Strongly Coupled Physics, Chongqing University, Chongqing 401331, P.R. China 
+
+> 3
+
+Institute of Advanced Interdisciplinary Studies, Chongqing University, Chongqing 401331, China 
+
+> 4
+
+Department of Electronical Information Science and Technology, Xingtai University, Xingtai 054001, P.R. China 
+
+> 5
+
+Department of Earth and Sciences, Southern University of Science and Technology, Shenzhen 518055, P.R. China 
+
+> 6
+
+Department of Physics, Southern University of Science and Technology, Shenzhen 518055, P.R. China 
+
+> 7
+
+School of Microelectronics and Communication Engineering, Chongqing University, Chongqing 401331, P.R. China 
+
+(Dated: June 11, 2026) 
+
+g mode resonances in eccentric binary neutron star systems are potential probes of internal strati-fication, superfluidity, composition gradients, and the equation of state. Although such weak dynam-ical tidal signatures are unlikely to be resolved with current detector sensitivities, third generation observations may make them accessible, in which case identifying the weak resonant phase shift would provide information beyond the bulk adiabatic tidal deformability. We build a four class dataset in an eccentric harmonic framework, containing point particle, adiabatic tide, resonant g
+
+mode, and pure noise samples, and use Einstein Telescope (ET) and Cosmic Explorer (CE) detector data to test whether this weak resonant phase signature can be identified from noisy time domain strain. The ET, CE, and ET+CE deep learning models reach accuracies of 0 .655, 0 .815, and 0 .897, respectively. On the same simulated samples, the matched filtering method reaches lower accuracies of 0 .514, 0 .677, and 0 .689. This result arises from the fact that the resonant correction manifests as a weak phase morphology difference superimposed on the adiabatic tidal background, whereas matched filtering is sensitive only to the overall similarity. Hence, in the presence of weak phase dif-ferences, the neural classifier employed in deep learning is better able to learn these local phase and morphology features from the complete time domain strain segment. The results indicate that joint third generation observations improve the identifiability of weak internal mode phase information. 
+
+I. INTRODUCTION 
+
+Binary neutron star (BNS) mergers provide a grav-itational wave (GW) probe of dense nuclear matter. GW170817 and its electromagnetic counterpart showed that BNS signals carry information about masses, dis-tances, and merger rates, and constrain neutron star radii and the equation of state (EoS) through tidal deformabil-ity [1–6]. The properties of strongly interacting matter above nuclear saturation density remain difficult to de-termine uniquely from microscopic theory, while neutron star interiors directly probe this regime. This motivates the question of whether GW waveforms can provide addi-tional probes of internal structure beyond the bulk tidal deformability. In waveform modeling, static and adia-batic tides mainly describe the global response of a neu-tron star to an external tidal field through the tidal Love number and the dimensionless tidal deformability [7–10]. Dynamical tides arise from resonant coupling between in-ternal modes and the orbital tidal field [11–13]. Among them, the f mode is mainly determined by bulk stellar properties such as mass and radius, whereas the g mode is a buoyancy driven gravity mode and is more sensitive to the density dependence of the lepton fraction, superfluid-  
+
+> ∗cqujinli1983@cqu.edu.cn
+> †zhongyh@cqu.edu.cn
+
+ity, crustal structure, and density discontinuities induced by strong first order phase transitions [14–19]. Identify-ing such modes in GW data would provide a channel for constraining the microphysics of neutron star interiors beyond static tidal parameters. The main observational challenge for the g mode is that its coupling to the external tidal field is weak. Com-pared with the dominant adiabatic tidal response, a mode resonance usually does not produce a strong amplitude variation in the waveform, but instead appears mainly as a weak phase shift. In realistic noisy data, this weak phase perturbation can be masked by the dominant tidal phase, uncertainties in the mass parameters, and noise fluctuations [20–22]. In eccentric orbits, the tidal driv-ing contains multiple orbital harmonics, which modifies the accumulation of the g mode resonant phase shift. Higher orbital harmonics can accumulate larger phase shifts at an earlier inspiral stage and bring these shifts into the more sensitive frequency bands of the detector. Eccentric binaries can also undergo multiple epicyclic res-onances, further increasing the total phase shift [23–25]. Thus, eccentricity is not only an additional complication in waveform modeling, but also a possible mechanism for enhancing otherwise weak internal mode information. Eccentric BNS events are expected to be rare, but their formation channels are theoretically well motivated. Iso-lated field binaries are usually close to circular by the time they enter the ground based detector band, whereas 
+
+> arXiv:2606.11959v1 [astro-ph.HE] 10 Jun 2026
+
+2dynamical interactions in dense clusters or hierarchical systems may allow binaries to retain measurable eccen-tricity [23, 26–30]. Searches for eccentric BNS signals and reanalyses of existing events have not yet produced a confirmed detection, but eccentricity measurements have become part of current data analysis practice. If residual eccentricity is ignored, tidal deformability and EoS infer-ence may suffer from systematic biases [31–35]. In this context, detecting weak g mode signatures in eccentric BNS signals is relevant to eccentric orbit formation, dy-namical tide modeling, and constraints on neutron star internal structure. Third generation GW detectors will improve the ob-servability of eccentric orbits and weak dynamical tidal effects. The Einstein Telescope (ET) and Cosmic Ex-plorer (CE) will substantially improve on current detec-tors in low frequency sensitivity, strain sensitivity, and detection range. These improvements will support stud-ies of eccentric orbits, multiharmonic structure, and weak dynamical tides over a broader parameter space [36–41]. A multidetector network can provide complementary sig-nal information and improve the overall signal to noise ratio. For weak phase effects such as g modes, it is there-fore necessary to test whether multidetector observations improve the identifiability of weak phase perturbations. Matched filtering and full Bayesian parameter estimation remain standard tools in GW data analysis. However, when eccentric orbits, dynamical tides, multiharmonic resonances, and detector noise are all present, waveform generation, parameter search, and online filtering become increasingly time consuming [42–44]. As third genera-tion detectors provide longer signal durations and higher event rates, computationally efficient data analysis meth-ods will become increasingly important. Deep learning has been applied to real time GW detection, signal classi-fication, parameter estimation, waveform reconstruction, and denoising, and can serve as a computationally effi-cient complement to matched filtering and Bayesian in-ference [45–53]. Building on recent studies of eccentric g mode reso-nances [23–25], we investigate the feasibility of identify-ing eccentric BNS g mode resonant phase shifts from an adiabatic tidal background under noisy observing condi-tions expected for third generation detectors. The cen-tral question is whether a deep learning classifier can not only distinguish signals from noise, but also separate adi-abatic tide (AT) and resonant g mode (AT+ g) samples when point particle (PP), AT, AT+ g, and pure noise (PN) samples are all present. We construct a dedicated dataset and a multidetector classification framework. We also build a matched filtering method from the train-ing split and evaluate it on the same fixed test samples. We first summarize the g mode resonant phase shift in the harmonic expansion of eccentric orbits, mapping the mode resonance effect from the orbital frequency level to different radiative harmonics. We then construct four class samples under ET, CE, and ET+CE observing con-figurations, and analyze identification performance as a function of physical parameters including mass, eccen-tricity, mode frequency, and tidal parameters. Finally, we use a 1D ResNet with historical state attention resid-ual blocks to evaluate the ability of single detector and dual detector observations to identify g mode resonant signals. The paper is organized as follows. Section II summa-rizes the theoretical framework for g mode resonances in eccentric orbits and the corresponding phase correction. Section III describes the ET/CE detector response, noise modeling, and strain construction. Section IV presents the dataset construction, parameter space, and sample construction. Section V details the matched filtering method, deep learning architecture, and training strat-egy. Section VI reports the classification results and ana-lyzes the dependence on physical conditions. Section VII summarizes the work and outlines future extensions.  
+
+> II. THEORETICAL FRAMEWORK
+
+This section summarizes the eccentric BNS g mode resonance phase prescription adopted in this work and specifies how it is used for waveform construction, dataset generation, and identification analysis.    
+
+> A. Eccentric orbit harmonics and gmode resonance
+
+Following Refs. [20–22, 25], we adopt an eccentric or-bit harmonic framework to describe the g mode reso-nant phase. In this construction, the resonant phase shift is first computed at the orbital frequency level and then mapped to the corresponding radiative harmonics. The calculation uses a Newtonian tidal orbital coupling model, retains only the quadrupolar tidal degrees of free-dom, and labels the modes by α = {n, l = 2 , m }, where 
+
+n denotes the radial mode order rather than a radiative harmonic index. Spin is neglected and the orbit is re-stricted to the orbital plane. The effective Lagrangian of the primary star can be written as [20–22, 25] 
+
+L =
+
+ 12 μ ˙r2 + 12 μr 2 ˙ϕ2 + mtot μr
+
+
+
+− X
+
+> α
+
+12 Qαij Eij 
+
++ X
+
+> α
+
+14λα 
+
+> 1
+
+ω2
+
+> α
+
+ ˙Qαij ˙Qαij − ω2
+
+> α
+
+Qαij Qαij 
+
+
+
+, (1) where mtot = m1 + m2, μ = m1m2/m tot , Qαij is the tidal quadrupole degree of freedom, Eij is the external tidal tensor, and λα 
+
+> 1
+
+and ωα describe the tidal deformability and eigenfrequency. Following the notation commonly used in GW tidal modeling, we use 
+
+kα = 2π
+
+2l + 1 ˜Q2
+
+> α
+
+˜ω2
+
+> α
+
+, kα = 32
+
+λα
+
+> 1
+
+R5 , (2) where ˜Qα and ˜ ωα are the dimensionless mode overlap and eigenfrequency in this normalization, and R is the 3stellar radius. We also use the dimensionless mode tidal parameter Λ α 
+
+> 1
+
+= λα 
+
+> 1
+
+/m 51. For the first order g mode con-sidered here, we denote the corresponding coupling by Λg , whose typical scale can lie between 10 −2 and 1. In the simulations below, we focus on a weak coupling por-tion of this range, taking Λ g from 0 .03 to 0 .30 to examine how the resonant phase amplitude affects identification performance [25]. The external tidal tensor is 
+
+Eij = −m2 ∂i∂j
+
+ 1
+
+r
+
+
+
+. (3) Expanding it in a spherical tensor basis gives Qα =P 
+
+> m
+
+QαmY 2m and E = P 
+
+> m
+
+EmY 2m. The corresponding mode amplitude satisfies ¨Qαm + 2 γα ˙Qαm + ω2
+
+> α
+
+Qαm = −λα 
+
+> 1
+
+ω2
+
+> α
+
+Em. (4) For g modes, viscous damping and radiation reaction are typically much weaker than the orbital radiation driving, so we take γα ≃ 0 at leading order. The key feature of an eccentric orbit is that the driving term naturally contains multiple orbital harmonics. Its Fourier expansion can be written as 
+
+−λα 
+
+> 1
+
+ω2
+
+> α
+
+Em(t) = Cmλα 
+
+> 1
+
+ω2
+
+> α
+
+m2
+
+a3
+
+> ∞
+
+X
+
+> ℓ=−∞
+
+X−3,−m 
+
+> −ℓ
+
+e−iℓ Φ, (5) where a is the semimajor axis, Φ is the mean anomaly, 
+
+Cm is the geometric coefficient for the m component, and Xk,m ℓ (e) is the Hansen coefficient. The resonance condition 
+
+ℓr Ω = sgn( m) ωα (6) shows that the same eccentric system can trigger mode resonances at multiple harmonics. In the following for-mulas we take the positive resonant harmonics ℓr > 0, corresponding to the m = 2 component; the m = −2contribution has the same amplitude and is included by symmetry. Thus, in an eccentric waveform, the g mode contributes phase perturbations distributed across the harmonic structure. Within the stationary phase approximation, the cor-responding single resonance mode amplitude and ex-changed energy are approximately 
+
+|qαm| ≈ Cmλα 
+
+> 1
+
+ωαm2
+
+2a3 X−3,|m|
+
+> ℓr
+
+s
+
+2π
+
+|ℓr | ˙Ωr
+
+, (7) ∆E ≈ 9πλ α 
+
+> 1
+
+ω2
+
+> α
+
+m22
+
+8ℓr ˙Ωr a6
+
+
+
+X−3,2
+
+> ℓr
+
+2
+
+. (8) The associated single resonance phase shift is related to the energy perturbation by ∆Φ ≈ − 3Ω 2∆E
+
+2 ˙Ω|Eorb | . (9) Using the eccentricity dependent Peters factor 
+
+F(e) = 
+
+
+
+1 + 73 24 e2 + 37 96 e4
+
+
+
+(1 − e2)−7/2, (10) and the mass ratio q = m2/m 1, this can be written as ∆Φ 1 ≈ − 75 π
+
+8192 
+
+ℓr Λα
+
+> 1
+
+q(q + 1) 
+
+" X−3,2
+
+> ℓr
+
+F(er )
+
+#2
+
+. (11) Here Eorb is the orbital binding energy, and the subscript 
+
+r denotes quantities evaluated at resonance, such as er
+
+and Ω r . For the two neutron stars, we compute the phase shifts separately using their masses, mass ratio, and tidal parameters, and then sum the two contributions. In the equal mass limit, this reduces to the direct sum of the two stellar contributions [25]. This expression shows that the visibility of the resonance effect is controlled not only by the coupling strength Λ g , but also by the harmonic weights determined by eccentricity, the orbital evolution rate at resonance, and the mass ratio structure. Only harmonic resonances satisfying the coherence condition can contribute an identifiable phase shift to the waveform, 
+
+δN r = Ωr
+
+2π δt r ≳ 1, δt r =
+
+s
+
+2πℓr ˙Ωr
+
+. (12) Otherwise, the resonance is averaged out by rapid fre-quency sweeping and cannot accumulate a stable phase shift. Summing all coherent resonance terms gives the total orbital frequency level phase correction, ∆Φ tot = X 
+
+> δN r>1
+
+∆Φ 1(ℓr , e r ). (13)  
+
+> B. Resonant phase shift and multiharmonic phase correction
+
+Because the phase correction is applied to frequency domain waveforms, we use its frequency domain repre-sentation. Under the stationary phase approximation, ∆Ψ( F ) = 2 πF ∆t(F ) − ∆Φ( F ), (14) where ∆ t(F ) is the time delay for the perturbed system to reach orbital frequency F . For a single resonance, ∆t1 = ∆Φ 1/Ωr , giving ∆Ψ tot (F ) = X 
+
+> δN r>1
+
+
+
+1 − FFr
+
+
+
+∆Φ 1 Θ( Fr − F ). (15) Here Fr is the orbital frequency at resonance, and Θ is the Heaviside step function. We then map the orbital level correction to each radiative harmonic as ∆ψℓ(f ) = ℓ ∆Ψ 
+
+ fℓ
+
+
+
+. (16) 4In the waveform construction, the resonant phase is eval-uated at the orbital frequency level and then assigned to the corresponding radiative harmonic. This preserves the multiharmonic structure of eccentric systems, keeps the phase correction tied to its g mode resonance origin, and provides the basis for the synthetic dataset used below.  
+
+> III. DETECTOR CONFIGURATION AND NOISE MODELING
+
+This section describes the detector responses of ET and CE, the noise modeling procedure, and the construction of noisy strain data at the detector level.  
+
+> A. Detector response functions
+
+Given the source frame polarization waveforms, the signal must be projected onto a specified detector config-uration. For each detector I ∈ { ET , CE }, the frequency domain signal response is ˜hdet  
+
+> I
+
+(f ) = F I
+
+> +
+
+(α, δ, ψ ) ˜h+(f ) + F I
+
+> ×
+
+(α, δ, ψ ) ˜h×(f ), (17) where F I 
+
+> +
+
+and F I 
+
+> ×
+
+are antenna pattern functions, and (α, δ, ψ ) denote right ascension, declination, and polariza-tion angle. Sky position, inclination, polarization angle, and coalescence phase are randomized so that the data marginalize over source geometry and do not encode class labels through a fixed geometric configuration. The ET and CE response functions and target sensi-tivity curves are based on the ET design sensitivity study [37] and the CE next generation ground based detector design [41]. In the simulations, the corresponding F I
+
+> +
+
+,
+
+F I
+
+> ×
+
+, and Sn,I (f ) enter the detector projection and col-ored noise generation.  
+
+> B. Noise modeling and strain construction
+
+For each detector, a colored Gaussian noise realization 
+
+nI (t) is generated with PyCBC from the one sided de-tector power spectral density (PSD) Sn,I (f ) [54]. The ET and CE PSDs are taken from their corresponding design sensitivity curves [37, 41], so that the simulated noise reflects the instrumental noise properties in each frequency band. After the projected detector response is transformed to the time domain, the noisy detector strain is written as dI (t) = hdet  
+
+> I
+
+(t) + nI (t). The noisy time domain strain from each detector is used as one input channel. Using the training samples, we compute a normalization at each time sample for each detector channel, 
+
+xI (t) = dI (t) − μI (t)
+
+σI (t) + ε , (18) where μI (t) and σI (t) are computed from the stacked training samples at the corresponding time sample, and 
+
+ε is a small constant preventing division by zero. The dual detector input consists of ET and CE time domain sequences of length 4096, while the single detector exper-iments use a single channel of the same length, ensuring comparability across configurations.  
+
+> IV. DATASET CONSTRUCTION AND SIMULATION SETUP
+
+This section presents the parameter space, waveform construction procedure, and four class sample construc-tion used in the simulations.  
+
+> A. Parameter space and waveform generation pipeline
+
+The synthetic BNS data are specified by the intrinsic physical parameter vector 
+
+θ = ( m1, m 2, Λtide ,1, Λtide ,2, e 10Hz , f g , Λg ) . (19) The parameter ranges are listed in Table I, and the dataset and input settings are summarized in Table II. We also record the redshift z and the corresponding lumi-nosity distance DL, and randomly sample sky position, inclination, polarization angle, and coalescence phase to construct the detector projected noisy strain data. The BNS redshift distribution is sampled from the probability density [46, 55] 
+
+ρ(z) ∼ 4πd 2 
+
+> C
+
+(z)R(z)
+
+H(z)(1 + z) , (20) where the comoving distance is 
+
+dC (z) = 
+
+Z z
+
+> 0
+
+1
+
+H (z′) dz ′. (21) The luminosity distance is DL = dC (1 + z). The range 
+
+z ∈ [0 , 2] is chosen to cover cosmological BNS events expected to be accessible to third generation detector networks while keeping the simulated classification set within the redshift range considered in this work. The source evolution rate is [56–58] 
+
+R(z) = 
+
+
+
+1 + 2 z, z ≤ 1, 
+
+> 34
+
+(5 − z), 1 < z < 5,
+
+0, z ≥ 5.
+
+(22) Figure 1 compares the sampled redshift distribution with the normalized theoretical probability density from Eq. (20), showing that the sampling is consistent with the target distribution. The waveform generation pipeline proceeds as follows. First, an eccentric BNS waveform without resonant g5
+
+FIG. 1: BNS redshift distribution. The histogram shows the sampled redshifts, and the solid curve shows the normalized probability density corresponding to Eq. (20). TABLE I: Physical parameter space.                                                     
+
+> Parameter Symbol Range/value Component mass m1U(1 .2,2.0) M⊙
+> Component mass m2U(1 .2,2.0) M⊙
+> Tidal parameter Λtide ,1U(100 ,1000) Tidal parameter Λtide ,2U(100 ,1000) Eccentricity at 10 Hz e10Hz U(0 ,0.5)
+> gmode frequency fgfrom 50 to 300 Hz, step 25 Hz
+> gmode coupling Λg0.03, 0 .05, 0 .07, 0 .10 0.15, 0 .20, 0 .30 Redshift zEq. (20), z∈[0 ,2] Luminosity distance DLfrom z(Eq. (20)) Right ascension αU(0 ,2π)Declination δsin δ∼ U (−1,1) Inclination ιcos ι∼ U (−1,1) Polarization ψU(0 , π )Phase ϕcU(0 ,2π)
+
+mode phase corrections is generated from the component masses, eccentricity, and dominant tidal parameters [59], yielding the time domain polarizations h+(t) and h×(t). The waveform is generated from an initial GW frequency of 20 Hz, and the network input is the final 2 s premerger segment of the generated waveform. With a sampling rate of 2048 Hz, each input contains 4096 time samples. Here e10Hz labels the binary eccentricity at the 10 Hz ref-erence frequency. The waveform is then transformed to the frequency domain, where the resonance conditions, Hansen coeffi-cients, coherence indicators, and single resonance phase shifts are computed for each harmonic. Coherent terms TABLE II: Dataset composition and input settings.             
+
+> Item Setting Classes PP, AT, AT+ g, PN Samples per class 5×10 4
+> Total samples per task 2×10 5
+> Detector configurations ET, CE, ET+CE Sampling rate 2048 Hz Time window 2 s Radiation harmonics ℓ= 1–40
+
+are summed to obtain the orbital frequency phase cor-rection ∆Ψ( F ). Finally, using the harmonic mapping described above, this correction is mapped harmonic by harmonic back to radiative frequency to construct the frequency domain waveform containing the g mode res-onance. The corrected frequency domain waveform is inverse transformed to the time domain before detector noise is added, so the machine learning input is the noisy time domain strain after the frequency domain resonant phase correction has been applied. We select one sample from the noiseless dataset as a reference event to illustrate how the resonant phase cor-rection affects the waveform morphology. The compo-nent masses of this event are m1 = 1 .786 M⊙ and m2 =1.214 M⊙, the tidal deformabilities are Λ tide ,1 = 925 .99 and Λ tide ,2 = 763 .94, and the eccentricity at 10 Hz is 
+
+e10Hz = 0 .253. The g mode parameters used for the res-onant phase correction are fg = 200 Hz and Λ g = 0 .30, with redshift z = 0 .366 and luminosity distance DL =1953 .61 Mpc. We then vary fg and Λ g separately, while keeping the other parameters fixed, and compute normal-ized residuals of the noiseless frequency domain waveform relative to the reference waveform. Figure 2a shows that changing fg shifts and redistributes the main frequency domain contribution of the resonant perturbation. Fig-ure 2b shows that increasing Λ g increases the relative difference between the corrected waveform and the ref-erence waveform for the same event. Figure 2c further compares the normalized difference between the AT+ g
+
+and AT waveforms for the same reference event, show-ing that the resonant g mode contribution mainly ap-pears as a weak frequency domain perturbation from low frequencies to several hundred Hz. Figure 3 shows the corresponding time domain waveforms used as network inputs before detector noise is added. Together these fig-ures connect the frequency domain phase correction to the time domain strain supplied to the classifier. 
+
+B. Sample classes and identification task 
+
+We define four sample classes according to their phys-ical content. The PP class denotes eccentric BNS sig-nals without tidal corrections. The AT class adds the dominant adiabatic tidal term on top of PP but does not include a g mode resonance. The AT+ g class fur-ther adds the resonant phase correction obtained from the multiharmonic phase correction on top of the adia-batic tidal background. The PN class contains only col-ored noise matched to the detector PSD and does not include a GW signal. With these definitions, the iden-tification problem tests whether noisy data can separate pure noise, nontidal signals, adiabatic tidal backgrounds, and weak resonant phase shifts. The AT+ g class there-fore represents a resonant phase perturbation embedded in an adiabatic tidal background. In addition to the four class assignments, we store physical parameters such as 
+
+e10Hz , Λ g , and fg , which are later used to analyze how 6  
+
+> (a) Varying fg
+> (b) Varying Λ g
+> (c) AT+ grelative to AT
+
+FIG. 2: Normalized frequency domain residuals under noiseless conditions. Panels (a) and (b) show the waveform with a resonant g mode phase correction relative to the reference waveform when fg and Λ g are varied, respectively. Panel (c) shows the normalized frequency domain difference between the AT+ g and AT waveforms for the reference event. identification performance varies with these parameters. Figure 4 summarizes the full pipeline from parameter sampling, waveform generation, and resonant phase cor-rection to detector projection, noise addition, and sample construction.  
+
+> V. MATCHED FILTERING AND DEEP LEARNING
+
+This section describes the matched filtering method, the deep learning classifier, and the training and evalu-ation procedure used to test the identifiability of weak 
+
+FIG. 3: Time domain reference waveforms for the same sample used in Fig. 2. The curves show how the frequency domain resonant phase correction is transformed back to the time domain before detector noise is added and before the strain is supplied to the classifier. resonant phase shifts in noisy time domain strain.  
+
+> A. Matched filtering
+
+We use the standard noise weighted inner product for detector I [42], (a|b)I = 4 Re 
+
+Z fmax 
+
+> fmin
+
+˜aI (f )˜b∗ 
+
+> I
+
+(f )
+
+Sn,I (f ) df, (23) where Sn,I (f ) is the one sided detector PSD, and the in-tegral is evaluated over the analysis frequency band used for the waveform comparison. For a detector configura-tion q, with detector set Iq , the network inner product is (a|b)q = X
+
+> I∈I q
+
+(aI |bI )I . (24) Let c ∈ { PP , AT , AT + g} denote the three signal con-taining classes. The template bank for class c is 
+
+B(q) 
+
+> c
+
+=
+
+n
+
+h(q)
+
+> c,k
+
+(θk)
+
+oNc
+
+> k=1
+
+, c ∈ { PP , AT , AT + g}, (25) where Nc is the number of templates for class c. The templates are noiseless waveforms drawn from the same simulated database, excluding the fixed evaluation sam-ples, and θk denotes the source parameters of the kth template. For a noisy strain segment d(q), the matched filter (MF) output for template h(q) 
+
+> c,k
+
+is the noise weighted correlation normalized by the template norm, 
+
+ρ(q)MF ,c,k (d) = 
+
+
+
+d(q)|h(q)
+
+> c,k
+
+
+
+> q
+
+r
+
+h(q)
+
+> c,k
+
+|h(q)
+
+> c,k
+
+
+
+> q
+
+. (26) 7                   
+
+> Parameter sampling
+> mi,Λtide , e 10Hz
+> fg,Λg, z, D L
+> Eccentric BNS waveform
+> ℓ=1–40
+> h+, h ×
+> gmode resonance Hansen coefficients
+> ℓr>0, ℓ rΩ = ωα
+> Multiharmonic phase correction
+> δN r≳1∆ψℓ(f)
+> Detector projection PSD matched noise standardization
+> PP no tides
+> AT adiabatic tide
+> AT+ g
+> resonant phase correction
+> PN pure noise
+> Four class dataset 5×10 4/class ET, CE, ET+CE
+> Four classes
+> Auxiliary quantities: resonance harmonics, residuals, e10Hz ,fg, Λ g
+
+FIG. 4: Data generation pipeline. The procedure starts from physical parameters, source geometry, and distance information to generate an eccentric BNS reference waveform. Coherent g mode resonances are then selected in the eccentric orbit harmonic framework and represented as resonant phase corrections. The physical classes are projected onto ET/CE detectors, PSD matched colored Gaussian noise is added, and standardized PP, AT, AT+ g,and PN samples are obtained. Auxiliary quantities are stored for the conditional analysis. For the four class assignment we use the corresponding normalized match, 
+
+M (q) 
+
+> c,k
+
+=
+
+
+
+d(q)|h(q)
+
+> c,k
+
+
+
+> q
+
+r d(q)|d(q)
+
+> q
+
+
+
+h(q)
+
+> c,k
+
+|h(q)
+
+> c,k
+
+
+
+> q
+
+. (27) The normalization by p(d(q)|d(q))q does not change the ordering of templates for a fixed data segment, but makes the statistic a dimensionless match. The comparison is performed on the same final premerger time window used throughout the analysis, so the statistic measures wave-form consistency within this fixed segment rather than carrying out a full search over arrival time. For each physical signal family, we retain the largest match over its template bank, 
+
+ρ(q) 
+
+> c
+
+(d) = max  
+
+> h(q)
+> c,k ∈B (q)
+> c
+
+M (q) 
+
+> c,k
+
+, (28) 
+
+ρ(q)max (d) = max  
+
+> c∈{ PP ,AT ,AT+ g}
+
+ρ(q) 
+
+> c
+
+(d). (29) The PN class has no signal template. We therefore determine a threshold τ (q) from a separate subset disjoint from both the template bank and the evaluation set by maximizing the macro averaged F1 on that subset. The four class prediction rule is ˆy(d(q)) = 
+
+
+
+PN , ρ(q)max (d) < τ (q),
+
+arg max  
+
+> c∈{ PP ,AT ,AT+ g}
+
+ρ(q) 
+
+> c
+
+(d), ρ(q)max (d) ≥ τ (q).
+
+(30) Thus the procedure first tests whether the strain is con-sistent with any signal template and then assigns the most strongly matched signal class. We report the matched filtering results on the same fixed evaluation samples used for the neural network models. 
+
+B. Network architecture 
+
+Using the four sample classes defined above, we train classifiers to distinguish PP, AT, AT+ g, and PN sam-ples from noisy time domain strain. Two configurations are considered: a single detector model for ET or CE observations, and a dual detector model for ET+CE ob-servations. Both configurations share the same type of 1D convolutional encoder. The historical state attention residual module is used to combine local convolutional features with information from earlier representation lev-els. This choice is motivated by the weak and distributed phase perturbation produced by eccentric BNS g mode resonances. Figure 5 shows the single detector and dual detector architectures used in this work. For the single detector model, the input time series first passes through an initial convolution, normalization, and ReLU activation layer to produce the initial feature H(0) .The network then stacks several historical state attention residual blocks. In block l, two convolutional layers first produce the current feature ˜H(l). All previous historical states and the current feature are then jointly passed into the attention residual module for weighted fusion, ˜H(l) = R(l) H(l−1) , (31) 
+
+H(l) = ϕ
+
+> l
+
+X
+
+> i=0
+
+α(l) 
+
+> i
+
+V(l)
+
+> i
+
+!
+
+. (32) Here R(l) denotes the local feature transforma-tion formed by two 1D convolutional layers, 
+
+V(l) 
+
+> i
+
+∈ {H(0) , H(1) , . . . , H(l−1) , ˜H(l)} denotes the historical states and current feature participating in fusion, α(l) 
+
+> i
+
+is the attention weight, and ϕ(·) is the point-wise ReLU activation. Each state is first summarized by global average pooling and then passed through RMSNorm, a shared linear mapping, and softmax to obtain α(l) 
+
+> i
+
+. The encoder output is then passed through global average pooling and a hidden fully connected layer, followed by a softmax output over the four classes. 8In the dual detector mode, ET and CE are processed by two parallel encoder branches. The two branches use isomorphic historical state attention residual encoders, but retain their detector specific feature statistics before fusion, allowing the model to adapt to different detec-tor noise spectra and response functions. Each branch outputs a global feature vector, and the two vectors are concatenated in feature space and passed through a fully connected layer to produce the joint prediction. Cross detector information exchange therefore occurs af-ter branch level feature aggregation. This late fusion structure treats ET and CE responses separately before combining their global representations, enabling a direct comparison with the corresponding single detector cases.  
+
+> C. Training strategy
+
+For training, the four classes are concatenated and split by stratified random sampling, with a training to valida-tion ratio of 9 : 1. The models are optimized using an adaptive gradient method with an initial learning rate of 10 −4. Single detector models are trained for at most 200 epochs with a batch size of 32, while the ET+CE joint model is trained for at most 200 epochs with a batch size of 16. The learning rate is adjusted according to the validation loss, and early stopping is applied when per-formance no longer improves to reduce overfitting. Model training and inference are performed using an NVIDIA A800 80G GPU and two Intel(R) Xeon(R) Silver 8480 CPUs. The fixed evaluation set and performance met-rics are specified in Sec. VI.  
+
+> VI. RESULTS AND ANALYSIS
+
+This section examines the identifiability of the four simulated classes under different detector configurations and then analyzes how the recovery of AT+ g depends on physical parameters. In the four class task, PN serves mainly as a noise control, while the AT/AT+ g confusion directly probes the separability of an additional resonant phase shift on top of the adiabatic tidal background. The analysis therefore reports both global classification met-rics and diagnostics tied to the AT/AT+ g boundary. All neural network models and the matched filtering method are evaluated on the same fixed set of 10 4 sam-ples. Overall performance is quantified using Accuracy and Average F1. Class level behavior is described by Precision, Recall, and F1 computed from the multiclass confusion matrix, with particular attention to the Re-call of AT+ g because it measures the recovery of weak resonant phase samples. Score level separability is eval-uated using receiver operating characteristic area under the curve (ROC AUC) and precision recall area under the curve (PR AUC); micro averaged values summarize the four class output, while class level curves are used to examine the separability of individual classes. Using the same evaluation samples allows the overall metrics, class level metrics, conditional statistics, and matched filtering results to be directly compared. To connect the identification performance with the un-derlying physical parameters, we further compute con-ditional statistics in bins of e10Hz , Λ g , and fg . These parameters respectively affect the eccentric harmonic weights, the resonant coupling strength, and the fre-quency range in which the resonant phase perturbation enters the detector sensitive band.  
+
+> A. Overall Identifiability Across Detector Configurations
+
+Figure 6 shows the overall performance for ET, CE, and ET+CE configurations, including the matched filter-ing results evaluated on the same samples, and Table III lists class level Precision, Recall, and F1. For the ET sin-gle detector model, Accuracy is 0 .655 and Average F1 is 0.572. The CE single detector model gives an Accuracy of 0 .815 and an Average F1 of 0 .812. The dual detector model reaches an Accuracy of 0 .897 and an Average F1
+
+of 0 .897. The corresponding matched filtering accura-cies are 0 .514, 0 .677, and 0 .689, respectively. Under this fixed evaluation setup, the ET+CE configuration gives the highest overall performance, and the neural network classifiers yield higher Accuracy and AT+ g Recall than the maximum match method. The matched filtering method has lower overall Accu-racy and lower AT+ g Recall under all detector config-urations. Its AT+ g Recall remains close to 0 .43, while the neural network values are 0 .959, 0 .926, and 0 .949 for ET, CE, and ET+CE. This behavior is consistent with the weak nature of the resonant phase perturbation: once the signal is detected, the difficult part is whether a small 
+
+g mode phase correction can be separated from the adia-batic tidal background and source parameter variations. At the class level, the PN class in the ET+CE model reaches Precision, Recall, and F1 values of 1 .000, indi-cating no appreciable confusion between pure noise and samples containing GW signals under the present colored Gaussian noise simulation and fixed evaluation set. In the joint model, the F1 scores are 0 .892 for PP, 0 .795 for AT, and 0 .902 for AT+ g. Compared with single detector models, the joint model improves the balance among sig-nal containing classes and the overall separability. The remaining difficulty is concentrated near the AT/AT+ g
+
+boundary. Figure 7 shows the confusion matrices for the three de-tector configurations, comparing the deep learning classi-fiers with the matched filtering method. Consistent with Table III, the ET single detector model has limited re-covery of the AT class and tends to assign part of the dominant tide samples to AT+ g. CE and ET+CE re-duce this effect and improve the mutual discrimination among PP, AT, and AT+ g. The dominant misclassifi-cation directions remain concentrated at the AT/AT+ g9
+
+> (a) Single detector attention residual 1D convolutional neural network.
+> (b) Dual detector joint attention residual 1D convolutional neural network.
+
+FIG. 5: Network architecture used in this work. Panel (a) shows the single detector version, whose backbone consists of an initial convolutional feature extractor, historical state attention residual blocks, global average pooling, and a fully connected output layer. Panel (b) shows the dual detector version, where ET and CE are encoded by isomorphic branches and then jointly classified after feature vector concatenation. boundary, because the two classes share the same BNS tidal background and differ mainly by the weak resonant phase shift added on top of the adiabatic tidal phase. For the deep learning models, PN is rarely confused with signal containing classes; the matched filtering method shows the same behavior mainly for CE and ET+CE, while the ET matched filtering result has a larger PN leakage. PP and tidal classes still show misclas-sification, but the main difficulty is concentrated between AT and AT+ g. The reduction of AT/AT+ g confusion in 10 
+
+FIG. 6: Overall performance for ET, CE, and ET+CE configurations. Solid curves show the deep learning classifiers, and dashed curves show the matched filtering results evaluated on the same samples. The metrics include Accuracy, Average F1, micro ROC AUC, and micro PR AUC. the ET+CE case is the main reason for using AT+ g Re-call, AT+ g PR AUC, and the two directions AT+ g →AT and AT →AT+ g as diagnostics below. In addition to confusion matrices, ROC curves char-acterize score level separability of the neural network outputs. Figure 8 gives the average ROC results, and Fig. 9 shows the ROC curves and class wise separability for the four classes. The micro ROC AUC and micro PR AUC of ET+CE reach 0 .990 and 0 .970, respectively, both higher than those of ET and CE alone. At the class level, PN outputs are stable and PP also improves under ET+CE compared with single detector configurations. The AT and AT+ g curves remain closer to the core of the problem, so the analysis also examines AT+ g Re-call, PR AUC, and the main AT/AT+ g misclassification directions. The error distribution of the AT+ g class identifies the main source of class confusion. The ET single detector model gives an AT+ g Recall of 0 .959, but its AT Recall is zero, indicating that many dominant tide samples are assigned to AT+ g. The CE model gives Accuracy and Average F1 values of 0 .815 and 0 .812, respectively, with AT+ g Recall of 0 .926, and reduces the AT misclassifica-tion seen in the ET case. The ET+CE model gives the highest Accuracy and Average F1, both close to 0 .897, with AT+ g Recall of 0 .949, indicating improved global classification and AT/AT+ g separation in the joint con-figuration. This behavior is consistent with the physical nature of the g mode resonance. The g mode mainly leaves dis-tributed perturbations in the frequency domain phase through the multiharmonic structure of eccentric or-bits. If the adiabatic tidal phase, mass parameter vari-ation, and noise fluctuations produce similar waveform responses in some regions, AT and AT+ g can be con-fused. These trends motivate the use of AT+ g Recall, PR AUC, and the two AT/AT+ g misclassification direc-TABLE III: Overall identification performance of the ET, CE, and ET+CE models, with matched filtering rows evaluated on the same samples. Here MF and DL denote matched filtering and deep learning, respectively. Method Class Prec. Rec. F1
+
+MF ET PP 0.727 0.539 0.619 AT 0.316 0.304 0.310 AT+ g 0.480 0.423 0.450 PN 0.558 0.795 0.656 Average 0.520 0.515 0.509 Accuracy 0.514 CE PP 0.915 0.869 0.892 AT 0.436 0.444 0.440 AT+ g 0.469 0.433 0.450 PN 0.867 0.963 0.913 Average 0.672 0.677 0.674 Accuracy 0.677 ET+CE PP 0.923 0.899 0.911 AT 0.441 0.450 0.445 AT+ g 0.463 0.429 0.445 PN 0.908 0.979 0.942 Average 0.684 0.689 0.686 Accuracy 0.689 DL ET PP 0.469 0.710 0.565 AT 0.000 0.000 0.000 AT+ g 0.661 0.959 0.782 PN 0.923 0.959 0.941 Average 0.513 0.657 0.572 Accuracy 0.655 CE PP 0.718 0.773 0.744 AT 0.696 0.568 0.626 AT+ g 0.836 0.926 0.879 PN 0.998 1.000 0.999 Average 0.812 0.817 0.812 Accuracy 0.815 ET+CE PP 0.921 0.866 0.892 AT 0.814 0.777 0.795 AT+ g 0.858 0.949 0.902 PN 1.000 1.000 1.000 Average 0.898 0.898 0.897 Accuracy 0.897 tions as diagnostics of weak phase identifiability in the conditional analysis below.  
+
+> B. Dependence on physical conditions
+
+We evaluate the trained classifiers in bins of e10Hz , Λ g ,and fg , using AT+ g Precision, Recall, PR AUC, and the fraction misclassified as AT. The matched filtering result is used as a global four class reference; the binned analysis is restricted to the neural network outputs because it is intended to diagnose the parameter dependence of AT+ g
+
+identifiability. The eccentricity panels in Fig. 10 show that the ET+CE model is overall stable for AT+ g identification 11 
+
+FIG. 7: Confusion matrices for ET, CE, and ET+CE configurations. The top row shows the deep learning classifiers, and the bottom row shows the matched filtering results evaluated on the same samples. 
+
+FIG. 8: Average ROC curves and overall separability for the ET, CE, and ET+CE models. across the eccentricity bins. AT+ g Recall lies between 0.930 and 0 .978, and PR AUC lies between 0 .922 and 0.972. Within the present parameter space, eccentric-ity does not produce a clear monotonic trend in reso-nant class identification. The multiharmonic structure changes the frequency domain distribution of the reso-nant phase, but the model maintains high AT+ g Re-call. The PR AUC at the high eccentricity end is slightly lower, suggesting that eccentric harmonic complexity can still affect the AT/AT+ g classification boundary. The Λ g panels in Fig. 10 show a clearer dependence on the resonant coupling strength. For ET+CE, when Λg = 0 .03, Recall is 0 .870, PR AUC is 0 .924, and the AT+ g →AT misclassification rate is 0 .127. When Λ g in-creases to 0 .30, Recall rises to 0 .977, PR AUC rises to 0.991, and the misclassification rate decreases to 0 .020. There are small fluctuations in the low coupling region, for example the PR AUC values at Λ g = 0 .05 and 0 .07 are lower than that at Λ g = 0 .03, but the overall trend is clear: as Λ g increases, AT+ g Recall and PR AUC in-crease, while the AT+ g →AT error decreases. This indi-cates that a larger resonant phase shift amplitude makes it easier for the model to distinguish AT+ g from the AT background. The fg panels in Fig. 10 show that the dependence on fg is weaker. For ET+CE, the Recall values from 50 to 300 Hz lie between 0 .927 and 0 .968, and PR AUC lies between 0 .939 and 0 .968. Thus, within the current discrete set of mode frequencies, fg has a weaker effect on classification than Λ g and mainly produces a mild frequency dependence. Table IV gives the exact values for the joint model. Overall, the difficulty of identifying AT+ g shows the strongest dependence on Λ g and is reflected in the vari-ation of the AT+ g →AT error rate. When Λ g = 0 .03, 12 .70% of true AT+ g samples are classified as AT. When Λg = 0.10, this fraction decreases to 3 .00%. When Λg = 0 .30, it further decreases to 2 .00%, while Recall and PR AUC remain high. Combining the binned results for e10Hz and fg , the current model is most sensitive to 12   
+
+> (a) PP (b) AT
+> (c) AT+ g(d) PN
+
+FIG. 9: ROC curves and class wise separability for the four classes.               
+
+> (a) AT+ gRecall versus e10Hz (b) AT+ gRecall versus Λ g(c) AT+ gRecall versus fg
+> (d) AT+ gPR AUC versus e10Hz (e) AT+ gPR AUC versus Λ g(f) AT+ gPR AUC versus fg
+
+FIG. 10: AT+ g identification as a function of physical parameters. The upper row shows AT+ g Recall in bins of 
+
+e10Hz , Λ g , and fg , and the lower row shows the corresponding PR AUC values for ET, CE, and ET+CE observations. the amplitude of the resonant phase shift. This suggests that, within the present simulated parameter space, the AT/AT+ g separation is more strongly controlled by the strength of the weak resonant phase shift than by eccen-tricity or the selected discrete mode frequencies.  
+
+> VII. CONCLUSION AND OUTLOOK
+
+This work investigated whether weak resonant phase shifts from eccentric BNS g mode resonances can be identified in noisy third generation detector data. We constructed a four class simulated dataset by applying a multiharmonic resonant phase correction to eccentric BNS waveforms, projecting the resulting signals onto ET 13 TABLE IV: AT+ g identification metrics of the ET+CE model under different physical conditions. Here P and 
+
+R denote AT+ g Precision and Recall, PR AUC characterizes AT+ g identification, and AT+ g →AT denotes the fraction of true AT+ g samples misclassified as AT.                                                                                                                                  
+
+> Variable Bin PRPR AUC AT+ g→AT
+> e10Hz
+> [0 .00 ,0.05] 0.838 0.930 0.947 0.061 [0 .05 ,0.10] 0.857 0.957 0.953 0.039 [0 .10 ,0.15] 0.893 0.953 0.972 0.047 [0 .15 ,0.20] 0.879 0.943 0.969 0.054 [0 .20 ,0.25] 0.832 0.952 0.969 0.048 [0 .25 ,0.30] 0.890 0.955 0.966 0.045 [0 .30 ,0.35] 0.858 0.955 0.960 0.041 [0 .35 ,0.40] 0.867 0.978 0.967 0.023 [0 .40 ,0.45] 0.846 0.934 0.941 0.059 [0 .45 ,0.50] 0.820 0.937 0.922 0.058 Λg
+> 0.03 0.890 0.870 0.924 0.127 0.05 0.819 0.913 0.904 0.084 0.07 0.817 0.963 0.913 0.035 0.10 0.878 0.967 0.958 0.030 0.15 0.846 0.980 0.977 0.014 0.20 0.881 0.972 0.989 0.025 0.30 0.877 0.977 0.991 0.020
+> fg/Hz 50 0.842 0.968 0.968 0.032 75 0.843 0.946 0.959 0.054 100 0.843 0.927 0.939 0.065 125 0.812 0.965 0.954 0.025 150 0.838 0.958 0.953 0.042 175 0.865 0.955 0.967 0.046 200 0.878 0.959 0.959 0.037 225 0.888 0.950 0.964 0.050 250 0.885 0.937 0.962 0.059 275 0.878 0.959 0.958 0.042 300 0.867 0.927 0.959 0.065
+
+and CE detector responses, and adding detector colored Gaussian noise. In this setup, the g mode contribution appears as a small phase perturbation on top of the adia-batic tidal waveform, so the central task is to distinguish AT+ g waveforms from the AT background while also sep-arating PP signals and PN samples. Under this fixed four class evaluation, the ET, CE, and ET+CE deep learning models reach Accuracy values of 0 .655, 0 .815, and 0 .897, with corresponding Average F1 values of 0 .572, 0 .812, and 0 .897. The matched filtering method evaluated on the same samples gives lower Accuracies of 0 .514, 0 .677, and 0 .689. The joint ET+CE model also reaches a mi-cro ROC AUC of 0 .990 and a micro PR AUC of 0 .970, and identifies AT+ g samples over most of the simulated parameter space. The conditional analysis shows that the remaining AT/AT+ g confusion is most strongly con-trolled by Λ g : weak coupling samples are more easily absorbed into the AT background, whereas the depen-dence on e10Hz and the discrete fg values considered here is weaker. Future work can extend this analysis by broadening the physical parameter space and connecting the iden-tification results more directly to neutron star physics. Including adiabatic tidal parameters, inclination, and source population information in the conditional anal-ysis would help clarify how the AT+ g separability varies across different physical and observational conditions. The framework can also be extended to broader waveform and detector configurations to examine how the identi-fied AT/AT+ g separation trends depend on waveform modeling and detector response. A natural next step is to develop a Bayesian inference framework for eccentric BNS g mode resonances, using the present identification results to guide parameter space selection and likelihood construction. Such an extension would allow the recov-ered weak resonant phase signatures to be translated into posterior constraints on mode parameters and neutron star internal physics. 
+
+ACKNOWLEDGEMENTS 
+
+This work was supported by the National Key Re-search and Development Program of China (Grant No. 2021YFC2203004), the Fundamental Research Funds for the Central Universities Project (Grant No. 2024IAIS-ZD009), the National Natural Science Foundation of China (Grant Nos. 12575072, 12547101 and 125B2102), and the Natural Science Foundation of Chongqing (Grant No. CSTB2023NSCQ-MSX0103). 14 
+
+[1] LIGO Scientific Collaboration and Virgo Collaboration, Gw170817: Observation of gravitational waves from a bi-nary neutron star inspiral, Physical Review Letters 119 ,161101 (2017), arXiv:1710.05832 [gr-qc]. [2] LIGO Scientific Collaboration and Virgo Collaboration, GW170817: Measurements of neutron star radii and equation of state, Physical Review Letters 121 , 161101 (2018). [3] S. De, D. Finstad, J. M. Lattimer, D. A. Brown, E. Berger, and C. M. Biwer, Tidal deformabilities and radii of neutron stars from the observation of GW170817, Physical Review Letters 121 , 091102 (2018). [4] E. Annala, T. Gorda, A. Kurkela, and A. Vuori-nen, Gravitational-wave constraints on the neutron-star-matter equation of state, Physical Review Letters 120 ,172703 (2018). [5] LIGO Scientific Collaboration, Virgo Collaboration, and KAGRA Collaboration, Gwtc-3: Compact bi-nary coalescences observed by ligo and virgo during the second part of the third observing run, arXiv preprint arXiv:2111.03606 10.48550/arXiv.2111.03606 (2021), arXiv:2111.03606 [gr-qc]. [6] E. Annala, T. Gorda, E. Katerini, A. Kurkela, J. N¨ attil¨ a, V. Paschalidis, and A. Vuorinen, Multimessenger con-straints for ultradense matter, Physical Review X 12 ,011058 (2022). [7] T. Hinderer, Tidal love numbers of neutron stars, The Astrophysical Journal 677 , 1216 (2008). [8] T. Damour and A. Nagar, Relativistic tidal properties of neutron stars, Physical Review D 80 , 084035 (2009). [9] T. Hinderer, B. D. Lackey, R. N. Lang, and J. S. Read, Tidal deformability of neutron stars with realistic equa-tions of state and their gravitational wave signatures in binary inspiral, Physical Review D 81 , 123016 (2010). [10] K. Yagi and N. Yunes, I-Love-Q: Unexpected universal relations for neutron stars and quark stars, Science 341 ,365 (2013). [11] T. Hinderer, A. Taracchini, F. Foucart, A. Buonanno, J. Steinhoff, M. Duez, L. E. Kidder, H. P. Pfeiffer, M. A. Scheel, B. Szilagyi, K. Hotokezaka, K. Kyutoku, M. Shibata, and C. W. Carpenter, Effects of neutron-star dynamic tides on gravitational waveforms within the effective-one-body approach, Physical Review Letters 
+
+116 , 181101 (2016). [12] J. Steinhoff, T. Hinderer, A. Buonanno, and A. Tarac-chini, Dynamical tides in general relativity: Effective action and effective-one-body hamiltonian, Physical Re-view D 94 , 104028 (2016). [13] G. Pratten, P. Schmidt, and N. Williams, Impact of dy-namical tides on the reconstruction of the neutron star equation of state, Physical Review Letters 129 , 081102 (2022). [14] E. M. Kantor and M. E. Gusakov, Composition temperature-dependent g modes in superfluid neutron stars, Monthly Notices of the Royal Astronomical Soci-ety: Letters 442 , L90 (2014). [15] A. Passamonti, N. Andersson, and W. C. G. Ho, Buoy-ancy and g-modes in young superfluid neutron stars, Monthly Notices of the Royal Astronomical Society 455 ,1489 (2016). [16] C. Constantinou, S. Han, P. Jaikumar, and M. Prakash, g-modes of neutron stars with hadron-to-quark crossover transitions, Physical Review D 104 , 123032 (2021). [17] P. Jaikumar, A. Semposki, M. Prakash, and C. Con-stantinou, g-mode oscillations in hybrid stars: A tale of two sounds, Physical Review D 103 , 123009 (2021). [18] A. R. Counsell, F. Gittins, N. Andersson, and I. Tews, Interface modes in inspiralling neutron stars: Agravitational-wave probe of first-order phase transitions, Physical Review Letters 135 , 081402 (2025). [19] A. Passamonti, N. Andersson, and P. Pnigouras, Dy-namical tides in neutron stars: The impact of the crust, Monthly Notices of the Royal Astronomical Society 504 ,1273 (2021), arXiv:2012.09637 [astro-ph.HE]. [20] D. Lai, Resonant oscillations and tidal heating in coalesc-ing binary neutron stars, Monthly Notices of the Royal Astronomical Society 270 , 611 (1994). [21] A. Reisenegger and P. Goldreich, Excitation of neutron star normal modes during binary inspiral, The Astro-physical Journal 426 , 688 (1994). [22] K. D. Kokkotas and G. Sch¨ afer, Tidal and tidal-resonant effects in coalescing binaries, Monthly Notices of the Royal Astronomical Society 275 , 301 (1995). [23] M. Vick and D. Lai, Tidal effects in eccentric coalescing neutron star binaries, Physical Review D 100 , 063001 (2019). [24] J. Tak´ atsy, L. Zwick, P. Saini, and J. Samsing, Orbital eccentricity can make neutron star g-mode resonances ob-servable with current gravitational-wave detectors, arXiv e-prints , arXiv:2402.15111 (2024), arXiv:2402.15111 [gr-qc]. [25] J. Tak´ atsy, L. Zwick, P. Saini, and J. Samsing, Or-bital eccentricity can make neutron star g-mode reso-nances observable with current gravitational-wave detec-tors, Phys. Rev. D 113 , 103047 (2026), arXiv:2602.15111 [astro-ph.HE]. [26] P. C. Peters and J. Mathews, Gravitational radiation from point masses in a keplerian orbit, Physical Review 
+
+131 , 435 (1963). [27] P. C. Peters, Gravitational radiation and the motion of two point masses, Physical Review 136 , B1224 (1964). [28] R. Gold, S. Bernuzzi, M. Thierfelder, B. Br¨ ugmann, and F. Pretorius, Eccentric binary neutron star mergers, Physical Review D 86 , 121501 (2012). [29] W. E. East, F. Pretorius, and B. C. Stephens, Dynamical capture binary neutron star mergers, The Astrophysical Journal Letters 760 , L4 (2012). [30] V. Paschalidis, W. E. East, F. Pretorius, and S. L. Shapiro, One-arm spiral instability in hypermassive neu-tron stars formed by dynamical-capture binary neutron star mergers, Physical Review D 92 , 121502 (2015). [31] A. H. Nitz, A. Lenon, and D. A. Brown, Search for eccen-tric binary neutron star mergers in the first and second observing runs of advanced ligo, The Astrophysical Jour-nal 890 , 1 (2020), arXiv:1912.05464 [astro-ph.HE]. [32] A. K. Lenon, A. H. Nitz, and D. A. Brown, Measuring the eccentricity of gw170817 and gw190425, Monthly No-tices of the Royal Astronomical Society 497 , 1966 (2020), arXiv:2005.14146 [astro-ph.HE]. [33] A. K. Lenon, D. A. Brown, and A. H. Nitz, Eccentric bi-nary neutron star search prospects for Cosmic Explorer, 15 
+
+Physical Review D 104 , 063011 (2021). [34] P. Dutta Roy and P. Saini, Impact of unmodeled eccen-tricity on the tidal deformability measurement and impli-cations for gravitational wave physics inference, Physical Review D 110 , 024002 (2024). [35] K. Kacanja, K. Soni, and A. H. Nitz, Eccentricity signa-tures in ligo-virgo-kagra’s bns and nsbh binaries, arXiv e-prints , arXiv:2508.00179 (2025), arXiv:2508.00179 [gr-qc]. [36] M. Punturo, M. Abernathy, F. Acernese, B. Allen, et al. ,The einstein telescope: A third-generation gravitational wave observatory, Classical and Quantum Gravity 27 ,194002 (2010). [37] S. Hild, M. Abernathy, F. Acernese, P. Amaro-Seoane, 
+
+et al. , Sensitivity studies for third-generation gravita-tional wave observatories, Classical and Quantum Grav-ity 28 , 094013 (2011). [38] M. Maggiore, C. van den Broeck, N. Bartolo, E. Bel-gacem, D. Bertacca, et al. , Science case for the einstein telescope, arXiv preprint arXiv:1912.02622 10.48550/arXiv.1912.02622 (2019), arXiv:1912.02622 [astro-ph.CO]. [39] D. Reitze et al. , Cosmic explorer: The u.s. contribu-tion to gravitational-wave astronomy beyond ligo, Bul-letin of the American Astronomical Society 51 , 35 (2019), arXiv:1907.04833 [astro-ph.IM]. [40] M. Evans, R. X. Adhikari, C. Afle, S. Ballmer, et al. , A horizon study for cosmic explorer: Science, observato-ries, and community, arXiv preprint arXiv:2109.09882 10.48550/arXiv.2109.09882 (2021), arXiv:2109.09882 [astro-ph.IM]. [41] E. D. Hall, Cosmic explorer: A next-generation ground-based gravitational-wave observatory, Galaxies 10 , 90 (2022). [42] B. Allen, W. G. Anderson, P. R. Brady, D. A. Brown, and J. D. E. Creighton, FINDCHIRP: An algorithm for detection of gravitational waves from inspiraling compact binaries, Physical Review D 85 , 122006 (2012). [43] J. Veitch, V. Raymond, B. Farr, W. Farr, P. Graff, S. Vitale, B. Aylott, K. Blackburn, N. Christensen, M. Coughlin, W. Del Pozzo, F. Feroz, J. Gair, C.-J. Haster, V. Kalogera, T. Littenberg, I. Mandel, R. O’Shaughnessy, M. Pitkin, C. Rodriguez, C. R¨ over, T. Sidery, R. Smith, M. Van Der Sluys, A. Vecchio, W. Vousden, and L. Wade, Parameter estimation for compact binaries with ground-based gravitational-wave observations using the LALInference software library, Physical Review D 91 , 042003 (2015). [44] G. Ashton, M. H¨ ubner, P. D. Lasky, C. Talbot, K. Ack-ley, S. Biscoveanu, Q. Chu, A. Divakarla, P. J. Easter, B. Goncharov, F. Hernandez Vivanco, J. Harms, M. E. Lower, G. D. Meadors, D. Melchor, E. Payne, M. D. Pitkin, J. Powell, N. Sarin, R. J. E. Smith, and E. Thrane, Bilby: A user-friendly bayesian inference li-brary for gravitational-wave astronomy, The Astrophys-ical Journal Supplement Series 241 , 27 (2019). [45] D. George and E. A. Huerta, Deep learning for real-time gravitational wave detection and parameter estimation: Results with advanced ligo data, Physics Letters B 778 ,64 (2018), arXiv:1711.03121 [gr-qc]. [46] M. Sun, J. Li, S. Cao, and X. Liu, Deep learning forecasts of cosmic acceleration parameters from DECi-hertz inter-ferometer gravitational-wave observatory, Astronomy & Astrophysics 682 , A177 (2024). [47] H. Gabbard, M. Williams, F. Hayes, and C. Messen-ger, Matching matched filtering with deep networks for gravitational-wave astronomy, Physical Review Letters 
+
+120 , 141103 (2018). [48] M. Sun, J. Wu, J. Li, B. McCane, N. Yang, X. Ma, B. Wang, and M. Zhang, Conditional autoencoder for generating binary neutron star waveforms with tidal and precession effects, Physical Review D 112 , 084016 (2025). [49] E. Cuoco, J. Powell, M. Cavagli` a, K. Ackley, et al. , En-hancing gravitational-wave science with machine learn-ing, Machine Learning: Science and Technology 2,011002 (2020). [50] M. Sun and J. Li, Parameter estimation for intermediate-mass binary black holes through gravitational waves ob-served by DECIGO, arXiv e-prints , arXiv:2312.07834 (2023), arXiv:2312.07834 [gr-qc]. [51] A. J. K. Chua and M. Vallisneri, Learning bayesian pos-teriors with neural networks for gravitational-wave infer-ence, Physical Review Letters 124 , 041102 (2020). [52] M. Sun, J. Wu, Q. Hu, J. Li, N. Yang, X. Ma, B. Wang, M. Zhang, and Y. Zhong, Detection of multi-band lensed gravitational waves from dark matter ha-los with deep learning, Physical Review D 113 , 103004 (2026), arXiv:2511.09107 [astro-ph.IM]. [53] M. Dax, S. R. Green, J. Gair, J. H. Macke, A. Buonanno, and B. Sch¨ olkopf, Real-time gravitational wave science with neural posterior estimation, Physical Review Letters 
+
+127 , 241103 (2021). [54] A. Nitz, I. Harry, D. Brown, C. M. Biwer, J. Willis, T. D. Canton, C. Capano, T. Dent, L. Pekowsky, G. S. C. Davies, S. De, M. Cabero, S. Wu, A. R. Williamson, B. Machenschalk, D. Macleod, F. Pannarale, P. Kumar, S. Reyes, dfinstad, S. Kumar, M. T´ apai, L. Singer, P. Ku-mar, veronica villa, maxtrevor, B. U. V. Gadre, S. Khan, S. Fairhurst, and A. Tolley, gwastro/pycbc: v2.3.3 release of pycbc (2024). [55] W. Zhao, C. Van Den Broeck, D. Baskaran, and T. G. F. Li, Determination of dark energy by the Einstein Tele-scope: Comparing with CMB, BAO, and SNIa observa-tions, Physical Review D 83 , 023005 (2011). [56] R. Schneider, V. Ferrari, S. Matarrese, and S. F. Porte-gies Zwart, Low-frequency gravitational waves from cos-mological compact binaries, Monthly Notices of the Royal Astronomical Society 324 , 797 (2001). [57] C. Cutler and D. E. Holz, Ultrahigh precision cosmology from gravitational waves, Physical Review D 80 , 104009 (2009). [58] R.-G. Cai and T. Yang, Estimating cosmological param-eters by the simulated data of gravitational waves from the Einstein Telescope, Physical Review D 95 , 044024 (2017). [59] S. Albanesi, R. Gamba, S. Bernuzzi, J. Fontbut´ e, A. Gon-zalez, and A. Nagar, Effective-one-body modeling for generic compact binaries with arbitrary orbits, Physical Review D 112 , L121503 (2025).
