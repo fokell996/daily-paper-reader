@@ -1,0 +1,601 @@
+Title: Improving low-latency multi-messenger follow-up of neutron star-black hole mergers with mode-by-mode filtering
+
+URL Source: https://arxiv.org/pdf/2606.17137v1
+
+Published Time: Wed, 17 Jun 2026 00:03:08 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+## Improving low-latency multi-messenger follow-up of neutron star–black hole mergers with mode-by-mode filtering 
+
+Francesco Iacovelli ,1, ∗ Digvijay Wadekar ,2, 1 Javier Roulet ,3, 4 Emanuele Berti ,1 and Alessandra Corsi 1
+
+> 1
+
+Department of Physics and Astronomy, Johns Hopkins University, 3400 N. Charles Street, Baltimore, Maryland, 21218, USA 
+
+> 2
+
+Center for Gravitational Physics, University of Texas at Austin, Austin, TX 78712, USA 
+
+> 3
+
+Kavli Institute for Cosmological Physics, The University of Chicago, 5640 South Ellis Avenue, Chicago, IL 60637, USA 
+
+> 4
+
+School of Natural Sciences, Institute for Advanced Study, 1 Einstein Drive, Princeton, NJ 08540, USA 
+
+(Dated: June 17, 2026) Rapid parameter estimation for neutron star-black hole (NSBH) mergers is essential for decid-ing whether, where, and how electromagnetic facilities should follow up gravitational-wave alerts. Current low-latency analyses typically use only the dominant quadrupole harmonic, leaving strong degeneracies among luminosity distance, inclination, and intrinsic binary parameters. We show that mode-by-mode filtering of the (2 , 2), (3 , 3), and (4 , 4) signal-to-noise-ratio (SNR) time series enables low-latency marginalization over higher-order-mode information at a computational cost comparable to quadrupole-only analyses a. Applied to simulated NSBH detections in a LIGO-Virgo network at design sensitivity, our method improves constraints on luminosity distance, viewing an-gle, localization volume, and source-frame secondary mass, thereby sharpening crucial estimates of electromagnetic detectability and host-galaxy association. We also validate the approach on public data for previously detected NSBH events, finding the largest improvement for the asymmetric, higher-SNR event GW190814. 
+
+Introduction— Gravitational waves (GWs) from com-pact binary coalescences (CBCs) have transformed as-tronomy since their first detection in 2015 [1]. The LIGO-Virgo-KAGRA (LVK) [2–4] Collaboration GW transient catalog now contains over 390 candidates [5, 6], predom-inantly binary black holes. Binary neutron star (BNS) mergers remain rarer, with only two confident detec-tions [7, 8]. The joint observation of GW170817 with electromagnetic (EM) emission [9] marked the beginning of the era of multi-messenger GW astronomy, demon-strating the power of combined observations to constrain nuclear physics [7, 10], cosmology [11], and relativistic astrophysics. Neutron star-black hole (NSBH) binaries are a promis-ing, yet elusive, multi-messenger target. Three likely NSBH candidates have been reported [12–14] along with a few marginal ones [13, 15, 16], but no confirmed EM counterpart has been identified. Multi-messenger ob-servations of NSBHs, albeit rare with current detec-tors [17], could constrain the cosmic expansion history via standard-siren measurements [18], probe supranuclear-density matter through tidal disruption [19], and shed light on the progenitor channels linking stellar evolu-tion to compact remnants [20]. Realizing this potential requires rapid, accurate parameter estimation (PE) to guide time-sensitive EM follow-up by facilities such as the Neil Gehrels Swift Observatory [21], ULTRASAT [22], SVOM [23], and the Einstein Probe [24], as well as wide-field optical searches with the Zwicky Transient Facil-ity [25], the Vera C. Rubin Observatory [26], GOTO [27], DECam/GROWTH [28], and GRANDMA [29].   
+
+> ∗fiacovelli@jhu.edu
+> aA public implementation and example workflow are available at
+> https://github.com/JayWadekar/flywheel .
+
+Current low-latency LVK searches and alert prod-ucts provide sky localization, distance estimates, and source classification within seconds to minutes [30– 36], with rapid localizations commonly produced by the BAYESian TriAngulation and Rapid localization (BAYESTAR ) pipeline [37–39] (see also Ref. [40]). These analyses model only the dominant ( ℓ, |m|) = (2 , 2) GW harmonic. For asymmetric binaries like NSBHs, where mass ratios q ≡ m1/m 2 can exceed ∼ 5–10, subdomi-nant harmonics carry useful information [41–52]. These modes depend differently on the source parameters and can therefore break degeneracies. In quadrupole-only waveforms, luminosity distance ( dL) correlates strongly with inclination ( ι), while mass ratio correlates with ef-fective spin ( χeff ) [53–55]. These degeneracies broaden localization volumes, weaken constraints on the nature of the secondary object (NS vs. BH), and degrade incli-nation estimates, all of which affect follow-up decisions. Higher-order modes (HM) can break these degen-eracies even in low-latency analyses. Mode-by-mode matched filtering [56] isolates the contributions of indi-vidual harmonics, enabling rapid inference when com-bined with efficient marginalization techniques [57]. For NSBHs, improved constraints on dL and ι inform crucial observational strategies/choices to: (i) efficiently identify the host from galaxy catalogs [58]; (ii) determine if view-ing angles favor detectable γ-ray/X-ray/radio emission from jets, and how long and deep to observe [59–61]; (iii) assess if the system lies within realistic EM search hori-zons for kilonovæ (KNe) [62–67]. Additionally, tighter mass-ratio constraints help source classification and in-ference on the potential tidal disruption of the secondary (affecting KN brightness) [68–70], reducing false alarms for resource-intensive observing campaigns. In this work, we show that including HMs in rapid PE of NSBH mergers yields substantially improved localiza-
+
+> arXiv:2606.17137v1 [gr-qc] 15 Jun 2026
+
+2Low-latency PE – 22 + higher harmonics Low-latency PE – 22 only (BAYESTAR-like) Full PE    
+
+> 0.4
+> 0.8
+> 1.2
+> ι
+> 2.48
+> 2.56
+> 2.64
+> 2.72
+> msrc 2 (M )
+> 0.8
+> 1.6
+> 2.4
+> ψ
+> 0.21
+> 0.22
+> 0.23
+> 0.24
+> RA
+> 200
+> 250
+> 300
+> dL(Mpc)
+> −0.450
+> −0.435
+> −0.420
+> Dec
+> 0.4
+> 0.8
+> 1.2
+> ι
+> 2.48
+> 2.56
+> 2.64
+> 2.72
+> msrc 2(M)
+> 0.8
+> 1.6
+> 2.4
+> ψ
+> 0.21
+> 0.22
+> 0.23
+> 0.24
+> RA
+> −0.450
+> −0.435
+> −0.420
+> Dec
+
+GW190814-like event in O5 
+
+FIG. 1. Low-latency PE for a GW190814-like injected sig-nal in a LIGO–Virgo network at O5 design sensitivity. We compare our method including higher harmonics with aquadrupole-only analysis similar to those currently used in low-latency LVK pipelines. We also show full PE results from bilby . Including HMs recovers the full-PE luminosity-distance and inclination posteriors much more faithfully, while also improving polarization and mildly improving msrc 2 .
+
+tions and secondary-mass measurements at a computa-tional cost comparable to existing pipelines. We demon-strate this using simulated detections from the best-fit LVK population model [14] in mock data for the upcom-ing fifth observing run O5, and later validate the method on real LVK events. 
+
+Catalog simulation and SNR time series— To estab-lish the detectability and characterization prospects for NSBH mergers, we simulate mock populations compati-ble with the latest LVK results. We employ the NSBH-pop model [71] for masses and aligned-spin components, drawing 100 realizations of 1-year populations out to 
+
+z ∼ 10 using posterior samples from Ref. [14]. We ex-trapolate the population to high redshift using a Madau-Dickinson merger-rate density profile with typical pa-rameters [72, 73]. The catalogs contain ∼ 2.1 × 10 4
+
+to ∼ 3.4 × 10 5 events each (totaling ∼ 2.5 × 10 7 bina-ries), ensuring sufficient statistics. Extrinsic parameters are sampled uniformly. For each event, we compute the signal-to-noise ratio (SNR) in a three-detector network (two LIGO detectors and Virgo) with O5 sensitivities [74] using gwfast [75]. We employ the IMRPhenomXHM 
+
+waveform [76] (as implemented in the LIGO Algorithm Library, LAL [77]) including the ( ℓ, |m|) = (2 , 2), (3 , 3), and (4 , 4) modes. For systems with SNR ≥ 8 ( ∼ 1.6×10 4
+
+in total, redshifts out to z ∼ 0.64, SNRs ∼ 8–85), we com-pute zero-noise SNR [78] time series for each mode us-ing the SNR timeseries module from our publicly avail-able codebase; see Supplemental Material. While simpli-fied, this zero-noise, perfect-template analysis establishes a clear performance benchmark for our methodology. 
+
+Low-latency marginalized parameter estimation— Full stochastic-sampling PE (e.g. with bilby [79]), which explores the joint posterior over ∼ 15 binary param-eters, can take hours to days when higher harmonics are included, which is incompatible with low-latency follow-up. Complementary machine-learning approaches such as DINGO [80, 81] or labrador [82] can also pro-vide rapid compact-binary inference for binary neutron stars, however these do not account for higher modes yet. Our approach instead marginalizes analytically or semi-analytically over parameters that enter the likelihood in simple ways, such as dL and reference phase, and uses adaptive importance sampling for the remaining extrin-sic parameters. This brings the runtime to seconds while retaining faithful posteriors for the parameters most rel-evant to EM follow-up, as verified against full PE in Fig. 1 (discussed below). We use flywheel , a low-latency version of the cogwheel library [57, 83, 84] previously adapted for the coherent candidate-ranking statistic in the IAS-HM search pipeline [56]. The analysis includes the higher-order mode contributions ( ℓ, |m|) = (3 , 3) and (4 , 4) alongside the dominant (2 , 2) harmonic. The algorithm takes three inputs: (i) ⟨d|hℓm ⟩, the SNR time series for each mode template; (ii) ⟨hℓm |hℓ′m′ ⟩, the mode covariance matrix; and (iii) prior samples for the mode SNR ratios under an assumed astrophysical distri-bution, 
+
+Rℓm ≡ ⟨hℓm (f )|hℓm (f )⟩1/2
+
+⟨h22 (f )|h22 (f )⟩1/2 . (1) Each (2 , 2) template in a search pipeline corresponds to a region of intrinsic parameter space [ m1, m 2, χ 1z , χ 2z ]. We use the Rℓm values associated with that region in the marginalization. Details of the sample library construc-tion are given in Supplemental Material. We summarize the likelihood and coherent marginal-ization used in this work in Supplemental Material Al-gorithm A (see also Sec. 3A of Ref. [56]). We marginal-ize over the extrinsic binary parameters and the subset of intrinsic parameters which affect the mode amplitude ratios in Eq. (1). The luminosity-distance integral is evaluated by interpolating a precomputed table [37], the reference-phase integral over ϕ0 by trapezoid quadrature, and the remaining integrals over inclination, sky loca-tion, and polarization by adaptive importance sampling; see Ref. [57] for further details on the marginalization procedure. Once the marginalization integral is computed, pos-terior samples are obtained by importance resampling the quasi-Monte Carlo samples used in the integral; an illustrative example is given in Supplemental Material, Sec. C. For ten representative O5 catalog events, one 30.0 0.2 0.4 0.6 0.8 1.0  
+
+> dHM
+> L, 90% /d 22
+> L, 90%
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> 1.2
+> 1.4
+> V HM c, 90% /V  22 c, 90%
+> 00.25 0.50.75 11.25 1.51.75 2
+> N P ≥inj , HM gal  /N  P ≥inj , 22 gal
+
+FIG. 2. Accurate distance and volume estimates determine how efficiently observers can search for EM counterparts or host galaxies. We show the HM-to-(2 , 2) ratio of the 90% c.l. width of the dL posterior and the 90% c.l. localiza-tion comoving volume for all analyzed NSBH systems; color gives the corresponding ratio of candidate galaxies followed up before reaching the true host (smaller is better), and point size scales with viewing angle. Including HMs usually shrinks the distance–volume search space and reduces the host-galaxy follow-up burden. 
+
+higher-mode marginalization takes 0 .13 ± 0.03 s on a sin-gle Intel Xeon Gold 6426Y core, and drawing 1000 pos-terior samples takes an additional 0 .11 s. 
+
+Inference of catalog properties— We compare analyses using SNR time series for all three modes against a (2 , 2)-only analysis, mirroring current LVK pipelines such as 
+
+BAYESTAR . Figure 1 compares the two approaches for an event with the same characteristics as GW190814 [85] in an O5 network. GW190814 is one of the most asym-metric mergers observed. We simulate the SNR time series using the maximum-likelihood parameters from public LVK data at our network configuration (optimal matched-filter SNR ∼ 78). While sky localization is mini-mally affected, the dL and ι reconstructions improve sub-stantially with HMs, reducing the comoving volume by a factor ∼ 4.2. The (2 , 2)-only pipeline’s strong dL–ι cor-relation exacerbated by the standard PE priors [86] bi-ases the posterior toward large distances, while including HMs favors smaller distances near the true value. The HM analysis also increases the log-likelihood (ln L) of the drawn samples. Comparing our low-latency PE with a full Bayesian analysis for this simulated event obtained with bilby [79] and the nested sampler dynesty [87], we find that including HMs gives remarkably similar re-sults for the luminosity distance and inclination, while maintaining a low computational cost. Both low-latency analyses shown slightly overconstrain msrc 2 because they condition on the detector frame intrinsic parameters pro-vided by the search pipeline rather than marginalizing over them; see Supplemental Material for further discus-0◦ 15 ◦ 30 ◦ 45 ◦ 60 ◦ 75 ◦ 90 ◦
+
+> Θ
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> ΘHM 90% /Θ22 90%
+> 00.25 0.50.75 1246810
+> P HM det  (GRB) /P  22 det (GRB)
+
+FIG. 3. The viewing/inclination angle Θ controls whether a relativistic jet is likely to be visible, so rapid constraints on Θ directly affect GRB follow-up decisions. We show the injected Θ and the HM-to-(2 , 2) ratio of the posterior width on Θ; color gives the ratio of the Swift -BAT GRB-detection probability from Eq. (2), and black crosses mark events with vanishing probability in both analyses. We see that HMs sharpen viewing-angle inference and can correctly strengthen or weaken the case for rapid GRB follow-up, depending on the reconstructed orientation. 
+
+sion. Figure 2 shows population-level improvements: for each event, we plot the ratio of 90% credible-level (c.l.) widths for dL and comoving volume Vc between the two methods. To ensure numerical stability, we estimate Vc
+
+via k-nearest neighbors in a coordinate system designed to minimize correlations. We use ( dL, θ net , ϕ net ) coor-dinates [83], scaled by directional distance sensitivity. Adding HMs improves constraints for most signals, often by a factor of ≳ 2. This is important for EM follow-up because it improves assessments of detectability, reduces the area and volume to search for counterparts, and in-creases the spatial association probability for the true host galaxy. The point size in Fig. 2 is proportional to the viewing angle, Θ = min( ι, 180 ◦ − ι). Some events anomalously show larger Vc when includ-ing HMs despite narrower dL posteriors. This is because HMs can narrow the posterior towards larger dL, where the comoving volume is larger; see Supplemental Mate-rial. A smaller volume is not necessarily better if it is biased. We therefore consider the number of candidate galaxies an observer would have to follow up before reach-ing the true host, Ngal . The point colors in Fig. 2 show a proxy for Ngal , computed from the number of galaxies in posterior regions with probability density higher than the injection. We use a survey-agnostic convention, assum-ing a galaxy catalog is already available for the follow-up: galaxies are followed up in order of posterior probability at their location, and their number density is uniform in comoving volume. 40.0 0.2 0.4 0.6 0.8 1.0    
+
+> msrc ,22 2,90% /¯msrc ,22 2
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> msrc , HM 2, 90%  / ¯msrc , HM 2
+> 0.91.01.11.21.31.41.5
+> P HM (msrc 2 ≤ 2.7 M  )/P  22 (msrc 2 ≤ 2.7 M  )
+
+FIG. 4. The source-frame secondary mass helps determine whether the lighter object is plausibly a NS and whether tidal disruption could power a kilonova. We compare relative un-certainties on msrc 2 with HMs ( y-axis) and without HMs ( x-axis); color gives the ratio of P (msrc 2 < 2.7 M ⊙) (larger is more accurate), and point size scales with the injected msrc 2 . We see that HMs give modest but useful gains in secondary-mass classification, especially for heavier msrc 2 .
+
+Figure 3 shows that HMs improve viewing-angle con-straints across the population, by up to ∼ 5 for face-on/off systems, by breaking the dL–ι degeneracy. This has di-rect consequences for searches for prompt γ-ray burst (GRB) or afterglow emission: a rapid reconstruction of Θ can help determine whether a telescope should slew to the event. As a concrete example, the Swift Burst Alert Telescope (BAT) [88] has a field of view covering ∼ 10% of the sky, and its slewing time between two sky positions separated by θsep degrees is tslew = (25 + 2 θsep ) s [89]. Point colors show the ratio of GRB detection proba-bilities [ Pdet (GRB)] between pipelines with and without HMs, computed assuming a universal Gaussian jet (see, e.g., Refs. [90, 91]): 
+
+FGRB = A0
+
+4πd 2
+
+> L
+
+e−Θ2/(2Θ 2  
+
+> c)
+
+, (2) with A0 = 2.7 × 10 51 erg s −1 and Θc = 3.27 ◦ ob-tained from a multimessenger analysis of GW170817 [92]. We then impose a detectability cut of FGRB , th =10 −8 erg cm −2 s−1, appropriate for Swift -BAT [88], to cal-culate Pdet (GRB). Figure 4 compares the relative uncertainty in the low-latency secondary-mass constraint, m2,90% / ¯m2. The rel-ative uncertainty ranges from 0 .03 to 0 .9, with median 0.37. The quadrupole-only and HM analyses yield sim-ilar detector-frame mdet 2 posteriors, so the improvement in msrc 2 is primarily due to the narrower dL posterior in the HM case. We assess NS identification probability using a BH/NS mass threshold at 2 .7 M ⊙. While most events show modest improvement, higher-mass systems Low -latency PE – 22 + higher harmonics Low -latency PE – 22 only (BAYESTAR-like) Full PE    
+
+> 0.8
+> 1.6
+> 2.4
+> ι
+> 2.4
+> 2.8
+> 3.2
+> msrc 2 (M )
+> 0.2
+> 0.3
+> 0.4
+> RA
+> 160
+> 240
+> 320
+> dL(Mpc)
+> −0.56
+> −0.48
+> −0.40
+> Dec
+> 0.8
+> 1.6
+> 2.4
+> ι
+> 2.4
+> 2.8
+> 3.2
+> msrc 2(M)
+> 0.2
+> 0.3
+> 0.4
+> RA
+> −0.56
+> −0.48
+> −0.40
+> Dec
+
+FIG. 5. We use our method on the noisy LIGO–Virgo strain data of GW190814 as a real-data test of our method. The black vertical lines show the full-PE posterior sample with the highest matched-filter SNR. We see that HMs move the low-latency posterior toward the full-PE preference for smaller distance and better constrained inclination. 
+
+(larger points) gain up to 50% in P (msrc 2 ≤ 2.7 M ⊙) when HMs are included. This can better inform KN follow-up strategies. Moreover, as we can appreciate from Fig. 1, the inclu-sion of HMs improves the polarization angle ψ constraints by breaking its degeneracy with the orbital phase. This could be relevant for astronomers performing GRB po-larization measurements (e.g., the LEAP [93] and PO-LAR [94] missions), which can constrain the emission mechanism if coupled with GW observations [95]. Finally, not all the simulated NSBH sources could power an EM counterpart. Using the ligo.em-bright 
+
+pipeline [96], we have verified that ∼ 34% of the detected systems in our simulation have a probability larger than 10% to be EM bright. Restricting to these systems, we still find dL, 90% , Vc, 90% , and Θ 90% are reduced by ∼ 8% on average thanks to HMs, with posteriors shrinking by as much as 70% for some events. 
+
+Real event analysis— We apply our pipeline to public LVK data for GW190814 [85] and for the three confident NSBH mergers, GW200105 162426, GW200115 042309 [12], GW230529 181500 [14]. Using 
+
+PyCBC [97], we compute SNR time series for all three modes in windows of 4 s around each trigger for each ac-tive detector, with noise power spectral densities (PSDs) estimated via the Welch method over 32 s segments pre-ceding the trigger. Mode templates are simulated using the IMRPhenomXHM approximant evaluated at the 5maximum matched-filter SNR parameters from public posterior samples. We find that the three NSBH events show no signifi-cant improvement with HMs. This is expected given their modest SNRs ( ∼ 11–14) and modest masses ( Mtot ≲
+
+13 M ⊙). However, GW190814 differs markedly: its higher SNR ( ∼ 25), larger mass ( Mtot ≲ 27 .4 M ⊙), and high mass ratio ( q ∼ 9) produce a clear ℓ = |m| = 3 spike (SNR ∼ 6) in the SNR time series. We show the PE re-sults in Fig. 5 and find that using HMs narrows the dL
+
+posterior by a factor of 1 .6 (favoring smaller distances, consistent with full parameter estimation); narrows ι by a factor of 2; and reduces the localization comoving volume by a factor of 2 .1. This improvement is smaller than for the O5-sensitivity injection of Fig. 1, but still substantial. 
+
+Conclusions and future work— Including HMs in rapid GW parameter estimation improves NSBH binary char-acterization for EM follow-up. We have developed a ready-to-use pipeline that jointly analyzes the SNR time series of the (2 , 2), (3 , 3), and (4 , 4) harmonics. Applied to simulated O5-sensitivity detections, our pipeline im-proves the accuracy of luminosity-distance, inclination, and secondary-mass estimation. Crucially, the computa-tional cost is of order a second, comparable to existing (2 , 2)-only methods. These improvements can be important for a number of EM follow-up strategies. Tighter dL, ι, and msrc 2 re-constructions enable observers to (i) reduce search vol-umes in galaxy-targeted strategies, potentially decisive for time-limited campaigns; (ii) more confidently classify events as NSBH, triggering follow-up protocols; (iii) as-sess EM detectability before using their resources. We validate our method using data from previ-ously detected NSBH candidates. For GW190814, the low-latency posterior more closely reproduces the full Bayesian posterior, demonstrating the real-data viability of the method. The other three lower-SNR NSBH events show no improvement, consistent with their weaker sub-dominant mode content. Since our method only requires mode-by-mode SNR time series and their covariance, it can in principle be applied to outputs from any search pipeline that provides these quantities. Our findings motivate generalizing the quadrupole-only low-latency searches currently in use with our HM-based method in the upcoming O5 run. Several extensions remain for future work. One ad-vantage of HMs is that they enter the detector band ear-lier than the (2 , 2) mode [98, 99]. We aim to explore this point for next-generation detectors such as the Ein-stein Telescope [100–102] and Cosmic Explorer [103–105], whose low-frequency sensitivity could enable alerts tens of minutes before merger. A natural calibration extension is a P-P-plot test using injections with random noise re-alizations; a fully realistic version requires running them through a discrete NSBH template bank with a tailored mode-amplitude-ratio library, to capture the suboptimal templates that may be recovered in practice, see Supple-mental Material. Precession is another relevant effect for NSBH binaries and can also help break the dL–ι degen-eracy [43, 106, 107]. Incorporating precessing harmonics into our mode-by-mode filtering procedure represents a natural extension of this work. 
+
+> ACKNOWLEDGMENTS
+
+We thank Mukesh Kumar Singh, Hsin-Yu Chen, Sylvia Biscoveanu, Steve Fairhurst, Daniel Holz, Matias Zal-darriaga, Daryl Haggard, Alberto Colombo, and Kara Merfeld for helpful discussions. We also thank Juan Calder´ on Bustillo for comments on the manuscript. This research has made use of data, software and/or web tools obtained from the Gravitational Wave Open Science Center ( https://www.gw-openscience.org/ ), a service of LIGO Laboratory, the LIGO Scientific Collaboration and the Virgo Collaboration. LIGO Laboratory and Advanced LIGO are funded by the United States Na-tional Science Foundation (NSF) as well as the Science and Technology Facilities Council (STFC) of the United Kingdom, the Max-Planck-Society (MPS), and the State of Niedersachsen/Germany for support of the construc-tion of Advanced LIGO and construction and operation of the GEO600 detector. Additional support for Ad-vanced LIGO was provided by the Australian Research Council. Virgo is funded, through the European Gravi-tational Observatory (EGO), by the French Centre Na-tional de Recherche Scientifique (CNRS), the Italian Isti-tuto Nazionale di Fisica Nucleare (INFN) and the Dutch Nikhef, with contributions by institutions from Belgium, Germany, Greece, Hungary, Ireland, Japan, Monaco, Poland, Portugal, Spain. The work of F.I. is supported by a Miller Postdoctoral Fellowship. F.I. and E.B. are supported by NSF Grants No. AST-2307146, No. PHY-2513337, No. PHY-090003, and No. PHY-20043, by NASA Grant No. 21-ATP21-0010, by John Templeton Foundation Grant No. 62840, by the Simons Foundation [MPS-SIP-00001698, E.B.], by the Simons Foundation International [SFI-MPS-BH-00012593-02], and by Italian Ministry of Foreign Affairs and International Coopera-tion Grant No. PGR01167. J.R. acknowledges support from the Jonathan M. Nelson Center for Collaborative Research. This work was carried out at the Advanced Research Computing at Hopkins (ARCH) core facility (https://www.arch.jhu.edu/ ), which is supported by the NSF Grant No. OAC-1920103. 
+
+> Appendix A: Coherent likelihood with higher-order modes
+
+Here we summarize how the mode-by-mode SNR time series are combined in the marginalized likelihood used in the main text, following the formalism of Ref. [56]. For a fixed (2 , 2) template, the detector-frame waveform in detector k can be written as 6
+
+hk(f ) ≃ dL, 0
+
+dL
+
+
+
+F+,k 
+
+1 + cos 2 ι
+
+2 − i cos ι F ×,k 
+
+  
+
+e2iϕ 0 h22 (f ) + e3iϕ 0 R33 sin ι h33 (f ) + e4iϕ 0 R44 sin 2 ι h44 (f )
+
+
+
+, (A1) where hℓm are unit-normalized complex templates for the modes, dL, 0 is a reference distance for which the (2 , 2) mode has unit SNR (assuming F+ = 1 , F × = 0 , ι = 0), 
+
+dL is the luminosity distance, and F+,k and F×,k are the antenna responses. The ratios Rℓm are the intrinsic mode-amplitude ratios defined in Eq. (1); in practice they are drawn from the precomputed library described in the following. We restrict the analysis to ℓ = |m| modes, for which the polarization and inclination dependence can be factorized as in Eq. (A1). The public example notebook in our GitHub repository 1 follows this notation closely. The file 
+
+snrs timeseries *.hdf5 stores, for each event, the complex matched-filter time series ρℓℓ,k (t) for the (2 , 2), (3 , 3), and (4 , 4) templates in each detector, together with the common time grid. The file snrs opt info *.hdf5 
+
+stores the optimal-SNR normalization for each mode and detector, as well as the normalized cross-mode overlaps 
+
+⟨h22 |h33 ⟩, ⟨h22 |h44 ⟩, and ⟨h33 |h44 ⟩. These two files pro-vide the data-dependent term and the template covari-ance entering the likelihood in Eq. (A4). The sepa-rate sampled*.h5 , snrs 22 *.txt , snrs 33 *.txt , and 
+
+snrs 44 *.txt files provide the intrinsic samples and the corresponding R33 and R44 values used for the discrete marginalization over mode ratios (see Sec. D). The covariance between the mode templates enters the normalization term in the likelihood. For a single detec-tor, 
+
+⟨h|h⟩ = X
+
+> ℓ,ℓ ′
+
+d2
+
+> L, 0
+
+d2
+
+> L
+
+F+
+
+1 + cos 2 ι
+
+2 − iF × cos ι
+
+> 2
+
+eiϕ 0(ℓ′−ℓ)Cℓ,ℓ ′ , C =
+
+ 1 R33 sin ι ⟨h22 |h33 ⟩ R44 sin 2 ι ⟨h22 |h44 ⟩− R233 sin 2 ι R33 R44 sin 3 ι ⟨h33 |h44 ⟩− − R244 sin 4 ι
+
+, (A2) where the omitted lower-triangular entries are fixed by Hermitian conjugation. In the code, these quantities are passed to cogwheel 
+
+as two arrays. The array dh mtd contains the rescaled matched-filter products ( d|hℓm ) with dimensions [mode, time, detector], ordered as (22 , 33 , 44). The array hh md 
+
+contains the six independent covariance entries with dimensions [mode-pair, detector], ordered as (22 , 22), (22 , 33), (22 , 44), (33 , 33), (33 , 44), and (44 , 44). Since the SNR time series are generated from normalized tem-plates, while the cogwheel distance lookup table assumes inner products at its reference distance, the notebook multiplies these arrays by the factor dist factor ref 
+
+(or its square for hh md ). This is a change of normaliza-tion convention only; the final luminosity-distance sam-ples are converted back to physical (Mpc) units in post-processing. The data-dependent term is evaluated from the com-plex matched-filter time series for each mode. If ρℓℓ,k (t)denotes the inner product of the data in detector k with the unit template hℓℓ at time t, then 
+
+⟨hk|dkei2πf t ⟩ = dL, 0
+
+dL
+
+
+
+F+,k 
+
+1 + cos 2 ι
+
+2 − i cos ι F ×,k 
+
+ 
+
+e2iϕ 0 ρ22 ,k (t)+ e3iϕ 0 R33 sin ι ρ 33 ,k (t)+ e4iϕ 0 R44 sin 2ι ρ 44 ,k (t)
+
+
+
+. (A3) The arrival time in each detector is tk = t⊕ + rk · ˆn/c ,where t⊕ is the geocentric arrival time, rk is the detector position, and ˆ n is the sky direction. For computational efficiency, the notebook also con-structs an incoherent arrival-time proposal from the single-detector SNR time series. This proposal whitens the three mode time series using the cross-mode covari-ance matrix and forms an approximate single-detector log likelihood over arrival time. It is used only to pro-pose promising detector arrival times before enforcing the coherent sky-location delays in the full likelihood. For a fixed set of extrinsic parameters and mode ratios, the detector log likelihood is ln Lk = Re ⟨hk|dk⟩ − 12 ⟨hk|hk⟩ . (A4) The coherent score is obtained by marginalizing the prod-uct of detector likelihoods over distance, phase, sky loca-tion, inclination, polarization, geocentric time, and the discrete library of mode-amplitude-ratio samples:  
+
+> 1https://github.com/JayWadekar/flywheel .
+
+7
+
+eρ2coh /2 ≃ X
+
+> i
+
+w(i)
+
+Z
+
+dΠ exp 
+
+" X
+
+> k∈dets
+
+ln Lk
+
+
+
+tk, R (i)33 , R (i)44 , ι, ϕ 0, d L, ψ, ˆn
+
+#
+
+. (A5)                                   
+
+> Input :ρℓℓ,k (t), mode covariances, samples of (R33 , R 44 ), detector network.
+> Output: Posterior samples for sky position, distance, inclination, polarization, time, and intrinsic quantities.
+> Precompute:
+> Rescale ρℓℓ,k (t) and covariances to the reference-distance convention. Build an incoherent arrival-time proposal from the whitened mode SNR time series.
+> Marginalize: foreach QMC point and mode-ratio sample do
+> Draw ι,ψ,t⊕, sky position, and ( R33 , R 44 ). Map t⊕to detector arrival times tk.Interpolate ρℓℓ,k (t) at each tk.Evaluate ⟨hk|dk⟩and ⟨hk|hk⟩using Eqs. (A2) and (A3). Marginalize over dLand ϕ0.
+> end Sample:
+> Combine detectors and weighted mode-ratio samples to estimate the marginalized integral Eq. (A5). Importance-resample the marginalization points. Repeat with R33 =R44 = 0 for the quadrupole-only comparison.
+
+Algorithm 1: Low-latency marginalization with mode-by-mode filtering Note that this is the same coherent score used in the ranking statistic of the IAS-HM search pipeline and com-puted for all the zero-lag and time-slided candidates [56]. Our likelihood has the same structure for nuisance pa-rameters such as luminosity distance and reference phase: when their dependence is smooth or can be tabulated ac-curately, integrating them out is faster than sampling them explicitly while preserving the posterior for the pa-rameters retained in the analysis. In Eq. (A5), w(i) are the weights associated with the precomputed mode-ratio samples. In the implementation used here, the distance integral is evaluated using a pre-computed interpolation table, the ϕ0 integral by trape-zoid quadrature, and the remaining extrinsic-parameter integrals by adaptive importance sampling. Note that the effect of ϕ0 is different for different higher modes, and hence we cannot marginalize the orbital phase an-alytically as typically done for quadrupole-only wave-forms [37]. Instead, we use trapezoid quadrature, which performs adequately since the likelihood is a periodic function of the orbital phase. Once we perform the marginalized integral in Eq. (A5), we use it to draw the low-latency posterior samples discussed in the main text. The example notebook evaluates Eq. (A5) twice for the same event. The higher-mode run uses the sam-pled R33 and R44 values. The comparison “(2 , 2)-only” run sets these ratios to zero, leaving the same detec-tor network, time series, and sampling settings but re-moving the higher-mode contribution from the wave-form model. Posterior samples are then drawn by im-portance resampling from the quasi-Monte Carlo points used in the marginalization; App. C gives a simpler one-template version of the same logic for reference. The notebook reports the sky position, luminosity distance, polarization, inclination, source-frame secondary mass, effective spin, and likelihood. The source-frame mass and effective-spin samples are attached by carrying along the same intrinsic-sample index used for the mode-ratio sam-ple; the luminosity distance is converted back from the 
+
+cogwheel normalization, and the right ascension is ob-tained from the sampled longitude and geocentric time. For the timing estimate quoted in the main text, we selected ten representative O5 catalog events and timed only the marginalization call and the subsequent posterior-sample generation, excluding input loading and construction of the coherent-score object (performed once for the entire O5 run). The benchmark used 512 phase points, a minimum target effective sample size of 50, and a maximum of 2 16 QMC samples. The higher-mode runs used ≃ 5.3 × 10 3 QMC samples on average, corresponding to ≃ 2.6 × 10 6 vectorized QMC-phase like-lihood evaluations. After the max-over-distance thresh-olding step, ≃ 2.2×10 5 QMC-phase points per event were retained for distance-marginalized likelihood lookup, and the average effective sample size was ≃ 1.9 × 10 2.
+
+> Appendix B: Avenues for future work
+
+We outlined a few directions for future work at the end of the main text. Here we discuss additional limitations of the present implementation. First, some high-SNR events can yield a low effec-tive sample size in the adaptive marginalization. This happens because the posterior support becomes narrow enough that the present QMC resolution is not always sufficient; increasing the maximum QMC resolution or adapting the proposal more aggressively should improve the sampling efficiency for such events. Second, the cur-rent framework assumes that the intrinsic parameters are fixed to the maximum-likelihood template provided by the search pipeline, with the precomputed mode-ratio samples representing the neighborhood of that template. A more complete low-latency treatment could combine information from multiple nearby templates, thereby ap-proximately marginalizing over intrinsic parameter space rather than conditioning on a single best-fit template. This could follow template-bank or iterative-grid ap-8proaches used in dot-PE [108] and RIFT [109–111]. Third, in our simulations we compute the SNR time series using the quadrupole-mode template evaluated at the injected parameters. A realistic search uses a dis-crete NSBH template bank, so the recovered trigger may correspond to a slightly mismatched, suboptimal tem-plate. This idealization also limits the calibration tests we can currently perform. A standard P-P plot would draw injections from the prior, add a random noise re-alization to each, and check whether the resulting credi-ble levels are uniformly distributed; with our zero-noise, perfect-template setup neither ingredient is present, and in particular the maximum-likelihood point lies at the injection by construction, biasing any credible-level CDF away from the diagonal. Performing a meaningful P-P test therefore requires two coupled upgrades: adding noise realizations drawn from the assumed O5 PSDs, and recovering each injection through a discrete NSBH tem-plate bank so that the suboptimal-template effect is in-cluded. The second step also requires a mode-amplitude-ratio library tailored to that bank, constructed using the procedure of App. D applied to each template rather than only to the best-fit point. We plan to address both up-grades in a follow-up project, either using our IAS-HM 
+
+search pipeline or in collaboration with one of the LVK pipelines. Finally, we included only the dominant ℓ = |m| = 3 and 4 modes in this analysis. Other HMs can be incorpo-rated in the same framework, and we leave this extension to future work. 
+
+> Appendix C: Illustrative example: posterior sampling via marginalization
+
+The advantage of marginalization over brute-force sampling can be illustrated with a simple matched-filtering example. Consider a single-template likelihood with unknown amplitude A and reference phase ϕ0,ln L(A, ϕ 0) = A Re e−iϕ 0 ⟨d|h⟩ − 12 A2⟨h|h⟩ , (C1) where ⟨d|h⟩ is the (complex) matched-filter inner product of the data with a unit-normalized template. Sampling jointly in ( A, ϕ 0) requires exploring a banana-shaped pos-terior, and the ϕ0 direction is periodic and can be multi-modal. Marginalizing analytically over ϕ0 with a uniform prior yields the well-known closed form 
+
+Lmarg (A) ∝ I0(A |⟨ d|h⟩| ) exp 
+
+
+
+− 12 A2⟨h|h⟩
+
+
+
+, (C2) where I0 is the modified Bessel function of the first kind. This removes a parameter without approximation, elim-inates the multimodality induced by ϕ0, and leaves a one-dimensional likelihood that can be evaluated directly. This is precisely the structure exploited by BAYESTAR 
+
+and cogwheel for ϕ0, and analogously by a precomputed lookup table for the luminosity distance dL. Posterior samples in ( A, ϕ 0) are then obtained in two steps, mir-roring the procedure used in our pipeline. First, Aj is drawn from the one-dimensional marginalized posterior 
+
+Lmarg (A) p(A), for example by inverse-CDF sampling on a grid. Second, the conditional posterior for the phase given Aj is 
+
+p(ϕ0 | Aj , d ) ∝ exp[ Aj |⟨ d|h⟩| cos( ϕ0 − ϕd)] , (C3) where ϕd ≡ arg ⟨d|h⟩ is a von Mises distribution from which ϕ0,j can be drawn directly. The pair ( Aj , ϕ 0,j ) is then an unweighted joint posterior sample. Our pipeline extends the same logic to the discrete library sampled from Eq. (A5), replacing stochastic exploration over a hard combinatorial space with a deterministic weighted sum. Note that the HM case is different from this simple example. The orbital phase ϕ0 enters each harmonic with a different prefactor and cannot be marginalized analyti-cally as in the (2 , 2)-only case [37]; we instead integrate it numerically by trapezoid quadrature (see App. A). The toy example above captures the structure of the result-ing two-step sampling procedure, with the analytic von Mises step replaced by an inverse-CDF draw from the tabulated phase posterior. 
+
+> Appendix D: Creating samples for mode amplitude ratios
+
+In this appendix, we describe how we construct the library of Rℓm samples from Eq. (1) for a given (2 , 2) template: 
+
+Rℓm ≡ ⟨hℓm (f )|hℓm (f )⟩1/2
+
+⟨h22 (f )|h22 (f )⟩1/2 . (D1) Each (2 , 2) template in a search pipeline corresponds not to an infinitesimal point, but to a region of in-trinsic parameter space [ m1, m 2, χ 1z , χ 2z ]. We therefore need a fast way to assign Rℓm values to that region. One approach is to perform Monte Carlo sampling over [m1, m 2, χ 1z , χ 2z ], collect the samples associated with each template, and calculate R33 and R44 for those sam-ples. Instead of storing a discrete list of {R33 , R 44 } for each template, one can model an interpolated probability density p(R33 , R 44 |tα), where tα denotes the parameters of the (2 , 2) template (e.g., SVD coordinates in the case of Refs. [44, 112]). This normalizing-flow approach was used in the IAS-HM O3 search [44] and in Ref. [107] for precession harmonics. The model p(R33 , R 44 |tα) can be learned during template-bank construction. In this paper, however, we did not build a full NSBH template bank, and instead use the approximate method described below. For each (2 , 2) template, we construct a scaled Fisher ellipse to approximate its associated region of intrinsic parameter space. Consider the match between neighbor-ing points given by M ≡ ⟨ h(θ)|h(θ+∆ θ)⟩/(|| h(θ)|| || h(θ+9∆θ)|| ) ≡ 1 − gij ∆θi∆θj , where gij is the Riemannian metric in the intrinsic parameters. This metric can be derived from the Fisher information matrix as gij =Γij /(2 ρ2), where Γ ij = ⟨∂ih|∂j h⟩ and ρ ≡ ⟨ h|h⟩1/2 is the SNR. The region of parameter space corresponding to each template is given by the mismatch ellipse [113] 
+
+gij ∆θi∆θj < μ , (D2) where μ is the threshold mismatch. We use μ = 1 −0.97 = 0.03, corresponding to the minimal match commonly adopted in template-bank construction. We then sam-ple intrinsic parameters inside the mismatch ellipse and construct a library of {R33 , R 44 } values for use in the marginalized integral in Eq. (A5). A useful byproduct of this construction is that each (R(i)33 , R (i)44 ) sample is generated from a specific intrinsic-parameter point θ(i) = ( m(i)1 , m (i)2 , χ (i)1z , χ (i)2z ) inside the mismatch ellipse. Storing θ(i) alongside the mode ratios lets us obtain approximate posteriors on derived intrinsic quantities, such as the secondary mass m(i)2 , chirp mass 
+
+M(i), mass ratio q(i), and effective spin χ(i)eff , at essen-tially no additional cost. We obtain importance weights on ( R(i)33 , R (i)44 ) from Eq. (A5) and use the same weights on the associated θ(i), so the intrinsic posteriors follow by reweighting the stored samples. Because the θ(i) are drawn from inside the Fisher mismatch ellipse, the im-plicit prior is uniform within that neighborhood of the best-fit template (an astrophysical prior can be applied as a postprocessing reweighting if desired). This is also the origin of the mild msrc 2 overconstraint visible in Fig. 1: the intrinsic posterior is conditioned on the best-fit-template neighborhood, not marginalized over the full intrinsic pa-rameter space (see App. B). 
+
+Appendix E: Simulated population and uncertainties 
+
+We simulate 100 realizations of a catalog correspond-ing to 1 yr of observation time. The source-frame masses 
+
+msrc 1,2 and spins are drawn according to the NSBH-pop 
+
+model first introduced in Ref. [71]. In this model, the BH distribution is assumed to be a truncated power-law, while the mass ratio distribution is assumed to be a truncated Gaussian between 1 M ⊙/m src 1 < q <
+
+min( mNS , max /m src 1 , 1), where mNS , max denotes the max-imum NS mass. The BH spin magnitudes are modeled as a Beta distribution in the range χ1 ∈ [0 , 0.99], while the NS spin magnitudes are assumed to be uniformly distributed over χ2 ∈ [0 , 0.7]. The cosines of the spin tilts are sampled uniformly. Each one of our realizations corresponds to a different (hyper)posterior sample from the latest LVK analysis [14]. From the same sample we also extract the local merger rate and low-z slope of the merger rate distribution. We extend the distribution to high redshift using a Madau-Dickinson profile [72], such 1.0    
+
+> 1.5
+> 2.0
+> 2.5
+> msrc 2 (M )
+> 0.0
+> 2.5
+> 5.0
+> 7.5
+> z
+> −0.5
+> 0.0
+> 0.5
+> χ1,z
+> −0.4
+> 0.0
+> 0.4
+> χ2,z
+> 5
+> 10
+> 15
+> 20
+> msrc 1(M)
+> 10 −1
+> 10 0
+> 10 1
+> 10 2
+> SNR
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> msrc 2(M)
+> 0.0
+> 2.5
+> 5.0
+> 7.5
+> z
+> −0.5
+> 0.0
+> 0.5
+> χ1,z
+> −0.4
+> 0.0
+> 0.4
+> χ2,z
+> 10 −1
+> 10 0
+> 10 1
+> 10 2
+> SNR
+
+FIG. 6. In the main text, we tested our low-latency HM pipeline on mergers detected in 100 simulated one-year NSBH catalogs with O5 LIGO–Virgo design-sensitivity network. Here, we show the intrinsic parameters, redshift, and SNR of all the events (detected+undetected) in the combined set of our catalogs; dashed lines mark the furthest detected-event redshift and the SNR threshold. 
+
+that 
+
+p(z) ∝ dVc
+
+dz (z) (1 + z)αz −1
+
+1 + 
+
+ 1 + z
+
+1 + zp
+
+αz +βz . (E1) We use the typical parameters zp = 2 and βz = 3 [73]. The redshift of the furthest detection is z ∼ 0.64, so this high-redshift extension does not affect our results. Fig-ure 6 shows the resulting intrinsic-parameter distribution across the 100 catalogs, along with the SNR in the chosen LVK design-sensitivity network. The extrinsic parame-ters are sampled uniformly in their physical ranges. The main text focuses on relative improvements be-tween the HM and (2 , 2)-only pipelines. As a comple-ment, Fig. 7 reports the distributions of the 90% local-ization area, the relative 90% widths of the luminosity-distance and source-frame-secondary-mass posteriors, the 90% width of the viewing-angle posterior, and the optimal matched-filter SNR. Sky localization and SNR are largely unchanged by HMs, while the improvement in msrc 2 is mild, as discussed in the main text. The viewing-angle distribution shifts appreciably to smaller values with the full pipeline, and the dL distribution also gains support at smaller distances. For a minority of systems, the relative width of the dL posterior is larger in the full analysis. This occurs partly because the HM posterior can shift to smaller dL (see, e.g., Fig. 1), giving 10 22 + Higher harmonics 22 only (BAYESTAR-like)       
+
+> 0.25
+> 0.50
+> 0.75
+> dL,  90% / ¯dL
+> 15
+> 30
+> 45
+> 60
+> 75
+> Θ90%  (deg)
+> 0.25
+> 0.50
+> 0.75
+> msrc 2, 90% / ¯msrc 2
+> 10 1
+> 10 2
+> 10 3
+> Ω90% (deg 2)
+> 10
+> 30
+> 50
+> 90
+> SNR
+> 0.25
+> 0.50
+> 0.75
+> dL, 90% /¯dL
+> 15
+> 30
+> 45
+> 60
+> 75
+> Θ90% (deg)
+> 0.25
+> 0.50
+> 0.75
+> msrc 2,90% /¯msrc 2
+> 10
+> 30
+> 50
+> 90
+> SNR
+
+FIG. 7. Population-level one-dimensional summaries comple-ment the event-by-event ratios shown in the main text. We compare the HM pipeline (blue) with the (2 , 2)-only pipeline (orange dashed) for sky area, relative dL and msrc 2 widths, viewing-angle width, and SNR. We see that HMs mainly im-prove distance and viewing-angle information, while sky area and SNR remain largely unchanged. 
+
+a larger relative uncertainty even when the absolute pos-terior width is comparable to the (2 , 2)-only result. In some low-SNR systems, HMs can also make the poste-rior structure slightly more complex, producing the mild broadening visible in the dL, 90% / ¯dL–SNR panel of Fig. 7. 
+
+Appendix F: Example of an event with larger Vc
+
+when including higher-order modes 
+
+As reported in the main text, for a small fraction of the simulated events we find a larger localization comov-ing volume at 90% c.l. when running the analysis in-cluding HMs. This is not a spurious effect: for systems with small viewing angles and little observed harmonic content, accounting for subdominant harmonics reduces support for edge-on configurations. The posterior can therefore shift toward larger luminosity distances, where the corresponding comoving volume is larger. While the 90% Vc is larger using the full pipeline, the posterior peaks closer to the true value. Figure 8 shows one such example, in which the relative 90% dL posterior from the full analysis is ∼ 8% narrower, while the 90% localization comoving volume is ∼ 12% larger. The sky-localization posteriors are consistent between the two analyses, but the full analysis gives more support to the injected pa-rameters. Low -latency PE – 22 + higher harmonics Low -latency PE – 22 only (BAYESTAR-like)    
+
+> 0.8
+> 1.6
+> 2.4
+> ι
+> 1.50
+> 1.75
+> 2.00
+> 2.25
+> msrc 2 (M )
+> 2
+> 4
+> 6
+> RA
+> 1000
+> 2000
+> 3000
+> 4000
+> dL(Mpc)
+> −0.6
+> 0.0
+> 0.6
+> 1.2
+> Dec
+> 0.8
+> 1.6
+> 2.4
+> ι
+> 1.50
+> 1.75
+> 2.00
+> 2.25
+> msrc 2(M)
+> 2
+> 4
+> 6
+> RA
+> −0.6
+> 0.0
+> 0.6
+> 1.2
+> Dec
+
+FIG. 8. A small fraction of events in the main text figure about the dL–ι constraints showed a larger 90% c.l. localiza-tion comoving volume when HMs are included. Here, we show one example of such events. We see that the HM posterior is closer to the injected luminosity distance. Therefore, a larger quoted volume is not necessarily a failure of the HM analysis, because the posterior can become less biased while shifting to distances with larger comoving volume. 11 
+
+[1] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 116 , 061102 (2016), arXiv:1602.03837 [gr-qc]. [2] J. Aasi et al. (LIGO Scientific), Class. Quant. Grav. 32 ,074001 (2015), arXiv:1411.4547 [gr-qc]. [3] F. Acernese et al. (Virgo), Class. Quant. Grav. 32 ,024001 (2015), arXiv:1408.3978 [gr-qc]. [4] Y. Aso, Y. Michimura, K. Somiya, M. Ando, 
+
+et al. (KAGRA), Phys. Rev. D 88 , 043007 (2013), arXiv:1306.6747 [gr-qc]. [5] A. G. Abac et al. (LIGO Scientific, Virgo, KAGRA), (2025), arXiv:2508.18082 [gr-qc]. [6] (LIGO Scientific, Virgo, KAGRA), (2026), arXiv:2605.27225 [gr-qc]. [7] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 119 , 161101 (2017), arXiv:1710.05832 [gr-qc]. [8] B. P. Abbott et al. (LIGO Scientific, Virgo), Astrophys. J. Lett. 892 , L3 (2020), arXiv:2001.01761 [astro-ph.HE]. [9] B. P. Abbott et al. (LIGO Scientific, Virgo, Fermi GBM, INTEGRAL, IceCube, AstroSat Cadmium Zinc Telluride Imager Team, IPN, Insight-Hxmt, ANTARES, Swift, AGILE Team, 1M2H Team, Dark Energy Camera GW-EM, DES, DLT40, GRAWITA, Fermi-LAT, ATCA, ASKAP, Las Cumbres Observa-tory Group, OzGrav, DWF (Deeper Wider Faster Program), AST3, CAASTRO, VINROUGE, MAS-TER, J-GEM, GROWTH, JAGWAR, CaltechNRAO, TTU-NRAO, NuSTAR, Pan-STARRS, MAXI Team, TZAC Consortium, KU, Nordic Optical Telescope, ePESSTO, GROND, Texas Tech University, SALT Group, TOROS, BOOTES, MWA, CALET, IKI-GW Follow-up, H.E.S.S., LOFAR, LWA, HAWC, Pierre Auger, ALMA, Euro VLBI Team, Pi of Sky, Chan-dra Team at McGill University, DFN, ATLAS Tele-scopes, High Time Resolution Universe Survey, RIMAS, RATIR, SKA South Africa/MeerKAT), Astrophys. J. Lett. 848 , L12 (2017), arXiv:1710.05833 [astro-ph.HE]. [10] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 121 , 161101 (2018), arXiv:1805.11581 [gr-qc]. [11] B. P. Abbott et al. (LIGO Scientific, Virgo, 1M2H, Dark Energy Camera GW-E, DES, DLT40, Las Cumbres Observatory, VINROUGE, MASTER), Nature 551 , 85 (2017), arXiv:1710.05835 [astro-ph.CO]. [12] R. Abbott et al. (LIGO Scientific, KAGRA, Virgo), Astrophys. J. Lett. 915 , L5 (2021), arXiv:2106.15163 [astro-ph.HE]. [13] R. Abbott et al. (KAGRA, Virgo, LIGO Scientific), Phys. Rev. X 13 , 041039 (2023), arXiv:2111.03606 [gr-qc]. [14] A. G. Abac et al. (LIGO Scientific, KAGRA, Virgo), Astrophys. J. Lett. 970 , L34 (2024), arXiv:2404.04248 [astro-ph.HE]. [15] S. Olsen, T. Venumadhav, J. Mushkin, J. Roulet, B. Za-ckay, and M. Zaldarriaga, Phys. Rev. D 106 , 043009 (2022), arXiv:2201.02252 [astro-ph.HE]. [16] R. Abbott et al. (LIGO Scientific, VIRGO), Phys. Rev. D 109 , 022001 (2024), arXiv:2108.01045 [gr-qc]. [17] A. Colombo et al. , Astron. Astrophys. 686 , A265 (2024), arXiv:2310.16894 [astro-ph.HE]. [18] S. Vitale and H.-Y. Chen, Phys. Rev. Lett. 121 , 021303 (2018), arXiv:1804.07337 [astro-ph.CO]. [19] T. A. Clarke, L. Chastain, P. D. Lasky, and E. Thrane, Astrophys. J. Lett. 949 , L6 (2023), arXiv:2302.09711 [gr-qc]. [20] F. S. Broekgaarden et al. , Mon. Not. Roy. Astron. Soc. 
+
+516 , 5737 (2022), arXiv:2112.05763 [astro-ph.HE]. [21] N. Gehrels et al. (Swift Science), Astrophys. J. 611 ,1005 (2004), [Erratum: Astrophys.J. 621, 558 (2005)], arXiv:astro-ph/0405233. [22] Y. Shvartzvald et al. , Astrophys. J. 964 , 74 (2024), arXiv:2304.14482 [astro-ph.IM]. [23] J.-L. Atteia, B. Cordier, and J. Wei (SVOM), Int. J. Mod. Phys. D 31 , 2230008 (2022), arXiv:2203.10962 [astro-ph.IM]. [24] W. Yuan et al. (Einstein Probe Team), PoS SWIFT10 ,006 (2015), arXiv:1506.07735 [astro-ph.HE]. [25] S. Anand et al. , Nature Astron. 5, 46 (2021), arXiv:2009.07210 [astro-ph.HE]. [26] I. Andreoni et al. , Astrophys. J. Supp. 260 , 18 (2022), arXiv:2111.01945 [astro-ph.HE]. [27] B. P. Gompertz et al. , Mon. Not. Roy. Astron. Soc. 497 ,726 (2020), arXiv:2004.00025 [astro-ph.HE]. [28] D. A. Goldstein et al. , Astrophys. J. Lett. 881 , L7 (2019), arXiv:1905.06980 [astro-ph.HE]. [29] S. Antier et al. , Mon. Not. Roy. Astron. Soc. 497 , 5518 (2020), arXiv:2004.04277 [astro-ph.HE]. [30] S. S. Chaudhary et al. , Proc. Nat. Acad. Sci. 121 ,e2316474121 (2024), arXiv:2308.04545 [astro-ph.HE]. [31] S. Sachdev et al. , (2019), arXiv:1901.08580 [gr-qc]. [32] A. H. Nitz, T. Dal Canton, D. Davis, and S. Reyes, Phys. Rev. D 98 , 024050 (2018), arXiv:1805.11174 [gr-qc]. [33] T. Adams, D. Buskulic, V. Germain, G. M. Guidi, 
+
+et al. , Class. Quant. Grav. 33 , 175012 (2016), arXiv:1512.02864 [gr-qc]. [34] Q. Chu et al. , Phys. Rev. D 105 , 024023 (2022), arXiv:2011.06787 [gr-qc]. [35] V. Villa-Ortega, T. Dent, and A. C. Barroso, Mon. Not. Roy. Astron. Soc. 515 , 5718 (2022), [Er-ratum: Mon.Not.Roy.Astron.Soc. 535, 2503 (2024)], arXiv:2203.10080 [astro-ph.HE]. [36] (LIGO Scientific, Virgo, KAGRA), (2026), arXiv:2605.27224 [gr-qc]. [37] L. P. Singer and L. R. Price, Phys. Rev. D 93 , 024013 (2016), arXiv:1508.03634 [gr-qc]. [38] L. P. Singer et al. , Astrophys. J. Lett. 829 , L15 (2016), arXiv:1603.07333 [astro-ph.HE]. [39] L. P. Singer et al. , Astrophys. J. Suppl. 226 , 10 (2016), arXiv:1605.04242 [astro-ph.IM]. [40] R. Essick, S. Vitale, E. Katsavounidis, G. Vedovato, and S. Klimenko, Astrophys. J. 800 , 81 (2015), arXiv:1409.2435 [astro-ph.HE]. [41] C. Capano, Y. Pan, and A. Buonanno, Phys. Rev. D 
+
+89 , 102003 (2014), arXiv:1311.1286 [gr-qc]. [42] C. Mills and S. Fairhurst, Phys. Rev. D 103 , 024042 (2021), arXiv:2007.04313 [gr-qc]. [43] S. Fairhurst, C. Hoy, R. Green, C. Mills, and S. A. Usman, Phys. Rev. D 108 , 082006 (2023), arXiv:2304.03731 [gr-qc]. [44] D. Wadekar, J. Roulet, T. Venumadhav, A. K. Mehta, 
+
+et al. , (2023), arXiv:2312.06631 [gr-qc]. 12 
+
+[45] S. Yi, F. Iacovelli, S. Marsat, D. Wadekar, and E. Berti, Phys. Rev. D 112 , 124063 (2025), arXiv:2502.12237 [gr-qc]. [46] S. Yi, F. Iacovelli, E. Berti, R. S. Chandramouli, S. Marsat, D. Wadekar, and N. Yunes, (2026), arXiv:2602.09088 [gr-qc]. [47] A. K. Mehta, D. Wadekar, J. Roulet, I. Anantpurkar, 
+
+et al. , (2025), arXiv:2501.17939 [gr-qc]. [48] A. K. Mehta, D. Wadekar, I. Anantpurkar, J. Roulet, et al. , Phys. Rev. D 112 , 124023 (2025), arXiv:2508.15350 [gr-qc]. [49] D. Wadekar, T. Venumadhav, A. K. Mehta, J. Roulet, et al. , Phys. Rev. D 110 , 084035 (2024), arXiv:2310.15233 [gr-qc]. [50] K. Chandra, J. Calder´ on Bustillo, A. Pai, and I. W. Harry, Phys. Rev. D 106 , 123003 (2022), arXiv:2207.01654 [gr-qc]. [51] J. Calder´ on Bustillo, S. H. W. Leong, and K. Chandra, Nature Astron. 9, 1530 (2025), arXiv:2211.03465 [gr-qc]. [52] P. Sinha, R. Prasad, M. K. Singh, P. Kumar, A. Maurya, and K. Paul, (2025), arXiv:2507.07021 [gr-qc]. [53] C. Cutler and E. E. Flanagan, Phys. Rev. D 49 , 2658 (1994), arXiv:gr-qc/9402014. [54] S. A. Usman, J. C. Mills, and S. Fairhurst, Astrophys. J. 877 , 82 (2019), arXiv:1809.10727 [gr-qc]. [55] J. Calder´ on Bustillo, S. H. W. Leong, T. Dietrich, and P. D. Lasky, Astrophys. J. Lett. 912 , L10 (2021), arXiv:2006.11525 [gr-qc]. [56] D. Wadekar, T. Venumadhav, J. Roulet, A. K. Mehta, B. Zackay, J. Mushkin, and M. Zaldarriaga, Phys. Rev. D 110 , 044063 (2024), arXiv:2405.17400 [gr-qc]. [57] J. Roulet, J. Mushkin, D. Wadekar, T. Venumadhav, B. Zackay, and M. Zaldarriaga, Phys. Rev. D 110 ,044010 (2024), arXiv:2404.02435 [gr-qc]. [58] N. Gehrels, J. K. Cannizzo, J. Kanner, M. M. Kasliwal, S. Nissanke, and L. P. Singer, Astrophys. J. 820 , 136 (2016), arXiv:1508.03608 [astro-ph.HE]. [59] N. Sarin, P. D. Lasky, F. H. Vivanco, S. P. Stevenson, D. Chattopadhyay, R. Smith, and E. Thrane, Phys. Rev. D 105 , 083004 (2022), arXiv:2201.08491 [astro-ph.HE]. [60] O. S. Salafia and G. Ghirlanda, Galaxies 10 , 93 (2022), arXiv:2206.11088 [astro-ph.HE]. [61] B. J. Morsony, R. D. L. Santos, R. Hernandez, J. Bus-tamante, et al. , Mon. Not. Roy. Astron. Soc. 533 , 510 (2024), arXiv:2306.00076 [astro-ph.HE]. [62] A. S. Carracedo, M. Bulla, U. Feindt, and A. Goo-bar, Mon. Not. Roy. Astron. Soc. 504 , 1294 (2021), arXiv:2004.06137 [astro-ph.HE]. [63] E. A. Chase, B. O’Connor, C. L. Fryer, E. Troja, et al. ,Astrophys. J. 927 , 163 (2022), arXiv:2105.12268 [astro-ph.HE]. [64] I. Andreoni et al. , Astrophys. J. Supp. 258 , 5 (2022), arXiv:2106.06820 [astro-ph.HE]. [65] I. Andreoni et al. , Astropart. Phys. 155 , 102904 (2024), arXiv:2307.09511 [astro-ph.HE]. [66] T. Ahumada et al. , Publ. Astron. Soc. Pac. 136 , 114201 (2024), arXiv:2405.12403 [astro-ph.HE]. [67] S. Stevenson, A. M¨ oller, and J. Powell, Astrophys. J. 
+
+998 , 8 (2026), arXiv:2510.12932 [astro-ph.HE]. [68] F. Foucart, T. Hinderer, and S. Nissanke, Phys. Rev. D 98 , 081501 (2018), arXiv:1807.00011 [astro-ph.HE]. [69] C. Barbieri, O. S. Salafia, A. Perego, M. Colpi, and G. Ghirlanda, Eur. Phys. J. A 56 , 8 (2020), arXiv:1908.08822 [astro-ph.HE]. [70] B. P. Gompertz, M. Nicholl, J. C. Smith, S. Harisankar, G. Pratten, P. Schmidt, and G. P. Smith, Mon. Not. Roy. Astron. Soc. 526 , 4585 (2023), arXiv:2305.07582 [astro-ph.HE]. [71] S. Biscoveanu, P. Landry, and S. Vitale, Mon. Not. Roy. Astron. Soc. 518 , 5298 (2022), arXiv:2207.01568 [astro-ph.HE]. [72] P. Madau and M. Dickinson, Ann. Rev. Astron. Astro-phys. 52 , 415 (2014), arXiv:1403.0007 [astro-ph.CO]. [73] P. Madau and T. Fragos, Astrophys. J. 840 , 39 (2017), arXiv:1606.07887 [astro-ph.GA]. [74] B. P. Abbott et al. (KAGRA, LIGO Scientific, Virgo), Living Rev. Rel. 19 , 1 (2016), arXiv:1304.0670 [gr-qc]. [75] F. Iacovelli, M. Mancarella, S. Foffa, and M. Maggiore, Astrophys. J. Supp. 263 , 2 (2022), arXiv:2207.06910 [astro-ph.IM]. [76] C. Garc´ ıa-Quir´ os, M. Colleoni, S. Husa, H. Es-tell´ es, et al. , Phys. Rev. D 102 , 064002 (2020), arXiv:2001.10914 [gr-qc]. [77] LIGO Scientific Collaboration, Virgo Collaboration, and KAGRA Collaboration, “LVK Algorithm Library - LALSuite,” Free software (GPL) (2018). [78] In a zero-noise injection, the SNR of an injected sig-nal is defined relative to the detector’s assumed noise power spectral density, even though no random noise realization is added. It measures the signal’s strength compared to the noise level, not noise actually present in the data. [79] G. Ashton et al. , Astrophys. J. Suppl. 241 , 27 (2019), arXiv:1811.02042 [astro-ph.IM]. [80] M. Dax, S. R. Green, J. Gair, J. H. Macke, A. Buo-nanno, and B. Sch¨ olkopf, Phys. Rev. Lett. 127 , 241103 (2021), arXiv:2106.12594 [gr-qc]. [81] M. Dax, S. R. Green, J. Gair, N. Gupte, et al. , Nature 
+
+639 , 49 (2025), arXiv:2407.09602 [gr-qc]. [82] J. Roulet, M. Crisostomi, L. M. Thomas, and K. Chatziioannou, (2026), arXiv:2604.08897 [gr-qc]. [83] J. Roulet, S. Olsen, J. Mushkin, T. Islam, T. Venumad-hav, B. Zackay, and M. Zaldarriaga, Phys. Rev. D 106 ,123015 (2022), arXiv:2207.03508 [gr-qc]. [84] T. Islam, J. Roulet, and T. Venumadhav, (2022), arXiv:2210.16278 [gr-qc]. [85] R. Abbott et al. (LIGO Scientific, Virgo), Astrophys. J. Lett. 896 , L44 (2020), arXiv:2006.12611 [astro-ph.HE]. [86] The standard choices in GW PE are a prior uniform in cos ι, and a prior uniform in comoving volume Vc and source-frame time for dL. The former assigns more prior mass to edge-on configurations when expressed as a den-sity in ι, while the latter strongly favors large distances. These two effects partially compete: edge-on systems are intrinsically fainter and therefore, for a given ob-served amplitude, tend to be inferred at smaller dis-tances, whereas the volumetric distance prior pushes the posterior toward larger dL. In general, if the like-lihood does not constrain the inclination well, the dis-tance posterior can be significantly influenced by these priors, often being shifted toward larger distances by the dL prior. [87] J. S. Speagle, MNRAS 493 , 3132 (2020), arXiv:1904.02180 [astro-ph.IM]. [88] S. D. Barthelmy et al. , Space Sci. Rev. 120 , 143 (2005), arXiv:astro-ph/0507410. 13 
+
+[89] R. A. J. Eyles-Ferris et al. , Mon. Not. Roy. Astron. Soc. 
+
+536 , 2857 (2024), arXiv:2411.05072 [astro-ph.HE]. [90] A. Farah, R. Essick, Z. Doctor, M. Fishbach, and D. E. Holz, Astrophys. J. 895 , 108 (2020), arXiv:1912.04906 [astro-ph.HE]. [91] O. S. Salafia, M. E. Ravasio, G. Ghirlanda, and I. Mandel, Astron. Astrophys. 680 , A45 (2023), arXiv:2306.15488 [astro-ph.HE]. [92] E. Troja, L. Piro, G. Ryan, H. van Eerten, et al. ,Mon. Not. Roy. Astron. Soc. 478 , L18 (2018), arXiv:1801.06516 [astro-ph.HE]. [93] M. L. McConnell, M. Baring, P. Bloser, M. S. Briggs, 
+
+et al. , in UV, X-Ray, and Gamma-Ray Space Instru-mentation for Astronomy XXII , Vol. 11821, edited by O. H. Siegmund, International Society for Optics and Photonics (SPIE, 2021) pp. 237 – 250. [94] N. De Angelis et al. (2025) arXiv:2509.06601 [astro-ph.HE]. [95] M. Kole, F. Iacovelli, M. Mancarella, and N. Produit, Astron. Astrophys. 669 , A77 (2023), arXiv:2211.12403 [astro-ph.HE]. [96] D. Chatterjee, S. Ghosh, P. R. Brady, S. J. Kapadia, A. L. Miller, S. Nissanke, and F. Pannarale, Astrophys. J. 896 , 54 (2020), arXiv:1911.00116 [astro-ph.IM]. [97] A. Nitz, I. Harry, D. Brown, C. M. Biwer, et al. ,“gwastro/pycbc: v2.3.3 release of pycbc,” (2024). [98] S. J. Kapadia, M. K. Singh, M. A. Shaikh, D. Chatter-jee, and P. Ajith, Astrophys. J. Lett. 898 , L39 (2020), arXiv:2005.08830 [astro-ph.HE]. [99] M. K. Singh, S. J. Kapadia, M. A. Shaikh, D. Chatter-jee, and P. Ajith, Mon. Not. Roy. Astron. Soc. 502 ,1612 (2021), arXiv:2010.12407 [astro-ph.HE]. [100] M. Punturo et al. , Class. Quant. Grav. 27 , 194002 (2010). [101] M. Branchesi et al. , JCAP 2023 , 068 (2023), arXiv:2303.15923 [gr-qc]. [102] A. Abac et al. (ET), JCAP 2026 , 081 (2026), arXiv:2503.12263 [gr-qc]. [103] D. Reitze et al. , Bull. Am. Astron. Soc. 51 , 035 (2019), arXiv:1907.04833 [astro-ph.IM]. [104] M. Evans et al. , (2021), arXiv:2109.09882 [astro-ph.IM]. [105] M. Evans et al. , (2023), arXiv:2306.13745 [astro-ph.IM]. [106] R. Dhurkunde and A. H. Nitz, Phys. Rev. D 106 , 103035 (2022), arXiv:2207.14645 [astro-ph.IM]. [107] Z. Zhou et al. , (2026), arXiv:2603.05784 [gr-qc]. [108] J. Mushkin, J. Roulet, B. Zackay, T. Venumad-hav, et al. , Phys. Rev. D 112 , 104025 (2025), arXiv:2507.16022 [gr-qc]. [109] J. Lange, R. O’Shaughnessy, and M. Rizzo, (2018), arXiv:1805.10457 [gr-qc]. [110] A. B. Yelikar, V. Delfavero, and R. O’Shaughnessy, (2023), arXiv:2301.01337 [gr-qc]. [111] J. Wofford et al. , Phys. Rev. D 107 , 024040 (2023). [112] J. Roulet, L. Dai, T. Venumadhav, B. Zackay, and M. Zaldarriaga, Phys. Rev. D 99 , 123022 (2019), arXiv:1904.01683 [astro-ph.IM]. [113] B. J. Owen and B. S. Sathyaprakash, Phys. Rev. D 60 ,022002 (1999), arXiv:gr-qc/9808076.
