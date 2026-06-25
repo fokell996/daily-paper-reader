@@ -1,0 +1,362 @@
+Title: 3D particle-in-cell simulations of pulsar wind-disk interaction: application to the transitional millisecond pulsar PSR J1023+0038
+
+URL Source: https://arxiv.org/pdf/2606.25114v1
+
+Published Time: Thu, 25 Jun 2026 00:15:25 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+Astronomy & Astrophysics manuscript no. main ©ESO 2026 June 25, 2026 
+
+# 3D particle-in-cell simulations of pulsar wind – disk interaction: application to the transitional millisecond pulsar PSR J1023 +0038 
+
+Valentina Richard-Romei 1, Benoît Cerutti 1, Alessandro Papitto 2, and Riccardo La Placa 2 
+
+> 1
+
+Univ. Grenoble Alpes, CNRS, IPAG, 38000 Grenoble, France  
+
+> 2
+
+INAF, Osservatorio Astronomico di Roma e-mail: valentina.richard-romei@univ-grenoble-alpes.fr 
+
+e-mail: benoit.cerutti@univ-grenoble-alpes.fr 
+
+e-mail: alessandro.papitto@inaf.it 
+
+e-mail: riccardo.laplaca@inaf.it 
+
+Received June 25, 2026; accepted X 
+
+ABSTRACT 
+
+Context. Transitional millisecond pulsars constitute a peculiar subclass of neutron stars in which the pulsar alternates between accretion-powered and rotation-powered states, depending on the variations in the mass accretion flow coming from a low-mass companion star. A third intermediate state, referred to as “sub-luminous disk state”, has been identified. During this state, observa-tions indicate the presence of a disk surrounding the pulsar, and the system exhibits intriguing features, such as broad optical and X-ray pulsations characterized by a high luminosity. To date, no ab initio model of a pulsar wind interacting with an accretion disk has been developed to address these observables. 
+
+Aims. We aim to model the interaction of a pulsar wind with a surrounding disk in order to investigate the origin of the enhanced electromagnetic emission and to reproduce the observable properties of such systems, including their light curves and polarization signatures. 
+
+Methods. We perform three-dimensional particle-in-cell simulations of a pulsar magnetosphere surrounded by a perfectly conducting torus to model the interaction between the pulsar wind and the disk. We conduct a parametric study to assess the impact of the pulsar’s magnetic obliquity. 
+
+Results. We find that the presence of the disk induces a significant reconfiguration of the magnetosphere compared to the rotation-powered state, leading to enhanced plasma density at the inner disk boundary, increased magnetic field strength, and more e ffi cient plasma isotropization and particle acceleration. As a result, the synchrotron radiation is substantially enhanced, and characterized by a strong continuous component and either one or two-peaked light curves, depending on the pulsar’s magnetic obliquity. The polarization degree is reduced compared to isolated systems, and its energy dependence is explored. The rotation of the polarization angle can also be altered, depending on the observer’s viewing angle. 
+
+Conclusions. The model successfully reproduces some of the main features of the optical and X-ray pulsed emission originating from PSR J1023 +0038, thereby corroborating the scenario in which these pulsations originate from synchrotron radiation generated as the pulsar wind interacts with the inner edge of the disk. 
+
+Key words. pulsars: general – pulsars: individual PSR J1023 +0038 – acceleration of particles – magnetic reconnection – radiation mechanisms: non-thermal – methods: numerical – stars: winds, outflows 
+
+1. Introduction 
+
+Millisecond pulsars (MSPs), old neutron stars that display spin periods < 30 ms, are thought to be descendants of low-mass X-ray binaries (LMXBs), systems where matter from a low-mass donor star ( < 1M ⊙) is accreted onto a neutron star, thereby transferring angular momentum and spinning up the pulsar to millisecond periods. Two main categories of millisecond pulsars can be distinguished: accreting millisecond pulsars (AMXPs; see Campana & Di Salvo 2018 for a review), a subclass of LMXBs, and rotation-powered millisecond pulsars, referred to as spider pulsars when the companion is a main-sequence star (Roberts 2013). However, since the early 2000s, a new class referred to as “transitional millisecond pulsars” (tMSPs) has been discovered, in which pulsars alternate between accretion-powered, rotation-powered, and a third, intermediate state called “sub-luminous disk state" (see Campana & Di Salvo 2018; Papitto & de Mar-tino 2022 for reviews). Three such sources have been identified so far (Archibald et al. 2009; Papitto et al. 2013; Bassa et al. 2014). The sub-luminous disk state owes its name to its interme-diate X-ray luminosity of LX ∼ 10 33 –10 34 erg s −1 (Linares 2014; Papitto & de Martino 2022), fainter than that of AMXPs in out-burst, but brighter than that of quiescent AMXPs and rotation-powered MSPs. Additionally, this state features two X-ray in-tensity modes, “high” and “low” modes, with luminosities dif-fering by roughly an order of magnitude, and occasional flaring activity. Mode transitions occur on timescales of about 10 s and each mode persists for periods ranging from ∼ 10 s to few hours. Based on these characteristic properties of the sub-luminous disk state, many candidate systems have been identified, including several over the past year alone (Pattie et al. 2024; Thongmeear-kom et al. 2024; Turchetta et al. 2025; Kyer et al. 2025; Zyuzin et al. 2025). PSR J1023 +0038, the first discovered and prototype of tM-SPs, is characterized by a pulsar spin period of 1 .69 ms and a 0 .2 M ⊙ main-sequence companion star, orbiting the pulsar in 
+
+Article number, page 1 of 11  
+
+> arXiv:2606.25114v1 [astro-ph.HE] 23 Jun 2026 A&A proofs: manuscript no. main
+
+4.75 hours (Archibald et al. 2009). It is observed ∼ 80% of the time in the high mode (Jaodand et al. 2016). When in the high mode, X-ray and optical coherent, quasi-simultaneous pul-sations are detected (Papitto et al. 2019). The pulses are simi-lar and characterized by two broad peaks per spin period sep-arated by ∼ 180 ◦. The optical pulses lag the X-ray ones by 
+
+∼ 150 μs (Illiano et al. 2023) and are found to be emitted from regions a few tens of kilometers apart. The root-mean-square (rms) pulsed fraction exhibits temporal variability (Mi-raval Zanon et al. 2022). In X-rays the rms amplitudes range from approximately 4 .3% to 10 .8%, whereas in the optical band they span roughly 0 .1% to 0 .8% (Illiano et al. 2023). Strikingly, the pulsed optical /UV luminosity lies on the same power law as the pulsed X-ray emission (Papitto et al. 2019), and recent po-larimetric observations (Baglio et al. 2025) found that the slope of the polarized emission spectrum matches that of the pulsed emission spectrum. Taken together, these observations suggest that a common mechanism is responsible for the pulsed emis-sion at both optical and X-ray wavelengths, yet its precise origin is still uncertain. Since the detection of these puzzling pulsations, numerous studies have tried to unveil their physical origin. Several phe-nomenological models have been proposed. First, X-ray pulses were attributed to matter channeled onto the magnetic poles by accretion columns (Archibald et al. 2015). This scenario was challenged by the discovery of corresponding optical pul-sations (Ambrosino et al. 2017), due to their luminosity largely exceeding that expected from such scenario. Such high lumi-nosities also exclude models in which optical photons are pro-duced by accretion-generated X-rays reprocessed at the stellar or disk surface. Papitto & Torres (2015) suggested a propeller model, still relying on accretion-driven X-ray pulsations, for which a significant variation in the spin-down rate between the rotation-powered and disk states would be expected. Conversely, Ambrosino et al. (2017) proposed a rotation-powered origin of the optical and X-ray pulsations, attributing them to synchro-curvature emission within the pulsar magnetosphere. However, this scenario would imply an exceptionally e ffi cient conversion of spindown power into optical and X-ray emission, far exceed-ing what is observed in any other pulsar (Papitto et al. 2019). Pa-pitto et al. (2019); Veledina et al. (2019) and subsequent works (Campana et al. 2019; Baglio et al. 2025) instead argued that the emission modulated by the pulsar’s spin period originates from synchrotron radiation of particles accelerated at the shock front formed between the pulsar wind and the disk. In this scenario, pulsations disappear in the X-ray low mode due to the disk be-ing pushed further out by the pulsar wind. The model put for-ward by Veledina et al. (2019) also attributes the pulsations to synchrotron radiation originating from the inner boundary of the accretion disk, lying outside the light cylinder, heated by the pul-sar wind. Contrary to the scenario of Papitto et al. (2019), the low mode is explained by the disk penetration inside the light cylin-der, causing a transition to the propeller regime and suppres-sion of the wind. Recent spin-down rate measurements (Burtovoi et al. 2020; Baglio et al. 2025) show a small ( ∼ 5%) decrease when the disk is present, relative to the rotation-powered state of the same source. These results favor the most recent models, as they imply the absence of accretion onto the neutron star surface or of a strong propeller, which would greatly alter this rate, but also a quite close disk, otherwise the spin-down rate would be unchanged. The aforementioned phenomenological models fundamen-tally rely on the interaction between the pulsar magnetosphere and the accretion disk. This interaction has been addressed ana-lytically, with notable contributions from Ek¸ si & Alpar (2005), but has been explored primarily through numerical studies, mainly using magnetohydrodynamic simulations. The first in-sights into disk-magnetosphere coupling were provided by mod-els of magnetized, rotating stars surrounded by an accretion disk, especially in the context of T-Tauri stars (Hayashi et al. 1996; Romanova et al. 2002, 2003b, 2008; Zanni & Ferreira 2009, 2013; Takasao et al. 2018; Romanova et al. 2021). Ac-creting neutron stars were first simulated as aligned dipolar ro-tators (Romanova et al. 2003a; Çıkınto˘ glu et al. 2022), with some studies accounting for general relativistic e ff ects (Parfrey et al. 2017; Parfrey & Tchekhovskoy 2017, 2024). More re-cently, these models have been extended to oblique dipolar rota-tors (Das & Porth 2024; Murguia-Berthier et al. 2024) and multi-polar magnetic field configurations (Das et al. 2022). In the past year, a few works have addressed tMSPs using numerical simu-lations, whether hydrodynamic (Guerra et al. 2024) or magneto-hydrodynamic simulations (Vurgun et al. 2025, Mignon-Risse et al., in prep.). However, these approaches do not account for both the large-scale dynamics of the pulsar wind – disk interaction and the kinetic processes responsible for particle acceleration and non-thermal radiation. Capturing this combined behavior is essen-tial to explain the non-thermal emission detected from tMSPs, in particular to reproduce their distinctive X-ray and optical sig-natures. This provides the main motivation for our study and motivates a PIC approach, capable of capturing both the global dynamics and the microphysics of the system. In the following, we first introduce our numerical model (Section 2). In Section 3, we describe the magnetospheric recon-figuration induced by the disk and discuss the associated kinetic eff ects. Section 4 presents the observable results, beginning with the luminosity enhancement, followed by the light curves and polarization properties. We then apply our model to the case of PSR J1023 +0038 in Section 5 and conclude in Section 6. 
+
+2. PIC numerical model 
+
+> 2.1. 3D initial setup
+
+We resort to the 3D spherical, flat spacetime version of the 
+
+Zeltron code. The grid, of spherical coordinates ( r, θ, ϕ), is made of 1024 × 128 × 256 cells in the respective directions. Uniform angular spacing is adopted in θ and ϕ, while the radial direction is sampled logarithmically to preserve the cell aspect ratio with radius. This choice is well suited to pulsar magneto-sphere simulations, where particle densities and field strengths decline with radius, causing both the plasma skin depth and the Larmor radius to grow with radius. The neutron star surface ( r =
+
+r⋆) defines the inner boundary of the domain, which extends up to rmax = 5.6 RLC , where RLC = c/Ω = 5 r⋆ is the light-cylinder radius and Ω is the star’s angular velocity. The outer boundary is designed to capture the immediate wind–disk interaction region, but it is not intended to model radiative evolution over the larger scales that may contribute to inter-band lags and other non-local observables. We include an absorbing layer at rabsorb = 0.9rmax 
+
+for fields and particles, following the approach of Cerutti et al. (2015), to approximate open-boundary conditions. Given the pa-rameters adopted in these simulations, the fast magnetosonic point lies close to the outer edge of the computational domain, which justifies treating the wind as freely expanding to infin-ity beyond that radius (see Richard-Romei & Cerutti 2024 for a comparison of the sub- and super-magnetosonic regimes). Par-ticles impacting the star surface are also absorbed, while elastic 
+
+> Article number, page 2 of 11 Valentina Richard-Romei et al.: Pulsar wind – disk interaction
+
+reflection is applied at the θ−boundaries, and periodic boundary conditions are imposed in the ϕ−direction. For the fields, axial symmetry is enforced along θ, and periodic boundary conditions are implemented in the ϕ−direction. The simulation begins with a dipolar magnetic field ( B) an-chored to the star surface, in vacuum. The rotation axis ( Ω/Ω) is aligned with the θ = 0 direction and the magnetic moment ( μ) is inclined by an angle χ in the ϕ = 0 plane relative to the rotation axis. The magnetic field is expressed as: 
+
+B(r) = 3 ( μ · r) r
+
+r5 − μ
+
+r3 (1) 
+
+= μ
+
+r3 (2 sin χ sin θ cos ( Ωt − ϕ) + 2 cos χ cos θ) ur
+
++ μ
+
+r3 (− sin χ cos θ cos ( Ωt − ϕ) + cos χ sin θ) uθ
+
+− μ
+
+r3 sin χ sin ( Ωt − ϕ) uϕ ,
+
+where the norm of the magnetic moment is given by μ = B⋆r3
+
+> ⋆
+
+,with B⋆ denoting the surface polar magnetic field. The perfect conductor condition imposed at the star surface induces, due to the Lorentz transformation, an electric field: 
+
+E = − (Ω × r⋆) × B
+
+c . (2) This constraint causes the magnetic field lines to start rotating at 
+
+t = 0. Initially, the simulation domain is devoid of plasma. Plasma is injected via two complementary mechanisms. First, pairs are supplied uniformly across the entire star surface, at a rate of one macroparticle per cell, with a probability of injection set at 20%. Each simulated macroparticle represents a large number of physical particles, characterized by a weight ( wp), all having the same charge-to-mass ratio and thus following identical tra-jectories in phase space. To ensure the formation of electric gaps able to accelerate particles, plasma injection takes place only in regions where the plasma density is lower than the Goldreich-Julian density ( nGJ = Ω B⋆/2πec ; Goldreich & Julian 1969). In those regions, a charge density given by 10% of the di ff erence between the radial electric field and the corotation radial electric field (Eq. 2), both computed at the star surface, is released at each timestep, in corotation with the star. Secondly, pairs are also sup-plied wherever the Lorentz factor of the primary particle exceeds a threshold, defined by γth = 0.005 γpc , where γpc = eμΩ4/mec4
+
+denotes the maximum Lorentz factor reachable by a particle ac-celerated by the polar cap potential drop and e, me are respec-tively the charge and mass of the electron. Pairs are injected at the location of the primary particle and along its direction of motion, without intermediate photon emission, assuming a neg-ligible photon mean free path. Newly-created pairs all display the same energy, given by 0 .1γth , and the same amount of en-ergy is removed from the parent particle. Similarly to the first injection mechanism, plasma injection is inhibited wherever the charge density exceeds a threshold density, fixed at 10 nGJ . Ions are neglected in this setup, due to their expected little impact on the magnetospheric dynamics and on the radiation. The large-scale di ff erence between plasma kinetic scales and macroscopic magnetospheric scales requires us to rescale the simulations. Indeed, we obtain a ratio between the skin depth at the star surface and the star radius of d⋆ 
+
+> e
+
+/r⋆ ∼ 7 × 10 −3, implying a simulation rescaling of approximately three orders of magni-tude compared to actual spatial scales. The plasma skin depth is resolved by roughly 2 cells ( ∆r) at the stellar surface, about 18 cells at RLC , and gradually saturates to approximately 20 cells at larger radii. At the light-cylinder radius, the Larmor radius is re-solved by about 13 cells within the current sheet and 1 cell in the wind. Its resolution in the wind increases with radius, reaching roughly 5 cells at rmax . Table 1 summarizes the main simulation parameters. Table 1: Simulation parameters. Parameter Value Number of cells 1024 ( r) × 128 ( θ) × 256 ( ϕ)Inner boundary r⋆
+
+RLC 5 r⋆
+
+rmax 5.6 RLC 
+
+d⋆ 
+
+> e
+
+/r⋆ 7 × 10 −3
+
+(de/∆r)LC 18 
+
+Pspin /∆t 9.5 × 10 4
+
+Plasma composition electrons + positrons Injection model from star surface + pair creation 
+
+χ(◦) 15, 30, 60, 75 
+
+R 3.572 RLC 
+
+h 0.3 R
+
+> 2.2. Disk implementation
+
+The disk is modeled as a perfectly conducting torus (see Fig-ure 1). The disk is positioned in the equatorial plane, with its inner radius at 2 .5 RLC , which is in agreement with the radii ex-pected in the case of tMSPs (Papitto et al. 2019). Moreover, such a distance represents a good compromise, allowing the proper formation of the current sheet before the disk but also keeping su ffi cient space beyond the disk to observe the rearrangement of the magnetosphere. The aspect ratio of the disk is not well con-strained observationally (Papitto et al. 2019). We set h/R = 0.3, where h denotes the minor radius of the torus and R = 3.572 RLC 
+
+its major radius (see Figure 1), consistently with previous mod-els (Parfrey & Tchekhovskoy 2017; Veledina et al. 2019). The magnetic field of the disk is neglected: Btorus = 0. We also ne-glect its orbital motion, the Keplerian period being much longer than the pulsar’s spin period; hence Etorus = 0. The disk absorbs any particle or photon hitting its surface. Hence, the disk is not evolved as a plasma flow, but instead serves as a boundary con-dition for the pulsar wind. The setup is designed to isolate the electrodynamic e ff ects of a nearby conducting disk on the pulsar wind. 
+
+> 2.3. Temporal evolution scheme
+
+The self-consistent evolution of particles and fields relies on a computational loop completed at each timestep. Particles evolve according to the Abraham-Lorentz-Dirac equation, which con-tains a radiation-reaction term to account for radiative losses. An area-weighting scheme enables to deposit charges and cur-rents on the grid, before evolving the fields. Electromagnetic fields evolve on a grid according to the Maxwell-Faraday and Maxwell-Ampère equations through the Yee algorithm (Yee 1966). The Poisson equation is solved with the Gauss-Seidel method every 25 timesteps to ensure charge conservation. The timestep ( ∆t) is set to half the Courant-Friedrich-Lewy stability limit and the spin period amounts to Pspin ∼ 9.5 × 10 4∆t. Gen- 
+
+> Article number, page 3 of 11 A&A proofs: manuscript no. main
+
+Ω χ μ
+
+# RRrh
+
+> max LC
+
+α
+
+Fig. 1: Numerical setup. The pulsar, of angular velocity Ω and light-cylinder radius RLC is represented by the black sphere. The magnetic moment μ is inclined by an angle χ with respect to the rotation axis. The torus aspect ratio h/R is of 0 .3. α denotes the observer’s viewing angle and rmax the outer boundary of the simulation box. eral relativistic e ff ects are neglected, as our focus is on the pulsar wind rather than the immediate vicinity of the star surface. 
+
+> 2.4. Synchrotron-curvature modeling
+
+In the studied systems, the cooling of particles is predominantly due to curvature and synchrotron radiation. We therefore re-strict this study to the modeling of synchro-curvature emission. To model such radiation, we consider that each macroparticle emits a macrophoton, which corresponding number of physical photons is determined by the macroparticle’s weight ( wp). Each macrophoton radiates the following power: 
+
+Prad = 23 wpr2e cγ2 ˜B2 
+
+> ⊥
+
+, (3) where re is the classical radius of the electron, γ is the particle’s Lorentz factor and ˜ B2 
+
+> ⊥
+
+is the e ff ective perpendicular magnetic field, defined as (Cerutti et al. 2016b) ˜B⊥ =
+
+q
+
+(E + β × B)2 − (β · E)2 . (4) Contrary to the classical expression used in the case of pure mag-netic fields B⊥ = B sin α, with α being the angle between the magnetic field and the particle’s direction of motion, ˜ B2 
+
+> ⊥
+
+takes into account both the electric and magnetic fields, which are of comparable strength in the pulsar wind. Photons are emitted along the particle’s direction of motion, due to the strong rela-tivistic beaming, and propagate along straight trajectories at the speed of light. They do not interact with each other nor with the magnetic field. Photons are eclipsed by the star, and for the pur-pose of computing photon trajectories, the outer side of the torus is extended to the outer boundary of the domain at fixed h, en-suring that photons intersecting either the torus or this extension are eclipsed. Non-eclipsed photons are registered on a plane per-pendicular to the observer’s line of sight and tangent to the outer edge of the simulation domain, serving as a proxy for a screen located at infinity. 
+
+3. Magnetospheric structure 
+
+> 3.1. Dependence on magnetic obliquity
+
+The latitudinal opening angle of the current sheet is directly determined by the magnetic obliquity of the pulsar ( χ). Since the current sheet represents the densest region of the magneto-sphere beyond the light cylinder, the fraction of the sheet inter-cepted by the disk is expected to influence both the global re-structuring of the magnetosphere and the associated electromag-netic emission. Therefore, keeping the disk aspect ratio fixed at 
+
+h/R = 0.3, corresponding to a disk half-opening angle of 16.7°, we explore the parameter space by performing simulations for magnetic obliquities χ = 15 ◦, 30 ◦, 60 ◦, and 75 ◦. For compar-ison, we also run the four corresponding reference simulations for isolated pulsars. Simulations were run for 5 Pspin and con-verged after 1 .1 Pspin . This was evidenced by a transient in the outgoing radial Poynting flux, generated at the stellar surface, leaving the computational domain. 
+
+> 3.2. Density
+
+The 3D density structure of the magnetosphere is presented in Figure 2. Panels (a) and (c) show the isolated pulsar cases for 
+
+χ = 15 ◦ and χ = 75 ◦, respectively. The current sheet forms a 3D Archimedean spiral of wavelength 2 πRLC (Coroniti 1990; Bo-govalov 1999). As expected, increasing the magnetic obliquity enhances the latitudinal expansion of the current sheet, which extends over an angle 2 χ in the θ-direction. We observe entan-gled plasma flux ropes produced by the fragmentation of the cur-rent sheet through the tearing instability. The addition of the disk around the torus significantly alters the magnetosphere (Figure 2, panels b and d), as it forces the rearrangement of both plasma and magnetic field lines around the obstacle. The plasma density in-creases markedly, owing to the partial confinement of the plasma between the star and the inner edge of the disk. As a result, the magnetosphere develops vertically. Some plasma manages to cir-cumvent the disk by flowing along field lines, thereby reaching larger radii. The confinement of the plasma and the increased vertical extent of the plasma distribution around the torus imply a geometrically thicker emitting region than in the isolated case. This is expected to enhance the quasi-continuous component of the emission, broaden the pulse profiles by keeping portions of the thicker current sheet visible over a larger fraction of the spin cycle, and reduce the net polarization through the superposition of emission from a wider range of magnetic-field orientations. For su ffi ciently large magnetic obliquities such that the magnetic poles are oriented toward the disk surface (with the critical an-gle determined by the disk aspect ratio), some open field lines anchored at the polar caps are periodically driven to close and subsequently reopen. This cyclic process modulates the plasma dynamics and the associated energy release, producing alternat-ing phases of retention and ejection. For visualization purposes, 2D poloidal maps of the plasma density, in which the isolated and pulsar-disk interaction cases are superimposed, are shown in Figure 3, for both χ = 15 ◦ and χ = 75 ◦. In the least inclined case (Fig. 3, left panel), the original shape of the current sheet closely matches the inner edge of the torus, causing the plasma to be channeled along the inner boundary of the disk with only 
+
+> Article number, page 4 of 11 Valentina Richard-Romei et al.: Pulsar wind – disk interaction
+
+Fig. 2: 3D rendering of the particle density ( n/n0)( r/r⋆)2 in pulsar magnetospheres at t = 2.5 Pspin . The normalization factor is defined as n0 = κ nGJ , where κ = 10 represents the plasma multiplicity and nGJ corresponds to the Goldreich-Julian density computed at the stellar magnetic poles. The central black sphere represents the neutron star, and black solid lines trace the magnetic field lines. 
+
+Panels (a) and (c): isolated pulsar magnetospheres for χ = 15 ◦ and χ = 75 ◦, respectively. Panels (b) and (d) : reconfiguration of the pulsar magnetosphere in the presence of the torus (grey shaded region), for χ = 15 ◦ and χ = 75 ◦, respectively. minor perturbations. For highly inclined configurations (Fig. 3, middle panel), the current sheet intersects the torus more verti-cally, strengthening perturbations of the magnetic field lines and plasma flow, and thereby yielding a more turbulent reconfigu-ration of the magnetosphere. For all magnetic obliquities, the disk induces a tighter winding of the two spiral arms of the cur-rent sheet around the pulsar, leading to their merging at the inner edge of the disk, as illustrated by the 2D equatorial map shown in Figure 3, right panel. 
+
+> 3.3. Magnetic field and kinetic effects
+
+The change in the magnetospheric structure leads to a signifi-cant increase in the magnetic field strength, most prominently at the inner edge of the torus, but extending throughout the entire simulation domain (see Fig. 4, left panel). Plasma isotropiza-tion is also enhanced in the presence of the disk, as shown in Figure 4 (middle panel). In isolated pulsars, the plasma glob-ally follows the magnetic field lines, except when trapped in the current sheet, where it is isotropized by acceleration processes. The introduction of the disk, however, alters particle trajectories, thereby amplifying pitch angles by at least a factor of two near the disk edges. Increasing the magnetic obliquity further perturbs the current sheet, leading to an even stronger plasma isotropiza-tion. Another important e ff ect of the disk is the acceleration of particles at its inner edge (see Fig. 4, right panel). Indeed, the torus surface causes the bending and compression of magnetic field lines, which favors the dissipation of magnetic energy into particles, via magnetic reconnection. The enhancement of parti-cle acceleration at the polar caps is likely related to the modifica-tion of the plasma boundary conditions induced by the presence of the torus. In this configuration, charge conservation at the pul-sar surface appears to require an increased charge density in the current sheet. 
+
+4. Synchrotron radiation 
+
+> 4.1. Increase of the synchrotron power
+
+The rearrangement of the interacting magnetosphere described in Section 3, together with the associated magnetic and kinetic eff ects, implies (see Eq. 3) a substantial increase in the syn-chrotron emission in the presence of the disk. The disk not only  
+
+> Article number, page 5 of 11 A&A proofs: manuscript no. main
+
+poloidal plane, χ=15° poloidal plane, χ=75° toroidal plane, χ=15° 
+
+Fig. 3: 2D snapshots of the plasma density ( n/n0)( r/r⋆)2, after 2 .5 pulsar spin periods. The left and middle panels show poloidal cuts ( ϕ = 0◦) for a magnetic obliquity of χ = 15 ◦ and χ = 75 ◦ respectively, while the right panel shows a toroidal cut ( θ = 0◦) for 
+
+χ = 15 ◦, which is representative of the other obliquity cases. We superimpose the current sheet density obtained in the isolated case (nref ; blue color scale) onto the plasma density ( n; warm color scale) resulting from the interaction case. Radii are given in units of 
+
+RLC .⟨γ⟩ 
+
+> B /B B/B
+> ┴
+
+*
+
+Fig. 4: 2D poloidal maps of the pulsar-disk interaction case for χ = 15 ◦, at 1 .4 Pspin . Left panel: magnetic field strength ( B/B⋆). 
+
+Middle panel: plasma isotropization ( B⊥/B). Right panel: particle acceleration ( ⟨γ⟩). The central black sphere represents the neutron star. a) χ=15° b) χ=75° 
+
+Fig. 5: Time evolution of 2D poloidal synchrotron maps dPsync /dV (r/r⋆)4, illustrating the e ff ect of the disk for χ = 15 ◦ (panel a) and χ = 75 ◦ (panel b), shown at times t = 2.5 Pspin and t + Pspin /2. Magenta circles indicate emission minima, and the eye sketch marks the observer’s viewing angle. Radii are given in units of RLC .enhances the synchrotron radiation but also modifies the emis-sion region, which now corresponds to the geometry of the dis-rupted current sheet. As a result, a marked structural di ff erence arises between low- and high-obliquity cases, as illustrated in Figure 5. For low-obliquity cases, each arm of the current sheet sweeps from π/ 2+χ to π/ 2−χ, crossing the observer’s angle once per rotation period. The radially escaping emission thus peaks at time t and reaches a minimum at t + Pspin /2 (see magenta cir-cles on Fig. 5, panel a), with the same pattern shifted by half a spin period on the opposite hemisphere. Overall, the emission is modulated over a pulsar rotation, yielding a single intensity peak per spin period. Conversely, for high-obliquity cases (see Fig. 5, panel b), the nearly vertical orientation of the current sheet as it reaches the inner edge of the disk causes it to break apart around the disk in an approximately symmetric manner. Consequently, each time an arm of the current sheet reaches the disk, a burst of light is emitted, regardless of the hemisphere. We therefore ex-
+
+> Article number, page 6 of 11 Valentina Richard-Romei et al.: Pulsar wind – disk interaction
+
+pect two intensity peaks per spin period, for a given observer’s angle. 
+
+> 4.2. Light curves
+
+As suggested by Section 4.1, the introduction of the disk in the pulsar magnetosphere has dramatic e ff ects on the emitted light curves. The most striking observational signature emerging from the simulations is the replacement of the narrow current-sheet pulses seen in isolated pulsars by broader, brighter, disk-induced pulses, whose number and morphology depend primarily on how the current sheet interacts with the disk. Figure 6 presents the time-averaged skymaps and light curves computed for both the reference isolated simulations (left column) and the pulsar-disk interaction simulations (right column), for each magnetic obliq-uity. For the reference simulations, we recover well-established results (e.g., Cerutti et al. 2016b): the light curves display two narrow intensity peaks originating from the current sheet. The width and phase separation of these peaks depend on the geom-etry of the current sheet as intercepted by the observer’s line of sight, and therefore on the pulsar’s magnetic obliquity. The light curves obtained in the interaction case di ff er markedly from the canonical ones. The intensity increases substantially throughout the entire rotation period, independently of both the magnetic obliquity and the observer’s viewing angle. The intensity peaks are considerably broader than in the isolated pulsar case, regard-less of the magnetic obliquity. When two peaks are present, they exhibit slight di ff erences in amplitude and are separated by half a spin period. We observe an increase in intensity with mag-netic obliquity, although the χ = 60 ◦ simulation appears to be the brightest. In agreement with Figure 5, the low-obliquity case (χ = 15 ◦) exhibits a single peak per spin period for a given view-ing angle, with the emission from the two hemispheres separated by half a spin period in phase. In contrast, the high-obliquity case (χ = 75 ◦) exhibits two peaks per period that occur at the same rotational phase in both hemispheres. The intermediate magnetic obliquities (i.e., χ = 30 ◦ and χ = 60 ◦) show a progressive tran-sition from one regime to the other. Figure 7 summarizes the dependence of these properties on magnetic obliquity. Firstly, the total luminosity emitted in the in-teraction case is enhanced by a factor of ∼ 5 to ∼ 12 .5 relative to the corresponding reference intensity, as χ increases. Secondly, the pulsed fraction, computed by subtracting the continuous flux (i.e., the phase minimum) from the total flux and normalizing to the total flux, remains significantly lower than in the refer-ence simulations. This is due to the presence of a strong contin-uous component. While the pulsed fraction increases with mag-netic obliquity in isolated pulsars, it remains roughly constant at 
+
+∼ 30% in the interaction case. The peak amplitude ratios P2/P1
+
+decrease from 1.6 to 1.2 as χ increases from 30 ◦ to 75 ◦.
+
+> 4.3. Polarization signatures
+
+The modification of the magnetic field topology caused by the disk a ff ects the polarization signatures of the system. Due to the ultra-relativistic nature of particles, the circular polarization component is neglected. The polarization degree is then given by 
+
+Π = 
+
+pQ2 + U2
+
+I , (5) where I, Q and U are the Stokes parameters. The polarization angle (PA), defined between the rotation axis and the direction of the e ff ective perpendicular magnetic field ( ˜ B⊥; Eq. 4), reads: tan(2 PA ) = UQ . (6) A detailed description of their computation is provided in Cerutti et al. (2016a). Figure 8 shows the polarization degree obtained for the χ =
+
+75 ◦ simulations, both for the isolated case and in the presence of the torus, considering all observer’s viewing angles and rota-tion phases. Although we observe some variations with magnetic obliquity, some features are common to all magnetic obliquities. The isolated case (Fig. 8, top panel) is characterized by a po-larization degree reaching up to 20%, and a pronounced drop in polarization within the current sheet, due to the magnetic field cancellation at reconnection X-points, and the strong isotropiza-tion of accelerated particles. The introduction of the torus (Fig. 8, middle panel) induces a depolarization of the magnetosphere, as it causes the disruption of the current sheet, the accumulation of plasma before its inner edge, and the isotropization of particles. Accordingly, a correlation emerges between the flux intensity peaks (Fig. 6, right bottom panel) and the local minima of the polarization degree. Similarly, Figure 9 is devoted to the polarization angle. For isolated pulsars (Fig. 9, top panel), the dominant feature is the sharp polarization angle swing occurring across the current sheet, caused by the reversal of the magnetic field across it. On either side of the current sheet, the magnetic polarity remains nearly uniform. Adding the disk (Fig. 9, middle panel) does not significantly a ff ect the rotation of the polarization angle. Indeed, it rotates approximately from −70 ◦ to 70 ◦ across the current sheet, and remains nearly uniform on either side of the current sheet. However, the equatorial regions are rather blurred, with lower polarization angles, due to the eclipse. The disruption of the current sheet causes the local mixing of di ff erent polarities, thereby leading to some additional noise. These results are con-sistent across all magnetic obliquities. 
+
+5. Application to the tMSP J1023 +0038 
+
+In this Section, we examine whether the pulsar-disk interaction model developed above can account for the observed properties of PSR J1023 +0038 (Papitto et al. 2019). In the disk state, PSR J1023 +0038 emits significantly more high-energy radiation (X-rays, UV, and gamma rays; see Patruno et al. 2014; Stappers et al. 2014) than when it behaves as a rotation-powered pulsar. In addition, it exhibits two similar, bright and broad optical and X-ray pulses per spin period, that extend over half a rotational phase and are separated by 180 ◦. The model reproduces the in-crease of the total synchrotron radiation emitted by the pulsar magnetosphere when the disk is present (see Fig. 6). According to Figure 6, within the family of configurations explored here, the broad double-peaked pulse morphology of PSR J1023 +0038 is most naturally reproduced by the highest-obliquity case, sug-gesting that the magnetic moment of PSR J1023 +0038 might be highly inclined (see also Fig. 7, bottom panel). We therefore re-strict our analysis to the χ = 75 ◦ configuration in the following. We report a slight di ff erence in the peak amplitudes (Fig. 7, bottom panel), consistent with observations (Papitto et al. 2019). Moreover, observed pulsed fractions (Papitto et al. 2019) of 
+
+∼ 1% in the optical and ∼ 10% in the X-ray band (i.e., lower than the pulsed fraction typically measured in the X-ray band for isolated pulsars) reflect the presence of a strong continu-ous component. The numerical results also predict a stronger  
+
+> Article number, page 7 of 11 A&A proofs: manuscript no. main
+
+Fig. 6: Skymaps of the synchrotron radiation as a function of the viewing angle ( α) and the pulsar rotation phase, for all simulations. Below each skymap, we show the corresponding light curves computed for five di ff erent observer angles, α = 45 ◦, 67 .5◦, 90 ◦,112 .5◦ and 135 ◦, with dashed lines on the skymaps indicating the respective colors. The synchrotron flux is normalized to the time-averaged flux of the χ = 15 ◦ reference simulation. Data are averaged over 2 Pspin after convergence.       
+
+> Article number, page 8 of 11 Valentina Richard-Romei et al.: Pulsar wind – disk interaction 2
+> 4
+> 6
+> 8
+> 10
+> 12
+> Idisk /Iref
+> 20
+> 30
+> 40
+> 50
+> 60
+> pulsed
+> fraction [%]
+> pulsar+disk
+> isolated pulsar
+> 015 30 45 60 75 90
+> [degrees]
+> 1.0
+> 1.2
+> 1.4
+> 1.6
+> P2/P1
+
+Fig. 7: Light curves parameters as a function of the magnetic obliquity. Top panel: ratio of the total luminosity in the interac-tion case ( Idisk ) to that in the isolated case ( Iref ). Middle panel: 
+
+pulsed fraction obtained by subtracting the continuous compo-nent to the total intensity, and normalizing by the total intensity. 
+
+Bottom panel: ratio of the peak amplitudes ( P2/P1). The dashed column indicates the absence of a second peak. Data are aver-aged over 2 Pspin after convergence. continuous component than that expected from isolated pulsars (Fig. 7, middle panel), although they cannot be directly com-pared with observations, as our model inherently lacks several sources of continuous emission. In particular, most of the opti-
+
+Fig. 8: Polarization degree ( Π) as a function of the observer’s viewing angle ( α) and the rotation phase, for χ = 75 ◦. Top panel: 
+
+isolated pulsar magnetosphere. Middle panel: pulsar-disk inter-action case. The dashed lines indicate specific viewing angles, with the corresponding curves shown in the bottom panel. Bot-tom panel: polarization degree for three specific viewing angles (α = 22 .5◦, 46 .4◦ and 90 ◦). Data are averaged over 2 Pspin after convergence. 
+
+Fig. 9: Polarization angle (PA) as a function of the observer’s viewing angle ( α) and the rotation phase, for χ = 75 ◦. Top panel: 
+
+isolated pulsar magnetosphere. Middle panel: pulsar-disk inter-action case. The dashed lines indicate specific viewing angles, with the corresponding curves shown in the bottom panel. Bot-tom panel: polarization angle for three specific viewing angles (α = 22 .5◦, 46 .4◦ and 90 ◦). Data are averaged over 2 Pspin after convergence. 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 
+
+> Phase/2
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1.0
+> Flux [A.U.]
+> 1
+> 2
+> 3
+> 4
+
+Fig. 10: Light curves obtained by integrating the emission over four logarithmically spaced frequency bins ( ∆ν1, ∆ν2, ∆ν3, and 
+
+∆ν4), and computed for α = 46 .4◦, the estimated viewing angle of PSR J1023 +0038. Each curve is normalized to its own max-imum value for visualization purposes. Data are averaged over 2 Pspin after convergence. cal flux is produced by the irradiation of the disk or donor star, which are not included in our model. More generally, since the PIC method is well suited for low-density, collisionless environ-ments, the disk is treated as a boundary condition, which pre-vents us from capturing its emission. Moreover, the thermal ra-diation, which may contribute significantly, especially from the disk, is neglected. The potential presence of a compact jet in such systems (Baglio et al. 2023) could also provide an additional source of continuous emission. Finally, this study focuses exclu-sively on synchrotron emission, although such systems may also produce inverse-Compton emission resulting from the interac-tion between the pulsar wind and photons from the disk or com- 
+
+> Article number, page 9 of 11 A&A proofs: manuscript no. main
+
+panion. It is worth noting that, given the particle acceleration and photon densities revealed in our simulations, synchrotron self-Compton processes could also be expected. Although our simulations do not resolve the optical or X-ray bands due to the necessary rescaling of particle-in-cell sim-ulations (see Section 2.1), we can nevertheless divide the en-ergy range into di ff erent bins to assess the energy dependence of our results. Figure 10 presents the emitted synchrotron flux, for χ = 75 ◦ and α = 46 .4◦ (corresponding to the viewing angle of the system, estimated from optical photometry; Stringer et al. 2021), as a function of the rotation phase, for four logarithmi-cally equally spaced energy bins. Each curve is normalized by its own maximum value. We predict an increase in the pulsed frac-tion with energy. As mentioned at the beginning of Section 5, ob-servations show that the pulsed fraction is higher in X-rays than in the optical band. However, within the X-ray band, the source exhibits a constant pulsed fraction with energy (0 .5 − 50 keV, see Fig. 13 of Papitto et al. 2019). The total observed emission is made of the sum of the neutron star emission and of the unpulsed emission from other regions (e.g. the disk, the companion star), especially in the optical band. Since our model does not include the dominant optical continuum-emitting components, and the energy ranges are rescaled following the PIC approach, a direct comparison between our predictions and these observations is not possible at this stage. The pulses remain phase-aligned across the di ff erent energy bands, and therefore we do not reproduce the 150 μs lag detected between the optical and X-ray pulses. This discrepancy with ob-servations likely arises from the limited extent of our simulation domain, which only covers the inner regions of the wind (up to 5.6 RLC ) and therefore does not capture particle cooling occur-ring at larger distances. The synchrotron radiation produced in our model is linearly polarized, although the presence of the disk reduces the polar-ization compared to the isolated case, particularly in regions of plasma accumulation. In addition, Figure 11 shows that the po-larization degree increases noticeably with energy. Observations indicate that the pulsed and polarized fluxes are closely aligned across the spectrum, with polarization degrees of (1 .4±0.04)% in the optical band and (12 ± 3)% in the X-rays (Baglio et al. 2025), consistent with our predictions. Finally, the modeled polariza-tion angle oscillates across the pulsar phase (Fig. 9), similarly to what is reported from observations (Baglio et al. 2025). 10 2 10 1 10 0 10 1 10 2 
+
+> /0
+> 0
+> 5
+> 10
+> 15
+> [%]
+
+Fig. 11: Dependence of the polarization degree on frequency for the pulsar-disk case, with χ = 75 ◦ and α = 46 .4◦ (i.e., the estimated viewing angle for J1023 +0038). The phase-averaged polarization degree is computed for four logarithmically spaced frequency bins ∆ν/ν 0, where ν0 = 3eB ⋆/4πmec. Data are aver-aged over 2 Pspin after convergence. The main observational features successfully reproduced by the model can be summarized as follows: 
+
+– a brighter synchrotron emission from the pulsar magneto-sphere in the presence of the disk, compared to when the disk is absent; 
+
+– two similar, bright pulses, each lasting about half a spin pe-riod and separated by about half a spin period; 
+
+– a reduced pulsed fraction compared to isolated systems, due to a strong continuous component; 
+
+– the depolarization of the synchrotron emission compared to isolated systems, the increase of the polarization degree with energy, and a phase-dependent polarization angle. The main remaining discrepancies are: 
+
+– no phase lag appears across energy bands within the current simulation domain, contrary to the phase lag observed be-tween the optical and X-ray bands; 
+
+– the continuous component is not fully modeled, owing to the absence of disk emission and additional emission channels. 
+
+6. Conclusions 
+
+We present the first particle-in-cell simulations of a pulsar wind interacting with a surrounding disk, aimed at reproducing the op-tical and X-ray pulsed emission from the canonical transitional millisecond pulsar PSR J1023 +0038. We model the resulting re-arrangement of the magnetosphere, its associated kinetic e ff ects, and the synchrotron light curves and polarization properties ex-pected from such systems. We find a substantial increase in the total luminosity rela-tive to isolated pulsars, driven by increased plasma density be-tween the star and the disk, magnetic field amplification, and en-hanced plasma isotropization and particle acceleration. Impor-tantly, we show that the light curves can exhibit either one or two broad peaks per spin period, depending on the pulsar’s mag-netic obliquity, for a fixed disk aspect ratio ( h/R). Low magnetic obliquities ( χ ≤ tan −1(h/R)) are associated with a single peak, whereas high magnetic obliquities ( χ ≥ tan −1(h/R)) result in two peaks separated by half a spin period. At intermediate obliq-uities, the light-curve morphology evolves progressively from one regime to the other. Exploring a range of disk aspect ratios and distances would provide valuable confirmation of these re-sults. Our highest-obliquity simulation most closely reproduces the observed pulsed emission of PSR J1023 +0038, featuring two broad peaks separated by 180 ◦. Expanding the sample of tMSPs will be crucial to determine whether all sources should consis-tently emit two-peaked pulsed radiation, in which case - accord-ing to our model - a high magnetic obliquity is required to reach the subluminous disk state, or whether some systems may in-stead exhibit single-peaked light curves, indicative of low mag-netic obliquities. Our model successfully reproduces most of the observed fea-tures of PSR J1023 +0038 in the X-ray high mode, as reported in Papitto et al. (2019) and Baglio et al. (2025). Two discrepan-cies nevertheless remain, concerning the phase shift of the pul-sations across energy bands and the strength of the continuous component; these are likely attributable to intrinsic limitations of the current modeling approach. Furthermore, the observed energy dependence of the pulsed fraction, in particular its ap-proximately constant value across the X-ray band, cannot yet be assessed within the present framework. To conclude, our results confirm a synchrotron origin of the optical and X-ray pulsations, supporting a scenario in which they are generated by the interaction of the pulsar’s striped wind and the inner edge of the accretion disk, situated a few light-cylinder 
+
+> Article number, page 10 of 11
+
+Valentina Richard-Romei et al.: Pulsar wind – disk interaction 
+
+radii from the pulsar. Upcoming high-statistics polarimetric ob-servations, together with the discovery of new tMSP sources, will provide valuable constraints on emission models. 
+
+Acknowledgements. We thank R. Mignon-Risse and A. Veledina for insight-ful discussions, and D. F. Torres for useful comments on the manuscript. This project has received funding from the European Research Council (ERC) un-der the European Union’s Horizon 2020 research and innovation program (Grant Agreement No. 863412). Computing resources were provided by TGCC under the allocation A0150407669 made by GENCI. A.P. and R.L.P. were supported by INAF Research Grant AF2022 (FANS, PI: Papitto) and AF2024 (PULSE-X, PI: Papitto), the Italian Ministry of University and Research (PRIN MUR 2020, Grant 2020BRP57Z, GEMS, PI: Astone), and Fondazione Cariplo /Cassa Depositi e Prestiti (Grant 2023-2560, PI: Papitto). 
+
+References 
+
+Ambrosino, F., Papitto, A., Stella, L., et al. 2017, Nature Astronomy, 1, 854 Archibald, A. M., Bogdanov, S., Patruno, A., et al. 2015, ApJ, 807, 62 Archibald, A. M., Stairs, I. H., Ransom, S. M., et al. 2009, Science, 324, 1411 Baglio, M. C., Coti Zelati, F., Campana, S., et al. 2023, A&A, 677, A30 Baglio, M. C., Coti Zelati, F., Di Marco, A., et al. 2025, ApJ, 987, L19 Bassa, C. G., Patruno, A., Hessels, J. W. T., et al. 2014, MNRAS, 441, 1825 Bogovalov, S. V. 1999, A&A, 349, 1017 Burtovoi, A., Zampieri, L., Fiori, M., et al. 2020, MNRAS, 498, L98 Campana, S. & Di Salvo, T. 2018, in Astrophysics and Space Science Library, Vol. 457, Astrophysics and Space Science Library, ed. L. Rezzolla, P. Piz-zochero, D. I. Jones, N. Rea, & I. Vidaña, 149 Campana, S., Miraval Zanon, A., Coti Zelati, F., et al. 2019, A&A, 629, L8 Çıkınto˘ glu, S., Ek¸ si, K. Y., & Rezzolla, L. 2022, MNRAS, 517, 3212 Cerutti, B., Mortier, J., & Philippov, A. A. 2016a, MNRAS, 463, L89 Cerutti, B., Philippov, A., Parfrey, K., & Spitkovsky, A. 2015, MNRAS, 448, 606 Cerutti, B., Philippov, A. A., & Spitkovsky, A. 2016b, MNRAS, 457, 2401 Coroniti, F. V. 1990, ApJ, 349, 538 Das, P. & Porth, O. 2024, ApJ, 960, L12 Das, P., Porth, O., & Watts, A. L. 2022, MNRAS, 515, 3144 Ek¸ si, K. Y. & Alpar, M. A. 2005, ApJ, 620, 390 Goldreich, P. & Julian, W. H. 1969, ApJ, 157, 869 Guerra, C., Meliani, Z., & Voisin, G. 2024, A&A, 690, A75 Hayashi, M. R., Shibata, K., & Matsumoto, R. 1996, ApJ, 468, L37 Illiano, G., Papitto, A., Ambrosino, F., et al. 2023, A&A, 669, A26 Jaodand, A., Archibald, A. M., Hessels, J. W. T., et al. 2016, ApJ, 830, 122 Kyer, R., Roy, S., Strader, J., et al. 2025, The Astrophysical Journal, 983, 112 Linares, M. 2014, ApJ, 795, 72 Mignon-Risse, R., Parfrey, K., Linares, M., Tchekhovskoy, A., & Ressler, S. 2025, in preparation Miraval Zanon, A., Ambrosino, F., Coti Zelati, F., et al. 2022, A&A, 660, A63 Murguia-Berthier, A., Parfrey, K., Tchekhovskoy, A., & Jacquemin-Ide, J. 2024, ApJ, 961, L20 Papitto, A., Ambrosino, F., Stella, L., et al. 2019, ApJ, 882, 104 Papitto, A. & de Martino, D. 2022, in Astrophysics and Space Science Library, Vol. 465, Astrophysics and Space Science Library, ed. S. Bhattacharyya, A. Papitto, & D. Bhattacharya, 157–200 Papitto, A., Ferrigno, C., Bozzo, E., et al. 2013, Nature, 501, 517 Papitto, A. & Torres, D. F. 2015, ApJ, 807, 33 Parfrey, K., Spitkovsky, A., & Beloborodov, A. M. 2017, MNRAS, 469, 3656 Parfrey, K. & Tchekhovskoy, A. 2017, ApJ, 851, L34 Parfrey, K. & Tchekhovskoy, A. 2024, ApJ, 975, 57 Patruno, A., Archibald, A. M., Hessels, J. W. T., et al. 2014, ApJ, 781, L3 Pattie, E. C., Maccarone, T. J., Britt, C. T., et al. 2024, MNRAS, 531, 2191 Richard-Romei, V. & Cerutti, B. 2024, A&A, 689, A251 Roberts, M. S. E. 2013, in IAU Symposium, Vol. 291, Neutron Stars and Pulsars: Challenges and Opportunities after 80 years, ed. J. van Leeuwen, 127–132 Romanova, M. M., Koldoba, A. V., Ustyugova, G. V., et al. 2021, MNRAS, 506, 372 Romanova, M. M., Kulkarni, A. K., & Lovelace, R. V. E. 2008, ApJ, 673, L171 Romanova, M. M., Toropina, O. D., Toropin, Y. M., & Lovelace, R. V. E. 2003a, ApJ, 588, 400 Romanova, M. M., Ustyugova, G. V., Koldoba, A. V., & Lovelace, R. V. E. 2002, ApJ, 578, 420 Romanova, M. M., Ustyugova, G. V., Koldoba, A. V., Wick, J. V., & Lovelace, R. V. E. 2003b, ApJ, 595, 1009 Stappers, B. W., Archibald, A. M., Hessels, J. W. T., et al. 2014, ApJ, 790, 39 Stringer, J. G., Breton, R. P., Clark, C. J., et al. 2021, MNRAS, 507, 2174 Takasao, S., Tomida, K., Iwasaki, K., & Suzuki, T. K. 2018, ApJ, 857, 4 Thongmeearkom, T., Clark, C. J., Breton, R. P., et al. 2024, MNRAS, 530, 4676 Turchetta, M., Sen, B., Simpson, J. A., et al. 2025, Monthly Notices of the Royal Astronomical Society, 538, 380–394 Veledina, A., Nättilä, J., & Beloborodov, A. M. 2019, ApJ, 884, 144 Vurgun, E., García-Senz, D., Linares, M., & Ek¸ si, K. Y. 2025, MNRAS, 540, 3625 Yee, K. 1966, IEEE Transactions on Antennas and Propagation, 14, 302 Zanni, C. & Ferreira, J. 2009, A&A, 508, 1117 Zanni, C. & Ferreira, J. 2013, A&A, 550, A99 Zyuzin, D. A., Karpova, A. V., Kirichenko, A. Y., et al. 2025, A&A, 699, A21 
+
+Article number, page 11 of 11

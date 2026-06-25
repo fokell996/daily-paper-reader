@@ -6,54 +6,53 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-24
-- 运行时间：2026-06-24 21:46:38 UTC
+- 最新运行日期：2026-06-25
+- 运行时间：2026-06-25 21:02:55 UTC
 - 运行状态：成功
-- 本次总论文数：10
+- 本次总论文数：11
 - 精读区：7
-- 速读区：3
+- 速读区：4
 
 ### 今日简报（AI）
-今日精读两篇10分论文，分别揭示重复快速射电暴色散度量下降与年轻超新星遗迹膨胀的关联，以及脉冲星PSR J1757−1854的相对论轨道形变。
-
-最值得关注的是重复FRB色散度量减少趋势可解释为超新星遗迹膨胀，这为快速射电暴起源提供了新证据。
-
-建议普通读者优先阅读FAST脉冲星数据库中的尖峰子脉冲与准周期子脉冲分析，了解脉冲星射电辐射的精细结构。
-- 详情：[/202606/24/README](/202606/24/README)
+今日聚焦中子星状态方程模拟推理与脉冲星计时阵列协同研究。最值得关注的是基于模拟的贝叶斯推理方法及脉冲星计时与天体测量的协同效应。建议关注中子星物态与引力波背景探测的交叉进展。
+- 详情：[/202606/25/README](/202606/25/README)
 
 ### 精读区论文标签
-1. [Indication for Decreasing Dispersion Measure in the Population of Repeating Fast Radio Bursts and Connection to Young Supernova Remnant Expansion](/202606/24/2606.23903v1-indication-for-decreasing-dispersion-measure-in-the-population-of-repeating-fast-radio-bursts-and-connection-to-young-supernova-remnant-expansion)  
+1. [Amortized Simulation-Based Inference of Relativistic Mean-Field Couplings for Neutron-Star Equations of State](/202606/25/2606.25446v1-amortized-simulation-based-inference-of-relativistic-mean-field-couplings-for-neutron-star-equations-of-state)  
    标签：评分：10.0/10、query:pulsar-frb
-   evidence：重复快速射电暴色散演化及其与超新星遗迹的联系
-2. [Detection of relativistic orbital deformation from improved timing of PSR J1757$-$1854](/202606/24/2606.23926v1-detection-of-relativistic-orbital-deformation-from-improved-timing-of-psr-j1757-1854)  
-   标签：评分：10.0/10、query:pulsar-frb
-   evidence：脉冲星计时观测与引力理论检验
-3. [A Joint Optimal Search for Gravitational Waves from Resolved and Unresolved Supermassive Binary Black Holes with Pulsar Timing Arrays](/202606/24/2606.18241v2-a-joint-optimal-search-for-gravitational-waves-from-resolved-and-unresolved-supermassive-binary-black-holes-with-pulsar-timing-arrays)  
+   evidence：通过模拟推理约束中子星状态方程
+2. [Synergies Between Pulsar Timing Array and Astrometry](/202606/25/2606.24992v1-synergies-between-pulsar-timing-array-and-astrometry)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：利用脉冲星计时阵列联合搜索引力波
-4. [As above, so below: assessing extremeness of the neutron-star equation of state based on the unstable branch](/202606/24/2606.23929v1-as-above-so-below-assessing-extremeness-of-the-neutron-star-equation-of-state-based-on-the-unstable-branch)  
+   evidence：脉冲星计时阵列与天体测量的协同用于引力波探测
+3. [The kinetic-energy bottleneck in Fast Radio Burst models](/202606/25/2606.25035v1-the-kinetic-energy-bottleneck-in-fast-radio-burst-models)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：利用不稳定分支约束中子星状态方程的高密度行为
-5. [Radio eclipse of the slowest spinning Galactic-field spider pulsar PSR J1932+2121 and its X-ray emission prospect](/202606/24/2606.24069v1-radio-eclipse-of-the-slowest-spinning-galactic-field-spider-pulsar-psr-j19322121-and-its-x-ray-emission-prospect)  
+   evidence：快速射电暴发射机制的模型无关约束
+4. [Causality alone bounds the maximum radius difference between different-mass neutron stars](/202606/25/2606.25186v1-causality-alone-bounds-the-maximum-radius-difference-between-different-mass-neutron-stars)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：利用FAST进行脉冲星计时和食建模
-6. [EP251023a: A fast X-ray transient featuring a magnetar-powered optical internal plateau followed by a steep decay](/202606/24/2606.24329v1-ep251023a-a-fast-x-ray-transient-featuring-a-magnetar-powered-optical-internal-plateau-followed-by-a-steep-decay)  
+   evidence：基于因果性和NICER观测的中子星半径差约束
+5. [Fast Radio Bursts probe Galaxy Evolution: Evidence and implications of a redshift-dependent FRB host DM](/202606/25/2606.25214v1-fast-radio-bursts-probe-galaxy-evolution-evidence-and-implications-of-a-redshift-dependent-frb-host-dm)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：磁星驱动的光学内平台在快速X射线暂现源中
-7. [Asteroseismology of neutron stars with both hyperons and $Δ$ resonances](/202606/24/2606.24343v1-asteroseismology-of-neutron-stars-with-both-hyperons-and--resonances)  
+   evidence：快速射电暴作为宿主星系色散测量演化的探针
+6. [Compact Objects Revealed by SKA and SKA-VLBI](/202606/25/2606.25543v1-compact-objects-revealed-by-ska-and-ska-vlbi)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：中子星星震学约束状态方程
+   evidence：SKA/VLBI对中子星状态方程和致密双星的研究
+7. [$K^-$-Driven Direct Urca Cooling in Rotating Neutron Stars: A Bayesian Study](/202606/25/2606.25703v1-k--driven-direct-urca-cooling-in-rotating-neutron-stars-a-bayesian-study)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：利用NICER观测贝叶斯研究反Kaon凝聚和中子星状态方程
 
 ### 速读区论文标签
-1. [FAST Pulsar Database IV. Spike subpulses and quasi-periodic subpulses of 25 pulsars observed by FAST](/202606/24/2606.23970v1-fast-pulsar-database-iv-spike-subpulses-and-quasi-periodic-subpulses-of-25-pulsars-observed-by-fast)  
+1. [3D particle-in-cell simulations of pulsar wind-disk interaction: application to the transitional millisecond pulsar PSR J1023+0038](/202606/25/2606.25114v1-3d-particle-in-cell-simulations-of-pulsar-wind-disk-interaction-application-to-the-transitional-millisecond-pulsar-psr-j10230038)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：FAST对25颗脉冲星的尖峰子脉冲和准周期子脉冲观测
-2. [Nanohertz gravitational waves from domain walls nucleated during inflation](/202606/24/2606.24070v1-nanohertz-gravitational-waves-from-domain-walls-nucleated-during-inflation)  
+   evidence：过渡毫秒脉冲星的脉冲星风-盘相互作用模拟
+2. [Probing Kinematic Anisotropies in the Stochastic Gravitational Wave Background with the SKA](/202606/25/2606.25845v1-probing-kinematic-anisotropies-in-the-stochastic-gravitational-wave-background-with-the-ska)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：脉冲星计时阵列探测引力波背景各向异性
+3. [Composition of Radiation-Driven Winds from Type I X-ray Bursts](/202606/25/2606.23818v1-composition-of-radiation-driven-winds-from-type-i-x-ray-bursts)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：畴壁产生的纳赫兹引力波与脉冲星计时阵列相关
-3. [Probing Baryonic Feedback Effect with CSST Weak Lensing and Future FRB Measurements](/202606/24/2606.24061v1-probing-baryonic-feedback-effect-with-csst-weak-lensing-and-future-frb-measurements)  
+   evidence：X射线暴模拟探测与状态方程相关的中子星性质
+4. [Study for curvature radiation and magnetic pair creation process on polar-cap region of magnetic white dwarf](/202606/25/2606.25806v1-study-for-curvature-radiation-and-magnetic-pair-creation-process-on-polar-cap-region-of-magnetic-white-dwarf)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：利用FRB色散测量统计研究重子反馈效应
+   evidence：研究类比脉冲星的极冠加速过程，与脉冲星辐射机制相关
 
 
 <div class="dpr-home-promo-card">

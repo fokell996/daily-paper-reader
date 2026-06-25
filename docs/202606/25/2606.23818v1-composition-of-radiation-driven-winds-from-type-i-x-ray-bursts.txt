@@ -1,0 +1,654 @@
+Title: Composition of Radiation-Driven Winds from Type I X-ray Bursts
+
+URL Source: https://arxiv.org/pdf/2606.23818v1
+
+Published Time: Wed, 24 Jun 2026 00:05:07 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+> Draft version June 24, 2026
+> Typeset using L ATEX twocolumn style in AASTeX631
+
+Composition of Radiation-Driven Winds from Type I X-ray Bursts 
+
+Jason S. Pero 1 and Nevin N. Weinberg 2
+
+> 1Department of Physics and Astronomy, University of Kansas, Lawrence, KS 66045, USA; jpero@ku.edu
+> 2Department of Physics, University of Texas at Arlington, Arlington, TX 76019, USA
+
+ABSTRACT Recent NICER observations of photospheric radius expansion (PRE) X-ray bursts reveal absorption features consistent with photospheres enriched in intermediate-mass elements. These features may arise from radiation-driven winds that eject freshly synthesized nuclear ashes, offering a new probe of X-ray bursts and neutron star properties. Motivated by these observations, we use the MESA stellar evolution code to simulate PRE bursts from accretion through the hydrodynamic wind phase. We model a range of ignition depths for both pure helium and mixed hydrogen/helium accretion and explore several prescriptions for convection during burst rise. We find that the wind abundances depend sensitively on both ignition depth and convective treatment, including the efficiency of semiconvective mixing and the prescription used to define convective boundaries. Bursts igniting at column depths 
+
+≳ 5×10 8 g cm −2 produce ash-enriched winds, with ejecta ranging from intermediate-mass to iron-peak elements depending on ignition depth, accretion composition, and the treatment of convection. 
+
+1. Introduction 
+
+Type I X-ray bursts are triggered by the unstable ther-monuclear ignition of freshly accreted hydrogen and he-lium on the surfaces of neutron stars in low-mass X-ray binaries (Bildsten 1998; Strohmayer & Bildsten 2003; Galloway & Keek 2021). They are observed as bright X-ray flashes lasting seconds to minutes and provide a unique means of probing thermonuclear burning, neu-tron star (NS) structure, and dense matter physics un-der extreme conditions. In about 20% of observed bursts (Galloway et al. 2020), the radiative luminosity exceeds the local Eddington limit, resulting in a radiation-driven wind that ejects the outer layers of the accreted at-mosphere. During these photospheric radius expansion (PRE) bursts, the photosphere is lifted off the NS sur-face and pushed outward tens to hundreds of kilometers (and ≳ 10 3 km in superexpansion bursts; in’t Zand & Weinberg 2010). In recent years, there has been a renewed effort to use the spectral analysis of X-ray bursts to measure the mass and radii of NSs (see ¨Ozel & Freire 2016 for a review). However, because of wind and spectral model-ing uncertainties, these measurements may be subject to systematic errors (Steiner et al. 2010; Boutloukos et al. 2010; Suleimanov et al. 2011; Miller 2013; Miller & Lamb 2016; Medin et al. 2016). In order to address these un-certainties and reliably measure NS masses and radii from bursts, we need to better understand the dynam-ics of the PRE and the composition of the wind ejecta, and from these compute spectral models that can be compared with observations. While the spectra of X-ray bursts are typically well-fit by blackbody models (Galloway et al. 2008), the recent discovery of narrow spectral lines in PRE bursts fur-ther motivates the development of improved wind mod-eling. Strohmayer et al. (2019) find narrow absorption and emission lines during the PRE phases of four X-ray bursts from 4U 1820-30, including an emission line near 1.0 keV and absorption features near 1.7 and 3.0 keV. They tentatively associate the latter absorption feature with the He-like lines of S XV. There is a systematic shift in the line energies between pairs of bursts with different PRE strength, which Strohmayer et al. (2019) argue is likely produced by a combination of gravita-tional redshift and Doppler blueshifts associated with the burst-driven wind. Barra et al. (2025) reanalysed the same four bursts and analysed another eight bursts from 4U 1820-30 observed by NICER . They detected several significant (> 99 .9% significance) absorption lines, including the 2.97 keV line reported by Strohmayer et al. (2019) and another at 3.4 keV, as well as emission lines at 1 keV, 2 keV, and 2.4 keV. Jaisawal et al. (2025) report similar results in their analysis of the same set of bursts (see also Yu et al. 2025). In addition, they analyze the aftermath emission of a long burst (a superburst) from 4U 1820-30 and detected three absorption lines (see also Peng et al. 2025), whose energies gradually decrease during the re-covery period following the superburst. They argue that 
+
+> arXiv:2606.23818v1 [astro-ph.HE] 22 Jun 2026
+
+2the absorption features share a common origin in heavy nuclear ashes enriched with elements like Si, Ar, Ca, or Ti, either from the burst wind or from an accretion flow contaminated by the burst wind. While Jaisawal et al. (2025) and Peng et al. (2025) interpret an absorption line at 3.8 keV following the 4U 1820-30 superburst as coming from an intermediate-mass element in the accretion flow well above the NS surface, Iaria et al. (2025) interpret it as a gravitation-ally redshifted Fe absorption line from the NS surface. Using a photoionization absorption model, they mea-sure a redshift of 1 + z = 1 .72 ± 0.05, which implies a NS compactness of R/M = 4 .46 ± 0.13 km/ M⊙ (3 .02 ± 0.09 in dimensionless units). Regardless of which interpre-tation is correct, the observed spectral features provide a strong incentive to improve our understanding of the dynamics and composition of burst winds. Early theoretical studies modeled the winds assum-ing steady-state, optically thick outflows with simpli-fied outer boundary conditions (Ebisuzaki et al. 1983; Kato 1983; Quinn & Paczynski 1985; Joss & Melia 1987; Paczynski & Proszynski 1986; Nobili et al. 1994). More recently, Herrera et al. (2020) improved on various as-pects of the input physics and numerical techniques to extend the analysis of steady-state solutions and explore the parameter space in more detail. Herrera et al. (2023) then linked these steady-state stellar wind models to time-dependent burst simulations assuming surface at-mospheres in hydrostatic equilibrium. Guichandut et al. (2021) calculated steady-state models using flux-limited diffusion, which allowed them to account for the tran-sition from optically thick to optically thin regions and thereby extend the steady state solutions out to low op-tical depths. Importantly, the steady-state assumption is often not well satisfied in PRE bursts. This is because the PRE lasts only a few seconds in most cases and it takes at least that long for time-independent conditions to be established in the wind (Joss & Melia 1987). More-over, the wind composition continually varies with time, first ejecting the outer atmospheric layers which contain mostly light, accreted material (H and/or He) and even-tually ejecting the deeper layers that can contain heavy, freshly synthesized ashes of nuclear burning. The first time-dependent wind models were presented by Yu & Weinberg (2018; hereafter YW18) who simulated PRE bursts from NSs accreting pure He (as in 4U 1820-30; see Cumming 2003). Guichandut & Cumming (2023; hereafter GC23) studied time-dependent winds assum-ing NSs that accrete a mix of H/He, highlighting the in-fluence of the initial fuel composition and compositional gradients on convection and burst light curves. In the work presented here, we advance these efforts by systematically exploring how ignition depth, accre-tion composition, and different prescriptions for con-vection shape PRE burst wind dynamics and compo-sition. While YW18 also consider a range of ignition depths, they assume pure He accretion whereas we also consider mixed H/He accretion and various convective treatments. GC23 assume mixed H/He accretion, but only consider a single ignition depth and focus primarily on the burst light curve whereas we focus primarily on the wind dynamics and composition. All three studies use the MESA stellar evolution code to model the bursts and winds, with our study taking advantage of several features available in newer versions of MESA . Most no-tably, it now includes options to implement a variety of different models of convection (e.g., predictive mixing and convective premixing) whose impact on the burst and wind we explore. GC23 showed that the treatment of convection can significantly influence the predicted burst light curve and we likewise show that it can sig-nificantly influence the predicted wind composition. In Section 2 we describe the MESA setup, including ini-tial models, accretion conditions, and our treatment of the hydrostatic (burst rise) phase and the hydrodynamic (wind) phase. Section 3 examines the dynamics of the atmosphere during the hydrostatic phase and Section 4 examines the dynamics of the wind during the hydro-dynamic phase, including how these depend on ignition depth and accretion composition. Section 5 describes the wind composition for different ignition depths and convection prescriptions, highlighting the conditions un-der which heavy-element ashes reach the wind photo-sphere. We summarize our results and conclude in Sec-tion 6.  
+
+> 2.
+
+Numerical Methods and Model Parameters 
+
+We use the MESA stellar evolution code 1 (version 23.05.1; Paxton et al. 2011, 2013, 2015, 2018, 2019, Jermyn et al. 2023) to simulate a suite of PRE bursts 2.The processes modeled include the accretion of matter, thermonuclear ignition and burning on the NS surface, and the evolution of a radiation-driven wind. 2.1. Neutron Star and Initial Envelope 
+
+We assume a non-rotating, spherically symmetric NS with a mass M = 1 .4M⊙ and radius R = 12 km in Newtonian gravity. We construct an initial envelope us-    
+
+> 1Simulations were compiled using the MESA Software Develop-ment Kit, version 24.7.1 available at Townsend (2024).
+> 2Our MESA inlists, models, and simulation setup are available at doi.org:10.5281/zenodo.20713214
+
+3ing the make env model provided in the MESA test suite. The initial envelope is composed of pure 56 Fe down to a column depth of y = 10 12 g cm −2, where 
+
+y(r) = 
+
+Z ∞
+
+> r
+
+ρ dr, (1) with r and ρ the radial coordinate and mass density, respectively. Light elements (H/He) accrete on top of this 56 Fe layer and eventually the conditions for unsta-ble thermonuclear ignition are reached. The 56 Fe layer is meant to serve as a proxy for the inert ashes of burning from previous bursts. Although the actual composition of burst ashes is not nearly as simple as pure 56 Fe (see, e.g., Meisel et al. 2019; Zhen et al. 2025), this should not impact the results of our simulation since our primary aim is to determine the ashes of the freshly synthesized elements ejected in the wind. While ashes of previous bursts can, in principle, be dredged up and ejected by the wind, our study is not designed to study this possi-bility. 2.2. Sources of Pre-Ignition Heating 
+
+There are two potential sources of heating that set the temperature profile of the accreting atmosphere: deep crustal heating and, if H is present in the accretion ma-terial, hot CNO burning. We model the former as a flux 
+
+Fcrust = ˙mQ crust emanating from below the accreted layers, where ˙m = ˙M / 4πR 2 is the local mass accretion rate, ˙M is the global mass accretion rate, and Qcrust is the energy release per nucleon in the crust (Brown & Bildsten 1998; Cumming 2003; Cumming et al. 2006). We assume Qcrust = 200 keV nucleon −1 for all ignition depths and accretion compositions except for the shal-lowest burst models ( yb = 3 × 10 8 g cm −2) for which we instead assume Qcrust = 100 keV nucleon −1 due to numerical issues we encountered at higher Qcrust (both sets of values are within the theoretical range consid-ered by the studies cited above). In practice, such a flux is implemented in MESA by setting the core luminosity parameter Lc = 4 πR 2Fcrust .The flux FH from stable H burning via the hot CNO cycle is self-consistently computed by MESA , which tracks the depletion of H (and formation of He) with depth through the accreted layers. As described in Cumming & Bildsten (2000) and GC23, the H is completely de-pleted at a column depth 
+
+yd ≃ 5.4 × 10 8 g cm −2 ˙M
+
+0.1 ˙MEdd 
+
+! 0.01 
+
+ZCNO 
+
+ X0
+
+0.7
+
+
+
+, (2) where X0 and ZCNO are the initial H and CNO nu-clei mass fractions, respectively, and we scale ˙M by the                                         
+
+> Table 1. MESA Ignition Parameters
+> Pure He Mixed H/He
+> Label yb˙MLc˙MLc
+> (g cm −2)( ˙MEdd )(L⊙)( ˙MEdd )(L⊙)y3e8 3.0×10 80.35 20.2 0.05 1.8 y5e8 5.0×10 80.11 12.9 0.03 1.9 y1e9 1.0×10 90.07 7.8 0.02 1.3 y5e9 5.0×10 90.03 3.3 0.01 0.7
+
+Eddington accretion rate ˙MEdd = 8 πRm pc/ (1 + X0)σT
+
+corresponding to a neutron star with R = 12 km and 
+
+X0 = 0 .7. In all our simulations, the burst ignition depth yb > y d and thus all our bursts ignite in a pure He layer (aside from trace amounts of CNO). 2.3. Burst Ignition Depths 
+
+We consider four ignition depths in our study yb =
+
+{3, 5, 10 , 50 } × 10 8 g cm −2, which we will designate as models {y3e8, y5e8, y1e9, y5e9 }, respectively. For each ignition depth, we consider a pure He accretion model and a mixed H/He accretion model. For the latter, we assume initial 1H, 4He, and 12 C mass fractions of 
+
+X = 0 .7, Y = 0 .28, Z = 0 .02, respectively. As in GC23, we assume for simplicity that 12 C is the only metal ac-creted. Since the CNO abundances adjust to the equi-librium ratio of 14 O and 15 O in the hot CNO cycle, this simplification has little effect on the burst ignition and nucleosynthesis. We demonstrate this quantitatively in Section 5.5 by simulating a burst with a more realistic solar abundance accretion. To obtain models that ignite at these four specific depths, we vary the accretion rate ˙M (which in turn also sets Lc, as described above). The values of ˙M and 
+
+Lc for each model are given in Table 1. For a given ignition depth, the mixed H/He models have a lower 
+
+Lc and ˙M because their accreting atmospheres are kept warm not just by deep crustal heating but also by the hot CNO cycle. The two shallower depths (y3e8, y5e8), are representative of short duration bursts (which are by far the most common type of bursts observed) whose total durations are a few seconds to tens of seconds, while the two larger ignition depths (y1e9, y5e9) are representative of intermediate duration bursts which last a few minutes to tens of minutes. Short and long duration bursts are found to occur in systems accreting both pure He and mixed H/He (Galloway & Keek 2021). 42.4. Reaction Network 
+
+We use MESA ’s approx21.net reaction network throughout our calculations (including during the wind phase). The approx21.net network builds on the 
+
+α-chain backbone by incorporating simplified models for steady-state H burning (including the PP chain and CNO cycle), carbon and oxygen burning reactions (12 C + 12 C, 12 C + 16 O, and 16 O + 16 O), and certain aspects of photodisintegration involving 54 Fe, as out-lined in Weaver et al. (1978). It also introduces the iso-topes 56 Cr and 56 Fe. Nuclear reaction rates are from JINA REACLIB (Cyburt et al. 2010), NACRE (An-gulo et al. 1999), and additional tabulated weak reac-tion rates (Fuller et al. 1985; Oda et al. 1994; Langanke & Mart´ ınez-Pinedo 2000). Screening is included via the prescription of Chugunov et al. (2007). Thermal neu-trino loss rates are from Itoh et al. (1996). Incorporat-ing larger nuclear reaction networks, capable of captur-ing extended rp -process burning, presented numerical challenges and are left for future work. 2.5. Baseline Treatment of Convection 
+
+Our baseline treatment of convection assumes the Ledoux criterion, which accounts for stabilizing gradi-ents in both temperature and composition. We use the Henyey formulation (Henyey et al. 1965), which includes a self-consistent treatment of radiative losses from con-vective elements and is better suited for inefficient con-vection. Thermohaline mixing is included using the Kip-penhahn et al. (1980) prescription with a thermohaline coefficient αth =2, enabling mixing in regions where the mean molecular weight decreases inward. The semicon-vection efficiency parameter is set to the MESA default value of αsc =0. This simplified, baseline treatment of convection may miss important physics, and the MESA documentation recommends enabling additional convection prescrip-tions, particularly in the presence of composition gra-dients. In Section 5, we consider different treatments of convection and assess the extent to which these can ultimately influence the wind structure, evolution, and composition. In general, we find that while the overall wind structure and timescales are relatively insensitive to the treatment of convection,, the wind’s composition can vary greatly depending on the treatment of convec-tion. 2.6. Transition to Hydrodynamic Wind Phase 
+
+The unstable ignition of helium marks the formal on-set of the burst and the resulting energy release quickly heats up the overlying layers. Within ≃ 1 s, the radia-tive luminosity in the top-most layers of the atmosphere exceeds the local Eddington limit 
+
+LEdd (X, T ) = 4πcGM κ(X, T ) . (3) The opacity κ(X, T ) is dominated by electron scatter-ing and depends on composition (primarily the H mass fraction X) and temperature due to relativistic (Klein-Nishina) corrections. As the radiation diffuses upward into shallower, cooler layers, κ increases and the radia-tive luminosity transitions from being sub-Eddington (Lrad < LEdd ) to super-Eddington ( Lrad > LEdd ). This marks the onset of the wind stage and the mo-ment we switch from using MESA ’s hydrostatic solver to its hydrodynamic solver. In practice, we implement this by modifying the extras check model routine in 
+
+run star extras.f90 to stop the hydrostatic simula-tion when Lrad /L Edd ≥ 0.9995 in the outermost layers. This threshold is chosen so that the model never for-mally reaches or exceeds the Eddington limit under the hydrostatic solver, which anyway begins to experience numerical difficulties when this condition is met. The subsequent wind phase is modeled as a nearly purely radiative outflow by disabling convective mixing (turning off MESA ’s implementation of mixing length the-ory), turning off accretion, and activating the hydrody-namic solver to track the wind dynamics and composi-tion. During the hydrostatic phase, the top boundary is set at an optical depth of τ = 100 to prevent numerical instabilities that can arise in shallower layers. During the wind phase, however, we set the top boundary at 
+
+τ = 1 to capture the regions near the photosphere. Sharp gradients in the H mass fractions in the pre-wind atmosphere created numerical challenges when simulating the winds and led to density inversions that disrupted the MESA integration. To address this, we applied the same smoothing spline technique used by GC23 to soften the composition jumps before running the mixed H/He wind simulations.  
+
+> 3.
+
+HYDROSTATIC BURST RISE The evolution of the hydrostatic envelope during the rise phase of a burst plays a critical role in determin-ing the extent of convective mixing and the subsequent composition of material ejected in the wind. In this sec-tion, we examine the thermal and convective response of the envelope from the onset of unstable nuclear burn-ing to the point just before wind launch. In Section 3.1, we analyze how the depth of ignition influences the ex-tent of convective mixing, comparing pure He and mixed H/He accretion models. In Section 3.2, we describe the prevalence of split convection zones in the simulations. Finally, in Section 3.3, we evaluate the sensitivity of 510 4
+
+10 5
+
+10 6
+
+10 7
+
+10 8
+
+10 9
+
+Column Depth (g cm −2)10 8
+
+10 9
+
+> −1.08 s
+> −0.30 s
+> −0.25 s
+> −0.21 s
+> −0.16 s 0.00 s
+
+10 4
+
+10 5
+
+10 6
+
+10 7
+
+10 8
+
+10 9
+
+Column Depth (g cm −2)10 8
+
+10 9
+
+> −1.02 s
+> −0.53 s
+> −0.49 s
+> −0.47 s
+> −0.45 s 0.00 s
+> Temperature (K)
+
+Pure He 
+
+> ywb
+
+Mixed H/He               
+
+> ywb
+> yd
+> Figure 1. Temperature as a function of column depth for ignition at yb= 5 ×10 8g cm −2assuming pure He accretion (left panel) and mixed H/He accretion (right panel). The different line colors correspond to different times during the burst rise, with time labeled in seconds and t= 0 corresponding to the start of the radiation-driven wind. Squares indicate the top of the convection zone ycand the dashed vertical lines mark the maximum depth of the wind base ywb during the subsequent wind phase (the wind will eject material above this line). The dotted line in the mixed H/He panel is the hydrogen depletion depth
+> yd.
+
+convective mixing to the detailed elemental composi-tion of the accreted material by comparing models with simplified and realistic solar abundances. The results presented in this section and the next use our baseline treatment of convection (see Section 2.5); we consider different treatments of convection in Section 5.4. 3.1. Effects of Ignition Depth and Accretion Composition on the Burst Rise 
+
+Figure 1 shows the evolution of the temperature as a function of column depth during the burst rise for the y5e8 models assuming pure He accretion (left panel) and mixed H/He accretion (right panel). The time labels indicate seconds before t = 0, defined as the start of the wind (the moment when Lrad first exceeds LEdd in the outer atmosphere). Squares mark the top of the convection zone, while the dashed vertical line denotes the maximum inward extent of the wind base ywb during the PRE phase; material above this depth is ejected in the wind. We define the column depth of the wind base as 
+
+ywb (t) = Mej (t)4πR 2 (4) where the total mass ejected at time t > 0 is given by 
+
+Mej (t) = R t 
+
+> 0
+
+˙Mw(t′)dt ′. Here the mass-loss rate ˙Mw =4πr 2ρv , where ρ and v are the density and velocity of the wind at radius r and time t.In both models, the convection zone initially extends outward along an adiabat before eventually retreating as radiative diffusion carries an increasing fraction of the flux, consistent with the hydrostatic burst-rise evolution described by Weinberg et al. (2006; hereafter W06) and YW18. The column depth at the top of the convection zone, yc, reaches a minimum value that is smaller than 
+
+ywb , implying that the wind will entrain some of the convectively mixed ashes of thermonuclear burning. In each panel of Figure 1, the rightmost black square marks this minimum yc.As noted in Section 2.2, the accretion rate is slow enough that all the H in the mixed H/He models burns via the hot CNO cycle prior to He ignition. Therefore, their ignition occurs in nearly pure He layers just like the pure He accretion models. Nonetheless, there are two notable differences in their convective evolution. First, as can be seen in Figure 1, the mixed H/He models have steep temperature gradients just shallower than the hydrogen depletion depth yd (see Equation (2)) due to sharp gradients in the mean molecular weight between the heavy ashes and the light H-rich material. This compositional stratification tends to inhibit the outward growth of the convective zone until the material becomes sufficiently hot to overcome the buoyancy barrier, as dis-cussed in W06. Second, for models y5e8 and y1e9, the minimum yc is somewhat smaller in the mixed H/He 60.0 1.0 2.0 3.0 Base Temperature (10 9 K) 10 3
+
+10 4
+
+10 5
+
+10 6
+
+10 7
+
+10 8
+
+10 9
+
+10 10 
+
+> y3e8 y5e8 y1e9 y5e9
+
+0.0 1.0 2.0 3.0 Base Temperature (10 9 K) 10 3
+
+10 4
+
+10 5
+
+10 6
+
+10 7
+
+10 8
+
+10 9
+
+10 10 
+
+> y3e8 y5e8 y5e8 solar y1e9 y5e9
+> yc (g cm −2)
+
+Pure He Mixed H/He        
+
+> Figure 2. Evolution of the top of the convection zone ycas a function of base temperature Tbduring the burst rise (before wind launch) for models with pure He accretion (left panel) and mixed H/He accretion (right panel). The horizontal dotted lines denote the wind base ywb , color coded by the respective models.
+
+models compared to the pure He models (see also Fig-ure 2 discussed next). As described in GC23, this is due to the collision between the convection zone and the overlying H layer which brings in fresh protons be-low yd, causing a rapid injection of energy and a further expansion of the convection zone. Figure 2 shows how the top of the convection zone 
+
+yc evolves as a function of base temperature Tb dur-ing the burst rise up until the wind is launched. The left panel shows models with pure He accretion and the right panel shows models with mixed H/He accretion. Each curve corresponds to a different ignition column depth yb, and the maximum value of ywb is indicated by the horizontal dotted lines. In both pure He and mixed H/He accretion, the convection zone initially ex-tends outward from the base of the burning layer as the temperature rises. The extent of this outward growth depends strongly on the ignition depth and the com-position of the accreted material. In the shallowest ignition models ( yb = 3 × 10 8 g cm −2), the convective boundary yc never reaches ywb . However, for deeper ignition depths ( yb ≥ 5 × 10 8 g cm −2), the convection zone extends well past ywb , indicating that ashes of nu-clear burning can be ejected during the subsequent wind phase. The distinct shape of the mixed H/He y3e8 curve in the right panel, which shows a relatively shallow and gradual slope in yc as Tb increases, can be explained by the shallow ignition depth and the timing of heat transport during the burst rise. For shallow bursts like y3e8, the location of peak temperature does not initially occur at the base of the accreted layer. Instead, it starts slightly above the base and slowly moves downward as burning progresses. This delays the development of a steep inward temperature gradient near yb and prevents rapid expansion of the convection zone. By contrast, for deeper ignitions, such as those shown in Figure 1, the temperature rises sharply at yb and the top of the convection zone moves outward to lower column depths more rapidly with increasing Tb.3.2. Split Convection 
+
+Split convection zones are regions within a convective envelope characterized by the temporary interruption of convective flow by stable, radiative layers. These zones arise from a variety of physical conditions, including lo-cal changes in opacity, composition gradients, or com-plex heat transport mechanisms. GC23 investigated split convection zones, finding that they emerge as a natural consequence of the rapid inter-play between nuclear burning and convection, especially following the collision of the convection zone with the H-rich radiative layers at y < y d. This process, driven by rapid energy injection from proton captures, causes the convection to split into multiple zones interspersed by tiny radiative gaps. However, the authors highlighted that the resultant complexity is highly sensitive to the chosen convection prescription and spatial resolution, noting that this splitting might be an artifact of simpli-fied one-dimensional assumptions and that simulations 710 −6
+
+10 −3
+
+1
+
+> ρ
+> (g cm −3)
+
+# Pure He 
+
+0.05 s 1.04 s 11.21 s 12.22 s 10 −6
+
+10 −3
+
+1
+
+# Mixed H/He 
+
+0.05 s 1.09 s 18.4 s 19.43 s 10 6
+
+10 7
+
+10 8
+
+> T (K)
+
+10 6
+
+10 7
+
+10 8
+
+10 1
+
+10 3
+
+> τ
+
+10 1
+
+10 3
+
+10 6
+
+10 8
+
+> v
+> (cm s −1)
+
+10 6
+
+10 8
+
+10 100 1000 Radius (km) 10.5 2˙Mw
+
+> (10 18  g s −1)
+
+10 100 1000 Radius (km) 10.5 2
+
+Figure 3. Radial profiles of the wind structure at different times for ignition at yb = 5 ×10 8 g cm −2 assuming pure He accretion (left panels) and mixed H/He accretion (right panels). The panels show, from top to bottom, the mass density ρ, temperature 
+
+T , optical depth τ , wind velocity v, and mass loss rate ˙Mw. Each curve is terminated at the location where the optical depth 
+
+τ = 1. The circles indicate the location of the photosphere rph .
+
+only converge when boundary effects like overshoot mix-ing are explicitly modeled. We find evidence of split convection across all of our simulations, with a prevalence that depends on which treatment of convection is adopted (it is more prevalent in the predictive mixing and CPM treatments, which we describe in Section 5.4). Models computed at higher spatial resolution also exhibit a greater number of split convective zones and wider radiative gaps, consistent with the convergence test results reported by GC23. 3.3. More Realistic Mixed Accretion Composition 
+
+As discussed in Section 2.3, the mixed H/He mod-els assume initial 1H, 4He, and 12 C mass fractions of 
+
+X = 0 .7, Y = 0 .28, Z = 0 .02, respectively. To examine the impact of this simplified treatment of metal abun-8dances, we ran a y5e8 model with a more realistic solar accretion abundance based on the values of Lodders & Palme (2009; we call this model y5e8 solar). We find that for the same ˙M , both ignite at yb = 5 ×10 8 g cm −2,but that the top of the convection zone of the y5e8 solar model reaches slightly shallower column depths, plac-ing it slightly farther above ywb (compare the y5e8 and y5e8 solar curves in Figure 2). However, as we will show in Section 5 (see Figure 9), this has only a very mod-est effect on the composition of the ashes ejected in the wind.  
+
+> 4.
+
+WIND DYNAMICS When the radiative luminosity Lrad in the atmosphere first exceeds the local Eddington limit LEdd , a radiation-driven wind is launched. 3 As described in Section 2, at that moment we stop the hydrostatic simulations and use the last hydrostatic profile as the starting model for the hydrodynamic wind simulations. In this section, we focus on the evolution of the wind structure and the time-dependence of its global parame-ters, examining how they depend on ignition depth and accretion composition (we will describe the wind com-position in Section 5). In Section 4.1, we describe results from the two representative y5e8 models (pure He and mixed H/He). Although the overall wind structure and evolution are similar across the various models, there are some important differences that we describe in Sec-tion 4.2. 4.1. Time Evolution of the Wind Profiles 
+
+In Figure 3 we show the evolution of the wind struc-ture of the y5e8 models assuming pure He accretion (left panels) and mixed H/He accretion (right panels). The different panels show from top to bottom, respec-tively, the radial profiles of density ρ, temperature T ,optical depth τ , wind velocity v, and mass loss rate ˙Mw = 4 πr 2ρv . The curves are each truncated at op-tical depth τ = 1, and the location of the photosphere 
+
+rph is marked by an open circle. Following YW18, we define rph as the radius where σT 4 = Lrad /4πr 2; as can be seen in the optical depth profiles, rph typically cor-responds to τ ≈ 3 − 5 (similar to estimates in Quinn & Paczynski 1985; Paczynski & Proszynski 1986). In both the pure He and mixed H/He accretion models, the wind gradually strengthens over time, with increases in ρ, T ,
+
+τ , and ˙Mw, consistent with the results of YW18.      
+
+> 3The condition Lrad (y)> L Edd (y) occurs first in the outermost layers and then over time moves inward to larger y(see Figure 5 in YW18).
+
+For the pure He accretion y5e8 model, we find that the wind settles into a steady state at time t ≃ 1 s, with only modest changes over the next ≈ 10 s. Dur-ing this phase, the mass-loss rate reaches a peak value of ˙Mw ≃ 1.8 × 10 18 g s −1 and the photospheric radius reaches a maximum value of r ph ≃ 230 km. By t ≃ 12 s, the atmosphere has cooled and Lrad decreases below 
+
+LEdd causing a rapid decline in ρ, T , v, and ˙Mw that begins near the NS surface. The wind profiles for the mixed H/He accretion y5e8 model are overall similar to that of the pure He accre-tion model. One notable difference is that mixed H/He model evolves somewhat more slowly, as evident from the longer timescales, with the profiles reaching steady state at t ≃ 1 s and remaining relatively unchanged for the next ≈ 18 s. The maximum mass-loss rate is slightly lower too, with ˙Mw ≃ 1.5 × 10 18 g s −1, and the maxi-mum photospheric radius is somewhat larger, reaching 
+
+rph ≃ 370 km (see also the top panel of Figure 4 dis-cussed below). The reason the wind from the mixed H/He model lasts longer and is more spatially extended than that of the pure He model is likely because of the composition de-pendence of the electron scattering opacity κ(X, T ) and thus the Eddington limit LEdd (X, T ) (see Equation (3)). When H is present, the larger number of free electrons per nucleus increases κ which lowers LEdd . As illus-trated in Figure 9 of W06, this means that for the same 
+
+Lrad , a mixed H/He atmosphere will be super-Eddington over a broader range of depths than a pure He atmo-sphere. In an evolving burst, this lower LEdd allows the mixed case to remain super-Eddington for longer as the atmosphere cools after the burst rise, sustaining an extended photosphere and wind after the pure He case has already dropped below its Eddington limit. An ad-ditional factor that may contribute to the mixed H/He models’ longer lasting, more extended winds is the en-hanced energy release from H burning after the collision between the convection zone and the overlying H layer. 4.2. Dependence of Wind Profiles on Ignition Depth and Accretion Composition 
+
+We now describe how key properties of the wind de-pend on ignition depth as well as accretion composition. Figure 4 shows the time evolution of rph , τ (rph ), v(rph ), and ˙Mw(rph ) for bursts at four different ignition column depths ( yb = 3 × 10 8, 5 × 10 8, 1 × 10 9, and 5 × 10 9 gcm −2), comparing models with pure He accretion (left panels) and mixed H/He accretion (right panels). The time evolution of these quantities offers insight into the structure and dynamics of the wind and its sensitivity to both ignition depth and accretion composition. 910 −1 10 0 10 1 10 2
+
+100 1000 
+
+> rph
+> (km)
+
+# Pure He 
+
+y3e8 y5e8 y1e9 y5e9 10 −1 10 0 10 1 10 2
+
+100 1000 
+
+# Mixed H/He 
+
+2.55.07.5
+
+> τ
+
+2.55.07.510 8
+
+10 9
+
+> v
+> (cm s −1)
+
+10 8
+
+10 9
+
+0.1 1 10 100 Time (s) 0.1 110 ˙Mw
+
+> (10 18  g s −1)
+
+0.1 1 10 100 Time (s) 0.1 110         
+
+> Figure 4. Wind properties evaluated at the photosphere rph as a function of time for the four burst ignition depths (listed at the top) assuming pure He accretion (left panels) and mixed H/He accretion (right panels). The panels show, from top to bottom, the evolution of the photospheric radius rph , the optical depth τ, the wind velocity v, and the mass loss rate ˙Mw.
+
+Overall, we find that the deeper the ignition, the longer the wind duration and the larger the peak rph .The duration is a few seconds for yb = 3 × 10 8 g cm −2
+
+and over 100 seconds for yb = 5 × 10 9 g cm −2. This is because deeper ignitions release more energy and thus have longer lasting and more powerful winds. While these wind parameters (especially duration) are sensitive to ignition depth, we see that they have a rela-tively mild dependence on accretion composition. Con-sistent with the y5e8 models discussed above, the peak value of rph ( ˙Mw) is somewhat larger (smaller) for the mixed H/He accretion models, although nearly all have maximum radii of rph ≈ 200 − 400 km (maximum mass loss rates of ˙Mw ≈ 1 − 3 × 10 18 g s −1). The one ex-ception is the y5e9 mixed H/He accretion model which reaches an especially large radius rph ≳ 1000 km. The optical depth at the photosphere is a nearly con-stant value of τ ≃ 3.5 independent of time, ignition depth, and accretion composition. This is consistent with with the arguments presented in Quinn & Paczyn-ski (1985) and Paczynski & Proszynski (1986). The ap-parent spikes above τ ∼3.5 are not physical; they occur when the wind subsides and the location of rph becomes difficult to resolve numerically.  
+
+> 5.
+
+WIND COMPOSITION In this section we explore how the composition of ma-terial ejected during the wind depends on the accre-tion composition, ignition depth, and the scheme used to model convection during the hydrostatic burst rise. 10 10 2
+
+10 3
+
+10 4
+
+10 5
+
+10 6
+
+10 7
+
+10 8
+
+10 9
+
+Column Depth (g cm −2)10 −7
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+110 2
+
+10 3
+
+10 4
+
+10 5
+
+10 6
+
+10 7
+
+10 8
+
+10 9
+
+Column Depth (g cm −2)10 −7
+
+10 −6
+
+10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+1 1H
+
+> 4He
+> 12 C
+> 14 N
+> 16 O
+> 20 Ne
+> 24 Mg
+> 28 Si
+> 32 S
+> 36 Ar
+> 40 Ca
+> 44 Ti
+> 48 Cr
+> 52 Fe
+> 56 Fe
+
+227 43 12.03 12.0 Radius (km) 369 63 12.03 12.0 Radius (km) Mass Fraction 
+
+# t = 11 .2 s t = 18 .4 s        
+
+> Figure 5. Mass fraction of elements during the maximum radial extent of the wind as a function of column depth (bottom axis) and radius (top axis) for our baseline y5e8 model. The left panel is the pure He accretion model at t= 11 .2 s, while the right panel is the mixed H/He accretion model at t= 18 .4 s (corresponding to each model’s time of maximum rph ). The line styles are shown in the right panel key and represent the same elements in both panels. The vertical dashed-dotted line marks the location of the photosphere rph .
+
+In Section 5.1 we show the wind compositions for our baseline y5e8 models with pure He accretion and mixed H/He accretion. In Section 5.2 we examine how the y5e8 results depend on the choice of the semiconvec-tive mixing efficiency parameter αsc and in Section 5.3 we show how the wind composition depends on ignition depth yb (for various values of αsc ). In Section 5.4 we explore different convection prescriptions and their in-fluence on the wind composition. Finally, in Section 5.5, we test the role of active nuclear burning during the wind phase and assess the impact of the accreted metal abun-dance by comparing the carbon-only case (our baseline model) with accretion of solar metal abundances. To-gether, these analyses provide a multifaceted view of how physical effects and numerical choices can shape the nucleosynthetic signatures observable in burst winds. 5.1. Dependence on Accretion Composition 
+
+Figure 5 shows the wind composition for our base-line y5e8 models, plotted as a function of column depth (bottom axis) and radius (top axis). The composition profiles are taken at t ≈ 11 .2 s for the pure He accretion model (left panel) and t ≈ 18 .4 s for the mixed H/He ac-cretion model (right panel). These times correspond to the maximum radial extent of the wind (maximum rph )in each case. The vertical dash-dotted line indicates the location of the photosphere rph .In the pure He accretion model, the wind’s photo-sphere is rich in intermediate mass elements with promi-nent mass fractions of 12 C, 16 O, 20 Ne, 24 Mg, 28 Si, and 
+
+> 32
+
+S which were synthesized during the burst. The mass fraction of 4He decreases rapidly for y ≳ 10 8 g cm −2,indicating efficient helium consumption in the burning layer. As expected, 1H is absent due to the lack of hy-drogen in the accreted material. The composition from the photosphere at rph ≃ 230 km down to r ≃ 20 km is relatively uniform and dominated by intermediate mass elements. This reflects the pre-wind composition of the outer atmosphere, whose layers are stratified by the con-vection zone’s retreat and which the wind gradually ex-poses. In the mixed H/He accretion model, the wind is pri-marily composed of the accreted H/He that resides in the top layers of the atmosphere (at y < y d) as well as trace amounts of 12 C and 16 O associated with pre-burst hot CNO burning. Given that the pure He and mixed H/He models have fairly similar ash-rich com-positions near the burning layer (at y ≳ 10 8 g cm −2), their different wind composition shows that convection during the burst rise is less efficient at bringing heavy elements above the wind base ywb in the mixed H/He model. This occurs because the lighter elements in the mixed H/He model enhance the atmosphere’s compo-sitional stratification and thus suppress convection and convective mixing. This highlights the influence of ac-11 2345678910 −7
+
+10 −5
+
+10 −3
+
+10 −1
+
+23456789 23456789
+
+2345678910 −7
+
+10 −5
+
+10 −3
+
+10 −1
+
+23456789 23456789
+
+> 1H
+> 4He
+> 12 C
+> 14 N
+> 16 O
+> 20 Ne
+> 24 Mg
+> 28 Si
+> 32 S
+> 36 Ar
+> 40 Ca
+> 44 Ti
+> 48 Cr
+> 52 Fe
+> 56 Fe
+
+43 12.25 12.11 12.03 128 17 12.23 12.03 199 23 12.35 12.02 336 32 12.49 12.01 307 33 12.73 12.01 320 34 12.04 12.0 Radius (km) log Column Depth (g cm −2)Mass Fraction 
+
+Figure 6. Evolution of the wind composition profile for the y5e8 model with mixed H/He accretion assuming a semiconvection efficiency parameter αsc = 0.5. The top row (left to right) shows the profiles at t = 0 .05, t = 2, and t = 4 s and the bottom row (left to right) shows them at t = 6, t = 10, and t = 16 s. The vertical dashed-dotted line indicates the location of the photosphere. 
+
+cretion composition on the wind composition, with po-tential implications for the spectral signatures of heavy elements in PRE bursts. However, as we will show in Sections 5.2, 5.3, and 5.4, mixed H/He models can eject heavier elements in the wind depending on the semicon-vective mixing efficiency, ignition depth, and how con-vection is modeled, respectively. 5.2. Impact of Semiconvective Mixing 
+
+In our baseline y5e8 models shown in Figure 5, we ne-glected the possibility of semiconvective mixing during the hydrostatic burst rise, i.e., we set αsc = 0 in MESA .In the next section, we consider a range of values for αsc 
+
+and present results for the four ignition depths yb. In this section, we begin with a detailed comparison for the y5e8 mixed H/He accretion model. In Figure 6 we show the time evolution of the wind composition for αsc = 0.5 (we also show results for 
+
+αsc = 0 .1 in the next section). Each panel displays the elemental mass fractions as a function of column depth (bottom axis) and radius (top axis) at a different stage of the wind. The top row (left to right) shows it at 
+
+t = 0 .05, 2, and 4 s, and the bottom row shows it at 
+
+t = 6, 10, and 16 s. The vertical dash-dotted line in each panel marks the location of the photosphere. Near the onset of the wind ( t = 0 .05 s), the outflow is just beginning to develop. The composition above the photosphere is still dominated by unburned light el-ements, primarily 1H and 4He. A significant amount of 12 C, originating from the accreted material, is also ejected at this early time. The heavier nuclei produced by helium burning, such as 16 O and 20 Ne, remain con-fined to deeper layers at this early stage. By t = 2 and 4 s, the wind has intensified and the pho-tosphere has moved out to rph ≃ 100 − 200 km. Some intermediate mass elements that were synthesized dur-ing the burst, such as 20 Ne and 24 Mg, begin to be lifted off the NS surface. At t = 6 s, ashes appear at the 12 photosphere in small but increasing amounts, indicat-ing that the wind has peeled away the outer atmosphere and is beginning to expose the deeper layers. By t = 10 s, and even more so at t = 25 s, the wind contains appreciable mass fractions of 28 Si, 32 S, 36 Ar, and 40 Ca at the photosphere (although 1H and 4He al-ways dominate the composition). These intermediate mass elements are products of α-capture, and their pres-ence signals that semiconvection (with αsc = 0 .5) has enabled significant mixing between the deeper burning layers near yb and the wind base at ywb .5.3. Impact of Ignition Depth 
+
+We now describe how the wind composition depends on ignition depth yb. Figure 7 shows the composition at the photosphere at the time of maximum rph for the mixed H/He accretion models with yb = 3 ×10 8, 5 ×10 8,1 × 10 9, and 5 × 10 9 g cm −2 (top to bottom). We show results for three values of the semiconvection efficiency parameter αsc = 0 .0, 0.1, and 0.5. This range of values is motivated by Kaiser et al. (2020), who in their study of the relative importance of convective uncertainties in massive stars considered αsc = 0 .004 and 0 .4 as repre-senting slow and fast semiconvection. For the shallowest ignition depth (y3e8 models), the wind composition remains dominated by H and He and closely resembles the initial accreted abundances, with barely any ashes ejected regardless of αsc . This result reflects the limited extent of convection yc compared to the depth of the wind base ywb (see the right panel of Figure 2). For the y5e8 models, the effects of semiconvective mix-ing become apparent as αsc increases. For αsc = 0 .1, and especially for αsc = 0 .5 (see also Section 5.2), the mass fractions of intermediate mass elements (mass numbers 30 −40) are clearly enhanced, indicating mixing of ashes from the burning layer. While light elements still domi-nate, the appearance of these heavier nuclei in the pho-tosphere suggests the possibility of compositionally en-riched outflows in short duration (i.e., shallow ignition depth), mixed H/He PRE bursts. At the deepest ignition depths (y1e9 and y5e9 mod-els), the dependence on αsc is especially striking. In the absence of semiconvection ( αsc = 0 .0), the wind of the y1e9 models remains H and He rich, with only traces of heavier elements. However, for αsc = 0 .1 and 0.5, the wind composition is highly enriched in ashes of ad-vanced α-capture burning, including 36 Ar, 40 Ca, and 
+
+> 44
+
+Ti. For the y5e9 models, iron group nuclei such as 
+
+> 52
+
+Fe, 56 Fe, and 56 Ni are present in the photosphere even for αsc = 0 .1. 10 −9
+
+10 −6
+
+10 −3
+
+1
+
+> αsc =0.0, pure He
+> αsc =0.0, mixed H/He
+> αsc =0.1, mixed H/He
+> αsc =0.5, mixed H/He
+
+10 −9
+
+10 −6
+
+10 −3
+
+1
+
+10 −9
+
+10 −6
+
+10 −3
+
+1
+
+0 10 20 30 40 50 60 Mass Number 10 −9
+
+10 −6
+
+10 −3
+
+1
+
+> Mass Fraction
+
+# y5e9 y1e9 y5e8 y3e8 
+
+Figure 7. Composition of the wind at the photosphere ( r =
+
+rph ) at the time of maximum rph for the pure He models (squares) and the mixed H/He models (circles). Each panel corresponds to a different ignition depth: yb = 3 × 10 8, 5 ×
+
+10 8, 1 × 10 9, and 5 × 10 9 g cm −2 (top to bottom). For the mixed H/He models, we shows results for three values of the semiconvection efficiency parameter αsc = 0 , 0.1, 0.5. The pure He accretion models are all with αsc = 0. 
+
+These results show that for the mixed H/He accre-tion models, ignition depth and semiconvection mix-ing efficiency significantly impact the chemical makeup of the wind. Deeper ignition depths naturally pro-13 duce more processed material and shallower yc (see Fig-ure 2), but the extent to which that material reaches the wind’s photosphere depends strongly on the efficiency of semiconvective mixing during the hydrostatic pre-wind phase. Figure 7 also shows results for the pure He models at the same four values of yb (assuming αsc = 0). Similar to the mixed H/He models, the composition is domi-nated by the accretion composition for the y3e8 model and becomes increasingly rich in heavier elements with increasing yb. The key difference is that for the pure He models, ashes are ejected even with αsc = 0. This is be-cause there is no overlying H layer to suppress convective mixing (see discussion at end of Section 5.1). 5.4. Dependence on How Convection is Modeled 
+
+In our baseline MESA setup, we use the Ledoux crite-rion to model convection during the burst rise. Accord-ing to the Ledoux criterion, convective boundaries are located where the discriminant ∇rad − ∇ L changes sign; here ∇rad is the radiative temperature gradient and ∇L
+
+is the Ledoux temperature gradient, which takes into account the effect of composition gradients (see Equa-tion (11) of Paxton et al. 2013). In this section, we explore how the following three alternative MESA treat-ments of convection impact the wind composition: the Schwarzschild criterion, predictive mixing, and convec-tive premixing (CPM). We briefly describe each of these and refer the reader to Paxton et al. (2013, 2018, 2019) for detailed descriptions. According to the Schwarzschild criterion, convective boundaries are located where the discriminant ∇rad −∇ad changes sign, where ∇ad is the adiabatic temper-ature gradient; thus, unlike the Ledoux criterion, it ig-nores the effects of composition gradients. As described in Paxton et al. (2018), an issue with using the Ledoux or Schwarschild criteria in MESA is that the location of a convective boundary is not uniquely determined but in-stead depends on the mixing history near the boundary. As a result, it is possible that ∇rad > ∇ad on the con-vective side of the boundary, which is physically incon-sistent with the local mixing length theory requirement that ∇rad = ∇ad on the convective side of the boundary. To resolve this problem, Paxton et al. (2018) introduced the predictive mixing scheme which improves on MESA ’s previous algorithms by allowing a convective region to expand during a time step until its boundary satisfies 
+
+∇rad = ∇ad on the convective side. However, Paxton et al. (2018; see also Paxton et al. 2019) found certain cases that continue to exhibit ∇rad > ∇ad on the convec-tive side of the boundary even with predictive mixing. The CPM scheme introduced in Paxton et al. (2019) is 10 −6
+
+10 −4
+
+0.01 1
+
+> accretion y3e8 y5e8 y1e9 y5e9
+
+10 −6
+
+10 −4
+
+0.01 1
+
+10 −6
+
+10 −4
+
+0.01 1
+
+0 10 20 30 40 50 60 Mass Number 10 −6
+
+10 −4
+
+0.01 1
+
+> Mass Fraction
+
+# Ledoux Schwarzschild Predictive Mixing CPM                   
+
+> Figure 8. Composition of the wind at the photosphere (r=rph ) at the time of maximum rph assuming mixed H/He accretion. Each panel corresponds to a different treatment of convection: the Ledoux criterion, the Schwarschild crite-rion, predictive mixing, and CPM (top to bottom). Within each panel, we show results for the four ignition depths:
+> yb= 3 ×10 8, 5 ×10 8, 1 ×10 9, and 5 ×10 9g cm −2.The gray open circles indicate the accreted composition.
+
+designed to address these issues and better track convec-tive boundaries by directly modifying abundances each time step through an iterative series of mixings over a shifting window of computational cells. 14 Predictive mixing in MESA is governed by a set of pa-rameters that control how the scheme operates within predefined convection zones ( core , shell , and surf ). In our models, predictive mixing functioned as intended only when both the shell (convective shell) and surf 
+
+(surface convection zone) regions were explicitly en-abled. Once these zones are activated, it is also neces-sary to specify the minimum superadiabaticity required for predictive mixing to operate in each region. The 
+
+MESA documentation recommends adopting a minimum superadiabaticity of at least 0.005 for core He-burning models in order to prevent artificial splitting of the core convection zone and the occurrence of core breath-ing pulses. Motivated by this guidance, we adopted a threshold of 0.005 for the shell zone and a slightly lower value of 0.001 for the surf zone in our burst models with predictive mixing. In Figure 8, we show the wind composition at the pho-tosphere at the time of maximum rph for mixed H/He ac-cretion models at the four ignition depths: yb = 3 × 10 8,5×10 8, 1 ×10 9, and 5 ×10 9 g cm −2. From top to bottom, the panels correspond to the four different treatments of convection during the hydrostatic burst rise: the Ledoux criterion (our baseline treatment), the Schwarzschild cri-terion, predictive mixing, and CPM (all with αsc = 0). At the shallowest ignition depth (y3e8), all convec-tion schemes yield winds composed almost entirely of the accreted material. The only slight exception is the Schwarzschild criterion, which has some mixing between the burning layers and the shallower depths, resulting in the emergence of small amounts of intermediate-mass nuclei (e.g., 20 Ne and 24 Mg). For the y5e8 models, the differences between the con-vection schemes become more pronounced. The Ledoux criterion again yields winds composed mostly of the ac-creted material. By contrast, the three other schemes show significant enrichment of intermediate-mass α-capture nuclei extending from the Si–Ca region. The Schwarzschild criterion and predictive mixing show the most while CPM shows slightly less. Nuclei such as 
+
+> 28
+
+Si, 32 S, 36 Ar, and 40 Ca appear prominently, and trace amounts of heavier elements such as 44 Ti and 48 Cr are also present. For the y1e9 models, the Ledoux criterion continues to show limited enrichment, with the wind still dominated by the accretion composition. In the three other convec-tion schemes, however, heavier elements such 40 Ca, 44 Ti, and 48 Cr dominate the composition. Iron-peak elements such as 52 Fe and 56 Fe are also present, demonstrating that the burning has progressed to the final pathways of the approx21.net network. 10 −6
+
+10 −4
+
+0.01 1 accretion (C-only) y5e8 net on y5e8 net off 
+
+0 10 20 30 40 50 60 Mass Number 10 −6
+
+10 −4
+
+0.01 1 accretion (solar metal mix) y5e8 solar           
+
+> Mass Fraction
+> Figure 9. Composition of the wind at the photosphere ( r=
+> rph ) at the time of maximum rph for mixed H/He accretion with yb= 5 ×10 8g cm −2. The top panel shows results with nuclear burning turned on and turned off (net on and net off, respectively) during the wind phase. The bottom panel shows the accretion composition and the wind composition assuming a realistic solar abundance accretion rather than the 12 C-only metal accretion of our baseline models.
+
+At the deepest ignition depth (y5e9), the Ledoux cri-terion finally shows enrichment of intermediate-mass α-capture nuclei. The remaining three schemes continue the trend toward heavier compositions with increasing 
+
+yb, and are dominated by 56 Ni. Overall we see that the choice of convection scheme has a significant impact on the wind composition. The Ledoux criterion consistently yields winds dominated by the accretion composition, while the Schwarzschild crite-rion, predictive mixing, and CPM all yield substantially ash-enriched winds (though not for the y3e8 models). These results, as well as the αsc results, underscore the critical role of convective mixing physics in determining the wind composition and thus the potential spectro-scopic signatures of PRE bursts. 5.5. Impact of Ongoing Burning and Metallicity 
+
+Our baseline calculations allow for ongoing nuclear burning during the wind phase and assume 12 C is the only accreted metal in the mixed H/He accretion mod-els. As explained in Section 2.3, the 12 C-only model 15 should be sufficient because the CNO abundances ad-just to the equilibrium ratio of 14 O and 15 O in the hot CNO cycle prior to ignition, as noted by GC23. In Figure 9 we explore how changing each of these approaches impacts the wind composition (for αsc = 0). The top panel compares the y5e8 model for mixed H/He accretion with nuclear reactions turned on to one with them turned off during the wind phase. Although the abundance profiles are identical at wind onset, they dif-fer shortly thereafter, with the net-on case yielding en-hanced abundances of 12 C and 20 Ne. This difference is likely due to slight differences in the wind-base depth 
+
+ywb (t), arising from variations in the luminosity evolu-tion between the net-on and net-off cases. It is not due to heavier elements synthesized during the wind phase, as such products are formed too deep to be ejected by the wind. The bottom panel shows results assuming an accre-tion composition consisting of a realistic solar abun-dance pattern based on the results of Lodders & Palme (2009). We find that the composition of the wind closely matches the accretion composition just like in the 12 C-only y5e8 model (see Figure 7). This suggests that the 
+
+> 12
+
+C-only model is sufficient for accurately capturing the burst rise and the subsequent wind phase.  
+
+> 6.
+
+SUMMARY AND CONCLUSIONS We carried out hydrodynamic MESA simulations of PRE bursts that explore how ignition depth yb, accre-tion composition, and the treatment of convection in-fluence the structure, evolution, and composition of a burst’s radiation-driven winds. Our study extends pre-vious work by modeling a range of ignition depths for both pure He and mixed H/He accretion, while also com-paring several prescriptions for convection that modify the extent of compositional mixing during the hydro-static burst rise. We find that deeper ignitions produce more power-ful, longer lasting winds with somewhat larger maxi-mum photospheric radii rph and peak mass-loss rates ˙Mw (Figure 4). For a given yb, the pure He and mixed H/He accretion models show relatively similar wind structure and evolution, although not composition. This is because in both cases the ignition layer is com-posed of nearly pure He (in all our models the H deple-tion depth yd < y b) and therefore their burst energet-ics and radiative-luminosity evolution L(t) are similar. One notable difference is that for a given yb, the winds of mixed H/He accretion bursts last somewhat longer, especially for yb ≳ 10 9 g cm −2. This is because the H in the outer layers of the atmosphere increases the opacity which lowers the Eddington luminosity LEdd and pro-longs the super-Eddington phase L(t) > L Edd .The wind composition is highly dependent on yb and the treatement of convection (Figures 7 and 8). The larger yb is, the more enriched the wind is with freshly synthesized ashes of nuclear burning. The reason is two fold. First, bursts with larger yb have more extended convection zones (smaller minimum yc; Figure 2) and thus more effectively transport ashes into the shallower layers ejected by the wind. Second, the larger yb is the further up the α-capture chain the burning reaches dur-ing the ≈ 1 s long vigorous convective phase that pre-cedes the wind; bursts with yb ≲ 5 × 10 8 g cm −2 have only synthesized up to intermediate mass elements by this time, while bursts with yb ≳ 10 9 g cm −2 have al-ready synthesized Fe-peak elements. Even though the wind is launched after the convective phase has effectively ended, the composition of the ash-stratified layers left behind by convection and ejected by the wind depends on the treatment of convective mixing and boundaries during the burst rise. In or-der to explore this dependence, we considered three dif-ferent values of the semiconvection efficiency parameter (αsc = 0 , 0.1, 0.5) and four different prescriptions for evaluating the location of convective boundaries avail-able in MESA : the Ledoux criterion (our baseline pres-ription), the Schwarzschild criterion, predictive mixing, and convective premixing (CPM). For the shallowest ignition depth we considered ( yb = 3 × 10 8 g cm −2), nearly all treatments of convection result in winds com-posed primarily of the accreted material, with only trace amounts of freshly-synthesized ashes (the excep-tion is the Schwarzschild criterion, which includes sub-stantial amounts of 20 Ne and some 24 Mg). However, for 
+
+yb ≥ 5 × 10 8 g cm −2, we find that the winds are highly enriched in ashes of burning for the pure He models and for the mixed H/He models at larger values of αsc and in three out of the four convective boundary prescriptions. The Ledoux criterion is the exception and requires either 
+
+αsc = 0 .5 or very deep igntion ( yb ≳ 10 9 g cm −2). In general, we find that shallower bursts can eject substan-tial amounts of intermediate mass α-capture elements such as 20 Ne, 24 Mg, 28 Si, and 32 S, while deeper bursts can eject substantial amounts of 40 Ca, 44 Ti, 48 Cr, and 
+
+> 56
+
+Ni. While this overall trend applies to both pure He and mixed H/He accretion models (Figure 7), the former eject ashes even for the Ledoux criterion with αsc = 0. Overall, our results show that the wind composition of PRE bursts is not simply a function of ignition depth and accretion composition but also depends critically on the efficiency of convective mixing and the location of convective boundaries. The abundance of heavy nu-16 clei in the wind photosphere is thus a sensitive probe of not just the ignition conditions but also the convective evolution during the burst rise. Continued advances in modeling nuclear burning, mul-tidimensional convection, radiation-driven outflows, and radiation transport will further improve the predictive power of PRE burst models. Particularly useful would be models that carry out time-dependent burst and wind calculations in full general relativity, relax the assump-tion of local thermodynamic equilibrium and the diffu-sion approximation in the outer parts of the wind, and use composition-dependent opacities that account for bound-free and bound-bound transitions and Compton scattering. Such improvements would allow for a more complete understanding of PRE bursts, help explain the spectral features observed by NICER , and might help inform PRE-based measurements of NS radii. This work was supported by NSF award No. 2107218. We thank Ian J. M. Crossfield for granting us access to the KU ExoLab research group’s high-performance server, which enabled us to run a large portion of our 
+
+MESA simulations. 
+
+# Software: This work made use of the Python libraries 
+
+astropy (Astropy Collaboration et al. 2022), N umP y 
+
+(Harris et al. 2020), SciP y (Virtanen et al. 2020), and 
+
+M atplotlib (Hunter 2007). The py mesa reader package (Schwab et al. 2024) was used to process MESA output files ; MESA (version 23.05.1; Paxton et al. 2011, 2013, 2015, 2018, 2019, Jermyn et al. 2023). This work also made use of analysis scripts adapted from GC23. REFERENCES 
+
+Angulo, C., Arnould, M., Rayet, M., et al. 1999, NuPhA, 656, 3, doi: 10.1016/S0375-9474(99)00030-5 Astropy Collaboration, Price-Whelan, A. M., Lim, P. L., et al. 2022, ApJ, 935, 167, doi: 10.3847/1538-4357/ac7c74 Barra, F., Barret, D., Pinto, C., et al. 2025, Astronomy and Astrophysics, 694, A266, doi: 10.1051/0004-6361/202452878 Bildsten, L. 1998, in NATO Advanced Science Institutes (ASI) Series C, Vol. 515, NATO Advanced Science Institutes (ASI) Series C, ed. R. Buccheri, J. van Paradijs, & A. Alpar, 419 Boutloukos, S., Miller, M. C., & Lamb, F. K. 2010, ApJL, 720, L15, doi: 10.1088/2041-8205/720/1/L15 Brown, E. F., & Bildsten, L. 1998, ApJ, 496, 915, doi: 10.1086/305419 Chugunov, A. I., Dewitt, H. E., & Yakovlev, D. G. 2007, PhRvD, 76, 025028, doi: 10.1103/PhysRevD.76.025028 Cumming, A. 2003, ApJ, 595, 1077, doi: 10.1086/377446 Cumming, A., & Bildsten, L. 2000, The Astrophysical Journal, 544, 453 Cumming, A., Macbeth, J., in ’t Zand, J. J. M., & Page, D. 2006, ApJ, 646, 429, doi: 10.1086/504698 Cyburt, R. H., Amthor, A. M., Ferguson, R., et al. 2010, ApJS, 189, 240, doi: 10.1088/0067-0049/189/1/240 Ebisuzaki, T., Hanawa, T., & Sugimoto, D. 1983, PASJ, 35, 17 Fuller, G. M., Fowler, W. A., & Newman, M. J. 1985, ApJ, 293, 1, doi: 10.1086/163208 Galloway, D. K., & Keek, L. 2021, in Astrophysics and Space Science Library, Vol. 461, Timing Neutron Stars: Pulsations, Oscillations and Explosions, ed. T. M. Belloni, M. M´ endez, & C. Zhang, 209–262, doi: 10.1007/978-3-662-62110-3 5 Galloway, D. K., Muno, M. P., Hartman, J. M., Psaltis, D., & Chakrabarty, D. 2008, ApJS, 179, 360, doi: 10.1086/592044 Galloway, D. K., in’t Zand, J., Chenevez, J., et al. 2020, The Astrophysical Journal Supplement Series, 249, 32, doi: 10.3847/1538-4365/ab9f2e Guichandut, S., & Cumming, A. 2023, The Astrophysical Journal, 954, 54, doi: 10.3847/1538-4357/ace43c Guichandut, S., Cumming, A., Falanga, M., Li, Z., & Zamfir, M. 2021, The Astrophysical Journal, 914, 49, doi: 10.3847/1538-4357/abfa13 Harris, C. R., Millman, K. J., van der Walt, S. J., et al. 2020, Nature, 585, 357–362, doi: 10.1038/s41586-020-2649-2 Henyey, L., Vardya, M. S., & Bodenheimer, P. 1965, ApJ, 142, 841, doi: 10.1086/148357 Herrera, Y., Sala, G., & Jos´ e, J. 2020, Astronomy and Astrophysics, 638, A107, doi: 10.1051/0004-6361/201936895 —. 2023, Astronomy and Astrophysics, 678, A156, doi: 10.1051/0004-6361/202346190 Hunter, J. D. 2007, Computing in Science and Engineering, 9, 90, doi: 10.1109/MCSE.2007.55 Iaria, R., Di Salvo, T., Anitra, A., et al. 2025, arXiv e-prints, arXiv:2511.20499, doi: 10.48550/arXiv.2511.20499 17 
+
+in’t Zand, J. J. M., & Weinberg, N. N. 2010, A&A, 520, A81 Itoh, N., Nishikawa, A., & Kohyama, Y. 1996, ApJ, 470, 1015, doi: 10.1086/177926 Jaisawal, G. K., Chenevez, J., Strohmayer, T. E., et al. 2025, The Astrophysical Journal, 986, 16, doi: 10.3847/1538-4357/adcc24 Jermyn, A. S., Bauer, E. B., Schwab, J., et al. 2023, ApJS, 265, 15, doi: 10.3847/1538-4365/acae8d Joss, P. C., & Melia, F. 1987, ApJ, 312, 700 Joss, P. C., & Melia, F. 1987, ApJ, 312, 700, doi: 10.1086/164913 Kaiser, E. A., Hirschi, R., Arnett, W. D., et al. 2020, Monthly Notices of the Royal Astronomical Society, 496, 1967, doi: 10.1093/mnras/staa1595 Kato, M. 1983, PASJ, 35, 33 Kippenhahn, R., Ruschenplatt, G., & Thomas, H. C. 1980, A&A, 91, 175 Langanke, K., & Mart´ ınez-Pinedo, G. 2000, NuPhA, 673, 481, doi: 10.1016/S0375-9474(00)00131-7 Lodders, K., & Palme, H. 2009, Meteoritics and Planetary Science Supplement, 72, 5154 Medin, Z., von Steinkirch, M., Calder, A. C., et al. 2016, ApJ, 832, 102, doi: 10.3847/0004-637X/832/2/102 Meisel, Z., Merz, G., & Medvid, S. 2019, The Astrophysical Journal, 872, 84, doi: 10.3847/1538-4357/aafede Miller, M. C. 2013, ArXiv e-prints. https://arxiv.org/abs/1312.0029 Miller, M. C., & Lamb, F. K. 2016, European Physical Journal A, 52, 63, doi: 10.1140/epja/i2016-16063-8 Nobili, L., Turolla, R., & Lapidus, I. 1994, ApJ, 433, 276, doi: 10.1086/174643 Oda, T., Hino, M., Muto, K., Takahara, M., & Sato, K. 1994, Atomic Data and Nuclear Data Tables, 56, 231, doi: 10.1006/adnd.1994.1007 ¨Ozel, F., & Freire, P. 2016, Annual Review of Astronomy and Astrophysics, 54, 401, doi: 10.1146/annurev-astro-081915-023322 Paczynski, B., & Proszynski, M. 1986, ApJ, 302, 519, doi: 10.1086/164012 Paxton, B., Bildsten, L., Dotter, A., et al. 2011, ApJS, 192, 3, doi: 10.1088/0067-0049/192/1/3 Paxton, B., Cantiello, M., Arras, P., et al. 2013, ApJS, 208, 4Paxton, B., Marchant, P., Schwab, J., et al. 2015, ApJS, 220, 15 Paxton, B., Schwab, J., Bauer, E. B., et al. 2018, ApJS, 234, 34 Paxton, B., Smolec, R., Schwab, J., et al. 2019, ApJS, 243, 10 Peng, Z., Li, Z., Pan, Y., et al. 2025, The Astrophysical Journal, 982, 18, doi: 10.3847/1538-4357/adb726 Quinn, T., & Paczynski, B. 1985, ApJ, 289, 634 Quinn, T., & Paczynski, B. 1985, ApJ, 289, 634, doi: 10.1086/162927 Schwab, J., Wolf, B., Zingale, M., et al. 2024, wmwolf/py mesa reader: 0.3.5, 0.3.5, Zenodo, doi: 10.5281/zenodo.13697200 Steiner, A. W., Lattimer, J. M., & Brown, E. F. 2010, ApJ, 722, 33, doi: 10.1088/0004-637X/722/1/33 Strohmayer, T., & Bildsten, L. 2003, arXiv e-prints, astro, doi: 10.48550/arXiv.astro-ph/0301544 Strohmayer, T. E., Altamirano, D., Arzoumanian, Z., et al. 2019, ApJL, 878, L27, doi: 10.3847/2041-8213/ab25eb Suleimanov, V., Poutanen, J., & Werner, K. 2011, A&A, 527, A139, doi: 10.1051/0004-6361/201015845 Townsend, R. 2024, MESA SDK for Mac OS, 24.7.1, Zenodo, doi: 10.5281/zenodo.13768941 Virtanen, P., Gommers, R., Oliphant, T. E., et al. 2020, Nature Methods, 17, 261, doi: 10.1038/s41592-019-0686-2 Weaver, T. A., Zimmerman, G. B., & Woosley, S. E. 1978, ApJ, 225, 1021 Weinberg, N. N., Bildsten, L., & Schatz, H. 2006, ApJ, 639, 1018 Yu, H., & Weinberg, N. N. 2018, ApJ, 863, 53, doi: 10.3847/1538-4357/aad045 Yu, W., Li, Z., Pan, Y., et al. 2025, Astronomy and Astrophysics, 696, A139, doi: 10.1051/0004-6361/202453142 Zhen, G., Liu, H., Dohi, A., et al. 2025, The Astrophysical Journal, 982, 122, doi: 10.3847/1538-4357/adb71c
