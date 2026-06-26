@@ -1,0 +1,914 @@
+Title: The SPOTLIGHT Multibeam Real-Time Transient Detection System
+
+URL Source: https://arxiv.org/pdf/2606.27262v1
+
+Published Time: Fri, 26 Jun 2026 01:17:32 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+> Draft version June 26, 2026
+> Typeset using L ATEX twocolumn style in AASTeX7.0.1
+
+The SPOTLIGHT Multibeam Real-Time Transient Detection System 
+
+Ujjwal Panda ,1 Jayanta Roy ,1 Kshitij Bane ,1 Chahat Dudeja ,1 Sridhar Gajendran ,1
+
+Param Joshi ,1, 2 Sanjay Kudale ,1 Arpan Pal ,1 Raghav Wani ,1, 3 Karel Adamek ,4 Wes Armour ,5
+
+Kenil Ajudiya ,6 Jayaram Chengalur ,1 Jyotirmoy Das ,1 Nishant Pradeep Deo ,1, 7 Deepak Bhong ,1
+
+Shelton Gnanaraj ,1 Santaji N. Katore ,1 Mekhala Muley ,1 and Harshavardhan Reddy 1
+
+> 1National Centre for Radio Astrophysics (NCRA), Pune, 411007, Maharashtra, India
+> 2Department of Physics and Astronomy, National Institute of Technology, Rourkela, 769008, India
+> 3Indian Institute of Science Education and Research (IISER), Pune, 411008, Maharashtra, India
+> 4Department of Physics, Silesian University in Opava, Opava, 74601, Czech Republic
+> 5Oxford e-Research Centre (OeRC), University of Oxford, Oxford-OX13PJ, United Kingdom
+> 6International Centre for Radio Astronomy Research (ICRAR), Curtin University, Bentley, WA 6102, Australia
+> 7Indian Institute of Science Education and Research (IISER), Kolkata, Mohanpur-741246, West Bengal, India
+
+ABSTRACT Fast Radio Bursts (FRBs) are among the most enigmatic transient phenomena in the Universe. In order to unravel the mystery behind these extremely short-lived events, one requires instruments that possess the ability to detect, localise, and capture these events high spectro-temporal-polarimetric res-olution, as they search for these events over large fields-of-view in real-time. The SPOTLIGHT project is one such backend, leveraging the high sensitivity, wide frequency coverage, and excellent localisation capabilities of the upgraded Giant Metrewave Radio Telescope (uGMRT) to conduct a commensal search for FRBs and other radio transients. This search is done using a dedicated high-performance computing facility, comprised of 90 NVIDIA A100 GPUs and 60 compute servers. Here we present the design, implementation, and performance of SPOTLIGHT’s real-time transient search pipeline, a GPU-accelerated system capable of processing up to 2000 post-correlation beams in real time. The pipeline combines AstroAccelerate -powered brute-force dedispersion and single-pulse search, with a multi-stage and robust candidate optimisation framework, as well as a triggering system for auto-matic capture of high-time-resolution visibility and baseband data. To ensure continuous validation of pipeline performance, we have also developed a real-time signal injection framework capable of in-jecting synthetic bursts directly into SPOTLIGHT’s beamformed data stream. The system operates commensally with routine uGMRT observations, processing data streams in real-time while maintain-ing high sensitivity to millisecond-duration transients across dispersion measures extending up to 2000 pc cm −3. During its initial deployment in uGMRT Cycle 49 and Cycle 50, the pipeline detected 2870 bursts from 42 known astrophysical sources, and demonstrated sensitivity consistent with the pre-dicted survey threshold of ∼0.2 Jy ms. SPOTLIGHT’s real-time transient search pipeline establishes a scalable framework for wide-field, low-frequency transient discovery and localisation, providing a key technological foundation for next-generation radio transient surveys. 
+
+1. INTRODUCTION In time domain astronomy, fast radio bursts (FRBs) stand out as one of the most mysterious sources. Ra-diating on timescales of a few milliseconds or shorter, their emission is bright, coherent, wideband (from 110 MHz Pleunis et al. (2021) to 8 GHz Gajjar et al. (2018)), and highly polarised. The sources themselves are com-
+
+> Corresponding author: Ujjwal Panda ujjwalpanda97@gmail.com, upanda@ncra.tifr.res.in
+
+pact, as well as extragalactic. The former was inferred from the timescale and coherency of their emission, while the latter was inferred from their large disper-sion measures. Both properties were confirmed through VLBI-based imaging and localisation of these sources to their host galaxies (Chatterjee et al. 2017; Tendulkar et al. 2017; Bannister et al. 2019; Xu et al. 2022). Since their serendipitous discovery in 2007 Lorimer et al. (2007), their number has grown drastically, especially after the inception of the CHIME/FRB project using the Canadian Hydrogen Intensity Mapping Experiment 
+
+> arXiv:2606.27262v1 [astro-ph.IM] 25 Jun 2026
+
+2 The SPOTLIGHT Collaboration 
+
+(CHIME) telescope (CHIME/FRB Collaboration et al. 2018). Originally meant for mapping 21-cm emission across the radio sky with its wide field-of-view, this very feature coincidentally made it into the most pro-lific FRB discovery instrument, single-handedly con-tributing 3641 FRBs, or ∼ 72 .7% of the total frac-tion, which now total up to 5006 (estimated by com-bining the catalogue of FRBs maintained at the Tran-sient Name Server (TNS), https://www.wis-tns.org ,with the catalogue maintained at Blinkverse, https: //blinkverse.zero2x.org ). However, the number of FRBs localised to their host galaxies has been low (119, or only ∼ 2.38% of FRBs). It is to be noted that while this precision has since been improved through the dumping of baseband data (Michilli et al. 2021), and subsequently through the construction of outrig-ger stations (Lanman et al. 2024; Khairy 2024), a ma-jority (3615 out of 3641, or 99.29%) of the detections in CHIME’s catalogue remain poorly localised ; that is, with a localisation precision ≲ 5 arcseconds that is re-quired to associate an FRB unambiguously to a host galaxy with a redshift z ≳ 0.1 (Eftekhari & Berger 2017). This prompted commensal surveys from several interferometers despite their small fields-of-view, such as CRAFT (Macquart et al. 2010) and CRACO (Wang et al. 2025) by ASKAP, MeerTRAP (Sanidas et al. 2017) by MeerKAT, and realfast Law et al. (2018) by the VLA. Dedicated interferometers were commissioned as well, such as DSA-110 (Law et al. 2023), and BURSTT (Lin et al. 2022). This has led to an increase in localisations and successful associations of both repeating and one-off FRBs to their host galaxies. Pinning down an FRB to its host provides a deeper look into its local environ-ment (Tendulkar et al. 2021), possible progenitors mod-els (Metzger et al. 2017, 2019; Margalit et al. 2020), and enables its use as a probe of both cosmology (Macquart et al. 2020; Li et al. 2020), and the intergalactic medium (IGM) (Simha et al. 2020; Sammons et al. 2023). For the reasons outlined above, the SPOTLIGHT project (Survey for sPoradic radi O burs Ts via acommensa L mult I-beam GPU-powered HPC at the GMR T) 8 was commissioned (Roy et al. (in prep)). It aims to leverage the upgraded GMRT’s high sensi-tivity, large bandwidths, unique low-frequency spectral windows, and localisation capabilities to carry out a commensal survey of FRBs and other transients. An overview of the SPOTLIGHT project will be provided in Roy et al. (in prep). In order to carry out a sur-vey commensally with regular GMRT observations (over  
+
+> 8https://spotlight.ncra.tifr.res.in
+
+300 −1460 MHz frequency range), a dedicated back-end was built, funded under the Government of India’s National Supercomputing Mission (NSM). Known as the SPOTLIGHT system, it consists of 60 of C-DAC’s indigenously developed Rudra servers, each of which houses a 768/128 GB RAM, a Intel(R) Xeon(R) Gold 6240R CPU, with 24 physical and 48 logical cores, and 2 NVIDIA A100 GPUs, each with 80 GB of GPU mem-ory. Overall, the SPOTLIGHT cluster has 90 NVIDIA A100 GPUs, ∼ 40 TB of CPU memory, ∼ 7 TB of GPU memory, and 2 PB of on-disk storage. It takes in data from GMRT’s digitisers at a rate of 25 GB/s, via 32 10 GB fibre links. This data is then processed by SPOT-LIGHT’s correlator and beamformer (Reddy et al. (in prep)) to form up to 2000 post-correlation (PC) beams Roy et al. (2018), through the phased addition of visi-bilities at a time resolution of 1.3 milliseconds. These beams are then optimally tiled, balancing the field-of-view (FoV) with sensitivity. An incoherent beam is also formed using the autocorrelation terms rejected when forming the post-correlation beams, allowing for a much wider FoV while sacrificing sensitivity. The system holds  1.31072 × 10 −3 × 800 × 32 × 12 = 402 .653184 seconds of data in its transient, visibility, and baseband buffers simultaneously. The beamformed and visibility data are sampled every 1.31072 milliseconds, while the baseband data is sampled at the Nyquist rate (2.5 nanoseconds for a bandwidth of 200 MHz, and 1.25 nanoseconds for a bandwidth of 400 MHz). Once a trigger is generated by the real-time transient search pipeline, its correspond-ing data is dumped from all buffers to disk. The 1.3 ms time resolution visibilities are then used to image each event, via our real-time imaging pipeline (Pal et al. (in prep)). An overview of SPOTLIGHT’s multibeam and inco-herent beam real-time transient search pipelines is pre-sented in §2, and a module-by-module description is given in §3. The performance of the pipeline is dis-cussed in §4, and results obtained from the pipeline are presented in §5. Finally, we summarise in §6.  
+
+> 2.
+
+PIPELINE OVERVIEW SPOTLIGHT’s real-time transient search pipeline utilises 32 NVIDIA A100 GPUs, in conjunction with 768 CPU cores, across 16 Rudra servers. The processing framework is divided into two asynchronous pipelines, 
+
+aamulti and spltpipe , designed to maximise hardware utilisation by keeping both GPUs on each compute node continuously occupied. This architecture can sustain a computational throughput of ( ∼ 252 TFLOPS) while processing 2000 beams in real time, corresponding to nearly 80% of the theoretical peak single-precision per-The SPOTLIGHT Real-time Transient Search Pipeline 3formance of 32 NVIDIA A100 GPUs. The former half is described in §3.1, while the latter is described in §3.2. A bird’s-eye view of the entire pipeline can be seen in Fig. 1. Currently, the SPOTLIGHT system is de-ployed with 640 post-correlation (PC) beams, at 1.31072 milliseconds time resolution, and 4096 frequency chan-nels. An incoherent array (IA) beam, with the same time and frequency resolution, is formed in parallel, and is searched independently for transient events using 
+
+aa.single and splt.single , single beam analogues of the same pipeline used for the PC beams; this pipeline is described in more detail in §3.3. Beamformed data obtained from SPOTLIGHT’s cor-relator/beamformer (Reddy et al. in preparation) is first written to a small ring buffer, known internally as TELRing . It is divided into 8 blocks; each block is 800 × 1.31072 × 10 −3 = 1 .048576 seconds long, making the entire buffer only 8.388608 seconds long. Data is read from this ring buffer one block at a time, appro-priately scaled, radio frequency interference (RFI) mit-igated, flipped (so that the highest frequency is first; required for certain observation bands at the GMRT which start from the lowest frequency channel instead), injected with simulated events (if specified; see §3.4 for more details), and written to a larger ring buffer, known as FRBRing . All of this is handled by a dedicated pro-gram called Ares 9. The RFI mitigation methodology is inspired from PulsarX ’s filtool program (Men et al. 2023), and will be described in more detail in Wani et al. (in prep). Both aamulti and spltpipe read data from this FRBRing buffer. This buffer, created by 
+
+Ares , is divided into 12 blocks, and each one of them is 1 .048576 × 32 = 33 .554432 seconds long; that is, the same duration as 32 blocks of TELRing . Each block holds the time-spliced data from N beams, where N is the total number of beams divided by the number of hosts; currently N = 640 /16 = 40. This implies that 
+
+FRBRing holds 33 .554432 × 12 = 402 .653184 seconds, or 46.875 GB of data, for 640 beams in memory at any given time. The same duration of data is held in analo-gous ring buffers for high-resolution visibility data (sam-pled at 1.31072 milliseconds time resolution), and base-band data (sampled at the Nyquist resolution). Holding a large duration of data in memory is necessary, since it allows us to dump beamformed, visibility, and baseband data for each event once it is detected, while taking any pipeline delays into account. More details on how this data dumping is triggered is given in §3.2.3. A diagram illustrating the structure of TELRing and FRBRing , and  
+
+> 9https://github.com/nsmspotlight/Ares
+
+how data is transferred between them, can be seen in Fig. 2. The ring buffers for incoherent beam data fol-low the same design, except that there is no time-splicing required, since there is only a single beam in this case. All of these ring buffers can be accessed in both C++ and Python via the shazam 10 library.  
+
+> 3.
+
+PIPELINE MODULES 3.1. aamulti 
+
+The first half, aamulti , is powered by the 
+
+AstroAccelerate 11 library. The pipeline reads 4 blocks = 134 .217728 seconds at a time, and searches for single pulses. To accommodate the maximum dis-persion delay corresponding to a DM of 2000 pc cm −3
+
+across Band 3 (300 −500 MHz), the pipeline employs an overlap-read strategy of one data block (= 33 .554432 seconds) between consecutive processing segments, en-suring highly dispersed signals that cross block bound-aries can be recovered completely. The metadata is read from a separate shared memory buffer, which is updated every 1.048576 seconds. The search done by aamulti 
+
+has two stages: dedispersion and single pulse search. The former is described in more detail in §3.1.1, and the latter in §3.1.2. 3.1.1. Dedispersion 
+
+As a radio signal passes through the interstellar medium (ISM) along the line-of-sight between the Earth and the source, different frequencies travel at different speeds due to their interactions with the ionised plasma that comprises the ISM; this effect is called dispersion .Before we can search for such signals, this effect needs to be undone. Assuming that the signal travels through cold plasma, we can calculate the amount of delay intro-duced for a particular frequency, with respect to some reference frequency, as: ∆τ =
+
+ e2
+
+2πm ec
+
+
+
+× DM × 1
+
+f 2 − 1
+
+f 2high 
+
+!
+
+(1) = D × DM × 1
+
+f 2 − 1
+
+f 2high 
+
+!
+
+, (2) where f is the frequency for which the delay is being calculated, fhigh is the highest frequency in the obser-vation band, which is taken as the reference frequency, 
+
+D = e2 
+
+> 2πm ec
+
+= 4 .1488064239(11) × 10 3 MHz 2 pc −1 cm 3
+
+s is the dispersion constant (Kulkarni 2020), and DM is   
+
+> 10 https://github.com/astrogewgaw/shazam
+> 11 https://github.com/AstroAccelerateOrg/astro-accelerate
+
+4 The SPOTLIGHT Collaboration Dedispersion  
+
+> 0 - 2000 pc cm -3, 8625 DM trials
+
+Single Pulse Search Peak Filtering 
+
+> 3x3 and 11x11 stencils
+
+aamulti 
+
+Clustering    
+
+> DBSCAN with eps = 5, minsamps = 10
+> Using cuml and cudf .
+
+Filtering      
+
+> S/N > 10, DM > 10, W< 100 ms
+> Using pandas .
+
+Candidate Optimisation  
+
+> Per-node anti-coincidence fi ltering Reject if candidate in all N beams in that node.
+
+Feature Extraction + Classi fi cation   
+
+> Dedispersed dynamic spectrum + DM transform Features made and classi fi ed by candies .Models taken from FETCH .
+> Candidate Optimisation + Triggering
+> Coincidence  fi ltering across all nodes. Trigger recording of all data for each candidate.
+
+spltpipe 
+
+> LUSTRE System
+
+Figure 1. A flowchart illustrating how SPOTLIGHT’s real-time transient search pipeline is structured. The pipeline is divided into two modules: aamulti and spltpipe , in order to maximise GPU utilisation and throughput. All results are written to the LUSTRE filesystem, mounted across all hosts. A detailed description of individual modules can be found in the text. 
+
+the dispersion measure . The dispersion measure quan-tifies the total amount of plasma encountered by the signal, and is defined as the integrated column density of electrons along the line-of-sight; that is: DM = 
+
+Z
+
+ne dl, (3) where ne is the column density of electrons, and dl 
+
+is a line element along the line-of-sight. The process of removing or mitigating these effects from the signal before processing is called dedispersion. However, since the DM along the line-of-sight is not known a priori in a blind search, dedispersion is carried out for a large number of trial DM values. Note that dedispersing a signal at an incorrect DM smears it, and with enough smearing it can become undetectable. Thus, the trial DM values are chosen so that this smearing is kept at a minimum, while also keeping the number of trials to a minimum. This results in a dedispersion plan, which divides the entire DM range one wishes to search over into one or more sub-ranges; within each sub-range, trial DM values are spaced so as to minimise smearing, which is estimated based on the parameters of the observation setup; these are the sampling time, the frequency reso-lution, and the observation bandwidth. Such a plan has been constructed for the SPOTLIGHT survey, with a maximum DM limit of 2000 pc cm −3 for GMRT’s Band 3 (300 − 500 MHz), Band 4 (550 − 750 MHz), and Band 5 (1060 − 1460 MHz), covered with 8625 DM trials. One can dedisperse a signal via one of two approaches: coherent or incoherent dedispersion. In the coher-ent dedispersion, one corrects for the dispersion in the Fourier domain, where it is a phase-only filter, and thus one can dedisperse the signal by multiplying its spec-trum with the filter’s inverse. However, while this ap-proach boasts both high accuracy and sensitivity, it is also quite compute-intensive, due to the large FFTs that need to be evaluated for each DM trial. Hence, blind surveys typically opt for incoherent dedispersion, where the effect is corrected by shifting each channel in channelised intensity data (also known as a dynamic spectrum ) by the appropriate time delay, calculated us-ing Eq. 1. Multiple approaches exist which approx-imate this correction in favour of speed, such as sub-band dedispersion (), tree dedispersion (), or the fast DM transform (Zackay & Ofek 2017). However, these approximations trade-off sensitivity, accuracy, or flexi-bility for speed. Thus, in aamulti we instead opt for the GPU-based implementations of brute-force dedis-persion that come packaged with the AstroAccelerate The SPOTLIGHT Real-time Transient Search Pipeline 58 blocks 8.388608 seconds 
+
+TELRing 
+
+> 4blocks=1 3 4 .
+
+2 1 7 7 2 8s
+
+12 blocks 1 block = 33.554432 seconds 402.653184 seconds 46.875 GB for N = 640 beams 
+
+# FRBRing 33.554432sN BEAMS PER NODE N = 40 FOR 640 BEAMS 
+
+arachne Ares 
+
+Figure 2. SPOTLIGHT manages beamformed data using two shared-memory-based ring buffers: TELRing and FRBRing . The former is where data is written to by SPOTLIGHT’s correlator/beamformer, after which data is appropriately processed and transferred to the latter by Ares . Simulated FRB-like signals can also be injected during this transfer, using arachne . The pipeline reads data from FRBRing , and processes 4 blocks at a time. Each block is time-spliced to contain the data from 40 beams, across 16 hosts, for a total of 640 beams. 3250 3300 3350           
+
+> 0
+> 500
+> 1000
+> 1500
+> 2000
+> 3250 3300 3350 3250 3300 3350 3250 3300 3350
+> 10
+> 1000
+> Single pulse candidates
+> Number of candidates = 86287 A.
+> 1000 10000
+> Clustered candidates
+> Number of candidates = 170 B.
+> 10
+> Filtered candidates
+> Number of candidates = 161 C.
+> 110
+> Classified candidates
+> Number of candidates = 7 D.
+> 1
+> Arrival time (s)
+> Dispersion measure, DM (pc cm  3)
+
+Figure 3. Scatter plots of the dispersion measure (DM) versus the arrival time for events detected in a single beam from a single time block of 134.217728 seconds, as seen at each stage of SPOTLIGHT’s transient search; from left to right, these stages are A) single pulse search, B) clustering, C) filtering, and D) classification. These plots illustrate how spurious candidates are eliminated at each stage, starting from 86,287 candidates at the first, single pulse search stage, to only 7 candidates at the final, classification stage. 6 The SPOTLIGHT Collaboration 
+
+library. The library provides two implementations: one uses a GPU’s cache memory, and another that utilises a GPU’s shared memory (Novotn´ y et al. 2023). The lat-ter implementation leverages the faster memory access and data locality of a GPU’s shared memory; and since dedispersion is ultimately a memory-bound algorithm, rather than a compute-bound one, these optimisations are crucial to accelerating dedispersion on multi-core ar-chitectures. The former version is a fail-safe, used when the latter implementation cannot be used; this usually happens when the data cannot fit into the limited size of a GPU’s shared memory. aamulti ’s dedispersion plans in each band are carefully designed to ensure that the fail-safe system is never invoked. The output from either of the two implementations is a two-dimensional array, with each row representing a time series at a particular trial DM value. This array is known as a DM transform .3.1.2. Single pulse search 
+
+After creating the DM transform, aamulti searches each row for single pulses. The methodology used for this search was first given in Cordes & McLaughlin (2003), and is based on the matched filtering theorem. The theorem guarantees that if the input to a filter, x(t), 
+
+matches its impulse response, h(t)12 , then the signal-to-noise ratio (S/N) of the filter’s output, y(t), will be max-imum. For a linear and time-invariant filter, this output is merely the convolution of the input signal with the impulse response; that is, y(t) = x(t) ⊗ h(t). If we think of h(t) as a template , then we use this method to search for single pulses, since wherever we get a pulse in the input signal that matches our template, our output’s S/N will rise, and we can then pick all pulses in the out-put above a certain S/N threshold as our detections. In order to optimise this method further, one uses a box-car as a template, since the convolution of any signal with a boxcar is the cumulative sum of the input signal across the boxcar width. Since the width of the signal is not known a priori, the search is carried using multiple boxcar filters, with different trial widths. aamulti uses 
+
+AstroAccelerate ’s GPU-optimised single pulse search algorithm, as described in Ad´ amek & Armour (2020). The single pulse search is carried out up to a maximum width of 0.5 seconds, and all candidates above a thresh-old of 6 σ are taken to the next stage. At this point, the number of candidates per beam can range from 10 3 to 10 6.         
+
+> 12 The impulse response is how a filter responds to a delta func-tion, δ(t). Since any signal can be reconstructed as a series of delta functions, the impulse response describes the response of a filter to any function; in fact, the output of the filter, for any input x(t), is y(t) = x(t)⊗h(t).
+
+After searching for single pulses, the 
+
+AstroAccelerate library can employ another stage, that of peak filtering, which leads to an order-of-magnitude reduction in the number of candidates. Peaks are filtered out by sliding a window across the candi-dates in the DM-time plane. From each window, the peak with the highest S/N is picked, and all others are rejected. Two different stencils are used: a 3 × 3 win-dow, and an 11 × 11 window. The number of candidates per beam at this stage can range from 10 2 to 10 6 per beam per block. 3.2. spltpipe 
+
+The second half, spltpipe , responds as soon as 
+
+aamulti is done processing. Despite employing a peak-filtering stage in aamulti , the number of candidates obtained can range from a thousand to around a mil-lion per beam, depending on the RFI environment. Amajority of these candidates are often spurious. Thus, 
+
+spltpipe takes the output obtained from aamulti ,and removes spurious candidates in several stages. An overview of how this removal happens at each stage can be seen in Fig. 3. 3.2.1. Candidate optimisation 
+
+Candidates from each beam are clustered in the DM-time plane using the DBSCAN (Density-Based Spa-tial Clustering of Applications with Noise, Ester et al. (1996)) algorithm. A cluster is only considered if it has 5 points or more in the DM-time plane. The neighbour-hood radius parameter, ( ϵ), is set to 0.5 based on the ex-pected distribution of astrophysical and RFI detections in the DM–time plane, taking into account the sensitiv-ity and frequency coverage of the GMRT observations. Out of each cluster, the peak with the highest S/N is picked, and all other peaks are rejected. The number of candidates at this stage can range from 10 2 - 10 3 per beam per block. After clustering, the candidates from all beams in a particular host are combined together into one list, and are then passed through several thresholds, based on DM, width, and S/N. Currently, spltpipe re-jects all candidates below an S/N of 10, a DM of 10 pc cm −3, and higher than a width of 100 ms. These thresholds are configurable, even during a running ob-servation. Spurious candidates can be reduced further by connecting candidates across beams . We would like to describe this approach as (anti-)coincidence filtering, wherein associating candidates detected at the same ar-rival time across neighbouring beams would be deemed as coincidence , whereas rejecting candidates detected at the same arrival time, but across vastly different and/or scattered beams would be deemed anti-coincidence . The latter is facilitated on a per-node basis by distributing The SPOTLIGHT Real-time Transient Search Pipeline 710 100  
+
+> 0
+> 1
+> 10
+> 100
+> Total number of detections = 2870
+> SPOTLIGHT’s Fluence Limit J0332+5434 J0543+2329 J0659+1414 J0738-4042 J0820-4114 J0837-4135 J1136+1551 J1600-5044 J1645-0317 J1752-2806 J1829-1751 J1844+1454 J1935+1616 J2257+5909 J0528+2200 J0614+2229 J0729-1448 J0742-2822 J0826+2637 J1003-4747 J1509+5531 J1602-5100 J1731-4744 J1817-3837 J1840-0815 J1847-0402 J1939+2134 J2321+6024 J0534+2200 J0629+2415 J0729-1836 J0820-1350 J0835-4510 J1115+5030 J1543-0620 J1644-4559 J1740-3015 J1825-0935 J1842-39 J1932+1059 J2046-0421 J2326+6113 Dispersion measure, DM (pc cm −3)Fluence (Jy ms)
+
+Figure 4. A census of detections obtained from SPOTLIGHT’s real-time transient search pipeline via commensal observations in GMRT’s Cycle 49 and Cycle 50. A total of 2870 detections were made from 42 known sources; each colour in the plot represents a particular source. The fluence of each detected bursts is plotted, versus its dispersion measure (DM). Each point’s size is scaled by its detected width. The red dashed line is the predicted fluence limit of 0.2 Jy ms (for a burst with an S/N 0f 10) for the SPOTLIGHT survey. 
+
+beams randomly across the nodes, so that beams that end up on the same node have vastly different sky po-sitions. Thus, a candidate that is present in all, or a majority, of the beams is definitely RFI, and can be removed. The number of candidates at this stage can range from 10 to 10 2 per beam per block. 3.2.2. Classification 
+
+For each candidate that survives the candidate optimi-sation procedure laid out in §3.2.1, the beamformed data corresponding to it is extracted from the ring buffers de-scribed in §2; this is taken care of via shazam . It extracts a number of samples equal to the maximum dispersive delay across the observation band, plus the number of samples corresponding to the width of the candidate, both before and after the candidate’s arrival time. This data is then given to candies 13 , which extracts two fea-tures from this data: the dedispersed dynamic spectrum, and the DM transform. candies replaces your 14 , which is what was previously used to generate these features. The former is created at the candidate’s detected DM, while the latter is created at a narrow DM range centred around that DM. In your , this range spanned 0 pc cm −3
+
+to twice the candidate’s DM. In candies this range is calculated by estimating the change in DM required in order to decrease S/N by a certain factor; this change is estimated using the following equation: 
+
+δDM ≈√π
+
+1382 Ws
+
+ SS(δDM )
+
+ ν3MHz 
+
+∆νMHz 
+
+, (4)  
+
+> 13
+
+Source code: https://github.com/astrogewgaw/candies . The package is also available on the Python Packing Index (PyPI) here: https://pypi.org/project/candies . 
+
+> 14
+
+https://github.com/thepetabyteproject/your 
+
+where ∆ νMHz is the observation bandwidth in MHz, 
+
+νGHz is the central observational frequency in GHz, 
+
+Wms is the width of the candidate in milliseconds, and   
+
+> S(δDM )
+> S
+
+is the ratio of the S/N of the pulse dedispersed at the wrong trial DM, versus the peak S/N. By de-fault, this ratio is set to 0 .1 in candies , corresponding to a 90% loss in S/N with respect to the peak S/N of the burst. A detailed derivation of Eq. 4 can be found in Appendix A. These features are then passed to FETCH 15 (Agarwal et al. 2020), a classifier based on convolutional neural networks (CNNs). FETCH is trained on actual and sim-ulated pulsar and FRB data, and looks for particular characteristics in both features: a straight line span-ning the entire band in the dedispersed dynamic spec-trum, and a bowtie-like structure in the DM transform. Previously, when your was used to generate the same features for GMRT data, this structure was almost in-distinguishable, both by eye, and by FETCH itself. An example of the same can be seen in Fig. 6, which shows these features obtained from data taken with Band 3 (300 - 500 MHz), Band 4 (550 - 750 MHz), and Band 5 (1060 - 1460 MHz) of the GMRT, using both your and 
+
+candies . In Fig. 7, an even clearer comparison can be seen between the two packages; here, we compare how 
+
+FETCH responds to features generated by either package, for actual single pulses detected from FRB 20180916B and FRB 20201124A using the GMRT. It is evident from Fig. 7 that candies helps improve FETCH ’s accuracy by a significant margin. It is also faster than your , since it uses custom, optimised GPU kernels to create the re-quired features. A speed comparison between your and 
+
+candies , as benchmarked on SPOTLIGHT’s NVIDIA  
+
+> 15
+
+https://github.com/devanshkv/fetch 8 The SPOTLIGHT Collaboration 120 ° 60 ° 0° 300 ° 240 °   
+
+> Galactic Longitude ( l)
+> -60 °
+> -30 °
+> 0°
+> 30 °
+> 60 °
+> Galactic Latitude ( b)
+> SPOTLIGHT Scans SPOTLIGHT Detections
+> 100 200 300 400
+> DM (pc cm −3)
+
+Figure 5. A galactic map of the sources detected obtained from SPOTLIGHT’s real-time transient search pipeline via com-mensal observations in GMRT’s Cycle 49 and Cycle 50. A total of 39 unique sources were detected. The colour represents the dispersion measure (DM) of each source. 
+
+A100 GPUs, can be seen in Fig. 8. From the plot, it is clear that candies is 1 × to 3 × faster than your , and this speed-up with respect to your is higher for larger dispersion measures. For classification, FETCH uses two CNNs, each trained separately on one of the two features. spltpipe uses 
+
+FETCH ’s best performing model, model a, comprised of 
+
+DenseNet121 and Xception . Then, a multiplicative fu-sion approach is used to fuse the two networks, yielding a single output: a probability indicating how likely it is that the candidate is an astrophysical event. All can-didates with a probability of 50% and above are passed to the next stage. After classification, the number of candidates can range from 1 - 10 per beam per block. 
+
+candies handles both the feature extraction and clas-sification stages, since it has absorbed the ONNX -based inference-only version of FETCH 16 entirely. It can work on both SIGPROC filterbank files recorded on disk, as well as on data obtained directly from SPOTLIGHT’s ring buffers.   
+
+> 16 Available here: https://github.com/devanshkv/fetch/tree/ onnx .
+
+3.2.3. Triggering 
+
+All of the above stages are carried out independently on each beam and each node, and the candidate lists from all beams across all nodes are merged into one, and passed through a final candidate optimisation stage. Candidates are grouped across the DM-time plane, and a final list of triggers is generated. Currently, 1 trig-ger is generated every 10 minutes on average, and thus we expect to process ∼ 100 such triggers per day. For each trigger, high-resolution visibility data (sampled ev-ery 1.31072 milliseconds) and baseband data (sampled at the Nyquist rate) is dumped from ring buffers anal-ogous to the ones for beamformed data, sliced around the trigger’s arrival time. The former is immediately processed by SPOTLIGHT’s real-time imaging pipeline (Pal et al. (in prep)), while the latter is stored, to be pro-cessed at a later stage by our offline correlator (Reddy et al. (in prep)). 3.3. aa.single and splt.single 
+
+The IA beam is searched using single-beam analogues of the same real-time transient search system described above: aa.single 17 and splt.single 18 . Most modules   
+
+> 17 https://github.com/nsmspotlight/aa.single
+> 18 https://github.com/nsmspotlight/splt.single
+
+The SPOTLIGHT Real-time Transient Search Pipeline 9−50 0 50                  
+
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600
+> Band 3 (100 to 500 MHz) A.
+> −20 −10 010 20
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600
+> 700
+> 800
+> Band 4 (550 to 950 MHz) B.
+> −40 −20 020 40
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600
+> 700
+> 800
+> Band 5 (1060 to 1460 MHz) C.
+> −500 −250 0250 500
+> 340
+> 345
+> 350
+> 355
+> 360
+> Band 3 (100 to 500 MHz) D.
+> −100 0100
+> 380
+> 390
+> 400
+> 410
+> 420
+> 430
+> 440
+> Band 4 (550 to 950 MHz) E.
+> −100 0100
+> 250
+> 300
+> 350
+> 400
+> 450
+> 500
+> 550
+> 600
+> Band 5 (1060 to 1460 MHz) F.
+> Time, ∆t (ms) DM (pc cm −3)
+
+Figure 6. Variation of the DM transform (DMT) over different frequency bands at the GMRT, for actual bursts detected from FRB 20180916B and FRB 20201124A. From left to right, we have Band 3 (300 to 500 MHz), Band 4 (550 to 750 MHz), and Band 5 (1060 to 1460 MHz). For real signals, we expect a bow-tie pattern in the DMT, which becomes more and more difficult to observe at lower frequencies. Plots in the first row were created using your ’s your candmaker.py script, while plots in the second row were created via candies for the same exact bursts. 
+
+remain unchanged, since they work on a per-beam basis; however, some modules are removed, such as the ones for coincidence or anti-coincidence filtering, since they only make sense in the context of multiple beams. 3.4. arachne 
+
+arachne is SPOTLIGHT’s real-time injection module. It can inject one or multiple events from a library of pre-simulated bursts directly into FRBRing . These events are injected before the data from the ring buffer is pro-cessed by Ares . The library of pre-simulated bursts is constructed using simulatesearch (Luo et al. 2022), but can be constructed using other simulation programs as well. The injection methodology follows that of Luo et al. (2022). Assuming Gaussian radiometer noise and using the known frequency-dependent system tempera-ture and telescope gain of the observation, the proba-bility that an injected signal modifies a given data bit is computed and used to generate realistic signal in-jections. This probability will change based on which quantised level the bit currently occupies, as well as the amplitude of the injected signal, and will need to be determined for each quantised level, including the one the bit already occupies (that is, the probability that the bit will remain unchanged). As Luo et al. (2022) al-ready states, this calculation is already quite challenging for the case of 2-bit data, since the number of probabil-ities that need to be estimated is equal to the number of quantised levels at or above the one occupied by each data bit, which can vary from 2 0 = 1 to 2 2 = 4 for 2-bit data (depending on whether the highest or lowest level is occupied). For the general case, that is, for M-bit data, this can vary from 1 to 2 M. Since the data obtained from SPOTLIGHT is 8-bit quantised by default, we ex-tend this logic, to both the general, M-bit case, and to the specific 1-bit, 2-bit, and 8-bit cases; the details of this are given in Appendix B. 
+
+4. PERFORMANCE Both aamulti and spltpipe output detailed bench-marks with each run. These were used to estimate the real-time factor of each run of the pipeline. Fig 9 shows the mean real-time factor for aamulti , spltpipe , and both combined for GMRT’s Band 3 (300 − 500 MHz), Band 4 550 − 750 MHz), and Band 5 (1060 − 1460 MHz). We have only used runs from GMRT’s Cycle 50, 10 The SPOTLIGHT Collaboration 0             
+
+> 10
+> 20
+> 30
+> 40
+> 50 A.
+> RFI FRB
+> B.
+> RFI FRB
+> 020 40 60 80
+> 0
+> 20
+> 40
+> 60
+> 80
+> C.
+> RFI FRB
+> 020 40 60 80
+> D.
+> RFI FRB Signal-to-noise ratio (S/N) Number of bursts
+
+Figure 7. Histograms of S/N for 74 bursts detected from FRB 20180916, and 142 bursts detected from FRB 20201124, using the GMRT. These bursts were passed through both your + FETCH (left ) and candies + FETCH (right ). The bursts wrongly labelled as RFI are in red, while the bursts correctly labelled as FRBs are in blue. From the plots, it is clear that candies helps improve the classification done by FETCH, particularly for S/N ¡ 10. 
+
+since real-time RFI mitigation was implemented on both voltage and beamformed data from this cycle (Wani et al. (in prep)). In this cycle, the pipeline is running on 640 beams, up to a DM of 2000 pc cm −3, and with an S/N limit of 10 σ, which corresponds to a fluence limit of 0.2 Jy ms. From the plot, it is clearly evident that the pipeline is doing as good as, or better than, real-time for both Band 3 and Band 4, and is a bit worse than real-time for Band 5. This is likely due to the fact that dispersive delays are lower in Band 5, which im-plies that the pipeline cannot easily distinguish between astrophysical signals and RFI, leading to a much larger number of spurious candidates. 
+
+5. RESULTS The SPOTLIGHT multibeam, real-time transient search pipeline was first provisionally deployed in GTAC Cycle 40 (April 2025), and then deployed after proper science and functionality validation in GTAC Cycle 49 (October 2025) with 160 beams. A major milestone was achieved in GTAC Cycle 50 (April 2026) when the entire SPOTLIGHT system, including the real-time transient search pipeline, was deployed with 640 beams. This de-ployment also included the incoherent beam real-time transient search pipeline. As of June 2026, the pipeline has detected 2870 bursts from 42 known sources. A cen-sus of these detections can be seen in Fig. 4, where we plot the fluence of each burst versus its dispersion mea-sure (DM). The fluence is estimated using the gmrtetc 19 
+
+package, which is a pure Python implementation of GMRT’s Exposure Time Calculator. gmrtetc gives an estimate of the RMS for each burst detected in a par-ticular epoch, based on observational parameters, and the width of the burst (as obtained from the search) 20 .These estimates are then scaled by the detection S/N to obtain the flux density. The fluence of each burst is then simply a product of the flux density and the width of the burst. Note that the S/N might not take into account all components of a bursts; only the component or components successfully matched by one of the trial boxcars are accounted for. The red dashed line in Fig. 4 represents the theoretical fluence limit of 0.2 Jy ms for the SPOTLIGHT system, estimated for a burst with             
+
+> 19 https://github.com/astrogewgaw/gmrtetc
+> 20 For amore detailed overview of how GMRT’s Exposure Time Calculator functions, refer to the help document avail-able here: http://www.ncra.tifr.res.in:8081/~secr-ops/ etc/etc_help.pdf .
+
+The SPOTLIGHT Real-time Transient Search Pipeline 11 2 4 6 8 10 
+
+1.0
+
+1.5
+
+2.0
+
+2.5
+
+3.0 DM 100 pc cm −3
+
+500 pc cm −3
+
+1000 pc cm −3
+
+Number of CPU cores Speed-up factor of  candies  v/s  your 
+
+Figure 8. The real-time speed-up factor of candies v/s 
+
+your , plotted v/s the number of CPU cores used. Note that both your and candies use multiple CPU cores to process several candidates in parallel on the GPU; each candidate is still processed on the GPU. This benchmark was obtained on one of SPOTLIGHT’s compute nodes, using one of its NVIDIA A100 GPUs, for 50 candidates in each run. For each point, we take the mean of 3 runs. From the plot, it is clear that candies is 1 to 3 times faster than your .
+
+an S/N = 10; it can be clearly seen that many detec-tions reach this limit, proving that the system and the pipeline are working as expected. Fig. 5 shows the sky coverage of the SPOTLIGHT sys-tem, from the deployment of the real-time pipeline, till June 2026. The pipeline ran for 22,043 scans, covered a total of 277.77 sq. degrees of sky in all bands; 239.09 sq. degrees were covered in Band 3 (300 to 500 MHz), 48.49 sq. degrees were covered in Band 4 (550 to 950 MHz), and 10.51 sq. degrees were covered in Band 5 (1060 to 1460 MHz). The 42 known sources detected by the pipeline so far are overlaid on this sky coverage, and each Band 3 
+
+> (300 - 500 MHz)
+> Band 4
+> (550 - 750 MHz)
+> Band 5
+> (1060 - 1460 MHz)
+> 0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1
+> 1.2
+> 1.4
+> 0.81
+> 1.05
+> 1.38 Real-time factor = 1
+> Run time for aamulti
+> Run time for spltpipe
+> Real-time factor
+
+Figure 9. Real-time factors (that is, the time taken by the pipeline versus the time processed by the pipeline) for 
+
+aamulti , spltpipe , and both combined for GMRT’s Band 3 (300 − 500 MHz), Band 4 550 − 750 MHz), and Band 5 (1060 − 1460 MHz). The dashed black line represents a real-time factor of 1; ideally, the pipeline’s real-time factor should lie firmly below this limit. 
+
+point’s colour represents the DM of each source. Using the all-sky rate of [523 ±30(stat.) +143 
+
+> −131
+
+(sys.)] sky −1 day −1
+
+estimated from CHIME/FRB’s First Catalog (Amiri et al. 2021; Collaboration et al. 2023), one can estimate that the pipeline should have detected 2 .78 +0 .62  
+
+> −0.36
+
+FRBs, assuming a fluence index of α = −1.4. 
+
+6. SUMMARY We have presented the design, implementation, and on-sky performance of the SPOTLIGHT real-time tran-sient search pipeline, a GPU-accelerated system devel-oped to enable commensal searches for fast radio tran-sients with the uGMRT. Operating on a dedicated high-performance computing facility comprising 90 NVIDIA A100 GPUs and 60 compute servers, the pipeline is deployed to process up to 640 post-correlation beams in real time while simultaneously supporting transient localisation through high-time-resolution visibility and baseband recording. The pipeline combines brute-force GPU-based dedis-persion, matched-filter-based single-pulse searching, candidate clustering, coincidence and anti-coincidence filtering, machine-learning-based classification, and au-tomated triggering. To ensure continuous validation of system performance, we have also developed arachne ,a real-time signal injection framework capable of inject-12 The SPOTLIGHT Collaboration 
+
+ing realistic synthetic bursts directly into the live beam-formed data stream. During its initial science deployment in uGMRT Cy-cles 49 and 50, the system operated commensally with regular telescope observations and successfully detected 2870 bursts from 42 known sources. The detected bursts span a wide range of dispersion measures and fluences, reaching the predicted survey sensitivity limit of approx-imately 0.2 Jy ms, thereby validating both the sensitiv-ity and robustness of the pipeline. Performance mea-surements demonstrate near real-time operation across the major uGMRT observing bands, while processing 640 beams and searching dispersion measures up to 2000 pc cm −3. The SPOTLIGHT real-time transient search pipeline represents one of the largest GPU-powered com-mensal transient-search systems currently operating at low radio frequencies. ACKNOWLEDGMENTS We acknowledge the invaluable contribution of col-leagues from the Oxford e-Research Centre (OeRC), NVIDIA, and the Centre for the Development of Ad-vanced Computing (C-DAC). We thank our colleagues at the Centre for Development of Advanced Comput-ing (C-DAC) for their support in setting up the Param Brahmand data centre at the GMRT. We acknowledge the funding of the SPOTLIGHT backend (called Param Brahmand) under the National Supercomputing Mis-sion’s (NSM) Phase 3, as well as the support of the Department of Atomic Energy (DAE), Government of India, under project no. 12 − R&D − TFR5 .02 − 0700, for the contributions towards the overhead cost. The uGMRT is operated by the National Centre for Radio Astrophysics of the Tata Institute of Fundamental Re-search, India. We gratefully acknowledge support from the “Building Indo–UK Collaborations Towards the Square Kilometre Array”, funded under the DAE–STFC Technology and Skills Programme, which facilitated the development of SPOTLIGHT’s highly efficient, real-time transient search pipelines. We sincerely thank the uGMRT engi-neers involved in the SPOTLIGHT survey for their re-lentless efforts in commissioning and stabilising SPOT-LIGHT’s correlator and beamformer systems, ensuring high quality data flow for all of SPOTLIGHT’s real-time and offline systems. We also thank the uGMRT oper-ators for their coordinated efforts in successfully con-ducting the SPOTLIGHT survey observations. This re-search was supported in part by the International Cen-tre for Theoretical Sciences (ICTS) for the FTSky: Aprogram in the field of Fast Radio Transients (code: ICTS/FTSky2025/10). APPENDIX  
+
+> A.
+
+DERIVATION FOR THE CHANGE IN DM FOR A GIVEN S/N LOSS In order to derive Eq. 4, we need to first calculate the S/N loss due to dispersing a pulse at an incorrect trial DM value. This is a direct consequence of the dispersive smearing discussed in §3.1.1. As per Cordes & McLaughlin (2003), if the DM of a candidate is off by δDM, then the ratio of the measured peak flux S(δDM) to the true peak flux S, for a Gaussian pulse with a full width at half maximum (FWHM) of W is: 
+
+S(δDM) 
+
+S =
+
+√π
+
+2 ζ−1erf( ζ), (A1) where erf( x) is the error function, defined as: erf( x) := 2
+
+√π
+
+Z x
+
+> 0
+
+e−t2
+
+dt (A2) and ζ is defined as: 
+
+ζ := 6 .91 × 10 −3δDM ∆νMHz 
+
+Wms ν3GHz 
+
+, (A3) where ∆ νMHz is the observation bandwidth in MHz, νGHz is the central observational frequency in GHz, and Wms 
+
+is the width of the candidate in milliseconds. Note that the error function, erf( x), approaches 1 as x → ∞ ; in fact, this approximation is valid for most values of x ≥ 1. Thus, we can approximate Eq. A1 as: 
+
+S(δDM) 
+
+S ≈√π
+
+2ζ , if ζ ≫ 1. (A4) The SPOTLIGHT Real-time Transient Search Pipeline 13 And thus, substituing the value of ζ from Eq. A3 into Eq. A4, we get: 
+
+δDM ≈√π
+
+2 × 6.91 × 10 −3 Wms 
+
+ SS(δDM )
+
+ ν3GHz 
+
+∆νMHz 
+
+=
+
+√π
+
+2 × 691 Ws
+
+ SS(δDM )
+
+ ν3MHz 
+
+∆νMHz 
+
+=
+
+√π
+
+1382 Ws
+
+ SS(δDM )
+
+ ν3MHz 
+
+∆νMHz 
+
+,
+
+which is precisely Eq. 4. 
+
+B. INJECTING A SIGNAL INTO A M-BIT QUANTISED DATA STREAM Assuming that the background noise is represented by a Gaussian distribution, the probability density function (pdf) of the noise N is: 
+
+P (N ) = 1
+
+σ√2π e− (N − μ)22σ2
+
+where the noise level σ is given by the radiometer equation for a single antenna: 
+
+σ = Tsys 
+
+GpNpol δt ∆ν
+
+The cumulative distribution function of noise is given by: 
+
+ϕ(N ) = 12
+
+
+
+1 + erf 
+
+ N − μσ√2
+
+ 
+
+For a given signal S injected to data samples, we get digitized values ranging from 0 to 2 M − 1 for the M bit case. The probability matrix for digit changes upon injecting a signal would be: 
+
+Pij =
+
+
+
+P00 P01 · · · P0(2 M−1) 
+
+0 P11 · · · P1(2 M−1) 
+
+: . . .0 0 · · · P(2 M−2)(2 M−1) 
+
+0 0 · · · 1
+
+
+
+where Pnm is the probability to change the bit from state n to the state m and is given by: 
+
+Pnm = Probability to go from state n to state m
+
+Probability to remain in original state n
+
+Say we have M bit data; thus there are 2 M levels. Consider state n lying between μ + ilσ and μ + ( i + 1) lσ , where 
+
+μ is the mean of Gaussian noise, and l is the level setting number for digitization. Here, i runs from −( 2M 
+
+> 2
+
+− 1) to +( 2M 
+
+> 2
+
+− 1) and n varies from 0 to 2 M − 1. As shown in the figure (10), the probability of bit shift can be calculated as, 
+
+Pn→n+m = Area under pdf between intersection of states n and n + m
+
+Area under pdf up to state nPn→n+m = ϕ(min( μ + ( i + m)lσ − S , μ + ilσ )) − ϕ(max( μ + ( i + m − 1) lσ − S , μ + ( i − 1) lσ )) 
+
+ϕ(μ + ilσ ) − ϕ(μ + ( i − 1) lσ ) (B5) where n and i are related as n − i = 2M 
+
+> 2
+
+− 1. 14 The SPOTLIGHT Collaboration Without injected signal With injected signal  
+
+> n - 2 n + 1 n - 1 nnn + 1 n + m
+
+Figure 10. A diagram illustrating how a bit is shifted based on the amount of signal injected. Assuming the bit occupies the 
+
+nth level, the probability of it switching to the ( n + m)th level is calculated. This probability depends on the amount of overlap between the two levels (marked in red), which, in turn, depends on the amount of signal injected. The bit is then shifted to the level for which this probability is the highest. The same logic is repeated for each bit in the quantised data stream. 
+
+The first state (0) extends from −∞ to μ − ( 2M 
+
+> 2
+
+− 1) lσ and the last state (2 M − 1) extends from μ + ( 2M 
+
+> 2
+
+− 1) lσ 
+
+to + ∞. Therefore, we need to accommodate these variation at the boundary states. This can be done by modifying above formula as, 
+
+P0→0 = ϕ(μ + (1 − 2M 
+
+> 2
+
+)lσ − S )
+
+ϕ(μ + (1 − 2M 
+
+> 2
+
+)lσ ) (B6) 
+
+P0→m = ϕ(min( μ + ( m + 1 − 2M 
+
+> 2
+
+)lσ − S , μ + (1 − 2M 
+
+> 2
+
+)lσ )) − ϕ(μ + ( m − 2M 
+
+> 2
+
+)lσ − S )
+
+ϕ(μ + (1 − 2M 
+
+> 2
+
+)lσ ) (B7) 
+
+Pn→2M−1 = ϕ(μ + ( n + 1 − 2M 
+
+> 2
+
+)lσ ) − ϕ(max( μ + ( 2M 
+
+> 2
+
+− 1) lσ − S , μ + ( n − 2M 
+
+> 2
+
+)lσ )) 
+
+ϕ(μ + ( n + 1 − 2M 
+
+> 2
+
+)lσ ) − ϕ(μ + ( n − 2M 
+
+> 2
+
+)lσ ) (B8) 
+
+P0→2M−1 = ϕ(μ + (1 − 2M 
+
+> 2
+
+)lσ ) − ϕ(μ + ( 2M 
+
+> 2
+
+− 1) lσ − S )
+
+ϕ(μ + (1 − 2M 
+
+> 2
+
+)lσ ) = 1 − ϕ(μ + ( 2M 
+
+> 2
+
+− 1) lσ − S )
+
+ϕ(μ + (1 − 2M 
+
+> 2
+
+)lσ ) (B9) and, 
+
+P2M−1→2M−1 = 1 (B10) Equation (B5) to (B10) are general formulas to calculate probability of bit change from one state to other when a signal S is injected into the quantized data stream. Now, for the 8-bit case , we have n − i = 28 
+
+> 2
+
+− 1 = 127. Thus, 
+
+Pn→n+m = ϕ(min( μ + ( n + m − 127) lσ − S , μ + ( n − 127) lσ )) − ϕ(max( μ + ( n + m − 128) lσ − S , μ + ( n − 128) lσ )) 
+
+ϕ(μ + ( n − 127) lσ ) − ϕ(μ + ( n − 128) lσ )where the level-setting parameter l for 8-bit data is 0.030765, as adopted from Kouwenhoven & Voˆ ute (2001). The formula is appropriate, given that we are away from the boundary states (the first and last states). Probability of changing bit from 0 to 0 and 255 to 255, is 
+
+P0→0 = ϕ(μ − 127 lσ − S )
+
+ϕ(μ − 127 lσ ) and P255 →255 = 1, respectively. (B11) The SPOTLIGHT Real-time Transient Search Pipeline 15 For bit change from state 0 to any higher state m, the formula modifies as 
+
+P0→m = ϕ(min( μ + ( m − 127) lσ − S , μ − 127 lσ )) − ϕ(μ + ( m − 128) lσ − S )
+
+ϕ(μ − 127 lσ )Similarly, for bit change from any non-zero state n to the highest state 255, the probability is 
+
+Pn→255 = ϕ(μ + ( n − 127) lσ ) − ϕ(max( μ + 127 lσ − S , μ + ( n − 128) lσ )) 
+
+ϕ(μ + ( n − 127) lσ ) − ϕ(μ + ( n − 128) lσ )Lastly, the probability for bit change from the lowest state 0 to the highest state 255 is 
+
+P0→255 = ϕ(μ − 127 lσ ) − ϕ(μ + 127 lσ − S )
+
+ϕ(μ − 127 lσ ) = 1 − ϕ(μ + 127 lσ − S )
+
+ϕ(μ − 127 lσ )
+
+For a 1-bit case , M is 1 and thus there are only 2 levels 0 and 1. So, n and i are equal for 1-bit data. Only possible transition between these two states is 0 to 1, and the resulting probability from equation B9 is 
+
+P0→1 = ϕ(μ + (1 − 21 
+
+> 2
+
+)lσ ) − ϕ(μ + ( 21 
+
+> 2
+
+− 1) lσ − S )
+
+ϕ(μ + (1 − 21 
+
+> 2
+
+)lσ ) = 1 − ϕ(μ − S )
+
+ϕ(μ) = 1 − ϕ(μ − S )0.5 (B12) 
+
+P0→0 = 1 − P0→1 = ϕ(μ − S )0.5 (B13) 
+
+P1→0 = 0; P1→1 = 1 (B14) 
+
+For a 2-bit case , M is 2 and thus there are 4 levels namely 0, 1, 2, and 3. In this case, n and i are related as 
+
+n − i = 22 
+
+> 2
+
+− 1 = 1. Using equation (B5), 
+
+P1→1 = ϕ(min( μ + ( i + 1) lσ − S , μ + ilσ )) − ϕ(max( μ + ( i + 1 − 1) lσ − S , μ + ( i − 1) lσ )) 
+
+ϕ(μ + ilσ ) − ϕ(μ + ( i − 1) lσ ) (B15) = ϕ(μ − S ) − ϕ(μ − lσ )
+
+ϕ(μ) − ϕ(μ − lσ ) (B16) = ϕ(μ − S ) − ϕ(μ − lσ )0.5 − ϕ(μ − lσ ) (B17) 
+
+P1→2 = ϕ(min( μ + ( i + 1) lσ − S , μ + ilσ )) − ϕ(max( μ + ( i + 1 − 1) lσ − S , μ + ( i − 1) lσ )) 
+
+ϕ(μ + ilσ ) − ϕ(μ + ( i − 1) lσ ) (B18) = ϕ(min( μ + lσ − S , μ )) − ϕ(max( μ − S , μ − lσ )) 
+
+ϕ(μ) − ϕ(μ − lσ ) (B19) = ϕ(min( μ + lσ − S , μ )) − ϕ(max( μ − S , μ − lσ )) 0.5 − ϕ(μ − lσ ) (B20) and, 
+
+P2→2 = ϕ(min( μ + ( i + 1) lσ − S , μ + ilσ )) − ϕ(max( μ + ( i + 1 − 1) lσ − S , μ + ( i − 1) lσ )) 
+
+ϕ(μ + ilσ ) − ϕ(μ + ( i − 1) lσ ) (B21) = ϕ(μ + lσ − S ) − ϕ(μ)
+
+ϕ(μ + lσ ) − ϕ(μ) (B22) = ϕ(μ + lσ − S ) − 0.5
+
+ϕ(μ + lσ ) − 0.5 (B23) Using equation (B6), 16 The SPOTLIGHT Collaboration 
+
+P0→0 = ϕ(μ + (1 − 2M 
+
+> 2
+
+)lσ − S )
+
+ϕ(μ + (1 − 2M 
+
+> 2
+
+)lσ ) = ϕ(μ − lσ − S )
+
+ϕ(μ − lσ ) (B24) From equation (B7), 
+
+P0→m = ϕ(min( μ + ( m − 1) lσ − S , μ − 1lσ )) − ϕ(μ + ( m − 2) lσ − S )
+
+ϕ(μ − 1lσ )
+
+P0→1 = ϕ(min( μ − S , μ − lσ )) − ϕ(μ − lσ − S )
+
+ϕ(μ − lσ ) (B25) 
+
+P0→2 = ϕ(min( μ + lσ − S , μ − lσ )) − ϕ(μ − S )
+
+ϕ(μ − lσ ) (B26) from equation (B8). 
+
+Pn→3 = ϕ(μ + ( n − 1) lσ ) − ϕ(max( μ + lσ − S , μ + ( n − 2) lσ )) 
+
+ϕ(μ + ( n − 1) lσ ) − ϕ(μ + ( n − 2) lσ )
+
+P1→3 = ϕ(μ) − ϕ(max( μ + lσ − S , μ − lσ )) 
+
+ϕ(μ) − ϕ(μ − lσ ) = 0.5 − ϕ(max( μ + lσ − S , μ − lσ )) 0.5 − ϕ(μ − lσ ) (B27) 
+
+P2→3 = ϕ(μ + lσ ) − ϕ(max( μ + lσ − S , μ )) 
+
+ϕ(μ + lσ ) − ϕ(μ) = ϕ(μ + lσ ) − ϕ(max( μ + lσ − S , μ )) 
+
+ϕ(μ + lσ ) − 0.5 (B28) from equation (B9) 
+
+P0→3 = ϕ(μ − lσ ) − ϕ(μ + lσ − S )
+
+ϕ(μ − lσ ) (B29) and lastly from equation (B10) 
+
+P3→3 = 1 (B30) Equations (B12) to (B30) match with the probability formulas for injection in 1-bit and 2-bit data given in Luo et al. (2022), Appendix B. As per the bit shift logic derived above, the formulae for the calculation of the P2→3 and 
+
+P3→3 probabilities derived in Luo et al. (2022), Appendix B, are incorrect, and the corrected formulae are given above in equations (B28) and (B30). REFERENCES 
+
+Ad´ amek, K., & Armour, W. 2020, The Astrophysical Journal Supplement Series, 247, 56, doi: 10.3847/1538-4365/ab7994 
+
+Agarwal, D., Aggarwal, K., Burke-Spolaor, S., Lorimer, D. R., & Garver-Daniels, N. 2020, Monthly Notices of the Royal Astronomical Society, 497, 1661, doi: 10.1093/mnras/staa1856 
+
+Amiri, M., Andersen, B. C., Bandura, K., et al. 2021, The Astrophysical Journal Supplement Series, 257, 59, doi: 10.3847/1538-4365/ac33ab 
+
+Bannister, K. W., Deller, A. T., Phillips, C., et al. 2019, Science, 365, 565, doi: 10.1126/science.aaw5903 
+
+Chatterjee, S., Law, C. J., Wharton, R. S., et al. 2017, Nature, 541, 58, doi: 10.1038/nature20797 
+
+CHIME/FRB Collaboration, Amiri, M., Bandura, K., et al. 2018, The Astrophysical Journal, 863, 48, doi: 10.3847/1538-4357/aad188 
+
+Collaboration, T. C., Amiri, M., Andersen, B. C., et al. 2023, The Astrophysical Journal Supplement Series, 264, 53, doi: 10.3847/1538-4365/acb54c 
+
+Cordes, J. M., & McLaughlin, M. A. 2003, The Astrophysical Journal, 596, 1142, doi: 10.1086/378231 
+
+Eftekhari, T., & Berger, E. 2017, The Astrophysical Journal, 849, 162, doi: 10.3847/1538-4357/aa90b9 The SPOTLIGHT Real-time Transient Search Pipeline 17 
+
+Ester, M., Kriegel, H.-P., Sander, J., & Xu, X. 1996, in Proceedings of the Second International Conference on Knowledge Discovery and Data Mining, KDD’96 (Portland, Oregon: AAAI Press), 226–231 Gajjar, V., Siemion, A. P. V., Price, D. C., et al. 2018, The Astrophysical Journal, 863, 2, doi: 10.3847/1538-4357/aad005 
+
+Khairy, K. 2024, in 2024 United States National Committee of URSI National Radio Science Meeting (USNC-URSI NRSM), 396–396, doi: 10.23919/USNC-URSINRSM60317.2024.10465039 
+
+Kouwenhoven, M. L. A., & Voˆ ute, J. L. L. 2001, Astronomy & Astrophysics, 378, 700, doi: 10.1051/0004-6361:20011226 
+
+Kulkarni, S. R. 2020, Dispersion measure: Confusion, Constants & Clarity, arXiv, doi: 10.48550/arXiv.2007.02886 
+
+Lanman, A. E., Andrew, S., Lazda, M., et al. 2024, CHIME/FRB Outriggers: KKO Station System and Commissioning Results, arXiv, doi: 10.48550/arXiv.2402.07898 
+
+Law, C. J., Bower, G. C., Burke-Spolaor, S., et al. 2018, The Astrophysical Journal Supplement Series, 236, 8, doi: 10.3847/1538-4365/aab77b 
+
+Law, C. J., Sharma, K., Ravi, V., et al. 2023, Deep Synoptic Array Science: First FRB and Host Galaxy Catalog, doi: 10.48550/arXiv.2307.03344 
+
+Li, Z., Gao, H., Wei, J.-J., et al. 2020, Monthly Notices of the Royal Astronomical Society: Letters, 496, L28, doi: 10.1093/mnrasl/slaa070 
+
+Lin, H.-H., Lin, K.-y., Li, C.-T., et al. 2022, Publications of the Astronomical Society of the Pacific, 134, 094106, doi: 10.1088/1538-3873/ac8f71 
+
+Lorimer, D. R., Bailes, M., McLaughlin, M. A., Narkevic, D. J., & Crawford, F. 2007, Science, 318, 777, doi: 10.1126/science.1147532 
+
+Luo, R., Hobbs, G., Yong, S. Y., et al. 2022, Monthly Notices of the Royal Astronomical Society, 513, 5881, doi: 10.1093/mnras/stac1168 
+
+Macquart, J.-P., Bailes, M., Bhat, N. D. R., et al. 2010, Publications of the Astronomical Society of Australia, 27, 272, doi: 10.1071/AS09082 
+
+Macquart, J.-P., Prochaska, J. X., McQuinn, M., et al. 2020, Nature, 581, 391, doi: 10.1038/s41586-020-2300-2 
+
+Margalit, B., Metzger, B. D., & Sironi, L. 2020, Monthly Notices of the Royal Astronomical Society, 494, 4627, doi: 10.1093/mnras/staa1036 
+
+Men, Y., Barr, E., Clark, C. J., Carli, E., & Desvignes, G. 2023, Astronomy & Astrophysics, 679, A20, doi: 10.1051/0004-6361/202347356 
+
+Metzger, B. D., Berger, E., & Margalit, B. 2017, \apj, 841, 14, doi: 10.3847/1538-4357/aa633d 
+
+Metzger, B. D., Margalit, B., & Sironi, L. 2019, Monthly Notices of the Royal Astronomical Society, 485, 4091, doi: 10.1093/mnras/stz700 
+
+Michilli, D., Masui, K. W., Mckinven, R., et al. 2021, The Astrophysical Journal, 910, 147, doi: 10.3847/1538-4357/abe626 
+
+Novotn´ y, J., Ad´ amek, K., Clark, M. A., Giles, M., & Armour, W. 2023, The Astrophysical Journal Supplement Series, 269, 29, doi: 10.3847/1538-4365/acfef6 
+
+Pleunis, Z., Michilli, D., Bassa, C. G., et al. 2021, The Astrophysical Journal Letters, 911, L3, doi: 10.3847/2041-8213/abec72 
+
+Roy, J., Chengalur, J. N., & Pen, U.-L. 2018, The Astrophysical Journal, 864, 160, doi: 10.3847/1538-4357/aad815 
+
+Sammons, M. W., Deller, A. T., Glowacki, M., et al. 2023, Two-Screen Scattering in CRAFT FRBs, arXiv, doi: 10.48550/arXiv.2305.11477 
+
+Sanidas, S., Caleb, M., Driessen, L., et al. 2017, Proceedings of the International Astronomical Union, 13, 406, doi: 10.1017/S1743921317009310 
+
+Simha, S., Burchett, J. N., Prochaska, J. X., et al. 2020, The Astrophysical Journal, 901, 134, doi: 10.3847/1538-4357/abafc3 
+
+Tendulkar, S. P., Bassa, C. G., Cordes, J. M., et al. 2017, The Astrophysical Journal Letters, 834, L7, doi: 10.3847/2041-8213/834/2/L7 
+
+Tendulkar, S. P., Gil de Paz, A., Kirichenko, A. Y., et al. 2021, The Astrophysical Journal, 908, L12, doi: 10.3847/2041-8213/abdb38 
+
+Wang, Z., Bannister, K. W., Gupta, V., et al. 2025, Publications of the Astronomical Society of Australia, 42, e005, doi: 10.1017/pasa.2024.107 
+
+Xu, H., Niu, J. R., Chen, P., et al. 2022, Nature, 609, 685, doi: 10.1038/s41586-022-05071-8 
+
+Zackay, B., & Ofek, E. O. 2017, The Astrophysical Journal, 835, 11, doi: 10.3847/1538-4357/835/1/11

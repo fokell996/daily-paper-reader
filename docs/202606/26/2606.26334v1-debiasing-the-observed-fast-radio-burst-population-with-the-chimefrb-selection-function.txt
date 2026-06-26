@@ -1,0 +1,911 @@
+Title: Debiasing the Observed Fast Radio Burst Population with the CHIME/FRB Selection Function
+
+URL Source: https://arxiv.org/pdf/2606.26334v1
+
+Published Time: Fri, 26 Jun 2026 00:10:27 GMT
+
+Number of Pages: 25
+
+Markdown Content:
+Draft version June 26, 2026 
+
+Typeset using L ATEX default style in AASTeX631 
+
+Debiasing the Observed Fast Radio Burst Population with the CHIME/FRB Selection Function 
+
+Kyle McGregor ,1, 2 Jason W. T. Hessels ,1, 2, 3, 4 Victoria M. Kaspi ,1, 2 Kaitlyn Shin ,5
+
+Fengqiu Adam Dong ,6 Naman Jain ,1, 2 Robert Main ,1, 2 Mawson Sammons ,1, 2 Michele Woodland ,7
+
+Daniel Amouyal ,1, 2 Derek Bingham ,8 Charanjot Brar ,9 Amanda M. Cook ,2, 1, 3 Radu V. Craiu ,10 
+
+Alice Curtin ,1, 2, 3 Gwendolyn Eadie ,11, 10 B. M. Gaensler ,7, 12, 11 Jeff Huang ,1, 2 Afrokk Khan ,1, 2 
+
+Calvin Leung ,13, 14 Kiyoshi W. Masui ,15, 16 Ayush Pandhi ,1, 2 Swarali S. Patil ,17, 18 
+
+Aaron B. Pearlman ,15, 16, 2, 1, ∗ Sachin Pradeep E. T. ,1, 2 Paul Scholz ,6 Seth Siegel ,19, 20, 1, 2 
+
+Kendrick M. Smith ,20 and David Stenning 8
+
+> 1
+
+Trottier Space Institute at McGill University, 3550 rue University, Montr´ eal, QC H3A 2A7, Canada 
+
+> 2
+
+Department of Physics, McGill University, 3600 rue University, Montr´ eal, QC H3A 2T8, Canada 
+
+> 3
+
+Anton Pannekoek Institute for Astronomy, University of Amsterdam, Science Park 904, 1098 XH, Amsterdam, The Netherlands 
+
+> 4
+
+ASTRON, Netherlands Institute for Radio Astronomy, Oude Hoogeveensedijk 4, 7991 PD Dwingeloo, The Netherlands 
+
+> 5
+
+Cahill Center for Astronomy and Astrophysics, MC 249-17 California Institute of Technology, Pasadena CA 91125, USA 
+
+> 6
+
+Department of Physics and Astronomy, York University, 4700 Keele Street, Toronto, Ontario, ON MJ3 1P3, Canada 
+
+> 7
+
+Department of Astronomy & Astrophysics, University of California, Santa Cruz, 1156 High Street, Santa Cruz, CA 95064, USA 
+
+> 8
+
+Department of Statistics and Actuarial Science, Simon Fraser University, 8888 University Dr W, Burnaby, BC V5A 1S6, Canada 
+
+> 9
+
+NRC Herzberg Astronomy and Astrophysics, 5071 West Saanich Road, Victoria, BC V9E2E7, Canada 
+
+> 10
+
+Department of Statistical Sciences, University of Toronto, 700 University Ave, Toronto ON M4G 1Z5, Canada 
+
+> 11
+
+David A. Dunlap Institute Department of Astronomy & Astrophysics, University of Toronto, 50 St. George Street, Toronto, ON M5S 3H4, Canada 
+
+> 12
+
+Dunlap Institute for Astronomy & Astrophysics, University of Toronto, 50 St. George Street, Toronto, ON M5S 3H4, Canada 
+
+> 13
+
+Department of Astronomy, University of California, Berkeley, CA 94720, United States 
+
+> 14
+
+Miller Institute for Basic Research, University of California, Berkeley, CA 94720, United States 
+
+> 15
+
+MIT Kavli Institute for Astrophysics and Space Research, Massachusetts Institute of Technology, 77 Massachusetts Ave, Cambridge, MA 02139, USA 
+
+> 16
+
+Department of Physics, Massachusetts Institute of Technology, 77 Massachusetts Ave, Cambridge, MA 02139, USA 
+
+> 17
+
+Department of Physics and Astronomy, West Virginia University, PO Box 6315, Morgantown, WV 26506, USA 
+
+> 18
+
+Center for Gravitational Waves and Cosmology, West Virginia University, Chestnut Ridge Research Building, Morgantown, WV 26505, USA 
+
+> 19
+
+SKA Observatory, Science Operations Centre, CSIRO ARRC, 26 Dick Perry Avenue, Kensington, WA 6151, Australia 
+
+> 20
+
+Perimeter Institute for Theoretical Physics, 31 Caroline Street N, Waterloo, ON N25 2YL, Canada 
+
+ABSTRACT The recent release of CHIME/FRB Catalog 2 provides the largest sample to date with which to investigate the intrinsic distributions of fast radio bursts (FRBs). Leveraging an expanded campaign of 587,367 synethetic bursts injected into the live CHIME/FRB search pipeline, we perform a population analysis of the fluence, scattering timescale, pulse width, and dispersion measure distributions of Catalog 2 FRBs. We first infer the intrinsic population using a resampling-based framework that accounts for instrumental selection effects following previous CHIME/FRB population studies. Acentral goal of this work is to constrain the intrinsic distribution of scattering timescales, that remained weakly constrained in Catalog 1 owing to limited statistics at moderate and large scattering times (τ ≳ 10 ms at 600 MHz) and sparse injection coverage in this regime. Second, we construct an explicit multidimensional selection function by training a logistic regression model on the injected events. This model estimates the detection probability as a function of FRB observable properties, including higher-order interaction terms. We incorporate this selection function into a simulation-based inference framework to refine the inferred intrinsic scattering-timescale distribution. We find 
+
+Corresponding author: Kyle McGregor kyle.mcgregor@mail.mcgill.ca 
+
+> arXiv:2606.26334v1 [astro-ph.HE] 24 Jun 2026
+
+2evidence for a slight downturn in the intrinsic FRB scattering timescale distribution, though a flat or slightly rising distribution cannot be ruled out, that is further supported through a comparison with the higher-frequency scattering timescale distribution observed by Commensal Real-time ASKAP Fast Transients (CRAFT) survey. 
+
+Keywords: Radio Transient Sources (2008)  
+
+> 1.
+
+INTRODUCTION Fast radio bursts (FRBs) are bright, millisecond-scale radio transients that have emerged as an intriguing frontier of time-domain survey astrophysics. First discovered nearly 20 years ago (Lorimer et al. 2007), the study of FRBs has matured from a handful of enigmatic discoveries into a statistically rich population with the advent of wide-field radio surveys. In particular, with the release of more than 4500 FRBs observed by the Canadian Hydrogen Intensity Mapping Experiment (hereafter referred to as CHIME/FRB Catalog 2; CHIME/FRB Collaboration et al. 2026) the cumulative number of known FRB sources has greatly increased, enabling population-level analyses with improved statistical precision relative to earlier studies (Wang et al. 2025; Patil et al. 2026; CHIME/FRB Collaboration et al. 2026; Shah et al. 2026, Jain et al. in prep.). Selection effects are inherent to every astrophysical survey and are implicitly encoded in the sample detected by CHIME/FRB. Correcting for these effects is therefore imperative for making unbiased inferences about the underlying FRB population. Formally, these corrections are encoded through a survey’s selection function, which specifies the probability that an instrument will detect a given source with certain incident properties. With the emergence of large-scale, real-time transient search pipelines (e.g. CHIME/FRB Collaboration et al. 2018; Jankowski et al. 2023; Law et al. 2024; Shannon et al. 2025; Kania et al. 2026b), the characterization of selection effects has become increasingly complex, as detection is mediated by multi-stage triggering, hierarchical data products, and nonlinear interactions between burst properties and search algorithms. Complex radio-frequency interference environments may also cause false positive and false negative triggers (e.g. Petroff et al. 2015; Kania et al. 2026a; CHIME/FRB Collaboration et al. 2025a). This motivates the development of empirical selection function modeling, which in FRB and pulsar surveys is routinely achieved through injection-based tests of search pipelines (e.g., Lazarus et al. 2015; CHIME/FRB Collaboration et al. 2021; Qiu et al. 2023). For these studies, synthetic signals are injected directly into the data streams and processed through the search pipeline to empirically measure detection efficiency. To correct for selection biases in the first large-scale catalog of CHIME/FRB sources (CHIME/FRB Collaboration et al. 2021) ( ∼ 500 FRBs, hereafter referred to as Catalog 1), a population synthesis was performed using a large dataset of synthetic bursts injected into the instrument’s real-time live search pipeline (hereafter, injections ). This dataset, along with the observed catalog, was applied in Section 6 of CHIME/FRB Collaboration et al. (2021) to infer a fidu-cial, selection-corrected model for the marginalized distributions of FRB observables; the injections were subsequently leveraged by Shin et al. (2023) to constrain the redshift and energy distributions of FRBs. The design and implemen-tation of CHIME/FRB’s injection pipeline, as well as a detailed description of the resulting injection dataset and its intended use, were presented by Merryfield et al. (2023). In the work here, we build on the CHIME/FRB Collaboration et al. (2021) analysis by fitting a parametric selection function model that explicitly accounts for correlations between observables, employing a logistic regression framework to more accurately capture the structure of the CHIME/FRB detection process and extend the range of the parameter space to better quantify CHIME/FRB’s sensitivity to highly-scattered FRBs. This is in accompaniment to fitting an analogous single-variate model to CHIME/FRB Collaboration et al. (2021) using Catalog 2 and a newly-expanded set of injections. We structure this paper as follows: In Section 2 we describe the CHIME/FRB injection pipeline and the generation of a large population of synthetic bursts. In Section 3 we present a procedure for fitting a fiducial model for the intrinsic FRB observable distributions to the marginalized distributions of observed quantities, using an importance-sampling procedure similarly applied by CHIME/FRB Collaboration et al. (2021). In Section 4 we use the injections to fit a logistic regression model for the selection function. In Section 5 we refine the estimate of the intrinsic scattering timescale distribution using a simulation-based inference procedure to better constrain the behavior of the distribution  
+
+> ∗NASA Hubble Fellow
+
+3                                 
+
+> Table 1. Summary statistics of the CHIME/FRB Catalog 2 sample after applying cuts (see Section 3). Measured parameter Median Q25 Q75 Mean SD Min Max DM (pc cm −3)558.52 378.14 832.21 652.88 390.68 122.524 3200.12 Pulse width (ms) 0.57 0.30 1.21 1.12 1.72 0.030 26.65 Scattering timescale (ms) 1.77 0.64 5.36 5.33 13.18 0.016 234.53
+> Note —Scattering timescales are referenced to 600 MHz after scaling the Catalog 2 measurements from 400 MHz assuming
+> τ∝ν−4. Only a subset of bursts have measured scattering timescales from the fitburst dynamic spectrum fitting framework and may be treated as upper limits at the survey time resolution (0.983 ms) at 400 MHz (Fonseca et al. 2024).
+
+at large scattering times. In Section 6 we compare the resulting debiased distributions to previous work and to results from other FRB surveys, and in Section 7 we present our conclusions.  
+
+> 2.
+
+CHIME/FRB INJECTIONS This analysis requires a large catalog of synthetic FRB events injected into the CHIME/FRB real-time intensity data stream. These injections are processed by the same real-time detection, classification, and triggering pipeline used to identify astrophysical bursts, enabling an empirical characterization of the CHIME/FRB selection function. The injection framework used in this analysis was originally introduced by Merryfield et al. (2023), who included an overview of the synthetic pulse generation pipeline and database networking structure that remain unchanged since the CHIME/FRB Collaboration et al. (2021) deployment. Here we summarize the architectural and population-level details most relevant to the present analysis. 2.1. Injection Pipeline Architecture 
+
+The injection system described in Merryfield et al. (2023) is designed to forward-model synthetic FRB signals through the CHIME/FRB real-time search pipeline, enabling direct measurement of survey completeness as a function of in-trinsic burst properties. The CHIME/FRB search pipeline itself is implemented as a hierarchical, multi-stage software stack operating on beamformed intensity data generated by the CHIME F/X-engine (correlator and beamformer), as described in detail in the CHIME/FRB system overview (CHIME/FRB Collaboration et al. 2018). In this architec-ture, signal processing proceeds through four principal stages, denoted L1 through L4, following an initial beamforming and upchannelization stage (L0). At L0, voltage data from the CHIME antennas are beamformed into 1024 static, FFT-formed intensity beams spanning the primary field of view, with 16,384 frequency channels at 0.983 ms cadence (CHIME/FRB Collaboration et al. 2018). These intensity streams are distributed across a dedicated L1 compute clus-ter, with each L1 node processing data from eight static beams. The L1 pipeline conducts per-beam radio-frequency interference (RFI; see Rafiei-Ravandi & Smith (2023)) excision and executes an efficient search for dispersed bursts, identifying candidate events in the time–DM plane using a highly optimized tree-dedispersion algorithm. Candidate detections from all beams are then consolidated at L2, where events coincident in time, dispersion measure, and sky position are grouped and refined using multi-beam information. L3 classifies grouped events as Galactic or extra-galactic, cross-matches against a database of known FRB sources to identify candidate repeat events, and determines appropriate actions such as alerts or data callbacks; L4 then implements these actions and archives event metadata and associated data products for offline analysis (CHIME/FRB Collaboration et al. 2018). Following successful triggering and data callback, candidate events are sent for manual inspection to determine whether they are astrophysical in origin. Inclusion in the final CHIME/FRB catalog requires independent confirmation by two human classifiers. Injections interface directly with the L1 stage, ensuring that synthetic bursts are embedded within the same RFI environment and downstream automated classification scheme as astrophysical events, while maintaining strict isolation between synthetic and real data products. The injection pipeline does not model vetting by humans, though any effect due to misclassification by humans is assumed to be minimal. The injections are coordinated through a centralized application programming interface (API) that interfaces directly with the L1 pipeline nodes. Each injection request specifies the burst properties, injection time, and target synthesized beam, and is assigned a unique identifier that propagates through the pipeline. Detection metadata produced at L1 and subsequent processing stages are matched 4to active injections using a database-backed bookkeeping system. This architecture enables a binary classification of each injected burst as detected or not detected and prevents spurious triggers from RFI or astrophysical events from being misidentified as injections, as detailed by Merryfield et al. (2023). 2.2. Sample Construction 
+
+A key requirement for the injected population is to span the parameter space of observed FRB properties charac-terized by fluence F , pulse width w, scattering timescale τ , dispersion measure DM, and sky position (R.A., Decl.) broadly enough to characterize the survey response while avoiding an injection set overwhelmingly dominated by non-detections. Fluence and sky position are the principle drivers of detectability: naively sampling across these quantities would produce a detection fraction for injections that is prohibitively small. Accordingly, the sampling of sky positions must account for both the fiducial response of the primary and synthesized beams and the source position within an individual static beam. We therefore adopt a hierarchical sampling strategy to construct an injection sample that balances exploration of parameter space with efficiency. This procedure follows in three stages: 1. Initial sampling of catalog observables. We draw DM, intrinsic width, and scattering timescale from lognor-mal distributions informed by the observed catalog, supplemented by a uniform exploration fraction extending beyond the catalog distributions. We provide a table of summary statistics for each distribution in Table 1. For each of these parameters, 70% of injections are drawn from lognormal distributions fit to the Catalog 2 distributions. The remaining 30% are drawn from uniform distributions extending well beyond these observed parameter distributions. This increases sampling density in the regime where the detection probability is expected to transition from near unity to near zero. 2. Fluence and sky-position sampling. Fluences are drawn from a power-law distribution, p(F ) ∝ F −1.5,corresponding to the expectation for a Euclidean, non-evolving source population tentatively evidenced by CHIME/FRB Collaboration et al. (2021). Relative to the injection campaign accompanying Catalog 1, we adopt slightly enhanced sampling at the low-fluence end to increase the density of injections near the detection threshold. This improves the resolution with which the transition in detection probability can be constrained. The lower fluence bound is set at 0.1 Jy ms, near the approximate noise floor of CHIME/FRB detections and well below the estimated survey 95% completeness threshold of ∼ 5 Jy ms (CHIME/FRB Collaboration et al. 2026), so that a non-negligible fraction of injections populate the regime of near-zero detection probability; the upper bound extends to ≳ 10 4 Jy ms, well beyond the brightest cataloged events. CHIME/FRB does not have a single, well-defined fluence threshold; rather, the effective detection threshold varies across the sky as a function of beam sensitivity. Accordingly, sky positions 1 are drawn uniformly on the celestial sphere and initially filtered to exclude locations below the true horizon at CHIME’s latitude. The accepted positions are then mapped through the CHIME primary beam model to compute the gain and effective sensitivity at the time of injection, which is highly frequency dependent across the CHIME band (see Andersen et al. 2023). Positions with a primary beam response 2 below 10 −3 Jy /Jy and synthesized beam response below 10 −2 Jy /Jy are rejected to avoid scheduling injections in regions of negligible sensitivity relative to the main lobe. 3. Pre-selection using beam sensitivity and estimated S/N. For each candidate injection, we estimate a lower bound on the expected S/N by using a randomly drawn sky position from the previous step and computing its attenuation of the burst dynamic spectrum using a model of the CHIME/FRB beam response (e.g. Amiri et al. 2022; Andersen et al. 2023). Injections predicted to have an estimated lower-limit S /N < 12 under all beam realizations are rejected prior to scheduling. This step reduces the computational overhead of injecting many otherwise-undetectable bursts while preserving sampling in the vicinity of the survey threshold. We show the resulting marginalized distributions of simulated, injected, and detected events in Figure 1. The detected subset is biased toward higher fluence and smaller effective widths, consistent with the single-pulse detection metric S /N ∝ F / √wobs , where wobs is the quadrature sum of intrinsic width, intra-channel dispersion smearing, and   
+
+> 1In contrast to catalog events which each have measured header localizations, each injection is assigned a simple coordinate within the CHIME beam model for which a directional sensitivity can be calculated.
+> 2The beam model presented in, e.g, Amiri et al. (2022) defines the primary beam sensitivity as normalized at the transit of calibrator source Cygnus A for all frequencies, and the FFT-formed synthesized beams as normalized relative to the on-axis sensitivity.
+
+510 1 10 0 10 1 10 2 10 3 10 4                    
+
+> Fluence (Jy ms)
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> 10 6
+> 10 7
+> 10 8
+> Counts
+> Simulated
+> Injected
+> Detected
+> 10 310 210 110 010 110 2
+> Scattering time (ms)
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> 10 6
+> 10 7
+> Counts
+> 10 310 210 110 010 110 210 3
+> Pulse width (ms)
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> 10 6
+> 10 7
+> 10 8
+> Counts
+> 10 110 210 3
+> DM (pc cm 3)
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> 10 6
+> 10 7
+> Counts
+
+Figure 1. Marginalized distributions of the simulated (green), injected (purple), and detected (orange) populations for the injection campaign. Each panel shows one-dimensional projections in fluence, scattering timescale (referenced to 1 GHz), intrinsic pulse width, and dispersion measure (DM). The simulated population represents the underlying draws from distributions widely sampling the FRB parameter space, while the injected subset reflects the samples pre-selected for injection (see Section 2.2), and the detected sample corresponds to injected events with corresponding detection. 
+
+scatter broadening (Cordes & McLaughlin 2003). As such, broader bursts are more difficult to detect at fixed fluence when the width is greater than the 0.983 ms time resolution. The injected population is otherwise consistent with that employed for Catalog 1 (Merryfield et al. 2023), with several extensions: (i) an increased uniform exploration fraction for DM, intrinsic width, and scattering timescale (from 10% to 30%); (ii) an expanded upper bound on intrinsic width extending to 5 seconds to support concurrent injections for the CHIME/Slow backend 3 (Mate et al. 2026); and (iii) enhanced low-fluence sampling to improve characterization of the survey threshold. Scattering timescales are parameterized at a reference frequency of 600 MHz and scaled across the band assuming 
+
+τsc ∝ ν−4, corresponding to a Kolmogorov-like scattering index; this convention is adopted for all scattering timescales in this paper unless otherwise stated. At present, injections are limited to single-component bursts, both due to constraints in the dynamic spectrum simulator and as a simplification consistent with the predominance of apparently single-component broadband events detected by CHIME/FRB (Pleunis et al. 2021). These injections therefore assume a Gaussian intrinsic pulse profile convolved with a one-sided exponential scattering tail. This does not capture the full morphological complexity of real FRBs, notably multi-component structure, asymmetric temporal profiles, and non-exponential scattering tails. However, as CHIME/FRB uses boxcar matched filtering on dedispersed intensity data, this parameterization is broadly applicable to the characterization of most observed FRBs by CHIME/FRB’s search pipeline. While we do not model selection effects due to spectral morphology, we sample the parameters of spectral index and spectral running, that describe the slope and curvature of the burst spectrum across the observing band, respectively, from a 2D kernel density estimate in constructing the population, following CHIME/FRB Collaboration et al. (2021). This allows for marginalization across these parameters in the subsequent analysis.  
+
+> 3CHIME/Slow is a commensal search pipeline designed to detect long-duration radio transients with widths from 16 milliseconds up to 5 seconds, and has been detecting events in this regime from October 2025 onwards.
+
+62.3. September 2025 Injection Campaign 
+
+The injection dataset used in this work was collected during a dedicated campaign conducted from 2025 September 8–12. The campaign was designed to maximize injection throughput while maintaining stable pipeline behavior, which would alternatively cause a high rate of RFI masking of injections if the injection rate is too high. Additionally, during this period all downstream pipelines not required for injection tracking were temporarily disabled out of caution for these systems operating alongside the CHIME/FRB backend. This included intensity and baseband callbacks, VOEvent generation (see Abbott et al. 2025), and most L4 processing and database services. These components were restored to normal operation immediately following the conclusion of the run. In total, the campaign produced 587,367 injections, of which 130,763 have corresponding detections. The marginalized property distributions of the simulated, injected, and detected events are shown in Figure 1.  
+
+> 3.
+
+CORRECTING FOR MARGINALIZED SELECTION EFFECTS We present here the procedure for fitting a fiducial model of the debiased FRB population, closely following the resampling-based formalism introduced in Section 6 of CHIME/FRB Collaboration et al. (2021). While the full methodology is developed in that work, we summarize the relevant components here as they pertain to the present analysis. We restrict analysis to fluence, DM, intrinsic width w, and scattering timescale τ , and defer a detailed treatment of burst morphologies to a future dedicated injection campaign. A central motivation for this work is determining the intrinsic distribution of scattering timescales, which remained only weakly constrained in Catalog 1 owing to limited catalog statistics at moderate and large scattering times ( τ ≳ 10 ms at 600 MHz) and comparatively sparse injection coverage in this regime. Constraining this distribution is important as scattering traces turbulent plasma along the line of sight of the burst, and prior population modeling has shown that the observed scattering distribution by CHIME/FRB is more consistent with FRBs originating in dense local environments compared to the average host-galaxy ISM alone (e.g., Chawla et al. 2022). We implement several cuts to the Catalog 2 and injection samples to ensure a consistent and well-defined comparison between the observed population and the injections. For the catalog, we remove events affected by known exposure issues (including pre-commissioning data) as well as bursts detected in sidelobes ( > 5 degrees from the meridian). We further impose cuts in S/N (S /N ≥ 12) and DM (DM ≥ 100 pc cm −3). The S/N cut is intended to mitigate incompleteness associated with human verification near the triggering threshold (S /N ≥ 8), while the DM cut prevents contamination from Galactic sources. We also require the fitburst width to exceed 3 × 10 −2 ms, matching the lower bound of the injected width distribution (see Figure 1). Additionally, we remove known repeat bursts by retaining only the first detection from each source (as identified by Cook et al. 2026). Ignoring measurements from subsequent repeat events prevents highly active repeating sources from dominating the sample and ensures the same selection process for repeaters as apparent one-offs. We also remove bursts observed along sightlines where the Galactic contribution to scattering is expected to be significant. Using the NE2025 model (Ocker & Cordes 2026), we exclude bursts for which the predicted Milky Way scattering exceeds the CHIME/FRB search time resolution of 0.983 ms at 400 MHz. This cut removes events along sightlines for which the observed scattering could plausibly be dominated by the Galactic plane, rather than by propagation local to the source, its host galaxy, the circumgalactic medium, or the intergalactic medium. While the Catalog 2 scattering timescale distribution does not strongly depend on Galactic latitude, we nevertheless remove sightlines where the Milky Way contribution to scattering is expected to be significant. This cut removes fewer than 5% of the remaining sample, so Galactic scattering is unlikely to be the dominant driver of the observed scattering distribution. We also exclude all bursts without measured scattering timescales from the analysis. In Catalog 2, events with reported τ = 0 do not represent measurements of zero scattering, but cases in which fitburst prefers an unscattered Gaussian profile over a scatter-broadened profile (Fonseca et al. 2024). This may be due to an intrinsically very low scattering time, or that the intrinsic pulse width dominates over an otherwise measureable scattering value. These events therefore provide upper limits on τ , with the limit canonically set at twice the observed pulse width; previous population analyses have applied these events by assigning them an effective scattering timescale set at half the upper limit, i.e., τ = w (see CHIME/FRB Collaboration et al. 2021; Shin et al. 2023). However, we do not perform the same procedure, as this may artificially concentrate probability mass within an otherwise measureable part of parameter space, particularly as the true scattering timescales of these events may be much lower. Figure 2 shows that the τ = 0 70 
+
+> 100
+> 200
+> 300
+> 400
+> 500
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> Count
+> 10 210 3
+
+DM [pc cm 3]               
+
+> 10 6
+> 10 5
+> 10 4
+> 10 3
+> 10 2
+> 10 1
+> Scattering timescale [s]
+> 10 510 410 310 210 1
+
+Width [s]       
+
+> 10 6
+> 10 5
+> 10 4
+> 10 3
+> 10 2
+> 10 1
+> = 0
+> > 0
+
+Figure 2. Scattering timescale as a function of DM and width for the Catalog 2 sample with cuts applied (see Section 3). Blue points show individual events. Background histograms compare the distributions of events that do not prefer a scatter-broadened profile ( τ = 0) and events with measured scattering timescales ( τ > 0). 
+
+and τ > 0 samples occupy broadly similar ranges of DM and width. Thus, we excise the sample with unmeasured scattering times as it does not strongly bias the intrinsic distributions of these properties. For the scattering timescale distribution itself, however, we caution that this analysis is more sensitive to the high-scattering end of the distribution, where scattering can be well-measured, rather than the low-scattering end. Forthcoming CHIME/FRB data products with baseband data are better suited to address this limitation for Catalog 2, and such work is currently underway (Amouyal et al. in prep.). These data preserve raw complex voltages from most intensity triggers with S /N ≥ 12 and give an improved time resolution of 2.56 μs, enabling improved morphological characterization of low-scattering events (e.g. CHIME/FRB Collaboration et al. 2024; Sand et al. 2025). As such, we defer a detailed study of the low-scattering sample to future work. These cuts to the catalog sample give a total of 1079 bursts with which we apply the following analysis. 3.1. Fiducial Model 
+
+The intrinsic FRB population is described by a parametric probability density p(F, DM , w, τ ). Here, w represents an intrinsic Gaussian pulse width. As an initial model, we adopt a separable fiducial model for the underlying population, 
+
+p(F, DM , w, τ ) = p(F | α) p(DM | μDM , σ DM ) p(w | μw, σ w, ) p(τ | μτ , σ τ ), (1) where α is the fluence power law index and {μ, σ } represent the shape and scale of a lognormal distribution. The intrinsic fluence distribution is therefore modeled: 
+
+p(F | α) = α − 1
+
+Fmin 
+
+ FFmin 
+
+−α
+
+, F ≥ Fmin , (2) with Fmin fixed at 0 .1 Jy ms, well below the survey completeness limit (see Figure 1). This gives a fiducial approximation of the fluence distribution over the range probed by CHIME/FRB, and in reality will not extend to indefinitely high burst energies. A turnover in the energy distribution is expected above Emax ∼ 10 42 erg (Ould-Boukattine et al. 2026a; Shah et al. 2026), and observations of hyperactive repeating sources show that burst energy distributions can deviate from a simple power law (e.g., Kirsten et al. 2024; Ould-Boukattine et al. 2026b,c). 8025 50 75 100 125 150 175               
+
+> Counts
+> 0.0 0.5 1.0
+> Selection
+> 10 210 3
+> DM (pc cm 3)
+> 0.0 0.2 0.4 0.6 0.8
+> DM × Probability density
+> 025 50 75 100 125 150 175
+> Counts
+> 0.0 0.5 1.0
+> Selection
+> 10 410 310 2
+> Pulse width (s)
+> 0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35
+> Pulse width × Probability density
+> 020 40 60 80 100
+> Counts
+> 0123
+> Selection
+> 10 410 310 210 1
+> Scattering timescale (s)
+> 0.00 0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40
+> Scattering timescale × Probability density
+
+Figure 3. Binned selection plots for DM, pulse width and scattering time. (Top) Catalog 2 DM, pulse width, and scattering timescale distributions (bars), with a fiducial model modulated by a selection effect (solid lines). (Middle) Relative marginalized selection curve inferred during fiducial model fitting. (Bottom) Selection-corrected observed distribution (bars) with fiducial model (solid lines). 
+
+The intrinsic width and scattering timescale distributions are each modeled as a log-normal distribution in ln w and ln τ , respectively. For an observable x ∈ { w, τ, DM }, the log-normal probability density is 
+
+p(x | μx, σ x) = 1
+
+x σ x
+
+√2π exp 
+
+
+
+− (ln x − μx)2
+
+2σ2
+
+> x
+
+
+
+, x > 0. (3) The DM distribution is treated phenomenologically using this log-normal parameterization matched to the injected population, without explicitly decomposing Galactic, host, and intergalactic contributions. The full hyperparameter vector may therefore be written as 
+
+ϕ = {α, μ DM , σ DM , μ w, σ w, μ τ , σ τ }. (4) This parameterization provides a compact and interpretable description of the intrinsic FRB population while remain-ing sufficiently flexible to capture the broad features of the observed catalog when correcting for selection effects. Following Catalog 1, population inference is not performed directly in fluence space. CHIME/FRB intensity fluences are best interpreted as lower limits due to uncertainty in localization within the synthesized beam (Andersen et al. 2023). The analysis is therefore carried out in the space of DM and observed signal-to-noise ratio (S/N), which are highly correlated with fluence (see CHIME/FRB Collaboration et al. 2021) and robustly measured for all catalog events. The injection dataset is used to calibrate the instrument response by forward-modeling the detection probability as a function of intrinsic burst properties, implicitly encoding the mapping between ( F, DM , w, τ ) and the observed S/N. The predicted observable distribution in (DM , S/N) space is therefore obtained by integrating over fluence, 
+
+Pobs (DM , S/N) = 
+
+Z
+
+dF P (F, DM) P (S /N | F, DM) , (5) 9                                                               
+
+> Table 2. Best-fit fiducial model parameters with 1 σconfidence intervals from analogous cuts and fitting procedure with the CHIME/FRB Catalog 1 sample (CHIME/FRB Collaboration et al. 2021) and Catalog 2 (CHIME/FRB Collaboration et al. 2026).
+> αμDM [pc cm −3]σDM μw[s] σwμτ[s] στ
+> Catalog 1 −1.35 ±0.12 494 ±24 0.67 ±0.04 (9 .80 ±0.91) ×10 −40.97 ±0.08 (2 .15 ±1.10) ×10 −31.71 ±0.23 Catalog 2 −1.07 ±0.02 548 ±40.58 ±0.01 (8 .39 ±0.35) ×10 −41.34 ±0.03 (7 .49 ±0.60) ×10 −31.79 ±0.04
+> Note — Uncertainties are bootstrap-derived. Shape ( μ) and scale ( σ) parameters describe the dispersion measure (DM), width ( w), and scattering timescale ( τ) distributions. Catalog 1 and Catalog 2 use different treatments of scattering upper limits: Catalog 1 assigns unmeasured scattering timescales to the burst width, while Catalog 2 excludes bursts without measurable scattering from the analysis (see text).
+
+allowing the intrinsic fluence distribution to be constrained indirectly through its imprint on the observed S/N distri-bution, while avoiding uncertain beam corrections to individual fluence measurements that the injection system does not robustly inverse-model. The population parameters are constrained using an iterative maximum-likelihood fitting procedure identical to that used by CHIME/FRB Collaboration et al. (2021). At each iteration, the predicted catalog distributions are constructed by reweighting the detected injections according to the ratio between the current population model and the injected reference distribution. The resulting weighted injection sample provides a forward-modeled prediction for the observed catalog distributions in DM, intrinsic width, scattering timescale, and S/N. Model parameters are then updated by fitting these predicted distributions to the observed catalog via the binned Poisson likelihood, ln L(ϕ) = X
+
+> i
+
+[ni ln μi(ϕ) − μi(ϕ)] , (6) where ni is the binned catalog count in bin i and μi(ϕ) is the reweighted injection prediction. The fluence power-law index is constrained through the DM–S/N distribution. In Figure 3 we present the fit results of the fiducial population model to the observed catalog distributions. We also provide the parameter estimates for ϕ in Table 2, including bootstrapped 95% confidence intervals on each parameter. Note that, for DM and intrinsic width, the majority of catalog events lie in regions of relatively high selection probability, and the corresponding selection-corrected distributions are therefore well constrained. In contrast, the scattering timescale distribution extends substantially into a regime of low selection probability. When corrected using inverse-probability weighting, this behavior implies a comparatively large contribution from intrinsically highly scattered events that is increasingly dominated by statistical noise. In Catalog 1, this regime was similarly dominated by Poisson counting uncertainties owing to the small number of detected bursts at moderate and large scattering times. This effect is amplified due to choice of binning. Accordingly, CHIME/FRB Collaboration et al. (2021) quoted an upper limit of 10 ms for the well-characterized domain of the scattering-timescale distribution. We therefore proceed with a kernel density estimation (KDE) procedure that allows us to analogously define the upper limit of the scattering timescale distribution well-characterized by Catalog 2. 3.2. Nonparametric Density Estimation 
+
+To mitigate the sensitivity of the selection-corrected distributions to binning choices, we additionally estimate the intrinsic distributions using a KDE for nonparametric density. This is particularly useful for the scattering timescale distribution, which displays a modest number of detections in regions with large selection bias (see Figure 3). While we find that this approach yields smooth estimates for DM and intrinsic width, the Gaussian-kernel estimate for scattering exhibits an apparent drop-off at large τ . Given the strongly selection-limited nature of this regime and the small number of contributing catalog events, this behavior may not necessarily reflect a physical drop-off in the intrinsic scattering distribution, and instead arises from the asymptotic behavior of the reweighted kernel in regions of sparse data. As we expect CHIME/FRB observations may only probe the low-τ tail of a broader intrinsic scattering distribution, consistent with results from other surveys that do not show a clear high-τ cutoff,(e.g., James et al. 2026), we therefore explore alternative kernel choices for the scattering KDE. Specifically, we construct selection-corrected KDEs using 10         
+
+> Figure 4. Selection-corrected scattering timescale distributions at 600 MHz inferred via KDE using four kernel choices (Gaus-sian, tophat, linear, and Epanechnikov; insets). Solid curves denote the bootstrap median KDE, with shaded regions indicating the 95% confidence interval on the inferred distribution. The gray region marks the regime where the local dominance metric exceeds the threshold dCat1 (10 ms) = 0 .122 (see text surrounding Equation 8) calibrated from the Catalog 1 analysis, correspond-ing to a breakdown of reliable inference due to domination by a small number of heavily weighted events. This threshold occurs at τ∼30 ms, where the local effective sample size is neff ≈50. Beyond this scale, the KDE is increasingly noise-dominated and should not be interpreted as physically constraining. The onset of this noise-dominated regime is indicated by the left edge of the gray shaded region. The increased range relative to Catalog 1 for each kernel choice is indicated by the green arrows.
+
+boxcar, triangular, and Epanechnikov kernels (see Pedregosa et al. 2011), all of which fall identically to zero outside their respective bandwidths. The KDE distributions are shown in Figure 4 with their respective kernels. We apply Scott’s rule for bandwidth estimation (Scott 1979), computing the kernel in log 10 τ space. These alternative estimates more transparently illustrate the uncertainty associated with extrapolating beyond the range strongly constrained by the catalog. Uncertainties on the KDEs are quantified using a Bayesian bootstrap on the inverse-probability weights from which we derive a 95% confidence interval on the inferred distributions (Rubin 1981). Specifically, we treat the selection-corrected sample as a weighted empirical distribution and generate bootstrap realizations by drawing from a Dirichlet distribution to perturb the normalized weights. This technique is convenient as we can resample the probability mass assigned to each burst while holding the observed τ values fixed and without rerunning the computationally expensive fiducial model fitting procedure. The resulting ensemble of reweighted samples is then propagated through the KDE estimator to obtain bootstrapped confidence intervals that reflect finite-sample uncertainty in the selection-corrected distribution, conditioned on the adopted selection function model. To identify the upper limit of the selection-corrected scattering time distribution that remains meaningfully con-strained by the data, we introduce two diagnostics: the local effective sample size, neff , and a local dominance metric, 
+
+d(τ ). While the selection-corrected KDE exhibits a decline in the inferred intrinsic scattering distribution above 
+
+∼ 50 ms, this feature may be caused by a combined consequence of severe selection bias and the influence of the smoothing kernel, even when alternative kernel choices (Figure 4) are considered. Based on the design effect defined 11 by Kish (1965), we hence define the effective sample size 
+
+neff (τ ) = (P 
+
+> i
+
+wiKh(τ − τi)) 2
+
+P 
+
+> i
+
+(wiKh(τ − τi)) 2 , (7) and local dominance metric 
+
+d(τ ) = max i {wiKh(τ − τi)}
+
+P 
+
+> j
+
+wj Kh(τ − τj ) . (8) Here, Kh is the kernel function evaluated with bandwidth h, and wi = 1 /S (τi) represents the selection-corrected weight for each detection. The term wiKh(τ − τi) quantifies how much detection i contributes to the density estimate at τ , based on both its proximity to τ and its inverse probability weight. The effective sample size neff (τ ) gives the equivalent number of equally contributing detections required to produce the same level of statistical support. Meanwhile, the dominance metric d(τ ) captures the fractional influence of the most dominant detection. By placing a threshold on d(τ ), we define a limit on how much any single event may dominate the KDE. These metrics allow us to define a region beyond which the KDE is shaped primarily by kernel smoothing, and is thus uninformative. To ensure a consistent definition of the regime in which the scattering timescale KDE is meaningfully constrained by the data and consistent with previous population inference, we calibrate these diagnostics using the results of CHIME/FRB Collaboration et al. (2021) and then apply the same thresholds to Catalog 2. For the Catalog 1 inference, we evaluate the local dominance metric d(τ ) at τ = 10 ms, which corresponds to the informative upper limit placed on the scattering distribution in the previous analysis. There we measure a dominance value of dCat1 (10 ms) = 0 .122, which we adopt as a conservative threshold defining the maximum contribution of any single selection-corrected catalog event to the KDE. For Catalog 2 we compute the same diagnostics using an identical set of kernel distributions and bandwidth optimization procedures, identifying the largest scattering timescale τmax for which d(τ ) ≤ dCat1 (10 ms) and the local effective sample size remains non-zero. Applying this criterion, we find the selection-corrected scattering timescale distribution remains similarly informative up to τ ≲ 30 ms with a corresponding local effective sample size of neff ≈ 50 at the threshold. Beyond this scale, the KDE is increasingly dominated by statistical noise due to a small number of weighted detections, and is not necessarily physically constraining.  
+
+> 4.
+
+EXPLICIT SELECTION FUNCTION MODELING Using the injection data, we model the CHIME/FRB selection function as the probability that a burst is detected above a specified signal-to-noise threshold, analogous to placing a binary probability on the observation function defined by CHIME/FRB Collaboration et al. (2021). We define 
+
+S(x) = P (S /N > [S /N] thresh | x), (9) where x = ( F, DM , τ, w ) denotes the vector of observed burst parameters. While CHIME/FRB Collaboration et al. (2021) assumed that this high-dimensional detection probability factorizes into independent contributions from each variable, we instead model the selection function directly in the full four-dimensional parameter space using the injection set as labeled training data. This allows the detection probability to be inferred empirically without assuming separability. We adopt a logistic regression framework to model the detection probability. For each burst, let ϕ(x) denote the feature vector obtained from x after applying a chosen polynomial expansion, including interaction terms. Equivalently, for the full injection sample, the design matrix X is constructed by stacking the feature vectors ϕ(xi)T for all injected bursts. The selection function evaluated at a single point x is then modeled as 
+
+S(x | β) = 11 + exp[ −ϕ(x)T β] , (10) where β is the corresponding vector of regression coefficients. Equivalently, the log-odds of detection are given by ln 
+
+ S(x | β)1 − S(x | β)
+
+
+
+= ϕ(x)T β, (11) which defines the logistic link between the probability scale and the linear predictor. For example, for a second-order polynomial expansion, 
+
+ϕ(x)T β = β0 +
+
+> N
+
+X
+
+> i=1
+
+βixi +
+
+> N
+
+X
+
+> i=1
+> N
+
+X
+
+> j≥i
+
+βij xixj , (12) 12 with higher-order terms included in turn. We apply various methods for model selection to determine the optimal order of the polynomial expansion (see Section B). By applying the delta method (see, e.g., Wasserman 2004), which uses a first-order Taylor expansion to propagate uncertainty in the fitted parameters under asymptotic normality, we approximate the variance of the selection function evaluated at x, Var[ S(x; ˆβ)], from the covariance of the estimated coefficients, Cov( ˆβ), thereby obtaining the variance on the fit: Var 
+
+h
+
+S(x; ˆβ)
+
+i
+
+≈ [∇β S(x; β)] T 
+
+> ˆβ
+
+Cov( ˆβ) [ ∇β S(x; β)] ˆβ (13) =
+
+h
+
+S(x; ˆβ)
+
+
+
+1 − S(x; ˆβ)
+
+i 2
+
+ϕ(x)T Cov( ˆβ)ϕ(x). (14) We adopt a fiducial threshold of [S /N] thresh = 12, chosen to ensure consistency with previous CHIME/FRB pop-ulation analyses (CHIME/FRB Collaboration et al. 2021; Shin et al. 2023). In addition, we also perform the fit at [S /N] thresh = 8 and [S /N] thresh = 15 to probe how the inferred selection function changes as the observation threshold is raised. The lower threshold corresponds to the lower limit for triggering by the search algorithm in L1 and includes a larger population of detections near the noise floor, while the higher threshold ([S /N] thresh = 15) isolates a subset of events that are more separated from the noise. We fit the model using a reweighted least squares optimization algorithm from Wasserman (2004), which we outline in Appendix A. This method, referred to as iteratively reweighted least squares (IRLS), is computationally efficient for logistic regression with our large population of injections and provides both the maximum likelihood estimates of the model coefficients and their associated covariance matrix. To restrict the selection function model to areas of parameter space physically probed by the injections, we implement a boolean K-nearest neighbors (KNN) mask in 
+
+scikit-learn (Pedregosa et al. 2011). We set the threshold for the KNN mask arbitrarily at 12 σ. We find that a fourth-degree polynomial expansion is sufficient to capture the selection probability surface without introducing unneccesary higher-order terms. We describe our model selection and validation procedure, including an introduction to the statistical metrics we use, in Appendix B. The code used to construct and evaluate this selection function is publicly available at https://github.com/CHIMEFRB/chimefrb-selection. We provide a visualization of the selection function model in Figure 5. Here we show slices of the selection probability surface across fluence and scattering timescale space at fixed intrinsic widths and DMs. The dominant trend is an increase in detection probability with fluence, but the location and shape of this selection surface depends strongly on scattering time and pulse width. At fixed DM and width, larger scattering times shift the detection boundary to higher fluence, while broader intrinsic widths substantially suppress the region of high selection probability. The presence of these correlations motivates the use of the full four-dimensional selection model, as the marginalized procedure applied in Section 3 does not capture coupled changes in selection probability across ( F, DM , τ, w ).  
+
+> 5.
+
+REFINEMENT OF THE SCATTERING DISTRIBUTION The scattering timescale analysis presented in Section 3 suggests an apparent downturn in the distribution of scatter-ing times at large values. However, this interpretation is potentially affected by strong observational selection effects. In particular, the marginalized selection function for scattering times does not fully capture correlations between scat-tering and other burst properties that influence detectability. As highly scattered bursts are strongly suppressed by the detection pipeline, visualized in Figure 3, the selection-corrected distribution of scattering times presented therein may be significantly biased due to a highly correlated selection surface, as shown in Figure 5. To address this limitation, we apply the selection function model defined in Section 4. The goal is to determine whether the apparent high-τ downturn reflects an intrinsic feature of the FRB population or instead arises from the observational selection effects. Motivated by the marginalized analysis, we parameterize the intrinsic scattering distribution using a model that reproduces the lognormal distribution inferred at low scattering times while allowing flexibility in the high-τ tail. This parameterization is written as follows: 
+
+p(τ | κ, τ pivot ) ∝
+
+
+
+1
+
+τ θ τ
+
+√2π exp 
+
+"
+
+− (ln τ − ln τpivot )2
+
+2θ2
+
+> τ
+
+#
+
+, τmin ≤ τ ≤ τpivot ,
+
+1
+
+τpivot θτ
+
+√2π exp 
+
+ ττpivot 
+
+κ−1
+
+, τpivot < τ ≤ τmax .
+
+(15) 13 10 1 10 0 10 1 10 2 10 3 10 4
+
+Fluence (Jy ms)    
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> Scattering timescale (ms)
+
+DM = 100 pc/cm 3      
+
+> 10 110 010 110 210 310 4
+
+Fluence (Jy ms)    
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> Scattering timescale (ms)
+
+DM = 500 pc/cm 3      
+
+> 10 110 010 110 210 310 4
+
+Fluence (Jy ms)    
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> Scattering timescale (ms)
+> Width = 0.1 ms
+
+DM = 3000 pc/cm 3      
+
+> 10 110 010 110 210 310 4
+
+Fluence (Jy ms)          
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> Scattering timescale (ms)
+> 10 110 010 110 210 310 4
+
+Fluence (Jy ms)          
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> Scattering timescale (ms)
+> 10 110 010 110 210 310 4
+
+Fluence (Jy ms)          
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> Scattering timescale (ms)
+> Width = 5 ms
+> 10 110 010 110 210 310 4
+
+Fluence (Jy ms)          
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> Scattering timescale (ms)
+> 10 110 010 110 210 310 4
+
+Fluence (Jy ms)          
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> Scattering timescale (ms)
+> 10 110 010 110 210 310 4
+
+Fluence (Jy ms)              
+
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> Scattering timescale (ms)
+> Width = 20 ms
+> 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+
+Selection probability 
+
+Figure 5. Detection probability from the selection function model evaluated on a grid of fluence and scattering timescale. Each panel shows S(F, τ | w, DM) at fixed intrinsic width w (rows) and dispersion measure DM (columns). White areas correspond to masked regions where injections are not well-sampled. The color scale gives S ∈ [0 , 1]. 
+
+Here, θτ = 1 .81 is the logarithmic width of the fiducial scattering distribution (see Table 2) and τpivot is the peak of the lognormal half, which is kept as a free parameter. The model distribution therefore follows a lognormal below 
+
+τpivot and transitions to a power-law tail above this value. The slope of this tail is controlled by a single parameter 
+
+κ that determines whether the distribution turns downward, remains approximately flat, or increases toward larger scattering times. In this parameterization, κ < 0 corresponds to a declining tail, κ = 0 produces an approximately flat distribution in logarithmic space, and κ > 0 yields an upturn toward larger scattering times. Our objective is therefore to infer the values of κ and τpivot that best explain the observed catalog when accounting for the selection function. As the likelihood function is analytically complex once the full correlated selection function model and forward simulation are performed, we opt to employ a simulation-based inference (SBI) approach. Notably, SBI is commonly applied in astrophysics for population inference of transients (e.g., Sautron et al. 2025), and our procedure is a useful worked example for further use of the selection function model presented in the previous section. 5.1. Simulation-based inference of the scattering-tail slope 14 (b) 
+
+# (c) 
+
+## Simulator 
+
+## Evaluate 
+
+## Prior 
+
+## Propose 
+
+## Posterior 
+
+## Learn posterior 
+
+## model 
+
+# (a) 
+
+## Catalog 
+
+𝜅 , 𝜏 !"#$% 
+
+𝜅 , 𝜏 !"#$% 
+
+## 𝑥 ’
+
+## 𝑥 
+
+> “Amortization”
+
+Figure 6. SBI framework used to constrain the scattering parameters κ and τpivot . (a) Workflow of amortized posterior estimation, based on Figure 3f from Cranmer et al. (2020). Parameters κ and τpivot are drawn from a uniform prior and passed through a forward simulator of scattering timescale detections to generate synthetic datasets x′. These simulated parameter-data pairs are used as training data for a neural density estimator that learns an amortized model of the posterior distribution 
+
+p(κ, τpivot | x). Once trained, the learned posterior model is then evaluated using the observed catalog data to obtain the inferred posterior distribution. (b) Example models for several values of κ demonstrating a downturn, plateau, and upturn in the distribution with τpivot = 10 ms set at the fiducial value. (c) Random draws from the inferred posterior distribution, plotted as the range of model distributions consistent with the catalog data, plotted above the catalog scattering timescale histogram. 
+
+We estimate the posterior distribution p(κ, τ pivot | x) using neural posterior estimation (NPE), implemented with the 
+
+sbi Python framework (Tejero-Cantero et al. 2020). In this approach, the forward model of the FRB population and survey selection effects are treated as a simulator that generates synthetic observations for given model parameters. For each simulated realization, a value of κ and τpivot is first drawn from a uniform prior. Using this parameter vector, we then generate a simulated sample of FRB properties using the distributions for fluence, DM, and pulse width from the fiducial model and scattering times from the parameterized distribution in Equation 15. For each parameter draw, we generate a weighted sample of FRB realizations and continue sampling until reaching a target effective sample size of neff ≈ 10 ,000. Similar to Equation 7, we quantify the effective sample size using Kish’s design effect for weighted data (Kish 1965), 
+
+neff = (P 
+
+> i
+
+S(xi)) 2
+
+P 
+
+> i
+
+(S(xi)) 2 , (16) where S(xi) are the detection probability for each simulated event that acts as a weighting for the event. This criterion ensures that each simulation has a comparable statistical precision despite variability in the weight distribution induced by the selection function. Each resulting mock catalog realization is summarized using a vector of quantiles of log τ
+
+together with the mean and standard deviation of the distribution. This summary statistic provides a compact representation of the simulated scattering-time distribution while preserving information about the distribution point estimates. Pairs of simulated parameters and summary statistics ( κ, τ pivot , x ′) are then used as training data for 15 5.0 7.5 10.0 12.5 15.0            
+
+> pivot (ms)
+> pivot (ms) = 7.64 +0.8 0.71
+> 5.0 7.5 10.0 12.5 15.0
+> pivot (ms)
+> 1.0
+> 0.5
+> 0.0
+> 0.5
+> 1.0
+> 1.0 0.5 0.0 0.5 1.0
+> = -0.036 +0.094 0.1
+
+Figure 7. Corner plot of the estimated posterior distribution for the scattering model parameters τpivot and κ. Contours enclose the central 68.3, 95.4, and 99.7 percent credible regions, respectively, while the diagonal panels show the marginalized distributions with median and 68% credible intervals indicated. 
+
+a neural density estimator (Cranmer et al. 2020; Paszke et al. 2019) that learns an amortized approximation to the posterior distribution p(κ, τ pivot | x). Once training is complete, the observed catalog summary statistic vector is then provided to the trained network to obtain posterior samples for κ and τpivot . We illustrate the inference framework in Figure 6. The marginalized posterior for κ is centered at a median of κ = −0.036 with a 95% credible interval of [ −0.244 , 0.143]. The τpivot marginalized posterior has a median of τpivot = 7 .64 ms with a 95% credible interval of [6 .31 , 9.31] ms. We show the posterior corner plot in Figure 7. These results indicate that the catalog is consistent with an approximately flat tail in logarithmic space at large scattering timescales. However, the posterior strongly disfavors strongly positive values of κ that would imply a rapidly increasing abundance of highly scattered bursts, while moderately negative slopes remain allowed. There also does not appear to be any strong correlation between τpivot and κ. Random draws from the inferred posterior distribution demonstrate the range of scattering distributions consistent with the data, which exhibit a transition from the lognormal rise to a shallower tail, shown in Figure 6d. These results suggest that while the intense selection effect against high-scattering bursts primarily drives the drop-off in the observed distribution, the intrinsic scattering distribution is consistent with a uniform or slightly decreasing population at high scattering timescales. 
+
+6. DISCUSSION The primary result of this work is the correction of survey selection effects out of the empirical fluence, DM, width, and scattering distributions for CHIME/FRB Catalog 2. Using a similar procedure as CHIME/FRB Collaboration et al. (2021) we fit a fiducial model to the selection-corrected marginalized distributions of these parameters. We then fit an logistic regression model for the selection probability across the parameter space of injections, as shown in Figure 5, and apply this model to correct the scattering distribution in the presence of interactions between burst parameters. Here we discuss the implications of the scattering, width, and fluence distributions in the context of previous work, and provide guidance on future applications of the selection function model. 6.1. Scattering timescale distribution 
+
+We have constructed our analysis methods to leverage the statistical sample of Catalog 2 and improve constraints on the selection-corrected scattering distribution in a fully self-consistent manner. One benefit of our framework is 16 10 2 10 1 10 0 10 1 10 2 10 3
+
+## Intrinsic width wint (ms) 
+
+200 400 600 800 1000 1200 1400 1600 1800 2000 
+
+> Frequency (MHz)
+> CHIME/FRB DSA-110 ASKAP/CRAFT MeerKAT/MeerTRAP GREENBURST
+
+0.00 0.12 0.24 0.36 0.48 0.60         
+
+> P[ ( ) >  wint ]
+> Figure 8. Fraction of intrinsic FRB population with measured scattering timescale exceeding the intrinsic width, P[τ(ν)>wint ], computed using the Gaussian KDE in Figure 4. Regions where this fraction approaches unity correspond to bursts with morphology that is dominated by scattering. Marked rectangles show the frequency coverage and the searched width range for select FRB surveys—including GREENBURST (Kania et al. 2026b), MeerKAT/MeerTRAP (Jankowski et al. 2023), ASKAP/CRAFT (Shannon et al. 2025), DSA-110 (Law et al. 2024), and CHIME/FRB (CHIME/FRB Collaboration et al. 2018)—extending from the time resolution to the maximum search width. Regions corresponding to scattering timescales below
+> ∼1 ms at 400 MHz are hatched to reflect the uncertainty in the distribution shape below CHIME’s time resolution, where scattering cannot be measured in Catalog 2.
+
+the defining of the upper boundary of the recoverable scattering-time distribution in a way that is directly comparable to earlier work, while also constraining the nature of the intrinsic distribution at high values of scattering. Previous analyses by Chawla et al. (2022) and CHIME/FRB Collaboration et al. (2021) predicted the existence of a substantial population of highly scattered bursts that were largely undetectable to the intensity pipeline given the limited catalog size and injection coverage available at the time. The caveat, however, is that those studies tested for the existence of such a population, without the sensitivity to determine the structure within the distribution itself. With the selection-corrected scattering distribution, we can compute the fraction of bursts whose scattering timescale exceeds their intrinsic width, P [τ (ν) > w ], as a function of observing frequency and intrinsic pulse width. This quantity measures the degree to which the observed burst morphology is dominated by propagation effects rather than the emission process itself, under the assumption of an intrinsically Gaussian temporal profile. Figure 8 visualizes this fraction across a broad region of frequency–width parameter space, with values approaching unity indicating bursts that are scattering-dominated. Overlaid rectangles denote the frequency coverage and searched width ranges of representative surveys, spanning from their native time resolution to the maximum width included in the search. In this representation, CHIME/FRB occupies a transition region between scattering- and morphology-dominated regimes, implying that its detected population includes a mixture of heavily over-scattered and negligibly scattered events. By contrast, surveys operating at higher frequencies probe regions where the fraction of over-scattered bursts is smaller. Figure 9 compares the scattering timescale CDF from the sample observed by the CRAFT survey (Scott et al. 2025) to the inferred intrinsic CHIME/FRB population, with both distributions scaled to a reference frequency of 600 MHz assuming τ ∝ ν−4. The CRAFT distribution is broadly consistent with the selection-corrected CHIME/FRB 17 10 4 10 3 10 2 10 1
+
+Scattering timescale 600 MHz [s] 
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> Cumulative distribution
+
+CHIME/FRB Intrinsic CRAFT Observed          
+
+> Figure 9. Scattering timescale CDFs for the CRAFT observed sample and inferred CHIME/FRB intrinsic population. Mea-surements scale the observed scattering time to a reference frequency of 600 MHz from τobs by Scott et al. (2025) assuming a power-law scattering index of −4. (Red) CDF of the observed CRAFT scattering timescales with 95% pointwise confidence interval, representing the finite-sample uncertainty in the KDE distribution. (Blue) CDF of the CHIME/FRB Catalog 2 intrinsic scattering timescale KDE with 95% uncertainty interval from a bootstrap method. The light gray vertical region indicates τ < 1ms at 400 MHz, where no scattering can be measured by CHIME/FRB, and τ≥30 ms, where the observed distribution is increasingly uncertain.
+
+distribution. This comparison differs from that of Scott et al. (2025), who compared the observed CRAFT and CHIME/FRB distributions at 1000 MHz and 600 MHz, respectively, and suggested that the apparent high-τ dropoff could reflect a common selection effect against highly scattered bursts. With both samples referenced to 600 MHz, the consistency between the observed CRAFT distribution and the inferred intrinsic CHIME/FRB distribution suggests that CHIME/FRB is not missing a large population of scattered bursts relative to the population probed by CRAFT. We reason this as CRAFT observes at higher frequencies, where bursts with large scattering times at CHIME frequencies should be less temporally broadened and therefore easier to detect. The absence of a substantially heavier high-τ tail in CRAFT therefore supports the conclusion that the intrinsic scattering-timescale distribution does not rise strongly above τ ∼ 10 ms. As catalog events along sightlines for which Galactic scattering is expected to be measurable are excised from the sample, the presence of this behavior is unlikely to be an artifact of Milky Way scattering and provides some of the strongest evidence for an extragalactic population of highly scattered bursts. We also emphasize, however, that at lower scattering timescales the comparison remains limited by the survey time resolution. CHIME/FRB cannot measure any scattering value below approximately 1 ms at 400 MHz in Catalog 2, and larger values may also not be measured due to domination by the intrinsic pulse width (see Figure 2). CRAFT is similarly insensitive due to analogous effects at low scattering timescales relative to its higher frequency range and bandwidth. However, as FRBs may be intrinsically narrower at higher radio frequencies, it may be easier to resolve subtle scattering tails (Gajjar et al. 2018). While the current data disfavor a strongly rising high-τ tail, we cannot strongly distinguish between a distribution that is approximately uniform in log τ and one with additional structure at the low-τ end. 6.2. Intrinsic width distribution 18 Both the observed and selection-corrected width distributions show an accumulation of bursts at widths below the CHIME/FRB time resolution of 0.983 ms (see Fig. 3). This feature could suggest an excess of sub-millisecond bursts, but may also be due to systematic effects in the width estimation procedure. In particular, the fitburst modeling framework (Fonseca et al. 2024), which fits parametric templates to burst dynamic spectra, may bias width estimates toward artificially small values when the underlying burst morphology deviates from the assumed model. High time-resolution observations of FRBs, including follow-up of repeating sources and population studies with CHIME/FRB baseband data, have revealed complex non-gaussian temporal structures, often consisting of multiple unresolved sub-bursts and fine temporal features (Hewitt et al. 2023; Sand et al. 2025; Curtin et al. 2025). Individual burst components may be intrinsically asymmetric, with non-gaussian temporal profiles produced by the emission process itself rather than propagation effects. When these intrinsically structured signals are modeled with simplified functional forms, the inferred widths may collapse to values below the instrumental resolution. 6.3. Fluence distribution 
+
+In the Catalog 1 analysis, the joint distribution of fluence and DM was modeled using a parametric form, motivated by the possibility of a DM-dependent fluence slope (CHIME/FRB Collaboration et al. 2021). That work employed both maximum-likelihood estimation and Markov Chain Monte Carlo (MCMC) sampling of the posterior. The resulting constraints were α = −1.32 ± 0.11 from maximum likelihood and α = −1.41 ± 0.11 from the MCMC analysis. These estimates are mutually consistent within 1 σ, though the MCMC result provides a more complete characterization of parameter uncertainties and correlations. Notably, this parameter estimate is also consistent with the α = −1.5expectation for a non-evolving population in Euclidean space. In contrast, this work adopts the maximum-likelihood framework throughout. The resulting constraint α = −1.07 ± 0.02 is shallower, however, than both the maximum-likelihood and MCMC fit found by CHIME/FRB Collaboration et al. (2021), arising from the absence of an explicit joint treatment of fluence and DM and the exclusion of bursts with unmeasured scattering timescales. The cosmological evolution of FRB energetics will be addressed in a concurrent work by N. Jain et al. (in prep.) with an analysis following Shin et al. (2023), incorporating an explicit treatment of redshift evolution and volumetric rate mixture estimates. As such, we defer a more optimal treatment of the distribution of FRB energetics to that work. 6.4. Future applications of the selection function 
+
+The selection function presented in this work is directly relevant to the interpretation of CHIME/FRB intensity data products and provides a framework for extending population inference to baseband data and CHIME/FRB Outrigger localizations (CHIME/FRB Collaboration et al. 2024, 2025b,c,a; Cassanelli et al. 2024; Shah et al. 2025). CHIME/FRB saves raw voltage baseband data for only the highest S/N subset of the FRBs for which we capture total-intensity data, typically those with searched S /N > 12 (Michilli et al. 2021). These baseband captures preserve raw complex voltages at microsecond time resolution, enabling coherent dedispersion, improved spectro-temporal modeling with fitburst ,and more precise localization (CHIME/FRB Collaboration et al. 2024). Thus, the selection function may describe the probability that a burst with intrinsic properties ( F, τ, w, DM) produces the intensity trigger required for downstream baseband capture and localization. The triggering of baseband data introduces an additional hierarchical layer to the CHIME/FRB detection process. In current operations, only a subset of intensity triggers can trigger a baseband capture, and even among these, archiving is contingent on the availability of the baseband capture system. Importantly, the latter does not share identical uptime with the real-time intensity pipeline, leading to an effective selection that is not purely a function of S/N. Accounting for this is further complicated by time-variable changes in system performance or external observing environment are not currently well-modeled. Quantifying the relative uptime and overlap between the intensity and baseband systems is therefore necessary for a complete accounting of the baseband selection function; this characterization will be addressed in a forthcoming publication. A further complication arises from the fact that baseband triggering and recording are operationally distinct from the CHIME/FRB Outrigger backends. The CHIME/FRB Outrigger system, which consists of geographically separated stations across North America, receives real-time triggers from the CHIME core site and independently dumps baseband data for offline analysis (Leung et al. 2021; CHIME/FRB Collaboration et al. 2025b). The selection function developed here is explicitly limited in scope to the probability of triggering intensity data at the CHIME core and does not model whether baseband dumps are successfully recorded at the core or at Outrigger stations. While these triggering layers are expected to be correlated, as they depend on the same underlying intensity detection, their joint selection behavior is not captured in the present framework. 19 We emphasize that CHIME/FRB fluence measurements derived from intensity data should be interpreted as lower limits, owing to uncertainty in burst localization within the primary beam and the resulting ambiguity in beam response correction (Andersen et al. 2023). One advantage of a parametric selection function model is that debiasing population-level distributions under these conditions is straightforward. In particular, the Horvitz-Thompson estimator (see Horvitz & Thompson 1952; Zong et al. 2018) provides a natural and computationally trivial means of correcting for selection effects by weighting each detected burst by the inverse of its detection probability under the selection function. Looking ahead, the production of a large, systematically characterized catalog of baseband-localized events will enable substantially more precise population studies. Baseband data provide fluence and width measurements at microsecond precision with well-constrained beam responses, allowing these events to be incorporated directly into population synthesis models with minimal additional uncertainty. Once a baseband catalog corresponding to the intensity catalog is released, inverse probability weighting using the selection function model presented here will be straightforward to implement. However, this will require an explicit characterization of the “baseband selection function” as discussed above. Work toward modeling this extended selection hierarchy is currently underway, and the statistical framework applied in this paper provides a natural foundation for such future analyzes.  
+
+> 7.
+
+CONCLUSION In this work, we have presented a population analysis of FRB observables in CHIME/FRB Catalog 2 using nearly an order of magnitude more synthetic bursts injected into the instrument’s live search pipeline compared to previous works (CHIME/FRB Collaboration et al. 2021; Merryfield et al. 2023). These injections enable an empirical determination of the survey’s response and provide the basis for both a revised fiducial model of the intrinsic FRB observable distributions and an explicit, multidimensional model of the CHIME/FRB selection function. Using the injection population, we first fit a fiducial model for the intrinsic distributions of fluence, DM, intrinsic width, and scattering timescale following the framework originally presented in CHIME/FRB Collaboration et al. (2021). We find that the Catalog 2 data broadly support the qualitative picture established in earlier work, while yielding tighter constraints on the corresponding population parameter estimates. We then constructed a logistic regression model for the CHIME/FRB selection function in the four-dimensional space of fluence, DM, intrinsic width, and scattering timescale, of which the latter three are directly measured ob-servable quantities for CHIME/FRB. This model provides an explicit parameterization of the CHIME/FRB detection probability, avoiding the assumption of separability adopted in earlier treatments. We showed that a fourth-order polynomial expansion is sufficient to capture the dominant structure of the selection surface. The resulting selection model is useful both as a practical tool for debiasing population statistics and as a forward model for generating realistic mock detected samples. Applying this model, we refine the estimate of the scattering distribution to more robustly probe the behavior of the distribution at high scattering times. While the marginalized selection-correction estimates suggest an apparent downturn in the distribution above a characteristic peak at 13.1 ms (referenced to 600 MHz), our treatment suggests that this may be driven by the severe selection bias in this regime. Using simulation-based inference, we constrained the slope of the high-τ tail and found that the catalog data are consistent with an approximately flat or mildly declining distribution above the characteristic peak, though a continued upturn in the distribution cannot be ruled out. We further quantified the range over which the scattering distribution is meaningfully constrained, finding that the Catalog 2 data remain informative to larger scattering timescales than was possible in Catalog 1, conservatively raising the well-constrained scattering domain from 10 ms to around 30 ms at 600 MHz. This work emphasizes that rigorous FRB population inference requires an equally rigorous treatment of survey selection effects. In the near term, it enables improved correction of population statistics from intensity data products and more physically interpretable comparisons with other FRB surveys. In the longer term, it provides a natural basis for extending selection modeling to other CHIME/FRB data products, including baseband data and Outrigger localizations, where additional layers of detectability and instrumental uptime should be accounted for. As FRB samples continue to mature, selection function modeling will become increasingly central to transforming survey catalogs into robust constraints on the intrinsic burst population and its underlying astrophysics. The methods presented here are intended as a step toward that goal: a survey-calibrated, explicitly modeled, and practically usable description of the CHIME/FRB selection function that can support future studies of FRB populations.  
+
+> 8.
+
+ACKNOWLEDGMENTS 20 We acknowledge that CHIME is located on the traditional, ancestral, and unceded territory of the Syilx/Okanagan people. We are grateful to the staff of the Dominion Radio Astrophysical Observatory, which is operated by the National Research Council of Canada. CHIME operations are funded by a grant from the NSERC Alliance Program and by support from McGill University, University of British Columbia, and University of Toronto. CHIME was funded by a grant from the Canada Foundation for Innovation (CFI) 2012 Leading Edge Fund (Project 31170) and by contributions from the provinces of British Columbia, Qu´ ebec and Ontario. The CHIME/FRB Project was funded by a grant from the CFI 2015 Innovation Fund (Project 33213) and by contributions from the provinces of British Columbia and Qu´ ebec, and by the Dunlap Institute for Astronomy and Astrophysics at the University of Toronto. Additional support was provided by the Canadian Institute for Advanced Research (CIFAR), the Trottier Space Institute at McGill University, and the University of British Columbia. The CHIME/FRB baseband recording system is funded in part by a CFI John R. Evans Leaders Fund award to IHS. The AstroFlash research group at McGill University, University of Amsterdam, ASTRON, and JIVE is supported by: a Canada Excellence Research Chair in Transient Astrophysics (CERC-2022-00009); an Advanced Grant from the European Research Council (ERC) under the European Union’s Horizon 2020 research and innovation programme (‘EuroFlash’; Grant agreement No. 101098079); an NWO-Vici grant (‘AstroFlash’; VI.C.192.045); an NSERC Dis-covery Grant (RGPIN-2025-06681); an ERC Starting Grant (‘EnviroFlash’; Grant agreement No. 101223057); and an NWO-Veni grant (VI.Veni.222.295). We thank Sujay Mate for helpful comments on the CHIME/Slow commissioning and science observing timeline. K.T.M. is supported by an FRQNT Master’s Research Scholarship. M.W.S. is a Fonds de recherche du Qu´ ebec – Nature et technologies (FRQNT) postdoctoral fellow and acknowledges support from the Trottier Space Institute Fellowship program. R.V.C. is supported by the NSERC of Canada Discovery Grant RGPIN-2024-04506. S.P.E.T. is a Fonds de recherche du Qu´ ebec – Nature et technologies (FRQNT) doctoral fellow. G.M.E. acknowledges support from NSERC via the Discovery Grant program (RGPIN-2020-04554). D.C.S. is supported by an NSERC Discovery Grant (RGPIN-2021-03985). P.S. acknowledges the support of an NSERC Discovery Grant (RGPIN-2024-06266). V.M.K. holds the Lorne Trottier Chair in Astrophysics & Cosmology and a Distinguished James McGill Professorship, and receives support from an NSERC Discovery Grant (RGPIN 228738-13). D.B. is supported by an NSERC Discovery Grant. K.W.M. is supported by NSF Grant No. 2510771. A.B.P. acknowledges support by NASA through the NASA Hubble Fellowship grant HST-HF2-51584.001-A, awarded by the Space Telescope Science Institute, which is operated by the Association of Universities for Research in Astronomy, Inc., under NASA contract NAS5-26555. A.B.P. also acknowledges prior support from a Banting Fellowship, a McGill Space Institute (MSI) Fellowship, and a Fonds de recherche du Qu´ ebec – Nature et technologies (FRQNT) Postdoctoral Fellowship. A.P. is a Trottier Space Institute Postdoctoral Fellow. F.A.D. is funded by the Government of Canada / financ´ e par le gouvernement du Canada. S.S.P. is supported by the National Science Foundation under Grant AST-2407399. A.P.C. is a Canadian SKA Scientist and is funded by the Government of Canada / est financ´ e par le gouvernement du Canada. C.L. acknowledges support from the Miller Institute for Basic Research at UC Berkeley. A.M.C. is a Banting Postdoctoral Researcher. The author also gratefully acknowledges the Montr´ eal Canadiens’ 2026 Stanley Cup playoff run, during which much of this manuscript was developed and from which the color schemes of several figures drew inspiration. APPENDIX  
+
+> A.
+
+ITERATIVELY REWEIGHTED LEAST SQUARES ALGORITHM We fit our selection function parameterization S(x|β) using a form of the Iteratively Reweighted Least Squares (IRLS) algorithm, as outlined in Section X of Wasserman (2004). Let X denote the polynomial design matrix with components 
+
+xij corresponding to the ith predictor for the jth injection. At each iteration s, we update the coefficient vector β(s)
+
+by reweighting the logit-transformed response. Starting from the logistic model for the selection function, 
+
+S(xi | β(s)) = 11 + exp 
+
+
+
+− P 
+
+> j
+
+β(s) 
+
+> j
+
+xij 
+
+ , (A1) 21 222000 
+
+> 221000
+> 220000
+> 219000
+> 218000
+> Log-Likelihood
+
+S/N > 8 
+
+> 129000
+> 128000
+> 127000
+> 126000
+> Log-Likelihood
+
+S/N > 12 
+
+> 95500
+> 95000
+> 94500
+> 94000
+> 93500
+> 93000
+> Log-Likelihood
+
+S/N > 15                   
+
+> 436000
+> 438000
+> 440000
+> 442000
+> 444000
+> Information Criteria  AIC
+> BIC
+> 254000
+> 256000
+> 258000
+> Information Criteria  AIC
+> BIC
+> 187000
+> 188000
+> 189000
+> 190000
+> 191000
+> 192000
+> Information Criteria
+> AIC
+> BIC
+> 2345678
+> Polynomial Order
+> 465000
+> 470000
+> 475000
+> 480000
+> RSS
+> 2345678
+> Polynomial Order
+> 339500
+> 340000
+> 340500
+> RSS
+> 2345678
+> Polynomial Order
+> 272000
+> 274000
+> 276000
+> RSS
+
+Figure 10. Relative model comparison summary statistics for logistic regression fits of the injected population with [S /N] thresh =
+
+{8, 12 , 15 } as a function of increasing polynomial order. Plotted statistics include the Log-Likelihood, Akaike Information Criterion (AIC), Bayesian Information Criterion (BIC), Pearson residual sum of squares (RSS). These diagnostics are intended for comparing the relative performance of models across different orders, in compliment to the absolute goodness of fit statistics calculated in Table 3. 
+
+we construct a diagonal weight matrix W (s) and adjusted response vector Z(s):
+
+W (s) = diag 
+
+
+
+S(xi | β(s))
+
+h
+
+1 − S(xi | β(s))
+
+i 
+
+, (A2) 
+
+Z(s) 
+
+> i
+
+= logit 
+
+
+
+S(xi | β(s))
+
+
+
++ yi − S(xi | β(s))
+
+W (s)
+
+> i
+
+. (A3) This transforms the problem into a weighted linear regression of Z(s) on X at each step: 
+
+β(s+1) =
+
+
+
+X⊤W (s)X + λI
+
+−1
+
+X⊤W (s)Z(s), (A4) where λ is a small regularization parameter and I is the identity. The procedure is iterated until convergence, and within 500 iterations we do not observe any signs indicating against convergence. 
+
+B. MODEL SELECTION AND VALIDATION To determine the optimal functional form for our selection function parameterization, we consider a series of binary logistic regression models with increasing polynomial complexity. Each model of polynomial order n is defined by a design matrix X ∈ RN ×Pn , where N is the number of injections and Pn is the number of polynomial basis terms (including interaction terms) up to total degree n in the four predictor variables: log-transformed fluence F , scattering time τscat , pulse width w, and dispersion measure DM. We construct design matrices for each model up to polynomial order n ∈ { 1, 2, . . . , 7}. The total number of terms Pn grows combinatorially with n and the number of predictors 
+
+d = 4, following Pn =  n+dd
+
+. This formulation allows us to construct increasingly flexible logistic regression models with ˆβ ∈ RPn as the vector of regression coefficients estimated from the data. For model selection diagnostics we calculate the log-likelihood, relevant information criteria, and the sum of squares for Pearson residuals (RSS); these are shown in Figure 10. We also calculate McFadden’s pseudo-R2 statistic, mean Brier score across 5 folds, and Receiver Operating Characteristic Area Under Curve (ROC AUC), which are presented in Table 3. These each serve as metrics for assessing the predictive performance of binary classification models; we introduce them briefly in Appendix B. 22                                                                                                
+
+> Table 3. McFadden’s pseudo-R2, mean Brier score (BS) across 5 folds, and Receiver Operating Characteristic Area Under Curve (ROC AUC) for models of increasing polynomial order, evaluated on the S/N >8, S/N >12, and S/N >15 injection populations. Order PnS/N >8S/N >12 S/N >15
+> R2McF ⟨BS ⟩ROC AUC R2McF ⟨BS ⟩ROC (AUC) R2McF ⟨BS ⟩ROC AUC 150.2153 0.14002 0.8251 0.2902 0.07872 0.8882 0.3220 0.05723 0.9120 216 0.2633 0.1330 0.8405 0.3459 0.07459 0.8999 0.3803 0.05415 0.9218 335 0.2734 0.1318 0.8420 0.3584 0.07366 0.9013 0.3932 0.05341 0.9232 470 0.2757 0.13157 0.8425 0.3614 0.07350 0.9016 0.3963 0.05328 0.9234 5126 0.2768 0.13146 0.8426 0.3624 0.07344 0.9017 0.3973 0.05325 0.9235 6210 0.2773 0.13145 0.8426 0.3631 0.07343 0.9017 0.3979 0.05327 0.9234 7330 0.2776 0.13149 0.8425 0.3636 0.07349 0.9015 0.3988 0.05330 0.9233
+
+In general, we favor models that balance predictive performance with parsimony, avoiding unnecessary complexity once improvements in fit become marginal. Figure 10 summarizes the relative model-comparison diagnostics for each S/N threshold as a function of polynomial order. For all three thresholds, the log-likelihood increases between second and fourth order, suggesting that low-order models are underfitting the structure of the selection surface. Beyond approximately fourth order, however, the log-likelihood curves flatten, suggesting that additional polynomial terms yield diminishing improvements in fit. The information criteria show similar behavior but with clearer penalties for complexity. In all cases, differences among models of order ≳ 4 are small compared to the improvements observed be-tween low-order models, indicating that most of the explanatory structure is captured by relatively modest polynomial complexity. The Pearson RSS provides another measure of model misfit. For S/N > 8, the RSS decreases immediately from order 2. For S/N > 12, the RSS reaches its minimum near order 4 and fluctuates for higher orders. The S/N > 15 fit shows a smoother pattern, likely due to the increasingly stringent threshold for detection, with a minimum around fifth order. These trends indicate that the majority reduction of the residuals occurs by fourth order, and that additional terms do not substantially improving the fit. While Figure 10 evaluates relative goodness-of-fit and model complexity, Table 3 assesses predictive performance using cross-validation metrics. These display behavior consistent with the selection diagnostics. The Brier score (Brier 1950) decreases rapidly from first to third order and then changes only at the ∼ 10 −4 level for higher orders, while the ROC AUC (see Mason & Graham 2002) increases from low-order models and quickly saturates. Likewise, McFadden’s pseudo-R2 (McFadden 1979) rises steeply at low order but exhibits only marginal gains beyond fourth or fifth order for all S/N thresholds. R2McF provides a measure of model fit based on the likelihood ratio of nested models, and values in the range 0 .2–0 .4 canonically indicate excellent predictive performance for discrete choice models (see McFadden 1979). All models of order n ≥ 2 lie within or above this range for all S/N thresholds, indicating that even relatively low-order models already provide a good description of the data. However, the increase in R2McF beyond fourth order is small (e.g., ∆R2McF ∼ 0.005 between n = 4 and n = 6 for S/N > 12), corresponding to a fractional change of ∼ 1%, which evidences that higher-order terms yield only marginal improvements in explanatory power despite substantially increasing model complexity. Furthermore, increasing the S/N threshold yields uniformly larger R2McF values and ROC AUC scores, as higher thresholds suppress false positive detections and thereby improve the separability between detected and non-detected injections. The parity between model selection and cross-validation diagnostics indicates that models of order ≳ 4 provide nearly equivalent performance, and that this is consistent across all S/N thresholds. Because higher-order models introduce substantially more parameters without delivering commensurate gains in information criteria, residual reduction, or predictive accuracy, they offer little practical advantage and risk fitting noise in the injected population. We therefore adopt the fourth-order polynomial model as our fiducial parameterization, as it lies within the plateau region of all performance metrics while maintaining a relatively parsimonious functional form. 23 B.1. Log-likelihood 
+
+As the selection function S(x) represents the probability that a burst with properties x is detected by CHIME/FRB, we model the likelihood of the injection outcomes using the Bernoulli distribution. Each injection in the dataset is either a detection ( yi = 1) or a non-detection ( yi = 0), and the probability of observing each outcome is given by the predicted selection probability S(xi) from the logistic model. The likelihood function for the full sample of N injections is then given by the product: 
+
+L(ˆβ) = 
+
+> N
+
+Y
+
+> i=1
+
+S(xi)yi [1 − S(xi)] 1−yi ,
+
+where S(xi) is the predicted selection probability for injection i and ˆβ is the vector of converged regression coefficients for a given polynomial order model (see Appendix A). Taking the log-likelihood, log L(ˆβ) = 
+
+> N
+
+X
+
+> i=1
+
+[yi log S(xi) + (1 − yi) log(1 − S(xi))] .
+
+We maximize this quantity with respect to the regression coefficients β by using the fitting algorithm described in Appendix A. The resulting log-likelihood value serves as a relative measure of model fit across the parameter space and is requisite for calculating various information criteria necessary to compare models of varying polynomial complexity. B.2. Information Criteria 
+
+To compare logistic regression models of varying polynomial order, we compute two widely used information criteria: the Akaike Information Criterion (AIC) and the Bayesian Information Criterion (BIC). Both quantities balance model fit against model complexity, penalizing overparameterized models to avoid overfitting. They are defined as: AIC = 2 k − 2 log ˆL, BIC = k log N − 2 log ˆL,
+
+where k is the number of free parameters in the model (equal to the number of terms in the design matrix Pn), N is the number of injections, and log ˆL is the maximized log-likelihood of the model with estimated regression coefficients. Lower values of AIC and BIC indicate a more parsimonious model with better support from the data, also interpreted as minimizing the loss of information from the raw data to the model. B.3. Likelihood Ratio 
+
+In addition to the likelihood-based information criteria, we compute McFadden’s pseudo-R2 as a measure of overall model fit. This statistic is defined as 
+
+R2McF = 1 − log Lmodel 
+
+log Lnull 
+
+,
+
+where log Lmodel is the log-likelihood of the fitted model and log Lnull is that of a null model containing only the ˆβ0 intercept term (McFadden 1979). It is important to note that R2McF is not directly analagous to the coefficient of determination used in linear regression, which quantifies explained variance via the squared Pearson correlation and does not rely on parameter estimation a priori . However the pseudo-R2 statistic can still be interpreted as a goodness of fit measure, as it quantifies the relative improvement in model fit over the null model, conditioned on the parameter estimates ˆβ. The null model includes only a bias term (intercept), and thus assumes an uninformative constant selection probability across all injected events. While this captures the global detection probability, the null model does not characterize the location or steepness of the transition region in parameter space, nor any curvature or interactions among predictors. Typical values of R2McF for well-fit logistic models fall between 0.2 and 0.4, with values closer to 1 indicating a stronger fit (McFadden 1979). We report the calculated value for each model in Table 3. B.4. Pearson Residuals 
+
+We also compute the Pearson residuals to assess the goodness-of-fit for each logistic regression model across different polynomial orders. For each injection i, the Pearson residual quantifies the deviation between the observed binary 24 outcome yi and the predicted selection probability S(xi). To obtain a single summary statistic for each polynomial order model we calculate the residual sum of squares (RSS), given by RSS = 
+
+> N
+
+X
+
+> i=1
+
+[yi − S(xi)] 2
+
+S(xi) [1 − S(xi)] ,
+
+where the denominator corresponds to the standard deviation of a Bernoulli random variate with probability S(xi). Unlike in linear regression, the logistic regression model does not assume homoskedastic gaussian errors across the model domain. B.5. Brier Score 
+
+We compute the Brier score as a metric for evaluating the generalized probabilistic accuracy of each fitted selection function. The Brier score is defined as the mean squared error between the predicted selection probabilities and the observed binary outcomes: BS = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+(S(xi) − yi)2 .
+
+This score ranges from 0 to 1, with lower values indicating better predictive performance. In the context of logistic regression, the Brier score can be interpreted as a proper scoring rule for probabilistic forecasts (Brier 1950). REFERENCES 
+
+Abbott, T. C., Zwaniga, A. V., Brar, C., et al. 2025, AJ, 169, 39, doi: 10.3847/1538-3881/ad9451 Amiri, M., Bandura, K., Boskovic, A., et al. 2022, ApJ, 932, 100, doi: 10.3847/1538-4357/ac6b9f Andersen, B. C., Patel, C., Brar, C., et al. 2023, AJ, 166, 138, doi: 10.3847/1538-3881/acec78 Brier, G. W. 1950, Monthly Weather Review, 78, 1, doi: 10.1175/1520-0493(1950)078 ⟨0001:VOFEIT ⟩2.0.CO;2 Cassanelli, T., Leung, C., Sanghavi, P., et al. 2024, Nature Astronomy, 8, 1429, doi: 10.1038/s41550-024-02357-x Chawla, P., Kaspi, V. M., Ransom, S. M., et al. 2022, ApJ, 927, 35, doi: 10.3847/1538-4357/ac49e1 CHIME/FRB Collaboration, Amiri, M., Bandura, K., et al. 2018, ApJ, 863, 48, doi: 10.3847/1538-4357/aad188 CHIME/FRB Collaboration, Amiri, M., Andersen, B. C., et al. 2021, ApJS, 257, 59, doi: 10.3847/1538-4365/ac33ab —. 2024, ApJ, 969, 145, doi: 10.3847/1538-4357/ad464b CHIME/FRB Collaboration, Abbott, T. C., Amouyal, D., et al. 2025a, ApJL, 989, L48, doi: 10.3847/2041-8213/adf62f CHIME/FRB Collaboration, Amiri, M., Andersen, B. C., et al. 2025b, ApJ, 993, 55, doi: 10.3847/1538-4357/adfdcc CHIME/FRB Collaboration, Amiri, M., Amouyal, D., et al. 2025c, ApJS, 280, 6, doi: 10.3847/1538-4365/addbda CHIME/FRB Collaboration, Abbott, T., Andersen, B. C., et al. 2026, ApJS, 283, 34, doi: 10.3847/1538-4365/ae3828 Cook, A. M., Shin, K., Pleunis, Z., et al. 2026, arXiv e-prints, arXiv:2605.08410, doi: 10.48550/arXiv.2605.08410 Cordes, J. M., & McLaughlin, M. A. 2003, ApJ, 596, 1142, doi: 10.1086/378231 Cranmer, K., Brehmer, J., & Louppe, G. 2020, Proceedings of the National Academy of Science, 117, 30055, doi: 10.1073/pnas.1912789117 Curtin, A. P., Sand, K. R., Pleunis, Z., et al. 2025, ApJ, 992, 206, doi: 10.3847/1538-4357/adf844 Fonseca, E., Pleunis, Z., Breitman, D., et al. 2024, ApJS, 271, 49, doi: 10.3847/1538-4365/ad27d6 Gajjar, V., Siemion, A. P. V., Price, D. C., et al. 2018, ApJ, 863, 2, doi: 10.3847/1538-4357/aad005 Hewitt, D. M., Hessels, J. W. T., Ould-Boukattine, O. S., et al. 2023, MNRAS, 526, 2039, doi: 10.1093/mnras/stad2847 Horvitz, D. G., & Thompson, D. J. 1952, Journal of the American Statistical Association, 47, 663 James, C. W., Hoffmann, J. L., Prochaska, J. X., & Glowacki, M. 2026, PASA, 43, e038, doi: 10.1017/pasa.2026.10173 Jankowski, F., Bezuidenhout, M. C., Caleb, M., et al. 2023, MNRAS, 524, 4275, doi: 10.1093/mnras/stad2041 Kania, J. W., Bandura, K., Lorimer, D. R., & Prestage, R. 2026a, AJ, 171, 73, doi: 10.3847/1538-3881/ae0d86 Kania, J. W., Paine, S., Doskoch, G. M., et al. 2026b, MNRAS, 548, stag665, doi: 10.1093/mnras/stag665 25 
+
+Kirsten, F., Ould-Boukattine, O. S., Herrmann, W., et al. 2024, Nature Astronomy, 8, 337, doi: 10.1038/s41550-023-02153-z Kish, L. 1965, Survey Sampling (New York: John Wiley & Sons) Law, C. J., Sharma, K., Ravi, V., et al. 2024, ApJ, 967, 29, doi: 10.3847/1538-4357/ad3736 Lazarus, P., Brazier, A., Hessels, J. W. T., et al. 2015, ApJ, 812, 81, doi: 10.1088/0004-637X/812/1/81 Leung, C., Mena-Parra, J., Masui, K., et al. 2021, AJ, 161, 81, doi: 10.3847/1538-3881/abd174 Lorimer, D. R., Bailes, M., McLaughlin, M. A., Narkevic, D. J., & Crawford, F. 2007, Science, 318, 777, doi: 10.1126/science.1147532 Mason, S. J., & Graham, N. E. 2002, Quarterly Journal of the Royal Meteorological Society, 128, 2145, doi: 10.1256/003590002320603584 Mate, S., Luke, K., Bhusare, Y., et al. 2026, arXiv e-prints, arXiv:2602.12793, doi: 10.48550/arXiv.2602.12793 McFadden, D. 1979, Quantitative Methods for Analysing Travel Behaviour of Individuals (Routledge), 279–318 Merryfield, M., Tendulkar, S. P., Shin, K., et al. 2023, AJ, 165, 152, doi: 10.3847/1538-3881/ac9ab5 Michilli, D., Masui, K. W., Mckinven, R., et al. 2021, ApJ, 910, 147, doi: 10.3847/1538-4357/abe626 Ocker, S. K., & Cordes, J. M. 2026, ApJ, 1002, 3, doi: 10.3847/1538-4357/ae5825 Ould-Boukattine, O. S., Chawla, P., Hessels, J. W. T., et al. 2026a, MNRAS, 545, staf1937, doi: 10.1093/mnras/staf1937 Ould-Boukattine, O. S., Cooper, A. J., Hessels, J. W. T., et al. 2026b, MNRAS, 546, stag090, doi: 10.1093/mnras/stag090 Ould-Boukattine, O. S., Cooper, A. J., Cook, A. M., et al. 2026c, arXiv e-prints, arXiv:2605.18513. https://arxiv.org/abs/2605.18513 Paszke, A., Gross, S., Massa, F., et al. 2019, arXiv e-prints, arXiv:1912.01703, doi: 10.48550/arXiv.1912.01703 Patil, S. S., Main, R. A., Fonseca, E., et al. 2026, ApJL, 997, L5, doi: 10.3847/2041-8213/ae2eb3 Pedregosa, F., Varoquaux, G., Gramfort, A., et al. 2011, Journal of Machine Learning Research, 12, 2825 Petroff, E., Keane, E. F., Barr, E. D., et al. 2015, MNRAS, 451, 3933, doi: 10.1093/mnras/stv1242 Pleunis, Z., Good, D. C., Kaspi, V. M., et al. 2021, ApJ, 923, 1, doi: 10.3847/1538-4357/ac33ac Qiu, H., Keane, E. F., Bannister, K. W., James, C. W., & Shannon, R. M. 2023, MNRAS, 523, 5109, doi: 10.1093/mnras/stad1740 Rafiei-Ravandi, M., & Smith, K. M. 2023, ApJS, 265, 62, doi: 10.3847/1538-4365/acc252 Rubin, D. B. 1981, The Annals of Statistics, 9, 130. https://people.eecs.berkeley.edu/ ∼jordan/sail/readings/ rubin.pdf Sand, K. R., Curtin, A. P., Michilli, D., et al. 2025, ApJ, 979, 160, doi: 10.3847/1538-4357/ad9b11 Sautron, M., McEwen, A. E., Younes, G., et al. 2025, ApJ, 986, 88, doi: 10.3847/1538-4357/add0aa Scott, D. R., Dial, T., Bera, A., et al. 2025, PASA, 42, e133, doi: 10.1017/pasa.2025.10103 Scott, D. W. 1979, Biometrika, 66, 605, doi: 10.1093/biomet/66.3.605 Shah, V., Shin, K., Leung, C., et al. 2025, ApJL, 979, L21, doi: 10.3847/2041-8213/ad9ddc Shah, V., Hessels, J. W. T., Kaspi, V. M., et al. 2026, arXiv e-prints, arXiv:2602.19335, doi: 10.48550/arXiv.2602.19335 Shannon, R. M., Bannister, K. W., Bera, A., et al. 2025, PASA, 42, e036, doi: 10.1017/pasa.2025.8 Shin, K., Masui, K. W., Bhardwaj, M., et al. 2023, ApJ, 944, 105, doi: 10.3847/1538-4357/acaf06 Tejero-Cantero, A., Boelts, J., Deistler, M., et al. 2020, Journal of Open Source Software, 5, 2505, doi: 10.21105/joss.02505 Wang, H., Masui, K., Andrew, S., et al. 2025, arXiv e-prints, arXiv:2506.08932, doi: 10.48550/arXiv.2506.08932 Wasserman, L. 2004, All of Statistics: A Concise Course in Statistical Inference, Springer Texts in Statistics (New York, NY: Springer Science & Business Media). https://www.stat.cmu.edu/ ∼brian/valerie/617-2022/0% 20-%20books/2004%20-%20wasserman%20-%20all% 20of%20statistics.pdf Zong, X., Zhu, R., & Zou, G. 2018, arXiv e-prints, arXiv:1804.04255, doi: 10.48550/arXiv.1804.04255
