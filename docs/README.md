@@ -6,38 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-26
-- 运行时间：2026-06-26 21:58:32 UTC
+- 最新运行日期：2026-06-27
+- 运行时间：2026-06-27 20:49:45 UTC
 - 运行状态：成功
-- 本次总论文数：6
-- 精读区：4
+- 本次总论文数：2
+- 精读区：0
 - 速读区：2
 
 ### 今日简报（AI）
-今天重点关注了快速射电暴（FRB）的样本偏差校正与球状星团搜索。值得精读的是《用CHIME/FRB选择函数去偏FRB样本》和《FAST搜索M49球状星团中的FRB》。建议读者优先了解FRB选择函数如何修正统计偏差，并关注球状星团这一新搜索方向。
-- 详情：[/202606/26/README](/202606/26/README)
+今日速读了2篇论文，聚焦银河系射电微波全天建模和双中子星合并中的伽马射线发射机制。  
+值得关注的是银河系星际介质辐射的精确模型对宇宙微波背景探测的影响，以及核同质异能素在引力波电磁对应体中的关键作用。  
+建议优先阅读《All-sky modeling of Galactic emission》一文，学习其多频段辐射分离方法，可应用于天体物理数据分析。
+- 详情：[/202606/27/README](/202606/27/README)
 
 ### 精读区论文标签
-1. [Debiasing the Observed Fast Radio Burst Population with the CHIME/FRB Selection Function](/202606/26/2606.26334v1-debiasing-the-observed-fast-radio-burst-population-with-the-chimefrb-selection-function)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：直接研究快速射电暴种群和选择效应，与最新FRB研究相关
-2. [A search for Fast Radio Bursts from globular clusters in M49 with FAST](/202606/26/2606.27225v1-a-search-for-fast-radio-bursts-from-globular-clusters-in-m49-with-fast)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：在球状星团中搜索快速射电暴，检验前身模型
-3. [The SPOTLIGHT Multibeam Real-Time Transient Detection System](/202606/26/2606.27262v1-the-spotlight-multibeam-real-time-transient-detection-system)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：实时快速射电暴探测系统
-4. [A geometric multimessenger consistency test of radiative and near-zone gravity with LISA and SKA](/202606/26/2606.26945v1-a-geometric-multimessenger-consistency-test-of-radiative-and-near-zone-gravity-with-lisa-and-ska)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：提出利用脉冲星计时的多信使检验方法
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Long-Period Transients as a new frontier in time-domain astronomy](/202606/26/2606.26572v1-long-period-transients-as-a-new-frontier-in-time-domain-astronomy)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：讨论长周期射电暂现源作为快速射电暴可能的前身体
-2. [A Boundary-Consistent Two-Zone Electron Kernel for Distant Pulsar Contributions to Positron Flux and Anisotropy](/202606/26/2606.26597v1-a-boundary-consistent-two-zone-electron-kernel-for-distant-pulsar-contributions-to-positron-flux-and-anisotropy)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：研究脉冲星对宇宙线正电子通量的贡献，与射电脉冲星种群相关
+1. [All-sky modeling of Galactic emission at radio and microwave frequencies](/202606/27/2606.21334v1-all-sky-modeling-of-galactic-emission-at-radio-and-microwave-frequencies)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：提供全天空前景模型，对低频脉冲星计时观测至关重要
+2. [Nuclear Isomers and Their Impact on Gamma-Ray Emission in Binary Neutron Star Mergers](/202606/27/2606.26447v1-nuclear-isomers-and-their-impact-on-gamma-ray-emission-in-binary-neutron-star-mergers)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：双中子星并合中的r过程核合成，影响状态方程约束
 
 
 <div class="dpr-home-promo-card">
