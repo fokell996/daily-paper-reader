@@ -6,50 +6,53 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-29
-- 运行时间：2026-06-29 20:52:01 UTC
+- 最新运行日期：2026-06-30
+- 运行时间：2026-06-30 21:52:31 UTC
 - 运行状态：成功
-- 本次总论文数：10
-- 精读区：7
+- 本次总论文数：11
+- 精读区：8
 - 速读区：3
 
 ### 今日简报（AI）
-今日精读7篇、速读3篇，聚焦快速射电暴、微赫兹引力波及中子星暗物质混合等前沿课题。最值得关注的是满分论文《The Astrophysics of Fast Radio Bursts》全面解析FRB物理机制，以及9分论文《Unveiling the Microhertz Gravitational-Wave Sky》展示平方公里阵列对低频引力波的探测潜力。建议从这两篇高分综述入手，快速把握当前天体物理学最活跃的两个方向。
-- 详情：[/202606/29/README](/202606/29/README)
+今日共处理11篇论文，精读8篇、速读3篇，重点聚焦引力波源定位与脉冲星计时技术。最值得关注的两项突破：VLBI技术实现连续引力波源的高精度定位（9.0分），以及单脉冲计时多策略框架（TOA_SP）的提出（9.0分）。建议普通读者优先了解引力波天文学和脉冲星计时阵的最新观测方法，这些将直接影响未来对宇宙时空结构的认知。
+- 详情：[/202606/30/README](/202606/30/README)
 
 ### 精读区论文标签
-1. [The Astrophysics of Fast Radio Bursts](/202606/29/2606.27546v1-the-astrophysics-of-fast-radio-bursts)  
-   标签：评分：10.0/10、query:pulsar-frb
-   evidence：快速射电暴天体物理论述包括磁星前身
-2. [Unveiling the Microhertz Gravitational-Wave Sky with the Square Kilometre Array Observatory](/202606/29/2606.27418v1-unveiling-the-microhertz-gravitational-wave-sky-with-the-square-kilometre-array-observatory)  
+1. [VLBI-Enabled Localization of Continuous GW Sources](/202606/30/2606.28721v1-vlbi-enabled-localization-of-continuous-gw-sources)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：利用SKAO脉冲星计时探测引力波
-3. [Modelling Dissipative Dynamics of r-mode Instability in Hybrid Stars](/202606/29/2606.27465v1-modelling-dissipative-dynamics-of-r-mode-instability-in-hybrid-stars)  
+   evidence：脉冲星计时阵列用于引力波定位
+2. [TOA_SP: A Multi-Strategy Framework for Single-Pulse Timing](/202606/30/2606.28822v1-toasp-a-multi-strategy-framework-for-single-pulse-timing)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：利用NICER数据约束混合星状态方程和r模阻尼
-4. [A pulsar escaping an ancient open cluster via tidal stripping](/202606/29/2606.27796v1-a-pulsar-escaping-an-ancient-open-cluster-via-tidal-stripping)  
+   evidence：用于脉冲星和快速射电暴的单脉冲计时方法
+3. [Effects of Mirror Dark Matter on Neutron-Star Structure and Tidal Deformability](/202606/30/2606.28934v1-effects-of-mirror-dark-matter-on-neutron-star-structure-and-tidal-deformability)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：研究脉冲星从疏散星团逃逸，与脉冲星种群演化相关
-5. [A Unified Model for the Emission of Supernova-Associated Fast X-ray Transients: Case Studies of EP240414a, EP250108a, and GRB~171205A](/202606/29/2606.28115v1-a-unified-model-for-the-emission-of-supernova-associated-fast-x-ray-transients-case-studies-of-ep240414a-ep250108a-and-grb171205a)  
+   evidence：镜像暗物质、中子星结构、状态方程
+4. [Neutron Star Mass across Binary Pulsar Subpopulations: Mass-Spin Correlation, Mass Distributions, and Moment of Inertia Effects](/202606/30/2606.29146v1-neutron-star-mass-across-binary-pulsar-subpopulations-mass-spin-correlation-mass-distributions-and-moment-of-inertia-effects)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：提出磁星驱动的统一模型解释与超新星相关的快速X射线暂现源
-6. [Universal EOS-Radius Inverse Mappings Govern Precision-Dependent Inference of the Neutron Star Equation of State](/202606/29/2606.28183v1-universal-eos-radius-inverse-mappings-govern-precision-dependent-inference-of-the-neutron-star-equation-of-state)  
+   evidence：双星脉冲星质量与自旋分布研究
+5. [Nuclear equation-of-state at high density and multi-messenger astronomy: contribution of heavy-ion collisions](/202606/30/2606.29588v1-nuclear-equation-of-state-at-high-density-and-multi-messenger-astronomy-contribution-of-heavy-ion-collisions)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：从中子星半径测量推断状态方程
-7. [The Role of Scintillation in Detecting HI Absorption in FRB Spectra](/202606/29/2606.28314v1-the-role-of-scintillation-in-detecting-hi-absorption-in-frb-spectra)  
+   evidence：重离子碰撞对中子星核状态方程的约束
+6. [Pulsed Infrared Emission from Magnetar 4U 0142+61 Detected by JWST](/202606/30/2606.29653v1-pulsed-infrared-emission-from-magnetar-4u-014261-detected-by-jwst)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：快速射电暴中性氢吸收线及闪烁模型
+   evidence：JWST探测到磁星4U 0142+61的脉冲红外发射
+7. [VLBI Astrometry of Magnetars](/202606/30/2606.29671v1-vlbi-astrometry-of-magnetars)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：磁星、VLBI天体测量、自行、磁星起源
+8. [Evaluating the Fourier Approximation in Pulsar Timing Array Analysis](/202606/30/2606.30536v1-evaluating-the-fourier-approximation-in-pulsar-timing-array-analysis)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：脉冲星计时阵列、傅里叶近似、贝叶斯似然
 
 ### 速读区论文标签
-1. [Fast Radio Bursts as Cosmological Probes](/202606/29/2606.27714v1-fast-radio-bursts-as-cosmological-probes)  
+1. [The NANOGrav 15 yr Data Set: Customized Chromatic Noise Models](/202606/30/2606.28571v1-the-nanograv-15-yr-data-set-customized-chromatic-noise-models)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：快速射电暴发射机制与起源
-2. [Gamma-ray Bursts and Kilonovae from Gravitational Wave Events](/202606/29/2606.27037v1-gamma-ray-bursts-and-kilonovae-from-gravitational-wave-events)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：讨论通过GW170817和未来探测器对中子星状态方程的多信使约束
-3. [The crust of dark-matter admixed neutron stars: bulk properties and torsional oscillations](/202606/29/2606.27456v1-the-crust-of-dark-matter-admixed-neutron-stars-bulk-properties-and-torsional-oscillations)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：暗物质混合中子星壳层性质与状态方程
+   evidence：脉冲星计时阵噪声模型用于引力波搜索
+2. [Probing the Baryon Distribution with Fast Radio Bursts](/202606/30/2606.29388v1-probing-the-baryon-distribution-with-fast-radio-bursts)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：快速射电暴作为重子示踪剂
+3. [Radial oscillations of quark stars in light of current astrophysical constraints: A comparative study](/202606/30/2606.29510v1-radial-oscillations-of-quark-stars-in-light-of-current-astrophysical-constraints-a-comparative-study)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：夸克星径向振荡比较研究，检验多种状态方程
 
 
 <div class="dpr-home-promo-card">
