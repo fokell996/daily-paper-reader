@@ -6,53 +6,44 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-30
-- 运行时间：2026-06-30 21:52:31 UTC
+- 最新运行日期：2026-07-01
+- 运行时间：2026-07-01 22:06:23 UTC
 - 运行状态：成功
-- 本次总论文数：11
-- 精读区：8
+- 本次总论文数：8
+- 精读区：5
 - 速读区：3
 
 ### 今日简报（AI）
-今日共处理11篇论文，精读8篇、速读3篇，重点聚焦引力波源定位与脉冲星计时技术。最值得关注的两项突破：VLBI技术实现连续引力波源的高精度定位（9.0分），以及单脉冲计时多策略框架（TOA_SP）的提出（9.0分）。建议普通读者优先了解引力波天文学和脉冲星计时阵的最新观测方法，这些将直接影响未来对宇宙时空结构的认知。
-- 详情：[/202606/30/README](/202606/30/README)
+今日精读5篇、速读3篇，重点聚焦夸克星与磁星形成理论。最值得关注两篇9.0分论文：重标度群改进QCD下夸克混杂星结构，以及白矮星吸积坍缩形成磁星机制。建议进一步了解相对论MHD模拟中子星合并的激波突破辐射。
+- 详情：[/202607/01/README](/202607/01/README)
 
 ### 精读区论文标签
-1. [VLBI-Enabled Localization of Continuous GW Sources](/202606/30/2606.28721v1-vlbi-enabled-localization-of-continuous-gw-sources)  
+1. [Quark and hybrid stars with renormalization group improvement of NNLO perturbative QCD](/202607/01/2606.29576v1-quark-and-hybrid-stars-with-renormalization-group-improvement-of-nnlo-perturbative-qcd)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：脉冲星计时阵列用于引力波定位
-2. [TOA_SP: A Multi-Strategy Framework for Single-Pulse Timing](/202606/30/2606.28822v1-toasp-a-multi-strategy-framework-for-single-pulse-timing)  
+   evidence：利用RG改进微扰QCD推导夸克星和混合星的状态方程
+2. [Magnetar Formation from Accretion Induced Collapse of White Dwarfs](/202607/01/2606.30839v1-magnetar-formation-from-accretion-induced-collapse-of-white-dwarfs)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：用于脉冲星和快速射电暴的单脉冲计时方法
-3. [Effects of Mirror Dark Matter on Neutron-Star Structure and Tidal Deformability](/202606/30/2606.28934v1-effects-of-mirror-dark-matter-on-neutron-star-structure-and-tidal-deformability)  
+   evidence：吸积致坍缩形成磁星
+3. [Scattering of Strong Radio Waves by Particles in Strongly Magnetized Plasmas and Implications for Fast Radio Bursts](/202607/01/2606.31439v1-scattering-of-strong-radio-waves-by-particles-in-strongly-magnetized-plasmas-and-implications-for-fast-radio-bursts)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：镜像暗物质、中子星结构、状态方程
-4. [Neutron Star Mass across Binary Pulsar Subpopulations: Mass-Spin Correlation, Mass Distributions, and Moment of Inertia Effects](/202606/30/2606.29146v1-neutron-star-mass-across-binary-pulsar-subpopulations-mass-spin-correlation-mass-distributions-and-moment-of-inertia-effects)  
+   evidence：强无线电波在磁星磁层中的散射与FRB传播相关
+4. [High Frequency Wideband Study of FRB 20240114A with the Allen Telescope Array](/202607/01/2606.31897v1-high-frequency-wideband-study-of-frb-20240114a-with-the-allen-telescope-array)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：双星脉冲星质量与自旋分布研究
-5. [Nuclear equation-of-state at high density and multi-messenger astronomy: contribution of heavy-ion collisions](/202606/30/2606.29588v1-nuclear-equation-of-state-at-high-density-and-multi-messenger-astronomy-contribution-of-heavy-ion-collisions)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：重离子碰撞对中子星核状态方程的约束
-6. [Pulsed Infrared Emission from Magnetar 4U 0142+61 Detected by JWST](/202606/30/2606.29653v1-pulsed-infrared-emission-from-magnetar-4u-014261-detected-by-jwst)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：JWST探测到磁星4U 0142+61的脉冲红外发射
-7. [VLBI Astrometry of Magnetars](/202606/30/2606.29671v1-vlbi-astrometry-of-magnetars)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：磁星、VLBI天体测量、自行、磁星起源
-8. [Evaluating the Fourier Approximation in Pulsar Timing Array Analysis](/202606/30/2606.30536v1-evaluating-the-fourier-approximation-in-pulsar-timing-array-analysis)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：脉冲星计时阵列、傅里叶近似、贝叶斯似然
+   evidence：对重复快速射电暴的高频宽波段观测，研究暴发特性与发射机制
+5. [Multipolar Magnetic-Field Inference for PSR J0740+6620 with Neural-Network-Accelerated NICER Pulse-Profile Modeling](/202607/01/2606.30886v1-multipolar-magnetic-field-inference-for-psr-j07406620-with-neural-network-accelerated-nicer-pulse-profile-modeling)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：神经网络加速的NICER脉冲轮廓建模用于中子星磁场推断，关联状态方程约束
 
 ### 速读区论文标签
-1. [The NANOGrav 15 yr Data Set: Customized Chromatic Noise Models](/202606/30/2606.28571v1-the-nanograv-15-yr-data-set-customized-chromatic-noise-models)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：脉冲星计时阵噪声模型用于引力波搜索
-2. [Probing the Baryon Distribution with Fast Radio Bursts](/202606/30/2606.29388v1-probing-the-baryon-distribution-with-fast-radio-bursts)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：快速射电暴作为重子示踪剂
-3. [Radial oscillations of quark stars in light of current astrophysical constraints: A comparative study](/202606/30/2606.29510v1-radial-oscillations-of-quark-stars-in-light-of-current-astrophysical-constraints-a-comparative-study)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：夸克星径向振荡比较研究，检验多种状态方程
+1. [Modelling the delayed shock-breakout emission following jet-launching binary neutron star mergers via relativistic MHD simulations](/202607/01/2606.29515v1-modelling-the-delayed-shock-breakout-emission-following-jet-launching-binary-neutron-star-mergers-via-relativistic-mhd-simulations)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：双中子星并合喷流激波爆发模拟，关联中子星状态方程与并合环境
+2. [Assessing the Predictability of $δ$ Scuti Variable Stars for Spacecraft Navigation](/202607/01/2606.30691v1-assessing-the-predictability-of--scuti-variable-stars-for-spacecraft-navigation)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：使用delta Scuti变星计时进行航天器导航，类似脉冲星计时
+3. [Unveiling Radio Transients with SKAO Telescopes](/202607/01/2606.31701v1-unveiling-radio-transients-with-skao-telescopes)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：描述SKAO观测中子星并合和磁化致密天体等瞬态的潜力
 
 
 <div class="dpr-home-promo-card">
