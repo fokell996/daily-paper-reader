@@ -6,44 +6,43 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-01
-- 运行时间：2026-07-01 22:06:23 UTC
+- 最新运行日期：2026-07-02
+- 运行时间：2026-07-02 20:33:05 UTC
 - 运行状态：成功
-- 本次总论文数：8
-- 精读区：5
-- 速读区：3
+- 本次总论文数：7
+- 精读区：3
+- 速读区：4
 
 ### 今日简报（AI）
-今日精读5篇、速读3篇，重点聚焦夸克星与磁星形成理论。最值得关注两篇9.0分论文：重标度群改进QCD下夸克混杂星结构，以及白矮星吸积坍缩形成磁星机制。建议进一步了解相对论MHD模拟中子星合并的激波突破辐射。
-- 详情：[/202607/01/README](/202607/01/README)
+今日精读中子星状态方程和重复FRB散射变化两篇9.0高分工作，速读覆盖X射线脉冲星建模及毫赫兹振荡分析。
+最值得关注FRB20250613A重复暴发时标变化揭示散射机制，以及中子星新状态方程与观测高度吻合。
+建议聚焦FRB和脉冲星物理前沿，后续可追踪多波段联合观测进展。
+- 详情：[/202607/02/README](/202607/02/README)
 
 ### 精读区论文标签
-1. [Quark and hybrid stars with renormalization group improvement of NNLO perturbative QCD](/202607/01/2606.29576v1-quark-and-hybrid-stars-with-renormalization-group-improvement-of-nnlo-perturbative-qcd)  
+1. [An Analytical Toy Equation of State for Neutron Stars Consistent with Current Observations](/202607/02/2607.00070v1-an-analytical-toy-equation-of-state-for-neutron-stars-consistent-with-current-observations)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：利用RG改进微扰QCD推导夸克星和混合星的状态方程
-2. [Magnetar Formation from Accretion Induced Collapse of White Dwarfs](/202607/01/2606.30839v1-magnetar-formation-from-accretion-induced-collapse-of-white-dwarfs)  
+   evidence：解析状态方程与观测约束一致
+2. [FRB20250613A: a remarkable repeating FRB with apparent millisecond-timescale scattering variations](/202607/02/2607.00505v1-frb20250613a-a-remarkable-repeating-frb-with-apparent-millisecond-timescale-scattering-variations)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：吸积致坍缩形成磁星
-3. [Scattering of Strong Radio Waves by Particles in Strongly Magnetized Plasmas and Implications for Fast Radio Bursts](/202607/01/2606.31439v1-scattering-of-strong-radio-waves-by-particles-in-strongly-magnetized-plasmas-and-implications-for-fast-radio-bursts)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：强无线电波在磁星磁层中的散射与FRB传播相关
-4. [High Frequency Wideband Study of FRB 20240114A with the Allen Telescope Array](/202607/01/2606.31897v1-high-frequency-wideband-study-of-frb-20240114a-with-the-allen-telescope-array)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：对重复快速射电暴的高频宽波段观测，研究暴发特性与发射机制
-5. [Multipolar Magnetic-Field Inference for PSR J0740+6620 with Neural-Network-Accelerated NICER Pulse-Profile Modeling](/202607/01/2606.30886v1-multipolar-magnetic-field-inference-for-psr-j07406620-with-neural-network-accelerated-nicer-pulse-profile-modeling)  
+   evidence：重复FRB的详细观测与环境效应研究
+3. [A self-consistent single-fluid framework for neutron stars admixed with mirror dark matter](/202607/02/2607.00888v1-a-self-consistent-single-fluid-framework-for-neutron-stars-admixed-with-mirror-dark-matter)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：神经网络加速的NICER脉冲轮廓建模用于中子星磁场推断，关联状态方程约束
+   evidence：自洽的中子星状态方程框架，包含暗物质
 
 ### 速读区论文标签
-1. [Modelling the delayed shock-breakout emission following jet-launching binary neutron star mergers via relativistic MHD simulations](/202607/01/2606.29515v1-modelling-the-delayed-shock-breakout-emission-following-jet-launching-binary-neutron-star-mergers-via-relativistic-mhd-simulations)  
+1. [A New Relativistic Model for Spectral Formation in Accretion-Powered X-ray Pulsars: Pulse Profiles and Phase-Averaged Spectra](/202607/02/2606.30990v1-a-new-relativistic-model-for-spectral-formation-in-accretion-powered-x-ray-pulsars-pulse-profiles-and-phase-averaged-spectra)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：双中子星并合喷流激波爆发模拟，关联中子星状态方程与并合环境
-2. [Assessing the Predictability of $δ$ Scuti Variable Stars for Spacecraft Navigation](/202607/01/2606.30691v1-assessing-the-predictability-of--scuti-variable-stars-for-spacecraft-navigation)  
+   evidence：吸积驱动X射线脉冲星的脉冲轮廓与光谱模型
+2. [Evidence for Millihertz Oscillations in the bright atoll source GX 3+1](/202607/02/2606.31798v1-evidence-for-millihertz-oscillations-in-the-bright-atoll-source-gx-31)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：使用delta Scuti变星计时进行航天器导航，类似脉冲星计时
-3. [Unveiling Radio Transients with SKAO Telescopes](/202607/01/2606.31701v1-unveiling-radio-transients-with-skao-telescopes)  
+   evidence：中子星低质量X射线双星中毫赫兹准周期振荡的证据，为内部结构提供约束
+3. [Understanding Pulsar Wind Nebulae with the SKA](/202607/02/2607.00042v1-understanding-pulsar-wind-nebulae-with-the-ska)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：描述SKAO观测中子星并合和磁化致密天体等瞬态的潜力
+   evidence：通过脉冲星风云理解中子星磁层与演化
+4. [Constraining leptonic and hadronic gamma-ray emission from HESS J1825-137 and its environment](/202607/02/2607.00240v1-constraining-leptonic-and-hadronic-gamma-ray-emission-from-hess-j1825-137-and-its-environment)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：对脉冲星风云HESS J1825-137的宽带谱建模，约束辐射机制
 
 
 <div class="dpr-home-promo-card">
