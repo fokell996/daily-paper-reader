@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-07-04 <!--dpr-date:20260704-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/04/2607.01505v1-magneto-rotational-instabilities-in-solids-application-to-neutron-star-crusts" data-sidebar-item="{&quot;title&quot;: &quot;Magneto-rotational instabilities in solids: application to neutron-star crusts&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.01505v1-magneto-rotational-instabilities-in-solids-application-to-neutron-star-crusts&quot;, &quot;score&quot;: &quot;7.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;pulsar-frb&quot;}], &quot;evidence&quot;: &quot;研究中子星壳层中的磁旋转不稳定性，与内部动力学和脉冲星故障相关&quot;}">Magneto-rotational instabilities in solids: application to neutron-star crusts</a>
   * 2026-07-03 <!--dpr-date:20260703-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202607/03/2607.01288v1-pulsar-science-with-the-skao" data-sidebar-item="{&quot;title&quot;: &quot;Pulsar Science with the SKAO&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2607.01288v1-pulsar-science-with-the-skao&quot;, &quot;score&quot;: &quot;10.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;pulsar-frb&quot;}], &quot;evidence&quot;: &quot;SKAO脉冲星科学，巡天，中子星物理&quot;}">Pulsar Science with the SKAO</a>
