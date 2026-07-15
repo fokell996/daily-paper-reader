@@ -1,0 +1,457 @@
+Title: Constraining the High-Density Equation of State with Present and Future NICER Observations Using Physics-Informed Regularized Machine Learning
+
+URL Source: https://arxiv.org/pdf/2607.12722v1
+
+Published Time: Wed, 15 Jul 2026 12:02:06 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# Constraining the High-Density Equation of State with Present and Future NICER Observations Using Physics-Informed Regularized Machine Learning 
+
+Utkarsh Atul Deshmukh ,1, ∗ Asim Kumar Saha ,1, † and Ritam Mallick 1, ‡
+
+> 1
+
+Indian Institute of Science Education and Research Bhopal, Bhopal 462066, India 
+
+(Dated: March 2026) The precise mass and radius measurements of neutron stars by NICER have significantly advanced our ability to constrain the properties of matter at supranuclear densities. In this work, we develop a physics-informed regularized conditional Invertible Neural Network (cINN) that bijectively maps mass–radius posterior distributions directly onto the corresponding central energy density and pres-sure, eliminating the need for explicit high-dimensional parameter sampling. The physics-informed regularisation guarantees that all inferred solutions satisfy causality and thermodynamic stability, ensuring physically consistent predictions without explicit forward modelling. We demonstrate that the framework accurately reconstructs central EoS posteriors for NICER-like observations while preserving the mapping between macroscopic stellar observables and the microscopic properties of dense matter. Exploiting the computational efficiency of the cINN, we perform a systematic optimi-sation study of 62,400 simulated mass–radius observations to identify the most informative targets for constraining the high-density EoS. We find that the constraining power depends strongly on the location of the observation in the mass–radius plane, with an optimal strategy that alternates between compact high-mass stars and extended intermediate-mass stars, reducing the uncertainty in the inferred EoS by up to ∼ 9% −10% relative to the current NICER baseline. These results establish physics-informed invertible neural networks as a powerful framework for rapid, physically consistent inference of dense-matter properties from present and future multi-messenger observations. 
+
+I. INTRODUCTION 
+
+Understanding the Equation of State (EoS) of dense nuclear matter remains one of the central challenges in modern astrophysics [1, 2]. Simulating such extreme conditions, specifically cold, highly neutron-rich matter at several times the nuclear saturation density, is still not possible in terrestrial heavy-ion colliders. Therefore, Neutron Stars (NS) serve as our only natural laborato-ries for probing this regime [3–8]. Supplying a theoret-ical EoS into the Tolman-Oppenheimer-Volkoff (TOV) equations, one obtains the macroscopic observables of the star, namely its mass and radius[9, 10]. However, due to current technological and observa-tional constraints, the measurement error in the radius of a neutron star is considerable. Instead, current multi-messenger detections yield broad Mass-Radius ( M -R)posterior regions, characterised by varying levels of sta-tistical confidence. Despite the imprecise observations, these posteriors are incredibly valuable, allowing us to test the fundamental nature of the strong interaction under conditions entirely inaccessible to lattice Quan-tum Chromodynamics (QCD) and Earth-based experi-ments [11–14]. Employing an ensemble of parameterised EoS (as discussed in Section II E) into the TOV equa-tions, one generates a family of M -R curves. A subset of these curves that simultaneously satisfy current NS ob-servational posteriors allows us to isolate their underlying physics, thereby defining a constrained band of physically    
+
+> ∗utkarshd21@iiserb.ac.in
+> †asim21@iiserb.ac.in
+> ‡mallick@iiserb.ac.in
+
+viable models [15–21]. This band represents the allowed ranges of pressure ( p) and energy density ( ϵ) within a calculated uncertainty. Ultimately, reducing uncertainty in the EoS directly affects the understanding of dense matter[21–33]. Traditionally, the inference to constrain the EoS band has been approached within a Bayesian framework, where parametric EoS models are sampled using Markov Chain Monte Carlo (MCMC) techniques to construct posterior distributions consistent with observational data [31, 34– 39]. While robust and statistically well-founded, these methods are computationally expensive and scale poorly with increasing model complexity, often requiring hours to days for convergence. This limitation becomes particu-larly restrictive in the era of large-scale multi-messenger observations, where rapid inference is essential [40–44]. Although Bayesian statistics does a commendable job, it is intrinsically slow and requires substantial compu-tational power. On the other hand, recent advances in machine learning have opened new opportunities for ad-dressing such inverse problems: the direct reconstruc-tion of the underlying microscopic EoS from macro-scopic M -R observations [45–55]. In particular, condi-tional invertible neural networks (cINNs) provide a pow-erful framework for learning bijective mappings between observed data and the corresponding EoS data [56]. Unlike conventional neural networks, cINNs enable ex-act likelihood evaluation and reversible transformations, making them naturally suited for probabilistic inference tasks. Since observational constraints-such as those from NICER (Neutron star Interior Composition Explorer), do not yield discrete measurements but rather broad, continuous posterior patches in the M -R plane, bridg-ing these macroscopic uncertainties to the microscopic arXiv:2607.12722v1 [astro-ph.HE] 14 Jul 2026 2EoS requires a model capable of mapping to all proba-ble central values. In this sense, cINNs can be viewed as learning an inferred posterior distribution: once trained, they allow direct sampling of solutions conditioned on ob-servational data, rather than just outputting one single answer. Their underlying design enables them to map all valid possibilities and their likelihoods, providing a fast and comprehensive picture of the results [57–59]. However, purely data-driven models often lack a guar-antee of physical consistency, which is critical in astro-physical applications. To address this, we incorporate physics-informed regularisation (PIR) into our frame-work. PIR embeds physical laws directly into the training process by penalizing violations of governing constraints [60, 61]. In our implementation, we enforce causality and thermodynamic stability by constraining the squared speed of sound, c2 
+
+> s
+
+= dp dϵ , to lie within physical bounds (0 ≤ c2 
+
+> s
+
+≤ 1) [54, 62–68]. In this work, we develop a hybrid cINN+PIR archi-tecture that maps M -R posterior contours to the most probable regions in central energy density-central pres-sure space. By training on physically consistent data and enforcing constraints through the PIR component, our model learns a structured, interpretable representation of the inverse mapping. To validate our architecture against current astrophysical constraints, we apply our model to a speed-of-sound interpolated (SoSI) EoS dataset. We demonstrate the network’s ability to seamlessly integrate and satisfy joint observational contours, specifically map-ping 95% confidence macroscopic constraints of the grav-itational wave event GW170817 alongside the 95% confi-dence M -R posterior contours derived from NICER ob-servations of PSR J0030+0451, J0437-4715, J0614-3329, and J0740+6620 [69–77]. The structure of this paper is as follows. In Section II (Formalism), we describe the architecture of the cINN with the incorporation of PIR and the EoS data genera-tion. In Section III (Results and Discussion), we present results of synthetic and real observational data in the model’s PIR credibility by generating causal and ther-modynamically stable outputs in p-ϵ space. In the same section, we further test the model’s ability to retain the physically valid EoS parameter space, followed by a pre-dictive scan for optimal future targets. Finally in Section IV (Summary and Conclusion), we summarise our work and draw out the important conclusions.  
+
+> II. FORMALISM: MODEL ARCHITECTURE AND DATA GENERATION
+
+Conditional Invertible Neural Networks (cINNs) are a class of deep generative models based on normalis-ing flows. By definition, normalising flows are math-ematical frameworks designed to learn complex, high-dimensional probability distributions by transforming a simple, tractable base distribution (such as a standard multivariate Gaussian) through a sequence of bijective, differentiable functions [78, 79]. In the context of com-pact object astrophysics, cINNs provide a mathemati-cally rigorous framework for solving highly degenerate inverse problems. Rather than predicting a single deter-ministic point estimate, the network learns a conditional, invertible mapping between a latent Gaussian space z
+
+(as described from Eq. 4) and the physical target pa-rameters x (in this work, the central energy density ( ϵc), central pressure ( pc), and speed of sound at the center of the star ( c2
+
+> s,c
+
+), conditioned on macroscopic observables c-the M -R posterior contours. This probabilistic approach is exceptionally well-suited for multi-messenger astron-omy. Observational constraints from X-ray profiling (e.g. NICER) and gravitational wave detectors do not yield exact M -R coordinates; rather, they provide extended 2-D posterior probability contours [80, 81]. By condi-tioning the flow on these macroscopic M -R confidence regions, the cINN directly generates the corresponding conditional posterior distribution p(x | c) for the stel-lar central parameters. The step-by-step construction and optimisation of this architecture are detailed below, while the model design and the data flow pipeline are illustrated in Figure 8 in Appendix A.  
+
+> A. Data Representation and Contour Encoding
+
+During training, the conditioning information c is con-structed as a 200-dimensional feature vector from flat-tened M -R values, each with 100 discrete M -R coordi-nates. The feature vector is defined in the real coordinate space ( R) as c ∈ R200 . Extracted from the physically valid, TOV-solved equations of state [82] is the physi-cal target vector x representing the central EoS values of stars, defined as 
+
+x = (log ϵc, log pc, c 2
+
+> s,c
+
+) ∈ R3 (1) To ensure stable convergence, both inputs c and tar-gets x undergo global Z-score normalization-a process which standardizes the data by subtracting the mean of the dataset and dividing by the global standard devi-ation for each dimension, yielding zero-mean and unit-variance features, c′ and x′. Furthermore, to prevent the normalizing flow [83] from memorizing discrete train-ing manifolds-which causes artificial likelihood spikes, a Gaussian noise ϵ ∼ N (0 , σ 2
+
+> noise
+
+) is injected into the nor-malized targets during the forward pass. Here, N de-notes a normal distribution with a mean of zero, and the variance σ2 
+
+> noise
+
+is parameterized using the previ-ously computed standard deviation of the target vari-ables. Rather than conditioning the flow directly on the flattened 200-dimensional vector, a 1-D Convolu-tional Neural Network (CNN) is employed as a geomet-ric feature extractor [84]. Operating on two standard-ized channels ( M and R), the convolutional layers act as local spatial filters, automatically detecting physically relevant macroscopic geometries along the contour, such 3as local slope, curvature, boundary width, and shape anisotropy. The network compresses this spatial infor-mation into a dense, 32-dimensional context embedding 
+
+cemb ∈ R32 . A 32-dimensional space acts as an opti-mal balanced filter-preventing the memorization of dis-crete coordinate noise while retaining sufficient capacity to map complex contour geometries to the 3-dimensional physical target space (Eq. 1). This embedding serves as the continuous conditioning vector for the invertible blocks (detailed in the next section), providing a highly optimized summary of the observational constraints.  
+
+> B. Invertible Architecture and Likelihood Optimization
+
+The core of the cINN is a sequence of bijective transfor-mations designed to map the complex, unknown distri-bution of the normalized physical targets x′ into a sim-plified, tractable probability space. Specifically, condi-tioned on the context embedding cemb , we map x′ to a continuous latent variable z that is strictly constrained to follow a standard multivariate Gaussian distribution, 
+
+z ∼ N (0 , I ). We guarantee exact invertibility and a com-putationally tractable Jacobian determinant by utilizing a sequence of eight affine coupling layers [85]. In each coupling layer, the input vector is partitioned into two disjoint sub-vectors, xa and xb. The unmasked partition xa is concatenated with the context embed-ding to form u = [xa, c emb ]. This combined vector passes through an internal sub-network of sequential lin-ear transformations and ReLU activations to output a raw vector v. To prevent exploding gradients during op-timization, this output is bounded via a scaled hyperbolic tangent: (sθ , t θ ) = 2 · tanh( v) (2) where θ denotes the trainable weights and biases of this internal sub-network. These split vectors define the scale ( sθ ) and translation ( tθ ) for the affine transforma-tion. Within this affine transformation, the scaling term 
+
+sθ controls the variance by stretching or compressing the parameter space, while the translation term tθ dic-tates the spatial shift of the distribution’s mean. Scaling and shifting allow the model to map complex physical distributions into tractable Gaussians while guarantee-ing exact mathematical invertibility and computationally cheap Jacobian evaluations for efficient training. These are applied to the masked partition xb, while xa propa-gates forward unchanged: 
+
+x′ 
+
+> b
+
+= xb ⊙ exp( sθ ) + tθ
+
+x′ 
+
+> a
+
+= xa
+
+(3) where ⊙ denotes element-wise multiplication. Because 
+
+sθ and tθ depend solely on the untransformed xa, the inverse operation requires only simple subtraction and division, without ever needing to invert the sub-network 
+
+θ itself. Coordinate splitting is permuted between suc-cessive blocks to ensure all dimensions interact over the depth of the network. The total transformation is the exact mathematical composition of these sequential map-pings. Denoting the operation of the i-th coupling layer as fi, the complete forward pass is formulated as: 
+
+z = fθ (x′ | cemb )= f8
+
+
+
+f7
+
+  . . . f 1(x′ | cemb ) · · · | cemb 
+
+ | cemb 
+
+ (4) This strictly bijective mapping allows for the exact conditional probability density to be evaluated via the change of variables formula. The network is optimized by minimizing the negative log-likelihood (NLL) of the training data: 
+
+LN LL = 12 || z|| 2 − log | det J| (5) where Jij = ∂z i
+
+> ∂x ′
+> j
+
+is the Jacobian matrix of the full transformation. This objective function balances two competing geometric effects: the || z|| latent prior con-straint pulls the mapped physical parameters toward the high-probability center of the Gaussian latent space, while the log-Jacobian volumetric regularizer explicitly accounts for density changes, penalizing infinite phase-space compressions to prevent mode collapse.  
+
+> C. Physics-Informed Regularization (PIR Framework)
+
+While the NLL objective ensures the network learns the empirical data distribution, purely data-driven gen-erative models offer no intrinsic guarantees of physical consistency. Without constraints, the continuous density learned by the flow might extrapolate unphysical states outside the immediate training manifold. To enforce ad-herence to the fundamental principles of relativistic stel-lar structure, we embed a PIR constraint directly into the training loop. Specifically, the generated EoS must sat-isfy two strict macroscopic bounds governing the squared speed of sound, c2 
+
+> s
+
+= dp dϵ [86, 87]: 
+
+• Causality: The speed of sound within the dense medium must not exceed the speed of light in vac-uum. In natural units, this requires c2 
+
+> s
+
+< 1. 
+
+• Thermodynamic Stability: The matter must be dynamically stable against microscopic collapse, re-quiring a positive bulk modulus, hence c2 
+
+> s
+
+≥ 0. To actively penalize violations of these laws during training, we leverage the exact reversibility of the cINN architecture. In each iteration, we sample random latent 4vectors, denoted as zsample , from the target prior distri-bution. This prior is defined as a standard multivariate Gaussian N (0 , I ), representing a space with zero mean and an identity covariance matrix. We process these sam-ples through the inverse network mapping, conditioned on the context embedding: 
+
+x′ 
+
+> gen
+
+= f −1 
+
+> θ
+
+(zsample | cemb ) (6) This inverse pass maps the abstract Gaussian vectors back into the network’s predicted physical parameters, yielding the generated output x′ 
+
+> gen
+
+by inverting the for-ward pass from equation 4. However, x′ 
+
+> gen
+
+exists in the normalized, zero-mean data space used for training. Be-cause the fundamental physical limits of 0 and 1 apply exclusively to the true, unscaled values of the speed of sound, we must reverse the Z-score normalization process (as described in section II A) before the constraints can be evaluated. We denormalize the generated output to recover the real physical parameters ( xreal ) by reapply-ing the training dataset’s statistical standard deviation (σx) and mean ( μx): 
+
+xreal = x′ 
+
+> gen
+
+⊙ σx + μx (7) Extracting the predicted c2 
+
+> s,c
+
+from the unscaled vector 
+
+xreal , we formulate the physics-informed loss ( Lphy ) us-ing a piecewise penalty function. This function strictly activates only when predictions fall outside the physically permissible bounds: 
+
+Lphy = max(0 , c 2 
+
+> s,c
+
+− 1) + max(0 , −c2
+
+> s,c
+
+) (8) This formulation serves as a highly effective physical filter. If the network generates valid EoS parameters, 
+
+Lphy evaluates to exactly zero. However, if the network attempts to map the latent space to unphysical, acausal, or unstable regions, the resulting gradients heavily pe-nalize the network weights.  
+
+> D. Total Loss and Optimization
+
+The network is trained end-to-end by minimizing a joint objective function that balances the exact data like-lihood with the physical constraints. By combining Eq. 8 with the negative log likelihood from Eq. 5, the resulting cINN+PIR framework gives an inherent posterior distri-bution that is both data-driven and strictly bounded by fundamental physics. This combination gives a total loss equation 
+
+Ltotal = LN LL + λLphy (9) where λ is a penalty weighting hyperparameter that heavily penalizes acausal or unstable generative passes. The penalty weight λ = 10 .0 was empirically chosen be-cause it is large enough to strictly enforce physical bound-aries without overpowering the network’s ability to learn the data distribution. To optimize the network, the pa-rameters θ of the internal sub-networks across all affine coupling layers are updated via backpropagation. Back-propagation is the algorithmic process neural networks use to learn from their mistakes by working backward from the output to calculate exactly how much each in-ternal weight must be adjusted to minimize future errors. The optimization process builds upon the fundamental gradient descent step [88]: 
+
+θ − η∇θ Ltotal → θ (10) Conceptually, ∇θ Ltotal represents the gradient-a math-ematical vector indicating the direction of steepest in-crease in the model’s error. By subtracting this gradient from the current network parameters ( θ), the model takes a calculated step in the exact opposite direction to iter-atively minimize the loss. The learning rate, η, acts as a step-size multiplier controlling how aggressively the pa-rameters adjust during this update. In our model, the base learning rate is set to η = 10 −4. This value of η
+
+was established through experimental testing, providing the most stable convergence and optimal loss minimisa-tion. Because the cINN outputs a continuous probabil-ity density function (PDF) rather than a discrete prob-ability mass, density values are not strictly bounded by 1. Much like compressing a fixed volume of fluid into a narrower column increases its height, as the network becomes more confident, it concentrates the total prob-ability volume (which must strictly integrate to unity) into a progressively smaller parameter space. This causes the localised density values to exceed 1 by a significant amount. Mathematically, the logarithm of a density greater than 1 yields a positive value; consequently, the NLL objective becomes negative. As illustrated in Figure 1, the loss initially takes a positive value, indicating an uncalibrated network with broad, highly uncertain map-pings. As the network learns the underlying geometric and physical correlations, the predicted conditional pos-terior distribution, denoted as p(x | cemb ), systematically narrows. The probability density sharply peaks around the true stellar interior parameters, driving the NLL ag-gressively into the negative regime. Therefore, a highly negative NLL is a desirable outcome, serving as a direct mathematical proxy for extreme model confidence and precision. To prevent overfitting to the training manifold, we im-plement an early-stopping protocol evaluated on an inde-pendent validation set. Training is halted, and the opti-mal network weights are preserved, when the validation NLL reaches its saturated minimum at LN LL = −1.73, ensuring generalization to unseen astrophysical data. 5  
+
+> FIG. 1. Evolution of the validation NLL loss ( Ltotal ) over successive epochs. The transition to a negative loss signifies the network’s convergence onto a highly confident, localized probability density mapping.
+> E. Data Generation
+
+For the training data, we use a total of 90,000 EoSs comprising of the two types Monotonic and Non-Monotonic [28] each type generated in statistical bulk using the SoSI method [89–93]. The SoSI method con-structs these EoSs by modeling the squared speed of sound as a function of energy density. Specifically, each EoS is generated using a baseline crust parameter (Γ CET )[94–99] and four discrete speed-of-sound anchor points (C1, C2, C3, C4) [92, 100, 101]. For the monotonic EoS class, c2 
+
+> s
+
+strictly increases up to the neutron star core den-sity. In contrast, for the non-monotonic class, c2 
+
+> s
+
+reaches a peak and experiences a subsequent dip before reach-ing core density, allowing the dataset to comprehensively simulate diverse, physically plausible behaviors within the stellar interior. The built EoSs are solved using TOV equations [82, 102] to generate M -R sequences and each star’s corresponding ϵc, pc and c2 
+
+> s,c
+
+is saved. These cen-tral value relations with respective M -R values serve as input during the training of our cINN model while c2
+
+> s,c
+
+is used as a physical check in the PIR part of our model architecture that directly influence the learning of cINN.  
+
+> III. RESULTS AND DISCUSSION
+
+Having established the theoretical framework and con-vergence stability of the hybrid cINN+PIR architecture, we now evaluate its predictive performance. To ensure the reliability of our predictions and reduce the struc-tural uncertainty inherent to complex neural networks, we employ a deep ensemble sampling methodology [103] -a technique where multiple independent neural networks are trained to solve the same problem so their predic-tions can be aggregated. Because the optimization land-scape of normalizing flows is highly non-convex, a single model’s convergence can be sensitive to stochastic, or in-herently random, variations during training. To counter-act this, we independently initialize and train an ensem-ble of five identical cINN+PIR models. For each individ-ual model, we assign a different random seed. By vary-ing this seed, we guarantee that each of the five models receives a uniquely randomized starting set of network weights ( θ) and experiences a distinct shuffling of the training data batches. Upon reaching convergence cri-teria via our validation early-stopping protocol, the five models are frozen. To perform inference on a given M -R
+
+contour, the input condition cemb is passed through all five independent networks simultaneously. The generated target variables are then aggregated to form a joint con-ditional posterior distribution. This ensemble approach averages out initialization artifacts and single-model bi-ases, much like deploying multiple independent random-walk chains in Bayesian inference [104]. Therefore, the maximum probability zones identified below reflect ro-bust global optima in the EoS parameter space.  
+
+> A. Synthetic contour inference and physical validation of the cINN posterior
+
+To establish an understanding of the model’s mapping capabilities, we first evaluate the cINN on four synthetic 
+
+M -R contours designed to simulate the structural charac-teristics of NICER observations where the contours span a fixed elliptical dimension of mass ∆ M = 0 .3M⊙ and radius ∆ R = 2 km as shown in Figure 2 (upper panel). The resultant central EoS contours, specifically, the me-dian (50th percentile) of the cINN predictive distribu-tions, which best aligns with our comparative baseline, are presented in Figure 2 (lower panel). This test demon-strates the network’s ability to transition directly from the observable M -R space to the high-energy central EoS space ( ϵc, p c). Crucially, this approach performs the in-version using machine learning, circumventing the need for the explicit physical construction of each type of EoS and computationally expensive integration of the TOV equations to solve them. As shown in Figure 2, the cINN captures the most probable posterior regions consistent with the physical re-lationship between a star’s macroscopic properties and its internal structure. The high-mass configurations (stars 1 and 2) yield cINN posteriors localized at appropriately high central energy densities and pressures, a defining characteristic of massive compact objects. Moreover, the model has also learned to constrain the vast regions of EoS of the high mass stars (especially stars 1 and 2) and found the most probable zones of the central EoS val-ues to be significantly smaller than the posterior regions (dashed lines) of training EoS data corresponding to the TOV solved M -R curve values that are situated inside the M -R contour regions in Figure 2 (upper panel). In particular, star 4 (green contour) exhibits interesting be-haviour: being an intermediate-mass star with a large radius, this star must fundamentally possess lower EoS 6            
+
+> FIG. 2. Upper panel :-Synthetic stars utilized as NICER mock observations overlaid on M-Rband region of the corre-sponding EoSs used in neural network training. Lower panel :-Most probable central region posteriors corresponding to each mass-radius contour shown on a logarithmic scale. Filled region represents the cINN output while dashed contours rep-resent the parameter space of all known theoretical pc-ϵcval-ues consistent with the TOV solved M-Rdata correspond-ing to the synthetic contour regions in Fig. 2 (upper panel). Background color band indicates the range of EoS models (monotonic and non-monotonic) utilized during neural net-work training.
+
+parameters due to its low compactness. Moreover, a ma-jor part of this star contour falls outside the known data region of M -R, which was used in training (Figure 2 up-per panel). This contour, therefore, tests the model’s ability to extrapolate beyond the regions where it has never seen data during training. As a result, the cINN posterior for this unknown region extends beyond the training area contour curves plotted in dashed (Figure 2, lower panel) in the lower region of EoS space, reflecting the behaviour of stars with lower compactness. M-R curves reflect the properties of EoS. Its slope 
+
+dM/dR is known to reflect the stiffness properties of its EoS. Based on its slope an M-R curve can be front-bended ( dM/dR < 0), as well as back-bended ( dM/dR ≮
+
+0) [105–107]. Configurations 1,2 and 4 are populated with such back-bended MR curves. These curves are associated with EoS that exhibit early stiffening, which results in smaller values of central density. Conversely, for front-bended MR curves, the stiffening of EoS oc-curs late, at higher density, which results in higher val-ues of central densities [55]. Our cINN cleanly reproduces this behavior (Figure 2, lower panel). In particular, con-figuration 4 is correctly mapped to a lower-density re-gion, whereas configurations 1 and 2 exhibit an extended mapping, reflecting the presence of both front- and back-bended MR curves.      
+
+> FIG. 3. Posterior distribution of c2
+> s,c (c2
+> sat the center of the star) as a function of central energy density ( ϵc) generated by the cINN+PIR ensemble. Each colour zone corresponds to the star in Fig. 2 (upper panel). The physical constraints explicitly prohibit predictions from exceeding the causal limit (c2
+> s,c = 1) described by the black horizontal line.
+
+Conventionally, the sound speed is obtained by evalu-ating the local derivative of a continuous equation of state (EoS), c2 
+
+> s
+
+= ∂p/∂ϵ . This poses a fundamental challenge for generative models such as cINNs, which do not pro-duce continuous EoS curves. Instead, they learn a condi-tional probability distribution and generate an ensemble of independent point-wise predictions in the thermody-namic phase space, rendering post-inference numerical differentiation impossible. 7To overcome this limitation, we reformulate the role of the sound speed within the network. Rather than treating c2 
+
+> s,c
+
+as a derived quantity, we promote it to a primary thermodynamic variable that is co-predicted to-gether with the central pressure, pc, and central energy density, ϵc. During data generation, the training EoSs are continuous, allowing c2 
+
+> s,c
+
+to be computed explicitly at every thermodynamic state. The cINN therefore, learns the joint conditional distribution [ P(ϵc, p c, c 2
+
+> s,c
+
+, |, c M −R)], where cM −R denotes the observed mass–radius contour. This formulation enables the direct application of Physics-Informed Regularisation (PIR). During training, custom penalty terms enforce the physical bounds 0 ≤
+
+c2 
+
+> s
+
+≤ 1, corresponding to thermodynamic stability and causality. Since ϵc, pc, and c2 
+
+> s,c
+
+are learned jointly within a shared latent representation, these penalties constrain the entire inverse mapping, ensuring that the inferred central pressure and energy-density posteriors are sam-pled only from physically admissible regions. Conse-quently, although the generated samples are independent points rather than continuous curves, each point car-ries its correct local thermodynamic information inher-ited from the training EoSs. As a result, the cINN+PIR reconstructs physically consistent posterior distributions in the ( ϵc, c 2
+
+> s
+
+) plane while keeping the entire generated en-semble strictly within the causal and thermodynamically stable region, as illustrated in Fig. 3. The distribution of c2 
+
+> s
+
+for the four test configurations reveals that cINN was able to reproduce the EoS proper-ties one would expect for both more compact and massive stellar models. Comparing the configurations of 3 and 4, lower radii associated with configurations of 3 allow them to be more compact than 4, which requires greater stiffness, as has been reproduced by significantly higher 
+
+c2 
+
+> s
+
+values shown in the lower panel of Figure 3. Also, comparing the configurations of 1 and 2, the distribution of c2 
+
+> s
+
+for the massive models (configuration 1) is indeed lower than that of configuration 2. This is again a known physical feature [21, 67] as the massive neutron stars are expected to undergo phase transitions (smooth), result-ing in softer cores indicated by relatively smaller values of c2 
+
+> s
+
+compared to configuration 2, shown in the upper panel of Figure 3.  
+
+> B. Multi-observation consistency and theoretical baseline recovery
+
+Following validation on synthetic contours (Sec-tion III A) and demonstrating that the PIR guarantees causal and thermodynamically stable predictions, we ap-ply the cINN+PIR framework to observational data. Specifically, we use the mass–radius constraints from NICER (PSR J0030+0451, J0437 −4715, J0614 −3329, and J0740+6620) together with the component-star con-straints from the binary neutron-star merger GW170817, shown in Fig. 4. To assess the ability of the cINN+PIR to recover the           
+
+> FIG. 4. Observational M-Rcontours derived from NICER measurements and the GW170817 binary neutron star merger.
+
+physically allowed EoS space, we compare its predictions with the baseline speed-of-sound interpolation (SoSI) ensemble satisfying all six observational constraints si-multaneously. Applying the cINN independently to each observation produces six posterior regions in the (log 10 ϵc, log 10 pc) plane (Fig. 5). An EoS from the train-ing catalogue is retained in the final cINN-filtered ensem-ble only if its ( ϵc, p c) trajectory intersects all six poste-rior regions simultaneously, providing a stringent multi-observation consistency criterion. The resulting cINN-filtered envelope retains 84 .2% of the baseline SoSI area (0 .6683 versus 0 .7941 dex 2), with a mean width retention of 84 .9% and an Intersection over Union (IoU) of 84 .4%. The close agreement demonstrates that the cINN faithfully reconstructs the physically al-lowed EoS region while introducing a nearly uniform re-duction in uncertainty across the entire density range, rather than preferentially constraining a particular den-sity regime. Throughout this work, logarithmic distances and areas are expressed in dex, where 1 dex corresponds to one order of magnitude. The mapped posterior regions in the ( p, ϵ ) plane rep-resent the range of central pressures and energy densi-ties compatible with each individual observation. Their morphology directly reflects the structure of the corre-sponding mass–radius contours. The substantial over-lap between the GW170817 primary component, PSR J0437 −4715, and PSR J0614 −3329 arises from the over-lap of their corresponding regions in the mass–radius plane. In contrast, the GW170817 secondary compo-nent occupies the lower boundary of the ( p, ϵ ) envelope, consistent with its lower compactness. The posterior for PSR J0740+6620 exhibits a pronounced vertical elonga-tion. Although it is reconstructed from the same mixture of front-bended and back-bended mass–radius solutions, 8  
+
+> FIG. 5. Individual cINN pc-ϵcposterior regions inferred from each NICER and gravitational wave observations corresponding to Fig. 4. On a logarithmic scale, each panel shows the 50th-percentile KDE boundary of the five-member ensemble prediction conditioned on the respective observation.
+
+its comparatively high mass and broader radius range correspond to a wider range of compactness values. Re-producing these observations, therefore, requires central energy densities spanning EoSs with significantly differ-ent stiffness, giving rise to the extended vertical structure in the ( p, ϵ ) plane.  
+
+> C. Predictive Constraints: Identifying the Optimal Targets for Future Observation
+
+Having shown that the cINN can map broad observa-tional uncertainty, we systematically scan the M -R phase space to identify an ideal sequence of six new hypotheti-cal targets. Our objective is to determine the ordered se-quence of new pulsar observations that maximally shrinks the EoS band inferred from current NICER and GW ob-servations. At each step, we select the single best target conditioned on all prior observations to maximally nar-row down current EoS uncertainties.                                     
+
+> TABLE I. Stellar Parameters and Baseline Shrinkage Data
+> Star Mass Radius Shrinkage (dex) Percentage Number (M)(R)wrt Prev wrt Orig wrt Orig (%)
+> 12.04 11.00 0.0094 0.0094 1.60 21.62 12.50 0.0082 0.0176 3.00 31.54 12.30 0.0086 0.0262 4.47 41.53 12.20 0.0078 0.0341 5.80 51.63 12.50 0.0080 0.0420 7.15 61.99 10.60 0.0079 0.0499 8.50
+
+To quantify this shrinkage, we first establish a baseline EoS band using models that successfully satisfy current NICER observations. We then divide the M -R plane into a high-resolution grid spanning R ∈ [8 .5, 16 .5] km and 
+
+M ∈ [1 .2, 2.5] M⊙. With step sizes of ∆ R = 0 .1 km and ∆M = 0 .01 M⊙, this yields 10,400 distinct theoretical targets. We use a step-by-step search to find the optimal sequence of six stars. In each iteration, we scan all 10,400 grid points by evaluating them through the trained cINN ensemble. We identify the single target that most signifi-cantly reduces the current EoS uncertainty. Its synthetic data is then added to our baseline. The search contin-ues iteratively: the new, narrower EoS band acts as the updated baseline-simulating the successful observation of the previous target and the full grid search is repeated to find the next most valuable target. The goal is to fully explore the M -R space to find the maximum reduction in EoS uncertainty in six itera-tions, assuming these six new stars are observed alongside current NICER targets. This exercise highlights exactly which M -R regions future X-ray telescope campaigns should focus on, rather than relying solely on improving overall measurement precision. We quantify the reduc-tion in EoS uncertainty by dividing the energy density into continuous bins. We define the local width, Wi, as the difference between the 10th and 90th percentiles of the predicted pressure distribution ( Wi = p90 ,i − p10 ,i ). The absolute information gain is the reduction in the mean band width, ∆ W = ¯Wbase − ¯Wjoint . Scanning the full contour set for six target stars required passing 62,400 distinct simulated observations through our model. For the simulated observations, we assume measure-ment uncertainties of 0 .1, M ⊙ in mass and 3 km in ra-dius, centred at every point of the M –R grid. A se-quential search is then performed to identify the obser-vations that maximize the reduction of the EoS uncer-tainty. The resulting heatmaps are shown in Fig. 6, where each panel displays the incremental reduction in the EoS band relative to the baseline constrained by the current NICER and GW170817 observations. The black contours denote the existing observational constraints, while the cyan contours indicate the targets selected in previous iterations. For visual clarity, targets that lie very close to previously selected locations are omitted, 9 
+
+> FIG. 6. NICER baseline EoS band shrinkage across the mass–radius ( M–R) plane during the sequential search for six optimal observational targets. The heatmaps show the reduction in the EoS band width (in dex) obtained by placing a hypothetical mass–radius measurement at each grid point. As the sequential search progresses, increasingly darker regions indicate a larger reduction relative to the baseline EoS band constrained by the current NICER and GW170817 observations. The black contours denote the existing NICER and GW170817 observational constraints, while the cyan contours mark the optimal target selected in the previous iteration and are shown for reference.
+
+although their positions are still indicated by the cyan contours. The corresponding reduction achieved at each iteration is summarized in Table I. Figure 7 illustrates how the EoS envelope progressively contracts as the six optimal targets are incorporated. The red band denotes the chiral effective theory (CET) constraint, while our analysis focuses on densities above approximately 1 .87 ϵ0 (ϵ0 ≃ 150 , MeV , fm −3); lower den-sities are shown only for reference. The cINN-generated posteriors in the ( pc, ϵ c) plane are colour-coded consis-tently with the selected targets in Fig. 6. The sequential optimization reveals that the largest re-duction in EoS uncertainty occurs at intermediate densi-ties, approximately 2 .5–4 , ϵ 0, where the pressure predom-inantly determines the radii of intermediate- and high-mass neutron stars. Smaller improvements are also ob-served at higher densities (6–10 , ϵ 0), corresponding to the cores of maximum-mass stars populated by both mono-tonic and non-monotonic EoSs [28]. Notably, the op-timization does not preferentially constrain the narrow high-density region associated with the onset of these maximum-mass configurations, indicating that present observational precision is primarily sensitive to the EoS at moderate supranuclear densities. Starting from the baseline EoS width of 0.5877 dex, each newly selected target is incorporated sequentially to update the pos-terior before selecting the next observation. After six iterations, the EoS width decreases to 0.5377 dex, corre-sponding to an absolute reduction of 0.0499 dex, or an 8.5% improvement over the baseline uncertainty. In summary, our sequential search reveals highly spe-cific, optimal target zones for future observational cam-paigns. We conducted a similar study using a larger mea-surement uncertainty contour (0 .3 M⊙ and 2 km) in Ap-pendix B. The optimal M -R targets remained largely un-changed, indicating that changes in detector sensitivity do not significantly affect the overall strategy for con-straining the EoS. 10   
+
+> FIG. 7. Iterative shrinkage of the predicted EoS band from sequential search. The grey envelope represents baseline ob-servational uncertainty, while colored lines depict sequentially tightened constraints from optimal synthetic targets. Vertical green column indicates the central EoS values of maximum mass stars for monotonic and non-monotonic compositions. Colored blobs show cINN posteriors of stars exhibiting max-imal EoS band shrinkage per iteration.
+> IV. SUMMARY AND CONCLUSION
+
+We have demonstrated that diffuse observational mass–radius ( M –R) contours, such as those obtained from NICER and gravitational-wave observations, can be mapped directly to the corresponding central energy density and pressure using a hybrid conditional Invert-ible Neural Network with Physics-Informed Regularisa-tion (cINN+PIR). Unlike conventional Bayesian infer-ence, this framework bypasses forward modelling entirely, eliminating the need to construct parameterised equa-tions of state (EoSs) and repeatedly solve the Tolman– Oppenheimer–Volkoff equations during inference. The resulting inverse mapping is performed within seconds while faithfully propagating observational uncertainties into the high-density EoS parameter space. The PIR framework ensures that all inferred solu-tions satisfy fundamental physical requirements, enforc-ing both causality (0 ≤ c2 
+
+> s
+
+≤ 1) and thermodynamic stability. Tests on synthetic NICER-like observations demonstrate that the model accurately recovers distinct central-density and central-pressure posteriors while pre-serving the underlying relationship between the macro-scopic stellar observables and the microscopic properties of dense matter. Leveraging the computational efficiency of the frame-work, we performed a systematic optimization study in-volving 62,400 simulated observations. This analysis shows that the constraining power of future measure-ments depends strongly on their location in the mass– radius plane rather than solely on measurement precision. The optimal observing strategy alternates between com-pact high-mass stars and extended intermediate-mass stars, reducing the uncertainty in the inferred EoS by up to 8 .5% relative to the current NICER baseline. These results provide concrete observational guidance for future X-ray and multi-messenger campaigns by identifying the most informative regions of the mass–radius parameter space. A comparison with Bayesian MCMC inference demon-strates that the two approaches are complementary. While MCMC provides sharper localization around the highest-likelihood solutions, the cINN offers substantially better global coverage of the physically allowed high-density EoS space and maintains robust performance even in extrapolated regions where conventional para-metric sampling becomes inefficient. Overall, this work establishes the cINN+PIR frame-work as a physically consistent, computationally efficient approach for solving the inverse neutron-star EoS prob-lem. More broadly, it illustrates how incorporating ex-act physical constraints into deep generative models can transform astrophysical inverse inference, enabling rapid, reliable, and physically interpretable analyses for next-generation multi-messenger observations.  
+
+> V. ACKNOWLEDGMENTS
+
+The authors thank the Indian Institute of Science Edu-cation and Research Bhopal for providing all the research and computation infrastructure facilities. The authors also acknowledge Dr. Anshuman Verma for providing crucial insights to this project. RM acknowledges the Science and Engineering Research Board (SERB), Govt. of India, for financial support in the form of Core Re-search Grant (CRG/2022/000663).  
+
+> VI. DATA AVAILABILITY
+
+Model generated data corresponding to Figures 2, 3, 5 and 7 are available on Zenodo repository [108].  
+
+> APPENDIX A. Visual Representation of Model Architecture
+
+The training and testing model pipeline for cINN+PIR architecture is visually detailed in Figure 8  
+
+> B. Sensitivity Analysis: Impact of Varying Observational Uncertainties
+
+We conduct an analysis parallel to that in Section III C, but modify the simulated measurement uncertainties to 0.3 M⊙ in mass and 2 km in radius. This tests whether variations in detector sensitivity significantly alter our conclusions regarding EoS constraints. Additionally, this 11  
+
+> FIG. 8. Architecture of the cINN-PIR model pipeline, illustrating the forward likelihood optimization and the backward physics-informed regularization.
+
+exercise demonstrates the model’s versatility in process-ing observational contours of varying sizes to generate high-density EoS posteriors. Due to visual proximity of stars 2, 3, 4 close to each other, only three stars at dis-tant locations in the M -R space are plotted in Figure 9 with their corresponding band shrinkage visualized in Figure 10. The contours plotted in cyan represent the previous iteration’s star. The progressive reductions in EoS uncertainty for each iteration are detailed in Table II. The results indicate that broadening the observational uncertainty contours does not drastically alter the over-all reduction in the EoS band width. Starting from an initial NICER baseline uncertainty of 0.5877 dex, the band narrows to 0.5321 dex by the end of the sixth it-eration. This corresponds to a 9.46% total reduction in uncertainty from the baseline. Compared to the 8.50% shrinkage achieved with tighter contours, varying the M -
+
+R detector sensitivity does not fundamentally alter the effectiveness of this targeting strategy. More importantly, this test highlights a practical limitation: saturating the 
+
+M -R phase space with broad, less precise observational contours yields diminishing returns when attempting to further constrain the EoS.  
+
+> C. Comparing with Bayesian Analysis
+
+We compare our work with Bayesian EoS reconstruc-tion. This method models neutron star interiors using the SoSI approach with parameters γCET , c1, c2, c3,and c4 (see section II E). It enforces strict physical rules: 12                                          
+
+> FIG. 9. Evolution of 0.3 M⊙and 2 km radius stars from the NICER baseline band shrinkage across the M-Rphase space during the sequential search for six optimal targets. TABLE II. Stellar Parameters and Baseline Shrinkage Data
+> Star Mass Radius Shrinkage (dex) Percentage Number (M)(R)wrt Prev wrt Orig wrt Orig (%)
+> 12.00 10.60 0.0094 0.0094 1.59 21.95 10.60 0.0092 0.0185 3.15 31.99 10.60 0.0088 0.0273 4.65 42.07 10.70 0.0088 0.0362 6.15 51.89 10.50 0.0093 0.0455 7.74 61.62 9.90 0.0101 0.0556 9.46
+> FIG. 10. Iterative shrinkage of the predicted EoS band re-sulting from the sequential search.
+
+causality ( c2 
+
+> s
+
+< 1) and stability ( c2 
+
+> s
+
+> 0). MCMC al-gorithms sample variables like c2 
+
+> s
+
+and Γ BPS to find EoS setups that match observed M -R curves. While reliable and physically sound, the Bayesian approach has built-in traits that limit its output being a forward model. It rejects any setup breaking physical rules, cutting off parts of the 95% M -R contour that are statistically pos-sible but physically unreachable. Second, MCMC favors the center of the data space where curves are easiest to generate, often ignoring the extreme edges of the obser-vations. Therefore, Bayesian results show a very safe but restricted portion of the data, missing the full range of uncertainty. In contrast, our framework works as a con-tinuous inverse-mapper. Instead of pushing fixed values through the TOV equations, the cINN maps the entire given input M -R space directly back to it’s correspond-ing central EoS space ( ϵc, pc). To keep results phys-ically valid, we use PIR. The cINN flexibly maps the data’s shape, while PIR acts as a strict rule, penalizing paths that break causality or stability. This combined cINN+PIR method quickly maps the outer limits of the allowed data space. It offers a fast, thorough alternative to Bayesian analysis while still obeying physical laws. To test our model, we use synthetic M -R contours with fixed sizes (∆ M = 0 .3M⊙ and ∆ R = 2 km). We de-signed these to have different amounts of overlap with our Ground Truth (GT) training data. The GT includes various EoS curves created by solving TOV equations. By changing the overlap, we see how much data falls in the ”known” range versus the ”unknown” range where the model must guess (extrapolate). This checks how well the cINN performs when training data is sparse. We compare the network’s predictions for ϵc and pc against the GT and Bayesian results to verify its accuracy in un-known areas. Matching the Bayesian reliability proves our cINN+PIR model is a fast and trustworthy alterna-tive. We use three specific M -R contours based on their overlap, shown in Figure 11 (upper panel): 
+
+• Star 1: 99% overlap with the training data range. 
+
+• Star 2: 51.91% overlap with the training data range. 
+
+• Star 3: 15.30% overlap with the training data range. Figure 11 (lower panel) shows the outer boundaries in the ϵc-pc space, comparing the GT (dashed lines), Bayesian results (dotted lines), and cINN predictions (filled regions) for the three stars. The Bayesian results 13 cover a much smaller, tighter area compared to the GT and cINN. This happens because parametric EoS models naturally narrow down. By enforcing causality ( c2 
+
+> s
+
+< 1) and stability ( c2 
+
+> s
+
+≥ 0), the Bayesian SoSI method guaran-tees safe, physical results. However, it loses flexibility. Its fixed shape cannot easily stretch to cover the outer edges of a 95% confidence M -R contour. While this makes Bayesian outputs very precise, using them alone can hide the true size of the observational uncertainty.      
+
+> FIG. 11. Upper panel :-Synthetic mass radius contours anno-tated based on their overlap with training data range. Lower panel :-Comparison plot showing central value contours for the three synthetic stars derived from different methods as labeled. Plotted in logarithmic scale, each color of contour corresponds to the respective annotated star in Fig. 11 (up-per panel).
+
+In contrast, the cINN maps data backward continu-ously without relying on a fixed model. Instead of fitting a rigid curve, it translates the full M -R contours directly into the ϵc-pc space. As seen in Figure 11 (lower panel), the cINN smoothly covers the GT, filling in valid physical areas missed by limited datasets. Star 3 is a key test of the model’s ability to extrapolate. With only 15.30% of its data in the training range, the cINN naturally shifts to lower central energy densities and pressures. This shift is not random, rather, it makes physical sense since star 3 has low compactness (mass M ≤ 1.75 M⊙ and radius 
+
+R ≥ 12 .5 km). The network follows the correct TOV equation trends, pushing the central state toward the lower limits of the EoS space. This proves the cINN learned the actual physics, rather than just memorizing data, allowing it to make valid predictions even where data is lacking. To measure how much the cINN and Bayesian results differ from the GT, we use compara-tive metrics. We check the outer edges of each predicted EoS region in the log 10 ϵc - log 10 pc space to find overlaps, shape differences, and bias. All distances here are in log 10 
+
+units (dex). We measure spatial overlap using the Jac-card Index (intersection divided by union) and the Dice Coefficient (twice the intersection divided by total area). These penalize both missing valid areas and guessing too far outside, giving a balanced score. We combine these into a single composite accuracy score (their average). As illustrated in Figure 12, this composite score confirms that the cINN consistently beats the Bayesian method at capturing the valid GT area across all cases.  
+
+> FIG. 12. Composite accuracy score (Mean of Jaccard and Dice indices) comparing the cINN and Bayesian models across the three synthetic star scenarios. Higher values indicate bet-ter overall spatial agreement with the GT.
+
+Because the Bayesian method strictly follows fixed bounds to ensure physical safety, it focuses on a small, high-confidence area. It covers only 30.6%, 20.8%, and 9.8% of the GT area for Stars 1, 2, and 3 respectively. In contrast, the cINN maps a much wider area, reaching ra-tios of 1.28 and 1.46 for Stars 1 and 2. Even when forced to guess outside its main training data (Star 3), the cINN keeps a 67.1% coverage, a composite score of 0.301 (ver-sus the Bayesian 0.138), and a Jaccard Index of 0.2291 (versus 0.0980). This shows the cINN’s main strength: quickly and fully mapping the wide observational un-certainty that traditional solvers struggle to reach. We also evaluate the models using Mean Boundary Distance (MBD) and Wasserstein-2 distance (W-2), shown in Fig-ure 13. MBD measures the average distance between the predicted outer boundary and the true GT boundary. For Star 1 (with plenty of training data), the cINN 14 
+
+FIG. 13. Error metrics comparing the cINN (blue) and Bayesian (green) models. Left: Mean Boundary Dis-tance (lower indicates a tighter average boundary). Right: 
+
+Wasserstein-2 Distance (lower indicates better probability mass alignment). 
+
+traces the true boundary better than the Bayesian model (0.026 vs. 0.032 dex). However, for Stars 2 and 3, the Bayesian model gets a lower (better) MBD. As mentioned before, this is because the Bayesian model is conservative; it shrinks to a small, safe area near the center, keeping its distance errors low. The cINN does the opposite: it tries to map the wider, unknown edges, which naturally in-creases its average geometric error. The W-2 score mea-sures the mathematical ”cost” to shift the predicted re-sults to perfectly match the true data. For Star 1, both do well (0.097 vs. 0.094 dex). For Stars 2 and 3, the Bayesian model scores better because it packs its predic-tions tightly over the safest core of the GT, making its ”moving cost” low. The cINN gets higher (worse) scores because it spreads out to capture the full uncertainty, which increases the average cost. Ultimately, these met-rics show each method’s role. The Bayesian method is precise and safe, finding the dense core. The cINN is ex-ploratory, accepting slightly higher mathematical errors to successfully map the wide, true boundaries that tradi-tional models miss. Essentially, while Bayesian MCMC remains an excellent tool for rigorous inference, heav-ily over-constraining the pc-ϵc contours is not the ulti-mate goal of this project. It is unwise to assume that those regions are physically invalid given a traditional sampler struggles to reach them-like the outer edges of a NICER contour. Physically viable EoS configurations that satisfy observational data can and do exist in these peripheral spaces. The cINN directly addresses these blind spots. By trading a minor degree of localized preci-sion for immense computational speed, the network over-comes traditional sampling bottlenecks. It recovers the peripheral, valid regions, providing a broader and much more complete mapping of the true observational uncer-tainty. 
+
+REFERENCES 
+
+[1] Gordon Baym, Tetsuo Hatsuda, Toru Kojo, Philip D Powell, Yifan Song, and Tatsuyuki Takatsuka. From hadrons to quarks in neutron stars: a review. Reports on Progress in Physics , 81(5):056902, March 2018. URL: 
+
+http://dx.doi.org/10.1088/1361-6633/aaae14 , doi: 10.1088/1361-6633/aaae14 .[2] James M. Lattimer. The nuclear equa-tion of state and neutron star masses. An-nual Review of Nuclear and Particle Science ,62(1):485–515, November 2012. URL: http://dx. doi.org/10.1146/annurev-nucl-102711-095018 ,
+
+doi:10.1146/annurev-nucl-102711-095018 .[3] Edward V. Shuryak. Quantum Chromodynamics and the Theory of Superdense Matter. Phys. Rept. , 61:71– 158, 1980. doi:10.1016/0370-1573(80)90105-2 .[4] Stuart L. Shapiro and Saul A. Teukolsky. Black Holes, White Dwarfs, and Neutron Stars: The Physics of Com-pact Objects . John Wiley & Sons, 1983. [5] Norman K. Glendenning. Compact Stars: Nu-clear Physics, Particle Physics and General Relativity .Springer, New York, 2 edition, 2000. [6] J. M. Lattimer and M. Prakash. Neutron star obser-vations: Prognosis for equation of state constraints. 
+
+Physics Reports , 442:109–165, 2007. doi:10.1016/j. physrep.2007.02.003 .[7] F. ¨Ozel and P. Freire. Masses, radii, and the equa-tion of state of neutron stars. Annual Review of As-tronomy and Astrophysics , 54:401–440, 2016. doi: 10.1146/annurev-astro-081915-023322 .[8] M. Oertel, M. Hempel, T. Kl¨ ahn, and S. Typel. Equa-tions of state for supernovae and compact stars. Re-views of Modern Physics , 89(1):015007, 2017. doi: 10.1103/RevModPhys.89.015007 .[9] J. R. Oppenheimer and G. M. Volkoff. On mas-sive neutron cores. Phys. Rev. , 55:374–381, Feb 1939. URL: https://link.aps.org/doi/10.1103/PhysRev. 55.374 , doi:10.1103/PhysRev.55.374 .[10] Richard C. Tolman. Static solutions of einstein’s field equations for spheres of fluid. Phys. Rev. , 55:364–373, Feb 1939. URL: https://link.aps.org/doi/10.1103/ PhysRev.55.364 , doi:10.1103/PhysRev.55.364 .[11] Kenji Fukushima and Tetsuo Hatsuda. The phase di-agram of dense qcd. Reports on Progress in Physics ,74(1):014001, December 2010. URL: http://dx.doi. org/10.1088/0034-4885/74/1/014001 , doi:10.1088/ 0034-4885/74/1/014001 .[12] Anna L. Watts, Nils Andersson, Deepto Chakrabarty, Marco Feroci, Kai Hebeler, Gianluca Israel, Frederick K. Lamb, M. Coleman Miller, Sharon Morsink, Feryal ¨Ozel, Alessandro Patruno, Juri Poutanen, Dimitrios Psaltis, Achim Schwenk, Andrew W. Steiner, Luigi Stella, Laura Tolos, and Michiel van der Klis. ¡i¿colloquium¡/i¿: Measuring the neutron star equation of state using x-ray timing. Reviews of Modern Physics , 88(2), April 2016. URL: http://dx.doi.org/10.1103/RevModPhys. 88.021001 , doi:10.1103/revmodphys.88.021001 .[13] Collin D. Capano, Ingo Tews, Stephanie M. Brown, Ben Margalit, Soumi De, Sumit Kumar, Duncan A. Brown, Badri Krishnan, and Sanjay Reddy. Strin-gent constraints on neutron-star radii from multimes-senger observations and nuclear theory. Nature As-tronomy , 4(6):625–632, March 2020. URL: http://dx. doi.org/10.1038/s41550-020-1014-6 , doi:10.1038/ s41550-020-1014-6 .[14] Tim Dietrich, Michael W. Coughlin, Peter T. H. Pang, Mattia Bulla, Jack Heinzel, Lina Issa, Ingo Tews, 15 
+
+and Sarah Antier. Multimessenger constraints on the neutron-star equation of state and the hubble con-stant. Science , 370(6523):1450–1453, December 2020. URL: http://dx.doi.org/10.1126/science.abb4317 ,
+
+doi:10.1126/science.abb4317 .[15] H. T Cromartie et al. Nature Astronomy , 4(1):72–76, Jan 2020. doi:10.1038/s41550-019-0880-2 .[16] E. Fonseca et al. The Astrophysical Journal Letters ,915(1):L12, jul 2021. doi:10.3847/2041-8213/ac03b8 .[17] Sk Md Adil Imam, Tuhin Malik, Constan¸ ca Providˆ encia, and B. K. Agrawal. Implications of comprehensive nuclear and astrophysics data on the equations of state of neutron star matter. Phys. Rev. D, 109(10):103025, 2024. arXiv:2401.06018 ,
+
+doi:10.1103/PhysRevD.109.103025 .[18] Christian Ecker and Luciano Rezzolla. Impact of large-mass constraints on the properties of neutron stars. MN-RAS , 519(2):2615–2622, February 2023. doi:10.1093/ mnras/stac3755 .[19] S. K. Greif, G. Raaijmakers, K. Hebeler, A. Schwenk, and A. L. Watts. Equation of state sensitivities when in-ferring neutron star and dense matter properties. Mon. Not. Roy. Astron. Soc. , 485(4):5363–5376, 2019. arXiv: 1812.08188 , doi:10.1093/mnras/stz654 .[20] Luciano Rezzolla, Elias R. Most, and Lukas R. Weih. Using gravitational-wave observations and quasi-universal relations to constrain the maximum mass of neutron stars. The Astrophysical Jour-nal Letters , 852(2):L25, January 2018. URL: 
+
+http://dx.doi.org/10.3847/2041-8213/aaa401 , doi: 10.3847/2041-8213/aaa401 .[21] Asim Kumar Saha and Ritam Mallick. The prospect of confining the equation of state of neutron stars with future mass and radius measurements. Eur. Phys. J. C, 85(9):937, 2025. arXiv:2407.13149 , doi:10.1140/ epjc/s10052-025-14673-1 .[22] Sk Md Adil Imam, N. K. Patra, C. Mondal, Tuhin Ma-lik, and B. K. Agrawal. Bayesian reconstruction of nuclear matter parameters from the equation of state of neutron star matter. Phys. Rev. C , 105(1):015806, 2022. arXiv:2110.15776 , doi:10.1103/PhysRevC.105. 015806 .[23] Bhaskar Biswas. Bayesian model selection of neutron star equations of state using multi-messenger observa-tions. The Astrophysical Journal , 926(1):75, February 2022. URL: http://dx.doi.org/10.3847/1538-4357/ ac447b , doi:10.3847/1538-4357/ac447b .[24] Debanjan Guha Roy, Anagh Venneti, Tuhin Malik, Swastik Bhattacharya, and Sarmistha Banik. Bayesian evaluation of hadron-quark phase transition models through neutron star observables in light of nuclear and astrophysics data. Phys. Lett. B, 859:139128, 2024. arXiv:2411.08440 , doi:10.1016/j.physletb. 2024.139128 .[25] Eemeli Annala, Tyler Gorda, Evangelia Katerini, Aleksi Kurkela, Joonas N¨ attil¨ a, Vasileios Paschalidis, and Aleksi Vuorinen. Multimessenger Constraints for Ultra-dense Matter. Phys. Rev. X , 12(1):011058, 2022. arXiv: 2105.05132 , doi:10.1103/PhysRevX.12.011058 .[26] Skund Tewari, Sagnik Chatterjee, Deepak Kumar, and Ritam Mallick. Analyzing the dense matter equation of states in the light of the compact object HESS J1731-347. Phys. Rev. D , 111(10):103009, 2025. arXiv:2410. 20355 , doi:10.1103/PhysRevD.111.103009 .[27] Sk Md Adil Imam and N. K. Patra. Bayesian anal-ysis of the neutron star equation of state and model comparison: Insights from PSR J0437+4715, PSR J0614+3329, and other multiphysics data. Phys. Rev. D, 112(10):103018, 2025. arXiv:2509.07109 , doi:10. 1103/2fz9-xlv1 .[28] Anshuman Verma, Asim Kumar Saha, Tuhin Malik, and Ritam Mallick. Probing the Internal Structure of Neutron Stars: A Comparative Analysis of Three Dif-ferent Classes of Equations of State. Astrophys. J. ,988(2):258, 2025. arXiv:2503.16888 , doi:10.3847/ 1538-4357/ade9a2 .[29] Milena Albino, Tuhin Malik, M´ arcio Ferreira, and Con-stan¸ ca Providˆ encia. Bayesian inference of hybrid stars with large quark cores. Phys. Rev. D , 113(8):083019, 2026. arXiv:2511.02653 , doi:10.1103/jrz4-zjq1 .[30] Jo˜ ao Cartaxo, Chun Huang, Tuhin Malik, Shashwat Sourav, Wen-Li Yuan, Tianzhe Zhou, Xuezhi Liu, and Constan¸ ca Providˆ encia. Covariant Energy Den-sity Functionals for Modeling the Equation of State of Neutron Star Matter: Cross-comparison Analysis Using CompactObject. Astrophys. J. Suppl. , 282(2):33, 2026. 
+
+arXiv:2506.03112 , doi:10.3847/1538-4365/ae2310 .[31] Asim Kumar Saha, Tuhin Malik, and Ritam Mallick. Are NICER and GW170817 constraints suggesting a compactified scenario for Neutron stars? 12 2025. 
+
+arXiv:2512.24729 .[32] Eemeli Annala, Tyler Gorda, Joonas Hirvonen, Oleg Komoltsev, Aleksi Kurkela, Joonas N¨ attil¨ a, and Aleksi Vuorinen. Strongly interacting matter exhibits decon-fined behavior in massive neutron stars. Nature Com-mun. , 14(1):8451, 2023. arXiv:2303.11356 , doi:10. 1038/s41467-023-44051-y .[33] Tuhin Malik, N. Alam, M. Fortin, C. Providˆ encia, B. K. Agrawal, T. K. Jha, Bharat Kumar, and S. K. Pa-tra. Gw170817: Constraining the nuclear matter equa-tion of state from the neutron star tidal deformabil-ity. Physical Review C, 98(3), 2018. URL: http: //dx.doi.org/10.1103/PhysRevC.98.035804 , doi:10. 1103/physrevc.98.035804 .[34] Andrew W. Steiner, James M. Lattimer, and Edward F. Brown. The equation of state from observed masses and radii of neutron stars. The Astrophysical Jour-nal , 722(1):33–54, 2010. URL: http://dx.doi.org/10. 1088/0004-637X/722/1/33 , doi:10.1088/0004-637x/ 722/1/33 .[35] G. Raaijmakers, T. E. Riley, A. L. Watts, S. K. Greif, S. M. Morsink, K. Hebeler, A. Schwenk, T. Hin-derer, S. Nissanke, S. Guillot, Z. Arzoumanian, S. Bog-danov, D. Chakrabarty, K. C. Gendreau, W. C. G. Ho, J. M. Lattimer, R. M. Ludlam, and M. T. Wolff. A nicer view of psr j0030+0451: Implications for the dense matter equation of state. The Astrophysical Journal Letters , 887(1):L22, December 2019. URL: 
+
+http://dx.doi.org/10.3847/2041-8213/ab451a , doi: 10.3847/2041-8213/ab451a .[36] Andrew W. Steiner, James M. Lattimer, and Edward F. Brown. The neutron star mass-radius relation and the equation of state of dense matter. The Astrophysical Journal , 765(1):L5, February 2013. URL: http://dx. doi.org/10.1088/2041-8205/765/1/L5 , doi:10.1088/ 2041-8205/765/1/l5 .[37] Carolyn A. Raithel, Feryal ¨Ozel, and Dimitrios Psaltis. From neutron star observables to the equation of state. 16 
+
+ii. bayesian inference of equation of state pressures. The Astrophysical Journal , 844(2):156, August 2017. URL: 
+
+http://dx.doi.org/10.3847/1538-4357/aa7a5a , doi: 10.3847/1538-4357/aa7a5a .[38] Silvia Traversi, Prasanta Char, and Giuseppe Pagliara. Bayesian inference of dense matter equation of state within relativistic mean field models using astrophysical measurements. The Astrophysical Journal , 897(2):165, 2020. URL: http://dx.doi.org/10.3847/1538-4357/ ab99c1 , doi:10.3847/1538-4357/ab99c1 .[39] Eric Thrane and Colm Talbot. An introduction to bayesian inference in gravitational-wave astronomy: Pa-rameter estimation, model selection, and hierarchical models. Publications of the Astronomical Society of Australia , 36, 2019. URL: http://dx.doi.org/10. 1017/pasa.2019.2 , doi:10.1017/pasa.2019.2 .[40] John Antoniadis et al. Science , 340(6131):1233232, 2013. URL: https://www.science.org/doi/abs/ 10.1126/science.1233232 , arXiv:https://www. science.org/doi/pdf/10.1126/science.1233232 ,
+
+doi:10.1126/science.1233232 .[41] Tuhin Malik, M´ arcio Ferreira, B. K. Agrawal, and Con-stan¸ ca Providˆ encia. Relativistic Description of Dense Matter Equation of State and Compatibility with Neu-tron Star Observables: A Bayesian Approach. As-trophys. J. , 930(1):17, 2022. arXiv:2201.12552 , doi: 10.3847/1538-4357/ac5d3c .[42] P. Landry and R. Essick. Nonparametric equation of state inference from gravitational wave observations. 
+
+Physical Review D , 99:084049, 2019. doi:10.1103/ PhysRevD.99.084049 .[43] Xieyuan Dong, Hong Shen, Jinniu Hu, and Ying Zhang. The equation of state for neutron stars with speed of sound constraints via bayesian inference. arXiv e-prints ,2025. arXiv:2509.03069 .[44] Maximilian Dax, Stephen R. Green, Jonathan Gair, Jakob H. Macke, Alessandra Buonanno, and Bern-hard Sch¨ olkopf. Real-time gravitational wave science with neural posterior estimation. Phys. Rev. Lett. ,127:241103, Dec 2021. URL: https://link.aps.org/ doi/10.1103/PhysRevLett.127.241103 , doi:10.1103/ PhysRevLett.127.241103 .[45] Yuki Fujimoto, Kenji Fukushima, and Koichi Murase. Methodology study of machine learning for the neu-tron star equation of state. Physical Review D , 98(2), 2018. URL: http://dx.doi.org/10.1103/PhysRevD. 98.023019 , doi:10.1103/physrevd.98.023019 .[46] Yuki Fujimoto, Kenji Fukushima, and Koichi Murase. Mapping neutron star data to the equation of state using the deep neural network. Physical Review D ,101(5), March 2020. URL: http://dx.doi.org/10. 1103/PhysRevD.101.054016 , doi:10.1103/physrevd. 101.054016 .[47] Yuki Fujimoto, Kenji Fukushima, and Koichi Murase. Extensive studies of the neutron star equation of state from the deep learning inference with the ob-servational data augmentation. Journal of High En-ergy Physics , 2021(3), March 2021. URL: http:// dx.doi.org/10.1007/JHEP03(2021)273 , doi:10.1007/ jhep03(2021)273 .[48] Chun Huang et al. CompactObject: An open-source Python package for full-scope neutron star equation of state inference. arXiv , 11 2024. arXiv:2411.14615 .[49] Cassandra L. Armstrong, Pablo Giuliani, Kyle Godbey, Rahul Somasundaram, and Ingo Tews. Emulators for Scarce and Noisy Data: Application to Auxiliary-Field Diffusion Monte Carlo for Neutron Matter. Phys. Rev. Lett. , 135(14):142501, 2025. arXiv:2502.03680 , doi: 10.1103/9928-wyjm .[50] N. K. Patra, Tuhin Malik, Helena Pais, Kai Zhou, B. K. Agrawal, and Constan¸ ca Providˆ encia. Reconstruction of Equation of State From Neutron Star Observables via Machine Learning. DAE Symp. Nucl. Phys. , 69:837– 838, 2026. [51] N. K. Patra, Tuhin Malik, Helena Pais, Kai Zhou, B. K. Agrawal, and Constan¸ ca Providˆ encia. Inferring the equation of state from neutron star observables via ma-chine learning. Phys. Lett. B , 865:139470, 2025. arXiv: 2502.20226 , doi:10.1016/j.physletb.2025.139470 .[52] Val´ eria Carvalho, M´ arcio Ferreira, Michal Bejger, and Constan¸ ca Providˆ encia. Neural posterior estimation of neutron star equations of state, 2025. URL: https: //arxiv.org/abs/2507.23506 , arXiv:2507.23506 .[53] Shriya Soma, Lingxiao Wang, Shuzhe Shi, Horst St¨ ocker, and Kai Zhou. Neural network reconstruc-tion of the dense matter equation of state from neutron star observables. Journal of Cosmology and Astropar-ticle Physics , 2022(08):071, August 2022. URL: http: //dx.doi.org/10.1088/1475-7516/2022/08/071 , doi: 10.1088/1475-7516/2022/08/071 .[54] Sagnik Chatterjee, Harsha Sudhakaran, and Ritam Mallick. Analyzing the speed of sound in neu-tron star with machine learning. Eur. Phys. J. C ,84(12):1291, 2024. arXiv:2302.13648 , doi:10.1140/ epjc/s10052-024-13668-8 .[55] Rounak Mukherjee and Ritam Mallick. A geometric physics-informed machine learning inference for the neu-tron star maximum mass and the inverse problem. 22026. arXiv:2602.18191 .[56] Lynton Ardizzone, Jakob Kruse, Sebastian Wirkert, Daniel Rahner, Eric W. Pellegrini, Ralf S. Klessen, Lena Maier-Hein, Carsten Rother, and Ullrich K¨ othe. Analyzing inverse problems with invertible neural net-works, 2019. URL: https://arxiv.org/abs/1808. 04730 , arXiv:1808.04730 .[57] Johannes Buchner. Ultranest – a robust, general pur-pose bayesian inference engine, 2021. URL: https: //arxiv.org/abs/2101.09604 , arXiv:2101.09604 .[58] S. Gandolfi, J. Lippuner, A. W. Steiner, I. Tews, X. Du, and M. Al-Mamun. From the microscopic to the macro-scopic world: from nucleons to neutron stars. J. Phys. G, 46(10):103001, 2019. arXiv:1903.06730 , doi:10. 1088/1361-6471/ab29b3 .[59] Rahul Somasundaram, Isak Svensson, Soumi De, An-drew E. Deneris, Yannick Dietz, Philippe Landry, Achim Schwenk, and Ingo Tews. Inferring three-nucleon couplings from multi-messenger neutron-star observa-tions. Nature Commun. , 16(1):9819, 2025. arXiv: 2410.00247 , doi:10.1038/s41467-025-64756-6 .[60] M. Raissi, P. Perdikaris, and G.E. Karniadakis. Physics-informed neural networks: A deep learn-ing framework for solving forward and inverse prob-lems involving nonlinear partial differential equa-tions. Journal of Computational Physics , 378:686– 707, 2019. URL: https://www.sciencedirect. com/science/article/pii/S0021999118307125 , doi: 10.1016/j.jcp.2018.10.045 .[61] George Em Karniadakis, Ioannis G Kevrekidis, Lu Lu, 17 
+
+Paris Perdikaris, Sifan Wang, and Liu Yang. Physics-informed machine learning. Nature Reviews Physics ,3(6):422–440, 2021. [62] Paulo Bedaque and Andrew W. Steiner. Sound velocity bound and neutron stars. Phys. Rev. Lett. , 114:031103, Jan 2015. URL: https://link.aps.org/doi/10.1103/ PhysRevLett.114.031103 , doi:10.1103/PhysRevLett. 114.031103 .[63] Eemeli Annala, Tyler Gorda, Aleksi Kurkela, Joonas N¨ attil¨ a, and Aleksi Vuorinen. Evidence for quark-matter cores in massive neutron stars. Nature Physics ,16(9):907–910, June 2020. arXiv:1903.09121 , doi: 10.1038/s41567-020-0914-9 .[64] Len Brandes, Wolfram Weise, and Norbert Kaiser. In-ference of the sound speed and related properties of neu-tron stars. Phys. Rev. D , 107(1):014011, 2023. arXiv: 2208.03026 , doi:10.1103/PhysRevD.107.014011 .[65] Sinan Altiparmak, Christian Ecker, and Luciano Rez-zolla. On the Sound Speed in Neutron Stars. Astro-phys. J. Lett. , 939(2):L34, 2022. arXiv:2203.14974 ,
+
+doi:10.3847/2041-8213/ac9b2a .[66] Shrijan Roy and Teruaki Suyama. On the sound veloc-ity bound in neutron stars. Results Phys. , 61:107757, 2024. arXiv:2211.07874 , doi:10.1016/j.rinp.2024. 107757 .[67] Christian Ecker and Luciano Rezzolla. A General, Scale-independent Description of the Sound Speed in Neu-tron Stars. ApJL , 939(2):L35, November 2022. doi: 10.3847/2041-8213/ac8674 .[68] Aleksi Kurkela, Eduardo S. Fraga, J¨ urgen Schaffner-Bielich, and Aleksi Vuorinen. Constraining neutron star matter with quantum chromodynamics. The Astrophys-ical Journal , 789(2):127, June 2014. URL: http:// dx.doi.org/10.1088/0004-637X/789/2/127 , doi:10. 1088/0004-637x/789/2/127 .[69] Abbott et al. Gw170817: Measurements of neutron star radii and equation of state. Phys. Rev. Lett. , 121:161101, Oct 2018. URL: https://link.aps.org/doi/10.1103/ PhysRevLett.121.161101 , doi:10.1103/PhysRevLett. 121.161101 .[70] Miller et al. Psr j0030+0451 mass and radius from nicer data and implications for the properties of neutron star matter. The Astrophysical Journal Letters , 887(1):L24, December 2019. URL: http://dx.doi.org/10.3847/ 2041-8213/ab50c5 , doi:10.3847/2041-8213/ab50c5 .[71] Choudhury et al. A nicer view of the nearest and bright-est millisecond pulsar: Psr j0437–4715. The Astrophys-ical Journal Letters , 971(1):L20, August 2024. URL: 
+
+http://dx.doi.org/10.3847/2041-8213/ad5a6f , doi: 10.3847/2041-8213/ad5a6f .[72] Mauviard et al. A NICER View of the 1.4 M⊙
+
+Edge-on Pulsar PSR J0614-3329. The Astrophys-ical Journal , 995(1):60, December 2025. URL: 
+
+http://dx.doi.org/10.3847/1538-4357/ae145d , doi: 10.3847/1538-4357/ae145d .[73] Miller et al. The radius of psr j0740+6620 from nicer and xmm-newton data. The Astro-physical Journal Letters , 918(2):L28, 2021. URL: 
+
+http://dx.doi.org/10.3847/2041-8213/ac089b , doi: 10.3847/2041-8213/ac089b .[74] B. P. Abbott et al. Phys. Rev. Lett. , 119:161101, Oct 2017. URL: https://link.aps.org/doi/10.1103/ PhysRevLett.119.161101 , doi:10.1103/PhysRevLett. 119.161101 .[75] Matt Nicholl, Ben Margalit, Patricia Schmidt, Gra-ham P. Smith, Evan J. Ridley, and James Nuttall. Tight multimessenger constraints on the neutron star equation of state from GW170817 and a forward model for kilonova light-curve synthesis. Mon. Not. Roy. As-tron. Soc. , 505(2):3016–3032, 2021. arXiv:2102.02229 ,
+
+doi:10.1093/mnras/stab1523 .[76] Thomas E. Riley et al. The Astrophysical Journal Let-ters , 918(2):L27, sep 2021. doi:10.3847/2041-8213/ ac0a81 .[77] P. B. Demorest, T. Pennucci, S. M. Ransom, M. S. E. Roberts, and J. W. T. Hessels. A two-solar-mass neutron star measured using shapiro de-lay. Nature , 467(7319):1081–1083, October 2010. URL: http://dx.doi.org/10.1038/nature09466 , doi: 10.1038/nature09466 .[78] George Papamakarios, Eric Nalisnick, Danilo Jimenez Rezende, Shakir Mohamed, and Balaji Lakshmi-narayanan. Normalizing flows for probabilistic mod-eling and inference, 2021. URL: https://arxiv.org/ abs/1912.02762 , arXiv:1912.02762 .[79] Danilo Jimenez Rezende and Shakir Mohamed. Variational inference with normalizing flows, 2016. URL: https://arxiv.org/abs/1505.05770 , arXiv: 1505.05770 .[80] Abbott et. al. Properties of the binary neutron star merger gw170817. Physical Review X , 9(1), January 2019. URL: http://dx.doi.org/10.1103/PhysRevX.9. 011001 , doi:10.1103/physrevx.9.011001 .[81] Riley et al. A nicer view of psr j0030+0451: Mil-lisecond pulsar parameter estimation. The Astrophysi-cal Journal Letters , 887(1):L21, December 2019. URL: 
+
+http://dx.doi.org/10.3847/2041-8213/ab481c , doi: 10.3847/2041-8213/ab481c .[82] Richard C. Tolman. Static solutions of einstein’s field equations for spheres of fluid. Phys. Rev. , 55:364–373, Feb 1939. URL: https://link.aps.org/doi/10.1103/ PhysRev.55.364 , doi:10.1103/PhysRev.55.364 .[83] Ivan Kobyzev, Simon J.D. Prince, and Marcus A. Brubaker. Normalizing flows: An introduction and review of current methods. IEEE Transac-tions on Pattern Analysis and Machine Intelligence ,43(11):3964–3979, November 2021. URL: http://dx. doi.org/10.1109/TPAMI.2020.2992934 , doi:10.1109/ tpami.2020.2992934 .[84] Yann LeCun, Yoshua Bengio, and Geoffrey Hinton. Deep learning. Nature , 521(7553):436–444, 2015. [85] Laurent Dinh, Jascha Sohl-Dickstein, and Samy Bengio. Density estimation using real nvp, 2017. URL: https: //arxiv.org/abs/1605.08803 , arXiv:1605.08803 .[86] Mark G. Alford, Sophia Han, and Madappa Prakash. Generic conditions for stable hybrid stars. Physical Review D, 88(8), October 2013. URL: http://dx. doi.org/10.1103/PhysRevD.88.083013 , doi:10.1103/ physrevd.88.083013 .[87] Sophia Han and Andrew W. Steiner. Tidal deforma-bility with sharp phase transitions in binary neutron stars. Physical Review D , 99(8), April 2019. URL: http: //dx.doi.org/10.1103/PhysRevD.99.083014 , doi:10. 1103/physrevd.99.083014 .[88] Diederik P. Kingma and Jimmy Ba. Adam: A method for stochastic optimization, 2017. URL: https:// arxiv.org/abs/1412.6980 , arXiv:1412.6980 .[89] Mark Alford, Matt Braby, Mark Paris, and Sanjay 18 
+
+Reddy. Hybrid stars that masquerade as neutron stars. The Astrophysical Journal , 629(2):969–978, Au-gust 2005. URL: http://dx.doi.org/10.1086/430902 ,
+
+doi:10.1086/430902 .[90] Toru Kojo. Phenomenological neutron star equa-tions of state: 3-window modeling of qcd mat-ter. The European Physical Journal A, 52(3), March 2016. URL: http://dx.doi.org/10.1140/epja/ i2016-16051-0 , doi:10.1140/epja/i2016-16051-0 .[91] Gordon Baym, Shun Furusawa, Tetsuo Hatsuda, Toru Kojo, and Hajime Togashi. New neutron star equa-tion of state with quark–hadron crossover. The As-trophysical Journal , 885(1):42, October 2019. URL: 
+
+http://dx.doi.org/10.3847/1538-4357/ab441e , doi: 10.3847/1538-4357/ab441e .[92] Eemeli Annala, Tyler Gorda, Aleksi Kurkela, Joonas N¨ attil¨ a, and Aleksi Vuorinen. Evidence for quark-matter cores in massive neutron stars. Nature Physics , 16(9):907–910, 2020. URL: http://dx. doi.org/10.1038/s41567-020-0914-9 , doi:10.1038/ s41567-020-0914-9 .[93] Kamal Krishna Nath, Ritam Mallick, and Sagnik Chat-terjee. I-Love-Q relations for a generic family of neu-tron star equations of state. Mon. Not. Roy. Astron. Soc. , 524(1):1438–1447, 2023. arXiv:2302.05088 , doi: 10.1093/mnras/stad1967 .[94] Gordon Baym, Christopher Pethick, and Peter Suther-land. The Ground State of Matter at High Densities: Equation of State and Stellar Models. Astrophys. J. ,170:299, December 1971. doi:10.1086/151216 .[95] K. Hebeler, J. M. Lattimer, C. J. Pethick, and A. Schwenk. Equation of state and neutron star proper-ties constrained by nuclear physics and observation. The Astrophysical Journal , 773(1):11, jul 2013. URL: https: //dx.doi.org/10.1088/0004-637X/773/1/11 , doi:10. 1088/0004-637X/773/1/11 .[96] A. Kurkela, P. Romatschke, and A. Vuorinen. Cold quark matter. Physical Review D , 81:105021, 2010. doi: 10.1103/PhysRevD.81.105021 .[97] Eduardo S. Fraga, Aleksi Kurkela, and Aleksi Vuorinen. Interacting quark matter equation of state for compact stars. Astrophys. J. Lett. , 781(2):L25, 2014. arXiv: 1311.5154 , doi:10.1088/2041-8205/781/2/L25 .[98] I. Tews, T. Kr¨ uger, K. Hebeler, and A. Schwenk. Neutron matter at next-to-next-to-next-to-leading or-der in chiral effective field theory. Physical Review Letters , 110(3), January 2013. URL: http://dx.doi. org/10.1103/PhysRevLett.110.032504 , doi:10.1103/ physrevlett.110.032504 .[99] James M. Lattimer and Madappa Prakash. The equa-tion of state of hot, dense matter and neutron stars. 
+
+Physics Reports , 621:127–164, March 2016. URL: http: //dx.doi.org/10.1016/j.physrep.2015.12.005 , doi: 10.1016/j.physrep.2015.12.005 .[100] Anshuman Verma, Asim Kumar Saha, and Ritam Mallick. Comparison of Equations of State for Neu-tron Stars with First-order Phase Transitions: A Qual-itative Study. Astrophys. J. , 985(1):1, 2025. arXiv: 2501.06453 , doi:10.3847/1538-4357/adcee0 .[101] I. Tews, J. Margueron, and S. Reddy. Critical ex-amination of constraints on the equation of state of dense matter obtained from gw170817. Physical Review C, 98(4), October 2018. URL: http://dx. doi.org/10.1103/PhysRevC.98.045804 , doi:10.1103/ physrevc.98.045804 .[102] J. R. Oppenheimer and G. M. Volkoff. On mas-sive neutron cores. Phys. Rev. , 55:374–381, Feb 1939. URL: https://link.aps.org/doi/10.1103/PhysRev. 55.374 , doi:10.1103/PhysRev.55.374 .[103] Balaji Lakshminarayanan, Alexander Pritzel, and Charles Blundell. Simple and scalable predictive uncertainty estimation using deep ensembles, 2017. URL: https://arxiv.org/abs/1612.01474 , arXiv: 1612.01474 .[104] Daniel Foreman-Mackey, David W. Hogg, Dustin Lang, and Jonathan Goodman. emcee: The mcmc hammer. 
+
+Publications of the Astronomical Society of the Pacific ,125(925):306–312, March 2013. URL: http://dx.doi. org/10.1086/670067 , doi:10.1086/670067 .[105] Hung Tan, Veronica Dexheimer, Jacquelyn Noronha-Hostler, and Nicolas Yunes. Finding Structure in the Speed of Sound of Supranuclear Matter from Bi-nary Love Relations. Phys. Rev. Lett. , 128(16):161101, 2022. arXiv:2111.10260 , doi:10.1103/PhysRevLett. 128.161101 .[106] M´ arcio Ferreira and Constan¸ ca Providˆ encia. Con-straining neutron star matter from the slope of the mass-radius curves. Phys. Rev. D, 110(6):063018, 2024. arXiv:2406.12582 , doi:10.1103/PhysRevD.110. 063018 .[107] Andreas Bauswein, Aristeidis Nikolaidis, Georgios Li-outas, Hristijan Kochankovski, Prasanta Char, Chi-ranjib Mondal, Micaela Oertel, Laura Tolos, Nicolas Chamel, and Stephane Goriely. Stellar properties in-dicating the presence of hyperons in neutron stars. 
+
+Phys. Rev. Res. , 8(1):013253, 2026. arXiv:2507.10372 ,
+
+doi:10.1103/ygtr-ktqk .[108] Utkarsh Deshmukh, Asim Kumar Saha, and Ritam Mallick. cinn-pir generated data of dense matter eos, July 2026. doi:10.5281/zenodo.21337922 .
