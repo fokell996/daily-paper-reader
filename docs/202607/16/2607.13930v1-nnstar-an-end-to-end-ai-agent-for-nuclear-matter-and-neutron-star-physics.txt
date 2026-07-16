@@ -1,0 +1,533 @@
+Title: NNStar: An end-to-end AI agent for nuclear matter and neutron star physics
+
+URL Source: https://arxiv.org/pdf/2607.13930v1
+
+Published Time: Thu, 16 Jul 2026 01:29:05 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# NNStar: An end-to-end AI agent for nuclear matter and neutron star physics 
+
+Yao Ma, 1, ∗ Yong-Liang Ma, 2, 1, † and Jia-Ying Xiong 2, 1, ‡
+
+> 1
+
+School of Frontier Sciences, Nanjing University, Suzhou 215163, China 
+
+> 2
+
+School of Physics, Nanjing University, Nanjing 210093, China 
+
+(Dated: July 16, 2026) Constraining the equation of state of dense matter requires confronting effective models with massive data that spans many orders of magnitude in scale, from sub-saturation nuclear matter properties to the masses, radii, and tidal deformabilities of neutron stars. Exploring the high-dimensional coupling space of such a model and fine tuning it against all of these constraints is a labor- and time-intensive task. We present NNStar , an end-to-end artificial-intelligence agent that automates this workflow. Rather than a bespoke application, NNStar is delivered as a portable skill 
+
+for an open large-language-model (LLM) agent platform—a self-describing module that pairs worked usage conventions with symbolic and numerical physics engines that (i) build a relativistic mean-field model directly from a Lagrangian, (ii) solve the mean-field equations of motion and evaluate the saturation properties, (iii) construct the β-equilibrium equation of state, splice it to a crust, and integrate the Tolman–Oppenheimer–Volkoff equations, and (iv) score the resulting predictions through a Bayesian joint analysis against nuclear matter and astrophysical observations. The agent can read a model, fit its parameters, and report the full set of nuclear matter and neutron star observables without human intervention. NNStar therefore provides a new, AI-driven framework for analyzing nuclear matter and neutron-star observations. 
+
+I. INTRODUCTION 
+
+The properties of dense nuclear matter (NM), espe-cially those relevant to the cores of massive neutron stars (NSs), have been studied for several decades. Neverthe-less, several fundamental questions remain open, such as the composition of the matter and the evolution of the symmetries of QCD [1–8]. The observation of massive NSs around 2 M⊙ [9–11], the detection of gravitational waves from the binary NS merger GW170817 [12, 13], and the simultaneous mass–radius (M-R) measurements by NICER [14–17] have together sharpened the con-straints on the equation of state (EoS) while simultane-ously introducing tensions that are increasingly difficult to reconcile within a single theoretical framework. On the terrestrial side, heavy-ion collisions (HICs) and the analysis of nuclear structure provide complementary in-formation on NM properties around the saturation den-sity n0 ≈ 0.16 fm −3 [18–23]. To confront these data, the EoS is usually parame-terized through an effective model or theory whose low-energy constants encode the underlying QCD dynamics and are fixed by fitting the data. The fitting process, however, is delicate. Because, for example, a fine tun-ing of the attractive and repulsive forces is needed to pin down the small binding energy and the location of the saturation density, the physical observables depend sen-sitively on the couplings, and a global agreement with data across broad scales can only be reached by a care-ful, and often tedious, exploration of a high-dimensional parameter space. The simultaneous treatment of massive    
+
+> ∗mayao@nju.edu.cn
+> †ylma@nju.edu.cn
+> ‡xiongjiaying21@mails.ucas.ac.cn
+
+heterogeneous data and the fine tuning of the couplings are therefore very difficult, if not unfeasible, to accom-plish by hand. Machine-learning (ML) and artificial-intelligence (AI)-driven techniques offer a way out, owing to their efficiency and adaptivity in analyzing massive data and uncovering statistical correlations [24–29]. In nuclear astrophysics, they have already been used extensively to constrain the NM EoS and NS structure through deep neural networks (NNs), conditional variational autoencoders, normaliz-ing flows, and Bayesian deep learning that map astro-physical observables to the interior EoS or directly to the speed of sound [29–52]. These efforts span several methodological families. Supervised deep networks learn the inverse map from M-R and tidal-deformability data to the EoS or to NM parameters [30, 32]; Bayesian and nonparametric neural representations relax the assumed functional form of P (ε) while propagating observational and epistemic uncertainties [35, 45]; generative mod-els such as conditional variational autoencoders enable rapid, calibrated posterior sampling of EoSs compatible with a given set of observations [46]; and differentiable or symbolic surrogates connect the microscopic EoS or the sound speed c2
+
+> s
+
+(n) to macroscopic stellar observ-ables and accelerate the forward Tolman–Oppenheimer– Volkoff (TOV) map [37, 41, 48]. These studies each learn or emulate an individual statistical or physical map-ping, rather than autonomously executing the full physics pipeline from a chosen Lagrangian to the final constraint. In our earlier work [40], we constructed a modular NN platform that, taking a Walecka-type relativistic mean-field (RMF) model as a concrete example, estimates the model parameters such that both the NM properties around n0 and the global NS properties are reproduced, and showed that the platform extends straightforwardly to other effective models. This work demonstrated the arXiv:2607.13930v1 [nucl-th] 15 Jul 2026 2feasibility of automating the parameter search. What remained was to build an autonomous agent that itself plans and drives the entire physics pipeline—from model construction to the final M-R curve and its statistical assessment—so that the strong interaction in dense mat-ter can be investigated end-to-end with minimal human steering. Building such an autonomous agent—one that plans and drives the entire physics pipeline—is timely. The large-language-model (LLM) advances that power general-purpose assistants have given rise to autonomous scientific agents that reason, call external tools, and exe-cute multi-step research workflows [53–55], with demon-strations ranging from autonomous chemical synthe-sis [56, 57] to end-to-end machine-learning research [58, 59]. A recurring lesson from these efforts is that the re-liability of an agent hinges on grounding: replacing free-form recall with calls to verifiable, deterministic tools. In this work, we take that step—constructing an LLM agent that autonomously plans and executes the full forward-and-inference pipeline, from a constructed model to the final M-R curve and its statistical assessment—and introduce NNStar , an end-to-end AI agent for NM and NS physics, realized not as a bespoke program but as a portable skill that any LLM agent can load. The design rests on four guiding principles, illustrated schematically in Fig. 1: (i) a single model—the agent operates on one self-consistent Lagrangian at a time, building all observ-ables from first principles rather than from disconnected fits; (ii) fine tuning of the equations of motion (EOMs)— the agent owns the symbolic derivation of the mean-field EOMs and the numerical solver, so that the couplings are tuned against the exact field equations of the chosen model; (iii) extensibility—new models, constraints, and tools can be added without rewriting the agent, because the physics capabilities are exposed as discrete tools and the models are described by a generic, declarative format; and (iv) portability—the entire capability is delivered as a single, platform-agnostic skill (a documented specifi-cation bundled with executable physics code), so that any compliant LLM agent acquires it by loading the skill rather than through bespoke integration. The rest of this paper places NNStar in the context of autonomous scientific agents and ML for dense mat-ter (Sec. II), describes the model (Sec. III), the archi-tecture of the agent and the tools it controls (Sec. IV), and the computational physics methods implemented in the skill (Sec. V). We then exercise the skill along three steps that illustrate how it would be used in practice: we validate it by reproducing established Walecka-type models, demonstrate its extensibility by adding a sextic scalar self-interaction to TM1 and re-optimizing the en-larged model against data (Sec. VI), and present a com-pact benchmark of several contemporary LLMs driving the same skill (Sec. VII). The implications of these vali-dation, application, and benchmark results for the use of grounded, skill-based agents in NM and NS studies are discussed in Sec. VIII.  
+
+> II. BACKGROUND AND RELATED WORKS
+
+NNStar sits at the intersection of three lines of re-search: tool-augmented LLMs, autonomous scientific agents, and ML for the dense-matter EoS. We summarize each line and clarify what NNStar adds in this section. 
+
+Tool-augmented LLMs. —A central insight of recent LLM research is that reasoning quality improves dramat-ically when the model can interleave thought with actions that query external tools. The ReAct paradigm cou-ples chain-of-thought reasoning with tool calls [53], while Toolformer shows that models can learn when and how to invoke APIs [54]. Standardizing this interface, the Model Context Protocol (MCP) defines a client–server conven-tion in which tool providers expose “tools”, “resources”, and “prompts” that any compliant LLM can discover and call [60]. Building on this interface, recent agent plat-forms expose reusable skills —self-contained folders that bundle a documented specification with executable code, which the platform surfaces to the model on demand [61]. 
+
+NNStar packages its entire physics backend as such a skill, so that the backend is decoupled from, and inter-changeable with the reasoning model, and portable across any skill-aware agent platform. 
+
+Autonomous scientific agents. —Building on tool use, several systems now carry out multi-step research with limited human input. In chemistry, ChemCrow equips an LLM with expert tools for synthesis planning and execution [56], and a related platform autonomously designs and runs reactions [57]. In ML research itself, “The AI Scientist” and its successor automate hypoth-esis generation, experimentation, and manuscript writ-ing [58, 59]; broad surveys chart the move from automa-tion to autonomy and catalogue the recurring failure modes—bias toward training defaults, implementation drift, and weak verification [55]. Closer to the physi-cal sciences, autonomous agents have begun to target computation and experiment directly, from quantum-chemistry agents that generate and run workflows from natural-language prompts [62] to self-driving laborato-ries that plan and execute the synthesis of novel in-organic materials [63]. Compared with these largely domain-general or chemistry-focused systems, NNStar 
+
+is a domain-specific skill whose tools encode the exact field equations of a chosen Lagrangian, so that the out-puts of any agent that loads it are reproducible and phys-ically auditable rather than merely plausible. 
+
+ML for the dense-matter EoS. —Within nuclear astrophysics, ML has been used to infer the EoS from NS observables with deep networks [45, 48], conditional variational autoencoders [46], and Bayesian deep learn-ing for the speed of sound [36, 38], complementing the NN parameter-search platform of Ref. [40]. These works learn a statistical map between observables and the EoS. 
+
+NNStar is complementary: rather than learning the map, it automates the forward modeling and inference pipeline for a physically transparent Lagrangian, with the LLM supplying the planning and the deterministic 3tools supplying the physics.  
+
+> III. THE MODEL
+
+To set up the physics backbone of NNStar , we consider the general quantum hadrodynamical (GQHD) model that incorporates all hadron resonances below 1.0 GeV, i.e., the σ, ω, ρ, and a0 mesons in addition to the nucleons [64]. Note that this choice fixes only the adopted base model , not the framework itself. The un-derlying skill is model-agnostic, deriving and solving the field equations of whatever Lagrangian it is supplied. The GQHD model is used here because it is general enough to contain the standard RMF parameterizations as special cases (see below). The pion is not included because it vanishes in the RMF approximation. Keeping all opera-tors with (iso-)scalars and vectors up to dimension-four, the Lagrangian reads 
+
+L = LN + Lσ + Lω + Lρ + La0 + LI , (1) where 
+
+LN = ¯Ψ ( iγ μ∂μ − mN ) Ψ ,
+
+Lσ = 12
+
+ ∂μσ∂ μσ − m2 
+
+> σ
+
+σ2 − 13 gs3σ3 − 14 gs4σ4
+
+− 12 gs2o2σ2ωμωμ − 12 gs2r2σ2⃗ρ μ ·⃗ρ μ
+
+− gsr 2σ⃗ ρ μ ·⃗ρ μ − gso 2σω μωμ,
+
+Lω = − 14 Ωμν Ωμν + 12 m2 
+
+> ω
+
+ωμωμ + 14 go4 (ωμωμ)2
+
++ 12 go2r2ωμωμ⃗ρ μ ·⃗ρ μ,
+
+Lρ = − 14⃗ P μν ·⃗ Pμν + 12 m2
+
+> ρ
+
+⃗ρ μ ·⃗ρ μ + 14 gr4 (⃗ρ μ ·⃗ρ μ)2 ,
+
+La0 = 12 ∂μ⃗a 0 · ∂μ⃗a 0 − m2
+
+> a0
+
+⃗a 0 ·⃗a 0 + 14 ga4 (⃗a 0 ·⃗a 0)2
+
++ 12 ga2r2 (⃗a 0 ·⃗a 0) ( ⃗ρ μ ·⃗ρ μ) + 12 gsa 2σ (⃗a 0 ·⃗a 0)+ 12 gs2a2⃗a 0 ·⃗a 0σ2 + 12 go2a2⃗a 0 ·⃗a 0ωμωμ
+
++ gsora ⃗a 0 ·⃗ρ μωμσ + gora ⃗a 0 ·⃗ρ μωμ,
+
+LI = ¯Ψ ( gσ σ − gω γμωμ − gργμ⃗ρ μ + ga0⃗a 0) Ψ , (2) where Ψ = ( p, n )T is the iso-doublet nucleon field, ⃗ρ μ =
+
+ρiμτ i and ⃗a 0 = ai
+
+> 0
+
+τ i, and Ω μν and ⃗ P μν are the field-strength tensors of the vector mesons. Together with the masses fixed to their physical values, the free cou-plings span a 21-dimensional parameter set θ [64]. This Lagrangian is general enough to contain many Walecka-type models, such as TM1 [65], NL3 [66], and FSU [67] as their special cases, which makes it the natural common substrate for the agent. Every model the agent handles is a particular truncation of, or a particular point in, the coupling space of Eq. (2). A defining feature of the GQHD model is the mixed 
+
+σωρa 0 coupling. As shown in Ref. [64], this single inter-action substantially reshapes the speed of sound and the           
+
+> FIG. 1. The NNStar workflow as a closed research loop. A researcher poses a natural-language question to an LLM agent, which drives the bundled NNStar skill—a docu-mented, model-agnostic library that builds a RMF model from a Lagrangian, solves the mean-field EoM, constructs the EoS, evaluates the saturation properties, integrates the Tolman–Oppenheimer–Volkoff equations to the M-R curve, and scores the result through the Bayesian joint analysis. The fitted couplings, NM properties, and M-R curves are returned to the researcher, closing the loop.
+
+M-R relation under charge neutrality and β-equilibrium, producing a peak in the sound speed at ∼ (2–3) n0.Such a non-monotonic sound speed—rising well above the conformal value v2 
+
+> s
+
+= 1 /3 at intermediate densities before approaching it from above at higher densities—is required by the joint existence of 2 M⊙ stars and small intermediate-mass radii. It has been widely regarded as a signature of the transitions from hadrons to other com-positions such as quark and quarkyonic matter [68–71]. That the GQHD model reproduces this feature within a purely hadronic description is therefore quite interesting.  
+
+> IV. THE NNSTAR AGENT
+
+NNStar is structured as a thin reasoning layer—the LLM—on top of a deterministic physics stack. The LLM never computes physics itself; instead, it plans a sequence of tool calls, inspects structured results, and decides on subsequent steps. This separation ensures that numerical outputs remain reproducible and auditable, while allow-ing the agent to handle open-ended tasks—such as choos-ing models, selecting constraints, interpreting failures— in natural language.  
+
+> A. Architecture
+
+NNStar is not a standalone program, but rather a skill installed into an open agent platform (here, 
+
+openclaw ). The platform runs the agentic loop against the LLM and advertises the installed skills to the model. 4When a relevant request is received, the model reads the skill’s specification (its SKILL.md ) and invokes the bun-dled physics code through the platform’s code-execution tool. Because the capability travels with the skill rather than with a bespoke backend, the same skill remains portable across any skill-aware platform and any suffi-ciently capable LLM. Moreover, extending or swapping the physics requires only edits the skill folder. This de-sign also aligns NNStar with the emerging tool-use and agent-skill ecosystem [53, 54]. Schematically, User → agent platform ⇄ LLM ,
+
+LLM → skill ( SKILL.md + code) → execution .
+
+This design makes the skill model-agnostic on both ends: the LLM can be replaced (Sec. VII) and the physics li-brary can be extended independently.  
+
+> B. Physics tool layers
+
+Beneath the skill’s documented interface lies a layered, model-agnostic computation framework: 
+
+• Analytic layer. —Given the parameters, fields, and Lagrangians (as symbolic expressions), this layer automatically constructs the mean-field EOMs, the effective masses, and the energy-density terms using a computer-algebra engine. Because the EOMs are derived symbolically from the input Lagrangian, the same code can handle any model expressible in the form of Eq. (2)—or more general forms—with the same framework. 
+
+• Numeric layer. —For a given baryon density, this layer solves the coupled mean-field equations for the meson fields, evaluates the energy density, and returns the field solution, effective masses, and scalar densities. 
+
+• Nuclear-properties layer. —From the energy density ε(nn, n p) with nn and np being, respec-tively, the neutron and proton densities, this layer computes the saturation observables: the satura-tion density n0, binding energy E, incompressibil-ity K, symmetry energy Esym , and its slope L.
+
+• TOV layer. —This layer solves for β-equilibrium matter, splices the high-density EoS onto the low-density BPS crust to form a hybrid EoS, and in-tegrates the TOV equations to produce the M-R curve. Models are described declaratively in a JSON format (in-cluding parameter keys, field names, Lagrangian term strings, parameter values, and the density grid), and a generic loader transforms such a definition into afully built model. A single driver then runs the en-tire pipeline—nuclear properties → β-equilibrium EoS 
+
+→ crust-core (spliced) EoS → M-R curve —for any model definition. This forward chain, from a Lagrangian to the M-R curve, is the deterministic core that the skill bun-dles. The higher-level actions described next—fitting, scanning, statistical assessment, and reading a model— are not separate engines, but rather workflows that the agent composes by repeatedly driving this core.  
+
+> C. What the skill lets the agent do
+
+Guided by the skill’s SKILL.md , the agent drives the bundled forward engine to execute the workflow’s high-level tasks—invoking it for a single evaluation, or wrapping it in a loop for optimization and exploration. Broadly, the skill lets an agent: 
+
+• Define or import a model —assemble a model from a Lagrangian and its couplings (supplied di-rectly, drawn from the built-in parameterizations, or reconstructed from a published paper, e.g., a PDF file). 
+
+• Compute the observables —run the forward pipeline end-to-end to obtain the NM properties, the β-equilibrium EoS, and the M-R curve for any model. 
+
+• Tune and explore —optimize the couplings against a chosen set of constraints, and scan in-dividual couplings to map the response of the ob-servables. 
+
+• Assess and report —score a model statistically against empirical and astrophysical data, and save, retrieve, and present the results. The ability to import a model directly from the literature closes the loop between the published work and compu-tation: the agent can be given a paper, reconstruct the model defined therein, and independently reproduce its NM and NS predictions. This capability underpins the validation presented in Sec. VI.   
+
+> V. PHYSICS METHODS BEHIND THE SKILL A. Mean-field approach
+
+The default solver implements the RMF approxima-tion [72, 73]. In the simplest σ-ω model, the nucleon Dirac equation in uniform matter reads 
+
+ iγ μ∂μ − gω γ0ω0 − m∗
+
+> N
+
+ ψ = 0 , m∗ 
+
+> N
+
+= mN − gσ ϕ, (3) with the meson mean fields determined self-consistently by 
+
+ϕ = gσ
+
+m2
+
+> σ
+
+ns, ns = ⟨ ¯ψψ ⟩,ω0 = gω
+
+m2
+
+> ω
+
+nB , nB = ⟨ψ†ψ⟩.
+
+(4) 5For model (2), the analytic layer automatically gener-ates the corresponding coupled equations. The current skill retains only the direct (Hartree) contributions, and its layered, model-agnostic design is built to accommo-date the relativistic Hartree–Fock (RHF) method [74] as a drop-in extension, in which the exchange (Fock) contributions are retained and the nucleon self-energy acquires scalar, time, and space components, Σ( p) = ΣS (p) + γ0Σ0(p) + γ · ˆp ΣV (p). Once added, the Hartree and Hartree–Fock options together would allow the agent to quantify the role of exchange terms within the same model.  
+
+> B. TOV equation and the stellar model
+
+Given the β-equilibrium EoS, the NS structure follows from the TOV equation [75, 76] 
+
+dP dr = − GM(r)εr2
+
+
+
+1 + Pε
+
+  
+
+1 + 4πr 3P
+
+M(r)
+
+
+
+×
+
+
+
+1 − 2GM(r)
+
+r
+
+−1
+
+. (5) The star is modeled as a pure-hadronic-matter inner core, matched onto the BPS crust at low density [77, 78]. Re-peating the integration over a range of central pressures yields the full M-R curve, and the tidal deformability is obtained from the same background by integrating the perturbation equation.  
+
+> C. Bayesian joint analysis
+
+Taking the observables produced by the previous pro-cedure as input, the statistical assessment of a model is performed with the Bayesian joint analysis (BJA) frame-work [64, 79]. By Bayes’ theorem, 
+
+p(θ | D) = p(D | θ) p(θ)
+
+p(D) ,p(D) = 
+
+Z
+
+p(D | θ) p(θ) dθ, 
+
+(6) where θ are the model parameters, p(θ) the prior (tem-porarily taken as uniform within the allowed ranges for simplicity), p(D | θ) the likelihood, and p(D) the evi-dence. Assuming independent data, the likelihood fac-torizes 
+
+p(D | θ) = 
+
+> n
+
+Y
+
+> i=1
+
+p(Di | θ), (7) due to the fact that the evidence p(D) is hard to compute because of the high dimensionality of θ. The detailed normalization of the residuals and the definition of BJA score used to rank models are given in App. A.  
+
+> D. Phenomenological constraints
+
+The data D entering Eqs. (6)–(7) consists of two com-plementary blocks, both imposed at the 1 σ level: 
+
+• NM properties around n0: the binding energy 
+
+E(n), pressure P (n), incompressibility K(n), sym-metry energy Esym (n), and its slope L(n), taken from analyses of nuclear structure and HICs [18– 23, 80, 81]; 
+
+• NS M-R relations: the constraints from the massive pulsars and the NICER measure-ments PSR J0030+0451, PSR J0437–4715, and PSR J0614–3329, as well as the GW170817 tidal deformability [10, 12–17]. Within the BJA, these two blocks are combined into a single likelihood, so that the couplings are constrained simultaneously and consistently by both NM data and astrophysical observations. The agent exposes this con-straint catalog through the list the data constraints op-eration and lets the user select any subset for a given fit.   
+
+> VI. VALIDATION AND APPLICATION A. Validation on Walecka-type models
+
+As a first check, the agent is run on established Walecka-type models—TM1 [65], NL3 [66], and the δ-meson-extended FSU model FSU-δ6.7 [67]—by extract-ing their definitions and recomputing both the NM prop-erties and M-R relations. Recovering the published sat-uration properties and M-R curves for these models con-firms that the analytic derivation of the EOMs, the nu-merical solver, the crust matching, and the TOV integra-tion are all correct end-to-end. Table I compares the saturation properties recovered by the skill with the values obtained in Ref. [64]. The agent reproduces the saturation density n0, binding en-ergy E, symmetry energy Esym , and its slope L to within the rounding of the published couplings (typically ≲ 2%), and the incompressibility K to within ∼ 7% (see below). Figure 2 overlays the corresponding agent-generated M-R curves on the current astrophysical constraints—the massive-pulsar mass of PSR J0740+6620 [11], the NICER mass–radius measurements of PSR J0030+0451 [14], PSR J0740+6620 [15], and PSR J0437 −4715 [16], and the GW170817 tidal constraint on R1.4 [13]. The agent recovers the well-known ordering of these forces: NL3 and TM1 are stiff and predict large radii ( R1.4 ≳ 14 .5 km), in tension with the NICER and GW170817 radii, whereas the δ-meson model FSU-δ6.7 is softer, with R1.4 ≃ 13 km and Mmax ≃ 2.09 M⊙, passing close to the J0030 and J0740 ellipses—exactly the published behavior that the skill is meant to reproduce. 6
+
+TABLE I. Validation of the NNStar skill on three established Walecka-type models. For each model the saturation properties recovered by the agent (“NNStar”) are compared with the published values of Ref. [64] (“Ref.”): the saturation density n0,binding energy E, symmetry energy Esym , slope L, and incompressibility K. The neutron-star maximum mass Mmax and the radius at 1 .4 M⊙, R1.4, are the agent’s predictions. Model Source n0 E Esym L K Mmax R1.4
+
+[fm −3] [MeV] [MeV] [MeV] [MeV] [M⊙] [km] TM1 NNStar 0.145 −15 .9 36 .6 109 .9 275 2.21 14 .60 Ref. 0.142 −16 .2 36 .0 108 257 – –NL3 NNStar 0.151 −16 .6 38 .7 122 .9 264 2.78 14 .85 Ref. 0.148 −16 .3 38 .2 121 246 – –FSU-δ6.7 NNStar 0.149 −16 .4 32 .2 52 .5 231 2.09 12 .98 Ref. 0.148 −16 .3 32 .7 53 .5 229 – –9 10 11 12 13 14 15 16     
+
+> R [km]
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> M [ M ]
+> PSR J0740+6620 (radio, 2.08 M)
+> GW170817
+> R1.4
+> J0030+0451
+> J0740+6620
+> J0437 4715
+> NNStar (skill)
+> TM1
+> NL3
+> FSU-6.7
+
+FIG. 2. Mass–radius curves for TM1, NL3, and FSU-
+
+δ6.7 generated by the NNStar skill (couplings from Ref. [64]), overlaid on current astrophysical constraints: the radio mass of PSR J0740+6620 (gold band) [11]; the NICER mass–radius measurements of PSR J0030+0451 [14], PSR J0740+6620 [15], and PSR J0437 −4715 [16] (1 σ er-ror bars); and the GW170817 constraint on R1.4 (violet band) [13]. The stiff NL3 and TM1 forces yield large radii, while the δ-meson model FSU-δ6.7 is softer and lies closer to the data, reproducing the published behavior of these models. 
+
+The agreement in Table I is at the rounding level for 
+
+n0, E, E sym , and L, while K is systematically higher than the reference by ∼ 18 MeV ( ∼ 7%) for TM1 and NL3, but agrees to within ∼ 1% for FSU-δ6.7. The dominant cause is the precision of the published inputs: the couplings in Table II of Ref. [64] are quoted to only three significant figures, and K = 9 dP/dn is a second derivative of the energy per particle, making it far more sensitive to the scalar self-couplings gs3, g s4, and the mass mσ than to the lower-order quantities n0, E, E sym , and L. A truncation of these inputs at the third digit therefore propagates into a few-percent shift in K, while leaving the other observ-ables within rounding. This interpretation is confirmed by the GQHD2 model, for which the full-precision cou-plings are available and the agent recovers K = 214 MeV against the published value of 214 MeV. Sub-percent residual differences arise from the uniform choice of me-son masses ( mω = 783 , m ρ = 770 , m a0 = 980 MeV), the fixed crust–core matching at nb = 0 .08 fm −3, and the nu-merical determination of the saturation point. None of these affect the conclusion that the skill reproduces the published results; tightening K for TM1 and NL3 would only require the original full-precision couplings. 
+
+B. Extending and optimizing a model: a 
+
+σ6-augmented TM1 
+
+A more demanding test of the skill is not merely to re-produce a published model, but to extend its Lagrangian and re-optimize the new theory against data—the work-flow a practitioner actually follows when proposing a model. We use the agent to add a sextic scalar self-interaction, L ⊃ − 16 gs6 σ6, to TM1 and to find the opti-mal couplings of the extended model. The physics motivation is well established. The cu-bic and quartic scalar self-interactions of Boguta and Bodmer [82] are precisely what reduce the Walecka in-compressibility from K ∼ 550 MeV to the empirical value of K ∼ 230 MeV; higher-order scalar terms con-tinue this logic at supra-saturation density. M¨ uller and Serot [83] showed that models sharing the same satu-ration properties can differ in the NS maximum mass by more than 1 M⊙ once the high-order scalar sector is varied. Maslov et al [84] demonstrated that a scalar po-tential rising steeply just above n0 halts the decrease of the effective mass and stiffens the EoS at high density— raising Mmax —while leaving the saturation point un-touched. Motohiro et al [85] showed that a six-point interaction of the σ meson in the parity-doublet model reasonably reproduces the properties of normal NM. A σ6
+
+term is thus a natural high-density handle, and adding it to TM1 exercises both the symbolic (Lagrangian-to-EOM) and the optimization capabilities of the skill. Optimization protocol.—The agent builds the aug-mented model by appending the single − 16 gs6σ6 term to 7the TM1 definition, then minimizes the objective 
+
+χ2(θ) = X
+
+> i
+
+ Ri(θ) − Di
+
+σi
+
+2
+
+, (8) where Ri(θ) is the value of observable i computed by the skill’s forward pipeline, and ( Di, σ i) are the empir-ical central value and 1 σ width. This is identical, up to an additive constant, to the BJA log-likelihood of Eq. (A4): with the normalized residual of App. A, the rescaling factor ∆ cancels in the exponent, so BJA( θ) = 
+
+− 12 χ2(θ) + const, and minimizing χ2 maximizes the BJA score. The constraints Di ± σi are the NM set of Ref. [64]— n0 = 0 .16 ± 0.05 fm −3, E = −16 .0 ± 1.0, K =230 ± 30 , E sym = 30 .9 ± 1.9, L = 52 .5 ± 17 .5 MeV, and 
+
+mσ = 600 ± 200 MeV—together with the astrophys-ical bounds Mmax ≥ 2.08 M⊙ (PSR J0740+6620 [11], imposed as a one-sided penalty) and R1.4 = 12 .7 ±
+
+1.1 km (NICER PSR J0030+0451 [14]). Starting from the TM1 couplings (with gs6 = 0), all seven couplings 
+
+{gσ , g ω , g ρ, g s3, g s4, c 3, g s6} and the scalar mass mσ are freed; the saturation observables are evaluated and the NS sector through the TOV solver, and the minimization is carried out by a gradient-based search refined over the high-density coupling ( gs6). Result.—The agent drives the total χ2 from 25 .5 for the original TM1 to 7 .2 for the optimized σ6 model, with optimal couplings mσ = 492 .4, g σ = −9.93 , g ω =12 .86 , g ρ = 3 .89 , g s3 = 1743 , g s4 = −0.62 , c 3 = 107 .6 (all in their natural units), and gs6 = −2.9 × 10 −4 MeV −2.Table II compares the saturation and NS observables be-fore and after the optimization, and Fig. 3 shows the corresponding M-R curves. The fit brings the incom-pressibility ( K : 275 → 231 MeV) and the symmetry energy ( Esym : 36 .6 → 30 .1 MeV) onto their empiri-cal targets, and reduces the over-stiff slope ( L : 110 →
+
+90 MeV), all while preserving a maximum mass above 2 M⊙ (Mmax = 2 .11 M⊙). The optimal gs6 is small and negative: with the saturation sector already well con-strained, the sextic term acts as a fine high-density ad-justment that allows the agent meet the incompressibility and maximum-mass requirements simultaneously, rather than as a dominant new force. The residual tension lies in the radius, R1.4 ≃ 14 .3 km, which remains larger than the NICER value: R1.4 is governed mainly by the symme-try energy below saturation and cannot be brought down by a purely isoscalar σ6 term, an honest limitation that a richer isovector sector (as in the full GQHD model) is needed to address. The exercise nonetheless demon-strates the intended workflow end-to-end: the agent ex-tends a published Lagrangian, derives the new field equa-tions, and optimizes the enlarged coupling space against the full data set without human intervention. 
+
+TABLE II. Saturation and neutron-star observables for the original TM1 and for the σ6-augmented TM1 optimized by the agent against the empirical constraints (Eq. (8)). The last row is the total χ2. Mmax enters as a one-sided bound (≥ 2.08 M⊙). Observable Empirical TM1 TM1+ σ6
+
+n0 [fm −3] 0.16 ± 0.05 0.145 0.141 
+
+E(n0) [MeV] −16 .0 ± 1.0 −15 .9 −16 .1
+
+K(n0) [MeV] 230 ± 30 275 231 
+
+Esym (n0) [MeV] 30 .9 ± 1.9 36 .6 30 .1
+
+L(n0) [MeV] 52 .5 ± 17 .5 110 90 
+
+mσ [MeV] 600 ± 200 511 492 
+
+Mmax [M⊙] ≥ 2.08 2.21 2.11 
+
+R1.4 [km] 12 .7 ± 1.1 14 .6 14 .3
+
+χ2 – 25 .5 7.29 10 11 12 13 14 15 16      
+
+> R [km]
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> M [ M ]
+> PSR J0740+6620 (radio, 2.08 M)
+> GW170817
+> R1.4
+> J0030+0451
+> J0740+6620
+> J0437 4715
+> NNStar (skill)
+> TM1 (original)
+> TM1+ 6(optimized)
+
+FIG. 3. Mass–radius curves of the original TM1 (solid) and the agent-optimized σ6-augmented TM1 (dashed), with the same astrophysical constraints as in Fig. 2. Adding the sextic scalar term and re-optimizing softens the equation of state slightly, shrinking the radius while keeping Mmax > 2 M⊙.
+
+VII. BENCHMARKS 
+
+A central question for any scientific agent is how much its reliability depends on grounded use of the skill as opposed to the parametric knowledge of the underlying LLM [55]. A key advantage of the present setting is that, unlike open-ended literature or reasoning bench-marks [86, 87], dense-matter physics admits a determin-istic ground truth: the correct value of any NM or NS observable for a given Lagrangian is fixed by the field equations and computed by the tool stack itself. This al-lows us to score the agent against exact references rather than human judgment-an outcome-based protocol in the spirit of recent agentic tool-use benchmarks [88]. 8 
+
+> A. Task suite and metrics
+
+Performance is measured along three orthogonal axes, following the decomposition used in function-calling and agentic-tool evaluations [86, 88]: (a) task success rate— the fraction of tasks whose final answer matches the refer-ence within tolerance; (b) tool-call validity—whether the agent selects the correct tool and fills its arguments with a schema-correct call, separating intent understanding from format alignment; and (c) workflow efficiency—the number of tool calls and redundant or failed invocations relative to the optimal plan. Separating (a) from (b)–(c) is essential: a model may reach the right answer through an inefficient path, or issue valid calls yet misinterpret the result. In the present evaluation, we instantiate this protocol on the six observables of Sec. III—the binding energy, pressure, incompressibility, and symmetry energy at n0, together with the NS mass and radius—computed from a fixed, randomly sampled Lagrangian. For each LLM, we draw three independent tasks and solve each in both modes (skill-equipped and skill-free) under iden-tical conditions, with cross-session memory disabled and one fresh context per task; the agent must return the six values as a numerical vector, which is scored against the deterministic reference produced by the validated tool stack. For every run, we record the per-observable accu-racy together with the token usage and wall-clock time (Tables III and IV). This is a deliberately compact, proof-of-concept evaluation rather than an exhaustive one.  
+
+> B. With and without the skill
+
+We run each LLM on the suite in two modes: (i) skill-equipped, in which the agent has loaded the NNStar 
+
+skill and executes its bundled, validated physics code; and (ii) skill-free, in which the same LLM receives the identical task but without the skill and must answer from its own reasoning and ad hoc code alone. The compar-ison isolates the value added by the skill and quantifies the error incurred when the model is forced to “recall” or improvise rather than run grounded, validated code. To keep the comparison clean, the platform’s cross-session memory is disabled and each task is solved in a fresh context, so the only difference between the two modes is the presence of the skill. Table III reports this compar-ison for six contemporary LLMs, while App. B provides the complete per-run results in Table IV. With the skill, every model that engages the bundled code reproduces the four NM quantities essentially exactly and the NS mass and radius to within about a percent (sub-percent apart from a single DeepSeek run whose TOV step er-rored out, Table IV) . Without it, the same models either reconstruct the pipeline only approximately or fail out-right, with characteristic errors—most strikingly, a neg-ative incompressibility K < 0 from the saturation-only formula that the skill explicitly forbids (e.g. Claude and DeepSeek in Table IV). The skill thus turns a knowledge-dependent, unreliable computation into a deterministic one.  
+
+> C. Across different LLMs
+
+Because the skill is model-agnostic, it can be loaded by different LLMs. We benchmark a representative set— DeepSeek, Qwen, Kimi, GPT, Claude, and Gemini—on the identical suite and metrics. Table III summarizes this comparison. The skill-equipped accuracy is uniformly improved across all models, except that Kimi and one set of Qwen runs fail to engage the skill and instead return a hallucinated answer or nothing available. Without the skill, the models’ performance is poor and inconsistent: sometimes nothing is returned, and sometimes the agent misapplies the physics. Accordingly, the benchmark re-ported here is intended as an initial demonstration of the with/without-skill and cross-model effects rather than a final score; a more rigorous and larger-scale benchmark-ing scheme—with a broader task distribution, more sam-ples per model, and a formally defined scoring metric— will be presented in a forthcoming companion paper fo-cused on the agent algorithm.  
+
+> VIII. CONCLUSION AND OUTLOOK
+
+We have presented NNStar , a portable skill that turns a general LLM agent into an end-to-end solver which automates the labor- and time-intensive workflow of confronting a hadronic effective model with the full range of NM and NS data. By separating an LLM rea-soning layer from a deterministic, layered physics stack— packaged as a platform-agnostic skill that the agent loads and executes—the agent builds a model from its Lagrangian, derives and solves the mean-field EOMs, computes the saturation properties, constructs the β-equilibrium EoS with a realistic crust, integrates the TOV equations, and assesses the result through a BJA— all driven by natural-language instructions. The agent can read a model, reproduce its predictions, and refine its couplings. It has been validated against the Walecka-type models TM1, NL3, and FSU-δ6.7, reproducing their published saturation properties and M-R curves. Going beyond reproduction, we used the agent to an extended model—adding a sextic scalar self-interaction σ6 to TM1 and re-optimizing the enlarged coupling space against the full NM and NS constraint set—and we benchmarked several contemporary LLMs driving the identical skill, which shows that grounding in the bundled code turns an otherwise knowledge-dependent and unreliable com-putation into a deterministic one, largely independent of the underlying model. Several directions remain to be investigated in the fu-ture. One possible physics extension is to implement chiral effective models within the same skill, making it possible to study how chiral symmetry constrains the 9                                                                                                  
+
+> TABLE III. Cross-LLM benchmark: three random tasks per model, each solved with and without the NNStar skill (paired, identical tasks). “Valid” counts runs returning a well-formed six-vector; the error columns are means over valid runs of the relative error (%) on the nuclear-matter quantities (worst of E/A, P, K, E sym ), the mass M, and radius Rversus the deterministic reference. “Tokens” (thousands) and “Time” (s) are means and measure efficiency. Model Mode Valid matter (%) M(%) R(%) Tokens (k) Time (s) GPT-5.5 +skill 3/3 0.0 0.0 0.0 65 109
+> −skill 3/3 0.0 7.7 16.0 52 204 Claude-Opus-4.8 +skill 3/3 0.0 0.3 0.8 77 103
+> −skill 3/3 186.5 34.8 17.0 116 352 Gemini-3.1-Pro +skill 3/3 0.0 0.1 0.3 1218 386
+> −skill 2/3 52.4 1.0 1.0 1341 364 Qwen3.7-Max +skill 2/3 0.0 0.0 0.0 112 161
+> −skill 0/3 ––––154 DeepSeek-V4-Pro +skill 3/3 0.0 2.4 1.7 63 394
+> −skill 2/3 2214.3 100.0 ∼10 10 55 606 Kimi-K2.6 +skill 2/3 101.1 79.9 75.0 75 605
+> −skill 2/3 1334.4 100.0 85.7 56 609
+
+dense-matter EoS through the same automated work-flow [89, 90]. On the agent side, the benchmarks of Sec. VII should be completed and extended, and the skill’s tool catalog can be broadened to include additional observables (e.g., finite-temperature EoS and transport coefficients) and additional classes of models beyond the nucleon-only description—such as the inclusion of quark matter in the cores of massive NSs and strangeness through hyperons. Because the capability is delivered as a skill, such extensions immediately benefit any agent that loads it. More broadly, by packaging a complete, auditable physics stack as a shareable skill that any ca-pable LLM can load and drive, this work points to a new mode of research for dense-matter physics: the tedious forward-and-inference pipeline is delegated to a grounded AI agent, while the physicist focuses on proposing mod-els and posing questions. We expect that grounding LLM reasoning in verifiable, shareable physics skills, as done here, will become an increasingly important methodology for dense-matter phenomenology and, more generally, for confronting effective models with heterogeneous data. 
+
+> ACKNOWLEDGMENTS
+
+The work of Y. M. is supported by Jiangsu Funding Program for Excellent Postdoctoral Talent under Grant Number 2025ZB516. Y. L. M. is supported in part by the National Science Foundation of China (NSFC) under Grant No. 12547104, the National Key R&D Program of China under Grant No. 2021YFC2202900 and Gusu Tal-ent Innovation Program under Grant No. ZXL2024363. 
+
+> DATA AVAILABILITY
+
+All process-related data and code—the benchmark task suite, the deterministic ground-truth values, the 
+
+NNStar skill, and the agent-orchestration and scor-ing scripts used to produce the results of Sec. VII—are publicly available on GitHub at https://github.com/ AaronMahn/NM-rmf-benchmark-scheme .
+
+> Appendix A: Bayesian joint analysis
+
+Based on Bayes’ theorem (6) and discussion in the main text, the quantity of interest is the posterior p(θ | D). Using Eq. (7), the posterior is then 
+
+p(θ | D) ∝
+
+> n
+
+Y
+
+> i=1
+
+p(Di | θ) p(θ). (A1) We assume a normalized likelihood for each observable and uniform priors for simplicity (the extension to other distributions is straightforward) within the allowed parameter ranges. To ensure comparable contributions from observables with vastly different magnitudes and uncertainties, all data are mapped to a normalized residual space in which the experimental central values are shifted to zero and the uncertainties rescaled to a common effective value ∆ = 0 .5. Explicitly, for each observable, we define the dimensionless normalized residual fMi(θ) which measures the 10 difference between the model prediction and the experimental central value in units of the experimental uncertainty, rescaled by ∆: 
+
+fMi(θ) = ∆ Ri(θ) − Dexp 
+
+> i
+
+σexp 
+
+> i
+
+, (A2) where Dexp  
+
+> i
+
+and σexp  
+
+> i
+
+are, respectively, the experimental central value and uncertainty of the i-th observable and Ri(θ)is the model prediction. The corresponding likelihood is 
+
+p(Di | θ) = 1
+
+√2π ∆ exp − fM 2 
+
+> i
+
+(θ)2∆ 2
+
+!
+
+. (A3) Because the same ∆ multiplies every residual, it cancels between fM 2 
+
+> i
+
+and the ∆ 2 in the exponent; each observable therefore enters through its own inverse-variance weight 1 /(σexp  
+
+> i
+
+)2. As a result, quantities with larger absolute magnitude do not dominate the inference, while ∆ only sets a common overall normalization of the likelihood. Finally, to avoid numerical overflow from the product of likelihood terms, the BJA score used to rank models is defined as BJA = ln 
+
+> n
+
+Y
+
+> i=1
+
+p(Di | θ) p(θ)
+
+!
+
+, (A4) with higher BJA indicating better overall agreement between the model predictions and the empirical data. In the agent, the M-R contribution to Eq. (A4) is estimated by taking the maximum value of the model-predicted M-R line for a given constraint. For uniform priors p(θ) = const within the allowed ranges, substituting the likelihood into Eq. (A4) and using the cancellation of ∆ noted above gives the explicit connection to the least-squares objective of Eq. (8), BJA( θ) = − 12 χ2(θ) + C, C = −n  12 ln 2 π + ln ∆  + ln p(θ), (A5) where χ2(θ) = Pni=1 
+
+(Ri(θ) − Di)/σ i
+
+2 and the constant C collects the per-observable likelihood normalization and the (constant) prior. Since C is independent of θ, maximizing the BJA score is exactly equivalent to minimizing χ2.The only term not of this form is the one-sided maximum-mass bound Mmax ≥ 2.08 M⊙ used in Sec. VI B, which is imposed as a penalty active only when the bound is violated and therefore contributes to C wherever the bound is satisfied. 11 
+
+Appendix B: Per-run benchmark data 
+
+To make the aggregate results in Table III auditable, Table IV reports the ground-truth and agent-computed observables, token usage, and wall-clock time for every run. These per-run data reveal failures that are not visible in the averaged results and distinguish invalid outputs from errors in the NM calculation or TOV step.    
+
+> TABLE IV. Ground truth (GT) vs. agent-computed values for every run. “+skill”/“ −skill” are the two modes; “inv.” marks a run with no valid six-vector; “–” denotes not applicable. nis the task index.
+
+Model n Mode E/A P K Esym M R Tok Time [MeV] [MeV fm −3] [MeV] [MeV] [M⊙] [km] [10 3] [s] GPT-5.5 8GT -26.1 -0.9 301 56.8 1.719 8.78 – –+skill -26.1 -0.9 301 56.8 1.719 8.78 53.8 74 
+
+−skill -26.1 -0.9 301 56.8 2.037 9.92 60.1 264 32 GT 45.5 5.7 511 16.1 1.529 9.23 – –+skill 45.5 5.7 511 16.1 1.529 9.23 59.8 70 
+
+−skill 45.5 5.7 511 16.1 1.496 10.93 17.2 141 46 GT 101.0 12.6 1072 22.0 1.562 10.39 – –+skill 101.0 12.6 1072 22.0 1.562 10.39 81.0 183 
+
+−skill 101.0 12.6 1072 22.0 1.599 12.10 79.1 206 Claude-Opus-4.8 23 GT 63.7 8.8 856 23.3 1.601 10.11 – –+skill 63.7 8.8 856 23.3 1.600 10.05 80.7 78 
+
+−skill 158.7 12.3 -1477 61.3 1.347 7.43 162.2 489 94 GT 125.6 19.5 2206 39.1 1.773 11.13 – –+skill 125.6 19.5 2206 39.1 1.772 11.08 63.8 142 
+
+−skill 125.6 19.5 16 39.1 1.771 11.05 98.0 307 96 GT 146.9 20.1 1941 62.3 1.873 14.30 – –+skill 146.9 20.1 1941 62.3 1.861 14.12 86.1 90 
+
+−skill 146.2 57.9 -322 61.7 3.531 17.70 87.1 258 Gemini-3.1-Pro 11 GT 104.8 13.3 1151 29.3 1.332 10.02 – –+skill 104.8 13.3 1151 29.3 1.332 10.00 1647.6 560 
+
+−skill 104.8 13.3 1151 29.3 1.319 9.83 1636.1 533 45 GT 72.7 8.9 752 27.0 1.343 9.31 – –+skill 72.7 8.9 752 27.0 1.343 9.31 1015.6 274 
+
+−skill inv. inv. inv. inv. inv. inv. – 108 62 GT 48.0 7.6 817 14.7 1.642 10.03 – –+skill 48.0 7.6 817 14.7 1.646 10.08 991.7 324 
+
+−skill 48.0 7.6 -39 14.7 1.627 10.00 1044.9 453 Qwen3.7-Max 6GT 118.2 18.1 2027 52.4 1.657 10.58 – –+skill 118.2 18.1 2027 52.4 1.657 10.58 89.2 97 
+
+−skill inv. inv. inv. inv. inv. inv. – 155 8GT -26.1 -0.9 301 56.8 1.719 8.78 – –+skill -26.1 -0.9 301 56.8 1.719 8.78 135.1 197 
+
+−skill inv. inv. inv. inv. inv. inv. – 154 93 GT -11.2 -0.7 60 19.5 1.603 8.91 – –+skill inv. inv. inv. inv. inv. inv. – 190 
+
+−skill inv. inv. inv. inv. inv. inv. – 153 
+
+> continued on next page
+
+12 
+
+> TABLE IV (continued)
+
+Model n Mode E/A P K Esym M R Tok Time [MeV] [MeV fm −3] [MeV] [MeV] [M⊙] [km] [10 3] [s] DeepSeek-V4-Pro 57 GT 50.5 8.1 876 19.6 1.657 10.62 – –+skill 50.5 8.1 876 19.6 1.657 10.62 54.2 229 
+
+−skill -305.9 84.4 4912 376.9 0.000 2.0×10 9 53.1 606 66 GT 111.2 14.5 1296 22.7 1.564 10.49 – –+skill 111.2 14.5 1296 22.7 1.564 10.49 58.0 345 
+
+−skill inv. inv. inv. inv. inv. inv. – 607 71 GT 34.7 4.5 416 24.0 1.361 8.52 – –+skill 34.7 4.5 416 24.0 1.263 8.07 78.2 607 
+
+−skill 939.0 0.0 -0 -0.0 0.000 0.00 57.4 607 Kimi-K2.6 16 GT 181.8 23.8 2153 35.1 1.663 13.40 – –+skill 21.8 2.3 -45 11.8 0.667 6.70 98.4 605 
+
+−skill inv. inv. inv. inv. inv. inv. – 618 21 GT 128.0 16.7 1504 30.1 1.513 11.68 – –+skill inv. inv. inv. inv. inv. inv. – 605 
+
+−skill -469.5 75.1 4226 -0.0 0.000 20.00 51.1 605 36 GT 130.4 17.4 1612 21.1 1.409 11.21 – –+skill 0.0 0.0 -0 0.1 0.000 0.00 52.1 604 
+
+−skill -469.5 0.4 37105 0.1 0.000 0.00 60.4 604 13 
+
+[1] K. Fukushima and C. Sasaki, Prog. Part. Nucl. Phys. 72 ,99 (2013), arXiv:1301.6377 [hep-ph]. [2] J. W. Holt, M. Rho, and W. Weise, Phys. Rept. 621 , 2 (2016), arXiv:1411.6681 [nucl-th]. [3] G. Baym, T. Hatsuda, T. Kojo, P. D. Powell, Y. Song, and T. Takatsuka, Rept. Prog. Phys. 81 , 056902 (2018), arXiv:1707.04966 [astro-ph.HE]. [4] Y.-L. Ma and M. Rho, Prog. Part. Nucl. Phys. 113 ,103791 (2020), arXiv:1909.05889 [nucl-th]. [5] G. F. Burgio, H. J. Schulze, I. Vidana, and J. B. Wei, Prog. Part. Nucl. Phys. 120 , 103879 (2021), arXiv:2105.03747 [nucl-th]. [6] Y.-L. Ma and M. Rho, AAPPS Bull. 31 , 16 (2021), arXiv:2103.00744 [nucl-th]. [7] L. Brandes and W. Weise, Symmetry 16 , 111 (2024), arXiv:2312.11937 [nucl-th]. [8] A. P. Gupta, Int. J. Sci. Res. Eng. Mgmt 10 , 1 (2026). [9] P. Demorest, T. Pennucci, S. Ransom, M. Roberts, and J. Hessels, Nature 467 , 1081 (2010). [10] J. Antoniadis et al. , Science 340 , 6131 (2013). [11] E. Fonseca et al. , Astrophys. J. Lett. 915 , L12 (2021). [12] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 119 , 161101 (2017). [13] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 121 , 161101 (2018). [14] S. Vinciguerra et al. , Astrophys. J. 961 , 62 (2024), arXiv:2308.09469 [astro-ph.HE]. [15] T. Salmi et al. , Astrophys. J. 974 , 294 (2024), arXiv:2406.14466 [astro-ph.HE]. [16] D. Choudhury et al. , Astrophys. J. Lett. 971 , L20 (2024), arXiv:2407.06789 [astro-ph.HE]. [17] L. Mauviard et al. , “A NICER view of the 1.4 solar-mass edge-on pulsar PSR J0614–3329,” (2025), arXiv:2506.14883 [astro-ph.HE]. [18] M. Dutra, O. Louren¸ co, S. S. Avancini, B. V. Carlson, A. Delfino, D. P. Menezes, C. Providˆ encia, S. Typel, and J. R. Stone, Phys. Rev. C 90 , 055203 (2014), arXiv:1405.3633 [nucl-th]. [19] J. M. Lattimer and Y. Lim, The Astrophysical Journal 
+
+771 , 51 (2013). [20] P. Danielewicz and J. Lee, Nucl. Phys. A 922 , 1 (2014), arXiv:1307.4130 [nucl-th]. [21] A. Le F` evre, Y. Leifels, W. Reisdorf, J. Aichelin, and C. Hartnack, Nucl. Phys. A 945 , 112 (2016), arXiv:1501.05246 [nucl-ex]. [22] B. A. Brown, Phys. Rev. Lett. 111 , 232502 (2013), arXiv:1308.3664 [nucl-th]. [23] B. T. Reed, F. J. Fattoyev, C. J. Horowitz, and J. Piekarewicz, Phys. Rev. Lett. 126 , 172503 (2021), arXiv:2101.03193 [nucl-th]. [24] A. Vaswani, Advances in Neural Information Processing Systems (2017). [25] A. Radovic, M. Williams, D. Rousseau, M. Kagan, D. Bonacorsi, A. Himmel, A. Aurisano, K. Terao, and T. Wongjirad, Nature 560 , 41 (2018). [26] G. Carleo, I. Cirac, K. Cranmer, L. Daudet, M. Schuld, N. Tishby, L. Vogt-Maranto, and L. Zdeborov´ a, Rev. Mod. Phys. 91 , 045002 (2019), arXiv:1903.10563 [physics.comp-ph]. [27] I. Goodfellow, J. Pouget-Abadie, M. Mirza, B. Xu, D. Warde-Farley, S. Ozair, A. Courville, and Y. Ben-gio, Communications of the ACM 63 , 139 (2020). [28] A. Boehnlein et al. , Rev. Mod. Phys. 94 , 031003 (2022). [29] K. Zhou, L. Wang, L.-G. Pang, and S. Shi, Prog. Part. Nucl. Phys. 135 , 104084 (2024), arXiv:2303.15136 [hep-ph]. [30] Y. Fujimoto, K. Fukushima, and K. Murase, Phys. Rev. D 101 , 054016 (2020), arXiv:1903.03400 [nucl-th]. [31] R. Wang, Y.-G. Ma, R. Wada, L.-W. Chen, W.-B. He, H.-L. Liu, and K.-J. Sun, Phys. Rev. Res. 2, 043202 (2020), arXiv:2010.15043 [nucl-th]. [32] F. Morawski and M. Bejger, Astron. Astrophys. 642 , A78 (2020), arXiv:2006.07194 [astro-ph.HE]. [33] M. U. Anil, K. Banerjee, T. Malik, and C. Providˆ encia, JCAP 01 , 045 (2022), arXiv:2004.14196 [physics.comp-ph]. [34] X. H. Wu, Z. X. Ren, and P. W. Zhao, Phys. Rev. C 
+
+105 , L031303 (2022), arXiv:2105.07696 [nucl-th]. [35] M.-Z. Han, J.-L. Jiang, S.-P. Tang, and Y.-Z. Fan, As-trophys. J. 919 , 11 (2021), arXiv:2103.05408 [hep-ph]. [36] Y. Fujimoto, K. Fukushima, L. D. McLerran, and M. Praszalowicz, Phys. Rev. Lett. 129 , 252702 (2022), arXiv:2207.06753 [nucl-th]. [37] S. Soma, L. Wang, S. Shi, H. St¨ ocker, and K. Zhou, JCAP 08 , 071 (2022), arXiv:2201.01756 [hep-ph]. [38] M. Omana Kuttan, J. Steinheimer, K. Zhou, and H. Stoecker, Phys. Rev. Lett. 131 , 202303 (2023), arXiv:2211.11670 [hep-ph]. [39] W. He, Q. Li, Y. Ma, Z. Niu, J. Pei, and Y. Zhang, Sci. China Phys. Mech. Astron. 66 , 282001 (2023), arXiv:2301.06396 [nucl-th]. [40] L.-J. Guo, J.-Y. Xiong, Y. Ma, and Y.-L. Ma, Astrophys. J. 965 , 47 (2024), arXiv:2309.11227 [nucl-th]. [41] S. Chatterjee, H. Sudhakaran, and R. Mallick, Eur. Phys. J. C 84 , 1291 (2024), arXiv:2302.13648 [astro-ph.HE]. [42] W.-B. He, Y.-G. Ma, L.-G. Pang, H.-C. Song, and K. Zhou, Nucl. Sci. Tech. 34 , 88 (2023), arXiv:2303.06752 [hep-ph]. [43] L.-J. Guo, Y. Ma, Y.-L. Ma, R.-X. Wu, and Y.-L. Wu, (2024), arXiv:2410.06088 [nucl-th]. [44] E. Y¨ uksel, D. Soydaner, and H. Bahtiyar, Phys. Rev. C 
+
+109 , 064322 (2024), arXiv:2401.02824 [nucl-th]. [45] G. Ventagli and I. D. Saltas, JCAP 01 , 073 (2025), arXiv:2405.17908 [astro-ph.HE]. [46] M. Ferreira and M. Bejger, Phys. Rev. D 111 , 023035 (2025), arXiv:2403.14266 [nucl-th]. [47] W. Zhou, H. Shen, J. Hu, and Y. Zhang, Phys. Rev. D 
+
+110 , 043017 (2024), arXiv:2407.11447 [nucl-th]. [48] N. K. Patra, T. Malik, H. Pais, K. Zhou, B. K. Agrawal, and C. Providˆ encia, Phys. Lett. B 865 , 139470 (2025), arXiv:2502.20226 [nucl-th]. [49] K. Kovlakas, D. De Grandis, and N. Rea, Astron. Astro-phys. 701 , A267 (2025), arXiv:2509.03090 [astro-ph.HE]. [50] W. Liu, L. Wang, and Z. Zhu, (2026), arXiv:2604.05428 [astro-ph.HE]. [51] J. D. Baker, C. A. Bertulani, and R. V. Lobato, (2026), arXiv:2604.24949 [astro-ph.HE]. [52] G. Bezerra, V. Dexheimer, and R. Negreiros, (2026), arXiv:2605.31198 [astro-ph.HE]. [53] S. Yao, J. Zhao, D. Yu, N. Du, I. Shafran, K. Narasimhan, and Y. Cao, (2022), arXiv:2210.03629 [cs.CL]. [54] T. Schick, J. Dwivedi-Yu, R. Dess` ı, R. Raileanu, 14 
+
+M. Lomeli, L. Zettlemoyer, N. Cancedda, and T. Scialom, (2023), arXiv:2302.04761 [cs.CL]. [55] T. Zheng, Z. Deng, H. T. Tsang, W. Wang, J. Bai, Z. Wang, and Y. Song, (2025), arXiv:2505.13259 [cs.CL]. [56] A. M. Bran, S. Cox, O. Schilter, C. Baldassari, A. D. White, and P. Schwaller, Nature Mach. Intell. 6, 525 (2024), arXiv:2304.05376 [physics.chem-ph]. [57] D. A. Boiko, R. MacKnight, B. Kline, and G. Gomes, Nature 624 , 570 (2023). [58] C. Lu, C. Lu, R. T. Lange, J. Foerster, J. Clune, and D. Ha, (2024), arXiv:2408.06292 [cs.AI]. [59] Y. Yamada, R. T. Lange, C. Lu, S. Hu, C. Lu, J. Foerster, J. Clune, and D. Ha, (2025), arXiv:2504.08066 [cs.AI]. [60] Anthropic, “Introducing the Model Context Protocol,” https://www.anthropic.com/news/ model-context-protocol (2024). [61] Anthropic, “Equipping agents for the real world with Agent Skills,” https://agentskills.io (2025). [62] Y. Zou, A. H. Cheng, A. Aldossary, J. Bai, S. X. Leong, J. A. Campos-Gonzalez-Angulo, C. Choi, C. T. Ser, G. Tom, A. Wang, Z. Zhang, I. Yakavets, H. Hao, C. Crebolder, V. Bernales, and A. Aspuru-Guzik, Matter (2025), 10.1016/j.matt.2025.102263, arXiv:2505.02484 [cs.AI]. [63] N. J. Szymanski, B. Rendy, Y. Fei, R. E. Kumar, et al. ,Nature 624 , 86 (2023). [64] Y. Ma, Y.-L. Ma, and J.-Y. Xiong, (2026), arXiv:2603.01933 [nucl-th]. [65] Y. Sugahara and H. Toki, Nucl. Phys. A 579 , 557 (1994). [66] G. A. Lalazissis, J. Konig, and P. Ring, Phys. Rev. C 
+
+55 , 540 (1997), arXiv:nucl-th/9607039. [67] B. G. Todd-Rutel and J. Piekarewicz, Phys. Rev. Lett. 
+
+95 , 122501 (2005), arXiv:nucl-th/0504034. [68] P. Bedaque and A. W. Steiner, Phys. Rev. Lett. 114 ,031103 (2015), arXiv:1408.5116 [nucl-th]. [69] L. McLerran and S. Reddy, Phys. Rev. Lett. 122 , 122701 (2019), arXiv:1811.12503 [nucl-th]. [70] H. Tan, J. Noronha-Hostler, and N. Yunes, Phys. Rev. Lett. 125 , 261104 (2020), arXiv:2006.16296 [astro-ph.HE]. [71] S. Altiparmak, C. Ecker, and L. Rezzolla, Astrophys. J. Lett. 939 , L34 (2022), arXiv:2203.14974 [astro-ph.HE]. [72] J. D. Walecka, Annals Phys. 83 , 491 (1974). [73] B. D. Serot and J. D. Walecka, Adv. Nucl. Phys. 16 , 1 (1986). [74] A. Bouyssy, J. F. Mathiot, N. Van Giai, and S. Marcos, Phys. Rev. C 36 , 380 (1987). [75] R. C. Tolman, Phys. Rev. 55 , 364 (1939). [76] J. R. Oppenheimer and G. M. Volkoff, Phys. Rev. 55 ,374 (1939). [77] G. Baym, C. Pethick, and P. Sutherland, Astrophys. J. 
+
+170 , 299 (1971). [78] W. D. Arnett and R. L. Bowers, Astrophys. J. Suppl. 33 ,415 (1977). [79] T. Bayes, Philosophical Transactions of the Royal Society of London 53 , 370 (1763). [80] M. Dutra, O. Lourenco, J. S. Sa Martins, A. Delfino, J. R. Stone, and P. D. Stevenson, Phys. Rev. C 85 ,035201 (2012), arXiv:1202.3902 [nucl-th]. [81] J. M. Lattimer and Y. Lim, Astrophys. J. 771 , 51 (2013), arXiv:1203.4286 [nucl-th]. [82] J. Boguta and A. R. Bodmer, Nucl. Phys. A 292 , 413 (1977). [83] H. M¨ uller and B. D. Serot, Nucl. Phys. A 606 , 508 (1996), arXiv:nucl-th/9603037. [84] K. A. Maslov, E. E. Kolomeitsev, and D. N. Voskresen-sky, Phys. Rev. C 92 , 052801 (2015), arXiv:1508.03771. [85] Y. Motohiro, Y. Kim, and M. Harada, Phys. Rev. C 92 ,025201 (2015), [Erratum: Phys.Rev.C 95, 059903 (2017)], arXiv:1505.00988 [nucl-th]. [86] Y. Ma, Z. Gou, J. Hao, R. Xu, S. Wang, L. Pan, Y. Yang, Y. Cao, A. Sun, H. Awadalla, and W. Chen, (2024), arXiv:2402.11451 [cs.CL]. [87] D. Wang, M. Cheng, S. Yu, Z. Liu, Z. Guo, X. Li, and Q. Liu, (2025), arXiv:2510.10909 [cs.CL]. [88] F. Lei, Y. Yang, W. Sun, and D. Lin, (2025), arXiv:2508.16260 [cs.AI]. [89] Y. Ma and Y.-L. Ma, Phys. Rev. D 112 , 054026 (2025), arXiv:2507.10049 [nucl-th]. [90] J.-Y. Xiong, Y. Ma, B.-K. Sheng, and Y.-L. Ma, (2025), arXiv:2511.04353 [nucl-th].

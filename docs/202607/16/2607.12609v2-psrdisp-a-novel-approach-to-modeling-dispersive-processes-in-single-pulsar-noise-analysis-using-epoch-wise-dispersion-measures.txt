@@ -1,0 +1,737 @@
+Title: PSRDISP: A novel approach to modeling dispersive processes in single-pulsar noise analysis using epoch-wise dispersion measures
+
+URL Source: https://arxiv.org/pdf/2607.12609v2
+
+Published Time: Thu, 16 Jul 2026 00:34:23 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# PSRDISP : A novel approach to modeling dispersive processes in single-pulsar noise analysis using epoch-wise dispersion measures 
+
+Churchil Dwivedi a, Abhimanyu Susobhanan b
+
+> aAstronomy and Astrophysics Division, Physical Research Laboratory, Thaltej Campus, Thaltej, Ahmedabad, 380059, Gujarat, India
+> bSchool of Physics, Indian Institute of Science Education and Research Thiruvananthapuram, Maruthamala PO, Thiruvananthapuram, 695551, Kerala, India
+
+Abstract 
+
+We present PSRDISP , a novel approach to modeling deterministic and stochastic dispersive processes in pulsar timing datasets using high-precision epoch-wise dispersion measure (DM) estimates, with a Gaussian Process based approach. Unlike the con-ventional single-pulsar noise analysis methodology, which is applied to frequency-resolved times of arrival (ToAs) of pulses, this technique is applied to epoch-wise DMs which are derived from these ToAs. It can also be applied to wideband DMs measured si-multaneously with wideband ToAs. Therefore, this framework provides a paradigm-agnostic approach to characterise single-pulsar dispersive processes. This method is expected to minimise the impact of achromatic red noise processes while characterising these dispersive e ff ects. We substantiate the discussed technique with representative examples using simulated narrowband and wide-band datasets with realistic noise injections. We found the recovery to be in close agreement with the injections, and agnostic to the estimation technique. Our method applies to pulsar timing experiments where precise, epoch-wise DM estimates are possible, such as the Indian Pulsar Timing Array. This technique can serve as a powerful diagnostic tool for validating single-pulsar noise analyses, which is crucial for precision pulsar timing experiments, such as Pulsar Timing Arrays. 
+
+Keywords: Pulsars, Gravitational Waves, Interstellar Medium, Pulsar Timing Arrays 
+
+1. Introduction 
+
+Millisecond Pulsars (MSPs) are rotating neutron stars with millisecond-scale periods, acting as accurate celestial clocks due to their high rotational stability (Lorimer and Kramer, 2004; Hobbs et al., 2019). Pulsar timing is the technique of tracking a pulsar’s rotation by measuring the times of arrival (ToAs) of its pulses (Hobbs et al., 2006; Edwards et al., 2006). It is one of the most precise techniques in astrophysics, enabling us to study a wide range of time-domain phenomena ranging from testing strong-field gravity (Kramer et al., 2021) to coro-nal mass ejections (Chowdhury et al., 2026). Recently, Pulsar Timing Array (PTA: Foster and Backer, 1990) experiments re-ported the evidence for a stochastic Gravitational Wave Back-ground (GWB) in the nanohertz frequency range using precise timing of an ensemble of MSPs (Agazie et al., 2023; Reardon et al., 2023; Antoniadis et al., 2023; Xu et al., 2023; Agazie et al., 2024; Miles et al., 2025b). The propagation of electromagnetic waves from a pulsar through the ionized interstellar medium (IISM) and the inter-planetary medium introduces chromatic delays, primarily due to the frequency-dependent refractive index of the medium. As-suming a homogeneous IISM containing cold, ionised plasma, in the absence of Galactic magnetic fields and finite tempera-ture e ff ects (Kulkarni, 2020), we can write the refractive index as (Lorimer and Kramer, 2004) 
+
+μ =
+
+r
+
+1 −
+
+ νp
+
+ν
+
+2
+
+(1) where νp is the plasma frequency, given by 
+
+νp =
+
+s
+
+e2ne
+
+πme
+
+(2) Here, ne is the free electron number density in the medium, and 
+
+e and me are respectively the charge and mass of an electron. Due to this frequency dependence of μ, a radio wave of fre-quency ν will experience a propagation delay while traveling a distance dL relative to an infinite-frequency signal, given by 
+
+∆t =
+
+Z dL
+
+> 0
+
+dℓ
+
+V
+
+!
+
+− dL
+
+c (3) where V = cμ is the speed of the radio wave in the IISM and c
+
+is the speed of light in vacuum. Using equation (1), assuming 
+
+νp ≪ ν, and evaluating the integral in equation (3), we obtain the dispersion delay caused by a homogeneous IISM as 
+
+∆t = D × DM 
+
+ν2 (4) where DM =
+
+Z dL
+
+> 0
+
+ne dℓ (5) is the integrated free electron column density along the line of sight, and is called the Dispersion Measure (DM), and D ≈ 
+
+4.1488 × 10 3 MHz 2 pc −1 cm 3 s, is known as the dispersion con-stant (Lorimer and Kramer, 2004). arXiv:2607.12609v2 [astro-ph.IM] 15 Jul 2026 In general, the DM of a pulsar is not constant; it varies with time depending on the line of sight due to the relative motion between the pulsar and the Earth, and the inherently turbulent nature of the IISM. These temporal variations are usually mod-eled by pulsar timing packages, such as TEMPO2 (Edwards et al., 2006) and PINT (Luo et al., 2021; Susobhanan et al., 2024), using a low-order Taylor series expansion in time around a fiducial epoch (referred to as the DM_Taylor model). Such a model can account for the slow, deterministic variations in DMs, but it falls short in modeling the stochasticity arising due to random fluctuations occurring on varying timescales due to the intrinsic variability of the IISM, and the relative motion between the Earth and the pulsar (e.g. Donner et al., 2020). These stochastic DM variations, known as DM noise (hereafter 
+
+DMN ), are ubiquitous in pulsar timing and di ff erent approaches have been adopted over the years to model them in the mea-sured ToAs. These include the DMMODEL approach of Keith et al. (2012), which provides a spline-based representation of DM variations, the DMX approach described in Arzoumanian et al. (2015), where DM variations are modeled as a piecewise-constant function in time, the DMGP approach of Lentati et al. (2014), which represents the DM variations as a reduced-rank Fourier-domain Gaussian Process (GP), typically with a power-law spectrum, and the DMWaveX approach in PINT (Susobhanan et al., 2024), which uses an unconstrained Fourier series repre-sentation of DM variations. Apart from the IISM-induced variations, the solar wind (SW), which is a stream of charged particles, originating from the Sun, also alters the electron column density along the line of sight and hence produces variations in the DM. These vari-ations, however, depend on the solar elongation 1 throughout the year and are highest near solar conjunctions (Tiburzi et al., 2019, 2021). These deterministic variations are generally mod-eled using a spherically symmetric model of SW (Edwards et al., 2006) with a constant electron density ¯ nsw  
+
+> e
+
+, sometimes with higher-order derivatives to incorporate additional e ff ects (Nobleson et al., 2026). The SW itself exhibits an inherent stochasticity, which acts as a source of chromatic noise, known as the solar wind noise (hereafter SWN ), in pulsar timing. Simi-lar to the DMGP approach, the recent SWGP approach of Susarla et al. (2024) can be used to account for these e ff ects. Addi-tionally, the SWX model (Agazie et al., 2025) can also be used, where the variations in nsw  
+
+> e
+
+are modeled using a piece-wise con-stant function in time, similar to the DMX model. Another e ff ect caused by the turbulence in the IISM is the variation of ne on a wide range of length scales, leading to multi-path propagation of radio waves, that manifests as the broadening of an otherwise sharp intrinsic pulse profile. These distortions produce an apparent delay that scales as 
+
+∆tscat ∝ ν−4 (6) for Gaussian inhomogeneities 2 (Lorimer and Kramer, 2004). 
+
+> 1The angle between the Sun-Earth and the Earth-pulsar position vectors is called solar elongation. Due to Earth’s motion around the Sun, the solar elon-gation of a pulsar keeps changing with a periodicity of 1 yr.
+> 2The actual chromatic index for scattering-induced delays depends strongly
+
+These profile-shape distortions also experience stochastic varia-tions, giving rise to variable scattering in MSPs (Kulkarni et al., 2025). These variations are a source of chromatic red noise, commonly modeled in ToAs via GPs (Srivastava et al., 2023) for a given turbulence spectrum. However, a more generic ap-proach of a free-chromatic index noise model ( ∆t ∝ ν−χ) is also used (Nobleson et al., 2026; Larsen et al., 2026). The presence of scatter-broadening introduces a source of bias in the esti-mated DMs (Singha et al., 2024), the imprint of which over DM is not straightforward to interpret. These distortions produce a pulsar-dependent non-linear frequency dependence between scattering and other dispersive processes, which poses a road-block in deducing their inter-dependence. Profile-domain tech-niques are, therefore, paramount to estimate scatter broadening (Singha et al., 2024) and subsequently mitigate its e ff ect from the pulse profiles (Singha et al., 2024; Bathula et al., 2025). Due to all these inherent challenges, we restrict ourselves to the treatment of purely dispersive processes in the present work. For high-precision pulsar timing experiments, such as PTAs, these noise processes pose serious challenges. In particular, the presence of long-timescale DM variations can degrade a PTA experiment’s ability to accurately characterise gravita-tional wave signals, especially if they are mis-modeled. Fur-thermore, mis-modeled solar wind e ff ects can also mimic a Common Red Noise (CRN) process due to a common periodic-ity for all pulsars in the ensemble (Tiburzi et al., 2016; Susarla et al., 2024). Since the starting point of any PTA experiment to detect a GWB is to look for a CRN process in its ensemble of pulsars, it is of paramount importance to accurately char-acterise the single-pulsar noise processes, so as to prevent any false-positives (Chen et al., 2021; Arzoumanian et al., 2020; Goncharov et al., 2021; Antoniadis et al., 2022). In this work, we address the precise modeling of dispersive noise processes by presenting an alternative methodology, em-ploying the Fourier-domain GP-based approach of Lentati et al. (2014) to model the stochastic e ff ects owing to its favored use in the recent literature (Srivastava et al., 2023; EPTA Collabo-ration et al., 2023b; Larsen et al., 2024; Miles et al., 2025a; No-bleson et al., 2026). This method directly uses high-precision epoch-wise DM time series to fit for various dispersive noise processes in a purely Bayesian framework. This is in con-trast to what’s done in conventional single-pulsar noise anal-ysis (SPNA) techniques, which primarily work on ToA residu-als and model the delays introduced by various noise processes using packages such as ENTERPRISE (Ellis et al., 2020; John-son et al., 2024). Our treatment, therefore, ensures minimal contamination from achromatic red noise and white noise pro-cesses, aiding precise estimation of dispersive processes. The rest of the paper is organised as follows. In Section 2, we give a detailed description of the new technique. We provide the details of the simulation framework adopted for the injection and recovery study, along with the results for a representative    
+
+> on the turbulence spectrum along the line of sight to a pulsar. The ν−4form is an approximation for a large number of randomly distributed thin scattering screens. For the case of a Kolmogorov turbulence spectrum, these delays scale as ν−4.4.
+
+2case to advocate the e ff ectiveness of the technique in recovering deterministic and stochastic processes in Section 3. We discuss the results and their implications in Section 4, followed by a brief summary in Section 5, and outline the potential areas of future work in Section 6. 
+
+2. Description of the technique 
+
+In this section, we provide a detailed description of the the-oretical construct of this work. It should be noted that the DM measurements considered in this work correspond to high-precision epoch-wise DM estimates. These can be obtained either in the narrowband paradigm using epoch-wise ToA fit-ting techniques such as DMcalc (Krishnakumar et al., 2021), or in the wideband paradigm using PulsePortraiture (Pennucci et al., 2014; Pennucci, 2019). Additionally, we assume that the DM measurements for di ff erent epochs are independent, i.e, the measurements of one epoch do not a ff ect the others 3. This also means that the results of a global DMX or DMMODEL fit should be used with caution with this technique, since such measure-ments can have non-zero measurement covariance between dif-ferent epochs. That said, the framework presented in this sec-tion is agnostic to the DM estimation algorithms or pulsar tim-ing paradigms (narrowband or wideband) employed, as long as the above mentioned assumptions hold good. The total DM for any pulsar, in the absence of additional scattering-induced e ff ects, can be modeled in terms of a com-bination of deterministic and stochastic components. We can write this as DM(t) ≃ DM 0 + ∆ DM Taylor det (t) + ∆ DM SW det (t) 
+
++ ∆ DM DMN sto (t) + ∆ DM SWN sto (t) + ∆ DM WN 
+
+(7) where DM 0 is a constant (o ff set) DM term, ∆DM Taylor det (t) and 
+
+∆DM SW det (t) are the contributions from the deterministic DM and SW models, respectively, ∆DM DMN sto (t) and ∆DM SWN sto (t) are the contributions from the DMN and SWN stochastic noise processes, respectively, ∆DM WN is an additional term related to the mea-surement uncertainty in the DMs, and t represents time. In the present work, we consider a low-order Taylor series expansion in time for ∆DM Taylor det , which can be written as 
+
+∆DM Taylor det = DM 1
+
+t − tDM ref 
+
+ + 12! DM 2
+
+t − tDM ref 
+
+2
+
+(8) where DM 1 and DM 2 respectively represent the first and second order time derivatives of the DM, and tDM ref is the DM reference epoch (referred to as DMEPOCH in pulsar timing). We also con-sider a similar deterministic model for the SW process, which can be written, up to second order, as SW det (t) = ¯nsw e + ∂nsw e
+
+∂t t=tref 
+
+(t −tref )+ 12! 
+
+∂2nsw e
+
+∂t2 t=tref 
+
+(t −tref )2 (9) 
+
+∆DM SW det (t) = SW det (t) G(ρ, r, t) (10)  
+
+> 3This makes sure that the measurement covariance matrix, ζ, is diagonal.
+
+where ¯ ne represents the constant average solar wind electron number density 4 at 1AU, and tSW ref is the solar wind reference epoch (referred as SWEPOCH in pulsar timing). The multiplica-tive factor G is a geometric factor which depends on the solar elongation ρ and the position vector of the observatory relative to the Solar System Barycenter (SSB) r, and is given by (Ed-wards et al., 2006; Hazboun et al., 2022) 
+
+G(ρ, r, t) = ρ(t)
+
+|r| sin ρ(t) AU 2 (11) The quantities ρ and r are numerically calculated using solar-system ephemeris, such as DE440 (Park et al., 2021). We can write the stochastic variations induced by the DMN process in terms of a Fourier-basis GP as 
+
+∆DM DMN sto (t) =
+
+> Nharm
+
+X
+
+> j=1
+
+ADM  
+
+> j
+
+cos h2π f j
+
+t − tDM ref 
+
+i 
+
++ BDM  
+
+> j
+
+sin h2π f j
+
+t − tDM ref 
+
+i  (12) where {A DM } and {B DM } are the Fourier noise amplitudes, 
+
+f j = j/Tspan is the Fourier frequency, and Nharm is the maximum number of Fourier bins used for the process. It should be noted that, unlike the conventional ToA-based GP implementations, such as in ENTERPRISE , these amplitudes have units of DM, instead of time. Therefore, in order to ensure that they are com-parable with the conventional noise amplitudes, we perform a scaling transformation as 
+
+ADM  
+
+> j
+
+→ A DM 
+
+> j
+
+ ν2ref 
+
+D
+
+ , BDM  
+
+> j
+
+→ B DM 
+
+> j
+
+ ν2ref 
+
+D
+
+ (13) In a similar fashion, we include the stochastic variations in-duced by the SWN process in terms of a Fourier-basis GP, fol-lowing the prescription in Susarla et al. (2024), as 
+
+∆DM SWN sto (t) =
+
+> Nharm
+
+X
+
+> j=1
+
+ASW  
+
+> j
+
+cos h2π f j
+
+t − tSW ref 
+
+i 
+
++ BSW  
+
+> j
+
+sin h2π f j
+
+t − tSW ref 
+
+i  G(ρ, r, t)(14) where the noise amplitudes {A SW } and {B SW } have the units of cm −3 as per equation (10) 5. In order to take care of any sys-tematics associated with the estimated DMs, and compensate for the under /over-estimation of their measurement uncertain-ties, we use a white-noise process, ∆DM WN , with a standard deviation, ςWN , depending on the DM measurement uncertainty 
+
+σDM , given by 
+
+ς2WN = DISPEFAC 2 σ2DM + DISPEQUAD 2 (15)           
+
+> 4Hereafter, the terms (in leading order) in the deterministic SW model will be represented by NE_SW ,NE_SW1 and NE_SW2 , respectively, to stay coherent with pulsar timing conventions.
+> 5The SWN implementation in Susarla et al. (2024) does not require the further transformation of the SWN Fourier noise amplitudes, unlike as done for DMN us-ing equation (13). We follow the same prescription to remain coherent with the existing pulsar timing frameworks for better compatibility and cross-validation.
+
+3where DISPEFAC and DISPEQUAD are white-noise parameters employed to account for such systematics. It should be noted that in the case of narrowband, ςWN can be thought of as originating from the error propagated from the ToA measure-ment uncertainties. Hence, any inaccuracy in the ToA uncer-tainties (which are accounted by white noise parameters such as EFAC s and EQUAD s) have to be propagated to ςWN also. Throughout this work, we will only consider DISPEFAC and set 
+
+DISPEQUAD = 0.0 for simplicity. We can now write the Bayes’ Theorem in this context as 
+
+P(θ | d, M) = L(d | θ, M) Π(θ | M)
+
+Z(d | M) (16) where θ is the parameter vector, d is the data (containing the DM measurements, their uncertainties, and the correspond-ing epochs), and M is the model hypothesis. The quantity 
+
+P(θ | d, M) is the posterior distribution of parameters θ, given the data and the model hypothesis, L(d | θ, M) is the likelihood of the data, given the underlying model hypothesis, Π(θ | M) is the prior distribution of the model parameters, and Z(d | M) is the Bayesian evidence calculated over the prior volume. We can define the log-likelihood function for the DMs in the form of a multivariate Gaussian distribution, similar to the conventional SPNA (Lentati et al., 2014; Srivastava et al., 2023; Nobleson et al., 2026) approach, as ln L = − 12 ηT ζ−1η − 12 ln[det(2 πζ)] (17) where η is a vector of the DM time series, encapsulating all the deterministic and stochastic processes mentioned in equation (7), and ζ is the diagonal DM white noise covariance matrix containing the scaled DM uncertainties given by equation (15). By imposing Gaussian priors on the GP noise amplitudes with a covariance matrix Φ(θs) and hyper-parameters θs, we can an-alytically marginalise the likelihood expression following the prescription in van Haasteren and Levin (2013) to arrive at the marginalised likelihood, given by ln Λ = − 12
+
+η − ∆det (θd)T Ξ−1 η − ∆det (θd) − 12 ln[det(2 πΞ)] (18) where ∆det encapsulates all the deterministic processes and 
+
+θd is a vector containing all the respective model parameters. The e ff ective noise covariance matrix, Ξ, can be represented in the reduced-rank approximation (Lentati et al., 2014; van Haasteren and Vallisneri, 2014) as 
+
+Ξ = ζ + φ Φ φT (19) Here, φ is the noise basis matrix that contains, in general, the partial derivatives of DM time series with respect to the deter-ministic and stochastic components, and can be represented as 
+
+φi j = ∂η i
+
+∂a j
+
+, ∀ a ∈ { θd} ∪ nADM , BDM o ∪ nASW , BSW o (20) where nADM , BDM o and nASW , BSW o represent the set of Fourier components for the DMN and SWN processes, respec-tively. The covariance matrix of Fourier amplitudes, Φ, is related to the Fourier-domain power-spectral density (PSD), 
+
+S ( f ), of the noise processes as 
+
+Φn m α β = S ( fn; {θs}α) δnm δαβ / Tspan (21) where n, m = 1, 2, 3, . . . , Nharm , represent the Fourier basis in-dices, α, β = 1, 2, 3, . . . , Npsr , represent the pulsar indices for a PTA, δ is the Kronecker-delta function, and the PSD is given by 
+
+S ( f ) = A2
+
+12 π2
+
+ffyr 
+
+!−γ ννref 
+
+!−2χ
+
+yr 3 (22) where fyr is the 1 yr −1 reference Fourier frequency, νref is taken as 1400 MHz and χ = 2 for dispersive processes. In a more advanced treatment, we can consider solar wind as a spatially-correlated process, but this is beyond the scope of the current work. It is worthwhile to mention that in the implemented tech-nique, we also analytically marginalise against the DM o ff set and ∆DM Taylor det parameters, such that a not only contains the Fourier noise amplitudes, but also includes the DM 0, DM 1 and DM 2 parameters. The corresponding entries in Φ will be infi-nite. This methodology is also consistent with the implementa-tion in ENTERPRISE . Thus, equation (16) can be re-written in terms of the marginalised likelihood, Λ, to sample the reduced parameter space comprising of θs and θd. We use the emcee 
+
+package (Foreman-Mackey et al., 2013) to sample the poste-rior distributions of parameters with an a ffi ne-invariant Markov Chain Monte-Carlo (MCMC) sampling technique (Metropolis et al., 1953; Hastings, 1970; Earl and Deem, 2005; Goodman and Weare, 2010) using the priors mentioned in Table 1. To assess the convergence, we visually inspect the MCMC chains after discarding about 25% of the initial samples for all the fit-ted parameters. In the rest of the paper, we will denote the methodology de-scribed in this section as the PSRDISP technique. At this junc-ture, it is worthwhile to point out the uniqueness of this tech-nique compared to the ENTERPRISE framework, or even the work presented in (Susobhanan and van Haasteren, 2025) for the wideband paradigm. The ENTERPRISE implementation models noises in terms of delays introduced in the ToAs. This means that both chromatic and achromatic processes are kept on an equal footing. Such an implementation is susceptible to potential spectral leakages, primarily due to modeling all red noises in the Fourier-domain via GPs (Iraci et al., 2024). The treatment in (Susobhanan and van Haasteren, 2025) uses simul-taneous ToAs and DMs estimated via a global fit in the wide-band paradigm, however, still modeling the processes in terms of delays. PSRDISP , on the other hand, directly models the aforementioned dispersive processes in terms of the δDM pro-duced. Such a treatment is almost una ff ected by achromatic red noise, which gives the potential to accurately characterise the chromatic noises. Therefore, this framework provides a com-plimentary domain for modeling these processes and give an independent check on the conventional methods. 
+
+3. A representative example 
+
+In this section, we discuss the details of the simulation-based injection and recovery study performed to validate the 456000 57000 58000 59000 60000 61000 62000 63000 64000 
+
+MJD 
+
+60 
+
+40 
+
+20 
+
+0
+
+20 
+
+40 
+
+60 
+
+80 
+
+> ToA residual [  s]
+
+300 
+
+325 
+
+350 
+
+375 
+
+400 
+
+425 
+
+450 
+
+475 
+
+500 
+
+> [MHz]
+
+Figure 1: The simulated narrowband ToA residuals with 16 sub-bands in the 300 − 500 MHz observing frequency range. The ToAs have a sensitivity of 1 μs. The deterministic SW process is simulated with NE_SW = 2.0, NE_SW1 = 1.0, and NE_SW2 = 0.75, while the DM process is set as per the original timing solution. The 
+
+DMN process is injected with log 10 A = −13 .5 and γ = 3.0. Additional 16 Fourier bins below the 1 /Tspan bin are incorporated to simulate a realistic noise process. The high-frequency cuto ff is set to 1000 /Tspan .56000 57000 58000 59000 60000 61000 62000 63000 64000 
+
+> MJD
+> 10.3895
+> 10.3900
+> 10.3905
+> 10.3910
+> 10.3915
+> 10.3920
+> 10.3925
+> 10.3930
+> DM [pc/cm 3]
+> Simulated DM
+
+(a) DM time series with recovered noise realisations 56000 57000 58000 59000 60000 61000 62000 63000 64000  
+
+> MJD
+> 10.3895
+> 10.3900
+> 10.3905
+> 10.3910
+> 10.3915
+> 10.3920
+> 10.3925
+> 10.3930
+> DM [pc/cm 3]
+> Injected DM process
+> Extracted DM process
+
+(b) Injected and recovered noise realisations Figure 2: The DM time series extracted from the simulated narrowband ToAs (as crimson points) with 16 sub-bands using the DMcalc package, along with 20 random time-domain reconstructed noise process realisations using parameter estimates obtained after applying the PSRDISP technique on the DM time series (shown in solid black), shown in the left panel. The median precision of the estimated DMs is ∼ 4.6 × 10 −5 pc /cm 3. The right panel shows the injected DM process realisation (teal) compared with the 20 random recovered DM process realisations (black). 
+
+described technique. As mentioned in Section 2, since this method is agnostic to the DM estimation methods, we only present a representative study with the narrowband paradigm here, without any loss of generality. Additionally, we present a representative example using the wideband paradigm in Ap-pendix A for completeness. We used the PINT package to simulate narrowband ToAs with a span of ∼20 yr at a cadence of 14 days, with σToA = 1μs
+
+and 16 sub-bands per epoch in the 300 −500 MHz observing fre-quency range. We have taken the EPTA DR2Full+ (EPTA Col-laboration et al., 2023a) pulsar ephemeris for PSR J1909 −3744 as the starting timing solution. We consider the DMEPOCH to be the middle of the data span, without any loss of generality. We included the deterministic DM and SW processes (up to the sec-ond order), with NE_SW = 2.0, NE_SW1 = 0, and NE_SW2 = 1.0for the SW process, while the DM process is fixed as per the original timing solution. We injected DMN with log 10 A = −13 .5and γ = 3.0. We included additional 16 frequency bins below the 1 /Tspan bin, with a scale factor of 2, such that the lowest fre-quency bin corresponds to 1 /216 Tspan for the red noise process. We considered Nharm = 1000 for the injections, such that the high-frequency cuto ff corresponds to 1000 /Tspan . This choice of Fourier basis ensures that the red noises are close to real-ity. Furthermore, we used EFAC = 1.2 for white noise 6. The simulated narrowband ToA residuals are shown in Figure 1. To 
+
+> 6
+
+The parameters EFAC and DMEFAC are the conventional white-noise pa-rameters (Lentati et al., 2014; Luo et al., 2021; Susobhanan et al., 2024), while 
+
+DISPEFAC is the white-noise parameter introduced in the present work (see Section 2 for details). 
+
+5DISPEFAC = 1.10 +0.04 0.04      
+
+> 0.6
+> 1.2
+> 1.8
+> 2.4
+> NE_SW
+> NE_SW = 1.17 +0.44 0.42
+> 0.88
+> 0.96
+> 1.04
+> 1.12
+> 1.20
+> NE_SW1
+> NE_SW1 = 1.00 +0.05 0.05
+> 0.675
+> 0.700
+> 0.725
+> 0.750
+> NE_SW2
+> NE_SW2 = 0.71 +0.02 0.02
+> 2.8
+> 3.2
+> 3.6
+> 4.0
+> dm
+> dm =3.31 +0.20 0.20
+> 1.04
+> 1.12
+> 1.20
+> 1.28
+
+DISPEFAC 
+
+> 13.68
+> 13.60
+> 13.52
+> 13.44
+> 13.36
+> log 10  Adm
+> 0.6
+> 1.2
+> 1.8
+> 2.4
+
+NE_SW 
+
+> 0.88
+> 0.96
+> 1.04
+> 1.12
+> 1.20
+
+NE_SW1 
+
+> 0.675
+> 0.700
+> 0.725
+> 0.750
+
+NE_SW2 
+
+> 2.8
+> 3.2
+> 3.6
+> 4.0
+> dm
+> 13.68
+> 13.60
+> 13.52
+> 13.44
+> 13.36
+
+log 10 Adm    
+
+> log 10 Adm =13.52 +0.04 0.04
+
+Figure 3: The posterior distributions of the deterministic SW process and the DM WN parameters, along with DMN hyper-parameters, estimated using the PSRDISP 
+
+technique on the DM time series extracted from the simulated narrowband ToAs. The injected values of various parameters are highlighted as crimson vertical lines, while the median values along with 1 σ ranges are shown at the top of each posterior panel. 
+
+estimate the DM time series from these sub-banded ToAs, we used a modified version of the DMcalc package (Krishnakumar et al., 2021) which works on the ToAs directly instead of its original profile-domain implementation. The median precision of the DMs is estimated to be ∼ 4.6 × 10 −5 pc /cm 3 and the extracted DMs are shown in Figure 2(a) (as crimson points). We applied the PSRDISP technique, on the extracted DMs, and estimated the parameters of the dispersive noise processes, employing the priors listed in Table 1. We consider Nharm = 100 for recovery in the reduced-rank approximation (van Haasteren and Vallisneri, 2014) for the GP. In order to reconstruct the time-domain realisations of the process, we draw samples from a multivariate Gaussian distribution centered at the median val-ues of the parameter posterior distributions and having a width, 
+
+σrealisation = 3σposterior , for each parameter. We plot 20 such random realisations along with the extracted DM time series 610.390           
+
+> 10.391
+> 10.392
+> 10.393
+> 10.394
+> DM [pc/cm 3]
+> SW model DMs
+> Simulated DMs
+> 56000 57000 58000 59000 60000 61000 62000 63000 64000
+> MJD
+> 0.0015
+> 0.0010
+> 0.0005
+> 0.0000
+> 0.0005
+> 0.0010
+> 0.0015
+> DM [pc/cm 3]Figure 4: The extracted DM time series from narrowband ToAs along with the deterministic SW process estimated from PSRDISP shown in black (top panel), and the residual DM time series after removing the determinsitic SW e ff ects (bottom panel).
+
+in Figure 2(a), and against the injected DM noise realisation (in the ToAs) in Figure 2(b). It can be clearly seen that the reconstruction closely resembles the DM time series and the injected noise process, thereby proving the e ffi cacy of the re-covery via PSRDISP . The posterior distributions of the param-eters are shown in Figure 3, where the DMN amplitude is recov-ered within 1 σ level, but the spectral index is recovered at ∼2σ
+
+level. However, the ∼3σ recovery of NE_SW and NE_SW2 can be attributed to the strong covariance between them, and doesn’t aff ect the generated realisations. This can also be assessed from the bottom panel in Figure 4, which is obtained after subtract-ing the determinisitic processes from the extracted DM time series, wherein no prominent residual SW e ff ects are visible, apart from the stochasticity from DMN . We can, therefore, infer that the recovery is consistent with the injections. 
+
+4. Discussion 
+
+The results presented in the previous section highlight the eff ectiveness of the PSRDISP technique in estimating noise processes directly from the high-precision epoch-wise DMs. This technique is, therefore, complementary to the conventional SPNA approach implemented in packages such as ENTER-PRISE , where both chromatic and achromatic noise processes are modeled via delays introduced to ToAs. This treatment makes the conventional approach susceptible to spectral leak-ages that may arise due to complicated interplay of multiple noise processes, especially when they share a common Fourier basis. On the other hand, in the wideband SPNA implemen-tation presented in Susobhanan and van Haasteren (2025) and Susobhanan et al. (2026), this e ff ect is reduced, as noise pro-cesses are jointly modeled over simultaneous ToAs and DMs. The latter method, therefore, leverages the advantage of epoch-wise DMs, to model chromatic e ff ects in a way less prone to spectral leakages. That said, this technique is relatively new and it’s usage in the pulsar timing community is rather limited. The PSRDISP technique is limited to modeling processes having imprints on the DMs. Therefore, we can use this alter-nate technique to e ff ectively complement the conventional (nar-rowband) SPNA by, for instance, employing the posterior distri-butions of the parameters estimated using the PSRDISP tech-nique, to generate empirical distributions that can e ff ectively tune the Markov chains employed to sample the corresponding parameter space with the narrowband SPNA technique. We are currently investigating this prospect with simulations. Having said so, care should be taken as to not lead to circular analysis on grounds discussed in van Haasteren (2024), for instance, us-ing the results of this technique as prior distributions for other SPNA approaches on the same dataset. A peculiar issue is also posed by the presence of scattering-induced e ff ects on the estimated DMs. As detailed in Section 1, the scattering-induced profile-shape distortions need to be adequately corrected before the DMs can be subjected to fur-ther noise analysis with the PSRDISP technique. This lim-itation also exists for the wideband paradigm currently (Pen-nucci, 2019). While the narrowband SPNA can indeed account for generic chromatic processes (Nobleson et al., 2026; Larsen et al., 2026), the adequate propagation of their e ff ects to the 7Parameter Prior distribution Description 
+
+White Noise 
+
+DISPEFAC U(0 .1, 7) PSRDISP scaling fac-tor for σDM 
+
+Dispersion Measure Noise 
+
+γDMN U(0 , 7) DMN spectral index log 10 ADMN U(−16 , −10) DMN log-amplitude 
+
+Deterministic Solar Wind 
+
+NE_SW U(0 , 20) Constant SW electron density 
+
+NE_SW1 U(−10 , 10) First order time-derivative of NE_SW NE_SW2 U(−10 , 10) Second order time-derivative of NE_SW 
+
+Solar Wind Noise 
+
+γSWN U(−4, 5) SWN spectral index log 10 ASWN U(−9, 0) SWN log-amplitude                
+
+> Table 1: The prior distributions used for the parameters of various deterministic and stochastic noise processes. The units of NE_SW ,NE_SW1 and NE_SW2 are cm −3, cm −3yr −1and cm −3yr −2, respectively, while all other quantities are di-mensionless. The di ff erent priors used for SWN hyper-parameters are based on the implementation in ENTERPRISE , and as discussed in Susarla et al. (2024). The symbol U(α, β ) stands for a Uniform distribution between αand β. Col-umn 3 gives a description of the listed parameters for di ff erent processes.
+
+estimated DMs is still not well understood. Furthermore, it should be noted that the PSRDISP technique cannot be directly used to estimate achromatic noise processes, or perform PTA gravitational wave analyses. Rather, this technique provides a powerful validation tool to check the consistency of chromatic noise estimates derived from the conventional SPNA methods, which is of paramount importance to accurately characterise the single-pulsar noise budget of a PTA. 
+
+5. Summary 
+
+In this work, we presented a novel approach, PSRDISP , to model dispersive single-pulsar noise processes in pulsar timing datasets, complementing the existing SPNA techniques. The conventional narrowband SPNA methodology, as implemented in the ENTERPRISE package, models various noise processes as temporal perturbations to the original timing solution, as-suming them to be significantly smaller than the period of the pulsar. The stochastic processes are modeled as Fourier-basis GPs, commonly with a power-law kernel. This framework, however, isn’t resistant to the drawbacks of spectral leakages due to the interplay of various noise processes on a shared Fourier basis. As discussed in Iraci et al. (2024) and Larsen et al. (2024), such contaminations could lead to sub-optimal DM noise extraction using GPs, which can significantly a ff ect the sensitivity of a low observing-frequency PTA experiment to detect and accurately characterise the GWB. We addressed these potential issues by modeling the disper-sive noise processes directly using high-precision epoch-wise DM estimates. The uniqueness of this approach is that these DMs are almost una ff ected by leakages from the achromatic red noise, and to an extent, white noise processes. We imple-mented this technique using the Fourier-basis GP approach of Lentati et al. (2014) for stochastic processes in the reduced-rank approximation. This technique is inherently agnostic to the nar-rowband and wideband paradigms, as long as the epoch-wise DMs are mutually independent. In order to assess the e ffi cacy of noise modeling using the developed technique, we presented a representative example wherein we simulated wideband DMs using the PINT package with realistic injections of noise processes. We estimated the parameter posteriors using the emcee package, which employs an a ffi ne-invariant ensemble sampling algorithm (Foreman-Mackey et al., 2013; Goodman and Weare, 2010). Additionally, we reconstructed the time-domain realisations of the stochastic processes via a multivariate Gaussian distribution centered at the median parameter estimates, and having a width equivalent to 3 σ level of the parameter posterior distributions. The re-covered GP hyper-parameters were found to be ≲1σ level of the injected values. The reconstructed time-domain realisations closely resembled the simulated DM time series. We have also presented an additional case study using narrowband simula-tions in Appendix A, where again, we get good recovery using the developed technique. These simulations demonstrated the e ffi cacy of noise extrac-tion using high-precision epoch-wise DMs, which can serve as a complementary technique to the conventional ToA-based noise analysis methodologies. Therefore, this work holds im-mense potential in validating the existing SPNA techniques by providing an alternative framework to model dispersive single-pulsar noises. 
+
+6. Future Work 
+
+As outlined in Section 4, we are currently investigating the prospect of complementing the conventional SPNA techniques with the framework discussed in the present work. We are also planning to incorporate spatially correlated dispersive pro-cesses, such as a common solar wind process, to account for correlated DM e ff ects in the ensemble of pulsars observed by a PTA. The prospect of addressing the e ff ect of scattering-induced variations over DMs and their modeling in this frame-work is also being explored. 
+
+Acknowledgements 
+
+The work of CD at the Physical Research Laboratory (PRL) was supported by the Department of Space, Government of In-dia. CD acknowledges the Param Vikram-1000 High Perfor-mance Computing Cluster of the Physical Research Laboratory (PRL), a unit of the Department of Space, Government of In-dia, for performing the intensive computations. The authors acknowledge Bhal Chandra Joshi for his insights and valuable 8comments. CD acknowledges RM for the immense support during the work. 
+
+Software 
+
+• PYTHON (Van Rossum and Drake, 2009) • PINT (Luo et al., 2021; Susobhanan et al., 2024) • DMcalc (Krish-nakumar et al., 2021) • TEMPO2 (Edwards et al., 2006) 
+
+• emcee (Foreman-Mackey et al., 2013) • ASTROPY (As-tropy Collaboration et al., 2022) • SCIPY (Virtanen et al., 2020) • MATPLOTLIB (Hunter, 2007) • CORNER (Foreman– Mackey, 2016) • NUMPY (Harris et al., 2020) 
+
+Data Availability 
+
+The entire work presented in this paper is based on simu-lated datasets, generated solely for this purpose using publicly available software. The datasets are also shared along with the manuscript as supplementary material. 
+
+References 
+
+Agazie, G., Antoniadis, J., Anumarlapudi, A., Archibald, A.M., Arumugam, P., et al., 2024. Comparing Recent Pulsar Timing Array Results on the Nanohertz Stochastic Gravitational-wave Background. ApJ 966, 105. doi: 10. 3847/1538-4357/ad36be , arXiv:2309.00693 .Agazie, G., Anumarlapudi, A., Archibald, A.M., Arzoumanian, Z., Baker, P.T., Bécsy, B., Blecha, L., Brazier, A., Brook, P.R., Burke-Spolaor, S., Burnette, R., Case, R., Charisi, M., Chatterjee, S., Chatziioannou, K., Cheeseboro, B.D., Chen, S., Cohen, T., Cordes, J.M., Cornish, N.J., Crawford, F., Cromartie, H.T., Crowter, K., Cutler, C.J., Decesar, M.E., Degan, D., Demorest, P.B., Deng, H., Dolch, T., Drach-ler, B., Ellis, J.A., Ferrara, E.C., Fiore, W., Fonseca, E., Freedman, G.E., Garver-Daniels, N., Gentile, P.A., Gers-bach, K.A., Glaser, J., Good, D.C., Gültekin, K., Hazboun, J.S., Hourihane, S., Islo, K., Jennings, R.J., Johnson, A.D., Jones, M.L., Kaiser, A.R., Kaplan, D.L., Kelley, L.Z., Kerr, M., Key, J.S., Klein, T.C., Laal, N., Lam, M.T., Lamb, W.G., Lazio, T.J.W., Lewandowska, N., Littenberg, T.B., Liu, T., Lommen, A., Lorimer, D.R., Luo, J., Lynch, R.S., Ma, C.P., Madison, D.R., Mattson, M.A., McEwen, A., McKee, J.W., McLaughlin, M.A., McMann, N., Meyers, B.W., Meyers, P.M., Mingarelli, C.M.F., Mitridate, A., Natarajan, P., Ng, C., Nice, D.J., Ocker, S.K., Olum, K.D., Pennucci, T.T., Perera, B.B.P., Petrov, P., Pol, N.S., Radovan, H.A., Ransom, S.M., Ray, P.S., Romano, J.D., Sardesai, S.C., Schmiedekamp, A., Schmiedekamp, C., Schmitz, K., Schult, L., Shapiro-Albert, B.J., Siemens, X., Simon, J., Siwek, M.S., Stairs, I.H., Stinebring, D.R., Stovall, K., Sun, J.P., Susobhanan, A., Swiggum, J.K., Taylor, J., Taylor, S.R., Turner, J.E., Unal, C., Vallisneri, M., van Haasteren, R., Vigeland, S.J., Wahl, H.M., Wang, Q., Witt, C.A., Young, O., Nanograv Collaboration, 2023. The NANOGrav 15 yr Data Set: Ev-idence for a Gravitational-wave Background. ApJ 951, L8. doi: 10.3847/2041-8213/acdac6 .Agazie, G., Kaplan, D.L., Susobhanan, A., Stairs, I.H., Good, D.C., Meyers, B.W., Fonseca, E., Pennucci, T.T., Anu-marlapudi, A., Archibald, A.M., Arzoumanian, Z., Baker, P.T., Brook, P.R., Cassity, A., Cromartie, H.T., Crowter, K., DeCesar, M.E., Demorest, P.B., Dolch, T., Dong, F.A., Ferrara, E.C., Fiore, W., Freedman, G.E., Garver-Daniels, N., Gentile, P.A., Glaser, J., Hazboun, J.S., Jennings, R.J., Jones, M.L., Kerr, M., Lam, M.T., Lorimer, D.R., Luo, J., Lynch, R.S., McEwen, A., McKee, J.W., McLaughlin, M.A., McMann, N., Ng, C., Nice, D.J., Perera, B.B.P., Pol, N.S., Radovan, H.A., Ransom, S.M., Ray, P.S., Saf-fer, A., Schmiedekamp, A., Schmiedekamp, C., Shapiro-Albert, B.J., Stovall, K., Swiggum, J.K., Thompson, M.S., Wahl, H.M., 2025. CHIME-o-Grav: Wideband Timing of Four Millisecond Pulsars from the NANOGrav 15-yr dataset. arXiv e-prints , arXiv:2510.16668doi: 10.48550/ arXiv.2510.16668 , arXiv:2510.16668 .Antoniadis, J., Arumugam, P., Arumugam, S., Babak, S., Bagchi, M., Bak Nielsen, A.S., Bassa, C.G., Bathula, A., Berthereau, A., Bonetti, M., Bortolas, E., Brook, P.R., Bur-gay, M., Caballero, R.N., Chalumeau, A., Champion, D.J., Chanlaridis, S., Chen, S., Cognard, I., Dandapat, S., Deb, D., Desai, S., Desvignes, G., Dhanda-Batra, N., Dwivedi, C., Falxa, M., Ferdman, R.D., Franchini, A., Gair, J.R., Gon-charov, B., Gopakumar, A., Graikou, E., Grießmeier, J.M., Guillemot, L., Guo, Y.J., Gupta, Y., Hisano, S., Hu, H., Iraci, F., Izquierdo-Villalba, D., Jang, J., Jawor, J., Janssen, G.H., Jessner, A., Joshi, B.C., Kareem, F., Karuppusamy, R., Keane, E.F., Keith, M.J., Kharbanda, D., Kikunaga, T., Kolhe, N., Kramer, M., Krishnakumar, M.A., Lackeos, K., Lee, K.J., Liu, K., Liu, Y., Lyne, A.G., McKee, J.W., Maan, Y., Main, R.A., Mickaliger, M.B., Ni¸ tu, I.C., No-bleson, K., Paladi, A.K., Parthasarathy, A., Perera, B.B.P., Perrodin, D., Petiteau, A., Porayko, N.K., Possenti, A., Prabu, T., Quelquejay Leclere, H., Rana, P., Samajdar, A., Sanidas, S.A., Sesana, A., Shaifullah, G., Singha, J., Speri, L., Spiewak, R., Srivastava, A., Stappers, B.W., Surnis, M., Susarla, S.C., Susobhanan, A., Takahashi, K., Tarafdar, P., Theureau, G., Tiburzi, C., van der Wateren, E., Vecchio, A., Venkatraman Krishnan, V., Verbiest, J.P.W., Wang, J., Wang, L., Wu, Z., E., InPTA Collaboration, 2023. The sec-ond data release from the European Pulsar Timing Array. III. Search for gravitational wave signals. A&A 678, A50. doi: 10.1051/0004-6361/202346844 .Antoniadis, J., Arzoumanian, Z., Babak, S., Bailes, M., Nielsen, A.S.B., Baker, P.T., Bassa, C.G., Bécsy, B., Berthereau, A., Bonetti, M., Brazier, A., Brook, P.R., Burgay, M., Burke-Spolaor, S., Caballero, R.N., Casey-Clyde, J.A., Chalumeau, A., Champion, D.J., Charisi, M., Chatterjee, S., Chen, S., Cognard, I., Cordes, J.M., Cornish, N.J., Crawford, F., Cromartie, H.T., Crowter, K., Dai, S., DeCesar, M.E., De-morest, P.B., Desvignes, G., Dolch, T., Drachler, B., Falxa, 9M., Ferrara, E.C., Fiore, W., Fonseca, E., Gair, J.R., Garver-Daniels, N., Goncharov, B., Good, D.C., Graikou, E., Guille-mot, L., Guo, Y.J., Hazboun, J.S., Hobbs, G., Hu, H., Islo, K., Janssen, G.H., Jennings, R.J., Johnson, A.D., Jones, M.L., Kaiser, A.R., Kaplan, D.L., Karuppusamy, R., Keith, M.J., Kelley, L.Z., Kerr, M., Key, J.S., Kramer, M., Lam, M.T., Lamb, W.G., Lazio, T.J.W., Lee, K.J., Lentati, L., Liu, K., Luo, J., Lynch, R.S., Lyne, A.G., Madison, D.R., Main, R.A., Manchester, R.N., McEwen, A., McKee, J.W., McLaughlin, M.A., Mickaliger, M.B., Mingarelli, C.M.F., Ng, C., Nice, D.J., Osłowski, S., Parthasarathy, A., Pennucci, T.T., Per-era, B.B.P., Perrodin, D., Petiteau, A., Pol, N.S., Porayko, N.K., Possenti, A., Ransom, S.M., Ray, P.S., Reardon, D.J., Russell, C.J., Samajdar, A., Sampson, L.M., Sanidas, S., Sarkissian, J.M., Schmitz, K., Schult, L., Sesana, A., Shai-fullah, G., Shannon, R.M., Shapiro-Albert, B.J., Siemens, X., Simon, J., Smith, T.L., Speri, L., Spiewak, R., Stairs, I.H., Stappers, B.W., Stinebring, D.R., Swiggum, J.K., Tay-lor, S.R., Theureau, G., Tiburzi, C., Vallisneri, M., van der Wateren, E., Vecchio, A., Verbiest, J.P.W., Vigeland, S.J., Wahl, H., Wang, J.B., Wang, J., Wang, L., Witt, C.A., Zhang, S., Zhu, X.J., 2022. The international pulsar timing array sec-ond data release: Search for an isotropic gravitational wave background. Monthly Notices of the Royal Astronomical So-ciety 510, 4873–4887. doi: 10.1093/mnras/stab3418 .Arzoumanian, Z., Baker, P.T., Blumer, H., Bécsy, B., Brazier, A., Brook, P.R., Burke-Spolaor, S., Chatterjee, S., Chen, S., Cordes, J.M., Cornish, N.J., Crawford, F., Cromartie, H.T., DeCesar, M.E., Demorest, P.B., Dolch, T., Ellis, J.A., Ferrara, E.C., Fiore, W., Fonseca, E., Garver-Daniels, N., Gentile, P.A., Good, D.C., Hazboun, J.S., Holgado, A.M., Islo, K., Jennings, R.J., Jones, M.L., Kaiser, A.R., Ka-plan, D.L., Kelley, L.Z., Key, J.S., Laal, N., Lam, M.T., Lazio, T.J.W., Lorimer, D.R., Luo, J., Lynch, R.S., Madi-son, D.R., McLaughlin, M.A., Mingarelli, C.M.F., Ng, C., Nice, D.J., Pennucci, T.T., Pol, N.S., Ransom, S.M., Ray, P.S., Shapiro-Albert, B.J., Siemens, X., Simon, J., Spiewak, R., Stairs, I.H., Stinebring, D.R., Stovall, K., Sun, J.P., Swig-gum, J.K., Taylor, S.R., Turner, J.E., Vallisneri, M., Vige-land, S.J., Witt, C.A., 2020. The nanograv 12.5 yr data set: Search for an isotropic stochastic gravitational-wave background. The Astrophysical Journal Letters 905, L34. doi: 10.3847/2041-8213/abd401 .Arzoumanian, Z., Brazier, A., Burke-Spolaor, S., Chamber-lin, S., Chatterjee, S., Christy, B., Cordes, J.M., Cornish, N., Crowter, K., Demorest, P.B., Dolch, T., Ellis, J.A., Ferdman, R.D., Fonseca, E., Garver-Daniels, N., Gonza-lez, M.E., Jenet, F.A., Jones, G., Jones, M.L., Kaspi, V.M., Koop, M., Lam, M.T., Lazio, T.J.W., Levin, L., Lom-men, A.N., Lorimer, D.R., Luo, J., Lynch, R.S., Madison, D., McLaughlin, M.A., McWilliams, S.T., Nice, D.J., Pal-liyaguru, N., Pennucci, T.T., Ransom, S.M., Siemens, X., Stairs, I.H., Stinebring, D.R., Stovall, K., Swiggum, J.K., Vallisneri, M., van Haasteren, R., Wang, Y., Zhu, W., 2015. The NANOGrav Nine-year Data Set: Observations, Arrival Time Measurements, and Analysis of 37 Millisecond Pul-sars. ApJ 813, 65. doi: 10.1088/0004-637X/813/1/65 ,
+
+arXiv:1505.07540 .Astropy Collaboration, Price-Whelan, A.M., Lim, P.L., Earl, N., Starkman, N., Bradley, L., Shupe, D.L., Patil, A.A., Cor-rales, L., Brasseur, C.E., Nöthe, M., Donath, A., Tollerud, E., Morris, B.M., Ginsburg, A., Vaher, E., Weaver, B.A., Tocknell, J., Jamieson, W., van Kerkwijk, M.H., Robitaille, T.P., Merry, B., Bachetti, M., Günther, H.M., Aldcroft, T.L., Alvarado-Montes, J.A., Archibald, A.M., Bódi, A., Bapat, S., Barentsen, G., Bazán, J., Biswas, M., Boquien, M., Burke, D.J., Cara, D., Cara, M., Conroy, K.E., Conseil, S., Craig, M.W., Cross, R.M., Cruz, K.L., D’Eugenio, F., Dencheva, N., Devillepoix, H.A.R., Dietrich, J.P., Eigenbrot, A.D., Erben, T., Ferreira, L., Foreman-Mackey, D., Fox, R., Freij, N., Garg, S., Geda, R., Glattly, L., Gondhalekar, Y., Gordon, K.D., Grant, D., Greenfield, P., Groener, A.M., Guest, S., Gurovich, S., Handberg, R., Hart, A., Hatfield-Dodds, Z., Homeier, D., Hosseinzadeh, G., Jenness, T., Jones, C.K., Joseph, P., Kalmbach, J.B., Karamehmetoglu, E., Kałuszy´ nski, M., Kelley, M.S.P., Kern, N., Kerzendorf, W.E., Koch, E.W., Kulumani, S., Lee, A., Ly, C., Ma, Z., MacBride, C., Maljaars, J.M., Muna, D., Murphy, N.A., Nor-man, H., O’Steen, R., Oman, K.A., Pacifici, C., Pascual, S., Pascual-Granado, J., Patil, R.R., Perren, G.I., Pickering, T.E., Rastogi, T., Roulston, B.R., Ryan, D.F., Ryko ff , E.S., Sabater, J., Sakurikar, P., Salgado, J., Sanghi, A., Saunders, N., Savchenko, V., Schwardt, L., Seifert-Eckert, M., Shih, A.Y., Jain, A.S., Shukla, G., Sick, J., Simpson, C., Sin-ganamalla, S., Singer, L.P., Singhal, J., Sinha, M., Sip˝ ocz, B.M., Spitler, L.R., Stansby, D., Streicher, O., Šumak, J., Swinbank, J.D., Taranu, D.S., Tewary, N., Tremblay, G.R., de Val-Borro, M., Van Kooten, S.J., Vasovi´ c, Z., Verma, S., de Miranda Cardoso, J.V., Williams, P.K.G., Wilson, T.J., Winkel, B., Wood-Vasey, W.M., Xue, R., Yoachim, P., Zhang, C., Zonca, A., Astropy Project Contributors, 2022. The Astropy Project: Sustaining and Growing a Community-oriented Open-source Project and the Latest Major Release (v5.0) of the Core Package. ApJ 935, 167. doi: 10.3847/ 1538-4357/ac7c74 .Bathula, A., Krishnakumar, M.A., Jena, S., 2025. Re-covering Intrinsic Pulsar Profiles and Scattering Parame-ters with a CLEAN-Based Algorithm for High-Precision Timing. arXiv e-prints , arXiv:2511.22299doi: 10.48550/ arXiv.2511.22299 , arXiv:2511.22299 .Chen, S., Caballero, R.N., Guo, Y.J., Chalumeau, A., Liu, K., Shaifullah, G., Lee, K.J., Babak, S., Desvignes, G., Parthasarathy, A., Hu, H., van der Wateren, E., Antoniadis, J., Nielsen, A.S.B., Bassa, C.G., Berthereau, A., Burgay, M., Champion, D.J., Cognard, I., Falxa, M., Ferdman, R.D., Freire, P.C.C., Gair, J.R., Graikou, E., Guillemot, L., Jang, J., Janssen, G.H., Karuppusamy, R., Keith, M.J., Kramer, M., Liu, X.J., Lyne, A.G., Main, R.A., McKee, J.W., Mickaliger, M.B., Perera, B.B.P., Perrodin, D., Petiteau, A., Porayko, N.K., Possenti, A., Samajdar, A., Sanidas, S.A., Sesana, A., 10 Speri, L., Stappers, B.W., Theureau, G., Tiburzi, C., Vec-chio, A., Verbiest, J.P.W., Wang, J., Wang, L., Xu, H., 2021. Common-red-signal analysis with 24-yr high-precision tim-ing of the european pulsar timing array: inferences in the stochastic gravitational-wave background search. Monthly Notices of the Royal Astronomical Society 508, 4970–4993. doi: 10.1093/mnras/stab2833 .Chowdhury, S., Krishnakumar, M., Bagchi, M., Joshi, B.C., K, N., et al., 2026. Eff ects of coronal mass ejection on psr j1022 +1001 and possible mode change of psr j2145– 0750 in the inpta dr2. Journal of High Energy Astrophysics 51, 100547. doi: https://doi.org/10.1016/j.jheap. 2025.100547 .Donner, J.Y., Verbiest, J.P.W., Tiburzi, C., Osłowski, S., Künsemöller, J., et al., 2020. Dispersion measure variabil-ity for 36 millisecond pulsars at 150 MHz with LOFAR. A&A 644, A153. doi: 10.1051/0004-6361/202039517 ,
+
+arXiv:2011.13742 .Earl, D.J., Deem, M.W., 2005. Parallel tempering: Theory, ap-plications, and new perspectives. Physical Chemistry Chem-ical Physics (Incorporating Faraday Transactions) 7, 3910. doi: 10.1039/B509983H , arXiv:physics/0508111 .Edwards, R.T., Hobbs, G.B., Manchester, R.N., 2006. TEMPO2, a new pulsar timing package - II. The tim-ing model and precision estimates. MNRAS 372, 1549–1574. doi: 10.1111/j.1365-2966.2006.10870.x ,
+
+arXiv:astro-ph/0607664 .Ellis, J.A., Vallisneri, M., Taylor, S.R., Baker, P.T., 2020. En-terprise: Enhanced numerical toolbox enabling a robust pul-sar inference suite. Zenodo. URL: https://doi.org/10. 5281/zenodo.4059815 , doi: 10.5281/zenodo.4059815 .EPTA Collaboration, Antoniadis, J., Babak, S., Bak Nielsen, A.S., Bassa, C.G., Berthereau, A., Bonetti, M., Bortolas, E., Brook, P.R., Burgay, M., Caballero, R.N., Chalumeau, A., Champion, D.J., Chanlaridis, S., Chen, S., Cognard, I., Desvignes, G., Falxa, M., Ferdman, R.D., Franchini, A., Gair, J.R., Goncharov, B., Graikou, E., Grießmeier, J.M., Guillemot, L., Guo, Y.J., Hu, H., Iraci, F., Izquierdo-Villalba, D., Jang, J., Jawor, J., Janssen, G.H., Jessner, A., Karup-pusamy, R., Keane, E.F., Keith, M.J., Kramer, M., Krish-nakumar, M.A., Lackeos, K., Lee, K.J., Liu, K., Liu, Y., Lyne, A.G., McKee, J.W., Main, R.A., Mickaliger, M.B., Ni¸ tu, I.C., Parthasarathy, A., Perera, B.B.P., Perrodin, D., Pe-titeau, A., Porayko, N.K., Possenti, A., Quelquejay Leclere, H., Samajdar, A., Sanidas, S.A., Sesana, A., Shaifullah, G., Speri, L., Spiewak, R., Stappers, B.W., Susarla, S.C., Theureau, G., Tiburzi, C., van der Wateren, E., Vecchio, A., Venkatraman Krishnan, V., Verbiest, J.P.W., Wang, J., Wang, L., Wu, Z., 2023a. The second data release from the Euro-pean Pulsar Timing Array. I. The dataset and timing analy-sis. A&A 678, A48. doi: 10.1051/0004-6361/202346841 ,
+
+arXiv:2306.16224 .EPTA Collaboration, InPTA Collaboration, Antoniadis, J., Aru-mugam, P., Arumugam, S., Babak, S., Bagchi, M., Nielsen, A.S.B., Bassa, C.G., Bathula, A., Berthereau, A., Bonetti, M., Bortolas, E., Brook, P.R., Burgay, M., Caballero, R.N., Chalumeau, A., Champion, D.J., Chanlaridis, S., Chen, S., Cognard, I., Dandapat, S., Deb, D., Desai, S., Desvignes, G., Dhanda-Batra, N., Dwivedi, C., Falxa, M., Ferdman, R.D., Franchini, A., Gair, J.R., Goncharov, B., Gopakumar, A., Graikou, E., Grießmeier, J.M., Guillemot, L., Guo, Y.J., Gupta, Y., Hisano, S., Hu, H., Iraci, F., Izquierdo-Villalba, D., Jang, J., Jawor, J., Janssen, G.H., Jessner, A., Joshi, B.C., Kareem, F., Karuppusamy, R., Keane, E.F., Keith, M.J., Kharbanda, D., Kikunaga, T., Kolhe, N., Kramer, M., Kr-ishnakumar, M.A., Lackeos, K., Lee, K.J., Liu, K., Liu, Y., Lyne, A.G., McKee, J.W., Maan, Y., Main, R.A., Mickaliger, M.B., Ni¸ tu, I.C., Nobleson, K., Paladi, A.K., Parthasarathy, A., Perera, B.B.P., Perrodin, D., Petiteau, A., Porayko, N.K., Possenti, A., Prabu, T., Leclere, H.Q., Rana, P., Samaj-dar, A., Sanidas, S.A., Sesana, A., Shaifullah, G., Singha, J., Speri, L., Spiewak, R., Srivastava, A., Stappers, B.W., Surnis, M., Susarla, S.C., Susobhanan, A., Takahashi, K., Tarafdar, P., Theureau, G., Tiburzi, C., van der Wateren, E., Vecchio, A., Krishnan, V.V., Verbiest, J.P.W., Wang, J., Wang, L., Wu, Z., 2023b. The second data release from the European Pulsar Timing Array. II. Customised pulsar noise models for spatially correlated gravitational waves. A&A 678, A49. doi: 10.1051/0004-6361/202346842 ,
+
+arXiv:2306.16225 .Foreman-Mackey, D., 2016. corner.py: Scatterplot matrices in python. The Journal of Open Source Software 1, 24. doi: 10. 21105/joss.00024 .Foreman-Mackey, D., Conley, A., Meierjurgen Farr, W., Hogg, D.W., Lang, D., Marshall, P., Price-Whelan, A., Sanders, J., Zuntz, J., 2013. emcee: The MCMC Hammer. Astrophysics Source Code Library, record ascl:1303.002. 
+
+arXiv:1303.002 .Foster, R.S., Backer, D.C., 1990. Constructing a Pulsar Timing Array. ApJ 361, 300. doi: 10.1086/169195 .Goncharov, B., Shannon, R.M., Reardon, D.J., Hobbs, G., Zic, A., Bailes, M., Curyło, M., Dai, S., Kerr, M., Lower, M.E., Manchester, R.N., Mandow, R., Middleton, H., Miles, M.T., Parthasarathy, A., Thrane, E., Thyagarajan, N., Xue, X., Zhu, X.J., Cameron, A.D., Feng, Y., Luo, R., Rus-sell, C.J., Sarkissian, J., Spiewak, R., Wang, S., Wang, J.B., Zhang, L., Zhang, S., 2021. On the evidence for a common-spectrum process in the search for the nanohertz gravitational-wave background with the parkes pulsar tim-ing array. The Astrophysical Journal Letters 917, L19. doi: 10.3847/2041-8213/ac17f4 .Goodman, J., Weare, J., 2010. Ensemble samplers with a ffi ne invariance. Communications in Applied Mathematics and Computational Science 5, 65–80. doi: 10.2140/camcos. 2010.5.65 .11 Harris, C.R., Millman, K.J., van der Walt, S.J., Gommers, R., Virtanen, P., Cournapeau, D., Wieser, E., Taylor, J., Berg, S., Smith, N.J., Kern, R., Picus, M., Hoyer, S., van Kerk-wijk, M.H., Brett, M., Haldane, A., del Río, J.F., Wiebe, M., Peterson, P., Gérard-Marchant, P., Sheppard, K., Reddy, T., Weckesser, W., Abbasi, H., Gohlke, C., Oliphant, T.E., 2020. Array programming with numpy. Nature 585, 357– 362. doi: 10.1038/s41586-020-2649-2 .Hastings, W.K., 1970. Monte Carlo Sampling Methods using Markov Chains and their Applications. Biometrika 57, 97– 109. doi: 10.1093/biomet/57.1.97 .Hazboun, J.S., Simon, J., Madison, D.R., Arzoumanian, Z., Cromartie, H.T., Crowter, K., Decesar, M.E., Demorest, P.B., Dolch, T., Ellis, J.A., Ferdman, R.D., Ferrara, E.C., Fon-seca, E., Gentile, P.A., Jones, G., Jones, M.L., Lam, M.T., Levin, L., Lorimer, D.R., Lynch, R.S., McLaughlin, M.A., Ng, C., Nice, D.J., Pennucci, T.T., Ransom, S.M., Ray, P.S., Spiewak, R., Stairs, I.H., Stovall, K., Swiggum, J.K., Zhu, W., The Nanograv Collaboration, 2022. Bayesian So-lar Wind Modeling with Pulsar Timing Arrays. ApJ 929, 39. doi: 10.3847/1538-4357/ac5829 , arXiv:2111.09361 .Hobbs, G., Guo, L., Caballero, R.N., Coles, W., Lee, K.J., et al., 2019. A pulsar-based time-scale from the international pul-sar timing array. Monthly Notices of the Royal Astronomi-cal Society 491, 5951–5965. URL: https://doi.org/10. 1093/mnras/stz3071 , doi: 10.1093/mnras/stz3071 .Hobbs, G.B., Edwards, R.T., Manchester, R.N., 2006. TEMPO2, a new pulsar-timing package - I. An overview. MNRAS 369, 655–672. doi: 10.1111/j.1365-2966. 2006.10302.x , arXiv:astro-ph/0603381 .Hunter, J.D., 2007. Matplotlib: A 2d graphics environment. Computing in Science & Engineering 9, 90–95. doi: 10. 1109/MCSE.2007.55 .Iraci, F., Chalumeau, A., Tiburzi, C., Verbiest, J.P.W., Pos-senti, A., Shaifullah, G.M., Susarla, S.C., Krishnakumar, M.A., Lam, M.T., Cromartie, H.T., Kerr, M., Grießmeier, J.M., 2024. Pulsar timing methods for evaluating disper-sion measure time series. A&A 692, A170. doi: 10.1051/ 0004-6361/202450740 , arXiv:2410.22170 .Johnson, A.D., Meyers, P.M., Baker, P.T., Cornish, N.J., Hazboun, J.S., Littenberg, T.B., Romano, J.D., Taylor, S.R., Vallisneri, M., Vigeland, S.J., Olum, K.D., Siemens, X., Ellis, J.A., van Haasteren, R., Hourihane, S., Agazie, G., Anumarlapudi, A., Archibald, A.M., Arzoumanian, Z., Blecha, L., Brazier, A., Brook, P.R., Burke-Spolaor, S., Bécsy, B., Casey-Clyde, J.A., Charisi, M., Chatter-jee, S., Chatziioannou, K., Cohen, T., Cordes, J.M., Craw-ford, F., Cromartie, H.T., Crowter, K., DeCesar, M.E., Demorest, P.B., Dolch, T., Drachler, B., Ferrara, E.C., Fiore, W., Fonseca, E., Freedman, G.E., Garver-Daniels, N., Gentile, P.A., Glaser, J., Good, D.C., Gültekin, K., Jennings, R.J., Jones, M.L., Kaiser, A.R., Kaplan, D.L., Kelley, L.Z., Kerr, M., Key, J.S., Laal, N., Lam, M.T., Lamb, W.G., Lazio, T.J.W., Lewandowska, N., Liu, T., Lorimer, D.R., Luo, J., Lynch, R.S., Ma, C.P., Madison, D.R., McEwen, A., McKee, J.W., McLaughlin, M.A., Mc-Mann, N., Meyers, B.W., Mingarelli, C.M.F., Mitridate, A., Ng, C., Nice, D.J., Ocker, S.K., Pennucci, T.T., Per-era, B.B.P., Pol, N.S., Radovan, H.A., Ransom, S.M., Ray, P.S., Sardesai, S.C., Schmiedekamp, C., Schmiedekamp, A., Schmitz, K., Shapiro-Albert, B.J., Simon, J., Siwek, M.S., Stairs, I.H., Stinebring, D.R., Stovall, K., Susob-hanan, A., Swiggum, J.K., Turner, J.E., Unal, C., Wahl, H.M., Witt, C.A., Young, O. (NANOGrav Collaboration), 2024. Nanograv 15-year gravitational-wave background methods. Phys. Rev. D 109, 103012. URL: https://link. aps.org/doi/10.1103/PhysRevD.109.103012 , doi: 10. 1103/PhysRevD.109.103012 .Keith, M.J., Coles, W., Shannon, R.M., Hobbs, G.B., Manch-ester, R.N., Bailes, M., Bhat, N.D.R., Burke-Spolaor, S., Champion, D.J., Chaudhary, A., Hotan, A., Khoo, J., Kocz, J., Osłowski, S., Ravi, V., Reynolds, J.E., Sarkissian, J., van Straten, W., Yardley, D.R.B., 2012. Measurement and correc-tion of variations in interstellar dispersion in high-precision pulsar timing. Monthly Notices of the Royal Astronomi-cal Society 429, 2161–2174. URL: https://doi.org/10. 1093/mnras/sts486 , doi: 10.1093/mnras/sts486 .Kramer, M., Stairs, I.H., Manchester, R.N., Wex, N., Deller, A.T., et al., 2021. Strong-Field Gravity Tests with the Dou-ble Pulsar. Physical Review X 11, 041050. doi: 10.1103/ PhysRevX.11.041050 , arXiv:2112.06795 .Krishnakumar, M.A., Manoharan, P.K., Joshi, B.C., Gir-gaonkar, R., Desai, S., Bagchi, M., Nobleson, K., Dey, L., Susobhanan, A., Susarla, S.C., Surnis, M.P., Maan, Y., Gopakumar, A., Basu, A., Batra, N.D., Choudhary, A., De, K., Gupta, Y., Naidu, A.K., Pathak, D., Singha, J., Prabu, T., 2021. High precision measurements of interstellar dispersion measure with the upgraded GMRT. A&A 651, A5. doi: 10. 1051/0004-6361/202140340 , arXiv:2101.05334 .Kulkarni, A.D., Shannon, R.M., Reardon, D.J., Miles, M.T., 2025. Measuring scattering variations in pulsar timing ob-servations: a test of the fidelity of current methods. MN-RAS 544, 2795–2810. doi: 10.1093/mnras/staf1930 ,
+
+arXiv:2511.03185 .Kulkarni, S.R., 2020. Dispersion measure: Confusion, Con-stants & Clarity. arXiv e-prints , arXiv:2007.02886doi: 10. 48550/arXiv.2007.02886 , arXiv:2007.02886 .Larsen, B., Baier, J.G., Oliver, D.J., Wayt, K., Chang, Y.T., Hazboun, J.S., Mingarelli, C.M.F., Simon, J., Miles, M.T., Agazie, G., Anumarlapudi, A., Archibald, A.M., Arzouma-nian, Z., Baker, P.T., Brook, P.R., Cromartie, H.T., Crowter, K., DeCesar, M.E., Demorest, P.B., Dolch, T., Ferrara, E.C., Fiore, W., Fonseca, E., Freedman, G.E., Garver-Daniels, N., Gentile, P.A., Glaser, J., Good, D.C., Jennings, R.J., Jones, M.L., Kaplan, D.L., Kerr, M., Lam, M.T., Lorimer, D.R., 12 Luo, J., Lynch, R.S., McEwen, A., McLaughlin, M.A., Mc-Mann, N., Meyers, B.W., Ng, C., Nice, D.J., Pennucci, T.T., Perera, B.B.P., Pol, N.S., Radovan, H.A., Ransom, S.M., Ray, P.S., Schmiedekamp, A., Schmiedekamp, C., Shapiro-Albert, B.J., Stairs, I.H., Stovall, K., Susobhanan, A., Swig-gum, J.K., Wahl, H.M., 2026. The nanograv 15 yr dataset: Customized chromatic noise models. The Astrophysical Journal 1005, 29. URL: https://doi.org/10.3847/ 1538-4357/ae677c , doi: 10.3847/1538-4357/ae677c .Larsen, B., Mingarelli, C.M.F., Hazboun, J.S., Chalumeau, A., Good, D.C., Simon, J., Agazie, G., Anumarlapudi, A., Archibald, A.M., Arzoumanian, Z., Baker, P.T., Brook, P.R., Cromartie, H.T., Crowter, K., DeCesar, M.E., Demor-est, P.B., Dolch, T., Ferrara, E.C., Fiore, W., Fonseca, E., Freedman, G.E., Garver-Daniels, N., Gentile, P.A., Glaser, J., Jennings, R.J., Jones, M.L., Kaplan, D.L., Kerr, M., Lam, M.T., Lorimer, D.R., Luo, J., Lynch, R.S., McEwen, A., McLaughlin, M.A., McMann, N., Meyers, B.W., Ng, C., Nice, D.J., Pennucci, T.T., Perera, B.B.P., Pol, N.S., Radovan, H.A., Ransom, S.M., Ray, P.S., Schmiedekamp, A., Schmiedekamp, C., Shapiro-Albert, B.J., Stairs, I.H., Stovall, K., Susobhanan, A., Swiggum, J.K., Wahl, H.M., Champion, D.J., Cognard, I., Guillemot, L., Hu, H., Keith, M.J., Liu, K., McKee, J.W., Parthasarathy, A., Perrodin, D., Possenti, A., Shaifullah, G.M., Theureau, G., 2024. The NANOGrav 15 yr Data Set: Chromatic Gaussian Process Noise Models for Six Pulsars. ApJ 972, 49. doi: 10.3847/ 1538-4357/ad5291 , arXiv:2405.14941 .Lentati, L., Alexander, P., Hobson, M.P., Feroz, F., van Haasteren, R., Lee, K.J., Shannon, R.M., 2014. TEM-PONEST: a Bayesian approach to pulsar timing analysis. MNRAS 437, 3004–3023. doi: 10.1093/mnras/stt2122 ,
+
+arXiv:1310.2120 .Lorimer, D.R., Kramer, M., 2004. Handbook of Pulsar Astron-omy. volume 4. Luo, J., Ransom, S., Demorest, P., Ray, P.S., Archibald, A., Kerr, M., Jennings, R.J., Bachetti, M., van Haasteren, R., Champagne, C.A., Colen, J., Phillips, C., Zimmerman, J., Stovall, K., Lam, M.T., Jenet, F.A., 2021. PINT: A Modern Software Package for Pulsar Timing. ApJ 911, 45. doi: 10. 3847/1538-4357/abe62f , arXiv:2012.00074 .Metropolis, N., Rosenbluth, A.W., Rosenbluth, M.N., Teller, A.H., Teller, E., 1953. Equation of State Calculations by Fast Computing Machines. J. Chem. Phys. 21, 1087–1092. doi: 10.1063/1.1699114 .Miles, M.T., Shannon, R.M., Reardon, D.J., Bailes, M., Cham-pion, D.J., Geyer, M., Gitika, P., Grunthal, K., Keith, M.J., Kramer, M., Kulkarni, A.D., Nathan, R.S., Parthasarathy, A., Porayko, N.K., Singha, J., Theureau, G., Abbate, F., Buchner, S., Cameron, A.D., Camilo, F., Moreschi, B.E., Shaifullah, G., Shamohammadi, M., Krishnan, V.V., 2025a. The MeerKAT Pulsar Timing Array: the 4.5-yr data release and the noise and stochastic signals of the millisecond pul-sar population. MNRAS 536, 1467–1488. doi: 10.1093/ mnras/stae2572 , arXiv:2412.01148 .Miles, M.T., Shannon, R.M., Reardon, D.J., Bailes, M., Cham-pion, D.J., Geyer, M., Gitika, P., Grunthal, K., Keith, M.J., Kramer, M., Kulkarni, A.D., Nathan, R.S., Parthasarathy, A., Singha, J., Theureau, G., Thrane, E., Abbate, F., Buch-ner, S., Cameron, A.D., Camilo, F., Moreschi, B.E., Shaiful-lah, G., Shamohammadi, M., Possenti, A., Krishnan, V.V., 2025b. The MeerKAT Pulsar Timing Array: the first search for gravitational waves with the MeerKAT radio telescope. MNRAS 536, 1489–1500. doi: 10.1093/mnras/stae2571 ,
+
+arXiv:2412.01153 .Nobleson, K., Dwivedi, C., Desai, S., Joshi, B.C., Grover, H., Deb, D., Vyasraj, V., Vara, K., Tahbildar, H., Susob-hanan, A., Surnis, M., Srivastava, A., Sardana, S., Taka-hashi, K., Amarnath, Arumugam, P., Bagchi, M., Batra, N.D., Chakraborty, M., Chowdhury, S., Jacob, S.J., Jose, J., Kala, S., Kato, R., Krishnakumar, M., Meena, K., Pal-adi, A.K., Pandian, A., Rai, K., Rana, P., Singh, M., Singha, J., Shukla, A., Tarafdar, P., Thiagraj, P., Zuraiq, Z., 2026. The indian pulsar timing array data release 2: Ii. customised single-pulsar noise analysis and noise budget. Journal of High Energy Astrophysics 53, 100594. doi: 10.1016/j. jheap.2026.100594 .Park, R.S., Folkner, W.M., Williams, J.G., Boggs, D.H., 2021. The JPL Planetary and Lunar Ephemerides DE440 and DE441. AJ 161, 105. doi: 10.3847/1538-3881/abd414 .Pennucci, T.T., 2019. Frequency-dependent Template Profiles for High-precision Pulsar Timing. ApJ 871, 34. doi: 10. 3847/1538-4357/aaf6ef , arXiv:1812.02006 .Pennucci, T.T., Demorest, P.B., Ransom, S.M., 2014. Ele-mentary Wideband Timing of Radio Pulsars. ApJ 790, 93. doi: 10.1088/0004-637X/790/2/93 , arXiv:1402.1672 .Reardon, D.J., Zic, A., Shannon, R.M., Hobbs, G.B., Bailes, M., Di Marco, V., Kapur, A., Rogers, A.F., Thrane, E., Askew, J., Bhat, N.D.R., Cameron, A., Curyło, M., Coles, W.A., Dai, S., Goncharov, B., Kerr, M., Kulkarni, A., Levin, Y., Lower, M.E., Manchester, R.N., Mandow, R., Miles, M.T., Nathan, R.S., Osłowski, S., Russell, C.J., Spiewak, R., Zhang, S., Zhu, X.J., 2023. Search for an Isotropic Gravitational-wave Background with the Parkes Pulsar Tim-ing Array. ApJ 951, L6. doi: 10.3847/2041-8213/acdd02 .Singha, J., Joshi, B.C., Krishnakumar, M.A., Kareem, F., Bathula, A., Dwivedi, C., Jacob, S.J., Desai, S., Tarafdar, P., Arumugam, P., Arumugam, S., Bagchi, M., Batra, N.D., Dandapat, S., Deb, D., Debnath, J., Gopakumar, A., Gupta, Y., Hisano, S., Kato, R., Kikunaga, T., Marmat, P., Noble-son, K., Paladi, A.K., Arul Pandian, B., Prabu, T., Rana, P., Srivastava, A., Surnis, M., Susobhanan, A., Takahashi, K., 2024. Improving DM estimates using low-frequency scatter-broadening estimates. MNRAS 535, 1184–1192. doi: 10.1093/mnras/stae2405 , arXiv:2309.16765 .13 Srivastava, A., Desai, S., Kolhe, N., Surnis, M., Joshi, B.C., Susobhanan, A., Chalumeau, A., Hisano, S., Nobleson, K., Arumugam, S., Kharbanda, D., Singha, J., Tarafdar, P., Aru-mugam, P., Bagchi, M., Bathula, A., Dandapat, S., Dey, L., Dwivedi, C., Girgaonkar, R., Gopakumar, A., Gupta, Y., Kikunaga, T., Krishnakumar, M.A., Liu, K., Maan, Y., Manoharan, P.K., Paladi, A.K., Rana, P., Shaifullah, G.M., Takahashi, K., 2023. Noise analysis of the Indian Pulsar Tim-ing Array data release I. Phys. Rev. D 108, 023008. doi: 10. 1103/PhysRevD.108.023008 , arXiv:2303.12105 .Susarla, S.C., Chalumeau, A., Tiburzi, C., Keane, E.F., Ver-biest, J.P.W., Hazboun, J.S., Krishnakumar, M.A., Iraci, F., Shaifullah, G.M., Golden, A., Bak Nielsen, A.S., Donner, J., Grießmeier, J.M., Keith, M.J., Osłowski, S., Porayko, N.K., Serylak, M., Anderson, J.M., Brüggen, M., Ciardi, B., Dettmar, R.J., Hoeft, M., Künsemöller, J., Schwarz, D., Vocks, C., 2024. Exploring the time variability of the solar wind using LOFAR pulsar data. A&A 692, A18. doi: 10. 1051/0004-6361/202450680 , arXiv:2409.09838 .Susobhanan, A., Kaplan, D.L., Archibald, A.M., Luo, J., Ray, P.S., Pennucci, T.T., Ransom, S.M., Agazie, G., Fiore, W., Larsen, B., O’Neill, P., van Haasteren, R., Anumarlapudi, A., Bachetti, M., Bhakta, D., Champagne, C.A., Cromar-tie, H.T., Demorest, P.B., Jennings, R.J., Kerr, M., Lev-ina, S., McEwen, A., Shapiro-Albert, B.J., Swiggum, J.K., 2024. PINT: Maximum-likelihood Estimation of Pulsar Timing Noise Parameters. ApJ 971, 150. doi: 10.3847/ 1538-4357/ad59f7 , arXiv:2405.01977 .Susobhanan, A., Paladi, A.K., Desmecht, R., Amarnath, Bagchi, M., Chakraborty, M., Chowdhury, S., Das, S.J., Deb, D., Desai, S., Dwivedi, C., Grover, H., Jose, J., Joshi, B.C., Kala, S., Kareem, F., Meena, K., Mondal, S., No-bleson, K., Pandian, B.A., Rai, K., Shukla, A., Singh, M., Srivastava, A., Surnis, M., Tahbildar, H., Takahashi, K., Tarafdar, P., Vara, K., Vyasraj, V., Zuraiq, Z., 2026. Re-visiting wideband pulsar timing measurements. MNRAS doi: 10.1093/mnras/stag444 , arXiv:2512.01288 .Susobhanan, A., van Haasteren, R., 2025. Gaussian process representation of dispersion measure noise in pulsar wide-band data sets. MNRAS 542, 2892–2900. doi: 10.1093/ mnras/staf1422 , arXiv:2505.05274 .Tiburzi, C., Hobbs, G., Kerr, M., Coles, W.A., Dai, S., Manch-ester, R.N., Possenti, A., Shannon, R.M., You, X.P., 2016. A study of spatial correlations in pulsar timing array data. MNRAS 455, 4339–4350. doi: 10.1093/mnras/stv2143 ,
+
+arXiv:1510.02363 .Tiburzi, C., Shaifullah, G.M., Bassa, C.G., Zucca, P., Verbiest, J.P.W., Porayko, N.K., van der Wateren, E., Fallows, R.A., Main, R.A., Janssen, G.H., Anderson, J.M., Bak Nielsen, A.S., Donner, J.Y., Keane, E.F., Künsemöller, J., Osłowski, S., Grießmeier, J.M., Serylak, M., Brüggen, M., Ciardi, B., Dettmar, R.J., Hoeft, M., Kramer, M., Mann, G., Vocks, C., 2021. The impact of solar wind variability on pulsar timing. A&A 647, A84. doi: 10.1051/0004-6361/202039846 ,
+
+arXiv:2012.11726 .Tiburzi, C., Verbiest, J.P.W., Shaifullah, G.M., Janssen, G.H., Anderson, J.M., Horne ff er, A., Künsemöller, J., Osłowski, S., Donner, J.Y., Kramer, M., Kumari, A., Porayko, N.K., Zucca, P., Ciardi, B., Dettmar, R.J., Grießmeier, J.M., Hoeft, M., Serylak, M., 2019. On the usefulness of existing solar wind models for pulsar timing corrections. MNRAS 487, 394–408. doi: 10.1093/mnras/stz1278 ,
+
+arXiv:1905.02989 .van Haasteren, R., 2024. Pulsar Timing Arrays Require Hier-archical Models. ApJS 273, 23. doi: 10.3847/1538-4365/ ad530f , arXiv:2406.05081 .van Haasteren, R., Levin, Y., 2013. Understanding and analysing time-correlated stochastic signals in pulsar timing. MNRAS 428, 1147–1159. doi: 10.1093/mnras/sts097 ,
+
+arXiv:1202.5932 .van Haasteren, R., Vallisneri, M., 2014. New advances in the Gaussian-process approach to pulsar-timing data analy-sis. Phys. Rev. D 90, 104012. doi: 10.1103/PhysRevD.90. 104012 , arXiv:1407.1838 .Van Rossum, G., Drake, F.L., 2009. Python 3 Reference Man-ual. CreateSpace, Scotts Valley, CA. Virtanen, P., Gommers, R., Oliphant, T.E., Haberland, M., Reddy, T., Cournapeau, D., Burovski, E., Peterson, P., Weckesser, W., Bright, J., van der Walt, S.J., Brett, M., Wil-son, J., Millman, K.J., Mayorov, N., Nelson, A.R.J., Jones, E., Kern, R., Larson, E., Carey, C.J., ˙ Ilhan Polat, Feng, Y., Moore, E.W., VanderPlas, J., Laxalde, D., Perktold, J., Cimrman, R., Henriksen, I., Quintero, E.A., Harris, C.R., Archibald, A.M., Ribeiro, A.H., Pedregosa, F., van Mulbregt, P., Vijaykumar, A., Bardelli, A.P., Rothberg, A., Hilboll, A., Kloeckner, A., Scopatz, A., Lee, A., Rokem, A., Woods, C.N., Fulton, C., Masson, C., Häggström, C., Fitzgerald, C., Nicholson, D.A., Hagen, D.R., Pasechnik, D.V., Olivetti, E., Martin, E., Wieser, E., Silva, F., Lenders, F., Wilhelm, F., Young, G., Price, G.A., Ingold, G.L., Allen, G.E., Lee, G.R., Audren, H., Probst, I., Dietrich, J.P., Silterra, J., Webber, J.T., Slaviˇ c, J., Nothman, J., Buchner, J., Kulick, J., Schönberger, J.L., de Miranda Cardoso, J.V., Reimer, J., Harrington, J., Rodríguez, J.L.C., Nunez-Iglesias, J., Kuczynski, J., Tritz, K., Thoma, M., Newville, M., Kümmerer, M., Bolingbroke, M., Tartre, M., Pak, M., Smith, N.J., Nowaczyk, N., She-banov, N., Pavlyk, O., Brodtkorb, P.A., Lee, P., McGibbon, R.T., Feldbauer, R., Lewis, S., Tygier, S., Sievert, S., Vi-gna, S., Peterson, S., More, S., Pudlik, T., Oshima, T., Pin-gel, T.J., Robitaille, T.P., Spura, T., Jones, T.R., Cera, T., Leslie, T., Zito, T., Krauss, T., Upadhyay, U., Halchenko, Y.O., Vázquez-Baeza, Y., 2020. Scipy 1.0: fundamental al-gorithms for scientific computing in python. Nature Methods 17, 261–272. doi: 10.1038/s41592-019-0686-2 .Xu, H., Chen, S., Guo, Y., Jiang, J., Wang, B., Xu, J., Xue, Z., Caballero, R.N., Yuan, J., Xu, Y., Wang, J., Hao, L., Luo, J., 14 Lee, K., Han, J., Jiang, P., Shen, Z., Wang, M., Wang, N., Xu, R., Wu, X., Manchester, R., Qian, L., Guan, X., Huang, M., Sun, C., Zhu, Y., 2023. Searching for the Nano-Hertz Stochastic Gravitational Wave Background with the Chinese Pulsar Timing Array Data Release I. Research in Astronomy and Astrophysics 23, 075024. doi: 10.1088/1674-4527/ acdfa5 , arXiv:2306.16216 .15 Appendix A. A representative example using the wideband paradigm 
+
+For this representative case, we simulated wideband ToAs and DMs with the deterministic DM and SW processes (up to the second order), along with the achromatic red noise 7 (ARN ), DMN and SWN processes. We injected NE_SW = 2.0, NE_SW1 = 0, and 
+
+NE_SW2 = 1.0 for the deterministic SW process, while the DM process is fixed as per the original timing solution. We injected DMN 
+
+with log 10 A = −13 .5 and γ = 3.0, ARN with log 10 A = −13 .0 and γ = 3.5 and SWN with log 10 A = −6.8 and γ = 2.5. The red noise basis is defined as per Section 3. Furthermore, we used DMEFAC = EFAC = 1.2 for white noise. The simulated wideband DMs and ToA residuals are shown in Figure A.1. 56000 57000 58000 59000 60000 61000 62000 63000 64000 
+
+> MJD
+> 10.390
+> 10.391
+> 10.392
+> 10.393
+> 10.394
+> 10.395
+> DM [pc/cm 3]
+
+(a) DM time series 56000 57000 58000 59000 60000 61000 62000 63000 64000  
+
+> MJD
+> 40
+> 20
+> 0
+> 20
+> 40
+> Residuals [  s]
+
+(b) ToA residuals Figure A.1: The simulated wideband DMs (left) and ToA residuals (right). The DMs have a sensitivity of 5 × 10 −5 pc /cm 3, while that of ToAs is 1 μs. The deterministic SW process is simulated with NE_SW = 2.0, NE_SW1 = 0, and NE_SW2 = 1.0, while the DM process is set as per the original timing solution. The DMN 
+
+process is injected with log 10 A = −13 .5 and γ = 3.0, ARN with log 10 A = −13 .0 and γ = 3.5 and SWN with log 10 A = −6.8 and γ = 2.5. Additional 16 Fourier bins below the 1 /Tspan bin are incorporated to simulate a realistic noise process. The high-frequency cuto ff is set to 1000 /Tspan .56000 57000 58000 59000 60000 61000 62000 63000 64000 
+
+MJD 
+
+10.390 
+
+10.391 
+
+10.392 
+
+10.393 
+
+10.394 
+
+10.395 
+
+> DM [pc/cm 3]
+
+Simulated DM 
+
+Figure A.2: The simulated wideband DM time series along with 20 random time-domain reconstructed noise process realisations using parameter estimates obtained after applying the PSRDISP technique on the DM time series (shown in solid black). 
+
+We applied the PSRDISP technique, on the simulated DMs, and estimated the parameters of the dispersive noise processes, employing the priors listed in Table 1 with Nharm = 100 for all the dispersive GPs. The time-domain realisations are constructed as described in Section 3. We plot 20 such random realisations along with the simulated DM time series in Figure A.2. It can be 
+
+> 7
+
+This process, as suggestive by its name, does not have any chromatic e ff ects. Such a process is modeled by a power-law PSD given by equation 22 with χ = 0. 
+
+16 DISPEFAC = 1.22 +0.04 0.04           
+
+> 4
+> 8
+> 12
+> 16
+> NE_SW
+> NE_SW = 7.24 +1.92 2.16
+> 0.6
+> 0.3
+> 0.0
+> 0.3
+> 0.6
+> NE_SW1
+> NE_SW1 = 0.04 +0.17 0.19
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> NE_SW2
+> NE_SW2 = 0.73 +0.11 0.09
+> 2.0
+> 2.4
+> 2.8
+> 3.2
+> 3.6
+> dm
+> dm =2.81 +0.24 0.23
+> 0.0
+> 1.5
+> 3.0
+> 4.5
+> sw
+> sw =1.96 +0.79 0.61
+> 13.60
+> 13.52
+> 13.44
+> 13.36
+> log 10  Adm
+> log 10 Adm =13.48 +0.04 0.04
+> 1.12
+> 1.20
+> 1.28
+> 1.36
+
+DISPEFAC 
+
+> 8.5
+> 8.0
+> 7.5
+> 7.0
+> 6.5
+> log 10  Asw
+> 4
+> 8
+> 12
+> 16
+
+NE_SW 
+
+> 0.6
+> 0.3
+> 0.0
+> 0.3
+> 0.6
+
+NE_SW1 
+
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+
+NE_SW2 
+
+> 2.0
+> 2.4
+> 2.8
+> 3.2
+> 3.6
+> dm
+> 0.0
+> 1.5
+> 3.0
+> 4.5
+> sw
+> 13.60
+> 13.52
+> 13.44
+> 13.36
+
+log 10 Adm 
+
+> 8.5
+> 8.0
+> 7.5
+> 7.0
+> 6.5
+
+log 10 Asw    
+
+> log 10 Asw =6.69 +0.18 0.32
+
+Figure A.3: The posterior distributions of deterministic SW process and the DM WN parameters, along with DMN and SWN hyper-parameters, estimated using the 
+
+PSRDISP technique on the simulated wideband DM time series. The injected values of various parameters are highlighted as crimson vertical lines, while the median values along with 1 σ ranges are shown at the top of each posterior panel. 
+
+clearly seen that the reconstruction closely resembles the actual simulated DMs, thereby proving the e ffi cacy of the recovery via the PSRDISP technique. The posterior distributions of the parameters are shown in Figure A.3 along with the injected values as crimson vertical lines in the respective posterior panels. It is evident that all the GP hyper-parameters are recovered within 1 σ level of their injected values. However, the ∼3σ recovery of NE_SW and NE_SW2 can be attributed to the strong covariances, and can assessed from the bottom panel in Figure A.4, which is obtained after subtracting the determinisitic DM and SW process from the simulated DM time series, wherein no prominent residual SW e ff ects are visible, apart from the residual stochasticity due to DMN and SWN . The recovery is, therefore, consistent with the injections. 17 10.390         
+
+> 10.391
+> 10.392
+> 10.393
+> 10.394
+> 10.395
+> DM [pc/cm 3]
+> SW model DMs
+> Simulated DMs
+> 56000 57000 58000 59000 60000 61000 62000 63000 64000
+
+MJD 
+
+> 0.0005
+> 0.0000
+> 0.0005
+> 0.0010
+> DM [pc/cm 3]
+
+Figure A.4: The simulated wideband DM time series along with the deterministic SW process estimated from PSRDISP shown in black (top panel), and the residual DM time series after removing the determinsitic SW e ff ects (bottom panel). 
+
+It is worthwhile, however, to point out that the DISPEFAC value is close to the injected DMEFAC value in this case, which is not necessarily the case with narrowband and can be seen from Figure 3. This is in line with the arguments presented in the beginning of Section 3 as well. 18
