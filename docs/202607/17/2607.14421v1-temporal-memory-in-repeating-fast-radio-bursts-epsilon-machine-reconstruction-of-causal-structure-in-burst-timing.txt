@@ -1,0 +1,989 @@
+Title: Temporal Memory in Repeating Fast Radio Bursts: Epsilon-Machine Reconstruction of Causal Structure in Burst Timing
+
+URL Source: https://arxiv.org/pdf/2607.14421v1
+
+Published Time: Fri, 17 Jul 2026 01:11:25 GMT
+
+Number of Pages: 26
+
+Markdown Content:
+MNRAS 000 , 1–26 (2026) Preprint 17 July 2026 Compiled using MNRAS L ATEX style file v3.2 
+
+# Temporal Memory in Repeating Fast Radio Bursts: Epsilon-Machine Reconstruction of Causal Structure in Burst Timing 
+
+# Tom Kimpson, 1⋆ Joseph O’Leary 2,3
+
+> 1
+
+School of Mathematics and Statistics, University of Melbourne, Parkville, VIC 3010, Australia 
+
+> 2
+
+Innovative Planet Research Institute, Swinburne University of Technology, Hawthorn, VIC 3122, Australia 
+
+> 3
+
+School of Physics, University of Melbourne, Parkville, VIC 3010, Australia 
+
+Accepted XXX. Received YYY; in original form ZZZ 
+
+ABSTRACT 
+
+The emission mechanism of fast radio bursts (FRBs) remains unknown. Whether the bursts from a repeating FRB arrive at random or in a structured sequence is a key constraint on that mechanism. We apply ε-machine reconstruction, a tool from computational mechanics that infers the minimal model capturing all predictive information in a stochastic process. Applied to the waiting-time sequences of three repeating FRBs (FRB 20121102A and FRB 20201124A from FAST; FRB 20220912A from CHIME), the method yields the statistical complexity Cμ, the minimum number of bits required for optimal prediction. Both FAST sources carry roughly one bit of temporal memory (significant against permutation surrogates, p ≤ 0.01; per-source false-discovery-rate-adjusted p ≤ 0.028), while FRB 20220912A is consistent with memoryless emission. FRB 20201124A’s memory spans hours-to-days across four sessions, FRB 20121102A’s spans hours-to-weeks across thirty-nine, and neither source shows defensible within-session predictive memory. For FRB 20121102A the ordering of those sessions is itself predictive (session-shuffle p = 0 .02), whereas FRB 20201124A’s signal reflects the contrast between heterogeneous sessions rather than their order. A simulated windowing test shows that CHIME’s short transit observations would suppress comparable structure in the FAST data, leaving FRB 20220912A’s null result ambiguous. This first application of ε-machine reconstruction to astrophysical transients yields a model-independent constraint: the bursting of at least two of these repeaters is not memoryless, but is governed by a hidden state that occupies distinct activity-rate regimes varying across observing sessions, behaviour that any viable physical model must reproduce. 
+
+Key words: fast radio bursts – methods: statistical – methods: data analysis 
+
+1 INTRODUCTION 
+
+Fast radio bursts (FRBs) are bright, millisecond-duration radio transients of predominantly extragalactic origin (Lorimer et al. 2007; Petroff et al. 2022). Since the discovery of the first repeating source FRB 20121102A (Spitler et al. 2016), the population of confirmed repeaters has grown to several dozen, yet the physical mechanism generating the repeating bursts remains an open question (Platts et al. 2019; Zhang 2023). The detection of an FRB-like burst from the Galactic soft gamma repeater SGR 1935+2154 (Bochenek et al. 2020; CHIME/FRB Collaboration 2020b) established magnetars as at least one class of FRB progenitor, but whether all repeaters share a common emission mechanism is unknown. One of the central open questions for repeater models is whether the temporal sequence of bursts from a given source is structured or random (Oppermann et al. 2018; Cruces et al. 2021; Zhang et al. 2024; Sang & Lin 2024). If past waiting times  
+
+> ⋆
+
+E-mail: tom.kimpson@unimelb.edu.au 
+
+(the intervals between successive bursts) constrain future ones, this implies a hidden state (either intrinsic or extrinsic to the source) that evolves over time and modulates the probability of observing a burst. Conversely, if the waiting-time sequence is consistent with an independent and identically distributed (IID) process, the bursting at any given moment is memoryless and uncorrelated with the burst history. Distinguishing these scenarios constrains the space of viable physical models: a memoryless process is consistent with a stationary Poisson emitter, while structured timing demands an evolving hidden state. Several approaches have been used to probe this question, each sensitive to a different aspect of the temporal struc-ture. Waiting-time distribution analyses fit parametric models (exponential, Weibull, log-normal) to the observed waiting times (Oppermann et al. 2018; Gourdji et al. 2019; Aggarwal et al. 2021; Cruces et al. 2021; Jahns et al. 2023), testing whether the marginal distribution departs from the expo-nential form expected for a Poisson process; Li et al. (2021) additionally revealed a bimodal waiting-time distribution for 
+
+© 2026 The Authors arXiv:2607.14421v1 [astro-ph.HE] 15 Jul 2026 2 T. Kimpson and J. O’Leary 
+
+FRB 20121102A from observations with the Five-hundred-meter Aperture Spherical radio Telescope (FAST). Periodicity searches have revealed activity windows with periods of order days to weeks in some sources (CHIME/FRB Collaboration 2020a; Rajwade et al. 2020). More recently, Zhang et al. (2024) applied approximate entropy (the Pincus index; Pincus 1991) and maximum Lyapunov exponent to FRB arrival times and energies, finding that repeating FRBs behave more randomly and less chaotically than pulsars, earthquakes, or solar flares; Sang & Lin (2024) reached complementary conclusions for the FAST repeaters using the Pincus index, the Hurst expo-nent, and non-Gaussian fluctuation statistics. Related analyses likewise find that the waiting-time sequences of these FAST repeaters are not consistent with an independent random process, reporting correlations between successive intervals and clustering that persists across a wide range of timescales (Du et al. 2024; Wang et al. 2024, 2023). Each of these methods captures a specific projection of the temporal structure, but none recovers the minimal causal model generating the observed sequence. A Weibull fit char-acterises the shape of the waiting-time distribution but not whether consecutive waiting times are statistically dependent. A positive Lyapunov exponent indicates sensitivity to initial conditions but does not identify the hidden states driving it. What is missing is a framework that extracts the full predic-tive architecture of the process directly from data, without assuming a specific model form. Computational mechanics provides such a framework. De-veloped by Crutchfield & Young (1989) and formalised by Shalizi & Crutchfield (2001), it constructs the ε-machine : the unique minimal unifilar hidden Markov model (HMM) whose hidden states (the causal states) group together all histories that yield identical predictions about the future (Upper 1997; Crutchfield 2012). By ‘unifilar’ we mean that the current hidden state and the next observation uniquely determine the next hidden state, so an observer who knows the current state never loses track of it; we give the formal definition in Section 2.2. For a stationary, ergodic process, the ε-machine is provably the simplest model that captures all predictive information (Shalizi & Crutchfield 2001). Its Shannon entropy, known as the statistical complexity Cμ, measures the mini-mum memory (in bits) that the process requires for optimal prediction. In astrophysics, the only prior application of ε-machine reconstruction is the work of Bartlett et al. (2022), who reconstructed ε-machines from disc-integrated reflected light curves of Solar System planets and used Cμ as an agnos-tic biosignature, finding that Earth’s statistical complexity exceeds Jupiter’s by approximately 50%. No application to astrophysical transients (FRBs, stellar flares, magnetar bursts, accretion variability) has been reported. In this paper, we present the first application of ε-machine reconstruction to astrophysical transient timing. We analyse the waiting-time sequences of three repeating FRB sources: FRB 20121102A (FAST; Li et al. 2021), FRB 20201124A (FAST; Zhang et al. 2022), and FRB 20220912A (the Cana-dian Hydrogen Intensity Mapping Experiment, CHIME; CHIME/FRB Collaboration 2026). We reconstruct ε-machines from symbolised waiting-time sequences using the Causal State Splitting Reconstruction (CSSR) algorithm (Shalizi & Shalizi 2004), validate the pipeline on synthetic processes, and test the statistical significance of the results against permuta-tion surrogates. The remainder of this paper is organised as follows. Section 2 provides a self-contained introduction to computational me-chanics for an astrophysics audience. Section 3 describes the data and preprocessing. Section 4 details the analysis meth-ods. Section 5 presents the main results. Section 6 discusses the physical interpretation and limitations, and Section 7 summarises our conclusions. 
+
+2 COMPUTATIONAL MECHANICS 
+
+This section provides a self-contained tutorial on computa-tional mechanics for readers whose primary background is in observational astrophysics, following the pedagogical approach of Bartlett et al. (2022) and drawing on the foundational works of Crutchfield & Young (1989), Shalizi & Crutchfield (2001), and Crutchfield (2012). 
+
+2.1 Predictive equivalence and causal states 
+
+Consider a discrete-valued stochastic process {Xt}t∈Z, where each Xt takes values in a finite alphabet A. At any time 
+
+t, the process has a past (the sequence of symbols already observed, ←−x = . . . , x t−2, x t−1) and a future (the sequence yet to come, −→x = xt, x t+1 , . . . ). Different pasts may lead to different conditional distributions over futures. Two pasts ←−x
+
+and ←−x ′ are said to be predictively equivalent , written ←−x ∼ε ←−x ′,if they yield the same conditional distribution: 
+
+←−x ∼ε ←−x ′ ⇐⇒ P (−→
+
+X | ←−
+
+X = ←−x ) = P (−→
+
+X | ←−
+
+X = ←−x ′). (1) The equivalence classes under this relation are the causal states S = {s1, s 2, . . . }. These causal states form the coarsest partition of histories that preserves all predictive information about the future. To ground this abstract setup in the problem at hand: for the FRB application developed below, each symbol Xt in the sequence is one discretised waiting time between two consec-utive bursts (the discretisation is described in Section 4.1), and the alphabet A is the small set of waiting-time bins (for instance, ‘short’ versus ‘long’). The past ←−x is the run of preceding waiting times and the future −→x the run still to come. A causal state is then the minimal summary of the past needed to predict the future: two histories of waiting times belong to the same causal state whenever they imply the same distribution over what follows. 
+
+2.2 Epsilon-machines 
+
+The ε-machine is the stochastic automaton whose internal states are the causal states. At each time step, the machine occupies a causal state s and emits a symbol x ∈ A with probability P (Xt = x | St = s). The observed symbol Xt
+
+is the quantity we measure (here, the next waiting time), whereas the causal state St is hidden and inferred from the observed sequence; s denotes one particular value of that hidden state. The defining property that distinguishes the 
+
+ε-machine from a generic hidden Markov model is unifilarity : 
+
+> MNRAS 000 , 1–26 (2026)
+
+# Temporal Memory in Repeating FRBs 3
+
+once the current state s and the emitted symbol x are known, the next state s′ = δ(s, x ) is fixed. There is no residual stochasticity in the state transition itself; all the randomness in the process lives in the symbol emission. Figure 1 shows the general structure of an ε-machine schematically, and Figure 2 illustrates the reconstruction task that the rest of this paper performs: recovering such a machine from an observed symbol sequence. Shalizi & Crutchfield (2001) proved three results about ε-machines. First, every stationary ergodic process has a unique 
+
+ε-machine. Second, the ε-machine is minimal: no other unifilar HMM of the process has fewer states. Third, the ε-machine is sufficient: it captures all of the mutual information between the past and the future. Together, these properties single out the ε-machine among models of the process: it is the simplest model that loses no predictive information. 
+
+2.3 Key information-theoretic measures 
+
+The ε-machine defines three information-theoretic quantities standard in computational mechanics: 
+
+Statistical complexity Cμ. The Shannon entropy (Shan-non 1948; Cover & Thomas 2006) of the stationary distribution 
+
+π over causal states. Writing S for the stationary causal-state random variable, 
+
+Cμ = H[S] = − X
+
+> s∈S
+
+π(s) log 2 π(s). (2) Equation (2) defines the quantity we report throughout this paper. Cμ measures the minimum memory, in bits, that any unifilar predictive model of the process (one whose states, like the causal states, are functions of the observed history) must maintain for optimal prediction. It is a non-negative real number and is generally not an integer. A memoryless (IID) process has Cμ = 0, since no past information helps predict the future. A two-state process with equally probable causal states has Cμ = 1 bits ; skewed occupations of the same two states give smaller values, with the canonical Even Process (two causal states, π = (2 /3, 1/3); Crutchfield 2012) yielding 
+
+Cμ ≈ 0.918 bits . Higher values correspond to processes with more (or more uniformly occupied) causal states: a uniform distribution over n states gives Cμ = log 2 n bits , so Cμ has no upper bound in principle. A measured Cμ ≈ 1 bits therefore implies at least two distinguishable internal configurations of the process, without by itself fixing their precise number or occupation. 
+
+Entropy rate hμ. The rate of new information production per symbol. The ε-machine is by construction unifilar and the causal states are a sufficient statistic for the past (knowing the causal state captures everything the history reveals about the future, so no finer detail of the past adds predictive power); under these two properties, and assuming the process is stationary and ergodic, the Shannon entropy rate reduces to the expected single-symbol entropy conditional on the causal state (Crutchfield 2012): 
+
+hμ = − X
+
+> s∈S
+
+π(s) X
+
+> x∈A
+
+P (x | s) log 2 P (x | s), (3) i.e. the irreducible randomness that remains even with perfect knowledge of the causal state. Equation (3) is therefore an 
+
+ε-machine-specific identity; for a general unifilar HMM whose states are not also a sufficient statistic, the right-hand side is only an upper bound on the true hμ.
+
+Excess entropy E. The mutual information between the infinite past and infinite future of the process, E = I[←−
+
+X ; −→
+
+X ], quantifying the predictive information the past actually con-tains about the future. E is bounded above by the statistical complexity, E ≤ Cμ (Crutchfield 2012): E is the floor on the memory that any generative model of the process must carry, while Cμ is the memory the minimal unifilar predictive model (the ε-machine) actually carries; the gap between the two is the cost of requiring states that can be read deterministically off the observed history. We do not use E directly in this work, but include it for completeness because the triplet ( hμ, C μ, E )is the standard set in the computational-mechanics literature. 
+
+2.4 Relationship to hidden Markov models 
+
+Every HMM has a corresponding ε-machine, constructed by a deterministic procedure (the mixed-state construction of Up-per 1997). Relative to the original HMM, the ε-machine may have more states: the original states are not in general causal states, and resolving them into sufficient statistics for predic-tion (so that each state is unifilar and makes maximally precise predictions) can require splitting them. Among unifilar HMMs, however, the ε-machine is minimal: any unifilar HMM of the process has at least as many states. HMMs are themselves a well-established tool in astrophysical time-series analysis; they are used to track continuous gravitational waves from spin-wandering neutron stars (Suvorova et al. 2016), detect pulsar glitches (Melatos et al. 2020), search for gravitational waves from Scorpius X-1 (Abbott et al. 2022), detect continu-ous nanohertz gravitational waves with pulsar timing arrays (Kimpson et al. 2024b,c, 2025), suppress instrumental lines in continuous-wave searches (Kimpson et al. 2024a), time accreting X-ray pulsars (O’Leary et al. 2024, 2025, 2026a), discover radio pulsars in compact binaries (O’Leary et al. 2026b), and separate activity states in stellar light curves (Zimmerman et al. 2024). The ε-machine therefore builds on a modelling framework already familiar in the field, while additionally guaranteeing minimality and a sufficient-statistic interpretation of its states. These guarantees presuppose a stationary, ergodic process, an assumption we revisit for our multi-session sequences in Sections 4.2 and 6.4. 
+
+2.5 Why computational mechanics matters for FRBs 
+
+The power spectral density, waiting-time distribution, and scalar complexity measures (approximate entropy, Lyapunov exponents) used in prior FRB analyses are each low-dimensional projections of the full temporal structure. The power spectrum captures second-order correlations but misses higher-order dependencies. The waiting-time distribution de-scribes the marginals but not the sequential dependencies between consecutive intervals. Approximate entropy and Lya-punov exponents provide scalar summaries of regularity and sensitivity to initial conditions but do not identify the hidden  
+
+> MNRAS 000 , 1–26 (2026)
+
+# 4 T. Kimpson and J. O’Leary                                                      
+
+> s1
+> s2s3
+> a|p
+> b|1−q
+> b|1−p
+> a|1
+> a|q
+> Figure 1. Schematic structure of a three-state ε-machine. Circles are the causal states si, and each directed edge is labelled by an emitted symbol and its emission probability P(x|s); the outgoing probabilities from each state sum to one. Unifilarity means that the current state and the emitted symbol together determine the next state uniquely (from s1, for instance, aleads to s2and bto
+> s3), so all stochasticity is carried by the symbol emissions rather than by the state transitions. An ε-machine may have any number of causal states; the three shown here, along with the transition topology and the values ( p, q ), are purely illustrative.
+> Observed symbol sequence
+> 011011110011
+> even-length block of 1s
+> reconstruct ε-machine
+> s1s20|12
+> 1|12
+> 1|1
+> Figure 2. The reconstruction task that motivates this paper, illustrated for the Even Process (1s occur only in even-length blocks, bounded by 0s). The observable is a symbol sequence (top); what we infer from it is the underlying ε-machine (bottom). State s1
+> is stochastic, emitting “0” or “1” with equal probability, and state
+> s2is deterministic, emitting the “1” that completes an even block; edges are labelled by emitted symbol and emission probability
+> P(x|s). The hidden causal state is never observed directly: it is reconstructed from the statistics of the sequence, here by the CSSR algorithm (Section 4.2). This Even Process ε-machine is one of the analytically known test cases used to validate the pipeline in Appendix A1.
+
+states responsible. The ε-machine, by contrast, captures the full causal architecture of the process generating the observed temporal pattern. It is the unique minimal sufficient statistic for prediction, and Cμ complements these scalar summaries by quantifying the minimum predictive memory of the process, a property they do not capture. 
+
+3 DATA AND PREPROCESSING 
+
+We analyse three repeating FRB sources with enough bursts for reliable ε-machine reconstruction. Our synthetic validation (Appendix A) sets a conservative minimum of N ≳ 200 intra-session waiting times. We treat this as an approximate floor, chosen to keep the reconstruction statistically reliable and to leave a margin for real sequences carrying weaker structure than the clean synthetic benchmark. A fourth well-studied repeater, FRB 20180916B, was excluded because CHIME’s transit-mode observing yields only 24 intra-session waiting times, far below the floor. FRB 20220912A, with 193 intra-session waiting times, sits just under the nominal 200, within the margin the approximate floor is meant to allow; we retain it as a borderline case, and interpret its null result (Section 5.1) with that caveat. Sources well below this, in the 100 ≲ N ≲
+
+180 range, could be analysed only with limited statistical power (i.e. a reduced probability of detecting genuine temporal structure when it is present), and we leave them to future work. The three sources we analyse are summarised in Table 1 and described below. Their burst arrival times come from public archives: the Science Data Bank for the two FAST sources, and the CHIME/FRB catalogue for FRB 20220912A. 
+
+• FRB 20121102A . The first known repeater, observed extensively by FAST during a 53-day campaign spanning Modified Julian Date (MJD) 58724–58777 (Li et al. 2021); earlier Arecibo monitoring captured a similar burst-storm episode in 2016 (Hewitt et al. 2022). This dataset comprises 1652 bursts across 39 observing sessions, yielding 1613 intra-session waiting times with a median of 39.5 s. The waiting times span nearly eight orders of magnitude (from ∼10 −4 sto ∼10 4 s), reflecting alternation between periods of intense clustered activity and relative quiescence within sessions. 
+
+• FRB 20201124A . Observed by FAST during an active episode spanning 2.9 days (MJD 59482.9–59485.8; Xu et al. 2022; Zhang et al. 2022). Despite the short observing window, the source’s high burst rate yielded 881 bursts across 4 sessions and 877 intra-session waiting times, with the shortest median waiting time (5.1 s) of the three sources. 
+
+• FRB 20220912A . A prolific repeater detected by CHIME across a 368-day span (MJD 59833–60201; CHIME/FRB Collaboration 2026). CHIME operates in transit mode, observing each source for approximately 10–15 minutes per transit. This yields 353 bursts across 160 sessions but only 193 intra-session waiting times (median 149 s), because most transits contain at most two bursts. For each source we compute waiting times only between con-secutive bursts within the same observing session, exclud-ing the gaps between sessions, which reflect the telescope’s schedule rather than the source’s activity. The bursts fall into well-separated clusters, so assigning them to sessions is unambiguous: across all three sources, the largest gap be-tween consecutive bursts within a session is 104 minutes (for FRB 20121102A; the other two sources are tighter still), while the smallest gap between sessions is 19.1 hours, with no gaps in between. We treat any gap longer than 2 hours as a break between sessions; 2 hours is a round number inside this empty interval, and any threshold between ∼2 and 19 hours yields the same partition, so no result in this paper depends on the exact value. We adopt each source’s published burst list without modification. Whether closely spaced components are catalogued as distinct bursts or as sub-burst microstructure follows the originating catalogue, so the shortest waiting times (down to ∼10 −4 s for FRB 20121102A) reflect that catalogue’s burst definition rather than a criterion imposed here. For each source, the per-session waiting-time sequences are then  
+
+> MNRAS 000 , 1–26 (2026)
+
+# Temporal Memory in Repeating FRBs 5
+
+Source Telescope Reference Nburst Nsession Nwt Median waiting time (s) FRB 20121102A FAST Li et al. (2021) 1652 39 1613 39.5 FRB 20201124A FAST Zhang et al. (2022) 881 4 877 5.1 FRB 20220912A CHIME CHIME/FRB Collaboration (2026) 353 160 193 149.0 
+
+Table 1. Summary of the three repeating FRB sources analysed. Nburst is the total number of detected bursts, Nsession is the number of observing sessions (defined by a 2-hour gap threshold), and Nwt is the number of intra-session waiting times. The median waiting time is computed from the intra-session intervals only. 10 4 10 3 10 2 10 1 10 0 10 1 10 2 10 3 10 4
+
+Waiting time (s) 
+
+> 0.000
+> 0.025
+> 0.050
+> 0.075
+> 0.100
+> 0.125
+> 0.150
+> Fraction of waiting times per bin
+> FRB 20121102A (FAST)
+> FRB 20201124A (FAST)
+> FRB 20220912A (CHIME)
+
+Figure 3. Waiting-time distributions for the three FRB sources, plotted as overlaid step histograms with shared log-spaced bins. The y-axis is the fraction of each source’s waiting times falling in each bin, so each histogram sums to unity. The legend identifies each source and its telescope; the number of waiting times and the median waiting time per source are given in Table 1. Both FAST sources span many orders of magnitude in waiting time: FRB 20121102A extends from ∼10 −4 s to ∼10 4 s (eight orders) and is bimodal, with distinct populations near ∼10 −3 s and ∼10 2 s, while FRB 20201124A runs from ∼10 −3 s to ∼10 3 s (six orders). FRB 20220912A (CHIME) has a much narrower range concentrated around ∼10 2 s, set by CHIME’s transit-mode cadence. 
+
+concatenated end-to-end into a single sequence, which forms the input to the ε-machine reconstruction (Section 4). This concatenation leaves internal joins between successive ses-sions; whether the detected memory operates within sessions or across these joins is the central question of the session-resolved analysis in Section 5.2 and Appendix B. The waiting-time distributions for all three sources are shown in Figure 3, while the underlying burst arrival times and fluences for each campaign are displayed in Figure 4. 
+
+4 METHODS 
+
+The core analysis pipeline is organised as follows. We first convert each continuous waiting-time sequence into a discrete symbol stream (Section 4.1) and reconstruct an ε-machine from it using the CSSR algorithm (Section 4.2). We quan-tify finite-sample uncertainty on the resulting Cμ via block bootstrap (Section 4.3). Because a finite sample of a mem-oryless process can yield Cμ > 0 through estimation bias alone, a nonzero estimate does not by itself establish memory; we therefore test the observed Cμ against surrogates (Sec-tion 4.4), which define the memoryless null and distinguish linear from nonlinear memory. A mutual-information diag-nostic (Section 4.5) separates CSSR reconstruction failure from genuine memorylessness. The full pipeline is validated end-to-end on synthetic processes with known causal structure (Section 4.6). 
+
+4.1 Symbolisation 
+
+CSSR requires a discrete symbol stream as input, and the choice of discretisation determines which temporal features survive into the reconstructed machine. We convert each continuous waiting-time sequence into symbols via quantile discretisation: for a given alphabet size k, we sort the waiting times, partition them into k bins of equal occupancy, and replace each waiting time by the index of its bin. This produces a symbol sequence over the alphabet A = {0, 1, . . . , k − 1},where symbol 0 represents the shortest waiting times and symbol k − 1 the longest. We reconstruct ε-machines at k =2, 3, 4, 5 and report results across this range as a robustness check on the same underlying temporal structure, not as a set of independent hypotheses. Equal-frequency (quantile) binning has two advantages over equal-width binning for this application. First, it guarantees that each symbol is well-represented regardless of the shape of the waiting-time distribution, avoiding the empty-bin prob-lem that heavy-tailed distributions create for equal-width bins. Second, the marginal symbol distribution is uniform by construction ( P (Xt = a) = 1 /k for every a ∈ A ), so any departure from uniformity in the conditional next-symbol distribution P (Xt | ←−
+
+X ) is attributable to temporal structure rather than to distributional artefacts. The discretisation is intentionally lossy: the reconstructed ε-machine is the ε-machine of the symbolised process, a coarse-grained projection of the underlying continuous dynamics. The surrogate tests of Section 4.4 validate that the excess of 
+
+Cμ over the null reflects genuine sequential structure in this projection rather than properties of the binning. Brodu & Crutchfield (2022) extend ε-machine reconstruction to ingest continuous-valued observations directly, with no binning step; applying their method to the FRB waiting-time sequences is a natural extension of this work. An ε-machine formalism developed specifically for continuous-time, discrete-event pro-cesses (Marzen & Crutchfield 2022) offers a complementary route, since burst arrivals are themselves such a process. 
+
+4.2 CSSR reconstruction 
+
+We reconstruct ε-machines from each symbol sequence using the CSSR algorithm (Shalizi & Shalizi 2004), which recovers an ε-machine from a single observed sequence and makes no 
+
+MNRAS 000 , 1–26 (2026) 6 T. Kimpson and J. O’Leary 0 10 20 30 40 50                        
+
+> Days since first burst
+> 10 3
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> Fluence (Jy ms)
+> FRB 20121102A (FAST) (N= 1652 )
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> Days since first burst
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> Fluence (Jy ms)
+> FRB 20201124A (FAST) (N= 881 )
+> 050 100 150 200 250 300 350
+> Days since first burst
+> 10 0
+> 10 1
+> 10 2
+> Fluence (Jy ms)
+> FRB 20220912A (CHIME) (N= 321 )
+
+Figure 4. Burst arrival times and fluences for the three FRB sources. Each marker is one detected burst, plotted as fluence (Jy ms, log scale) versus time since the first burst in that source’s campaign; the x-axis is scaled per panel to the individual campaign duration. The clustering reflects each instrument’s observing cadence rather than intrinsic source activity: FAST (FRB 20121102A, FRB 20201124A) operates in pointed-tracking mode, so bursts are confined to the discrete observing sessions during which the source was being tracked, while CHIME (FRB 20220912A) is a transit instrument and samples the source for only ∼10–15 min per sidereal day, producing the much sparser scatter spread across the full 368-day campaign. Per-panel titles report the number of plotted bursts; for FRB 20220912A, 32 of the 353 catalogued bursts have non-finite fluences in the CHIME catalogue and are omitted from this figure (but retained for all timing-based analyses). 
+
+parametric assumption about the underlying state structure. We use the implementation in the emic Python package 1
+
+(Azariah 2026), which has been validated against multiple inference back-ends and exposes all of the standard complexity measures introduced in Section 2.3. The emic implementation uses a χ2 homogeneity test for state-splitting; the original Shalizi–Klinkner CSSR (Shalizi & Shalizi 2004) defaults to a Kolmogorov–Smirnov variant but lists χ2 as an equivalent alternative. CSSR has two hyperparameters: the maximum history length 
+
+L (the longest past considered when testing whether two histories are predictively equivalent) and the significance level 
+
+α for the χ2 state-splitting test (the threshold above which two histories are merged into the same causal state). We adopt L = 5 and α = 0 .001 throughout; the conservative α
+
+guards against over-splitting in finite samples, and Appendix C reports the sensitivity of Cμ to both choices. Pseudocode for the algorithm is given in Appendix D. Increasing the alphabet size k improves temporal resolution and detection power, but spreads a fixed sample over expo-nentially more candidate histories, so beyond some k the χ2
+
+state-splitting test loses calibration and the reconstructed Cμ
+
+overshoots. At the opposite extreme, too coarse an alphabet makes the test fail to fire at all, collapsing genuinely struc-tured data to Cμ = 0; this low-k reconstruction failure is diagnosed separately in Section 4.5. The state-splitting test compares, for each candidate history, the observed counts of the k possible next symbols; these counts form a contingency table with one cell per (history, next-symbol) pair, and the χ2
+
+approximation to the test statistic is trustworthy only when the expected count in each cell is of order a few or more. With up to kL candidate histories, each split across its k
+
+next-symbol outcomes, the expected count per cell under the null is ∼ N/k L+1 . For our parameters ( L = 5, k ∈ { 2, 3, 4, 5}, 
+
+> 1
+
+https://pypi.org/project/emic/ 
+
+and N ∈ { 193 , 877 , 1613 } for the three sources), this condition holds comfortably at k = 2 (3–25 expected counts per cell) but fails at k = 4 (0 .05–0 .4) and k = 5 (0 .01–0 .1), so at these resolutions the test’s asymptotic calibration is not formally justified. The conservative α = 0 .001 partly compensates by demanding strong evidence before splitting, but the Cμ values at k ≥ 4 should be interpreted as approximate rather than asymptotically calibrated. This calibration ceiling is why we do not simply adopt the largest available k, even though detection power increases with resolution (Appendix A): the surrogate test of Section 4.4, which calibrates significance empirically against reshuffled data rather than through the χ2 approximation, controls the false-positive rate at any k, but it cannot prevent the over-splitting that inflates the reconstructed Cμ itself. Our synthetic benchmark (the two-state HMM of Appendix A) has hidden-state entropy H(π) = 0 .918 bits and a reconstructed ε-machine complexity of ∼0.96 bits , slightly above H(π) because the ε-machine of a non-unifilar HMM may resolve additional causal states; at k = 4 the median reconstructed Cμ (∼0.89– 0.97 bits for N ≥ 500) is consistent with this benchmark scale, whereas at k = 5 it rises to ∼1.08 bits at the largest N , above both reference values. We therefore anchor on k = 4 as our fiducial resolution: although its sparse cell counts leave the χ2
+
+approximation formally unjustified, it is the finest resolution at which the benchmark recovery remains consistent with the generator, with k = 5 already overshooting. The benchmark is a proxy for, not a model of, the FRB data, and it informs only this choice of resolution; the detection claims themselves rest on the surrogate comparison of Section 4.4, in which real and surrogate sequences pass through the identical reconstruction, so any residual miscalibration affects both alike. We read the full sweep as a robustness check rather than a menu from which to select the most significant resolution. CSSR is a consistent estimator (it converges to the true ε-machine in the long-data limit) only for processes that are stationary with finitely many causal states (Shalizi & Shal-
+
+MNRAS 000 , 1–26 (2026) Temporal Memory in Repeating FRBs 7
+
+izi 2004). If the true process requires infinitely many causal states, CSSR can only capture the structure visible in histo-ries of length L or shorter, and the reconstructed Cμ then underestimates the true value: it is a lower bound, not a con-verged estimate. This truncation bias and the finite-sample over-splitting discussed above act in opposite directions, the former deflating the reconstructed Cμ and the latter inflating it; neither can be corrected exactly, which is why we treat the absolute value of Cμ as approximate throughout and draw conclusions only from its excess over the surrogate null. The consequences of the stationarity assumption for our concate-nated multi-session sequences are taken up in Section 6.4. 
+
+4.3 Bootstrap confidence intervals 
+
+To quantify finite-sample uncertainty on the point estimate Cμ
+
+before testing it against any null, we compute block-bootstrap confidence intervals (Efron 1979; K¨ unsch 1989). For each source and k, we draw 200 block-bootstrap replicates of the waiting-time sequence: each replicate is assembled by drawing, with replacement, blocks of consecutive waiting times from the original sequence and concatenating them until the full length N is reached. The block length is selected automatically as the larger of two estimates: the empirical decorrelation length of the waiting-time sequence (the first lag at which the autocorrelation function falls below 1 /e ) and the N 1/3 scaling rule (Hall et al. 1995), rounded to the nearest integer, which acts as a floor when the linear autocorrelation is weak. For all three sources the autocorrelation falls below 1 /e at the first lag, so the N 1/3 rule sets the block length: 12, 10, and 6 for FRB 20121102A, FRB 20201124A, and FRB 20220912A respectively. Because interval widths can be sensitive to the block length for dependent data, we repeated the procedure at half and double these values. The widths change by at most 
+
+∼35 per cent, in the expected direction (longer blocks preserve more serial dependence and give wider intervals), and every interval continues to include zero (Appendix F). We symbolise each replicate, reconstruct the ε-machine, and report the 95% confidence interval and standard error of Cμ. A naive IID bootstrap would destroy precisely the serial dependence that drives Cμ; the block bootstrap preserves that dependence within blocks while resampling the overall sequence. 
+
+4.4 Surrogate testing 
+
+To test whether the observed Cμ is consistent with a memo-ryless process, and to characterise the nature of any detected memory, we generate three families of non-parametric surro-gates and compare the real data against each. Each surrogate family answers a different question by destroying a different as-pect of the data while preserving others. Each surrogate passes through the same symbolise–reconstruct pipeline as the real data (Section 4.1), and we report significance as a one-sided 
+
+p-value: the fraction of surrogates with Cμ at or above the real value. We also report a z-score z = ( Creal  
+
+> μ
+
+− ⟨ Csurr  
+
+> μ
+
+⟩)/σ surr 
+
+> Cμ
+
+as an effect-size summary, but because the surrogate Cμ dis-tributions are non-Gaussian and bounded below by zero, it carries no inferential weight beyond the p-value. The three families are described in turn below, followed by the multiple-comparison correction applied across alphabet sizes. 
+
+Permutation surrogates. For each source and each k, we generate 1000 surrogate sequences by randomly permuting the waiting-time sequence and re-symbolising with the same quantile boundaries as the original data. The permutation preserves the marginal symbol distribution while destroying all temporal order, providing the primary null for the question “is the waiting-time sequence memoryless?” (Theiler et al. 1992). This is the test reported in Section 5.1 as the main result of the paper. 
+
+IAAFT surrogates. To test the stronger null that Cμ
+
+reflects only the linear autocorrelation captured by the au-tocorrelation function (ACF), we additionally generate 1000 Iteratively Amplitude-Adjusted Fourier Transform (IAAFT) surrogates (Schreiber & Schmitz 1996) of the raw (continuous) waiting-time sequence. IAAFT preserves both the marginal amplitude distribution and the power spectrum of the source series while destroying higher-order temporal structure; each surrogate is then quantile-symbolised with the same bound-aries as the real data and passed through CSSR. Significance against this null indicates that the detected memory has a nonlinear component beyond what the ACF alone captures. 
+
+ACF surrogates. The same 1000 permuted sequences are reused as the null distribution for the autocorrelation function itself: for each source we compute the ACF at lags 1–20 and flag a lag as significant when the real ACF exceeds the 95th percentile of the surrogate ACF distribution. This tests for temporal structure at the level of pairwise correlations, complementing the Cμ-based tests above. 
+
+Multiple-comparison correction. The four tested k val-ues per source are not independent hypotheses but four resolu-tions of the same underlying structure. We apply a Benjamini– Hochberg false discovery rate (FDR) correction (Benjamini & Hochberg 1995) per source ( m = 4 tests each) and report both raw and adjusted p-values in Table 2. 
+
+4.5 Mutual-information diagnostic 
+
+CSSR can fail to detect structure that is genuinely present: at coarse alphabets the conditional transition probabilities become nearly uniform, the χ2 state-splitting test never fires, and the reconstruction returns Cμ = 0 for data that are not memoryless (Section 4.2). A Cμ = 0 entry is therefore ambiguous between reconstruction failure and genuine memo-rylessness, two outcomes with qualitatively different physical implications. To distinguish them, we compute the lag-1 mu-tual information (MI) between consecutive symbols in the symbolised sequence, 
+
+I(Xt; Xt+1 ) = X
+
+> a,b ∈A
+
+P (a, b ) log 2
+
+P (a, b )
+
+P (a) P (b) , (4) where P (a, b ) is the empirical joint distribution of consecutive symbol pairs and P (a), P (b) are its marginals, and compare it against the MI of 1000 shuffled copies. If the MI is significantly above the shuffled baseline, the symbolisation has preserved temporal structure in the data even when CSSR returns 
+
+Cμ = 0. This diagnostic underwrites our interpretation of the  
+
+> MNRAS 000 , 1–26 (2026)
+
+# 8 T. Kimpson and J. O’Leary 
+
+Cμ = 0 entries in the main results table, distinguishing those attributable to CSSR coarse-resolution failure from those signalling true memorylessness. 
+
+4.6 Pipeline validation 
+
+Before applying the pipeline to real FRB data, we validate it end-to-end on synthetic processes with known causal structure: the analytic Even and Golden Mean machines, and Poisson and two-state HMM generators. The emic CSSR implemen-tation recovers the analytic machines to within 0 .5% of their known Cμ; these machines emit discrete symbols directly, so this test isolates the reconstruction step from symbolisa-tion. The looser benchmark agreement quoted in Section 4.2 for the two-state HMM reflects the full pipeline, including quantile symbolisation of continuous values and a generator whose ε-machine complexity is itself only bounded, not exactly known. Applied to the synthetic generators, the permutation-surrogate test controls false positives at the nominal rate and recovers the structured (HMM) process with a power that grows with alphabet resolution ( ∼0.64–0 .93 across k = 4–5 for N ≳ 200). Full details are given in Appendix A. 
+
+5 RESULTS 
+
+This section reports the temporal-memory analysis for the three sources. Section 5.1 presents the central detection: ε-machine reconstruction and surrogate testing. Section 5.2 then asks where the detected memory lives, separating structure within individual observing sessions from structure in how activity varies across sessions. Section 5.3 closes with four robustness checks: block-bootstrap confidence intervals, the behaviour of Cμ across alphabet size, a mutual-information diagnostic that separates genuine memorylessness from CSSR reconstruction failure at coarse resolution, and a fluence-completeness control against session-varying detection sensi-tivity. 
+
+5.1 Detection of temporal memory 
+
+As a model-free preliminary, Figure 5 shows the ACF of the waiting-time sequence for each source, overlaid with the 5th– 95th percentile (90%) envelope of the permutation surrogates. FRB 20121102A shows weak but persistent autocorrelation (ACF(1) = 0.085, with 19 of 20 lags exceeding the surrogate 95th percentile) and FRB 20201124A the strongest sustained autocorrelation (ACF(1) = 0.247, with all 20 lags significant). For FRB 20220912A, only 1 of 20 lags exceeds the envelope. One exceedance is the rate expected by chance under the null, although this one falls at lag 1, the most diagnostic lag, and its magnitude (ACF(1) ≈ 0.30, roughly three times the surrogate envelope) is larger than a marginal chance crossing would produce. Short-timescale burst-to-burst correlations have also been reported for this source in independent observations (Totani & Tsuzuki 2023), a point taken up in Section 6.1. The mutual-information diagnostic (Section 5.3) and the Cμ tests below are nonetheless null for FRB 20220912A at every k, so we treat the sequence as consistent with memorylessness while noting the lag-1 exceedance. These second-order statistics establish that some temporal structure is present in the FAST sequences, but they cannot say how much predictive memory that structure carries, nor what minimal model generates it; quantifying both is the task of the ε-machine reconstruction. Figure 6 compares the real Cμ for each source at k = 4 against the distribution of Cμ from 1000 permutation surro-gates (Section 4.4); Table 2 reports the full k-sweep. Both FAST sources show Cμ significantly above surrogates at 
+
+k ≥ 4. FRB 20121102A yields Cμ = 1 .116 bits at k = 4 (p = 0 .005, z = 3 .6) and Cμ = 0 .831 bits at k = 5 ( p = 0 .028, 
+
+z = 2 .4). FRB 20201124A yields Cμ = 0 .986 bits at k = 4 (p = 0 .009, z = 3 .4) and Cμ = 0 .900 bits at k = 5 ( p = 0 .014, 
+
+z = 2 .9). For both sources the surrogate distribution has mean Cμ ≈ 0.1 bits , with the real values lying well above its bulk ( p < 0.05 in all four tests, and p ≤ 0.01 for both 
+
+k = 4 detections). FRB 20121102A also reaches nominal sig-nificance at k = 2 ( Cμ = 0 .918 bits , p = 0 .039); this detection does not survive the multiple-comparison correction below (padj = 0 .052), and we do not count it among the robust detections. These canonical values are reconstructed from the full concatenated multi-session sequence; Section 5.2 and Appendix B establish that for both FAST sources this Cμ
+
+reflects predictive structure on inter-session timescales rather than within-session memory. FRB 20220912A shows Cμ = 0 at all four k values. At 
+
+k = 4, where the FAST sources show the strongest signal, FRB 20220912A has p = 0 .160, not significant. At k = 2 , 3, 5, the p-values are 1.000. The ε-machine for FRB 20220912A is trivial (a single state with uniform emissions) at every reso-lution tested. As shown in Section 6.3, this null result may reflect CHIME’s short transit-mode observing windows rather than intrinsic memorylessness. Testing four alphabet sizes across three sources gives 12 hy-pothesis tests, so Table 2 also reports Benjamini–Hochberg (Benjamini & Hochberg 1995) FDR-adjusted p-values. The correction can be applied in two ways: within each source, treating its four k values as one family ( m = 4 tests), which asks whether that source individually shows memory at any resolution; or pooling all 12 tests ( m = 12), which is stricter because it guards against any source–resolution combination in the study reaching significance by chance. The k = 4 de-tections survive the per-source correction at padj = 0 .020 (FRB 20121102A) and padj = 0 .028 (FRB 20201124A, whose 
+
+k = 5 result also survives at 0 .028); under the stricter pooled correction the strongest detections sit at padj = 0 .054, just above the conventional threshold. Our primary claim rests on the per-source correction, with the pooled numbers reported as a more conservative sensitivity check; the rationale for each choice is discussed alongside the other sensitivity analyses in Appendix C. The reconstructed ε-machines at k = 4 are shown in Figure 7. FRB 20121102A yields a three-active-state machine, with the dominant state ( π = 0 .70) emitting all four symbols at near-equal probability and two minor states ( π = 0 .23 and π = 0 .07) with distinct emission profiles. FRB 20201124A yields a two-state machine with an asymmetric stationary distribution (dominant state π = 0 .57, minor state π = 0 .43), where each state preferentially emits different symbols. FRB 20220912A yields a trivial single-state machine with uniform emissions, the hallmark of an IID process. The corresponding entropy  
+
+> MNRAS 000 , 1–26 (2026)
+
+# Temporal Memory in Repeating FRBs 95 10 15 20 
+
+Lag    
+
+> 0.1
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> Autocorrelation
+> 19/20 lags sig.
+> FRB 20121102A (FAST)
+> 90% surrogate band
+> Observed ACF
+> 510 15 20
+
+Lag    
+
+> 20/20 lags sig.
+> FRB 20201124A (FAST)
+> 90% surrogate band
+> Observed ACF
+> 510 15 20
+
+Lag 
+
+> 1/20 lags sig.
+> FRB 20220912A (CHIME)
+> 90% surrogate band
+> Observed ACF
+
+Figure 5. Autocorrelation function of the waiting-time sequence for each source (coloured lines) overlaid with the 5th–95th percentile (90%) envelope of 1000 permutation surrogates (grey shading). Stars mark lags where the real ACF exceeds the upper one-sided 95th percentile of the surrogate distribution. The number of significant lags (out of 20) is annotated on each panel. Lags count positions in the waiting-time sequence (lag 1 compares consecutive waiting times), not elapsed time. 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 
+
+C (bits)        
+
+> 0.0
+> 2.5
+> 5.0
+> 7.5
+> 10.0
+> 12.5
+> 15.0
+> 17.5
+> 20.0
+> Density
+> p = 0.005 **
+> z = 3.6
+> FRB 20121102A (FAST)
+> Surrogates
+> C= 1.116
+> Surr. mean = 0.118
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+
+C (bits)        
+
+> p = 0.009 **
+> z = 3.4
+> FRB 20201124A (FAST)
+> Surrogates
+> C= 0.986
+> Surr. mean = 0.097
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+
+C (bits)  
+
+> p = 0.160
+> z = -0.3
+> FRB 20220912A (CHIME)
+> Surrogates
+> C= 0.000
+> Surr. mean = 0.087
+
+Figure 6. Surrogate comparison at k = 4. Each panel shows the distribution of Cμ from 1000 permutation surrogates (grey histogram) and the real Cμ (vertical coloured line). Dashed grey lines mark the surrogate mean. The p-value and z-score are annotated; double asterisks mark p < 0.01. Both FAST sources are significant ( p < 0.01); FRB 20220912A is not. The surrogate distribution is bimodal (a pile-up at 
+
+Cμ ≈ 0 with a secondary cluster near 0.7–0.8 bits); this reflects CSSR’s binary state-splitting behaviour at finite N rather than physical bimodality, and is discussed further in Appendix F. 
+
+rates (Equation 3) at k = 4 are hμ = 1 .97 bits sym −1 (bits per symbol) for both FAST sources and effectively the IID value log 2 4 = 2 bits sym −1 for FRB 20220912A’s single-state ma-chine; the small deficits from that value for the FAST sources reflect the modest predictive structure that the surrogate tests establish. To test whether the detected memory extends beyond linear autocorrelation, we additionally generate IAAFT surrogates (Schreiber & Schmitz 1996), which preserve the marginal distri-bution and power spectrum (and hence the linear ACF) while destroying higher-order structure. FRB 20121102A marginally exceeds the IAAFT distribution at k = 4 ( p = 0.032, 
+
+z = 2 .3), suggesting a nonlinear component to its memory, while FRB 20201124A does not ( p ≥ 0.098 at all k), consistent with its strong linear autocorrelation accounting for most of the detected Cμ (though non-significance against IAAFT does not exclude a smaller nonlinear contribution). Full results are tabulated in Appendix E. 
+
+5.2 Where does the memory live? 
+
+A non-zero Cμ on the concatenated waiting-time sequence could reflect within-session causal structure (the per-burst emission mechanism remembering past bursts), inter-session activity-rate variation (the source occupying different bursting regimes across sessions), or some combination of the two. The sequence concatenates many separate observing sessions end to end, so it contains internal session boundaries, the joins between consecutive sessions. Within-session memory lies inside a session; inter-session structure lives across these joins. To disentangle the two, we run four analyses at k = 4 with 
+
+L = 5. Three are session-boundary controls , which perturb or 
+
+MNRAS 000 , 1–26 (2026) 10 T. Kimpson and J. O’Leary 
+
+Source k Cμ (bits) praw pm=4 adj pm=12 adj 
+
+FRB 20121102A 2 0.918 0.039 0.052 0.094 3 0.000 1.000 1.000 1.000 4 1.116 0.005 0.020 0.054 5 0.831 0.028 0.052 0.084 FRB 20201124A 2 0.000 0.084 0.112 0.168 3 0.000 0.112 0.112 0.192 4 0.986 0.009 0.028 0.054 5 0.900 0.014 0.028 0.056 FRB 20220912A 2 0.000 1.000 1.000 1.000 3 0.000 1.000 1.000 1.000 4 0.000 0.160 0.640 0.240 5 0.000 1.000 1.000 1.000 
+
+Table 2. Permutation-surrogate tests of the statistical complexity Cμ across all sources and alphabet sizes k. praw is the fraction of 1000 surrogates with Cμ ≥ Creal  
+
+> μ
+
+; pm=4 adj and pm=12 adj are Benjamini–Hochberg FDR-adjusted values under the per-source ( m = 4 tests per source) and pooled ( m = 12 tests) corrections. Bold marks p < 0.05 in each p column. Cμ is rounded to three decimal places; entries displayed as 0.000 can be non-zero at machine precision ( ≲10 −8 bits ), and their p-values, computed against the unrounded value, can therefore be below unity. Block-bootstrap 95% confidence intervals on the Cμ point estimates are reported separately in Table F1.   
+
+> FRB 20121102A 3 states, Cμ=1 .116 bits
+
+s1
+
+> π=0 .70
+
+s2
+
+> π=0 .23
+
+s3   
+
+> π=0 .07
+> 0:0 .24 1:0 .22 3:0 .29 0:0 .23 2:0 .27 3:0 .18 2:0 .25 2:0 .15 3:0 .10 1:0 .32 0:0 .41 1:0 .33
+> FRB 20201124A 2 states, Cμ=0 .986 bits
+
+s1
+
+> π=0 .57
+
+s2  
+
+> π=0 .43
+> 0:0 .24 1:0 .32 2:0 .27 0:0 .26 1:0 .19 3:0 .33 3:0 .17 2:0 .22
+> FRB 20220912A 1 state, Cμ=0 .000 bits
+
+s1
+
+> π=1 .00
+> 0:0 .25 1:0 .26 2:0 .24 3:0 .25
+
+Figure 7. Reconstructed ε-machines at k = 4 for all three sources, shown in left-to-right order: FRB 20121102A, FRB 20201124A, FRB 20220912A. Nodes represent causal states, labelled with their stationary probability π; directed edges represent transitions, labelled in the format symbol:probability , giving the emitted symbol and its conditional emission probability from the source state. The symbol index is colour-coded (0, 1, 2, 3) to set it apart from the probability value, and a single edge may bundle several symbols where distinct emissions from one state lead to the same successor. Zero-probability states (CSSR over-splitting artefacts) are omitted. Emission probabilities are rounded to two decimal places, so the outgoing probabilities from a state may not sum exactly to one (e.g. s3 of FRB 20121102A sums to 0.99). Both FAST sources yield multi-state machines with Cμ ≈ 1 bits , while FRB 20220912A yields a trivial single-state machine ( Cμ = 0), consistent with memoryless emission. 
+
+restrict the data and test whether the signal survives: (i) a session-shuffle test (100 permutations of session order, with within-session waiting times intact); (ii) per-session quantile binning (bin edges recomputed within each session, requiring 
+
+≥ 30 waiting times per session for inclusion); and (iii) a reconstruction restricted to each source’s single longest session. The fourth, (iv), is a boundary-free reconstruction , which removes cross-session histories by construction: CSSR’s suffix tree is built per session, so no history of length L spans a session boundary. The boundary-free analysis is developed in full in Appendix B, which carries most of the quantitative detail behind this separation. 
+
+(i) Session-shuffle test. For FRB 20121102A, only one of the 100 session-order permutations reaches the observed Cμ,giving p = 0 .020 under the Monte-Carlo ( r + 1) /(n + 1) esti-mate (Phipson & Smyth 2010): session ordering matters, and the signal is not merely an artefact of combining heterogeneous sessions in an arbitrary order. With 100 permutations this sits near the resolution floor of the test, so the precise value should not be over-read; the qualitative conclusion that order-ing carries signal does not depend on it. For FRB 20201124A, 
+
+p = 0 .376: the signal does not depend on session ordering, consistent with the memory arising from the contrast between sessions rather than from structure within them. 
+
+MNRAS 000 , 1–26 (2026) Temporal Memory in Repeating FRBs 11 
+
+(ii) Per-session quantile binning. Under this scheme, FRB 20121102A retains Cμ = 0.955 bits while FRB 20201124A drops to Cμ = 0 .000 bits . This test removes inter-session distributional differences but still operates on a concatenated symbol stream, so it does not by itself eliminate cross-session histories in the CSSR suffix tree. 
+
+(iii) Longest-session analysis. For FRB 20121102A, the longest session (121 waiting times) yields Cμ = 0 .598 bits ,suggestive of within-session structure but on a sample below our N ≈ 200 minimum-sample requirement (Appendix A). For FRB 20201124A, the longest session (541 waiting times, well above this requirement) yields Cμ = 0 .000 bits : no within-session structure detected. 
+
+(iv) Boundary-free reconstruction. For FRB 20121102A, the boundary-free Cμ at k = 4 drops to zero: the canonical 
+
+Cμ = 1 .116 bits is driven predominantly by cross-session histo-ries. For FRB 20201124A, the boundary-free Cμ = 0 .985 bits is essentially unchanged from the canonical 0.986 bits, as ex-pected since FRB 20201124A has only three internal session boundaries ( ∼1.7% of histories) which cannot carry the signal on their own. Tested against a within-session-shuffle null that preserves per-session waiting-time multisets, neither source shows significant within-session predictive memory at any k
+
+after multiple-comparison correction; FRB 20121102A retains borderline evidence at k = 5 ( praw = 0 .033, padj = 0 .134 across the k-sweep), echoing the longest-session and IAAFT results (Appendix B). These analyses converge on a common picture: for both FAST sources, the detected Cμ ≈ 1 bits reflects predictive structure operating on inter-session timescales. Each source apparently switches between activity-rate regimes; for FRB 20121102A the sequence of those regimes across sessions itself carries information, while for FRB 20201124A the information lies in the contrast between heterogeneous sessions. The two sources differ in the timescale of this switching: FRB 20201124A’s four sessions span 2.9 days, so the regime evolution it samples is on the hours-to-day scale; FRB 20121102A’s 39 sessions span 53 days, so its regime evolution can encompass hours to weeks. FRB 20121102A additionally shows weak hints of within-session structure (the Cμ = 0 .598 bits longest-session result and borderline boundary-free Cμ and lag-1 MI sig-nals at the finest alphabet resolution), but none of these survive the threshold applied throughout this paper ( p < 0.05 after Benjamini–Hochberg correction), and confirming within-session memory would require longer continuous sessions than are currently available. For FRB 20201124A, in contrast, the well-powered single-session reconstruction detects no within-session structure. Applying CSSR to the concatenated non-stationary sequence operates outside the formal stationarity guarantee of the ε-machine theorem (Shalizi & Crutchfield 2001), so the multi-session Cμ for both sources should be in-terpreted as quantifying inter-session regime structure rather than per-burst predictive memory. The within-session-shuffle null adds a final piece of corrobora-tion: for FRB 20201124A, surrogates with all within-session ordering destroyed still reproduce Cμ ∼ 0.45 bits from the session-level marginal contrasts alone, so a substantial part of its canonical signal requires no ordering information what-soever (Table B2). What these inter-session regimes are phys-ically, and what they do and do not imply about the source, is taken up in Section 6.1. 
+
+5.3 Robustness checks 
+
+Three further checks probe the statistical standing of the detection; the quantitative detail behind each is collected in Appendix F. First, block-bootstrap 95% confidence intervals on the Cμ
+
+point estimates (Section 4.3; Table F1) are wide, and all include zero. This reflects the bimodal character of the boot-strap distribution (individual replicates yield either Cμ ≈ 0or Cμ ≈ 1, the binary firing behaviour of CSSR’s χ2 state-splitting test at finite N ) rather than consistency with mem-orylessness; the same collapse occurs on known-structured synthetic data (Appendix A). The bootstrap quantifies how imprecisely the absolute value of Cμ is determined; the rejec-tion of memorylessness rests on the surrogate test, which asks a different question and is unaffected. Second, the ranking of the three FRB sources is robust across alphabet size (Figure F1): FRB 20220912A yields Cμ = 0 at every resolution, while the FAST sources exceed the surrogate band wherever CSSR detects structure. At k = 2 and 3 the FAST sources collapse to Cμ = 0 for some configurations; this is a CSSR reconstruction artefact at coarse resolution, not an absence of structure. Third, the mutual-information diagnostic (Section 4.5; Fig-ure F2) confirms that the coarse-resolution collapses are recon-struction artefacts: for both FAST sources the lag-1 MI of the symbolised sequence is significantly above the shuffled baseline at every tested k (at k = 2, FRB 20121102A p = 0 .032 and FRB 20201124A p = 0 .026), so the coarse-resolution Cμ = 0 entries reflect CSSR failing to fire where temporal structure is demonstrably present in the symbols. For FRB 20220912A the MI is not significant at any k (p > 0.1): the symbol sequence is indistinguishable from IID at every resolution, consistent with its Cμ = 0. A fourth control addresses instrumental rather than statisti-cal robustness: because the detected memory is inter-session, session-varying detection sensitivity could in principle mimic it (Section 6.4). Appendix G repeats the detection on sub-samples restricted to bursts bright enough to be detected regardless of session-to-session sensitivity (above the fluence completeness threshold). To check whether any loss of signal under this cut reflects the smaller sample rather than the removal of faint bursts, each cut is compared against sub-samples of the same size with bursts removed at random. FRB 20201124A’s detection survives cuts up to twice the published completeness threshold, so its signal is not carried by bursts near the detection limit; for FRB 20121102A the control is power-limited: the cut destroys the detection, but removing the same number of bursts at random usually de-stroys it too, so the loss reflects the smaller sample rather than the removal of faint bursts specifically.  
+
+> MNRAS 000 , 1–26 (2026)
+
+# 12 T. Kimpson and J. O’Leary 
+
+6 DISCUSSION 
+
+The preceding section established that two of the three sources carry temporal memory of order one bit, that this memory op-erates on inter-session rather than within-session timescales, and that the third source’s null result is ambiguous. This section interprets those findings. We develop the physical interpretation (Section 6.1), test whether the regime sequence carries more structure than a two-state rate-switching process can reproduce (Section 6.2), draw out the implications for observing strategy and the status of FRB 20220912A (Sec-tion 6.3), and set out what waiting-time data alone can and cannot establish (Section 6.4). 
+
+6.1 Interpreting the detected memory 
+
+For both FAST sources Cμ lies well above the bulk of the permutation-surrogate distribution ( p ≤ 0.01): the waiting-time sequence is not memoryless. Its absolute value is less precisely constrained, varying between 0.83 and 1.12 bits de-pending on the alphabet size k, with wide bootstrap confidence intervals (Section 5.3). The measured values are consistently of order one bit, which in the language of computational mechan-ics means that the process requires at least two distinguishable hidden modes for optimal prediction (since Cμ = 1 bits is the entropy of a fair binary variable; more states with asym-metric weights could also produce Cμ ≈ 1). As established in Section 5.2, these hidden modes are best understood as the activity-rate regimes that each source occupies across its observing campaign, with the timescale of regime switching distinguishing the two sources. Both FAST sources yield Cμ of similar magnitude despite dif-ferent autocorrelation structures and different reconstructed machine topologies (FRB 20121102A: three active states; FRB 20201124A: two active states). FRB 20121102A shows weak but persistent autocorrelation (ACF(1) = 0.085, 19/20 lags significant), while FRB 20201124A shows strong persis-tent autocorrelation (ACF(1) = 0.247, 20/20 lags significant). We cannot determine from two sources alone whether the similar Cμ values reflect a shared underlying constraint on the burst-generating process or are coincidental given the uncertainties. The two sources require a comparable amount of predictive memory despite their different correlation struc-tures; the nature of that dependence, which we examine below, differs even where the amount does not. The localisation results of Section 5.2 sharpen the distinction between the two sources. For FRB 20121102A, the session or-dering itself is predictive: rearranging the sessions destroys the signal. For FRB 20201124A, every ordering-sensitive control is null, and what remains is session-level rate heterogene-ity: four sessions with distinguishably different waiting-time distributions. FRB 20201124A’s Cμ is therefore best read as the memory required to track which kind of session the source is in, not as evidence for an ordered regime sequence. The binning sensitivity reinforces this reading (Appendix C): FRB 20201124A’s detection requires quantile discretisation, which by construction encodes inter-session distributional contrast, and vanishes under log-spaced binning, whereas FRB 20121102A’s detection survives the change of scheme. These results point to a simple picture: both sources are well described by a process that alternates between a small number of activity-rate regimes, with individual sessions ap-proximately stationary within a given regime and the regime varying between sessions. The boundary-free analysis explains why FRB 20121102A’s full-concatenation Cμ = 1 .116 bits ex-ceeds the per-session quantile result ( Cμ = 0 .955 bits ) and the longest-session result ( Cμ = 0 .598 bits ): the larger value picks up cross-session histories that encode the sequence of activity regimes, while the smaller values progressively remove that contribution. Many physical mechanisms are consistent with this picture. One class is magnetospheric models in which the source’s activity is set by a slowly evolving global configuration (a twisted magnetosphere whose state changes on timescales longer than an individual observing session; Wadiasingh & Timokhin 2019; Beloborodov 2020; Lu et al. 2020) whose sequence of occupied configurations is what the 
+
+ε-machine resolves. Other classes include propagation effects in a structured local environment and intermittent activity in a companion-perturbed magnetosphere. The waiting-time analysis does not by itself distinguish among these alterna-tives. The detection of Cμ significantly above zero is independent of any parametric model of the waiting-time distribution (though not of the discretisation scheme; Appendix C): the waiting-time process has temporal memory, and any viable physical model must reproduce this. The localisation gives the constraint its second side: the memory lives between sessions, and within sessions the timing is consistent with memoryless emission at current sensitivity, so models that generically predict strong burst-to-burst correlation on second-to-minute scales receive no support from these data at the resolutions our symbolisation probes. This within-session statement must, however, be reconciled with Totani & Tsuzuki (2023), who report aftershock-like burst-to-burst correlations in these same three sources. Their signal is strongest at the shortest separations, where quantile symbolisation compresses the entire short-waiting-time pop-ulation into a single symbol, so a rate enhancement largely confined within one bin’s dynamic range is mostly invisible to our test; the borderline within-session signals at our finest resolution (Appendix B) may be a trace of it. The two results are therefore not directly contradictory, but a quantitative reconciliation, ideally under a common burst definition, is left to future work. Taken together with the inter-session lo-calisation of Section 5.2, this leaves a two-sided constraint on physical models: any viable model must produce inter-session activity-rate regimes, with an ordering that is itself informative in the case of FRB 20121102A, while remain-ing consistent with memoryless within-session timing at the resolutions probed here. This constraint also bears on prior claims of memory in these same sources: Wang et al. (2023) and Sang & Lin (2024) report Hurst-exponent persistence on minute-to-hour (within-session) timescales, precisely the scales where our boundary-free and within-session-shuffle con-trols find no surviving predictive structure (though the test is power-limited for FRB 20121102A; Section 6.4). Persistence statistics and predictive complexity are different objects; Ap-pendix H discusses how our result relates to these prior claims. The IAAFT surrogate analysis (Appendix E) provides fur-ther insight into the nature of this memory at the multi- 
+
+> MNRAS 000 , 1–26 (2026)
+
+# Temporal Memory in Repeating FRBs 13 
+
+session level. For FRB 20121102A, there is marginal evidence (p = 0 .032 at k = 4) that the temporal structure of the con-catenated sequence includes nonlinear components beyond the autocorrelation function. For FRB 20201124A, the IAAFT sur-rogates produce Cμ distributions consistent with the observed value, suggesting that the strong linear ACF (ACF(1) = 0.247) may account for most of the detected Cμ. In both cases the inter-session process requires ∼1 bit of predictive memory, but the dependence structure differs: FRB 20121102A appears to have a nonlinear component in how its activity regimes sequence between sessions, while FRB 20201124A’s sequence is consistent with predominantly linear dependence. The ε-machine framework provides more than a scalar detec-tion of temporal memory. Consider FRB 20201124A’s recon-structed machine at k = 4: a two-state model with station-ary occupations {0.57 , 0.43 }, where each state emits different symbol distributions. This is a minimal generative model: it specifies the states, their occupancy probabilities, and the transition structure. The ACF detects that “consecutive wait-ing times are correlated”; the ε-machine tells us how they are correlated, via a model that can be simulated, tested against future data, and compared across sources (though the reconstructed state topology is less reliable than Cμ itself; Section 6.4). Cμ also quantifies the memory: ∼1 bit means op-timal prediction of the observed sequence requires at least two distinguishable states, one bit’s worth of information about which activity regime is active over an observing session. This is a tighter constraint than “waiting times are autocorrelated”. Two superficially similar claims must be kept apart. We es-tablish that the observed multi-session waiting-time sequence requires at least two activity-rate regimes for optimal pre-diction; we do not establish that the source itself possesses two or more internal physical configurations. A single-state engine with a continuously drifting mean rate, sampled at sessions that cluster into a few rate levels, would yield the same Cμ, as would an external modulator (orbital, propaga-tion, environmental) imposing rate variation on a structurally simpler source. The ε-machine result constrains the predictive structure of the observed sequence, not the dimensionality of the source’s internal state space, and we do not identify the regimes with specific physical mechanisms. This degeneracy is not specific to computational mechanics: any inference from burst arrival times alone (parametric waiting-time fits, per-sistence statistics, periodicity searches) cannot separate an intrinsic state sequence from externally imposed rate varia-tion. What the analysis does constrain is the timescale and magnitude of variability: whatever modulates FRB emission, on inter-session timescales it must vary by enough to carry at least one bit of predictive information about future emis-sion rate. This rules out memoryless (constant-rate Poisson) emission and quantifies the ordered rate variation that any viable model (whether a stationary hidden-state process or a genuinely non-stationary one) must accommodate. 
+
+6.2 Comparison with a Markov-modulated Poisson process 
+
+Could the detected memory be merely the signature of a rate-switching process? Non-Poissonian, clustered waiting-time models have been fitted to these sources: a Weibull renewal process (Oppermann et al. 2018; Cruces et al. 2021) and a time-varying-rate Poisson process (Jahns et al. 2023). The natural rate-switching generalisation of these models is a Markov-modulated Poisson process (MMPP). In the MMPP, a hidden state ζn ∈ { 1, 2} governs each waiting time, and transitions between fast and slow rates carry predictive information about the next waiting time’s expected length. We test this directly. We implemented the MMPP as a discrete-time hidden Markov model: transitions follow a 2 × 2 stochastic matrix T and each waiting time is drawn from Exp (λζn ). For each source we fitted the MMPP by Expectation–Maximisation (four free parameters), drew 1000 synthetic waiting-time sequences of length matched to the observed N , symbolised each at k = 4 using its own quantile boundaries, reconstructed an ε-machine for each, and recorded the resulting Cμ. These baselines con-dition on the best-fitting point estimate; uncertainty in the fitted MMPP parameters is not propagated into the synthetic 
+
+Cμ distributions. Symbolising each draw with its own quantile boundaries rather than those of the real data matches the procedure applied to the observations, where the quantiles are estimated from the sequence in hand. It also prevents the real marginal from leaking into the synthetic comparison, so the test isolates sequential structure rather than marginal differences. One structural mismatch remains: the synthetic draws are gap-free sequences of matched length, whereas the real data concatenate sessions separated by long unobserved gaps across which any hidden state continues to evolve; part of the Cμ excess over the fitted MMPP could therefore re-flect this sampling mismatch rather than dynamics beyond rate-switching, a caveat that the higher-order structured nulls discussed below would also address. For comparison with the published parametric fits (Cruces et al. 2021; Opper-mann et al. 2018), we additionally fitted a secondary IID two-component exponential mixture (three free parameters, fitted by Expectation–Maximisation, likewise 1000 synthetic draws); this null shares the marginal waiting-time distribution of a corresponding MMPP but cannot reproduce Cμ > 0 from temporal ordering by construction. If the MMPP captured all the temporal structure, draws from the fitted model would reproduce the observed Cμ. In fact, the ε-machine captures more structure than the MMPP (Figure 8). We summarise each separation as a σ-equivalent: the number of synthetic standard deviations between the observed Cμ and the MMPP baseline mean, z = ( Cobs  
+
+> μ
+
+−⟨CMMPP  
+
+> μ
+
+⟩)/σ MMPP (the same standardised effect size used for the surrogate tests in Section 4.4). Because the MMPP Cμ
+
+distributions are non-Gaussian and bounded below at zero, the σ-equivalent is a descriptive effect size; we therefore also report the empirical tail probability (the fraction of MMPP draws reaching or exceeding the observed Cμ) as the calibrated quantity. For FRB 20121102A, Cμ = 1 .116 bits is 3 .0σ above the MMPP baseline ( CMMPP  
+
+> μ
+
+= 0 .153 ± 0.323 bits ; only 14 of 1000 MMPP draws reach the observed value, an empirical tail probability of 0 .014); for FRB 20201124A, Cμ = 0 .986 bits is 3 .2σ above ( CMMPP  
+
+> μ
+
+= 0 .111 ± 0.276 bits ; 6 /1000 draws, 0.006). For FRB 20220912A the observed Cμ = 0 .000 bits is consistent with its baseline ( CMMPP  
+
+> μ
+
+= 0 .094 ± 0.253 bits ,0.4σ), as expected for a source with no detected memory, and its MMPP fit is in any case degenerate (one rate component at 3% stationary occupancy).  
+
+> MNRAS 000 , 1–26 (2026)
+
+# 14 T. Kimpson and J. O’Leary 
+
+The IID two-component exponential mixture, retained for comparison with the parametric literature, yields larger nomi-nal σ-separations for the two FAST sources (3 .3σ for both) because it cannot reproduce any sequential structure by con-struction; we report it for literature continuity rather than as a substantive null for the sequential claim. The central finding is therefore that the ε-machine detects temporal structure in the two FAST sources that goes beyond what a two-state rate-switching process can reproduce: the sequential ordering of activity-rate regimes across sessions, not merely the presence of two rate components and their stationary transition struc-ture, carries predictive information. Self-exciting (Hawkes) point processes (Hawkes 1971) offer an alternative and widely used description of clustered event sequences, in which each burst transiently raises the rate of subsequent ones; a Hawkes process and a higher-order ( ≥ 3-state) MMPP are the natural next structured nulls against which to test the inter-session 
+
+Cμ excess, and we leave them to future work. Detailed recon-ciliation with the broader FRB temporal-analysis literature (scalar complexity measures, Sang & Lin 2024; Zhang et al. 2024; parametric waiting-time fits, Cruces et al. 2021; period-icity searches, CHIME/FRB Collaboration 2020a; Rajwade et al. 2020) is given in Appendices H and I. 
+
+6.3 Implications for observing strategy 
+
+The most prominent feature of our results is the contrast between the FAST sources ( Cμ ≈ 1 bits , highly significant) and FRB 20220912A ( Cμ = 0, MI consistent with IID at all 
+
+k). Does that contrast reflect the sources’ intrinsic physics, or is it an artefact of CHIME’s transit-mode observing cadence? To distinguish these, we simulate CHIME-like observations of the two FAST sources: for each FAST session we retain only bursts within the first ∆ t minutes (mimicking a sin-gle CHIME transit), recompute the intra-window waiting times, and reconstruct an ε-machine from the windowed se-quence. Table 3 reports the results across window durations ∆t = 5 , 10 , 15 , 30 , 60 min. The simulation reproduces CHIME’s window duration but not its higher fluence threshold or per-transit completeness; since those selection effects would further reduce the number of usable waiting times per window, the simulation if anything understates the suppression. At ∆ t = 15 min, the typical duration of a CHIME transit, Cμ
+
+drops to zero at every k for FRB 20121102A and at every k
+
+except k = 3 ( Cμ = 0 .810 bits ) for FRB 20201124A. At ∆ t =60 min, FRB 20121102A’s signal is partially recovered ( Cμ =0.639 bits at k = 5; zero at all other k). FRB 20201124A’s ∆t = 60 min entry is uninformative as a windowing test: its sessions are each only ∼ 56 min long, so the 60-min window contains the full session and reproduces the original Cμ by construction. The scattered non-zero entries at ∆ t = 10– 15 min ( Cμ = 0 .81–0 .92 bits at isolated k values, vanishing at neighbouring k and ∆ t) are consistent with the noise floor of CSSR’s χ2 splitting at small N rather than with recovered signal; no surrogate calibration is attached to any windowed value, so the table should be read for its overall pattern rather than its individual entries. FRB 20121102A’s partial recovery at ∆ t = 60 reflects its session-duration distribution: 39 sessions with median 52 min but a long tail to 264 min, with 85% shorter than 60 min. The remaining long sessions contribute disproportionately to the waiting-time count and are truncated at ∆ t = 60. At 15-minute windows, both sources retain only ∼ 25% of their bursts per session, leaving too few contiguous waiting times for CSSR to detect causal structure. The collapse is therefore consistent with, not in tension with, the inter-session localisation of Section 5.2: windowing leaves the number and ordering of sessions intact but starves the reconstruction of the per-session statistics needed to resolve the regime contrasts, so the signal is lost to statistical power rather than to any removal of inter-session structure. Reliable detection of temporal memory in the FAST repeaters analysed here therefore appears to require continuous track-ing on roughly hour scales. Because the windowed values are single point estimates from an estimator with known bimodal finite-N behaviour, the ∼60-minute figure is an indicative scale rather than a calibrated threshold, but the overall pat-tern is clear. Transit-mode surveys, which yield ∼15-minute windows per source-day, cannot reliably measure Cμ even with multi-transit accumulation: Cμ depends on long contigu-ous symbol sequences, and concatenating many short transits (as our windowing simulation effectively does across the 39 FRB 20121102A sessions) does not recover the long-range structure. The Cμ = 0 result for FRB 20220912A is con-sequently ambiguous: there is an observational degeneracy between genuine memorylessness and insufficient continuous observing duration. The ∼60-minute scale itself is much longer than the median waiting time (5–40 s) and comparable to the session duration, consistent with the conclusion of Section 5.2 that the predictive structure is carried by the sequence of activity-rate regimes that successive sessions sample. Future studies of FRB temporal complexity should therefore prioritise long-duration tracking observations with instruments capable of hour-scale continuous monitoring. The status of FRB 20220912A therefore remains an open ques-tion with two possible outcomes. If long-duration tracking observations reveal Cμ ≈ 1 bits , the temporal memory would be shared across all three sources analysed here, consistent with a common origin. If Cμ remains near zero, a genuine dichotomy exists, which could reflect different magnetospheric configurations, magnetic field strengths, progenitor ages, or the same mechanism operating in different regimes. The test does not necessarily require new observations: FAST moni-toring of FRB 20220912A has already yielded more than a thousand bursts over ∼9 hr of tracking (Zhang et al. 2023), and applying the present analysis to that dataset is the natural next step. 
+
+6.4 Limitations 
+
+Instrumental systematics from the FAST telescope (time res-olution, radio-frequency interference (RFI) flagging, detection threshold effects) are partially controlled by the surrogate testing design: surrogates pass through the same data pipeline and use the same quantile boundaries as the real data, so any systematic that affects only the marginal waiting-time distribution is preserved. An artefact that specifically alters the temporal ordering of bursts without affecting their distri-bution (for example, time-varying detection sensitivity during high-RFI epochs causing faint bursts to be missed) would not  
+
+> MNRAS 000 , 1–26 (2026)
+
+# Temporal Memory in Repeating FRBs 15 0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75                    
+
+> C(bits)
+> 0
+> 5
+> 10
+> 15
+> 20
+> Density
+> = 3.0
+> AIC = -24.3
+> FRB 20121102A (FAST)
+> MMPP draws
+> IID mixture
+> MMPP mean = 0.153
+> C= 1.116
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4
+> C(bits)
+> = 3.2
+> AIC = +1.0
+> FRB 20201124A (FAST)
+> MMPP draws
+> IID mixture
+> MMPP mean = 0.111
+> C= 0.986
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+> C(bits)
+> = 0.4
+> degenerate fit
+> FRB 20220912A (CHIME)
+> MMPP draws
+> IID mixture
+> MMPP mean = 0.094
+> C= 0.000
+
+Figure 8. Observed statistical complexity Cμ (coloured vertical line) against the distribution of Cμ from 1000 synthetic draws of the fitted two-state MMPP (hatched) and of the IID two-component exponential mixture (dashed outline), all at k = 4. For both FAST sources the observed Cμ lies far above both synthetic baselines (3 .0σ and 3 .2σ above the MMPP mean): the inter-session structure exceeds what a two-state rate-switching process can reproduce. FRB 20220912A’s observed Cμ = 0 is consistent with its baseline (0 .4σ), and its MMPP fit is degenerate (one rate component at 3% stationary occupancy). The ∆AIC = AIC MMPP − AIC mix annotation tests whether the MMPP’s Markov transitions improve on the IID mixture (negative values favour the MMPP); this model-selection comparison is detailed in Appendix J. This plot mirrors Figure 6, but the null is different: there it is the memoryless permutation surrogate, here it is a structured rate-switching model fitted to the data, so the observed Cμ clearing it is the stronger statement that the memory exceeds rate-switching, though part of the excess may reflect the gap-free null’s mismatch to the gap-structured data (Section 6.2). FRB 20121102A FRB 20201124A ∆t (min) k = 2 k = 3 k = 4 k = 5 k = 2 k = 3 k = 4 k = 5 Original 0.918 0.000 1.116 0.831 0.000 0.000 0.986 0.900 5 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 10 0.000 0.818 0.000 0.000 0.922 0.000 0.000 0.000 15 0.000 0.000 0.000 0.000 0.000 0.810 0.000 0.000 30 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 60 0.000 0.000 0.000 0.639 0.000 0.000 0.986 0.900 Table 3. Effect of CHIME-like transit-mode windowing on Cμ (bits). For each FAST source, only bursts within the first ∆ t minutes of each observing session are retained before reconstruction. Bold entries match the original (unwindowed) non-zero value; zero entries that coincide with an original zero are not bolded. 
+
+be captured by this test. This caveat carries particular weight because the detected memory is inter-session: any instrumen-tal property that varies from session to session (detection threshold, RFI environment, gain variation with zenith an-gle, per-session completeness) is in principle degenerate with intrinsic activity-rate regimes. Appendix G tests for such ef-fects directly, repeating the detection on completeness-cut subsamples against a matched-N random-thinning baseline. For FRB 20201124A the detection survives cuts up to twice the published completeness threshold, so its signal is not car-ried by bursts near the detection limit. For FRB 20121102A the control is power-limited rather than informative: removing even the 4 per cent of bursts below the Li et al. (2021) com-pleteness threshold collapses the point estimate, but removing the same number of bursts at random does the same in 80 per cent of draws, so the loss reflects the estimator’s finite-
+
+N firing behaviour rather than evidence of an instrumental origin. A session-level sensitivity covariate check is likewise null once its order-statistics bias is calibrated away. A further consideration bounds the residual risk for FRB 20121102A: Li et al. (2021) correct each burst with a zenith-angle-dependent gain curve and report an off-pulse noise level stable to ∼6 per cent across the campaign’s sessions, leaving little room for threshold drift between sessions. The inter-session attribution should nonetheless be read with the limited power of the completeness control in mind. The primary methodological limitation is the quantile dis-cretisation step. Converting continuous waiting times to dis-crete symbols via quantile binning is a lossy projection: some continuous-valued temporal structure may be lost or distorted by the binning. Higher k retains more information (as con-firmed by the MI diagnostic, Figure F2, which shows increasing MI with k) but requires more data for reliable CSSR recon-struction. Our results should therefore be read as estimates of the complexity of the symbolised process at a fixed reso-lution, not as bounds on the complexity of the underlying continuous process: statistical complexity is not monotone under coarse-graining, and the k = 5 overshoot discussed in Section 4.2 shows that the estimator can also exceed the generator’s value. The CSSR hyperparameters and symbolisation scheme intro-duce a potential methodological sensitivity. Cμ is insensitive to the significance level α of the state-splitting test, depends 
+
+MNRAS 000 , 1–26 (2026) 16 T. Kimpson and J. O’Leary 
+
+on the maximum history length L (FRB 20121102A requires the full L = 5, the largest value we sweep, so stability at longer histories is untested; Appendix C), and is sensitive to the symbolisation scheme: quantile discretisation (our pri-mary method) yields the strongest signal, equal-width bin-ning yields zero for all sources because of bin imbalance for heavy-tailed distributions, and log-spaced binning recovers FRB 20121102A’s signal but not FRB 20201124A’s. The sur-rogate tests, which use the same binning as the real data, provide the most reliable inference; the absolute value of Cμ
+
+should be interpreted in the context of the chosen discretisa-tion. Full hyperparameter and binning sensitivity results are reported in Appendix C. The bootstrap confidence intervals are wide, reflecting the bimodal nature of Cμ estimates from finite data. The surrogate test provides a robust statistical assessment, but the absolute value of Cμ should be interpreted as approximate rather than precise. CSSR is prone to introducing spurious causal states (Shalizi & Shalizi 2004): the reconstructed machines contain zero-probability states (omitted from Figure 7), and the median reconstructed Cμ overshoots its known value once the χ2 split test loses calibration at k = 5 (Section 4.2). The number of reconstructed causal states is therefore unreliable, whereas the complexity measure Cμ is robust: the minimum-N analysis shows it stays near zero for the memoryless Poisson benchmark even where the state topology is not recovered. We therefore do not interpret the number of reconstructed states as a physically meaningful quantity. The session-boundary control analyses (Section 5.2) and the boundary-free reconstruction (Appendix B) collectively estab-lish that the multi-session Cμ reported in Section 5.1 reflects inter-session activity-regime switching rather than within-session causal structure of the per-burst emission mechanism. Applying CSSR to the concatenated multi-session sequence operates outside the formal stationarity guarantee of the ε-machine theorem (Shalizi & Crutchfield 2001), so the reported 
+
+Cμ for both FAST sources should be interpreted as quantify-ing inter-session predictive structure rather than the Cμ of a stationary process. The within-session-shuffle surrogate test of Appendix B has asymmetric statistical power between the two FAST sources. For FRB 20201124A (4 sessions, longest with N = 541 waiting times above the minimum-sample requirement), the within-session null is well-powered and fails to reject memorylessness; the data are consistent with no within-session predictive mem-ory. For FRB 20121102A (39 sessions, longest with N = 121 waiting times below the minimum-sample requirement), the within-session null is power-limited: the pooled within-session-shuffle test does not reject memorylessness after multiple-comparison correction, but borderline raw p-values at the finest alphabet resolution and a non-zero Cμ = 0 .598 bits in the longest single session leave room for a weak within-session signal below the detection threshold. We cannot distinguish a genuine absence of within-session memory in FRB 20121102A from one masked by limited per-session sample sizes. This caveat bears directly on Wang et al. (2023), who report per-sistence on minute-to-hour (within-session) timescales in both FAST sources via the Hurst exponent: whether that persis-tence reflects predictive structure that survives our boundary-free and within-session-shuffle controls, rather than the inter-session regime variation we detect, is left to future work (Appendix H). The windowing analysis shows that Cμ is sensitive to the duration of continuous observation: sessions shorter than ∼60 minutes may fail to detect genuine temporal memory. This places a practical floor on the observing requirements for this technique and limits the number of sources currently amenable to analysis. The windowing test retains the first ∆ t minutes of each session; repeating it with randomly phased or sliding windows, which would more fully bracket the variable transit phasing of a survey such as CHIME, is left to future work, though we expect the ∼60-minute detection scale to be robust to that choice. Finally, our analysis is limited to three sources, of which only two yield conclusive results. A larger sample, enabled by forthcoming data from long-duration tracking campaigns, will be needed to determine whether the temporal memory we detect is universal among repeaters or specific to certain sources. 
+
+7 CONCLUSIONS 
+
+We have presented the first application of ε-machine recon-struction to astrophysical transient timing. By analysing the waiting-time sequences of three repeating FRB sources through the lens of computational mechanics, we have mea-sured the minimum predictive memory, the statistical com-plexity Cμ, of each source’s temporal process. Two FAST-observed sources, FRB 20121102A and FRB 20201124A, carry significant temporal memory of order one bit, well above the permutation-surrogate distribution; the absolute value of Cμ is approximate, but its excess over surrogates is the robust result. FRB 20220912A (CHIME) shows no detectable memory. This memory is not a burst-to-burst effect: for both FAST sources it operates on inter-session rather than within-session timescales, reflecting how each source’s activity rate varies from one observing session to the next (Sec-tion 5.2, Appendix B). The two sources differ in kind: for FRB 20121102A the ordering of sessions is itself predictive, whereas FRB 20201124A’s signal reflects the contrast between heterogeneous sessions rather than their order. Neither source shows defensible within-session predictive memory, though suggestive evidence persists for FRB 20121102A in its longest session; confirming it would require longer continuous sessions than are currently available. A simulated observational-bias test shows that CHIME-like transit-mode windowing of FAST data drives Cμ to zero, so detection of temporal memory requires long continuous observing sessions. The null result for FRB 20220912A is therefore ambiguous: it may reflect genuinely memoryless emission or an observational limitation of CHIME’s short transit windows. Resolving this requires hour-scale continuous tracking of FRB 20220912A; our windowing analysis predicts that, if FRB 20220912A possesses memory comparable to the FAST sources, Cμ should rise above zero when observed for 
+
+≳ 60 minutes continuously. The minimal predictive model of each waiting-time sequence  
+
+> MNRAS 000 , 1–26 (2026)
+
+# Temporal Memory in Repeating FRBs 17 
+
+requires at least two distinguishable activity-rate regimes, a constraint on the source’s activity envelope rather than on the per-burst emission state itself, and the structure exceeds what a two-state Markov-modulated Poisson process can reproduce (Section 6.2). Because the surviving signal is entirely inter-session, any instrumental property that varies from session to session is in principle degenerate with intrinsic regime switching (Section 6.4). Computational mechanics offers a framework for characterising this structure, and forthcoming burst catalogues from CHIME/FRB Catalog 3 and the Deep Synoptic Array (DSA-2000; Hallinan et al. 2019) should enable population-level studies of temporal complexity, provided that observing modes yield sufficiently long continuous segments. The framework can also be applied to other astrophysical transients (magnetar burst storms, stellar flares, accretion variability) where the question of temporal memory is equally open. 
+
+ACKNOWLEDGEMENTS 
+
+This work made use of data from the Five-hundred-meter Aperture Spherical radio Telescope (FAST) and the Canadian Hydrogen Intensity Mapping Experiment (CHIME). We thank the FAST and CHIME/FRB collaborations for making their burst catalogues publicly available. 
+
+DATA AVAILABILITY 
+
+All burst data analysed in this work are public. The FAST burst lists are archived in the Science Data Bank: that of FRB 20121102A (Li et al. 2021) at https://doi.org/10. 11922/sciencedb.01092 , and that of FRB 20201124A (Zhang et al. 2022) at https://doi.org/10.57760/sciencedb. 06762 . The FRB 20220912A arrival times are from the sec-ond CHIME/FRB catalogue (CHIME/FRB Collaboration 2026), downloaded from the CHIME/FRB public portal at 
+
+https://www.chime-frb.ca/catalog .
+
+SOFTWARE AVAILABILITY 
+
+The ε-machine reconstruction uses the open-source emic 
+
+package (Azariah 2026), available from PyPI at https:// pypi.org/project/emic/ . The analysis pipeline developed for this work, including the boundary-free CSSR variant of Appendix B, the surrogate-testing framework, and the scripts that reproduce all tables and figures, will be shared on rea-sonable request to the corresponding author. 
+
+REFERENCES 
+
+Abbott R., et al., 2022, Physical Review D, 106, 062002 Aggarwal K., Agarwal D., Lewis E. F., et al., 2021, The Astrophys-ical Journal, 922, 115 Azariah J., 2026, emic: A Python framework for constructing and analyzing epsilon-machines based on computational mechanics, 
+
+https://pypi.org/project/emic/ 
+
+Bartlett S., Li J., Gu L., Sinapayen L., Fan S., Yung Y. L., 2022, Nature Astronomy, 6, 387 Beloborodov A. M., 2020, The Astrophysical Journal, 896, 142 Benjamini Y., Hochberg Y., 1995, Journal of the Royal Statistical Society: Series B (Methodological), 57, 289 Bochenek C. D., Ravi V., Belov K. V., et al., 2020, Nature, 587, 59 Brodu N., Crutchfield J. P., 2022, Chaos: An Interdisciplinary Journal of Nonlinear Science, 32, 023103 CHIME/FRB Collaboration 2020a, Nature, 582, 351 CHIME/FRB Collaboration 2020b, Nature, 587, 54 CHIME/FRB Collaboration 2026, The Astrophysical Journal Sup-plement Series, 283, 34 Cover T. M., Thomas J. A., 2006, Elements of Information Theory, 2nd edn. Wiley-Interscience Cruces M., Spitler L. G., Scholz P., et al., 2021, Monthly Notices of the Royal Astronomical Society, 500, 448 Crutchfield J. P., 2012, Nature Physics, 8, 17 Crutchfield J. P., Young K., 1989, Physical Review Letters, 63, 105 Du Y.-Q., Wang P., Song L.-M., Xiong S.-L., 2024, Monthly Notices of the Royal Astronomical Society: Letters, 531, L57 Efron B., 1979, The Annals of Statistics, 7, 1 Gourdji K., Michilli D., Spitler L. G., et al., 2019, The Astrophysical Journal Letters, 877, L19 Hall P., Horowitz J. L., Jing B.-Y., 1995, Biometrika, 82, 561 Hallinan G., Ravi V., Weinreb S., et al., 2019, Bulletin of the American Astronomical Society, 51, 255 Hawkes A. G., 1971, Biometrika, 58, 83 Hewitt D. M., Snelders M. P., Hessels J. W. T., et al., 2022, Monthly Notices of the Royal Astronomical Society, 515, 3577 Jahns J. N., Spitler L. G., Nimmo K., et al., 2023, Monthly Notices of the Royal Astronomical Society, 519, 666 Kantelhardt J. W., Zschiegner S. A., Koscielny-Bunde E., Havlin S., Bunde A., Stanley H. E., 2002, Physica A: Statistical Mechanics and its Applications, 316, 87 Kimpson T., Suvorova S., Middleton H., Liu C., Melatos A., Evans R. J., Moran W., 2024a, Physical Review D, 110, 122004 Kimpson T., et al., 2024b, Monthly Notices of the Royal Astronom-ical Society, 534, 1844 Kimpson T., et al., 2024c, Monthly Notices of the Royal Astronom-ical Society, 535, 132 Kimpson T., et al., 2025, Monthly Notices of the Royal Astronomical Society, 537, 1282 K¨ unsch H. R., 1989, The Annals of Statistics, 17, 1217 Li D., Wang P., Zhu W. W., et al., 2021, Nature, 598, 267 Lorimer D. R., Bailes M., McLaughlin M. A., Narkevic D. J., Crawford F., 2007, Science, 318, 777 Lu W., Kumar P., Zhang B., 2020, Monthly Notices of the Royal Astronomical Society, 498, 1397 Marzen S. E., Crutchfield J. P., 2022, Entropy, 24, 1675 Melatos A., Dunn L. M., Suvorova S., Moran W., Evans R. J., 2020, The Astrophysical Journal, 896, 78 O’Leary J., Melatos A., Kimpson T., O’Neill N. J., Meyers P. M., Christodoulou D. M., Bhattacharya S., Laycock S. G. T., 2024, The Astrophysical Journal, 971, 126 O’Leary J., Melatos A., Kimpson T., Christodoulou D. M., O’Neill N. J., Meyers P. M., Bhattacharya S., Laycock S. G. T., 2025, The Astrophysical Journal, 981, 150 O’Leary J., Melatos A., Kimpson T., Christodoulou D. M., O’Neill N. J., Meyers P. M., Bhattacharya S., Laycock S. G. T., 2026a, The Astrophysical Journal, 997, 130 O’Leary J., Dunn L., Melatos A., 2026b, The Astrophysical Journal, 998, 183 Oppermann N., Yu H.-R., Pen U.-L., 2018, Monthly Notices of the Royal Astronomical Society, 475, 5109 Petroff E., Hessels J. W. T., Lorimer D. R., 2022, The Astronomy and Astrophysics Review, 30, 2 Phipson B., Smyth G. K., 2010, Statistical Applications in Genetics and Molecular Biology, 9, Article 39 Pincus S. M., 1991, Proceedings of the National Academy of Sci-ences, 88, 2297 MNRAS 000 , 1–26 (2026) 18 T. Kimpson and J. O’Leary 
+
+> Platts E., Weltman A., Walters A., et al., 2019, Physics Reports, 821, 1 Rajwade K. M., Mickaliger M. B., Stappers B. W., et al., 2020, Monthly Notices of the Royal Astronomical Society, 495, 3551 Sang Y., Lin H.-N., 2024, Monthly Notices of the Royal Astronom-ical Society, 533, 872 Schreiber T., Schmitz A., 1996, Physical Review Letters, 77, 635 Shalizi C. R., Crutchfield J. P., 2001, Journal of Statistical Physics, 104, 817 Shalizi C. R., Shalizi K. L., 2004, in Proceedings of the 20th Conference on Uncertainty in Artificial Intelligence (UAI). pp 504–511, doi:10.48550/arXiv.cs/0406011 Shalizi C. R., Shalizi K. L., Crutchfield J. P., 2002, SFI Working Paper 02-10-060 Shannon C. E., 1948, The Bell System Technical Journal, 27, 379 Spitler L. G., Scholz P., Hessels J. W. T., et al., 2016, Nature, 531, 202 Suvorova S., Sun L., Melatos A., Moran W., Evans R. J., 2016, Physical Review D, 93, 123009 Theiler J., Eubank S., Longtin A., Galdrikian B., Farmer J. D., 1992, Physica D: Nonlinear Phenomena, 58, 77 Totani T., Tsuzuki Y., 2023, Monthly Notices of the Royal Astro-nomical Society, 526, 2795 Upper D. R., 1997, PhD thesis, University of California, Berkeley Wadiasingh Z., Timokhin A., 2019, The Astrophysical Journal, 879, 4Wang F. Y., Wu Q., Dai Z. G., 2023, The Astrophysical Journal Letters, 949, L33 Wang P., Song L.-M., Xiong S.-L., et al., 2024, The Astrophysical Journal, 975, 188 Xu H., Niu J. R., Chen P., et al., 2022, Nature, 609, 685 Zhang B., 2023, Reviews of Modern Physics, 95, 035005 Zhang Y.-K., et al., 2022, Research in Astronomy and Astrophysics, 22, 124002 Zhang Y.-K., Li D., Zhang B., et al., 2023, The Astrophysical Journal, 955, 142 Zhang Y.-K., Li D., Feng Y., Wang P., Niu C.-H., Dai S., Yao J.-M., Tsai C.-W., 2024, Science Bulletin, 69, 1020 Zimmerman R., van Dyk D. A., Kashyap V. L., Siemiginowska A., 2024, Monthly Notices of the Royal Astronomical Society, 534, 2142
+
+APPENDIX A: SYNTHETIC VALIDATION 
+
+Before applying the pipeline to real FRB data, we validate it on synthetic processes with known causal structure. 
+
+A1 Known ε-machine recovery 
+
+We first verify that the emic CSSR implementation correctly recovers analytically known ε-machines. The Even Process (1s occur only in blocks of even length, bounded by 0s) and the Golden Mean Process (no consecutive 1s) are two canoni-cal two-state ε-machines. Under fair-coin emission from the stochastic state (the standard convention in Crutchfield (2012), which we adopt), both processes have stationary distribution 
+
+π = (2 /3, 1/3), statistical complexity Cμ = log 2 3 − 2/3 ≈
+
+0.918 bits , and entropy rate hμ = 2 /3 ≈ 0.667 bits sym −1.They differ only in which symbol the deterministic state must emit: “1” for the Even Process (completing an even-length block) and “0” for the Golden Mean Process (forbidding a second consecutive 1). The two are thus distinct ε-machine topologies with identical complexity, so recovering both sepa-rately tests the topology and not merely the scalar Cμ. From 10 000-symbol sequences, emic recovers both machines with the correct number of states and Cμ within 0 .5% of the ana-lytical value. 
+
+A2 End-to-end pipeline validation 
+
+We test the full pipeline (waiting-time generation, quantile symbolisation, CSSR reconstruction, and complexity measure-ment) on two synthetic processes. A homogeneous Poisson process (rate λ = 1 s −1) represents the memoryless null model; a two-state HMM with distinct burst rates in each state rep-resents a structured process with known causal complexity. The Poisson process yields Cμ ≈ 0, hμ = 1 .58 bits sym −1,and the best-fit waiting-time distribution is exponential, as expected; hμ = log 2 3, the exact value for an IID se-quence quantile-binned into k = 3 equally occupied symbols, which provides a closed-form check. The two-state HMM yields Cμ = 0 .96 bits , hμ = 1 .35 bits sym −1, and approxi-mate entropy (ApEn; Pincus 1991) = 0 .45 (compared to 1.69 for the Poisson process). The reconstructed Cμ = 0 .96 bits slightly exceeds the generator’s two-state hidden-state entropy (H(π) = 0 .918 bits ; Section A3) because the ε-machine of a non-unifilar HMM may resolve additional causal states (Sec-tion 2.4), so the two quantities need not coincide. The pipeline correctly identifies the Poisson process as memoryless and the HMM as structured. 
+
+A3 Minimum-N analysis 
+
+The quantity that matters for the real-data inference is not the bias of the Cμ point estimate but the behaviour of the test we actually apply to it: at a given sequence length, how often does the permutation-surrogate procedure of Section 4.4 flag genuine structure, and how often does it fire on a memo-ryless process? We characterise both by passing two synthetic processes of known character through the identical symbolise– reconstruct–surrogate pipeline used on the FRB data: a ho-mogeneous Poisson process (memoryless) and the two-state HMM of Section A2 (structured, with hidden-state entropy 
+
+H(π) = 0 .918 bits ). For each process we generate sequences of length N = 100 , 200 , 500 , 1000 , 2000 (200 independent re-alisations per N ), sweep the alphabet size k = 2–5 at L = 5, and apply the one-sided permutation test (200 surrogates, rejection level 0 .05) to every realisation. The fraction of HMM realisations rejecting the memoryless null is the statistical power; the same fraction for the Poisson realisations is the empirical false-positive rate. The false-positive rate tracks the nominal level closely (Fig-ure A1, grey band): it stays at or below 0 .08 at every k and 
+
+N , with a mean of 0 .05. The permutation test is therefore well calibrated, and the elevated Cμ we report for the FAST sources is not an artefact of the reconstruction procedure. Detection power, by contrast, is governed more by the al-phabet resolution k than by N over this range. At k = 2 the test has little power (never exceeding ∼0.5); power rises with resolution, reaching ∼0.64–0 .80 at the fiducial k = 4 and 
+
+∼0.78–0 .93 at k = 5 for N ≳ 200. The shortfall from unity  
+
+> MNRAS 000 , 1–26 (2026)
+
+# Temporal Memory in Repeating FRBs 19 
+
+at low k is a coarse-resolution reconstruction failure rather than a sample-size effect: a fraction of structured realisations collapse to a trivial single-state machine ( Cμ = 0) because the conservative χ2 split test cannot separate the two rate regimes once they are merged into a coarse alphabet. This fraction falls from ∼0.5–0 .75 at k = 2 to ∼0.1 at k = 4–5 and is essentially independent of N , mirroring the coarse-resolution 
+
+Cμ = 0 entries seen in the real data and diagnosed by the mutual-information test of Section 4.5. Separately, Cμ is a more robust discriminator than the recon-structed state count. CSSR is prone to introducing spurious states (Shalizi & Shalizi 2004), but Cμ remains near zero for the Poisson process because such states carry near-identical emission distributions; the complexity measure is stable even where the state topology is not. This is why we report and interpret Cμ rather than the number of reconstructed states. Two practical conclusions follow. First, N ≳ 200 is a pragmatic floor rather than a sharp detection threshold. Power is already moderate at N = 100 (e.g. ∼0.5 at k = 4) and improves only gradually thereafter. What changes across N ∼ 100–200 is that power becomes more uniform across resolutions: at 
+
+N = 100 only k = 5 reaches ∼0.6, whereas by N = 200 all of k = 3–5 reach it. The χ2 state-splitting test also stays better calibrated, with expected cell counts ∼N/k L+1 , so halving N pushes even the fiducial k = 4 below the marginal regime of Section 4.2. Because the synthetic HMM is a clean, well-separated best case, real burst sequences are likely to be detected less readily at a given N , motivating the more conservative floor. Both FAST sources sit far above it ( Nwt =1613 and 877), whereas FRB 20220912A ( Nwt = 193) sits just below it, so its null result (Section 5.1) is consistent with either genuine memorylessness or a missed detection, which reinforces the windowing analysis of Section 6.3. Second, because the point estimate is noisy and false positives are controlled only by the surrogate procedure rather than by thresholding Cμ directly, all inference on the real data rests on the permutation test and block bootstrap, not on the bare 
+
+Cμ value. 
+
+APPENDIX B: BOUNDARY-FREE RECONSTRUCTION AND WITHIN-SESSION SURROGATES 
+
+The canonical analysis concatenates intra-session waiting times into a single 1-D array before passing them to CSSR. With L = 5, the resulting suffix tree includes histories whose (L + 1)-symbol span crosses between successive sessions: there are at most L such spurious histories per session boundary. For FRB 20121102A (38 boundaries across 1613 intra-session waiting times) this affects ≤ 190 histories ( ∼12% of the data); for FRB 20201124A (3 boundaries across 877 waiting times) only ≤ 15 histories ( ∼1.7%). To establish how much of the canonical Cμ depends on these cross-session histories, we per-form a boundary-free reconstruction that builds the CSSR suffix tree per session, and test both the boundary-free and canonical results against a within-session-shuffle null surrogate that preserves per-session waiting-time multisets and destroys only within-session temporal ordering. 100 200 500 1000 2000             
+
+> Sequence length N
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Detection rate ( p < )
+> 0.8 power
+> N= 200
+> HMM, k= 2
+> HMM, k= 3
+> HMM, k= 4
+> HMM, k= 5
+> Poisson FPR (range over k)
+> nominal = 0.05
+
+Figure A1. Detection power of the permutation-surrogate test (Section 4.4) as a function of sequence length N , from the synthetic validation. Coloured curves give the fraction of 200 structured (two-state HMM) realisations for which the one-sided test rejects the memoryless null at the 0 .05 level (i.e. the statistical power) at alphabet sizes k = 2–5. The grey band spans the corresponding rejection fraction for memoryless (Poisson) realisations across all 
+
+k, i.e. the empirical false-positive rate, which stays close to the nominal 0 .05 level (dotted line) at every N , confirming the test is well calibrated. Power is set more by alphabet resolution than by N over this range, reaching ∼0.78 at the fiducial k = 4 and 
+
+∼0.88 at k = 5 for N ≳ 500; the shortfall at low k is a coarse-resolution reconstruction failure (Section 4.5), not a sample-size effect. The vertical dashed line marks the N = 200 minimum-sample requirement adopted for source selection (Section 3). Curves reflect 200-realisation sampling noise. 
+
+B1 Boundary-free CSSR reconstruction 
+
+The canonical implementation calls emic ’s 
+
+SuffixTree.build from sequence , which slides a win-dow of length L across the concatenated symbol array and registers each (history, next-symbol) pair into the tree. The boundary-free variant replaces this single call with a loop over per-session symbol sequences, calling the lower-level SuffixTree.add observation method only for positions where both the history of length ℓ ≤ L and its next symbol lie within the same session. All subsequent CSSR phases (sufficiency, determinism, machine construction) are run unchanged on the resulting boundary-free suffix tree. Symbolisation uses the same global quantile boundaries as the canonical analysis (Section 4.1), so the marginal symbol distribution is identical at both levels. A session that yields only a single waiting time forms no (history, next-symbol) pair and so contributes nothing to the boundary-free tree; FRB 20121102A has two such sessions (two waiting times in total), FRB 20201124A none. Table B1 reports the boundary-free Cμ alongside the canon-ical value across the same k-sweep used in Table 2. For FRB 20201124A the boundary-free reconstruction is essen-tially indistinguishable from the canonical at every k, as expected given the small number of session boundaries. For FRB 20121102A, the boundary-free reconstruction collapses to Cμ = 0 at k = 2 , 3, 4 (including at the canonical fiducial 
+
+k = 4, where the concatenated Cμ = 1 .116 bits ) and yields 
+
+MNRAS 000 , 1–26 (2026) 20 T. Kimpson and J. O’Leary                                  
+
+> Source k= 2 k= 3 k= 4 k= 5
+> Canonical (concatenated)
+> FRB 20121102A 0.918 0.000 1.116 0.831 FRB 20201124A 0.000 0.000 0.986 0.900
+> Boundary-free
+> FRB 20121102A 0.000 0.000 0.000 1.070 FRB 20201124A 0.000 0.000 0.985 0.895
+> Table B1. Canonical (concatenated) and boundary-free Cμ(bits) for the two FAST sources at L= 5, α= 0 .001. The boundary-free reconstruction builds CSSR’s suffix tree per session so that no history of length Lspans a session boundary.
+
+Cμ = 1 .070 bits at k = 5. The k = 5 result is approximate (the χ2 null is not formally justified at this resolution; see Section 4.2) and is interpreted alongside the surrogate-test result below rather than on its own. That the boundary-free value at k = 5 exceeds the canonical 0 .831 bits despite the boundary-free tree containing strictly fewer histories is itself a symptom of this uncalibrated regime: removing sparse cross-session histories changes which marginal splits the χ2 test makes at cell counts far below calibration, and the resulting state structure (and hence Cμ) can move in either direction. 
+
+B2 Within-session-shuffle surrogates 
+
+The permutation surrogates of Section 5.1 shuffle waiting times across the entire concatenated sequence, destroying both within- and inter-session temporal ordering. They there-fore test the null hypothesis “the waiting-time sequence is memoryless in the multi-session-stitched sense”, which is the appropriate null for the primary Cμ comparison but conflates within- and inter-session contributions to the rejected null. To probe within-session structure specifically we generate within-session-shuffle surrogates that permute waiting times independently within each session, preserving the per-session waiting-time multiset (and therefore the per-session marginal distribution) while destroying only within-session temporal ordering. Statistics computed against this null reflect what we would see if the source had no within-session memory but the same activity-rate regimes across sessions. We apply three within-session-shuffle tests at L = 5 with 5000 surrogate draws each: 
+
+Within-session ACF. The autocorrelation function of the raw waiting-time sequence (Section 5.1) restricted to within-session pairs (lags 1–20). For FRB 20121102A, only 1 of 20 lags exceeds the 95th percentile of the surrogate distribution: un-der a null that preserves session-level marginal differences, the within-session ACF is consistent with no temporal structure. The 19/20-lags-significant result of Section 5.1 was there-fore measuring the combined within- and inter-session ACF, with the persistence dominated by inter-session structure. For FRB 20201124A, 2 of 20 lags exceed the surrogate band, also consistent with no within-session ACF structure (vs. 20/20 against the permutation null). 
+
+Within-session lag-1 MI. The lag-1 mutual information of the symbolised sequence (Section 4.5) computed on within-session symbol pairs only. For FRB 20121102A, only the k = 5                                                                              
+
+> Source kCreal
+> μCsurr
+> μpraw padj
+> FRB 20121102A 20.000 0.23 ±0.43 0.262 0.349 30.000 0.18 ±0.37 0.192 0.349 40.000 0.21 ±0.38 0.416 0.416 51.070 0.25 ±0.38 0.033 0.134 FRB 20201124A 20.000 0.20 ±0.39 0.388 0.409 30.000 0.28 ±0.44 0.409 0.409 40.985 0.45 ±0.48 0.130 0.409 50.895 0.56 ±0.49 0.333 0.409
+> Table B2. Boundary-free Cμ(bits) versus within-session-shuffle surrogates (5000 draws per cell) at L= 5, α= 0 .001. Csurr
+> μentries report mean ±standard deviation across surrogates. praw is the one-sided upper-tail p-value; padj is Benjamini–Hochberg-adjusted across the four krows per source ( m= 4). Bold marks praw <0.05; no entry survives BH correction at the 5% FDR threshold.
+
+result is borderline ( praw = 0 .043, padj = 0 .170 across the k-sweep with m = 4); the k ≤ 4 results are unambiguously null. For FRB 20201124A, no k value yields praw < 0.27. 
+
+Boundary-free Cμ. The boundary-free reconstruction of Section B1 repeated for each of the 5000 within-session-shuffle surrogates; results in Table B2. For FRB 20121102A, the 
+
+k = 5 boundary-free Cμ = 1 .070 bits exceeds the surrogate distribution at praw = 0 .033 but does not survive Benjamini– Hochberg correction across the k-sweep ( padj = 0 .134). At 
+
+k ≤ 4 the boundary-free real Cμ = 0 lies below the surrogate mean ( ∼ 0.2 bits ), which reflects the noise floor of CSSR’s χ2
+
+state-splitting test at finite N rather than physical structure in the surrogate; the test for FRB 20121102A at k ≤ 4 therefore has no power to detect signal weaker than the noise floor. For FRB 20201124A, the boundary-free Cμ = 0 .985 bits at k = 4 does not exceed the surrogate mean ( Csurr  
+
+> μ
+
+= 0 .45 bits ; praw =0.130), consistent with the source’s signal arising entirely from inter-session structure that within-session shuffling preserves. 
+
+B3 Interpretation 
+
+The verdicts of these tests are reported and combined with the session-boundary controls in Section 5.2; here we record only the two points specific to the boundary-free machinery. First, for FRB 20201124A the within-session-shuffle surrogates of the boundary-free reconstruction themselves yield Cμ ∼
+
+0.45 bits because they preserve the inter-session marginal contrasts that drive the signal; the surrogate baseline, not just the real value, reflects inter-session structure. Second, whether FRB 20121102A’s borderline k = 5 within-session signal ( praw ≈ 0.03–0 .04 in two independent statistics, neither surviving multiple-comparison correction) is genuinely absent or merely below the detection threshold at Nwt ≲ 121 per session cannot be determined from current data; resolving the ambiguity requires longer continuous sessions. In both cases the multi-session Cμ of Section 5.1 remains a valid descriptor of the concatenated sequence as observed; the boundary-free analysis clarifies the timescale on which that memory lives.  
+
+> MNRAS 000 , 1–26 (2026)
+
+# Temporal Memory in Repeating FRBs 21 
+
+APPENDIX C: CSSR HYPERPARAMETER AND SYMBOLISATION-SCHEME SENSITIVITY 
+
+The Cμ values reported in the main text rest on several discretionary choices in the analysis pipeline. This appendix quantifies how sensitive the results are to three of them: the multiple-comparison framing applied across the k-sweep, the CSSR hyperparameters L and α, and the symbolisation scheme that maps waiting times to symbols. 
+
+Multiple-comparison framing. The two FDR framings reported in Table 2 embody different views of the hypothesis family. The per-source correction ( m = 4 tests per source) treats the three FRB sources as independent astronomical objects, which is defensible given their disparate locations and host environments. The global correction ( m = 12) treats all source– k combinations as a single family. Because the k-sweep is a robustness check on the same temporal structure rather than 12 independent hypotheses, neither framing is unambiguously correct; the primary claim in the main text rests on the per-source framing, with the global numbers reported as a more conservative sensitivity check. 
+
+CSSR hyperparameters. Cμ is insensitive to the signif-icance level α of the state-splitting test across the range 
+
+α = 0 .01 to 0 .0001, but depends on the maximum history length L: FRB 20121102A requires the full L = 5 to detect its Cμ, while FRB 20201124A stabilises from L = 4. Because 
+
+L = 5 is the largest history length we sweep, and the CSSR estimate is an L-truncated lower bound, behaviour at L > 5is untested; the reported values should be read accordingly. 
+
+Symbolisation scheme. Quantile discretisation (our primary method) yields Cμ = 1.116 /0.986 /0.000 bits for FRB 20121102A / FRB 20201124A / FRB 20220912A re-spectively at k = 4. Equal-width binning yields Cμ = 0 for all three sources, which is expected given the extreme bin imbalance produced by equal-width partitioning of heavy-tailed waiting-time distributions (most waiting times fall in a single bin, destroying temporal contrast). Log-spaced binning yields Cμ = 1 .014 /0.000 /0.000 bits : FRB 20121102A’s signal is partially recovered, while FRB 20201124A’s vanishes. The log-spaced result for FRB 20201124A is consistent with the inter-session origin of its memory: log-spacing, like per-session quantile boundaries, alters the mapping from waiting-time values to symbols in a way that can remove the inter-session contrast. The memory detection for FRB 20201124A is there-fore not robust across binning schemes; it requires quantile discretisation, which by construction encodes distributional differences between sessions. The FRB 20121102A detection survives under log-spacing ( Cμ = 1 .014 bits ), reflecting the same multi-session structure that the canonical quantile result captures; the boundary-free analysis of Appendix B shows this multi-session structure is itself predominantly inter-session in origin. The sensitivity to symbolisation scheme indicates that the surrogate tests, which use the same binning as the real data, provide the most reliable inference; the absolute value of Cμ should be interpreted in the context of the chosen discretisation. 
+
+APPENDIX D: THE CSSR ALGORITHM 
+
+The CSSR algorithm (Shalizi & Shalizi 2004; Shalizi et al. 2002) infers the ε-machine from a single observed symbol sequence. The algorithm proceeds in three stages: (i) Suffix tree construction. For each history of length 
+
+ℓ = 0 , 1, . . . , L (where L is a user-specified maximum), esti-mate the conditional distribution ˆP (Xt+1 | ←−x ℓ) over next symbols given the observed ℓ-history. (ii) State splitting. Starting from a single state contain-ing all histories of a given length, iteratively test whether two histories should be split into different causal states. The splitting criterion is a χ2 homogeneity test at significance level α: if the conditional distributions of two histories differ at significance α, they are assigned to different states. (iii) Transition matrix construction. Once the causal states have been identified, estimate the transition probabili-ties P (x | s) and the deterministic transition function δ(s, x )from the data. The two hyperparameters are the maximum history length 
+
+L and the significance level α. Larger L allows detection of longer-range dependencies but requires more data; smaller α
+
+is more conservative (merges more states) and guards against over-splitting in small samples; their sensitivity is examined in Appendix C. The following pseudocode summarises the operational proce-dure used in this work. The algorithm takes as input a symbol sequence x = x1x2 . . . x N , a maximum history length L, and a significance level α.(i) Initialise. For each history w of length ℓ ≤ 1 (the empty history and each single symbol), estimate the conditional distribution ˆP (Xt+1 | xt−ℓ+1 . . . x t = w) by counting. (ii) For ℓ = 1 to L:
+
+(a) For each pair of histories ( w, w ′) of length ℓ currently in the same state, perform a χ2 test of homogeneity on their conditional distributions. (b) If the test rejects at level α, split w and w′ into separate states. (c) Extend all histories by one symbol (append each a ∈ A )and repeat. (iii) Determinise. After reaching ℓ = L, split any state whose histories do not all transition to a single successor state under a given next symbol, so that the resulting transition structure is deterministic (each state and symbol yield a unique successor). (iv) Construct. Build the transition matrices T (a) 
+
+> ij
+
+=
+
+P (St+1 = j, X t+1 = a | St = i) from the assigned state labels. (This emit-on-transition bookkeeping is equivalent, for a unifilar machine, to the emit-on-state convention P (Xt | St)of Section 2.2: the emitted symbol and current state jointly fix the successor.) (v) Output. Return the ε-machine: states, transitions, stationary distribution, Cμ, hμ. 
+
+> MNRAS 000 , 1–26 (2026)
+
+# 22 T. Kimpson and J. O’Leary 
+
+APPENDIX E: IAAFT SURROGATE DECOMPOSITION OF LINEAR AND NONLINEAR MEMORY 
+
+The permutation surrogates used in Section 5.1 destroy all tem-poral structure, including linear autocorrelation. Since both FAST sources show significant autocorrelation (Section 5.1), the elevated Cμ could merely reflect the known ACF structure rather than indicating higher-order (nonlinear) temporal de-pendence. To test this, we generated 1000 IAAFT surrogates (Schreiber & Schmitz 1996) for each source and k. IAAFT surrogates preserve both the marginal amplitude distribution and the power spectrum (and hence the linear autocorrelation) of the original series while destroying higher-order temporal structure. Because each IAAFT iteration rescales the surro-gate to the rank-ordered amplitudes of the observed series, every surrogate is a reordering of the actual waiting times, so positivity and the heavy-tailed marginal are preserved exactly and no parametric assumption about the waiting-time dis-tribution enters; only the temporal arrangement compatible with the matched power spectrum is randomised. If Cμ is significant against IAAFT surrogates, the temporal memory extends beyond what linear correlations capture. Table E1 shows the results. The two FAST sources show qualitatively different behaviour. FRB 20121102A yields Cμ
+
+marginally above the IAAFT surrogate distribution at k = 4 (p = 0 .032, z = 2 .3), with a borderline result at k = 5 (p = 0 .076). This suggests that FRB 20121102A possesses tem-poral structure beyond its (weak) linear autocorrelation (this 
+
+p-value is not corrected for multiple testing across k and should be regarded as suggestive). In contrast, FRB 20201124A does not significantly exceed the IAAFT surrogates at any k (low-est p = 0 .098 at k = 4), indicating that its strong linear autocorrelation (ACF(1) = 0.247; Section 5.1) accounts for most of the detected Cμ. FRB 20220912A remains consistent with the IAAFT null at all k, as expected. The IAAFT analysis does not alter the measured Cμ val-ues; both FAST sources still carry Cμ of order one bit. The IAAFT test decomposes the origin of that memory: the tem-poral memory detected in FRB 20121102A has a suggestive nonlinear component, while the memory in FRB 20201124A is consistent with being primarily linear. In both cases, the waiting-time process requires ∼1 bit of predictive information, but the nature of the temporal dependence appears to differ between sources. 
+
+APPENDIX F: ROBUSTNESS DIAGNOSTICS 
+
+This appendix collects the quantitative detail behind the robustness checks summarised in Section 5.3: block-bootstrap confidence intervals, the behaviour of Cμ across alphabet size, and the mutual-information diagnostic. 
+
+Bootstrap confidence intervals. Table F1 reports the 95% block-bootstrap confidence intervals (CIs) for Cμ (Section 4.3). The intervals are wide because Cμ is bimodal across bootstrap replicates: individual replicates yield either Cμ ≈ 0 or Cμ ≈ 1, with little intermediate density. This bimodality is consistent with CSSR’s χ2 state-splitting at finite N , where either the test fires (multiple causal states, Cμ ≈ 1 bits ) or it does not (single state, Cμ = 0), rather than with genuine bimodality of the underlying parameter. The synthetic minimum-N analysis of Appendix A confirms this directly: a fraction of known-structured HMM realisations collapse to a single-state Cμ = 0 at finite N (falling from ∼0.5–0 .75 at k = 2 to ∼0.1 at k = 4 and essentially independent of N ), so an individual resample returning Cμ = 0 is an expected algorithmic outcome on data that genuinely carry structure rather than evidence that the signal is absent. The bootstrap and surrogate tests answer different questions. Bootstrap CIs quantify estimation uncer-tainty: “how precisely is Cμ measured?” The surrogate test is a hypothesis test: “is the observed Cμ consistent with a memoryless process?” The hypothesis test rejects memoryless-ness unambiguously ( p ≤ 0.01), even though the bootstrap intervals are wide; the wide CIs do not independently corrob-orate the detection but quantify how imprecisely the absolute value of Cμ is determined. A further design caveat applies: the selected block length of 6–12 waiting times (Section 4.3) is far shorter than a typical session, so resampling scrambles precisely the session-level structure that Section 5.2 identifies as the carrier of the signal. The wide intervals and zero me-dians at some k therefore partly reflect the resampling scale itself rather than only CSSR’s finite-N bimodality, and a session-level block scheme (resampling whole sessions) would be the natural refinement. To check sensitivity to the block-length choice directly, we re-ran the full bootstrap at half and double the selected block length for every source and k (block lengths 3–24). The intervals respond as expected for depen-dent data: upper limits shrink by up to ∼30 per cent at half the block length and widen by up to ∼35 per cent at double. The lower limit is zero in every configuration, so the interpre-tation above holds at all tested block lengths: the intervals are wide, include zero, and quantify estimation uncertainty without independently corroborating the detection. 
+
+Alphabet-size sweep. Figure F1 shows Cμ as a function of k for all three sources, with shaded bands indicating the 5th–95th percentile range of the surrogate distribution. The comparative ranking is robust across all k: FRB 20220912A yields Cμ = 0 at every resolution, while the FAST sources exceed it wherever CSSR detects structure. At k = 2 and 
+
+k = 3, the FAST sources show Cμ = 0 for some configurations; this is a CSSR reconstruction artefact at coarse resolution, not absence of temporal structure, as the mutual-information diagnostic below establishes. 
+
+Mutual-information diagnostic. Figure F2 shows the lag-1 MI of the symbolised sequence (Section 4.5) compared against shuffled surrogates. For both FAST sources, the lag-1 MI is significantly above the shuffled baseline at every tested resolution, confirming that the symbolisation preserves temporal structure even at the coarsest binning (at k = 2, FRB 20121102A p = 0 .032 and FRB 20201124A p = 0 .026). The fact that Cμ = 0 at k = 2 , 3 for some FAST configu-rations, despite significant MI, indicates that CSSR fails to detect the structure at coarse resolutions where conditional transition probabilities become nearly uniform: a reconstruc-tion failure, not an absence of signal. Appendix A shows the same collapse on synthetic processes of known structure, so this coarse-resolution null is an expected property of CSSR  
+
+> MNRAS 000 , 1–26 (2026)
+
+# Temporal Memory in Repeating FRBs 23 
+
+Source k = 2 k = 3 k = 4 k = 5 FRB 20121102A 0.918 (0.195) 0.000 (1.000) 1.116 ( 0.032 ) 0.831 (0.076) FRB 20201124A 0.000 (0.597) 0.000 (0.473) 0.986 (0.098) 0.900 (0.201) FRB 20220912A 0.000 (1.000) 0.000 (1.000) 0.000 (0.391) 0.000 (1.000) 
+
+Table E1. IAAFT surrogate testing results. Each entry shows Creal  
+
+> μ
+
+(bits) with the IAAFT surrogate p-value in parentheses; bold entries indicate p < 0.05. IAAFT surrogates preserve the marginal distribution and power spectrum (and hence the linear autocorrelation), destroying only higher-order temporal structure, so significance here indicates temporal memory beyond linear autocorrelation. Source k = 2 k = 3 k = 4 k = 5 FRB 20121102A 0.918 (0.000) [0.000, 0.993] 0.000 (0.000) [0.000, 1.377] 1.116 (0.679) [0.000, 1.623] 0.831 (0.815) [0.000, 1.846] FRB 20201124A 0.000 (0.000) [0.000, 1.442] 0.000 (0.000) [0.000, 1.373] 0.986 (0.773) [0.000, 1.658] 0.900 (0.850) [0.000, 1.832] FRB 20220912A 0.000 (0.000) [0.000, 0.920] 0.000 (0.000) [0.000, 0.998] 0.000 (0.000) [0.000, 1.417] 0.000 (0.000) [0.000, 1.341] 
+
+Table F1. Block-bootstrap 95% confidence intervals for Cμ (bits) across sources and k. Each cell shows Creal  
+
+> μ
+
+(bootstrap median) [2.5th, 97.5th percentile] over 200 replicates. The bootstrap distribution is bimodal: individual replicates yield either Cμ ≈ 0 or Cμ ≈ 1, reflecting whether the resample preserves sufficient temporal structure for CSSR to detect. At k = 4, the median is non-zero for both FAST sources (0.679 and 0.773 bits) but zero for FRB 20220912A. 2 3 4 5 
+
+> Alphabet size k
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> C (bits)
+> FRB 20121102A (FAST)
+> FRB 20201124A (FAST)
+> FRB 20220912A (CHIME)
+
+Figure F1. Statistical complexity Cμ as a function of alphabet size 
+
+k. Solid lines show the real Cμ for each source; shaded bands show the per-source 5th–95th percentile of the corresponding permutation surrogate distribution (the three bands overlap closely because surrogate Cμ distributions are similar across sources). Stars mark points where p < 0.05; uncertainties on the real-data points are quantified by the block-bootstrap intervals of Table F1. For sources with bimodal surrogate Cμ distributions (a pile-up at zero with a secondary cluster near 0.7–0.8 bits, as in Figure 6), the upper edge of the band can sit close to the real Cμ value while the tabulated 
+
+p-value remains < 0.05. The drop to Cμ = 0 between k = 2 and 
+
+k = 3 for FRB 20121102A is a CSSR coarse-resolution failure, not a genuine non-monotonic feature: at k = 2 the contingency-table 
+
+χ2 test fires reliably; at k = 3 expected cell counts fall below the threshold and the algorithm cannot reject the single-state null. The MI diagnostic of Figure F2 confirms that genuine temporal structure is present at k = 3. 
+
+rather than a source-specific result. For FRB 20220912A, the MI is not significant at any k (p > 0.1 in all cases); the symbol sequence is indistinguishable from an IID process at every resolution, consistent with the Cμ = 0 result. 
+
+APPENDIX G: ROBUSTNESS TO COMPLETENESS CUTS 
+
+Because the detected memory is entirely inter-session (Sec-tion 5.2), any instrumental property that varies from session to session is in principle degenerate with intrinsic regime switching (Section 6.4). This appendix tests the most acces-sible form of that degeneracy: structure carried by bursts near the detection limit, whose recovery is most sensitive to session-to-session threshold variation. We repeat the detection analysis on completeness-cut subsamples, removing all bursts with fluence below a threshold Fmin so that every retained burst is bright enough to be detected irrespective of the in-strument’s session-to-session sensitivity. The thresholds are anchored at each source’s published 90 per cent complete-ness value, F90 = 0 .02 Jy ms for FRB 20121102A (Li et al. 2021) and Eth = 3 .6 × 10 36 erg, equivalent to ≈0.032 Jy ms, for FRB 20201124A (Zhang et al. 2022), supplemented by multiples of the anchor and by the 10th, 25th and 50th per-centiles of each catalogue’s fluence distribution. Observing sessions are kept fixed at those of the full catalogue, since they reflect the telescope schedule rather than the burst sam-ple; the intra-session waiting times of the retained bursts are recomputed, symbolised with their own quantile boundaries, and passed through the same reconstruction and 1000-draw permutation-surrogate test as the real data (Section 4.4), to-gether with the session-shuffle test at k = 4. A no-cut rung reproduces the canonical values of Table 2. A null result from a fluence cut is interpretable only against a power reference: removing a burst merges its two adja-cent waiting times into one, so any depletion, selective or not, perturbs the symbol sequence directly. For each rung we therefore draw 200 uniform random thinnings of the full burst list to the same number of bursts as the cut and pass each through the identical pipeline at k = 4. The fraction of thinned realisations retaining Cμ ≥ 0.5 bits , reported as f0.5
+
+in Table G1, estimates the probability that a detection-scale 
+
+Cμ survives the removal of the same number of bursts cho-sen at random. The control is asymmetric by construction: a detection that survives the cut is strong evidence against an instrumental origin, whereas a joint collapse of cut and 
+
+MNRAS 000 , 1–26 (2026) 24 T. Kimpson and J. O’Leary 2 3 4 5 
+
+> Alphabet size k
+> 0.00
+> 0.02
+> 0.04
+> 0.06
+> 0.08
+> Lag-1 Mutual Information (bits)
+
+* *
+
+*
+
+*    
+
+> FRB 20121102A (FAST)
+> Shuffled MI
+> Observed MI
+> 2345
+> Alphabet size k
+
+*
+
+*
+
+*
+
+*    
+
+> FRB 20201124A (FAST)
+> Shuffled MI
+> Observed MI
+> 2345
+> Alphabet size k
+> FRB 20220912A (CHIME)
+> Shuffled MI
+> Observed MI
+
+Figure F2. Lag-1 mutual information of the symbolised sequence (coloured bars) compared to 1000 shuffled surrogates (grey bars, with error bars showing ±1σ of the shuffled distribution). Stars indicate p < 0.05. Temporal structure is preserved in the symbols at every tested k for both FAST sources; FRB 20220912A is consistent with IID at all k. For FRB 20220912A at k = 5 the observed MI (0 .082 bits) is the highest of any k for this source but remains within the shuffled distribution ( p = 0 .190); the bar appears comparable to the shuffled 
+
+±1σ envelope by construction, since σ corresponds to the ∼84th percentile of an approximately Gaussian shuffled distribution. 
+
+baseline is uninformative. A well-powered collapse under the cut alone would itself admit two readings, instrumental con-tamination or genuine memory carried disproportionately by faint bursts, so even the negative branch would not uniquely indicate systematics. For FRB 20201124A the detection survives the completeness cut and well beyond it. At F90 the k = 5 detection holds ( Cμ =1.000 bits , p = 0 .008); at every rung up to 2 F90 and P25 adetection persists at one or both of the anchor resolutions, and at 2 F90 , with 21 per cent of bursts removed, the k = 4 result is the strongest in the table ( p = 0 .001). The detection fails only at the 50th-percentile cut, where the thinning baseline collapses comparably ( f0.5 = 0 .34): a loss of power, not of signal. FRB 20201124A’s inter-session signal is therefore not carried by bursts near the detection limit. For FRB 20121102A the cut at F90 removes only 72 of 1652 bursts (4.4 per cent) yet collapses the k = 4 detection ( Cμ = 0, 
+
+p = 0 .245) and the session-shuffle signal ( p = 0 .564). The thinning baseline shows, however, that this is what almost any removal of 72 bursts does: only 20 per cent of matched random thinnings retain a detection-scale Cμ, and across all rungs the fluence-cut outcome is statistically typical of the thinning distribution (the fraction of thinnings doing as badly as or worse than the cut at k = 4 ranges over 0.66–0.83). The isolated revivals at single resolutions ( Cμ = 0 .767 at k = 4 for 1.5 F90 and at k = 5 for P25 ) mirror the scattered non-zero entries of the windowing test (Section 6.3) and are consistent with the binary firing behaviour of CSSR’s state-splitting test near threshold (Appendix F). The control is therefore power-limited for this source: it provides no evidence for a sensitivity-correlated component, but cannot exclude one either. A complementary covariate check asks whether session-to-session sensitivity variation correlates with the timing struc-ture at all. For each session we take the minimum detected fluence as a proxy for that session’s effective detection thresh-old and correlate it with the session’s median waiting time and mean symbol. The raw correlations for FRB 20121102A are substantial (Spearman ρ = 0 .66 and 0 .72 over the 38 of its 39 sessions that contain at least two bursts), but the mini-mum is an order statistic: sessions with more bursts sample deeper into the fluence distribution, which induces exactly this correlation under perfectly constant sensitivity. Calibrated against a permutation null that shuffles fluences across bursts while keeping arrival times and session membership fixed (null ρ = 0 .54 ± 0.09), the observed values are not significant (pperm = 0 .18 and 0 .056). For FRB 20220912A the same check is null ( ρ ≈ 0.03, pperm ≈ 0.4); FRB 20201124A, with four sessions, has too few for the correlation to be meaningful. 
+
+APPENDIX H: RECONCILIATION WITH PRIOR FRB TEMPORAL-ANALYSIS LITERATURE Scalar complexity measures. Zhang et al. (2024) ap-plied the Pincus index (approximate entropy) and maximum Lyapunov exponent to FRB burst arrival times and energies, finding that repeating FRBs behave more randomly and less chaotically than pulsars, earthquakes, or solar flares. Sang & Lin (2024) subsequently applied the Pincus index, the Hurst exponent, and non-Gaussian fluctuation statistics to FAST repeater data, reaching the related conclusion that the waiting-time sequences exhibit long-term memory and scale-invariant behaviour consistent with self-organised criticality. Our anal-ysis measures a different quantity: Cμ quantifies predictive memory, while approximate entropy measures regularity and the Lyapunov exponent measures dynamical instability. These are complementary perspectives on the same underlying pro-cess. Our measurement of Cμ ≈ 1 bits for the FAST sources indicates that the process, while appearing random by scalar complexity measures, possesses genuine predictive structure that these measures do not capture. The numerical scalar measures we computed for our three sources are tabulated in Appendix I. 
+
+MNRAS 000 , 1–26 (2026) Temporal Memory in Repeating FRBs 25                                                                                                                                  
+
+> Source Cut Fmin (Jy ms) Nburst Ck=4
+> μ(p)Ck=5
+> μ(p)pshuffle f0.5
+> FRB 20121102A F90 0.020 1580 0.000 (0.245) 0.000 (0.239) 0.564 0.20
+> P10 0.027 1486 0.000 (1.000) 0.000 (0.174) 1.000 0.21 1.5F90 0.030 1441 0.767 ( 0.028 )0.000 (1.000) 0.129 0.27 2F90 0.040 1276 0.000 (1.000) 0.000 (0.250) 1.000 0.30
+> P25 0.042 1241 0.000 (0.220) 0.767 ( 0.028 )0.228 0.34
+> P50 0.065 826 0.000 (1.000) 0.000 (1.000) 1.000 0.29 FRB 20201124A F90 0.032 823 0.679 (0.120) 1.000 ( 0.008 )0.307 0.78
+> P10 0.040 794 0.965 ( 0.012 )0.581 (0.177) 0.653 0.71 1.5F90 0.048 757 0.816 ( 0.017 )0.591 (0.170) 1.000 0.76 2F90 0.064 697 1.376 ( 0.001 )1.000 ( 0.011 )0.545 0.65
+> P25 0.073 663 1.000 ( 0.004 )1.000 ( 0.007 )0.505 0.66
+> P50 0.221 441 0.000 (1.000) 0.000 (1.000) 1.000 0.34
+> Table G1. Completeness-cut control. For each rung, all bursts with fluence below Fmin are removed, sessions are kept fixed at those of the full catalogue, and the detection analysis is repeated: Cμwith its 1000-draw permutation-surrogate p-value at k= 4 and k= 5, and the session-shuffle p-value at k= 4 (100 permutations). All p-values use the ( r+ 1) /(n+ 1) Monte-Carlo estimator (Phipson & Smyth 2010). f0.5is the power reference: the fraction of 200 random thinnings of the full burst list to the same Nburst whose k= 4 reconstruction retains Cμ≥0.5bits . Anchors F90 are the published 90 per cent completeness thresholds (FRB 20121102A: 0.02 Jy ms, Li et al. 2021; FRB 20201124A: Eth = 3 .6×10 36 erg ≈0.032 Jy ms, Zhang et al. 2022); P10 ,P25 ,P50 are percentiles of each catalogue’s fluence distribution. Bold marks p < 0.05. Entries displayed as 0 .000 can be non-zero at machine precision (cf. Table 2). FRB 20220912A remains null at every rung and is omitted.
+
+Long-range correlation and “memory” analyses. Sev-eral studies report “memory” or scale-invariant structure in repeater waiting times: Du et al. (2024) find universal scaling reminiscent of solar flares, and Wang et al. (2024) report con-ditional dependence of waiting times on the preceding interval, both consistent with the self-organised-criticality framing of Sang & Lin (2024). Totani & Tsuzuki (2023) provide the most direct evidence for short-timescale dependence: a correlation-function analysis in the two-dimensional time–energy space of nearly 7000 bursts from the same three sources analysed here finds that each burst has a 10–60 per cent chance of trigger-ing an aftershock, at a rate decaying with separation as the Omori–Utsu power law of earthquakes, a signal concentrated at the shortest separations and stable across changes in source activity. Because our pipeline symbolises waiting times into quantile bins that are logarithmically broad for these heavy-tailed distributions, an enhancement confined to separations within the lowest bin’s dynamic range only weakly alters which symbol follows which; this is the likely reason aftershock-like clustering does not register in the within-session controls of Appendix B, and a quantitative reconciliation under a com-mon burst definition remains open (Section 6.1). Wang et al. (2023) more specifically report memory in FRB 20121102A and FRB 20201124A on minute-to-hour (i.e. within-session) timescales, detected via the Hurst exponent and growth in burst-rate structure. This is a long-range-correlation or per-sistence statistic, a different object from the predictive com-plexity Cμ: a sequence can exhibit Hurst-detectable persis-tence without a finite-state predictive model surviving at our symbolisation, and their signal lies precisely on the sub-hour scales where our within-session predictive-memory test is null or power-limited (Section 5.2). Whether such within-session persistence reflects predictive structure that survives our boundary-free and within-session-shuffle controls is left to future work. 
+
+Parametric waiting-time fits. A series of studies have fit-ted parametric waiting-time distributions to FRB 20121102A bursts: Oppermann et al. (2018) adopted a Weibull form, Gourdji et al. (2019) and Aggarwal et al. (2021) both re-ported log-normal distributions (centred at ∼200 s and ∼75 s respectively, the latter from a larger Arecibo sample), Cruces et al. (2021) reported departures from exponentiality con-sistent with non-Poisson emission, and Jahns et al. (2023) described the November 2018 burst storm as a Poisson pro-cess with time-varying rate (between 0 and 218 bursts per hour). At first glance, these results, particularly the finding that waiting times within active windows are consistent with Poisson statistics, may appear to contradict our detection of temporal memory, but the two are compatible. A process that alternates between two Poisson rates produces individual waiting times that are each exponentially distributed (condi-tioned on the current state), yet the sequence of waiting times carries predictive information: observing several short waiting times in succession increases the posterior probability of being in the fast-rate state, and hence of the next waiting time also being short. Such a process has Cμ > 0 (encoding which rate is currently active) despite having Poisson marginal statistics within each state. Our Cμ measurement is sensitive to this kind of sequential dependence, which marginal distribution fitting cannot detect. That Cμ > 0 after symbolisation shows that the temporal ordering of waiting times, not just their distribution, carries information, as expected if a hidden state modulates the burst rate. The rate-switching comparison in Section 6.2 shows further that the observed Cμ exceeds what a fitted two-state Markov-modulated Poisson process alone would produce. 
+
+Periodicity searches. The periodicity analyses of CHIME/FRB Collaboration (2020a) and Rajwade et al. (2020) identify periodic activity windows on timescales of days to weeks. These are distinct from the temporal structure we de-tect in the concatenated waiting-time sequence, which reflects non-periodic session-to-session variability in the source’s activ-ity rate. ε-machines detect structure that need not be periodic;  
+
+> MNRAS 000 , 1–26 (2026)
+
+# 26 T. Kimpson and J. O’Leary                     
+
+> Source ApEn ( m= 2) λmax ∆α
+> FRB 20121102A 1.086 1.909 2.084 FRB 20201124A 0.891 1.887 1.029 FRB 20220912A 1.044 1.072 1.194
+> Table I1. Scalar complexity measures for the three FRB sources, computed on the raw (unsymbolised) waiting-time sequences. Ap-proximate entropy (ApEn, embedding dimension m= 2; natural-log base) and the MFDFA spectrum width ∆ αare dimensionless; the maximum Lyapunov exponent λmax is reported in units of inverse waiting-time step (natural-log base). All values are point estimates without uncertainty quantification and should be interpreted as indicative rather than statistically significant; bootstrap intervals on these scalar measures are not reported here because the Cμ
+> surrogate framework is our primary inferential tool (Section 4.4).
+
+the hidden state transitions may be stochastic, irregular, and non-repeating. 
+
+APPENDIX I: COMPARISON WITH SCALAR COMPLEXITY MEASURES 
+
+To contextualise the ε-machine results, we compute three scalar complexity measures on the raw waiting-time sequences: approximate entropy (Pincus 1991), as applied to FRB timing by Sang & Lin (2024) and Zhang et al. (2024); the maximum Lyapunov exponent, which quantifies dynamical instability; and the multifractal detrended fluctuation analysis (MFDFA; Kantelhardt et al. 2002) spectrum width ∆ α, which char-acterises multi-scale heterogeneity. Table I1 summarises the results. All three sources yield ApEn values between 0.89 and 1.09, indicating consistently high irregularity, consistent with the finding of Zhang et al. (2024) that FRBs are “more random” than pulsars by this measure. These scalar measures provide a different perspective from Cμ: ApEn measures distributional regularity, the Lyapunov exponent measures dynamical in-stability, and MFDFA characterises multi-scale heterogeneity, whereas Cμ measures predictive memory , that is, the minimum information about the past required for optimal prediction. By approximate entropy, FRB 20220912A (1.044) sits be-tween the two FAST sources (0.891 and 1.086) and so gives no hint of the categorical split that Cμ draws between them (Cμ ≈ 1 vs. Cμ = 0). The Lyapunov exponent does separate FRB 20220912A (1.072, well below the ∼1.9 of both FAST sources), but as a measure of dynamical instability rather than predictive memory. The widest multifractal spectrum (∆ α = 2 .08) belongs to FRB 20121102A, suggesting the most complex multi-scale structure, while FRB 20201124A has the lowest ApEn (0.891), consistent with its strongest persis-tent autocorrelation. The ε-machine framework contributes a minimal generative model and a precise memory quantifi-cation, complementing rather than superseding these scalar characterisations. 
+
+APPENDIX J: MODEL SELECTION FOR THE RATE-SWITCHING NULL 
+
+The rate-switching comparison of Section 6.2 asks whether the observed Cμ exceeds that generated by a fitted two-state MMPP. A complementary question is whether the MMPP’s transition structure is warranted in the first place, or whether a model with the same marginal waiting-time distribution but no temporal dependence fits the data equally well. We address this with an Akaike Information Criterion (AIC) comparison of the fitted MMPP against the IID two-component exponential mixture of Section 6.2 (same marginal distribution, each interval drawn independently), defining ∆AIC = AIC MMPP − AIC mix so that negative values favour the MMPP. The ∆AIC values are annotated on Figure 8. The two FAST sources differ. For FRB 20121102A the Markov transitions are strongly warranted (∆ AIC = −24 .3): the data support a genuine rate-switching process, so the Cμ excess reported in Section 6.2 is a step beyond a model that does capture rate-switching. For FRB 20201124A the transitions are not favoured (∆ AIC = +1 .0): the mixture fits as well as the MMPP, consistent with FRB 20201124A’s signal being session-level rate heterogeneity rather than an ordered regime sequence (Section 6.1). In both sources the Cμ excess over the fitted-MMPP baseline holds regardless, so it does not depend on the MMPP being the preferred parametric description of the waiting times.

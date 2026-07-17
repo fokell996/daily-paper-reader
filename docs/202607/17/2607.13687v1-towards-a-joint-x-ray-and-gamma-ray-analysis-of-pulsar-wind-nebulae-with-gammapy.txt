@@ -1,0 +1,95 @@
+Title: Towards a joint X-ray and gamma-ray analysis of Pulsar Wind Nebulae with Gammapy
+
+URL Source: https://arxiv.org/pdf/2607.13687v1
+
+Published Time: Thu, 16 Jul 2026 01:16:12 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+Mem. S.A.It. Vol. 00, 0 
+
+© SAIt 2023 Memorie della 
+
+# Towards a joint X-ray and gamma-ray analysis of Pulsar Wind Nebulae with Gammapy 
+
+K. Egg and A. M. W. Mitchell 
+
+Erlangen Centre for Astroparticle Physics (ECAP), Friedrich-Alexander-Universität Erlangen-Nürnberg, Germany e-mail: katharina.egg@fau.de Received: XX-XX-XXXX (Day-Month-Year); Accepted: XX-XX-XXXX (Day-Month-Year) Abstract. For detailed studies of Pulsar Wind Nebulae (PWNe), objects that show photon emission across the entire electromagnetic spectrum, multiwave-length analyses are crucial. The comparison of especially X-ray and gamma-ray emission and their angular sizes can help us to constrain the properties of PWNe, such as their particle transport mechanism or their potential for the acceleration of hadronic particles. In this vein, we are working towards a joint analysis of eROSITA X-ray data and H.E.S.S. gamma-ray data. To enable this, eROSITA data is adapted into the framework of Gammapy, a Python package for gamma-ray analysis through a multi-step process of adapting the formats of not only the photon event list, but also all X-ray response functions, into open data formats compatible with Gammapy. This is accomplished using newly developed Python converter functions. In this contribution we present the first eROSITA maps of the PWN MSH 15-52 in Gammapy, compared to the associated H.E.S.S. emission. Key words. Methods: data analysis, X-rays: general, Gamma rays: general 
+
+1. Introduction 
+
+Pulsar wind nebulae (PWNe) are regions of energetic electrons and positrons around pulsars, very interesting sources not only at X-ray and gamma-ray energies but over a wide range of the electromagnetic spectrum. They are created when parti-cles accelerated by a central pulsar inter-act with the surrounding medium, which causes photon emission (Gaensler & Slane 2006). Among identified sources, PWNe are the most numerous source class in galac-tic very-high-energy (VHE) gamma-ray as-tronomy (H. E. S. S. Collaboration et al. 2018). A number of questions, however, are still open in regards to their properties, such as the nature of their particle acceler-ation mechanism. Additionally PWNe are candidate PeVatrons, objects that acceler-ate particles to PeV energies (Mitchell & Gelfand 2022). For the study of the extended struc-tures of PWNe in gamma-ray energies the functionalities of the Python package Gammapy are ideal (Donath et al. 2023). Gammapy has introduced a 3D fitting algo-rithm, which fits the two spatial dimensions arXiv:2607.13687v1 [astro-ph.HE] 15 Jul 2026 Egg: Towards a joint X-ray and gamma-ray analysis of PWNe with Gammapy 1
+
+and the energy dimension simultaneously (Mohrmann et al. 2019). Additionally one of Gammapy’s key strengths is its compat-ibility with multi-mission gamma-ray data. Data from several different types of instru-ments have been included into its frame-work, enabling joint analyses over many in-struments, such as the flagship Crab spec-trum fit by Nigro et al. (2019). To fur-ther extend the energy range accessible to Gammapy analysis, X-ray 1D (energy) spectra have successfully been introduced into Gammapy by Giunti et al. (2022) and Rosillo et al. (2024). It is the objective of our work to in-clude X-ray data taken by the eROSITA telescope not only as 1D-spectra, but also at the event level in order to enable de-tailed spectral as well as morphological analysis through 3D fits, culminating in a combined analysis of X-ray and gamma-ray data. These proceedings will showcase our progress towards this goal and illustrate the conversion process of the X-ray data in to a Gammapy-compatible format. 
+
+2. Analysed data 2.1. eROSITA data 
+
+The eROSITA X-ray telescope on the SRG satellite has conducted four complete all-sky surveys, preceded by a Calibration and Performance Verification (CalPV) phase (Predehl et al. 2021; Merloni et al. 2024). The data of the western Galactic hemi-sphere taken in the CalPV phase were made public in the early data release (EDR). These data include a pointed ob-servation of MSH 15-52, that was analysed in the context of this work. The western half of the first eROSITA all-sky survey (eRASS1) meanwhile, was made public on January 31st 2024 compris-ing the first data release (DR1) (Merloni et al. 2024). MSH 15-52 was also observed in the course of eRASS1, making additional data publicly available for our analysis. eROSITA consists of seven telescope modules (TMs) recording data simultane-ously. Of these TMs 5 and 7 were excluded in this analysis as they are affected by an optical light leak (Predehl et al. 2021). During the EDR data only TMs 1 to 3 were recording data, all of which were used for our analysis. 
+
+2.2. H.E.S.S. data 
+
+The H.E.S.S. public data release includes 20 runs of 2004 observations of MSH 15-52, equalling 9.1 hours of observations of the extended source (H.E.S.S. Collaboration 2018). The H.E.S.S. data were used in this work not for the purpose of conducting new scientific analysis but to illustrate the great potential for synergy between eROSITA and H.E.S.S. data through simultaneous and combined analysis within one tool. 
+
+3. File conversion scheme 
+
+In this section the process of convert-ing the eROSITA X-ray data to GADF 1
+
+Gammapy-compatible formats is illus-trated. The data for each TM is treated individually in this pipeline, as slight dif-ferences exist between TMs, for example in their effective area (Predehl et al. 2021). 
+
+3.1. Events 
+
+Events-level eROSITA data is stored in cal-ibrated eventfiles that are created through the eSASS software (Brunner et al. 2022). They include an eventlist, GTI extensions for all included TMs, and further informa-tion, such as the pointing position and live time. For compatibility with Gammapy slight modifications were made to the event-files as follows. The PI column containing the event energy was renamed ENERGY. The time information contained in the MJDREF field in the eventfile header was transferred to fields MJDREFI and   
+
+> 1https://gamma-astro-data-formats. readthedocs.io/en/latest/ 2Egg: Towards a joint X-ray and gamma-ray analysis of PWNe with Gammapy
+
+MJDREFF. The deadtime correction is in-cluded in the eROSITA eventfiles as aseparate extension DEADCOR n (with n
+
+the number of the respective TM) with a column DEADC, containing deadtime entries for each 50 ms time interval. As Gammapy takes a single DEADC value, the keyword was filled with the column average. An OBS_ID is necessary for the processing of event data, so a substitute OBS_ID (usually the TM number) was added for each observation. Additionally the option of adding coordinates of a substi-tute “pointing direction”, usually the cen-tre of the analysis region, was added for all non-pointed observations to enable the display of event data. Note that this is a fake “pointing direction” that does not cor-respond to the true pointing of the TM. With these modifications, the events data could be read into Gammapy via EventList.read(). A comparison of one of the eventfiles in the image visualisation software ds9 (Joye & Mandel 2003) and in Gammapy can be seen in Figure 1. 
+
+3.2. Energy reconstruction 
+
+The energy reconstruction, corresponding to the energy dispersion of eROSITA data is described by the response matrix file (RMF). The RMF is based on calibra-tion measurements and assumed to be only dependent on the pattern filtering of the events. Consequently only one standard RMF is needed for all TMs (Brunner et al. 2022). The eROSITA RMF is compliant with the OGIP standard 2, which is accepted by the Gammapy EDispKernel.read() func-tion 3. A conversion is, however, presently still needed to read the eROSITA RMF, due to an indexing issue. A solution for this in Gammapy is already being worked on. At present a converter function is used to   
+
+> 2https://heasarc.gsfc.nasa.gov/docs/ heasarc/ofwg/ofwg_recomm.html
+> 3https://docs.gammapy.org/dev/ user-guide/irf/edisp.html
+
+Fig. 1. eROSITA DR1 TM1 eventfile of MSH 15-52 in ds9 (top) and Gammapy (bottom). 
+
+counteract this problem. Its task is to re-duce each value in the F_CHAN column by exactly one. With this change the RMF can be read by Gammapy. A plot of the eROSITA energy dispersion matrix can be seen in Figure 2. 
+
+3.3. Effective area 
+
+The X-ray effective area is stored in the auxiliary response file (ARF). This is a 1D format (effective area as a function of en-ergy), which is extracted for a particular region of the sky over a particular observa-tion time. Both the ARF and RMF are used in combination with 1D spectra to provide response information. Egg: Towards a joint X-ray and gamma-ray analysis of PWNe with Gammapy 3
+
+Fig. 2. eROSITA RMF/energy dispersion ma-trix plotted in Gammapy. 
+
+To obtain a 3D map of the effective area a custom Python script was used. It re-peatedly conducts the eSASS srctool task (Brunner et al. 2022) to generate ARFs over small sections of the image field. By moving the selection over the image field a 3D map of the effective area can be cre-ated. This map is combined with exposure time information from an exposure time map created with the eSASS task expmap (Brunner et al. 2022) to obtain what is re-ferred to as an exposure map in gamma-ray astronomy. This map can then be handled by Gammapy as a WcsNDMap. 
+
+3.4. Point Spread Function (PSF) 
+
+With a point spread function (PSF) in the arcsec range the resolution of eROSITA is much finer than that of gamma-ray instru-ments. As such the PSF can be used to ac-count for losses in the extraction of spectra of point sources (Brunner et al. 2022), but is generally not part of the spectral fits for extended emission. The eROSITA PSF cal-ibration measurements are provided as part of the CALDB in the form of 2D images for different energies and offsets. Radial PSF profiles were extracted from these images and brought into PSF3D format. Since Gammapy is so far designed for pointing gamma-ray observatories (Donath et al. 2023) (in either RA/DEC or Alt/Az coordinates) creating a PSFMap for the DR1 eROSITA data (taken in SURVEY/SCAN mode) had to be accom-plished outside of Gammapy. Inspired by the approach of Olivera-Nieto et al. (2022) the PSFMap was created by iterating over all pointing directions of the telescope dur-ing the observation. The ratio of time spent in each respective PSF bin was recorded for each pixel and the radial PSF profiles aver-aged accordingly. Additionally this average was weighted with a factor to account for the decrease in effective area towards the outer edges of the FoV. The map can then be read by PSFMap.read(). 
+
+3.5. Background 
+
+To estimate the background, Gammapy’s MapDatasetOnOff framework was utilised. Using a background spectrum extracted from near source free regions of the sky a “fake” Off region can be created and automatically subtracted, taking the re-spective areas and pixel exposures into ac-count. In the future, a method of fitting the eROSITA background with a multi-component model will be developed. 
+
+4. Full maps and comparison to H.E.S.S. data 
+
+The public H.E.S.S. data of MSH 15-52 were read into Gammapy (H.E.S.S. Collaboration 2018), with the accompany-ing background model fit to the source-free data using FoVBackgroundMaker to create a significance map. The full maps contain-ing the eROSITA MSH 15-52 data can be seen in Figure 3 for both the EDR and DR1 data, with H.E.S.S. significance contours at 
+
+4, 8, and 12 σ overlaid. It can be seen that there is very good agreement between not only the location, but also the elongated shape of the X-ray and gamma-ray sources. This further il-lustrates the potential for joint multiwave-length analyses utilising the functionalities of Gammapy. 4 Egg: Towards a joint X-ray and gamma-ray analysis of PWNe with Gammapy 
+
+Fig. 3. EDR (left) and DR1 (right) eROSITA maps in Gammapy with H.E.S.S. contours (4, 8, and 12 σ significance) 
+
+5. Conclusion and Outlook 
+
+In the course of this work it was shown how eROSITA X-ray data can be adapted into the Gammapy framework on the events-level. The format of the eventfiles, RMFs, ARFs, and PSFs was changed to be com-patible with GADF data. We present the first eROSITA counts and IRF maps in Gammapy. This approach enables large scale stud-ies of pulsar environments at X-ray, as well as at gamma-ray wavelengths, allowing us to investigate properties, such as their mor-phology, spectra, and to eventually further constrain the characteristics of their under-lying particle populations. A thorough validation of this method as well as a full analysis of eROSITA data in Gammapy is in progress. 
+
+Acknowledgements. K. Egg and A. M. W. Mitchell are supported by the Deutsche Forschungsgemeinschaft, DFG project number 452934793. This work is based on data from eROSITA, the soft X-ray instrument aboard SRG, a joint Russian-German science mission supported by the Russian Space Agency (Roskosmos), in the interests of the Russian Academy of Sciences represented by its Space Research Institute (IKI), and the Deutsches Zentrum für Luft- und Raumfahrt (DLR). The SRG spacecraft was built by Lavochkin Association (NPOL) and its subcontractors, and is oper-ated by NPOL with support from the Max Planck Institute for Extraterrestrial Physics (MPE). The development and construction of the eROSITA X-ray instrument was led by MPE, with contributions from the Dr. Karl Remeis Observatory Bamberg & ECAP (FAU Erlangen-Nuernberg), the University of Hamburg Observatory, the Leibniz Institute for Astrophysics Potsdam (AIP), and the Institute for Astronomy and Astrophysics of the University of Tübingen, with the sup-port of DLR and the Max Planck Society. The Argelander Institute for Astronomy of the University of Bonn and the Ludwig Maximilians Universität Munich also partici-pated in the science preparation for eROSITA. The eROSITA data shown here were processed using the eSASS software system developed by the German eROSITA consortium. 
+
+References 
+
+Brunner, H., Liu, T., Lamer, G., et al. 2022, A&A, 661, A1 Donath, A., Terrier, R., Remy, Q., et al. 2023, A&A, 678, A157 Gaensler, B. M. & Slane, P. O. 2006, ARA&A, 44, 17 Giunti, L., Acero, F., Khélifi, B., et al. 2022, A&A, 667, A130 H. E. S. S. Collaboration, Abdalla, H., Abramowski, A., et al. 2018, A&A, 612, Egg: Towards a joint X-ray and gamma-ray analysis of PWNe with Gammapy 5
+
+A1 H.E.S.S. Collaboration. 2018, H.E.S.S. First Public Test Data Release Joye, W. A. & Mandel, E. 2003, in Astron. Soc. of the Pacific Conference Series, Vol. 295, ADASS XII, 489 Merloni, A., Lamer, G., Liu, T., et al. 2024, A&A, 682, A34 Mitchell, A. M. W. & Gelfand, J. 2022, in Handbook of X-ray and Gamma-ray Astrophysics, ed. C. Bambi &A. Sangangelo, 61 Mohrmann, L., Specovius, A., Tiziani, D., et al. 2019, A&A, 632, A72 Nigro, C., Deil, C., Zanin, R., et al. 2019, A&A, 625, A10 Olivera-Nieto, L., Joshi, V., Schoorlemmer, H., et al. 2022, in 37th ICRC, 727 Predehl, P., Andritschke, R., Arefiev, V., et al. 2021, A&A, 647, A1 Rosillo, M. N., Acero, F., Otero-Santos, J., et al. 2024, A Unified Multi-Wavelength Data Analysis Workflow with gammapy
