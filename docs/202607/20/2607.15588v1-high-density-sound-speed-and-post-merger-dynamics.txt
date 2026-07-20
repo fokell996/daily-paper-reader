@@ -1,0 +1,739 @@
+Title: High-Density Sound Speed and Post-Merger Dynamics
+
+URL Source: https://arxiv.org/pdf/2607.15588v1
+
+Published Time: Mon, 20 Jul 2026 00:33:16 GMT
+
+Number of Pages: 31
+
+Markdown Content:
+## High-Density Sound Speed and Post-Merger Dynamics 
+
+John Stroud, 1 David Radice, 2, 3, 4 and Sanjay Reddy 11Institute for Nuclear Theory, University of Washington, Seattle, WA USA ∗
+
+> 2
+
+Institute for Gravitation and The Cosmos, The Pennsylvania State University, University Park PA 16802, USA 
+
+> 3
+
+Department of Physics, The Pennsylvania State University, University Park PA 16802, USA 
+
+> 4
+
+Department of Astronomy and Astrophysics, The Pennsylvania State University, University Park PA 16802 †
+
+1arXiv:2607.15588v1 [astro-ph.HE] 17 Jul 2026 Abstract 
+
+The density dependence of the speed of sound in cold neutron star matter remains poorly con-strained and is central to determining the high-density equation of state (EOS). While binary neutron star (BNS) merger simulations increasingly incorporate detailed microphysics, the direct impact of the sound-speed in the neutron star core on observable signatures has not been system-atically explored. We address this by introducing a simplified parametrization that suppresses mi-crophysics while allowing controlled variation of the sound speed at supranuclear densities through its derivative with respect to the baryon chemical potential. Using the WhiskyTHC code, we perform a suite of fully relativistic BNS merger simulations and identify correlations between the sound-speed slope parameter and key merger outcomes, including remnant properties and post-merger GW frequencies. These results demonstrate that multimessenger observables are sensitive to the behavior of matter at the highest densities reached in neutron star cores. We further ana-lyze gravitational-wave signals from the CoRe database of binary neutron star merger simulations employing more realistic equations of state. Our analysis reveals approximately EOS-independent relations between the derivative of the sound speed and the peak post-merger gravitational-wave frequency. Although these relations cannot be considered truly quasi-universal, they nonetheless indicate that post-merger gravitational waves retain measurable information about the EOS at he highest densities. At the same time, the remaining EOS dependence highlights the difficulty of iso-lating the underlying high-density physics and motivates the development of targeted parameterized frameworks for interpreting future multimessenger observations. 
+
+> Keywords: BNS Merger,Gravitational Waves,Sound Speed,Equation of State
+
+I. INTRODUCTION 
+
+Neutron stars provide a direct link between nuclear physics and astrophysical observa-tions, probing the behavior of matter at densities exceeding n0 ≈ 2.6×10 14 g/cm 3, the nuclear saturation density, and thus constraining the high-density equation of state (EOS) [1, 2]. Radio, x-ray and gravitational wave (GW) observations of neutron stars during the past decade have provided valuable constraints on their masses and radii. Taken together, the   
+
+> ∗jstroud3@uw.edu
+> †dur555@psu.edu
+
+2existence of neutron stars with masses near or above 2 M⊙ [3–5], the relatively small radii inferred by NICER [6–9], and the low tidal deformability extracted from GW170817 [10] now point toward an EOS that is comparatively soft at ∼ (1 −2) n0 but stiffens rapidly at higher densities in order to support the most massive stars. In phenomenological terms, this implies a marked increase of the sound speed in the inner core, often exceeding the conformal value c2 
+
+> s
+
+= 1 /3 over some density interval, and has been interpreted as evidence for strong non-perturbative effects that can produce stiffening at densities encountered in the core [11–14]. In binary systems, these objects emit gravitational radiation as they inspiral, a prediction of general relativity confirmed through binary pulsar timing [15, 16], culminating in mergers that generate detectable GW signals [17]. During the late stages of the inspiral, finite-size effects enter the waveform phase evolution through the tidal deformability parameter Λ,which depends sensitively on the stellar compactness and thus on the pressure at densities 
+
+∼ (1 –2) n0, providing direct constraints on the intermediate-density EOS [18, 19]. These events are accompanied by electromagnetic counterparts powered by relativistic ejecta and 
+
+r-process nucleosynthesis, establishing binary neutron star mergers as primary sites of heavy element production [20, 21]. The post-merger phase probes even more extreme conditions, with densities and temper-atures significantly exceeding those of cold, isolated neutron stars, and encodes additional EOS information in the GW spectrum. In particular, the dominant post-merger oscillation frequency fpk (also referred to as f2 in the literature) and related spectral features correlate with the radius and compactness of the remnant and therefore with the pressure at several times nuclear saturation density [22, 23]. Similarly, the threshold mass for prompt collapse to a black hole, Mth , provides a complementary constraint on the maximum mass and stiffness of the EOS [24, 25]. Electromagnetic observables arising from the merger ejecta provide an additional probe: the ejecta mass Mej , velocity vej , and composition depend on the merger dynamics, including shock heating, tidal torques, and the lifetime of the hyper-massive rem-nant, all of which are governed by the EOS. In particular, the high-density behavior of the speed of sound influences the remnant structure and stability, thereby affecting both the ef-ficiency of mass ejection and the kinetic energy of the outflows, which are directly imprinted in kilonova light curves and spectra. As next-generation detectors extend sensitivity into the kilohertz regime, these multi-messenger observables will provide increasingly stringent 3constraints on dense matter, motivating a systematic investigation of how extreme varia-tions in the sound speed at supranuclear densities impact merger outcomes. To this end, we introduce a parametrized description of the high-density EOS in which the behavior of the speed of sound is directly controlled, enabling a targeted exploration of its influence on merger dynamics and multi-messenger observables. Most existing studies of binary neutron star mergers emphasize increasingly sophisticated microphysical modeling, motivated by the high computational cost of fully relativistic simulations and the goal of achieving maximal realism. In contrast, the approach adopted here is to isolate the impact of specific features of the high-density equation of state (EOS) through a simplified, controlled parametriza-tion. In section II, we introduce a model in which the behavior of the speed of sound is governed by a single parameter, c2 
+
+> s
+
+(μ)′, allowing for systematic variation of the EOS stiffness at supranuclear densities. Using this framework, we perform a suite of equal-mass neutron star merger simulations within numerical relativity, employing a Γ-law prescription for the thermal component of the EOS. Within this controlled setting, in section III, we identify clear correlations between the sound-speed parameter and both GW observables and prop-erties of the dynamically ejected material, including the ejecta mass and velocity. This study represents a first step toward a reduced-parameter description of merger outcomes, enabling a more transparent mapping between EOS properties and multi-messenger signals. We also discuss how including knowledge of the sound speed can improve fits for existing quasi-universal relationships utilizing the CoRe database . In section IV, we conclude and comment on how parametrized models may be used to train surrogate models, including neural-network-based emulators, that aid in the extraction of EOS constraints from cur-rent and future observations by enabling efficient exploration of high-dimensional parameter spaces associated with dense matter thermodynamics.   
+
+> II. METHODS AND SETUPS A. High Density Equation of State
+
+Having outlined the broader motivation in the Introduction, we now focus on the theoretical landscape governing the equation of state (EOS) and sound speed in neutron-rich matter.A first-principles determination of the EOS across the full density range relevant to neutron 4stars remains an outstanding challenge. In the cores of massive neutron stars, densities may reach 6–8 n0, where many-body correlations, higher-order interactions, and potentially new degrees of freedom become essential. At present, a fully controlled treatment of such effects is not achievable. Moreover, neutron star matter—characterized by extreme isospin asymmetry with only ∼ 5–10% protons—cannot be directly probed in terrestrial experiments [26–28]. Consequently, astrophysical observations provide the primary empirical constraints on the high-density EOS. A central quantity derived from the EOS is the adiabatic sound speed, 
+
+c2 
+
+> s
+
+=
+
+∂P ∂ε 
+
+
+
+> s
+
+, (1) which governs the propagation of linear perturbations in relativistic hydrodynamics [29]. Its behavior directly impacts neutron star structure: larger values correspond to a stiffer EOS and support higher maximum masses and larger radii, while smaller values yield softer EOSs and more compact stars. 
+
+Controlled regime at low densities. A key theoretical anchor is provided by the regime 
+
+n ≲ 1.5 n0, where the EOS of neutron-rich matter is well constrained by ab initio nu-clear theory. In this density range, calculations based on chiral effective field theory (EFT), incorporating consistent two- and three-nucleon interactions, exhibit a high degree of robust-ness. Across a variety of many-body methods—including many-body perturbation theory, self-consistent Green’s functions, coupled cluster approaches, and quantum Monte Carlo simulations—predictions for the EOS and derived quantities such as the sound speed show remarkable consistency within controlled uncertainties. Early work by Hebeler and Schwenk demonstrated that chiral EFT interactions lead to convergent and systematically improv-able results in neutron matter [30]. This picture has since been reinforced by studies from Tews et al. , Drischler et al. , and Gandolfi, Carlson, and Reddy, which find agreement across different interaction models and computational frameworks [31–33]. This convergence pro-vides evidence that the EOS and sound speed below ∼ 1.5 n0 is known with well understood errors, establishing a solid baseline for extrapolations to higher densities where theoretical uncertainties grow rapidly. 
+
+Asymptotic regime and integral constraints. At asymptotically high densities, QCD becomes weakly coupled due to asymptotic freedom, and perturbative calculations become 5applicable. In this regime, approximate conformal symmetry is restored, implying that the sound speed approaches 
+
+c2 
+
+> s
+
+→ 13 c2 . (2) However, the densities at which perturbative QCD (pQCD) becomes quantitatively reliable lie far beyond those realized in neutron star interiors, typically npQCD ≳ 40 n0 [34, 35]. Nevertheless, it has become increasingly clear that pQCD can indirectly constrain the EOS at much lower densities relevant to neutron stars. These constraints emerge from enforcing thermodynamic consistency when connecting the well-controlled low-density regime to the asymptotic high-density limit. In particular, integral relations between the pressure and energy density impose nonlocal constraints on the EOS, correlating the behavior of the sound speed across widely separated density scales [13, 36, 37]. A key insight of recent work, including that of Kolomeitsev and Kurkela, is that these integral constraints can significantly restrict the allowed parameter space of EOS models, even at densities well below the nominal range of validity of pQCD. Physically, this reflects the fact that excessively large values of the sound speed over an extended density interval would lead to an over-accumulation of pressure relative to the asymptotic limit, thereby violating the requirement that the EOS smoothly approach the conformal regime at high densities. Importantly, the impact of these constraints is highly non-uniform. They primarily exclude extreme EOS realizations characterized by very large sound speeds sustained over broad density ranges. For more moderate sound speed profiles, the resulting restrictions are comparatively mild, leaving substantial freedom in the intermediate-density regime relevant for neutron stars. We shall return to the impact of these constraints when we discuss models characterized by c2 
+
+> s
+
+/c 2 ≃ 1
+
+over an extended interval and defer the discussion of the quantitative implications to a later section. 
+
+Intermediate densities and sound speed behavior. The behavior of the sound speed in the intermediate density regime which remains most uncertain is the subject of this study. While much of the existing literature has focused on cold, static neutron star configurations, dynamical scenarios such as binary neutron star mergers provide complementary sensitivity to the microphysics of dense matter [38, 39]. In particular, although the scenario in which 
+
+c2 
+
+> s
+
+approaches the perturbative limit monotonically is disfavored [11, 12] the behavior inside neutron stars, and the peak value at high density are not known. This density interval will 6be the focus of our study and we shall implement a range of models discussed in the next subsection. We investigate how different parameterizations of the sound speed, c2 
+
+> s
+
+(μ), im-pact the dynamics and observable outcomes of binary neutron star mergers, with particular emphasis on the role of intermediate-density behavior beyond the well-constrained ab initio 
+
+regime.  
+
+> B. EOS Models
+
+Following the discussion above, we now introduce the cold equations of state employed throughout this work. Up to nuclear saturation density, n0, where the EOS is relatively well constrained, we adopt a realistic tabulated nuclear EOS based on the Brueckner–Hartree– Fock approximation informed by chiral perturbation theory, obtained from the CompOSE online EOS database [2, 40–43]. At these densities, a variety of modern microscopic ap-proaches predict qualitatively similar behavior when the underlying two-body interactions are constrained by nucleon–nucleon scattering phase shifts and the three-body sector is calibrated to the structure and binding energies of light nuclei. In particular, many-body perturbation theory calculations based on chiral effective field theory interactions [31, 44–47] and Quantum Monte Carlo studies of neutron matter [33, 48–51] generally produce pres-sure and energy-density bands consistent with the low-density EOS employed here, lending additional support to the robustness of the EOS below and moderately above saturation density . These calculations, despite employing different many-body techniques and regula-tor choices, broadly agree over the density range most relevant for the outer core of neutron stars, suggesting that the dominant uncertainties arise primarily at higher densities where extrapolations beyond the regime directly constrained by nuclear data become unavoidable. At higher densities, where theoretical uncertainties become significant, we parametrize the EOS through the behavior of the sound speed. Our goal is to investigate how the density dependence of the sound speed, and in particular the rate at which it stiffens with increasing density, influences neutron-star merger observables. To this end, we consider a simple one-parameter model in which the squared sound speed varies linearly with baryon chemical potential, 
+
+c2 
+
+> s
+
+(μ) = c2 
+
+> sm
+
++ c2ref 
+
+(μ − μm)
+
+μm
+
+, (3) 7where c2 
+
+> sm
+
+≡ c2 
+
+> s
+
+(μm) is the sound speed at the matching point μm, and c2ref is a measure of the slope parameter. Given this ansatz, the remaining thermodynamic quantities follow directly from standard zero-temperature thermodynamic relations. At T = 0 for matter in beta equilibrium, the adiabatic sound speed 
+
+c2 
+
+> s
+
+=
+
+∂P ∂ε 
+
+
+
+> s
+
+, (4) together with dP = ndμ and dε = μdn , where n is the baryon number density, implies 
+
+dn dμ = nμc 2 
+
+> s
+
+(μ). (5) Integrating from the matching point (μm, n m, P m) yields 
+
+n (μ) = nm exp 
+
+Z μμm
+
+dμ ′
+
+μ′c2 
+
+> s
+
+(μ′)
+
+
+
+, (6) and the pressure follows from 
+
+P (μ) = Pm +
+
+Z μμm
+
+dμ ′ n (μ′) . (7) The energy density is then obtained from the zero-temperature Gibbs relation, 
+
+ε = μn − P. (8) For the linear sound-speed model considered here, the baryon density can be written analytically as 
+
+n (μ) = nm
+
+ μ c 2
+
+> sm
+
+μm c2 
+
+> s
+
+(μ)
+
+ 1
+
+> c2
+> sm −c2ref
+
+(9) The sound speed is evolved until it reaches a maximum value of c2 
+
+> s
+
+= 0 .95 . Consequently, all EOSs considered in this work exhibit a prolonged regime with large sound speed, substan-tially exceeding the conformal value c2 
+
+> s
+
+= 1 /3. Such rapid increases in the sound speed at densities relevant to neutron-star interiors must also be checked for consistency with recently derived integral constraints on the EOS [37]. These constraints provide additional nonlocal conditions on the permissible behavior of the sound speed and place important restrictions on strongly stiffening EOSs. We defer a detailed discussion of the compatibility of our pa-rameterized EOSs with these integral constraints to a later section. The speed of sound as well as its derivative are shown for our models and more realistic EOSs are shown in Figure 1. The maximum chemical potential which was probed in the remnant of our simulations 8are denoted with stars. For the softest equation of state every simulation results in a prompt collapse to a BH and so these simulations do not probe the high density remnant object. Figure 2 shows the pressure as a function of baryon density near saturation density. The blue band shows the maximal range of pressures spanned by several equations of state with realistic microphysics. Below the matching point at saturation our EOS agrees within the range of low density pressures. 1.0 1.2 1.4 1.6 1.8 2.0          
+
+> (GeV)
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> c2
+> s
+> a)
+> DD2
+> BHBlp
+> BLQ
+> BLh
+> LS220
+> EOS-V
+> EOS-IV
+> EOS-III
+> EOS-II
+> EOS-I 1.0 1.2 1.4 1.6 1.8 2.0 2.2 2.4 2.6
+> (GeV)
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> 3.5
+> 4.0
+> (c2
+> s )′ (MeV)  1
+> 1e 3
+
+b) 
+
+> DD2
+> BHBlp
+> BLQ
+> BLh
+> LS220
+
+FIG. 1: (a) The speed of sound ansatz employed for our models along with a comparison with several EOSs which incorporate realistic microphysics. (b) Derivative of c2 
+
+> s
+
+(μ) as a function of n/n 0 for the realistic EOSs. Dotted lines show the chosen values of the parameter (c2 
+
+> s
+
+)′ for models I − V . The solid curves are plotted up to the maximum chemical potential in our simulations. 
+
+Equation of State Constraints To restrict the range of possible behavior of the speed of sound at intermediate density we impose astrophysical constraints on neutron star structure. As discussed before the maximum mass ( Mmax or MTOV ) is currently unknown but observa-tions of pulsars suggest that MTOV ≥ 2.0M⊙. In addition measurements of the tidal coupling in the BNS merger GW170817 was able to place upper bounds on the radius of a canonical 1.4 M⊙ neutron star as R1.4 ≤ 13 .5 km. Since the model we are using is quite simple we choose these two constraints to establish an acceptable range of values for the slope param-eter. Using the TOV equations to solve for the structure of an isolated neutron star using our cold EOS models we can construct the mass-radius relation for our equations of state as shown in Figure 3. The horizontal line at 2.0 M⊙ represents the constraint that the maxi-90.6 0.8 1.0 1.2 1.4 1.6 
+
+n/n0
+
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> 6
+> 7
+> 8
+> Pcold (MeV fm  3 )
+> EOS-V
+> EOS-IV
+> EOS-III
+> EOS-II
+> EOS-I
+
+FIG. 2: Pressure vs number density in terms of saturation density. For values below and just above saturation all of our EOSs use the same low density tabulated nuclear EOS. The blue region represents the allowed region based the maximal retion bounded by the CoRE equations of state mum mass MTOV ≥ 2.0 M⊙. While the vertical dotted line represents the maximum radius of a 1.4 M⊙ neutron star. We also compute Λ the dimensionless tidal deformability defined by Λ = 23 k2C−5 where k2 is the dimensionless love number determined by solving a system of differential equations derived from small perturbations of the TOV solution from a static external gravity field (in the case of a merger this would come from the other star in the bi-nary) [52]. We determine this quantity as the tidal deformability influences the late inspiral and is imprinted in the resulting GW emission[53]. As mentioned previously, perturbative QCD (pQCD) calculations of the equation of state at asymptotically high densities, when combined with thermodynamic consistency and stability, provide important constraints on the EOS at intermediate densities [37]. In particular, pQCD calculations yield quantitative estimates for the pressure and baryon number density at quark chemical potentials of or-der μ ∼ 2.5 GeV, where uncertainties associated with renormalization scale variation are sufficiently controlled to make the results useful for neutron-star EOS studies. Any viable EOS must connect smoothly to this high-density regime while respecting thermodynamic consistency, causality, and monotonicity constraints. This significantly limits the extent to which the EOS can remain stiff over a broad density interval. Sustained regions with large sound speed, c2 
+
+> s
+
+= ( ∂P/∂ϵ )s, imply rapid growth of pressure with increasing energy density 10 10 11 12 13 14 15        
+
+> Radius (km)
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> 3.5
+> Mass ( M )
+> Causality
+> a)
+> EOS-V
+> EOS-IV
+> EOS-III
+> EOS-II
+> EOS-I 0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5
+> Radius (km)
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> 10 5
+> 10 6
+> 10 7
+> 10 8
+> Mass ( M )
+> b)
+> EOS-V
+> EOS-IV
+> EOS-III
+> EOS-II
+> EOS-I
+
+FIG. 3: (a) Mass vs Radius curve generated for each model along with a sample of realistic equations of state from the CoRe database as a comparison. The vertical dotted line denotes the GW radius constraint and in order for an EOS to satisfy this constraint the 1.4 
+
+M⊙ star must fall to the left of this line (b) Dimensionless tidal deformability as a function of mass for the five models considered along with a comparison with realistic EOSs and therefore tend to overshoot the pQCD pressure band before the asymptotic regime is reached. Komoltsev and Kurkela demonstrated quantitatively that this matching requirement strongly constrains the permissible intermediate-density behavior of the EOS, particularly models that invoke extended regions of large c2 
+
+> s
+
+to generate sufficiently high pressures to support massive neutron stars while maintaining relatively small radii. A natural question is whether this tension can be alleviated by introducing a strong first-order phase transition. In principle, such a transition can soften the EOS through a discontinuous jump in energy density at nearly constant pressure, corresponding to a mixed-phase region in which c2 
+
+> s
+
+≃ 0.This can partially compensate for earlier stiffening by delaying further pressure growth and thereby permit eventual matching to the pQCD asymptote. Figure 4(a) shows the pressure as a function of the baryon chemical potential. The perturbative QCD (pQCD) prediction at μ = 2 .7 GeV , including its estimated uncertainty, is indicated by the vertical black band using the parametrization of Ref. [54]. The equations of state used in our merger simulations are shown as solid curves. These models develop large sound speeds at intermediate densities and remain stiff at higher densi-11 ties. Consequently, the baryon chemical potential increases rapidly with density, preventing the pressure from reaching the pQCD value at the matching point. At first sight this appears to indicate an incompatibility with the high-density pQCD constraint. However, this appar-ent tension should not be interpreted as a limitation of the merger simulations themselves. As shown by the stars in Figure 4(a), our stiffest merger remnants probe maximum chemical potentials of only μ ≲ 1.5 GeV , well below the μ = 2 .7 GeV scale where the pQCD constraint is imposed. To demonstrate that compatibility with pQCD can nevertheless be achieved, a)b)
+
+FIG. 4: (a) Pressure vs chemical potential along with the b) equation of state for our original models denoted via solid lines as well as the models with a phase transition added at high densities as discussed in the text. we construct an extended family of equations of state in which the high-density behavior is modified beyond the densities relevant for mergers. Rather than remaining maximally stiff, these models undergo a first-order phase transition, producing a density interval with 
+
+c2 
+
+> s
+
+= 0 . Above the transition, the sound speed approaches its asymptotic conformal value, 
+
+c2 
+
+> s
+
+= 1 /3. The resulting extended equations of state are shown by the dotted curves in Fig-ure 4(b), while the corresponding pressure–chemical-potential relations are shown in Figure 4(a). Unlike the original models, these extensions successfully reproduce the pQCD pressure at μ = 2 .7 GeV while leaving the equation of state essentially unchanged throughout the density range probed by neutron star mergers. These results illustrate an important point. Large sound speeds inferred from binary neutron star mergers do not imply a violation of the pQCD constraint. Instead, they indicate that the sound speed must eventually decrease at 12 densities beyond those reached in mergers. A first-order phase transition provides a simple illustrative example of such behavior, although other non-monotonic evolutions of c2 
+
+> s
+
+are equally possible. 
+
+Finite Temperature During a BNS merger the temperature is expected to reach T ∼
+
+50 − 100 MeV where the approximation of cold matter is no longer valid. In our simulations the thermal contribution is added as an extra term to the pressure and energy density 
+
+P = Pcold + Pth (10) 
+
+ε = εcold + εth (11) A simple yet widely used method to calculate the thermal pressure is to approximate it using an ideal gas ansatz given by 
+
+Pth = (Γ th − 1) εth (12) Where Γth is the ideal gas index which for an ideal gas will approach Γth → 43 . As gamma is increased the equation of state becomes stiffer leading to higher thermal pressures. Solving for Γth = Pth  
+
+> εth
+
++ 1 . In a realistic situation where the thermal contribution depends on local conditions one can calculate an effective ideal gas index for each particular density, temper-ature, and composition. Since low density neutron star matter is well described by an ideal gas of relativistic electrons the effective index approaches 43 while for intermediate densities and temperature it varies between 1.5 ≤ Γ ≤ 2.0, this it is only a crude approximation to assume a constant Γ [55]. While there are more realistic approaches which better model the density variations in Γth , due to the simplicity of the high density cold EOS we choose a thermal EOS with Γth = 1 .7.Figure 1b shows the derivative of c2 
+
+> s
+
+(μb) for realistic equations of state while the dashed lines correspond to the constant values employed in our simple model. The speed of sound may also possess non-trivial features corresponding to possible transitions from hadronic to quark matter in NS cores, constraints from astrophysical observations and pQCD are not enough to rule out features from a crossovers along with first and higher order phase transitions [56]. Extensions of the arbitrary sound speed model may be used to constrain further features of the sound speed as a function of density which will be the subject of a future study. 13 C. BNS Merger Simulations 
+
+In order to simulate BNS mergers in full general relativity one must simultaneously solve the full Einstein field equations along with the equations of general relativistic hydrodynamics (GRHD) 
+
+Gμν = 8 πT μν (13) 
+
+∇μ(T μν ) = 0 (14) Where Gμν and Tμν represent the Einstein tensor and stress-energy tensor of matter respec-tively. We employ the WhiskyTHC code which is based on the Einstein Toolkit [57–59]. In the numerical scheme used by WhiskyTHC, The system of PDE’s contained in the Einstein equations is recast using the 3 + 1 ADM formulation. This transforms the system into a Cauchy problem where the spacetime is split into slices which are spacelike hypersurfaces which can be thought of as individual snapshots of the universe at different times (see e.g. [60]). The equations of GRHD are solved using a Kurganov-Tadmor scheme [61]. the points in each consecutive slice can be connected by a vector which consists of a scalar α called the lapse, and a three vector βi known as the shift. There is an inherent gauge freedom in choosing the lapse and shift. In our simulations, the lapse is evolved with the "1 + Log" gauge condition, While the Gamma driver condition is used in evolving the shift via the CTGamma code [62, 63]. The ADM equations themselves are split into equations which govern the evolution of the lapse and shift along with constraint equations which the rele-vant quantities must satisfy. In their original form the ADM equations do not naturally lend themselves to numerical solutions. In particular a major issue in NR simulations is main-taining numerical stability and violations of the constraint equations. The leading modern approach is a recast form of the Einstein equations known as Z4c which dampens constraint violating modes and has had much success in producing more accurate and stable simula-tions, our simulations utilize this approach [64]. The WhiskyTHC code is used to simulate the final 4-6 orbits starting from initial data generated by the LORENE pseudo-spectral code which evolves the orbital separation from 100 km to 45 km [65]. The simulations utilize an adaptive mesh refinement (AMR) scheme with seven levels of refinement and a minimum resolution of ∆x = 245 m. For simplicity we assume the system posses reflection symmetry across the x-y plane. A low resolution system was chosen to reduce the total computational 14 cost of the simulations. 
+
+GW Extraction and Spectral Analysis The strain from the resulting GW is extracted via the Newmann-Penrose formalism in which the strain is calculated via the relation Ψlm  
+
+> 4
+
+=¨hlm  
+
+> +
+
+−i¨hlm  
+
+> ×
+
+is double time integrated to determine the strain for the two GW polarizations h+
+
+and h×. Since the l = 2 , m = 2 mode is the dominant mode emitted during a BNS merger we focus solely on this one hereafter drop the l, m superscripts. The Weyl scalar Ψ4 is calculated from the Weyl tensor which is calculated from the trace free part of the Riemann tensor via the gauge invariant Moncrief formalism in which the perturbations are decomposed into even and odd parity modes and those are represented by spherical harmonics. From this formalism one can additionally calculate the GW luminosity dE GW  
+
+> dt
+
+and radiated angular momentum  
+
+> dJ z
+> dt
+
+[60]. All the aforementioned analysis was performed using the Kuibit python package [66]. Kuibit performs the double time integration using a fixed-frequency integration in the frequency domain. Before the data is Fourier transformed a Tukey window is applied to force the waveform to zero at the endpoints. The result of the integration is a timeseries for the two polarizations of strain. Using this we can determine amplitude of the spectral density was also calculated via |˜h(f )|2f 1/2 where |˜h(f )| =
+
+q|˜h×(f )|+| ˜h+(f )| 
+
+> 2
+
+. One prominent feature in the GW spectra is the fpk peak frequency which comes from the l = 2 , m = 2 deformation of the remnant object which releases the most energy in GW. This peak depends on the high density matter in the remnant and has been studied for possible correlations with EOS related properties. 
+
+Mass Ejecta Extraction In addition to the extraction of GWs from the merger we also cal-culate the outflow of ejected material. The ejecta across a spherical surface at ( R = 500 M⊙)using the outflow thorn of the Einstein Toolkit. Which calculates the flux of unbound mat-ter as well as the asymptotic velocity v∞ for each run. The criterion for the matter to be gravitationally unbound is that −hu t < −1 where h is the specific enthalpy of the fluid and 
+
+ut is the time component of the fluid four velocity.  
+
+> D. CoRE Database Analysis
+
+One of the primary goals of binary neutron star merger studies is the identification of 
+
+quasi-universal relations (QURs) connecting measurable merger observables to the proper-ties of neutron stars. Such relations are termed “quasi-universal” because they are largely 15 insensitive to the microscopic details of the equation of state (EOS), depending instead on a small number of macroscopic stellar properties such as the masses, radii, compactnesses, or tidal deformabilities of the binary components. Consequently, QURs provide an efficient means of inferring dense-matter properties from gravitational-wave observations without requiring detailed knowledge of the underlying microphysics. The best known examples relate merger observables, including the dominant post-merger frequency, to the binary tidal deformability ˜Λ(Λ 1, Λ2) [53, 67, 68], where the tidal deforma-bility of an individual star is 
+
+Λ = 23
+
+k2
+
+C5 , (15) with k2 the quadrupolar Love number and C = M/R the stellar compactness. Although remarkably successful, tidal deformability is fundamentally a global property of the neutron star. It is determined by integrating the EOS throughout the stellar interior and is therefore primarily sensitive to the pressure over the density range sampled by typical 1.2–1.4 M⊙
+
+neutron stars, corresponding to characteristic densities of approximately 2n0. The central densities reached in massive neutron stars and merger remnants are considerably higher, raising the question of whether post-merger observables retain additional information about the EOS that is not completely encoded in macroscopic stellar properties. A recent development addressing this question is the IPAD–TOV (Intrinsic Perturbative Analysis of the Dimensionless TOV equations) framework [69, 70]. Within this approach the tidal response is expressed in terms of intrinsic EOS variables, leading to the intrinsic tidal response function , D(X, Ψ) , where the dimensionless variables 
+
+X = Pc
+
+εc
+
+, Ψ = 2 d ln MNS 
+
+d ln εc
+
+, (16) encode information about the high-density EOS. The intrinsic tidal response function is the IPAD–TOV analogue of the tidal deformability. By expressing both the Love number and the compactness in terms of the intrinsic EOS variables X and Ψ, D provides a macroscopic quantity that encodes information about the integrated sound-speed profile throughout the neutron star. It therefore offers a natural framework for investigating the extent to which the microscopic behavior of the high-density EOS is captured by observable stellar properties. 16 In particular, 
+
+X = 1
+
+εc
+
+Z εc
+
+> 0
+
+c2 
+
+> s
+
+dε, (17) is a simple average of the squared sound speed throughout the star and represents the accumulated stiffness of the EOS from the surface to the stellar core. Previous work has shown that combining the relation between Λ and D with inspiral measurements can partially lift the degeneracy between Pc and εc, thereby extending EOS constraints to higher densities than are accessible using tidal deformability alone [70]. Motivated by the approximately mass-independent correlation between the sound-speed parameter and the dominant post-merger frequency found in our parameterized EOS models (Sec. 7b), we investigate whether information about the high-density sound-speed profile is already encoded in these macroscopic quantities or whether post-merger observables retain additional sensitivity to the detailed behavior of the EOS in the stellar core. To address this question we analyze simulations from the Computational Relativity (CoRe) database [53, 71], which contains a large collection of binary neutron star merg-ers spanning a wide range of mass ratios, q = m1/m 2 ≥ 1, and realistic equations of state. These include relativistic mean-field models such as Big Apple (BA), BHB Λϕ, and SFHo [72–74], as well as non-relativistic Skyrme models including LS220 [75]. For binary systems we construct the intrinsic tidal response parameter 
+
+˜D(X1, Ψ1, X 2, Ψ2) = 16 13 (m1 + 12 m2)m41D1
+
+(m1 + m2)5 + (1 ↔ 2) , (18) which is directly analogous to the binary tidal deformability ˜Λ. Unlike ˜Λ, however, ˜D
+
+depends explicitly on EOS variables that encode the integrated sound-speed profile within the neutron star and therefore carries more direct information about the high-density core. Rather than searching for an entirely new quasi-universal relation, our objective is to de-termine the extent to which the information contained in the microscopic sound-speed profile is already captured by macroscopic stellar properties. We therefore examine correlations be-tween the post-merger peak frequency and ˜D, and compare these with the corresponding relations based on conventional tidal deformability. To quantify these correlations while avoiding overfitting, we consider three simple two-parameter models relating the dimensionless peak frequency M f pk to ˜D: a linear relation, 17 M f pk = m ˜D + b, (19) an exponential relation, 
+
+M f pk = be −m ˜D, (20) and a power-law relation, 
+
+M f pk = b ˜D m. (21) 
+
+III. RESULTS A. One Parameter Model 
+
+Utilizing the aforementioned methods we have performed a set of simulations with parame-ters and observables described in table I. 
+
+GW Analysis Using the Kuibit library we extract the timeseries rh × and rh +. Figure 5 shows the cross polarizaation from a 1.3M binary from both the stiffest and softest EOS which did not result in a BH. 0 5 10 15 20 25 
+
+t (ms)   
+
+> 0.6
+> 0.4
+> 0.2
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> rh × (M )
+> EOS-V 1.3 M
+> EOS-II 1.3 M
+
+FIG. 5: h× GW polarization times the extraction radius for the softest and stiffest equations of state which don’t collapse to a black hole. 18 Model MN S (M⊙) EGW (M⊙) JGW 
+
+ M 2
+
+> ⊙
+
+ fpk (kHz) tBH (ms) EOS-I 1.3 0.0256 1.2442 - 0.129 EOS-I 1.4 0.0341 0.7584 - 0.046 EOS-II 1.3 0.0623 1.9006 3.135 -EOS-II 1.4 0.0446 1.6078 - 0.513 EOS-III 1.3 0.04927 1.6704 2.837 -EOS-III 1.4 0.0591 1.9442 2.935 -EOS-IV 1.3 0.0305 1.2514 2.567 -EOS-IV 1.35 0.0423 1.5703 2.640 -EOS-IV 1.4 0.0441 1.6408 2.742 -EOS-V 1.3 0.0274 1.1953 2.260 -EOS-V 1.4 0.0166 1.3692 2.318 -
+
+TABLE I: Table of runs for all of the performed simulations. are the total energy and angular momentum radiated by GWs extracted at t = 4900 M⊙ simulation time when for all but the Model C 1.3 M saturate. 0 5 10 15 20 25 30 
+
+t (ms) 
+
+> 0.60
+> 0.65
+> 0.70
+> 0.75
+> 0.80
+> 0.85
+> 0.90
+> 0.95
+> (c2
+> s )max
+> EOS-V 1.4M - 1.4M
+> EOS-V 1.3M - 1.3M
+> EOS-IV 1.4M - 1.4M
+> EOS-IV 1.35M - 1.35M
+> EOS-IV 1.3M - 1.3M
+> EOS-III 1.4M - 1.4M
+> EOS-III 1.3M - 1.3M
+> EOS-II 1.3M - 1.3M
+
+FIG. 6: Maximum c2 
+
+> s
+
+value as a function of simulation time for the runs which did not result in a black hole forming Having extracted the strain we now calculate the amplitude spectral density (ASD). 19 Figure 7(a) shows the ASD for the same two representative EOSs discussed above. The peak in both spectra around 2-3 kHz is the dominant post-merger peak frequency fpk .a)b)
+
+FIG. 7: a) Amplitude spectral density from GWs for the runs which did not result in a black hole forming. b)Post-merger peak frequency for each simulations as a function of the slope parameter of c2 
+
+> s′
+
+Repeating this analysis for all of our simulations we investigated the correlations between the GW observables and our model parameter c2 
+
+> s
+
+(μ)′. Figure 7(b) shows fpk as a function of the slope parameter. We note that there is an approximately linear correlation between fpk 
+
+and c2 
+
+> s
+
+(μ)′ for lower values of the sound speed slope. In addition these seem to be relatively mass independent with similar values for equal mass mergers of 1.3M ⊙, 1.35 M⊙, and 1.4M⊙
+
+which may indicate a possible relation between fpk and the slope insensitive to the mass of the binary. In addition we have calculated the total energy and angular momentum radiated from GW’s. As they both show similar behavior we only show the energy EGW in Figure 8 which exhibit a distinct peaked behavior in the sound speed parameter the mechanism behind this is similar to the trend found in the mass ejected during the merger and the explanation will be postponed to that section. 
+
+Ejecta Analysis Next we analyze the outflow of the fast dynamically launched ejecta with asymptotic velocity v∞ > 0.6. The main sources for this ejecta will be from the initial interface between the two colliding stars as well as material launched by the post merger bounce [76]. We show the amount of mass ejected normalized by the total system mass in Figure 9. For very small values of the slope parameter ther remnant quickly collapses 20 0 5 10 15 20 25 30 
+
+t [ms] 
+
+> 0.00
+> 0.01
+> 0.02
+> 0.03
+> 0.04
+> 0.05
+> 0.06
+> E (t<) [ M ]
+
+a)      
+
+> EOS-I 1.4 M
+> EOS-II 1.4 M
+> EOS-III 1.4 M
+> EOS-IV 1.4 M
+> EOS-V 1.4 M
+> EOS-I 1.3 M
+> EOS-II 1.3 M
+> EOS-IV 1.3M
+> EOS-III 1.3 M
+> EOS-V 1.3 M
+> EOS-IV 1.35M 1.5 2.0 2.5 3.0 3.5 4.0
+
+(c2 
+
+> s
+
+)′ [MeV 1] 1e 3 
+
+> 2
+> 3
+> 4
+> 5
+> 6
+> 7
+> EGW  [M ]
+> 1e 2
+
+b) 
+
+> 1.4 M
+> 1.3 M
+> 1.35M
+
+FIG. 8: (a) Plot of the cumulative released energy in GWs as a function of simulation time. The vertical line denotes the point at which the total energy radiated in GW’s was calculated and this data is shown in (b) as a function of the sound speed slope parameter 1.5 2.0 2.5 3.0 3.5 4.0 
+
+(c2 
+
+> s
+
+)′ (MeV 1) 1e 3 
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Msh /( M1 + M2)
+> 1e 6
+> 1.4 M
+> 1.3 M
+> 1.35 M
+
+FIG. 9: Mass of the shocked ejecta ( v∞ > 0.6 c) as a function of the slope speed parameter for simulations of 1.3M-1.3M, 1.35M - 1.35M, and 1.4M - 1.4M to a BH swallowing up much of the matter leading to very little ejected matter. At very high values of the sound speed parameter the stiffness of the remanant will likely lead to a less violent collapse launching a weaker bounce and ejecting less material. For equations of state which are soft but not so soft that they collapse the remnant would undergo a more violent collapse. The competition between these effects explain the peaked behavior we see in Figure 9. The same peaked behavior was observed for the energy and momentum released in GWs, thus there is a sort of optimal parameter which produces a soft enough 21 equation of state so that the collision is sufficiently violent, but not so soft that the result is a black hole. We show if Figure 10, a 2D color plot of the c2 
+
+> s
+
+for the softest and stiffest EOSs which do not result in a BH, snapshots taken at both tmrg and 3ms later show, for the softer EOS a considerable amount of high density ejecta has already been thrown off tidally at the moment of merger. In addition we have overlayed contours of constant density at 
+
+n0/2,n0,2n0,3n0,4n0. From this we see that as expected the object in the softer case is much more compact than in the stiff case. We have demonstrated several relationships between our model parameter and the GW spectra and mass ejecta. However, since our models are simple we should not expect these relationships to carry over to the more realistic case. In the next section we introduce our analysis of a database of more realistic merger simulations.  
+
+> B. Comparison with Realistic Binary Neutron Star Mergers
+
+The primary goal of the analysis is to explore the possibility of a quasi-universal relation between some measurable quantity in the merger and properties of the sound speed. Arelationship is considered quasi-universal if it is more or less independent of all but some subset of the EOS parameters this relation should be more or less insensitive to the choice of EOS as well as input parameters to the binary system such as mass ratio or spin. Such relationships may provide a very clean method for determining EOS properties via merger observables [77]. Employing the volume averaging procedure described in the methods section we investigated correlations between fpk and volume averaged values of c2 
+
+> s
+
+as well as (c2 
+
+> s
+
+(μ)′)avg , however we were unable to find any novel universal relations between these properties of the EOS and the GW spectra. Instead, we uncovered a relation between fpk 
+
+and the recently proposed ˜D quantity, which also encodes information about the stiffness of the EOS at supernuclear densities. 
+
+Quasi-Universal Relation Figure 11 shows the fitted quasi-universal relation as discussed in the methods section along with the relative difference between the predicted values and the observed values both from CoRe and our models. The parameters for each fit are given in Table II along with the standard deviations and calculated R2. We find that the exponential fit performs the best of our three candidates and it is shown plotted in Figure 11. Thus a measurement of the GW spectra would provide a way to determine ˜D and therefore 22 x (M )      
+
+> 40
+> 30
+> 20
+> 10
+> 0
+> 10
+> 20
+> 30
+> 40
+> y (M )
+> EOS-II 1.3 M1.3 Mt=tmrg
+
+x (M )           
+
+> y (M )
+> EOS-II 1.3 M1.3 Mt=tmrg + 3 ms
+> 40 20 020 40
+
+x (M )          
+
+> 40
+> 30
+> 20
+> 10
+> 0
+> 10
+> 20
+> 30
+> 40
+> y (M )
+> EOS-V 1.3 M1.3 Mt=tmrg
+> 40 20 020 40
+
+x (M )       
+
+> y (M )
+> EOS-V 1.3 M1.3 Mt=tmrg + 3 ms
+> 2.00
+> 1.75
+> 1.50
+> 1.25
+> 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00
+> log 10  (c2
+> s )
+
+FIG. 10: 2D color maps of the adiabatic sound speed for the softest and stiffest EOS mergers which did not collapse in the simulation time. Contours of constant density are plotted over the remnant at densities of n0/2, n 0, 2n0, 3n0, 4n0
+
+Model m b R2
+
+m ˜D + b −1.22 · 10 −4 ± 7.34 · 10 −6 5.19 · 10 −2 ± 8.87 · 10 −4 0.779 
+
+be −m ˜D 3.38 · 10 −3 ± 1.85 · 10 −4 5.51 · 10 −2 ± 1.10 · 10 −3 0.811 
+
+b ˜Dm −2.52 · 10 −1 ± 1.40 · 10 −2 1.21 · 10 −1 ± 7.70 · 10 −2 0.775 
+
+TABLE II: Fit coefficients for the M f pk 
+
+the parameter X showing that the IPAD-TOV formalism can be extended to BNS merger observables. 23 0 50 100 150 200 250     
+
+> 0.02
+> 0.03
+> 0.04
+> 0.05
+> 0.06
+> Mf pk
+> 50 100 150 200 250
+
+## D(X, )
+
+> 0.15
+> 0.15
+> Rel. Diff  1.0
+> 1.2
+> 1.4
+> 1.6
+> 1.8
+> 2.0
+> q
+
+FIG. 11: Quasi-Universal relation between ˜D ∼ M f pk . Green dots represent equal mass binaries (q = 1) while the red dots represent mass asymmetric binaries. Our models are represented as stars  
+
+> IV. CONCLUSIONS
+
+The density dependence of the speed of sound at supranuclear densities remains one of the largest uncertainties in the neutron-star equation of state and plays a central role in determining the structure of massive neutron stars and the dynamics of binary neutron-star mergers. In this work we introduced a simple parameterized equation of state in which the high-density behavior of the sound speed is controlled by a single parameter. This framework suppresses much of the complexity associated with realistic microphysics, allowing us to isolate the influence of the sound-speed profile on merger dynamics and multimessenger observables. Our simulations demonstrate that the evolution of the sound speed in the stellar core has a measurable impact on several key merger observables. In particular, the dominant post-merger gravitational-wave frequency exhibits an approximately monotonic dependence on the sound-speed slope (Fig. 7b), while the gravitational-wave energy and the mass of the shocked ejecta display a non-monotonic dependence, reflecting the competition between 24 prompt collapse for softer equations of state and the weaker post-merger bounce produced by very stiff remnants (Figs. 8 and 9). The remnant structure shown in Fig. 10 provides a physical explanation for these trends by illustrating how the compactness and high-density core evolve as the equation of state is varied. While these results demonstrate that post-merger observables are sensitive to the high-density sound speed, a more fundamental question is whether this microscopic information is already encoded in the macroscopic properties of neutron stars. Quantities such as the mass, radius, compactness, and tidal deformability are determined by integrating the equation of state throughout the stellar interior and therefore provide a compressed description of the underlying sound-speed profile. If these macroscopic properties completely characterize the relevant dense-matter physics, then post-merger observables should depend only on them, independent of the detailed behavior of the equation of state in the core. To investigate this question, we analyzed merger simulations from the CoRe database using the recently developed IPAD–TOV framework [69, 70]. In this approach, the intrin-sic tidal response function ˜D(X, Ψ) is constructed from dimensionless EOS variables that encode the integrated behavior of the sound speed within the star, with X = ε−1
+
+> c
+
+R c2 
+
+> s
+
+dε 
+
+representing the energy-density weighted average sound speed. Figure 11 demonstrates that incorporating these quantities reduces the scatter in the relation between the post-merger peak frequency and the binary properties, indicating that a significant fraction of the microscopic information contained in the high-density sound-speed profile is encoded in macroscopic stellar observables. At the same time, the remaining scatter in Fig. 11 demonstrates that this encoding is not complete. While global quantities such as the compactness and tidal deformability capture much of the influence of the equation of state, they do not fully characterize the detailed behavior of matter at the highest densities reached in neutron stars and merger remnants. Consequently, post-merger gravitational waves retain additional information about the core equation of state beyond that accessible through inspiral measurements alone. Rather than viewing the absence of a perfectly quasi-universal relation as a limitation, we interpret it as evidence that post-merger observations provide genuinely new constraints on dense matter. The present work therefore represents a first step toward understanding how microscopic properties of the equation of state are mapped onto observable merger signatures. The parameterized framework introduced here provides a transparent means of isolating the 25 role of individual features of the sound-speed profile and can be systematically extended to include additional physically motivated parameters, such as the density at which the sound speed reaches its maximum, the magnitude of that maximum, and possible non-monotonic behavior associated with phase transitions. Such reduced-order parameterizations provide an attractive foundation for constructing surrogate models and machine-learning emulators capable of rapidly exploring the high-dimensional EOS parameter space. As next-generation gravitational-wave detectors begin to detect post-merger signals with increasing sensitivity, these methods offer a promising route toward determining which aspects of the microscopic equation of state are already encoded in macroscopic neutron-star properties and which remain uniquely accessible through the dynamics of binary neutron star mergers.  
+
+> V. ACKNOWLEDGMENTS
+
+DR acknowledges support from the U.S. Department of Energy, Office of Science, Division of Nuclear Physics under Award Number(s) DE-SC0024388, and from the National Science Foundation under Grants PHY-2020275, PHY-2116686, PHY-2407681, and PHY-2512802. The simulations in this work were performed on the Expanse cluster at SDSC through allo-cation PHY240157 from the Advanced Cyberstructure Coordination Ecosystem (ACCESS) program.        
+
+> [1] J. M. Lattimer, Ann. Rev. Nucl. Part. Sci. 62 , 485 (2012). [2] M. Oertel, M. Hempel, T. Klaehn, and S. Typel, Rev. Mod. Phys. 89 , 015007 (2017). [3] P. B. Demorest, T. Pennucci, S. M. Ransom, M. S. E. Roberts, and J. W. T. Hessels, Nature
+> 467 , 1081 (2010), arXiv:1010.5788 [astro-ph.HE]. [4] J. Antoniadis, P. C. C. Freire, N. Wex, T. M. Tauris, R. S. Lynch, et al. , Science 340 , 6131 (2013), arXiv:1304.6875 [astro-ph.HE]. [5] E. Fonseca, H. T. Cromartie, T. T. Pennucci, P. S. Ray, A. Y. Kirichenko, et al. , Astrophys. J. Lett. 915 , L12 (2021), arXiv:2104.00880 [astro-ph.HE]. [6] T. E. Riley, A. L. Watts, S. Bogdanov, P. S. Ray, R. M. Ludlam, et al. , Astrophys. J. Lett.
+> 887 , L21 (2019), arXiv:1912.05702 [astro-ph.HE].
+
+26 [7] M. C. Miller, F. K. Lamb, A. J. Dittmann, S. Bogdanov, Z. Arzoumanian, et al. , Astrophys. J. Lett. 887 , L24 (2019), arXiv:1912.05705 [astro-ph.HE]. [8] T. E. Riley, A. L. Watts, P. S. Ray, S. M. Morsink, A. V. Bilous, et al. , Astrophys. J. Lett. 
+
+918 , L27 (2021), arXiv:2105.06980 [astro-ph.HE]. [9] M. C. Miller, F. K. Lamb, A. J. Dittmann, S. Bogdanov, Z. Arzoumanian, et al. , Astrophys. J. Lett. 918 , L28 (2021), arXiv:2105.06979 [astro-ph.HE]. [10] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. X 9, 011001 (2019), arXiv:1805.11579 [gr-qc]. [11] P. Bedaque and A. W. Steiner, Phys. Rev. Lett. 114 , 031103 (2015), arXiv:1408.5116 [nucl-th]. [12] I. Tews, J. Margueron, and S. Reddy, Phys. Rev. C 98 , 045804 (2018), arXiv:1804.02783 [nucl-th]. [13] E. Annala, T. Gorda, A. Kurkela, J. Nattila, and A. Vuorinen, Nature Phys. 16 , 907 (2020), arXiv:1903.09121 [astro-ph.HE]. [14] C. Ecker and L. Rezzolla, Astrophys. J. Lett. 939 , L35 (2022), arXiv:2207.04417 [astro-ph.HE]. [15] R. A. Hulse and J. H. Taylor, Astrophys. J. Lett. 195 , L51 (1975). [16] J. H. Taylor and J. M. Weisberg, Astrophys. J. 253 , 908 (1982). [17] LIGO Scientific Collaboration and Virgo Collaboration, Phys. Rev. Lett. 119 , 161101 (2017). [18] E. E. Flanagan and T. Hinderer, Phys. Rev. D 77 , 021502 (2008). [19] T. Hinderer, Astrophys. J. 677 , 1216 (2008). [20] B. D. Metzger, Living Rev. Rel. 20 , 3 (2017). [21] D. Kasen, B. Metzger, J. Barnes, E. Quataert, and E. Ramirez-Ruiz, Nature 551 , 80 (2017). [22] A. Bauswein and H.-T. Janka, Phys. Rev. Lett. 108 , 011101 (2012). [23] K. Hotokezaka et al. , Phys. Rev. D 88 , 044026 (2013). [24] A. Bauswein, T. W. Baumgarte, and H.-T. Janka, Phys. Rev. Lett. 111 , 131101 (2013). [25] S. Köppel, L. Bovard, and L. Rezzolla, Astrophys. J. Lett. 872 , L16 (2019). [26] H. Koehn et al. , Phys. Rev. X 15 , 021014 (2025), arXiv:2402.04172 [astro-ph.HE]. [27] J. M. Lattimer and M. Prakash, Astrophys. J. 550 , 426 (2001), arXiv:astro-ph/0002232. [28] J. M. Lattimer and M. Prakash, Science 304 , 536 (2004), arXiv:astro-ph/0405262. [29] L. Rezzolla and O. Zanotti, Relativistic Hydrodynamics (Oxford University Press, Oxford, 2013). [30] K. Hebeler and A. Schwenk, Phys. Rev. C 82 , 014314 (2010). 
+
+27 [31] I. Tews, T. Kruger, K. Hebeler, and A. Schwenk, Phys. Rev. Lett. 110 , 032504 (2013), arXiv:1206.0025 [nucl-th]. [32] C. Drischler, T. Soma, and A. Schwenk, Phys. Rev. C 94 , 054307 (2016). [33] S. Gandolfi, J. Carlson, and S. Reddy, Phys. Rev. C 85 , 032801 (2012), arXiv:1101.1921 [nucl-th]. [34] D. J. Gross, Proc. Nat. Acad. Sci. 102 , 9099 (2005). [35] R. Somasundaram, I. Tews, and J. Margueron, Phys. Rev. C 107 , L052801 (2023), arXiv:2204.14039 [nucl-th]. [36] E. Annala, T. Gorda, J. Hirvonen, A. Kurkela, and A. Vuorinen, Nature Phys. 16 , 907 (2020). [37] O. Komoltsev and A. Kurkela, Phys. Rev. Lett. 128 , 202701 (2022). [38] K. Hotokezaka, K. Kyutoku, H. Okawa, M. Shibata, and K. Kiuchi, Phys. Rev. D 83 , 124008 (2011), arXiv:1105.4370 [astro-ph.HE]. [39] M. Shibata, K. Taniguchi, and K. Uryu, Phys. Rev. D 71 , 084021 (2005), arXiv:gr-qc/0503119. [40] I. Bombaci and D. Logoteta, Astron. Astrophys. 609 , A128 (2018), arXiv:1805.11846 [astro-ph.HE]. [41] F. Douchin and P. Haensel, Astron. Astrophys. 380 , 151 (2001), arXiv:astro-ph/0111092. [42] S. Typel, M. Oertel, and T. Klähn, Phys. Part. Nucl. 46 , 633 (2015), arXiv:1307.5715 [astro-ph.SR]. [43] S. Typel et al. (CompOSE Core Team), Eur. Phys. J. A 58 , 221 (2022), arXiv:2203.03209 [astro-ph.HE]. [44] K. Hebeler and A. Schwenk, Phys. Rev. C 82 , 014314 (2010), arXiv:0911.0483 [nucl-th]. [45] C. Drischler, J. A. Melendez, R. J. Furnstahl, and D. R. Phillips, Phys. Rev. Lett. 122 , 042501 (2019), arXiv:1901.06968 [nucl-th]. [46] L. Huth, I. Tews, C. Drischler, and K. Hebeler, Nature Phys. 18 , 1197 (2022), arXiv:2107.06229 [nucl-th]. [47] C. Drischler, V. Somà, and A. Schwenk, Phys. Rev. C 102 , 054315 (2020), arXiv:2001.01709 [nucl-th]. [48] A. Gezerlis, I. Tews, E. Epelbaum, M. Freunek, S. Gandolfi, K. Hebeler, A. Nogga, and A. Schwenk, Phys. Rev. Lett. 111 , 032501 (2013), arXiv:1303.6243 [nucl-th]. [49] J. E. Lynn, I. Tews, J. Carlson, S. Gandolfi, A. Gezerlis, K. E. Schmidt, and A. Schwenk, Phys. Rev. Lett. 116 , 062501 (2016), arXiv:1509.03470 [nucl-th]. 
+
+28 [50] D. Lonardoni, S. Gandolfi, X. Wang, J. Carlson, and K. E. Schmidt, Phys. Rev. C 97 , 044318 (2018), arXiv:1904.08050 [nucl-th]. [51] A. Rios, J. Melendez, C. Drischler, and R. J. Furnstahl, Prog. Part. Nucl. Phys. (2023), arXiv:2306.XXXXX [nucl-th]. [52] T. Hinderer, B. D. Lackey, R. N. Lang, and J. S. Read, Phys. Rev. D 81 , 123016 (2010), arXiv:0911.3535 [astro-ph.HE]. [53] A. Gonzalez et al. , Class. Quant. Grav. 40 , 085011 (2023), arXiv:2210.16366 [gr-qc]. [54] E. S. Fraga, A. Kurkela, and A. Vuorinen, Astrophys. J. Lett. 781 , L25 (2014), arXiv:1311.5154 [nucl-th]. [55] A. Bauswein, H. T. Janka, and R. Oechslin, Phys. Rev. D 82 , 084043 (2010), arXiv:1006.3315 [astro-ph.SR]. [56] D. Mroczek, M. C. Miller, J. Noronha-Hostler, and N. Yunes, Phys. Rev. D 110 , 123009 (2024), arXiv:2309.02345 [astro-ph.HE]. [57] M. Rizzo, R. Haas, S. R. Brandt, Z. Etienne, D. Ferguson, L. T. Sanches, B.-J. Tsao, L. Wer-neck, D. Boyer, G. Bozzola, C.-H. Cheng, S. Cupp, P. Diener, T. P. Jacques, L. Ji, H. Macpher-son, I. Markin, E. Schnetter, W. Tichy, S. Tootle, Y. Xu, M. Zilhão, Y. Zlochower, M. Al-cubierre, D. Alic, G. Allen, M. Ansorg, F. G. L. Armengol, M. Babiuc-Hamilton, L. Baiotti, W. Benger, E. Bentivegna, S. Bernuzzi, K. Bhatia, T. Bode, B. Brendal, B. Bruegmann, M. Campanelli, M. Chabanov, F. Cipolletta, G. Corvino, R. D. Pietri, A. Dima, H. Dim-melmeier, J. Doherty, R. Dooley, N. Dorband, M. Elley, Y. E. Khamra, L. Ennoggi, J. Faber, G. Ficarra, T. Font, J. Frieben, B. Giacomazzo, T. Goodale, C. Gundlach, I. Hawke, S. Haw-ley, I. Hinder, E. A. Huerta, S. Husa, T. Ikeda, S. Iyer, D. Johnson, A. V. Joshi, J. Kalinani, A. Kankani, W. Kastaun, T. Kellermann, A. Knapp, M. Koppitz, P. Laguna, G. Lanferman, P. Lasky, F. Löffler, J. Masso, L. Menger, A. Merzky, J. M. Miller, M. Miller, P. Moesta, P. Montero, B. Mundim, P. Nelson, A. Nerozzi, S. C. Noble, C. Ott, L. J. Papenfort, R. Paruchuri, M. Pirog, D. Pollney, D. Price, D. Radice, T. Radke, C. Reisswig, L. Rezzolla, C. B. Richards, D. Rideout, M. Ripeanu, L. Sala, J. A. Schewtschenko, B. Schutz, E. Seidel, E. Seidel, J. Shalf, S. Shankar, K. Sible, U. Sperhake, N. Stergioulas, W.-M. Suen, B. Szilagyi, R. Takahashi, M. Thomas, J. Thornburg, C. Tian, M. Tobias, A. Tonita, P. Walker, M.-B. Wan, B. Wardell, H. Witek, and B. Zink, The Einstein Toolkit (2025). [58] F. Loffler et al. , Class. Quant. Grav. 29 , 115001 (2012), arXiv:1111.3344 [gr-qc]. 
+
+29 [59] D. Radice, L. Rezzolla, and F. Galeazzi, Class. Quant. Grav. 31 , 075012 (2014), arXiv:1312.5004 [gr-qc]. [60] T. W. Baumgarte and S. L. Shapiro, Numerical Relativity: Solving Einstein’s Equations on the Computer (Cambridge University Press, Cambridge, UK, 2010). [61] A. Kurganov and E. Tadmor, J. Comput. Phys. 160 , 241 (2000). [62] D. Pollney, C. Reisswig, E. Schnetter, N. Dorband, and P. Diener, Phys. Rev. D 83 , 044045 (2011), arXiv:0910.3803 [gr-qc]. [63] C. Reisswig, C. D. Ott, E. Abdikamalov, R. Haas, P. Moesta, and E. Schnetter, Phys. Rev. Lett. 111 , 151101 (2013), arXiv:1304.7787 [astro-ph.CO]. [64] A. Weyhausen, S. Bernuzzi, and D. Hilditch, Phys. Rev. D 85 , 024038 (2012), arXiv:1107.5539 [gr-qc]. [65] E. Gourgoulhon, P. Grandclement, K. Taniguchi, J.-A. Marck, and S. Bonazzola, Phys. Rev. D 63 , 064029 (2001), arXiv:gr-qc/0007028. [66] G. Bozzola, J. Open Source Softw. 6, 3099 (2021), arXiv:2104.06376 [gr-qc]. [67] W. Del Pozzo, T. G. F. Li, M. Agathos, C. Van Den Broeck, and S. Vitale, Phys. Rev. Lett. 
+
+111 , 071101 (2013), arXiv:1307.8338 [gr-qc]. [68] K. Chatziioannou, Gen. Rel. Grav. 52 , 109 (2020), arXiv:2006.03168 [gr-qc]. [69] B.-J. Cai and B.-A. Li, Eur. Phys. J. A 61 , 55 (2025), arXiv:2501.18676 [astro-ph.HE]. [70] S. Jian-Hao, B.-J. Cai, and Y.-G. Ma, A new scaling of neutron star tidal deformability for directly probing the core equation of state (2026), arXiv:2606.21402 [astro-PH.HE]. [71] T. Dietrich, D. Radice, S. Bernuzzi, F. Zappa, A. Perego, B. Brügmann, S. V. Chaurasia, R. Dudi, W. Tichy, and M. Ujevic, Class. Quant. Grav. 35 , 24LT01 (2018), arXiv:1806.01625 [gr-qc]. [72] F. J. Fattoyev, C. J. Horowitz, J. Piekarewicz, and B. Reed, Phys. Rev. C 102 , 065805 (2020), arXiv:2007.03799 [nucl-th]. [73] S. Banik, M. Hempel, and D. Bandyopadhyay, Astrophys. J. Suppl. 214 , 22 (2014), arXiv:1404.6173 [astro-ph.HE]. [74] A. W. Steiner, M. Hempel, and T. Fischer, Astrophys. J. 774 , 17 (2013), arXiv:1207.2184 [astro-ph.SR]. [75] J. M. Lattimer and F. D. Swesty, Nucl. Phys. A 535 , 331 (1991). 
+
+30 [76] S. Rosswog, N. Sarin, E. Nakhar, and P. Diener, Mon. Not. Roy. Astron. Soc. 538 , 907 (2025), arXiv:2411.18813 [astro-ph.HE]. [77] S. Bernuzzi, A. Nagar, S. Balmelli, T. Dietrich, and M. Ujevic, Phys. Rev. Lett. 112 , 201101 (2014), arXiv:1402.6244 [gr-qc]. 
+
+31
