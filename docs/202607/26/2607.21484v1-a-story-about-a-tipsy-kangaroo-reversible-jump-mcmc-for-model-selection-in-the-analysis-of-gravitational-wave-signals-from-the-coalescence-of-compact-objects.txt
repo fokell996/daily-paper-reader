@@ -1,0 +1,2004 @@
+Title: A story about a tipsy kangaroo: Reversible jump MCMC for model selection in the analysis of gravitational-wave signals from the coalescence of compact objects
+
+URL Source: https://arxiv.org/pdf/2607.21484v1
+
+Published Time: Fri, 24 Jul 2026 01:17:44 GMT
+
+Number of Pages: 32
+
+Markdown Content:
+## A story about a tipsy kangaroo: Reversible jump MCMC for model selection in the analysis of gravitational-wave signals from the coalescence of compact objects 
+
+Anna Puecher ,1, ∗ Tim Dietrich ,1, 2 Hauke Koehn ,1 Jonathan Gair, 2 Gregory Ashton, 3 Luca Negri ,4, 5 and Anuradha Samajdar 4, 5 
+
+> 1
+
+Institut f¨ ur Physik und Astronomie, Universit¨ at Potsdam, Haus 28, Karl-Liebknecht-Str. 24/25, 14476, Potsdam, Germany 
+
+> 2
+
+Max Planck Institute for Gravitational Physics (Albert Einstein Institute), Am M¨ uhlenberg 1, Potsdam 14476, Germany 
+
+> 3
+
+School of Mathematical Sciences, University of Southampton 
+
+> 4
+
+Institute for Gravitational and Subatomic Physics (GRASP), Utrecht University, Princetonplein 1, 3584 CC Utrecht, The Netherlands 
+
+> 5
+
+Nikhef, Science Park 105, 1098 XG Amsterdam, The Netherlands 
+
+(Dated: July 24, 2026) Bayesian inference is commonly employed in the analysis of gravitational-wave signals not only to estimate the source parameters, but also for model selection. The latter provides insight into the physics of the source and has the potential to inform the direction for future model development. Although model comparison is usually performed by analyzing the data separately with different models and comparing the obtained Bayesian evidences, an alternative approach consists in sam-pling directly over the model itself. Here, we present t-roo , a reversible jump Markov chain Monte Carlo sampler capable of performing transdimensional inference on gravitational-wave signals from compact binary coalescences. Employing t-roo , a single analysis provides simultaneously the model odds ratio and the parameter posteriors for the favored models, hence yielding a potentially sub-stantial computational advantage, particularly when comparing many models or analyzing highly informative data. t-roo is built on the sampler eryn and is specifically designed to compare models describing different kinds of sources, i.e., binary black hole, binary neutron star, or neutron star-black hole systems, as well as multiple models for the same source class. We validate the sampler on a set of injections, finding agreement with the results obtained with the nested sampler dynesty .We then use t-roo to analyze the real events GW190425 and GW230529, for which the system’s parameters alone do not provide conclusive evidence of the presence of a neutron star component. 
+
+t-roo can be adapted to any model-comparison scenario, thus providing a valuable tool in particu-lar for next-generation detectors, where analyzing data separately with competing models becomes computationally even more demanding. 
+
+I. INTRODUCTION 
+
+In the past ten years, a growing number of gravita-tional wave (GW) detections from different sources has enabled us to study the population and properties of binary systems of compact objects [1, 2], to place con-straints on the nuclear equation of state and cosmological parameters [3–7], and to test the theory of General Rel-ativity [8–11]. The properties of the emitting system are commonly inferred from GW signals through Bayesian inference, not only to measure the source’s parameters, but also to test hypotheses and compare different models in order to determine which one provides the best de-scription of the data. Bayesian analyses require estimat-ing parameter posteriors or model evidences, a computa-tionally challenging task for the highly-dimensional pa-rameter spaces involved in GW data-analysis. Therefore, stochastic sampling methods, such as nested or Markov chain Monte Carlo (MCMC) samplers [12–14], are usu-ally employed to estimate these quantities. Currently, various software exist for this purpose and are regularly employed by the LIGO-Virgo-KAGRA (LVK) [15–17] collaboration to analyze GW data, e.g., Refs. [18–20].  
+
+> ∗anna.puecher@uni-potsdam.de
+
+Adopting different approximants to analyze GW de-tections from a given type of source can hint at which features of the various models describe the data best, thus providing useful information for the development of future models, as shown in Refs. [21, 22] for binary neu-tron star (BNS) and binary black hole (BBH) detections, respectively. However, in the context of GW analyses from com-pact binary coalescences (CBC), the relevant question often becomes what was the nature of the objects in the system from which the signal originated. Unless a clear electromagnetic counterpart is present, the classification of a GW signal source is usually based on the estimated component masses [23, 24], or, if the signal-to-noise ra-tio (SNR) is large enough, on the presence of tidal in-formation in the phase. Nevertheless, for events such as GW190814 [25], GW230529 [26], and GW190425 [27], the nature of the components remains uncertain (see, e.g., Refs. [28–41]). Even for GW170817 [3], an exact source classification based only on the GW signal would not be possible. In these situations, analyzing GW data with different models can provide information beyond the mere com-parison of component masses, thus helping classify the signal’s source. Gravitational-waveform models incorpo-rate effects specific to the source they aim at describing: arXiv:2607.21484v1 [gr-qc] 23 Jul 2026 2BNS models include tidal phase information, alongside its interplay with spin, while the amplitude corrections in neutron star - black hole (NSBH) models describe the dif-ferent behaviors near merger and the possibility of tidal disruption. Bayesian statistics provides a natural way to compare different models or hypotheses describing a certain sig-nal. This is conventionally achieved by performing sepa-rate analyses on the same data with the various models investigated, and then comparing evidences to compute the so-called odds ratio. Alternatively, the model can be considered as one of the parameters to sample over. The main advantage of this second approach is that the more informative the data, the more time the sampler will spend in the correct model, reducing the iterations in the disfavored ones and the overall computational cost. References [21, 22] employed a specific case of this sec-ond method, introducing a categorical parameter to de-scribe the model to be used at each sampler iteration. However, this approach cannot be applied when com-paring models with different parameter-space dimension-ality. This issue arises, for example, when comparing aligned-spin and precessing models, or models describing different sources, since in the case of NS components also tidal effects should be accounted for. In these cases, when we want to compare models with different dimensionalities, we must resort to reversible jump MCMC (RJMCMC) [42, 43]. RJMCMC samplers are commonly employed for LISA (Laser Interferometer Space Antenna) data analysis [44–46], for X-ray bina-ries analyses [47], and for GW ground-based detectors in the context of modelling a burst (or noise) signal with a flexible number of given basis functions, for example in relation to glitch mitigation [48–52]. In this work, we develop, to the best of our knowledge, the first RJMCMC sampler to analyze full GW signals from different CBC sources with state-of-the-art wave-form approximants. In particular, our sampler, called 
+
+t-roo (Tipsy kangaROO) 1, can analyze GW data em-ploying multiple BBH, NSBH, or BNS models at the same time. In the end, the sampler provides parameter posteriors and odds ratios between the different models. The main advantages of this approach, compared to performing separate runs and then comparing evidences, are: (i) A significant reduction of the “human overhead” during the analysis, since only one run, with no model-specific settings, is needed. (ii) A reduction of the computational cost, especially for informative events. In particular, the compu-tational advantage increases the more models are compared at the same time.             
+
+> 1Regarding the name, kangaroo was chosen to recall the jump in “reversible jump”, and for consistency with Australian names for samplers such as Bilby and Dingo .The kangaroo is tipsy
+> because it not only jumps, but it can also perform reverse jumps.
+
+(iii) Although the odds ratio convergence requires some time, t-roo provides the source classification rather quickly, and could therefore be employed in the future also for low-latency purposes. Our sampler is based on elements from Bilby [20], where it relies especially on its well-tested utilities for evaluating the likelihood function for CBC signal analy-ses, and the eryn [44] sampling package, from which it inherits the structure of the RJMCMC sampler, includ-ing parallel tempering. We test t-roo performance on simulated signals for both current and future-generation detectors, such as the Einstein Telescope (ET), and we analyze the real GW events GW190425 and GW230529. The paper is structured as follows: in Sec. II we pro-vide an overview of the elements inherited from eryn and 
+
+Bilby , while in Sec. III we illustrate the specific propos-als used in t-roo . In Sec. IV we describe the analysis methods, and we show the results of a set of analyses on simulated data and on the real events in Sec. V. We summarize our conclusions in Sec. VI. In Appendix A, we provide a more detailed and technical description of the working mechanisms of RJMCMC samplers, focusing on the specific application to our case in Appendix B. We il-lustrate some possible empirical criteria for convergence in Appendix C, and in Appendix D we discuss the ro-bustness of the evidence computation by comparing the estimates obtained with different samplers. 
+
+t-roo is publicly available on GitHub at 
+
+https://github.com/AnnaPuecher/t roo . 
+
+> II. T-ROO BASICS
+
+MCMC sampling algorithms differ from nested ones in that they directly sample the target distribution. The main condition that MCMC samplers have to satisfy is the so-called detailed balance , which essentially means that the probability of a chain being in a state x and transitioning to a state x′ must be the same as being in the state x′ and transitioning to x. In the specific im-plementation of the Metropolis Hastings algorithm [53], at each step, we propose a new point in the parameter space and decide whether to accept it or not, where the exact form of the acceptance probability is what ensures detailed balance. RJMCMC is a generalized version of this algorithm, which allows the chain to move also across parameter spaces with different dimensionalities. A de-tailed overview of MCMC and RJMCMC samplers is pro-vided in Appendix A . For CBC analyses, MCMC algorithms are convention-ally employed to sample the source posterior p(⃗ θ | d, M ), where ⃗ θ denotes the parameters of interest, d the de-tector data, and M the model employed to describe the data [19, 54]. If, instead, we have a set of models {Mk}
+
+and want to establish which one describes the data best, we can either analyze the data separately with the var-3ious models and then compare evidences, usually com-puted with nested samplers, or, with MCMC samplers, we can directly sample the joint probability 
+
+p(⃗ θk, k | d) = p(⃗ θk | k, d )p(k | d), (1) where k is the model label and ⃗ θk the parameters of model 
+
+k. Notably, reversible jump MCMC allows us to do this even if the models considered have different dimensions. The better a model manages to describe the data, the more time the sampler will spend in that model. There-fore, once the sampler is converged, the final probability of a model will be given by 
+
+pmod k := p(k | d) = nk
+
+P 
+
+> k
+
+nk
+
+, (2) where nk is the number of samples specifically in the model k.
+
+t-roo is based on eryn [44], a sampler purposefully de-signed to tackle Bayesian analyses of complex and multi-dimensional problems, such as the LISA global fit, which is in turn based on the affine invariant sampler emcee [54]. In MCMC ensemble samplers, a collection of Nw walkers 
+
+explore the parameter space in parallel, with proposals based on the position of other walkers. The key property of affine invariant samplers is that they have the same efficiency in sampling different distributions related by affine transformations. This implies that they can rather efficiently sample highly-correlated distributions, which are commonly encountered in GW analysis from CBC sources. In the following, we provide a brief explanation of the features that t-roo inherited from eryn and Bilby . 
+
+> A. Stretch move
+
+In Ref. [55], the authors suggest the so-called stretch move as the simplest proposal to update the walkers po-sitions that satisfies both affine invariance and detailed balance. In a stretch move, the new position of a walker 
+
+Xi at time t is proposed by moving by a fraction of the distance with respect to another random walker Xj as 
+
+Xi, new = Xj (t) − z(Xi(t) − Xj (t)) , (3) with z being a random variable drawn from a distribution 
+
+g(z). This probability distribution is 
+
+g(z) = 
+
+( 1√z , if z ∈ [1 /a, a ]0, otherwise , (4) with a arbitrarily set to 2 [55]. The new proposed point is then accepted with probability 
+
+α(Xi, new , X i(t)) = min 
+
+
+
+1, z d−1 p(Xi, new )
+
+p(Xi(t)) 
+
+
+
+, (5) where p(X) denotes the target probability density, eval-uated at the point X, d is the dimension of the param-eter space involved in the stretch move, and zd−1 a fac-tor needed to preserve the symmetry condition; see Ap-pendix B 3 for details. When choosing the other random walker Xj needed for the stretch move, one must ensure that the position of this walker is not updated at the same time as the move we are currently attempting. In the group stretch move in eryn , the walkers are split into two (or more) separate groups and are updated sequentially. When updating the positions of walkers in a given group, the random walkers 
+
+Xj are then chosen from the other one(s), therefore called 
+
+complementary .As explained in detail later, we will employ stretch moves in t-roo for different purposes: to update the sin-gle models’ parameters and for the proposal of tidal de-formability parameters when considering jumps between models (cf. Sec. III).  
+
+> B. Parallel tempering
+
+MCMC samplers can struggle with complex and multi-modal distributions since there is a possibility that walk-ers get stuck in one of the modes. One way to miti-gate this issue is through parallel tempering [56–58]. In parallel tempering, for each walker nT chains are run in parallel, each one with a different temperature Tj , which transforms the likelihood as 
+
+L(d|⃗θ, M ) → L (d|⃗ θ, M )1/T j , (6) meaning that the j-th chain is effectively exploring the posterior 
+
+pTj (⃗ θ, d ) ∝ L (d|⃗θ, M )1/T j π(⃗θ). (7) Basically, the temperature effect “smoothens” the like-lihood profile, allowing the walkers to explore low-likelihood regions of the parameter space more easily. The chain with Tj = 1 explores the “true” posterior dis-tribution, i.e., the target distribution, while the Tj = ∞
+
+chain explores the prior. Different chains with different temperatures run in parallel and periodically exchange information. Chains with higher temperatures sweep across the parameter space, discovering (new) regions with potentially high likelihood, and then pass this infor-mation to the low-temperature chains, which can better explore the likelihood peaks. In order to preserve de-tailed balance, the swaps between chains with different temperatures are accepted with a probability 
+
+α(Ti, T j ) = min 
+
+1, L(d|⃗ θi)
+
+L(d|⃗ θj )
+
+! 1  
+
+> Tj−1
+> Ti
+
+ . (8) The number of required temperature chains depends on the problem at hand, but usually at least 10-20 are 4needed. The choice of the specific temperature values is non-trivial, since ideally it should maximize the informa-tion exchange among chains. To find the optimal temper-ature ladder, eryn , and consequently t-roo , employ the dynamic adaptation algorithm developed in Ref. [59]. It is good practice to consider the samples accumulated dur-ing the temperature optimization as part of the burn-in. In t-roo , temperature adaptation happens only during the preliminary sampling stage (see Sec. III A 2) and is automatically switched off during the RJMCMC phase. Therefore, when extracting the odds ratio or posterior parameters from the RJMCMC iterations, these samples are automatically not taken into account. As we will see later in Appendix D, parallel tempering also allows to compute evidences in MCMC samplers.  
+
+> C. Bilby features
+
+As mentioned in the introduction, t-roo employs the sampler infrastructure of eryn , combining it with Bilby 
+
+features in order to analyze CBC signals. In particular, the detector classes, the waveform generators, and the likelihood are directly called from Bilby with specific wrappers, which allow us to import advanced features implemented there, e.g., likelihood marginalization [60], or injections in different synthetic noise realizations. For the runs presented in this work, we employ the multibanding approximation of the likelihood [61], which restricts the waveform evaluation to a reduced set of frequency points, adapted according to the sig-nal duration, hence significantly reducing the com-putational cost. However, we note that in princi-ple all the likelihood methods — e.g., the “standard” 
+
+GravitationalWaveTransient likelihood, the relative binning [62], or the reduced-order-quadrature (ROQ) [63] ones— can be employed in t-roo 2. Similarly, the prior infrastructure is heavily based on bilby , therefore also somewhat specific priors such as the aligned spin one for the spin magnitudes or the uniform in comoving volume for the luminosity distance are available in t-roo . 
+
+> III. T-ROO PROPOSALS
+
+As discussed in detail in Appendix A, an RJMCMC sampler performs two different moves during each sam-pling step 3. For each walker we have:      
+
+> 2In the case of ROQ, this would would require the ROQ data to be available in the needed mass range for all the models investigated.
+> 3One could also decide to have multiple within-model moves in a sampling step. This possibility is implemented in t-roo but not used by default, since the preliminary sampling already helps identify the parameter regions with the largest support for each model.
+
+1. Within-model move: propose new parameter values for the model the walker is currently in and decide whether to accept the move to this new point in this parameter space or not. 2. Between-models move: propose a jump to a differ-ent model, and simultaneously update the param-eters in the new model; also in this case, there is a criterion to decide whether to accept the proposed jump or not. In the following, we describe the specific moves that we implemented in t-roo . We highlight that one strength of our approach is that we are not only able to compare different kinds of compact binaries, but we can also si-multaneously rank multiple waveform models within a certain binary category. Moreover, we can directly jump between BNS and BBH models, without the need to go through a NSBH one, which reduces the number of itera-tions and, consequently, the computational cost. Figure 1 shows a schematic overview of the t-roo algorithm and the different moves involved. The proposals are written assuming sampling in chirp mass Mc, mass ratio q = m2/m 1, and component tidal deformabilities Λ 1 and Λ 2. Although, in principle, it would be possible to sample over different combinations of these parameters and convert them before the pro-posal, this would yield an (unnecessary) computational cost. The posterior probabilities corresponding to differ-ent choices of sampling parameters can anyway be ob-tained by reweighting the final posteriors.  
+
+> A. Between-models move
+
+The choice for a specific form of the between-model moves is the hardest challenge in RJMCMC algorithms, because their acceptance ratio strongly affects the sam-pler’s overall performance. The proposed values for the parameters in the new model depend on the parameters in the current one: to avoid the risk of updating the two states simultaneously, in between-model jumps, we update all walkers in a given model at the time, proceeding sequentially through the models. This approach is similar to the idea of a group 
+
+stretch move, since the walkers are effectively divided into different groups that are updated in sequence. The difference is that the groups are not created with a ran-dom partition, but based on the model the walkers are currently in. When more than two models are compared, t-roo 
+
+randomly chooses which model a jump is proposed to, assuming that all the competing models have an equal probability. One could take into account prior informa-tion about the preferred models or source type by assign-ing models priors, that could be alternatively assigned (or further divided) based on the source classification. This would enable also the incorporation of astrophysi-cal information, e.g., what is the expected probability to 5n 
+
+> o
+> t
+> a
+> c
+> c
+> epted
+> a
+> c
+> c
+> e
+> p t e d
+> E
+> q
+> s
+> .
+> (
+> 1
+> 7
+> )
+> *
+> &
+> (
+> 1
+> 8
+> )
+> a
+> c
+> c
+> e
+> p
+> t
+> e
+> d
+> a
+> c
+> c
+> e
+> p
+> t
+> e
+> d
+> P
+> r
+> o
+> p
+> o
+> s
+> e
+> :
+> E
+> q
+> .
+> (
+> 3
+> );A
+> c
+> c
+> e
+> p
+> ta
+> n
+> c
+> e:
+> E
+> q
+> .
+> (
+> 4
+> )
+> n
+> o
+> t
+> a
+> c
+> c
+> e
+> p
+> t
+> e
+> d
+> Within -model move Between -models move
+
+Stretch move 
+
+Random Walk 
+
+> stretch move
+> stretch move
+> stretch move
+> random
+> walk
+> random
+> walk
+
+…
+
+…
+
+…
+
+Source NSBH  Source BNS  Source BBH         
+
+> MOD1 NSBH MOD2 NSBH
+> MODn NSBH
+> MOD1 BNS MOD2 BNS
+> MODn BNS
+> MOD1 BBH MOD2 BBH
+> MODn BBH
+> -step rw + step rw
+> p = 0.5 p = 0.5
+> E
+> q
+> s
+> .
+> (
+> 1
+> 6
+> )
+> &
+> (
+> 1
+> 8
+> )
+> a
+> c
+> c
+> e
+> p
+> t
+> e
+> d
+> n
+> o
+> t
+> a
+> c
+> c
+> e
+> p
+> t
+> e
+> d
+> draw random z
+> n o
+> t
+> a
+> c
+> c
+> e
+> p
+> t
+> e
+> d
+> E
+> q
+> s
+> .
+> ( 20)
+> &
+> (
+> 1
+> 8
+> )
+> MOD iBBH MOD iNSBH MOD iBNS
+
+FIG. 1. Schematic representation of the moves implemented in t-roo , with reference to the respective equations in the text; the asterisk ∗ denotes the inverse transformation. For the between-model move, the walkers can jump to any model, of a different or the same source class, with the same probability. For the within-model move, we update the pseudo -parameters with a random walk with step “step rw” and all the other parameters with a stretch move. See Sec. III for a complete discussion of the proposals. 
+
+detect systems with specific features, such as eccentricity or precession. This is left for future work, and currently the models’ priors can be incorporated a-posteriori by multiplying the final odds ratios. 
+
+1. Tidal deformability 
+
+Since our primary goal is to compare models that de-scribe BBH, BNS, and NSBH systems, the core of the between-model proposal concerns the tidal deformability parameters, Λ 1 and Λ 2. In principle, one could simply add and remove Λ 1 and Λ 2 based on the model jump (for example, when going from NSBH to BBH we could just remove Λ 2, while when going from BBH to BNS we could add Λ 1 and Λ 2). However, this would mean los-ing the tidal information gained while sampling with one model when going to a model with fewer tidal parame-ters. To avoid this, we add the pseudo tidal parameters Λ1,bbh , Λ 2,bbh , and Λ 1,nsbh for BBH and NSBH models, which essentially act as “storage” variables. Crucially, these pseudo -parameters are not included in the likeli-hood computation for the model they belong to, but serve just to cache the tidal information until the next jump to a model where that tidal parameter is actually included. The proposal between tidal parameters in different models is a stretch move, the primary move employed in emcee and explained in Sec. II A. In the implementa-tion proposed by Goodman and Weare in Ref. [55], the random variable z defining the stretch move is sampled in [1 /a, a ], with a arbitrarily set to a = 2. However, in our between-model moves, the pseudo -parameters are used to store the tidal information, thus, ideally, we do not want this stretch move to propose too large jumps. Therefore, we choose 
+
+g(z) = 
+
+( 1√z , if z ∈ [1 − ϵ, 1 + ϵ],
+
+0, otherwise , (9) with ϵ set by default to 0 .01, but adjustable by the user. Proposing very small jumps, of the order of a few percent, effectively means that we collect most of the informa-tion about the tidal parameters during the within-model moves in NSBH or BNS models. Xj is picked from the walkers in the other models, i.e., the ones that are cur-rently not updated. In order to avoid unphysical values of tidal deformability, if the proposed value becomes neg-ative, we simply retain the old one. 6
+
+FIG. 2. Example of Mc and ˜Λ distribution of samples collected by all the walkers in the last 200 steps of the preliminary sampling phase in the case of a NSBH injection with Λ 2 = 300 as recovered by ET ( nsbh lam300 et , see Sec. IV A for details), color-coded by the likelihood value of each sample; the orange-red colors correspond to samples recovered with the NSBH approximant IMRPhenomNSBH and the blue-green with the BBH approximant IMRPhenomD . The left panel displays the one-dimensional Mc distribution for the BBH and NSBH case, showing how the recovered support lies in disjoint ranges for the two models. We note that in the BBH model Λ 1,bbh and Λ 2,bbh , from which the ˜Λ parameter shown here is computed, are 
+
+pseudo-parameters used merely as storage variables, and therefore do not affect the likelihood. The cyan diamond and star indicate the likelihood center-of-mass values for the BBH and NSBH model, respectively. The proposal slope in Eq. (13) is computed from the dashed line connecting them. 
+
+2. Proposals for mass parameters 
+
+The presence of tidal effects in a signal can alter which values for Mc and q maximize the likelihood, because of the accelerated inspiral (due to the additional dissi-pated energy) and the degeneracy between tidal param-eters and mass ratio. This circumstance might cause the sampler to get stuck in one of the models: if we propose the jump to a different model assuming the same values for the mass parameters, the new model might not have significant likelihood support at those masses, especially for high-SNR signals. Therefore, we implement specific data-informed proposals for chirp mass and mass-ratio, which take into account the effect of different tidal con-tents 4.A t-roo run starts with a preliminary sampling phase, during which the sampler runs on each model separately for some time without proposing between-model moves 5.  
+
+> 4We only look empirically at the effect of including or not tidal phase contributions in the model, but a more complete proposal would need to take into account other contributions of matter effects, for example the differences in the spin-spin term in the phase description due to the different quadrupole moment values in NSs and BHs.
+> 5Note that parallel tempering is enabled during this stage, there-fore swaps between models due to tempering are still possible.
+
+Figure 2 shows an example of the distribution of Mc
+
+and ˜Λ samples after the preliminary sampling, illustrat-ing how the NSBH and BBH model find disjoint chirp mass intervals. To identify a mapping between these different intervals, and similarly for the mass ratio, the sampler considers the Mc, q, and ˜Λ samples from each model after the preliminary sampling phase has finished, with ˜Λ being the mass-weighted (or “reduced”) tidal de-formability parameter [64]. It determines the likelihood “center-of-mass“ of the Mc, q, and ˜Λ samples collected during the last 200 steps: 
+
+Mc, cm =
+
+P 
+
+> i
+
+L(⃗ θi)Mc,i 
+
+P 
+
+> i
+
+L(⃗ θi) , (10) 
+
+qcm =
+
+P 
+
+> i
+
+L(⃗ θi)qi
+
+P 
+
+> i
+
+L(⃗ θi) , (11) ¯˜Λcm =
+
+P 
+
+> i
+
+L(⃗ θi)˜Λi
+
+P 
+
+> i
+
+L(⃗ θi) , (12) Here, the index i runs over the model’s samples, and ⃗ θ
+
+refers to the parameters of that specific model. Further-more, the bar on ˜Λ denotes that for the computation of ˜Λcm in the BBH and NSBH models, we assume the phys-ical value of zero tidal deformability for the BH object, i.e., Λ 1,bbh =Λ 2,bbh =Λ 2,nsbh =0 (yielding, for BBH mod-els, ˜Λcm = 0), because these are the values employed in 7the likelihood calculation. We consider only the last 200 iterations to ensure no samples from the burn-in phase are used. However, how many final iterations should be used can be adjusted by the user. Using the equivalent of the center of the mass of the likelihood instead of, for example, the sample corresponding to its maximum value, ensures that we take into account the overall trend of the distribution, making the point choice more robust against potential biases or outliers. We consider the line connecting the different likelihood-center-of-mass points in the Mc-q-˜Λ space. For two different models mod 1 and mod 2, its slope is given by 
+
+sMc(mod 1,mod 2) = Mc, cm ,mod 1 − M c, cm ,mod 2
+
+¯˜Λcm ,mod 1 − ¯˜Λcm ,mod 2
+
+(13) 
+
+sq(mod 1,mod 2) = qcm ,mod 1 − qcm ,mod 2
+
+¯˜Λcm ,mod 1 − ¯˜Λcm ,mod 2
+
+. (14) For each between-models move, the proposed Mc and 
+
+q for the new model are computed following the lines with these slopes, starting from the point defined by the current sample in the current model, and assuming the physical values Λ 1,bbh = 0, Λ 2,bbh = 0, and Λ 1,nsbh = 0. However, if the ranges for the Mc support in different models overlap sufficiently, this specific proposal is not needed. In this case, the chirp mass value is not updated in the between-model move 6. Specifically, when going from mod 1 to mod 2, the chirp-mass proposal is not em-ployed when the likelihood center-of-mass value of Mc
+
+for mod 2 lies within the 68% interval of the Mc samples from mod 1. We do not apply this condition to the mass ratio, because the posteriors for this parameter are usu-ally much wider and this distinguishability criterion will rarely be satisfied. Besides identifying the right map between the different model parameters, the preliminary sampling phase also improves the overall convergence of the sampler. Before the reversible jump even starts, the walkers will already have reduced the region of parameter space to explore for each model. The number of iterations in the preliminary sampling phase should be enough to pass the burn-in phase and provide reliable, although not definitive, pos-teriors for the parameters of interest, but not too long to affect the computational performance of the algorithm. 
+
+3. The complete proposal 
+
+Taken all together, the between-model proposals read (see Appendix B 1 for the derivation)  
+
+> 6We skip the chirp mass proposal mostly to save computational time, although we note that the main computational bottleneck is in any case the waveform evaluation.
+
+BBH to NSBH 
+
+⃗
+
+Θnsbh ,i +1 =⃗ Θbbh ,i 
+
+Λ1,nsbh ,i +1 = Λ 1,bbh ,i 
+
+Λ2,nsbh ,i +1 = Λ 2,j,i + u2 (Λ 2,bbh ,i − Λ2,j,i )
+
+Mc, nsbh ,i +1 = Mc, bbh ,i + sMc(nsbh ,bbh ) · ¯˜Λnsbh ,i +1 
+
+qnsbh ,i +1 = qbbh ,i + sq(nsbh ,bbh ) · ¯˜Λnsbh ,i +1 
+
+v2 = 1 /u 2
+
+(15) 
+
+BNS to BBH 
+
+⃗
+
+Θbbh ,i +1 =⃗ Θbns ,i 
+
+Λ1,bbh ,i +1 = Λ 1,j,i + w1 (Λ 1,bns ,i − Λ1,j,i )Λ2,bbh ,i +1 = Λ 2,j,i + w2 (Λ 1,bns ,i − Λ2,j,i )
+
+Mc, bbh ,i +1 = Mc, bns ,i − sMc(bbh ,bns ) ˜Λbns ,i 
+
+qbbh ,i +1 = qbns ,i − sq(bbh, bns) ˜Λbns ,i 
+
+u1 = 1 /w 1
+
+u2 = 1 /w 2
+
+(16) 
+
+NSBH to BNS 
+
+⃗
+
+Θbns ,i +1 =⃗ Θnsbh ,i 
+
+Λ1,bns ,i +1 = Λ 1,j,i + v1 (Λ 1,nsbh ,i − Λ1,j,i )Λ2,bns ,i +1 = Λ 2,j,i + v2 (Λ 1,nsbh ,i − Λ2,j,i )
+
+Mc, bns ,i +1 =Mc, nsbh ,i +
+
+− sMc(bns ,nsbh )
+
+¯˜Λnsbh ,i − ˜Λbns ,i +1 
+
+
+
+qbns ,i +1 = qnsbh ,i − sq(bns ,nsbh )
+
+¯˜Λnsbh ,i − ˜Λbns ,i +1 
+
+
+
+w1 = 1 /v 1
+
+w2 = 1 /v 2
+
+(17) for the bbh → nsbh , bns → bbh , and nsbh → bns 
+
+moves, respectively. The subscript i denotes current samples, while i + 1 the proposed ones, and j refers to the complementary set of samples used for the stretch move. The parameter vector ⃗ Θ stands for the parame-ters for which no specific proposal is implemented, i.e., ⃗
+
+Θ = ⃗ θ \ {M c, q, Λ1, Λ2}. In the chirp-mass and mass-ratio proposal, the barred ¯˜Λ indicate that, in the case of NSBH or BBH systems, we do not use the stored values of the pseudo -parameters for the computation of ˜Λ, but we assume Λ 1,bbh = Λ 2,bbh = Λ 1,nsbh = 0, i.e., we assume physical values of zero tidal deformability for BHs, as for the computation of the slopes in Eqs. (13)-(14). The proposal for the auxiliary variables u1, u 2, v 1, v 2, w 1, w 2
+
+is determined by the requirement that the transforma-tions must be reversible (see Appendix A 5 and B 1 for details). The auxiliary variables w1 and v1 are not needed when swapping between NSBH and BBH models, because Λ 1,bbh and Λ 1,nsbh are both pseudo -parameters that can simply be set equal to each other, skipping 8the stretch-move. The opposite transformations, i.e., 
+
+nsbh → bbh , bbh → bns , and bns → nsbh , are simply the inverse ones, consistent with the requirements that, in RJMCMC algorithms, each proposal should be reversible (the inverse mapping is provided in Appendix B 1). Once the new model and parameters values have been proposed, they are accepted according to the acceptance probability 
+
+α(x, x ′) = min 
+
+1,
+
+L
+
+⃗θx′
+
+
+
+p
+
+⃗θx′
+
+
+
+g′
+
+> x′
+
+L
+
+⃗θx
+
+
+
+p
+
+⃗θx
+
+
+
+gx
+
+Jxx ′
+
+ , (18) where x denotes the “old” state model and parameters at step i, while x′ the new model and parameters of the proposed state at the following step i + 1. gx and gx′ rep-resent the probability distributions of the auxiliary vari-ables for the model in the states x and x′, respectively (see Appendix A for details). L(⃗ θy ) and p(⃗ θy ) denote the likelihood and prior for the parameters and model in stare y. As explained in detail in Appendix B 4, in order to preserve the detailed balance, the priors p(⃗θx), or p(⃗ θx′ ), must incorporate all the parameters we are sampling over, including the pseudo-parameters Λ 1,bbh ,Λ1,nsbh , and Λ 2,bbh , even if they are not used in the like-lihood calculation. For the proposals in Eqs. (15) to (17) and their in-verses, the Jacobians Jxx ′ depend exclusively on the aux-iliary variables, and, thanks to the specific mapping be-tween auxiliary variables in the different models, 
+
+gx′
+
+gx
+
+Jxx ′ = 1 (19) in all cases; see Appendix B 2 for the computation.  
+
+> 4. Proposal between models for the same type of source and parameter space
+
+t-roo provides the possibility to compare not only models that describe different kinds of binary systems, but also multiple models for a given source type. In this case, we do not need to take into account the effects of different tidal contents, therefore the parameter trans-formation between one model and the other is simply an identity transformation ⃗θmod 2 = I⃗θmod 1 , (20) with, consequently, a Jacobian Jxx ′ = 1. We note that this is possible because, for the time be-ing, we are assuming only models with the same physics, for example, aligned-spin only. Comparing models de-scribing not only different sources, but also different fea-tures for the same source, such as the presence of preces-sion, or eccentricity, would require dedicated proposals for the between-model moves, and is left for future work.  
+
+> B. Within-model moves
+
+We update the parameters within a model with a group stretch move as implemented in eryn and described in Sec. II A, with the exception of the pseudo -parameters Λ1,bbh , Λ 1,nsbh , and Λ 2,bbh . Given that they are included in the between-model moves, the pseudo-parameters are effectively part of the sampled parameter spaces, and as such have to be updated also in the within-model moves. However, since they are not relevant for the likelihood computation, we do not expect to gain information about them. Thus their posterior should ideally recover the prior, which, for simplicity, we assume to be the same as the actual tidal parameters in the BNS and NSBH models, i.e., uniform in the component tidal deformabil-ities. To facilitate the recovery of uniform distributions, we update the pseudo -parameters in the within-model move through a random walk with a default step size of 10 (in units of dimensionless tidal deformability). If the walkers spend a sufficient amount of time in a model without tidal information, the random walk ensures that the posterior samples of the pseudo -parameters will be uniformly distributed in the prior range. We include the possibility of block-sampling in the within-model moves, meaning that we can update only specific subsets of the parameters at each step. We em-ploy the same structure as in the Bilby -MCMC proposal cycle [19], but in our case only the parameters involved in the proposal change, while the move remains the same, i.e., a stretch move, or a random walk for Λ 1,bbh , Λ 2,bbh ,or Λ 1,nsbh . Block sampling is particularly useful in case of multi-modal distributions, since it allows the walkers to better explore the full range of each parameter. However, one of the strengths of affine samplers, such as emcee , on which eryn , and consequently t-roo , are based, is their efficiency in dealing with highly-correlated parameters, which is the case for CBC GW signals. Therefore, in this case, employing block sampling can actually slow-down convergence, and it is by default not used in t-roo .  
+
+> IV. ANALYSIS METHODS A. Injections setup
+
+To assess the robustness of the sampler, we test it on simulated data obtained by injecting different mock GW signals on top of synthetic detector noise. We assume a detector network composed of the two Advanced LIGO detectors, Hanford and Livingston [15], and the Ad-vanced Virgo detector [16] at design sensitivity [65, 66]. We consider NSBH signals with different tidal contri-butions and recover them with an NSBH and a BBH model, to investigate when t-roo can identify the pres-ence of a NS component. We also analyze BNS injections and recover them using different models describing BNS, NSBH, and BBH systems. In addition, we look at signals from BBH sources, with masses compatible with either 9                                          
+
+> TABLE I. Injections analyzed to assess the sampler’s performance. Together with the labels, we provide the component masses, spins, and tidal deformabilities. The second last column reports the models used to create the mock signal for the injection, while the last one lists the models employed for recovery.
+> m1,m2[M⊙]χ1,χ2Λ1, Λ 2Injected model Recovery models
+> nsbh lam300 3.75, 1.5 0.6, 0.02 0, 300 IMRPhenomNSBH IMRPhenomNSBH IMRPhenomD
+> nsbh lam600 3.75, 1.5 0.6, 0.02 0, 600 IMRPhenomNSBH IMRPhenomNSBH IMRPhenomD
+> nsbh lam1000 3.75, 1.5 0.6, 0.02 0, 1000 IMRPhenomNSBH IMRPhenomNSBH IMRPhenomD
+> bbh nsbhmasses 3.75, 1.5 0.6, 0.02 0, 0 IMRPhenomD IMRPhenomNSBH IMRPhenomD
+> bns lam600 1.4, 1.4 0.01, 0.02 600, 600 IMRPhenomD NRTidalv2 IMRPhenomD NRTidalv2 IMRPhenomNSBH IMRPhenomD
+> bbh bnsmasses 1.4, 1.4 0.01, 0.02 0, 0 IMRPhenomD IMRPhenomD NRTidalv2 IMRPhenomNSBH IMRPhenomD
+> bns lam600 mm 1.4, 1.4 0.01, 0.02 600, 600 IMRPhenomXAS NRTidalv3 IMRPhenomD NRTidalv2 IMRPhenomXAS NRTidalv3 SEOBNRv5 ROM NRTidalv3 IMRPhenomD IMRPhenomXAS SEOBNRv5 ROM
+
+BNS or NSBH systems, to evaluate how the sampler be-haves in the absence of tidal information. All injections are summarized with their labels and source properties in Table I. For NSBH sources, we use the IMRPhenomNSBH ap-proximant [67], which is based on the BBH amplitude prescription in Ref. [68], in turn based on IMRPhenomC ,and the tidal phase description in IMRPhenomD [69] and 
+
+NRTidalv2 [70]. Therefore, the comparison is performed with the IMRPhenomD approximant for the BBH case and 
+
+IMRPhenomD NRTidalv2 for the BNS one, in order to re-duce potential modelling systematics. On the other hand, when comparing multiple models for each source, we con-sider also other state-of-the-art approximants [71–73]. For all injections, we place the source at a lumi-nosity distance of dL = 30 Mpc in order to have a large signal-to-noise ratio, which enables us to identify tidal signatures if present. SNRs range roughly be-tween 50 and 100 depending on the simulated system. For the injection nsbh lam600 , we perform an addi-tional run at dL = 150 Mpc ( nsbh lam600 lowsnr ), to test the performance at lower SNR (specifically, this signal has an SNR of 14). We also perform the 
+
+nsbh lam300 and bns lam600 injections for an ET setup ( nsbh lam300 et and bns lam600 et , respec-tively), assuming two L-shaped detectors with a 15 km arm-length and misaligned orientation, placed in the pro-posed Sardinia and Lusatia sites [74–76]. We employ the multibanding likelihood, as imple-mented in Bilby , together with phase and distance marginalization in order to reduce the computational cost. Signals are analyzed starting from 20 Hz, and in all the tests we use Nw = 500 walkers, each with 16 tem-perature chains. These are implemented as the default values in t-roo , but can be changed depending on the analysis requirements. In particular, when sampling with a large number of models, it is advisable to increase the number of walkers, to ensure an adequate exploration of all parameter spaces.  
+
+> B. Priors
+
+The parameter priors are kept the same across different models, in order to avoid penalizing or favoring models with different prior support. For chirp mass, we choose a uniform prior in [1 .15 , 1.30] M⊙ and [1 .95 , 2.10] M⊙ for the injections of sources with masses compatible with BNS systems or not, respectively. In the analysis of real events, chirp mass is sampled uniformly in the range [1 .45 , 1.52] M⊙ and [2 .02 , 2.04] M⊙ in the case of GW190425 and GW230529, respectively. We use BNS models in the recovery only if the injected masses are fully compatible with BNS systems, meaning that we de-mand the full prior range to lie in the region of valid-10 
+
+FIG. 3. Top panel: Model probabilities, computed as the average number of samples over walkers in each model as a function of the sampling step for the bns lam600 analysis (see Sec. IV A). Bottom panel: for the same analysis, odds ratios with respect to the injected model computed every 300 steps over the last 500 iterations. In both panels, the horizontal lines show the final values obtained in the last 500 iterations and discussed in Sec. V. 
+
+ity of the model 7. For signals with masses close to the maximum value allowed for neutron star systems, the wider mass prior would cause the waveform evaluation for the BNS models to fail, thus artificially disfavoring the model. Although intuitively correct, since for quite large masses we expect the BNS hypothesis to be disfa-vored, a consistent treatment of this scenario requires an appropriate rescaling of the mass priors, or of the prior of the models themselves, which are left for future work. The mass ratio and the tidal deformabilities are sam-pled uniformly in q ∈ [0 .16 , 1] and Λ 1, Λ2 ∈ [0 , 5000], re-spectively. For the component spins, we take an aligned spin prior with the spin magnitudes in the range [0 , 0.90], while the luminosity distance is sampled uniformly in co-moving volume in the range [0 , 500] Mpc 8.     
+
+> 7In the case of real events, one would refer to low-latency point estimates, or to preliminary parameter estimation results.
+> 8Spin magnitudes are usually assumed to be smaller for NS com-ponents, given that the Kepler limit implies χ≲0.7. However, in
+
+C. Convergence 
+
+The convergence of MCMC analyses is usually based on the accumulated number of effective samples, i.e., the samples thinned by the autocorrelation time, or on met-rics such as the Gelman-Rubin coefficient [77]. In the case of RJMCMC analysis, quantities such as the autocorre-lation time and the convergence statistics would need to be defined in a way that takes into account that each chain (walker) jumps between models and dimensions. Trace plots are usually the best indicator of conver-gence for the parameter posteriors, and in the case of RJMCMC one can look whether the time spent in each model has become stable. Figure 3 shows how the proba-bilities for each model and the odds ratios evolve over the sampler iterations, for the example of the bns lam600 
+
+injection (see Sec. IV A for details). However, it is non-trivial to establish a definitive con-vergence criterion. Therefore, in this initial implementa-tion, t-roo by default runs for a fixed number of steps and, if needed, the analysis can be resumed and run for more iterations, thanks to the implemented checkpoints. Nonetheless, we also provide a few empirical criteria with which the sampler could automatically estimate conver-gence (see Appendix C). In the future, we may inves-tigate also alternative stopping criteria, more similar to standard MCMC analyses. 
+
+V. RESULTS: VALIDATION ON SIMULATED DATA AND ANALYSIS OF REAL EVENTS 
+
+To assess the performance of t-roo , we compare the results from the injection runs to an equivalent set of analyses performed with bilby and the dynesty sam-pler [18], both for parameter posteriors and model selec-tion. Usually, the odds ratio between two hypotheses, or models, HB and HA is computed as 
+
+OBA = ZHB
+
+ZHA
+
+≡ p(HB |d)
+
+p(HA|d) = p(d|H B )
+
+p(d|H A)
+
+p(HB )
+
+p(HA) . (21) If we assume no prior knowledge about the model pref-erences, this reduces to the Bayes factor BBA , i.e., to the ratio of evidences ZHB /ZHA . As mentioned earlier, for RJMCM samplers, the odds ratio is given by the per-centage of samples in a given model, i.e.: 
+
+OBA = nB
+
+ntot 
+
+ntot 
+
+nA
+
+= nB
+
+nA
+
+. (22)      
+
+> order to analyze the data without assumptions about the source, one has to take into account that each component could also be a BH, thus with spin up to χ= 1. The specific limit χmax = 0 .90 is due to waveforms validity constraints. This large range of spin magnitudes is then employed for all the models, even BNS approximants, in order to ensure a consistent prior volume.
+
+11 
+
+TABLE II. Posterior model probabilities and odds ratios recovered by t-roo compared to the corresponding odds ratios obtained with dynesty , including their conservative uncertainty estimates. 
+
+pmod odds ratios 
+
+t-roo t-roo dynesty 
+
+nsbh lam300 pnsbh = 0 .12 
+
+pbbh = 0 .88 ln Obbh nsbh = 2 .0 ln Obbh nsbh = 2 .1 ± 0.35 
+
+nsbh lam600 pnsbh = 0 .92 
+
+pbbh = 0 .083 ln Obbh nsbh = −2.4 ln Obbh nsbh = −1.9 ± 0.35 
+
+nsbh lam1000 pnsbh = 0 .97 
+
+pbbh = 0 .033 ln Obbh nsbh = −3.4 ln Obbh nsbh = −3.6 ± 0.35 
+
+bbh nsbhmasses pnsbh = 0 .24 
+
+pbbh = 0 .76 ln Onsbh bbh = −1.1 ln Onsbh bbh = −1.8 ± 0.35 
+
+bns lam600 pbns = 0 .32 
+
+pnsbh = 0 .68 
+
+pbbh = 1 .2 × 10 −4
+
+ln Onsbh bns = 0 .75 ln Obbh bns = −7.9ln Onsbh bns = 2 .0 ± 0.34 ln Obbh bns = −6.8 ± 0.34 
+
+bbh bnsmasses pbns = 0 .019 
+
+pnsbh = 0 .083 
+
+pbbh = 0 .90 ln Obns bbh = −3.8ln Onsbh bbh = −2.4ln Obns bbh = −9.3 ± 0.34 ln Onsbh bbh = −4.0 ± 0.33 
+
+bns lam600 mm pphend = 1 .2 × 10 −5
+
+pxas = 4 .8 × 10 −5
+
+pseob = 3 .2 × 10 −5
+
+pphendv2 = 0 .32 
+
+pxasv3 = 0 .30 
+
+pseobv3 = 0 .37 ln Ophend xasv3 = −10 ln Oxas xasv3 = −8.8ln Oseob xasv3 = −9.2ln Ophendv2 xasv3 = 0 .065 ln Oseobv3 xasv3 = 0 .20 ln Ophend xasv3 = −11 ± 0.32 ln Oxas xasv3 = −11 ± 0.32 ln Oseob xasv3 = −11 ± 0.32 ln Ophendv2 xasv3 = −0.22 ± 0.33 ln Oseobv3 xasv3 = 0 .43 ± 0.32 
+
+nsbh lam600 lowsnr pnsbh = 0 .70 
+
+pbbh = 0 .30 ln Obbh nsbh = −0.86 ln Obbh nsbh = 0 .40 ± 0.27 
+
+nsbh lam300 et pnsbh = 0 .99 
+
+pbbh = 0 .011 ln Obbh nsbh = −4.5 ln Obbh nsbh − 7.9 ± 0.44 
+
+bns lam600 et pbns = 0 .64 
+
+pnsbh = 0 .36 
+
+pbbh = 0 .0ln Onsbh bns = −0.57 ln Obbh bns = −∞ 
+
+ln Onsbh bns = −1.9 ± 0.38 ln Obbh bns = −217 ± 0.37 
+
+Table II lists the model probabilities and odds ratios, computed using Eq. (22), found with t-roo and the cor-responding odds ratios from the dynesty runs, evalu-ated with Eq. (21), for comparison. Model probabilities in t-roo are computed by taking the total number of samples over walkers in each model during the last 500 sampling steps, and odds ratios are always shown with respect to the injected model. Overall, in most cases we find good consistency be-tween odds ratios obtained with t-roo and dynesty .
+
+dynesty provides an uncertainty estimate for the com-puted evidence σ(ln Z), quantified from both statistical and sampling error contributions [18]. In Table II, next to the dynesty estimates of the odds ratio between two models mod 1 and mod 2, we report the uncertainty 9
+
+σ  ln Omod 2
+
+> mod 1
+
+ ∼ σ (ln Zmod 1 ) + σ (ln Zmod 2 ) . (23) For the odds ratios recovered with RJMCMC samplers, we cannot estimate uncertainty in the same way, since the models’ probabilities derive as a consequence of the  
+
+> 9
+
+This is a conservative estimate that effectively ignores potential correlations between evidences on the two models. 12 
+
+FIG. 4. Parameter posterior distributions recovered by t-roo for both the NSBH and BBH models for the nsbh lam600 
+
+injection, compared to the posteriors obtained for the same analysis with dynesty and Bilby . For t-roo , we show only the samples of the last 1000 sampling steps to exclude samples where the sampler is still exploring the preferred model. The black lines indicate the injected values. 
+
+sampler visiting more often the more favored models 10 .However, once the sampler is converged, we expect a good agreement with the odds ratio recovered by 
+
+dynesty . Nevertheless, we do not expect to recover the exact same value obtained with dynesty , given the differ-ences between the samplers and that also the evidences recovered with nested samplers can fluctuate; see Ap-pendix D for a more extended discussion. As an important validation, in all the tests, the model preferred by t-roo and dynesty is the same. We find larger differences in the recovered odds ratios in the cases          
+
+> 10 To provide some uncertainty, one could compute the probabil-ity of each model as the mean number of samples in that model over the walkers. This value would be characterized by the sta-tistical uncertainty σ= 1 /√Nw, with Nwbeing the number of walkers considered. However, given the large number of walkers employed (specifically, Nw= 500 in all the analyses presented here), this uncertainty would still be negligible compared to the
+> dynesty one.
+
+where we compare more than two models. This is likely due to the fact that the evidence, as computed in dynesty 
+
+and shown in Eq. A2, involves a marginalization over the entire parameter space. In t-roo , the less favored models are visited less often, and consequently also the param-eter space is less explored. To verify that, instead, this is not caused by some issue within the sampler, we re-analyze the injection bns lam600 with t-roo using for recovery only the NSBH and BNS models. If the sam-pler works properly, we expect to recover the same model probabilities, and consequently odds ratio ln Onsbh bns , as in the analysis including also the BBH model, because, once converged, a RJMCMC sampler should return the “cor-rect” model probabilities, independently of the number of models investigated. With this new analysis, we obtain 
+
+pnsbh = 0 .68 and pbns = 0 .32, yielding ln Onsbh bns = 0 .78, which correspond to the values reported in Table II for the analysis including also the BBH model (small differ-ences in the odds ratio value are due to fluctuations in the next significant digits in the model probabilities). There-13 fore, we confirm that the differences with the dynesty 
+
+results are not due to issues in the sampler, but to the fact that for the least favored models the collected sam-ples do not cover the full parameter space. In order to recover the same evidences, and consequently odds ra-tio, one could run the analysis for longer and potentially tweak the priors to ensure a full exploration of all the parameter spaces. However, this would undermine the computational advantage of t-roo and would be in con-trast to the wish of sampling more preferred models more often, while avoiding unnecessary evaluations of the less favored ones.  
+
+> A. Injection-recoveries with NSBH and BBH models
+
+Figure 4 shows the recovered posteriors for the in-trinsic parameters Mc, q, χ1, χ2 and Λ2 for the 
+
+nsbh lam600 analysis, comparing the posteriors ob-tained both for t-roo and dynesty with the NSBH model 
+
+IMRPhenomNSBH and the BBH one IMRPhenomD . The in-jected parameters are recovered correctly for the NSBH approximant and slightly biased for the recovery with the BBH one, as expected given that the former was used to inject the signal. In particular, the separated peaks of the Mc and q posteriors illustrate why we need specific proposals in the between-model move, as explained in Sec. III A 2. The posteriors recovered by t-roo are con-sistent with the ones obtained from Bilby using dynesty 
+
+for both models. The t-roo posterior for the BBH model appears somewhat rugged, as a consequence of the BBH model being disfavored and therefore rarely visited by the walkers. In fact, this shows the advantage of RJMCMC samplers and how they can reduce the computational cost of these analyses when one of the models is strongly pre-ferred, as the sampler will then focus automatically on the model with the higher preference. The marginalized distribution for Λ 2 shows how t-roo 
+
+accurately recovers the right value in the NSBH model, whereas in the BBH model Λ 2 is distributed across the entire prior range thanks to the random walk proposal. In the absence of tidal information, the BBH model would be preferred and the sampler would spend more time there; consequently, the large number of iterations of the random walk would consistently yield a final pos-terior that just recovers the prior on Λ 2.For the NSBH injections nsbh lam600 
+
+and nsbh lam1000 , t-roo correctly recovers 
+
+IMRPhenomNSBH as the favored model, while for 
+
+nsbh lam300 , the sampler favors the BBH approxi-mant IMRPhenomD . This is expected, because the tidal information recovered by the data in the latter case is not sufficient to discriminate between the two scenarios, and the sampler prefers the simpler model. Notably, this is consistent with the dynesty evidences, which also indicate a preference for the BBH model for this particular injection.    
+
+> FIG. 5. Model probabilities for the nsbh lam300 injection as recovered by a LIGO-VIRGO and an ET network (labeled “HLV” and “ET”, respectively), computed as the average number of samples per walker accumulated in each model over the RJMCMC sampling steps. The model probabilities do not start exactly at 0.5 because of the temperature swaps in the preliminary sampling.
+
+On the other hand, for nsbh lam600 lowsnr , i.e., the injection with Λ 2 = 600 but placed at a larger dis-tance, we still find that the NSBH model is favored, but only with pnsbh = 70% compared to pnsbh = 92% for the injection at dL = 30 Mpc. Also these results are consis-tent with the ones from dynesty .The situation changes when we analyze the signal from the same source but detected by ET: thanks to the larger SNR ( ∼ 519), also a smaller tidal deforma-bility is enough to clearly recover the tidal content, and therefore discriminate between the two scenarios. For the nsbh lam300 et test, both t-roo and dynesty cor-rectly identify IMRPhenomNSBH as the preferred model. Moreover, we note how, for such high-SNR signals, the data are very informative and therefore t-roo manages to converge very quickly, as shown in Fig. 5. This high-lights the potential of RJMCMC algorithms in these sce-narios: large SNRs usually make parameter estimation analyses more computationally expensive, and in these cases running separate analyses with all the models could become prohibitive. On the other hand, with t-roo large SNRs make it easier for the sampler to understand what the favored model is, yielding a significant computational advantage. If, instead, we simulate a BBH signal with the same parameters (i.e., the analysis bbh nsbhmasses in Ta-ble I), we see from Table II that t-roo correctly recovers the BBH model as the preferred one, with an odds ra-tio again consistent with the dynesty one. Also in this case, the inferred posteriors are in excellent agreement with the ones from Bilby and the Λ 2 parameter for the NSBH model rails against zero, indicating that no tidal information is recovered in the data. 14         
+
+> FIG. 6. Parameter posterior distributions recovered by t-roo with BNS, NSBH, and BBH models for the bns lam600 injection, compared to the posteriors obtained for the same analysis with dynesty . For t-roo , we show only the samples of the last 1000 sampling steps, to avoid including samples of a phase when the sampler is still exploring the preferred model. The black solid lines indicate the injected values, while the dashed line in the panel for the Λ 2one-dimensional distribution denotes the Λ 2
+> value needed by the NSBH model to yield the same ˜Λ value as the injected one.
+> B. Injection-recoveries with BBH, NSBH, and BNS models
+
+In Fig. 6, we show the posteriors recovered for the BNS injection bns lam600 . We used a BBH, NSBH, and BNS model for the recovery, as listed in Table I. We find again very good agreement between the distributions inferred with t-roo and dynesty . The injected values are cor-rectly recovered by the BNS and NSBH models, while we find biases in the BBH ones, especially in chirp mass and mass ratio, where the latter peaks at q = 0 .44 al-though the injected signal corresponds to an equal-mass system. This is expected given the lack of tidal content in the BBH model and the correlation between the tidal parameters and mass ratio. The t-roo posterior for the BBH model is rather scat-tered, because it encompasses less than 0 .1% of the to-tal number of samples, due to its low preference. We highlight that this is the expected outcome of RJMCMC samplers: the walkers will systematically explore mostly the favored model(s), therefore yielding a good estimate of their posteriors. Posteriors for the disfavored models could be obtained by running the sampler for longer, un-til the accumulated number of samples in the disfavored model is enough to reconstruct the parameters posterior probability. However, this undermines the purpose of RJMCMC, i.e., understanding which models are more likely and focusing on them. The underlying idea is that a RJMCMC sampler will provide us with an estimate of the preferred model and the “preferred” posterior probabili-15 ties, i.e., the posteriors conditional to the model deemed “correct”. From the models’ probabilities in Table II, the fa-vored model is IMRPhenomNSBH , even though the in-jected signal was simulated with the BNS approximant 
+
+IMRPhenomD NRTidalv2 . This is again in agreement with the odds ratios estimated by dynesty . Looking at the marginalized posterior for Λ 2 in Fig. 6, we see that for the NSBH model both t-roo and dynetsy recover a value larger than the injected one, Λ 2,inj = 600, peak-ing roughly at Λ 2 ∼ 1800. At leading order, the tidal information enters waveform approximants as the mass-weighted combination ˜Λ [78, 79], which, in the case of the bns lam600 injection, is ˜Λ = 600. When using the NSBH model for this specific system, we would need a NS tidal deformability of Λ 2 = 1200 to yield the injected value of ˜Λ, since the tidal deformability of the BH is set to zero. Therefore, the NSBH model is trying to recover the tidal information, but assuming it all belongs to just one object. This also explains why the NSBH model is preferred: since the tidal content at this point is basi-cally equivalent in the BNS and NSBH models, in the absence of other discriminant information the sampler prefers the simpler model. This means that in princi-ple we cannot distinguish signals from a BNS or NSBH source just based on the leading-order tidal information in different approximants, but this is not caused by issues in the specific sampling methods used. Employing more advanced models, such as NRTidalv3 [73], which can dis-tinguish the individual component’s tidal deformabilities, will help to solve this degeneracy. Because of the large number of samples accumulated for the NSBH model, its posterior for Λ 1 shows how the sampler recovers the uniform prior for this pseudo -parameter that, as explained in Sec. III, basically serves as a storage variable. As for Fig. 4, we see a noticeable difference in the pos-terior peaks of Mc and q between the BBH model and the NSBH or BNS one. Considering that, as discussed above, the NSBH and BNS models recover the same tidal information, this difference arises likely from the lack of tidal content in the BBH approximant, and supports the need of a tidal-dependent proposal for these two param-eters. Finally, for the bbh bnsmasses injection, where we analyze a signal coming from a source with the same parameters, but being a BBH system instead of a BNS one, t-roo correctly recovers IMRPhenomD as the pre-ferred model. In this case, the mass ratio is recovered correctly by all models, since the injection is performed with a BBH approximant (i.e., the data do not contain tidal information), and both the NSBH and BNS models recover correctly Λ 1 and/or Λ 2 being zero.  
+
+> C. Injection comparing multiple models
+
+Finally, we discuss the case in which we compare not only one model per binary type in the recovery, but multiple models describing the same source. For 
+
+bns lam600 mm , we use IMRPhenomXAS NRTidalv3 to inject a signal from an equal-mass BNS system with Λ1 = Λ 2 = 600, and analyze it with three BNS and three BBH approximants; cf. Table I. Figure 7 shows the posteriors recovered with the dif-ferent models. Although not shown here for simplicity, we find in all cases a very good agreement with the pos-teriors recovered by bilby runs with dynesty . We only see slight differences in the q posteriors recovered by BNS models. This is likely due to the interplay with the BBH model, which systematically prefers more unequal-mass systems and slows down the convergence for this param-eter: a more sophisticated proposal for the mass ratio, potentially also including spin information, would help mitigate this effect. We see that all BBH approximants recover very sim-ilar posteriors, and likewise all posteriors from BNS models are essentially identical. However, there are noticeable differences between BBH and BNS posteri-ors, especially for Mc and q, in analogy to the previ-ous results. The BNS models recover Λ 1 and Λ 2 cor-rectly, while the BBH ones tend to return the prior. 
+
+t-roo correctly favors the BNS models, and in par-ticular SEOBNRv5 ROM NRTidalv3 . Moreover, although the odds ratios are slightly different, the order of the model preference, even within the same kind of source, is the same as dynesty . The only difference is that t-roo slightly prefers IMRPhenomD NRTidalv2 over 
+
+IMRPhenomXAS NRTidalv3 . However, the difference with respect to the dynesty odds ratio lies within the uncer-tainty of the latter. We remark that the t-roo results are obtained with only one run, in which we can compare an arbitrary num-ber of models for different kinds of sources. Even though a larger set of models might require a larger number of it-erations for the sampler to reach convergence, this is still computationally and practically more convenient than running separate analyses for each model, especially if some of the models, like the BBH ones here, are quite strongly disfavored. We emphasize again that t-roo and RJMCMC sam-plers focus on model selection, returning a good posterior estimation only if a model is sufficiently favored. Basi-cally, the sampler does not “waste” time exploring the posteriors for models that it has inferred do not describe the data sufficiently well, which yields a significant com-putational gain. 16 
+
+FIG. 7. Parameter posterior distributions recovered by t-roo with three different BNS and three different BBH models for the 
+
+bns lam600 mm injection. To better show the comparison of the posteriors for the BBH models, in this case we include in the corner plot the last 1500 iterations. The black solid lines correspond to the injected values. Event pbbh pnsbh pbns 
+
+GW190425 0.66 0.31 0.033 GW230529 0.38 0.55 0.067 TABLE III. t-roo recovered probabilities for models cor-responding to different source types for the real events GW190425 and GW230529. 
+
+D. Real events 
+
+We employ t-roo to analyze the real events GW190425 and GW230529 11 , for which the absence of electromag-netic counterparts and of clear tidal signatures did not enable a certain classification of the components as NSs. We do not analyze GW190814 because, given the large mass ratio, higher-order-modes would need to be in-cluded in all models used to analyze this signal 12 .   
+
+> 11 Data were downloaded from the Gravitational Wave Open Sci-ence Center [80, 81], with the estimated power spectral densities provided in Refs. [82, 83], respectively
+> 12 Recently, an NSBH model including higher-order-modes has been developed in Ref. [84]. However, for this work we employ only publicly available models reviewed by the LVK collaboration.
+
+17 We analyze both events with IMRPhenomXAS for the BBH case, IMRPhenomNSBH for the NSBH case, and 
+
+IMRPhenomXAS NRTidalv3 for the BNS one. The recov-ered probabilities for each source are shown in Table III. For GW190425, t-roo prefers the BBH model, with a probability pbbh = 0 .66, consistent with the fact that no significant tidal information was recovered for this event. Among the NSBH and BNS models, the NSBH one is pre-ferred, again consistently with the fact that it has fewer free parameters. For GW230529, t-roo finds that the NSBH model 
+
+IMRPhenomNSBH is the one that best describes the data, with a probability pnsbh = 0 .55.  
+
+> E. Computational cost
+
+One of the main advantages of RJMCMC algorithms for Bayesian model selection is that, especially when the data are informative, the computational cost is reduced with respect to performing separate analysis for each model and then comparing the evidences. A consistent comparison between the samplers’ effi-ciency is beyond the scope of this paper because it would require specific prescriptions to describe computational costs that take into account not only the number of ac-cumulated samples and the likelihood evaluation time, but also the parallelization inefficiency, the burn-in time, and the effect of parallel tempering, as shown, for exam-ple, in Ref. [19] for Bilby -MCMC 13 .To provide an indication of the computational gain, the t-roo analysis for nsbh lam600 performed the pre-liminary sampling stage and accumulated 10 4 RJMCMC samples in 14 hours, while for dynesty the BBH run took a bit more than 24 hours, accumulating 10159 samples, and the NSBH one took ∼ 31 hours, accumulating 10889 samples. All these times refer to runs performed with 8 cores on the same machine. Even though eryn , and con-sequently t-roo , is parallelized, the current implemen-tation is suboptimal, as only the likelihood evaluations are performed on different physical CPUs, while every other operation is executed on one main device, leading to a significant overhead cost. Consequently, eryn does not scale properly when running on more than 8 cores. 
+
+dynesty , on the other hand, can run on many CPUs in parallel, making it faster in practice. In order to fully exploit the potential of t-roo , and especially to make it competitive with samplers like dynesty that can run in parallel on many more cores, the code parallelization has to be optimized.     
+
+> 13 As dynesty is a nested sampler, a different model for the com-putational cost estimation would be needed
+> VI. CONCLUSIONS AND FUTURE APPLICATIONS
+
+We have developed t-roo , the first RJMCMC sam-pler to analyze GW signals from CBCs with different state-of-the-art waveform models, even with a different number of parameters, at the same time. Our implemen-tation is focused towards applying this method to source classification, i.e., comparing models describing different types of binary systems such as BNSs, BBHs, and NS-BHs. We implement specific between- and within-model proposals that handle the different tidal content of the models. Moreover, we encompass the possibility of com-paring multiple different models for each of various source types at the same time. We assessed the performance of t-roo in different sce-narios, analyzing simulated GW detections from different sources (see Sec. V for details). In all the cases, the in-ferred posterior distributions and odds ratios are in agree-ment with the ones obtained from Bilby analyses with the dynesty sampler. For NSBH signals, t-roo correctly identifies the bi-nary type when the tidal information in the data is suffi-cient to discriminate the two options, otherwise it prefers the simpler BBH model. This means that signals from systems with a lower tidal deformability require larger SNR to be correctly identified, as expected. However, an NSBH system with Λ 2 = 600 is correctly identified already at an SNR of 14. On the other hand, when in-jecting BNS signals, the NSBH model is favored, due to the fact that it can mimic the tidal content of the injec-tion, while requiring one fewer free parameter. However, in all cases, the models preferred by t-roo are consistent with the dynesty results. We also investigated BBH sig-nals from sources where masses are within the BNS or NSBH range, finding that the BBH model is correctly preferred in both cases. Finally, we analyzed a BNS in-jection with three BNS and three BBH models, finding again that the inferred odds ratios and posteriors agree with the ones recovered by dynesty .We emphasize that the main advantage of an RJM-CMC approach is that it only requires one run to provide model probabilities and posteriors for the models suffi-ciently favored, while otherwise one run for each model is needed. It can significantly reduce the computational cost of the analysis, because, the less favored a model is, the less time the sampler will spend in that model; how-ever, t-roo specifically needs to be better parallelized in order to fully exploit its computational-gain potential. This reduction of the computational cost becomes more pronounced when the data is particular informa-tive, and when we are comparing many models. The advantage of performing only one run is not only compu-tational, but also practical, since it reduces the human overhead, the setup time, and the potential risk of mis-takes or mismatches in settings between runs. Further developments require, first of all, an improve-ment of the code parallelization, together with investigat-18 ing robust convergence criteria and potential methods to estimate uncertainties. Moreover, future work will not just focus on the improvements mentioned throughout the work, but also on the application to different case studies. Given the flexibility of the framework, different use-cases simply require the design of specific propos-als, in order to make the RJMCMC jumps efficient. For example, it will be interesting to compare models with precession and eccentricity, or models with or without deviations from GR described by extra parameters. The computational gain of this approach is going to be particularly important with the observation of long and loud signals. While the analysis of high-SNR sig-nals is usually more computationally expensive, for RJM-CMC samplers it becomes easier to distinguish the infor-mation, and consequently it requires fewer iterations to converge. Therefore, t-roo is a very powerful starting tool for a large number of applications in GW data anal-ysis not only for current detectors, but also for future ones such as the third-generation ground-based detectors Einstein Telescope and Cosmic Explorer, and the space-based LISA. 
+
+> ACKNOWLEDGMENTS
+
+We thank Alexandre Toubiana and Alessandro Santini for the help with eryn , and Nihar Gupte for the use-ful comments. A.P., T.D., and H.K. acknowledge fund-ing from the EU Horizon under ERC Starting Grant, no. SMArt-101076369. Views and opinions expressed are those of the authors only and do not necessarily reflect those of the European Union or the European Research Council. Neither the European Union nor the granting authority can be held responsible for them. JG acknowl-edges support from the Simons Foundation International via Grant No. SFI-MPS- BH-00012593-06. Computa-tions were performed on the DFG-funded research clus-ter Jarvis at the University of Potsdam (INST336/173-1; project number: 502227537). This material is based upon work supported by NSF’s LIGO Laboratory which is a major facility fully funded by the National Science Foundation.  
+
+> Appendix A: Reversible Jump MCMC theory 1. Bayesian model selection
+
+According to Bayes’ theorem, we can infer the parameters ⃗ θ of an observed system from the observed data d as 
+
+p(⃗ θ|d, H) = p(d|⃗ θ, H)p(⃗ θ|H )
+
+p(d|H ) , (A1) where p(⃗ θ|d, H) is the posterior probability of the parameters ⃗ θ given the data d and a model or hypothesis H to describe the data, p(d|⃗ θ, H) is the likelihood , and p(⃗ θ|H ) is the prior probability of the parameters under the assumption of the model or hypothesis H, i.e., the prior describes our knowledge about the parameters before the observation. The term at the denominator is called evidence and corresponds to the marginalized likelihood 
+
+p(d|H ) = 
+
+Z
+
+d⃗θp (d|H ,⃗ θ )p(⃗θ|H ). (A2) When interested in the parameters posterior probabilities p(⃗θ|d, H), the evidence serves just as a normalization factor. However, it plays a crucial role when the goal is model selection instead. Let us suppose that we have two models Ha and Hb, and we want to know which one provides a better description of some observed data d. Using Bayes theorem, the probability of each model given the data is 
+
+p(Ha|d) = p(Ha)p(d|H a)
+
+p(d) , (A3) and similarly for Hb. To compare the models’ probabilities, one usually refers to the odds ratio 
+
+Oba = p(Hb|d)
+
+p(Ha|d) = p(Hb)
+
+p(Ha)
+
+| {z } 
+
+> πba
+
+p(d|H b)
+
+p(d|H a)
+
+| {z }
+
+> Bba
+
+p(d)
+
+p(d) , (A4) where the ratio of the models’ prior probabilities πba is usually set to 1, meaning that we do not have a priori preference between them. Therefore, usually the odds ratio reduces to the Bayes factor Bba, defined as the ratio between the evidences obtained with the different models, computed as in Eq. (A2). 19 An alternative approach consists in sampling directly over the model, i.e., the target of the Bayesian inference becomes the joint posterior probability 
+
+p(⃗ θk, k |d) = p(d|k,⃗ θ k)p(k,⃗ θ k)
+
+P
+
+> k′∈K
+
+R p(k′,⃗ θ ′ 
+
+> k′
+
+)p(d|k′,⃗ θ ′ 
+
+> k′
+
+)d⃗θ ′
+
+> k′
+
+, (A5) with k being the model’s label for a finite set K of models, ⃗ θk the parameters of the specific model k, and p(k,⃗ θ k) = 
+
+p(k)p(⃗θk|k) the prior for each model and its parameters. This joint posterior probabilities can always be factorized in 
+
+p(k,⃗ θ k|d) = p(k|d)p(⃗θk|k, d ), (A6) hence providing the model’s probability given the data and the parameters probability for a given model, given the data and a specific choice of model. Reversible Jump MCMC algorithms sample directly the joint posterior p(⃗ θk, k |d). The key idea is that, the more (less) favored a model is, the more (less) time the sampler will spend in it, and consequently the more (less) samples it will accumulated for that model. Therefore, at the end of a RJMCMC algorithm, the odds ratio between two models Ha and Hb will be given by 
+
+Oba = nb
+
+na
+
+, (A7) with na and nb being the number of samples in model Ha and Hb, respectively.  
+
+> 2. MCMC review
+
+Markov chains are stochastic processes that define a sequence of states of a system, in which each state depends on the previous one, and only on that. A Markov chain is characterized by a transition kernel T , which describes the transition probability from one state to the other — i.e., T (x, y ) denotes the conditional probability of the next state in the chain to be y given that the present state is x—, and a limiting distribution π, to which the states probabilities stabilize after an infinite time, or an infinite number of steps. The limiting distribution of a Markov chain is stationary, i.e., it does not change over time, or πT = π.If a Markov chain is irreducible , i.e., each state can be reached from any other state in a finite, however large, number of steps, and aperiodic , i.e., we can return to the same state in an unknown number of steps, and not with a fixed periodicity, it will have a unique limiting distribution (see Meyn and Tweedie 1993 for proof and explanation) 14 .A Markov chain is said (time) reversible if the transition kernel satisfies the so-called detailed balance condition 
+
+π(x)T (x, y ) = π(y)T (y, x ), (A8) which basically means that the probability of being in a state x and going to a state y, proposed with the transition kernel T (x, y ), must be the same as being in a state y and going back to the state x. Any Markov chain with a transition kernel T that satisfies Eq. (A8) will have a stationary distribution π. This can be shown by reading the stationary distribution condition simply as “if we are in a state x described by the limiting distribution π, and we go to a new state y through the transition kernel T (x, y ), also the new state y will be described by the limiting distribution π”. The probability of being at a state y can then be computed as the probability of being in x and going to y, for all possible states x, i.e., 
+
+p(y) = 
+
+Z
+
+dxπ (x)T (x, y ) = 
+
+Z
+
+dxπ (y)T (y, x ) = π(y)
+
+Z
+
+dx T (y, x ) = π(y), (A9) where, in the last step, we used the fact that the transition kernel is normalized R T (y, x )dx = 1. Therefore, the detailed balance condition ensures that the probability of the new state y is also described by the limiting distribution 
+
+π.In MCMC samplers, the goal is to build Markov chains whose stationary distribution corresponds to the distribution we want to reconstruct. In Bayesian inference, the desired stationary distribution is the posterior. There exist different MCMC algorithms; in the following, we will discuss the Metropolis-Hastings one [53, 85], which can be then easily generalized to the reversible jump case.   
+
+> 14 If the space of states is continuous, also the so-called “positive recurrance” property is needed, meaning that, starting from any state, we can always go back in a finite number of steps.
+
+20 
+
+3. Metropolis-Hastings algorithm 
+
+The Metropolis-Hastings algorithm for MCMC sampling can be summarized as follows. Suppose we are in a state 
+
+xi in the Markov Chain, to move to the next state xi+1 one needs to: 1. Propose the new state xi+1 , generating it from the proposal distribution q(xi+1 |xi), which describes the proba-bility of xi+1 given xi (and only xi, since Markov chains depend only on the previous point). 2. Decide whether to accept the new state or not, based on the acceptance probability α. To decide whether the proposed point is accepted, a random value r between [0 , 1] is drawn: if α ≥ r, the proposed xi+1 is accepted and saved as the next state in the chain, otherwise it is rejected and xi is saved again as the chain state. The acceptance ratio is computed as 
+
+α = min 
+
+
+
+1, π(θi+1 )q(θi+1 |θi)
+
+π(θi)q(θi|θi+1 )
+
+
+
+. (A10) The expression for the acceptance probability is not unique, but Ref. [86] showed how this form optimizes efficiency. The acceptance probability in Eq. (A10) was derived by Hastings in Ref. [14] in the following way: assume that the chain is in a state x and wants to go to a state y in the same space. Based on the Metropolis-Hastings algorithm, the transition kernel can be written as T (x, y ) = q(y|x)α(x, y ), where we explicitly wrote the two probabilities of proposing a new point, q(x|y), and accepting it, α(x, y ). The detailed balance condition (Eq. (A8)) now reads 
+
+π(x)q(y|x)α(x, y ) = π(y)q(x|y)α(y, x ). (A11) Hastings proposed to write the acceptance probability as 
+
+α(x, y ) = s(x, y )1 + π(x)q(y|x)
+
+> π(y)q(x|y)
+
+, (A12) with the only condition that s must be symmetric, i.e., s(x, y ) = s(y, x ). With this expression for the acceptance ratio, Eq. (A11) can be rewritten as 
+
+π(x)q(y|x) s(x, y )
+
+> π(y)q(x|y)+ π(x)q(y|x)
+> π(y)q(x|y)
+
+= π(y)q(x|y) s(y, x )
+
+> π(x)q(y|x)+ π(y)q(x|y)
+> π(x)q(y|x)
+
+(A13) 
+
+π(x)q(y|x)s(x, y )π(y)q(x|y)
+
+π(y)q(x|y) + π(x)q(y|x) = π(y)q(x|y)s(y, x )π(x)q(y|x)
+
+π(x)q(y|x) + π(y)q(x|y) . (A14) Therefore, provided that s(x, y ) is symmetric, this form of the acceptance probability ensures that detailed balance is satisfied. An easy choice for s(x, y ) is 
+
+s(x, y ) = 
+
+(1 + π(x)q(y|x) 
+
+> π(y)q(x|y)
+
+if π(y)q(x|y) 
+
+> π(x)q(y|x)
+
+≥ 11 + π(y)q(x|y) 
+
+> π(x)q(y|x)
+
+if π(y)q(x|y) 
+
+> π(x)q(y|x)
+
+< 1. (A15) Therefore, the acceptance ratio becomes 
+
+α(x, y ) = 
+
+
+
+1 if π(y)q(x|y) 
+
+> π(x)q(y|x)
+
+≥ 1  
+
+> 1+ π(y)q(x|y)
+> π(x)q(y|x)
+> 1+ π(x)q(y|x)
+> π(y)q(x|y)
+
+if π(y)q(x|y) 
+
+> π(x)q(y|x)
+
+< 1, (A16) or 
+
+α(x, y ) = min 
+
+
+
+1, π(y)q(x|y)
+
+π(x)q(y|x)
+
+
+
+. (A17) This expression can be further simplified if the chosen proposal function is symmetric, i.e., if q(x|y) = q(y|x). In this case, the acceptance probability simply becomes 
+
+α(x, y ) = min 
+
+
+
+1, π(y)
+
+π(x)
+
+
+
+. (A18) 21 
+
+4. Generalizing Metropolis-Hastings 
+
+To facilitate the extension to the trans-dimensional case, we first consider the Metropolis-Hastings MCMC in a more general way. We now consider two states x and x′, belonging to the sets A and A′, respectively, which for now we assume are subsets (more precisely Borel sets) of a larger parameter space, e.g., A, A ′ ⊆ Rn.We impose detailed balance as the condition that the probability of a chain to be in a state in set A and going to a state in the set A′, must be the same as being in a state in A′ and going to a state in the set A. This can be written as 
+
+Z
+
+> A
+
+π(x)P (x, A ′)dx =
+
+Z
+
+> A′
+
+π(x′)P (x′, A )dx ′. (A19) The transition kernel is now P (x, A ′) (and similarly P (x′, A )), which describes the probability of being in a state x
+
+and ending up in the set A′. This can happen in two ways: 1. The chain is a state x ∈ A, it proposes a move to x′ ∈ A′, and the move is accepted 2. The chain is in a state x ∈ A′, it proposes a move anywhere but the move is not accepted, therefore the chain remains in the set A′.This can be written as 
+
+P (x, A ′) = 
+
+Z
+
+> A′
+
+q(x′|x)α(x, x ′)dx ′
+
+| {z }
+
+> case 1
+
++
+
+Z 
+
+q(x′|x)[1 − α(x, x ′)] dx ′
+
+
+
+· I{x∈A′}
+
+| {z }
+
+> case 2
+
+, (A20) where [1 − α(x, x ′)] denotes the probability of not accepting the move to x′, and I{x∈A′} is the indicator function, i.e., 
+
+I{x∈A′} =
+
+(
+
+1 if x ∈ A′
+
+0 if x / ∈ A′. (A21) Explicitly writing these two contributions in the detailed balance Eq. (A19), we obtain 
+
+Z
+
+> A
+
+dx π (x)
+
+Z 
+
+> A′
+
+q(x′|x)α(x, x ′)dx ′ + r(x) · I{x∈A′}
+
+
+
+=
+
+Z
+
+> A′
+
+dx ′ π(x′)
+
+Z 
+
+> A
+
+q(x|x′)α(x′, x )dx + r(x′) · I{x′∈A}
+
+
+
+, (A22) where we defined 
+
+r(x) = 
+
+Z
+
+q(x′|x)[1 − α(x, x ′)] dx ′ (A23) and 
+
+r(x′) = 
+
+Z
+
+q(x|x′)[1 − α(x′, x )] dx. (A24) Using 
+
+Z
+
+> A
+
+dx · I{x∈A′} =
+
+Z
+
+> A∩A′
+
+dx, (A25) the equation above becomes 
+
+Z
+
+> A
+
+Z
+
+> A′
+
+dxdx ′ π(x)q(x′|x)α(x, x ′) + 
+
+Z
+
+> A∩A′
+
+dx π (x)r(x) = 
+
+Z
+
+> A′
+
+Z
+
+> A
+
+dx ′dx π (x′)q(x|x′)α(x′, x ) + 
+
+Z
+
+> A∩A′
+
+dx ′ π(x′)r(x′).
+
+(A26) The second terms on the right- and left-hand side are the same, therefore it reduces to 
+
+Z
+
+> A
+
+Z
+
+> A′
+
+dxdx ′ π(x)q(x′|x)α(x, x ′) = 
+
+Z
+
+> A′
+
+Z
+
+> A
+
+dx ′dx π (x′)q(x|x′)α(x′, x ), (A27) which is called the integrated detailed balance condition. One can show that if Eq. (A27) holds for all subsets 
+
+A, A ′ ⊆ Rn, then the “regular” detailed balance (e.g., Eq. (A8)) also holds. 22  
+
+> 5. The trans-dimensional case
+
+So far we have assumed that the Markov chains always move between spaces with the same dimensionality. However, especially in the case where we want to compare different models, the states involved might belong to spaces with different dimensions. A “solution” to this issue, proposed by Green in Ref. [42], consists in introducing so-called 
+
+auxiliary-variables to ensure that, in the end, we always move between spaces with the same dimensionality. Suppose we want to move between a set with dimension nk and another one with dimensions nk′ , i.e., A ⊆ Rnk and 
+
+A′ ⊆ Rnk′ . When the chain is in a state x ∈ A, we generate a random variable ⃗u with dimension r from a distribution 
+
+g(⃗u), and, similarly, a random variable ⃗u ′ with dimension r′ from a distribution g′(⃗u ′) for the chain that is at the state x′ in A′. We define a mapping h between the states and auxiliary variables of the two sets, such that (x′,⃗ u ′) = h(x,⃗ u) (x,⃗ u) = h −1(x′,⃗ u ′), (A28) where h−1 is the inverse function of h.To ensure that the detailed balance is respected, the only condition upon the deterministic mapping h is to be a diffeomorphism, which in turn requires dimension-matching , i.e., 
+
+nk + r = nk′ + r′. (A29) Now let us look at the detailed balance condition in Eq. (A27). When working with auxiliary variables, the probability of proposing a new state reduces to the probability of drawing the specific random variable involved in the proposal, since the jump is then dictated by the deterministic transformation (Eq. (A28)). If the chain is in the current state x, the new point x′ is proposed through the function h(x,⃗ u). Since h is a deterministic mapping, it in turn depends on the drawn value for the random auxiliary variable ⃗u, thus the probability of proposing the new point 
+
+x′ corresponds to the probability of drawing a specific value ⃗u, i.e., it is given by g(⃗u). Therefore, when working with maps between spaces, Eq. (A27) can be rewritten as 
+
+Z
+
+> A
+
+Z
+
+> A′
+
+π(x)g(⃗u)α(x, x ′) dxd⃗ u =
+
+Z
+
+> A′
+
+Z
+
+> A
+
+π(x′)g′(⃗u ′)α(x′, x )dx ′d⃗ u ′, (A30) where we remind that π(x) is the probability of being in state x, g(⃗u) is the probability of drawing the random variable ⃗u, and α(x, x ′) represents the probability to accept the jump from state x to state x′, and similarly for the right-hand-side of the equation. Since we demand that the mapping h is a diffeomorphism, h and its inverse h−1 are both differentiable, we can perform a change of variables in the right-hand-side integral in Eq. (A30) as dx ′d⃗ u ′ = ∂h (x,⃗ u) 
+
+> ∂(x,⃗ u)
+
+dxd⃗ u, obtaining 
+
+Z
+
+> A
+
+Z
+
+> A′
+
+π(x)g(⃗u)α(x, x ′) dxd⃗ u =
+
+Z
+
+> A′
+
+Z
+
+> A
+
+π(x′)g′(⃗u ′)α(x′, x ) ∂h (x,⃗ u)
+
+∂(x,⃗ u) dxd⃗ u, (A31) where the term ∂h (x,⃗ u) 
+
+> ∂(x,⃗ u)
+
+is the Jacobian arising from the change of variables between ( x,⃗ u) and ( x ′,⃗ u ′). This implies 
+
+π(x)g(⃗u)α(x, x ′) = π(x′)g′(⃗u ′)α(x′, x ) ∂h (x,⃗ u)
+
+∂(x,⃗ u) , (A32) and, repeating the derivation in Sec. A 3, we find that the acceptance probability now reads 
+
+α(x, x ′) = min 
+
+
+
+1, π(x′)g′(⃗u ′)
+
+π(x)g(⃗u)
+
+∂h (x,⃗ u)
+
+∂(x,⃗ u)
+
+
+
+. (A33)  
+
+> 6. Reversible Jump MCMC
+
+As discussed earlier, when using RJMCMC algorithms in Bayesian inference to compare models or hypothesis is to sample the joint posterior probability p(⃗ θk, k |d) of the parameters and the model describing the data. Therefore, the chains move between states given by x = ( ⃗θk, k ), with k being the label denoting the model and ⃗ θk the parameters vector for that specific model. At each step the sampler has to perform two kinds of moves: 1. Within model move : Within a fixed model k, update the model’s parameters ⃗ θk with a standard MCMC procedure (e.g., the Metropolis Hastings algorithm described above). 23 2. Between-models move : Propose a jump to a different model, thus updating k and ⃗ θk simultaneously. For the within-model moves , a “standard” Metropolis-Hastings algorithm can be employed. In this move we want to go from a state x = ( ⃗ θk, k ) to a state ( ⃗θ′
+
+> k
+
+, k ). Since the model k is fixed, we can drop its identifying label in the states. Writing explicitly the stationary distribution π that we want to reconstruct as the joint posterior p(⃗θk, k |d), we find that the acceptance ratio in Eq. (A10) becomes 
+
+α(⃗θk,⃗ θ ′
+
+> k
+
+) = min 
+
+(
+
+1, p(⃗ θ′
+
+> k
+
+|d)q(⃗θk|⃗θ′
+
+> k
+
+)
+
+p(⃗ θk|d)q(⃗θ′
+
+> k
+
+|⃗θk)
+
+)
+
+= min 
+
+(
+
+1, L(d|⃗θ′
+
+> k
+
+, k )p(⃗ θ′
+
+> k
+
+|k)q(⃗ θk|⃗θ′
+
+> k
+
+)
+
+L(d|⃗θk, k )p(⃗ θk|k)q(⃗ θ′
+
+> k
+
+|⃗θk)
+
+)
+
+, (A34) where in the second step we applied Bayes’ theorem (see Eq. (A5)), and L denotes the likelihood term. For the prior, we used the fact that the joint model-parameters prior can be factorized in p(k,⃗ θ k) = p(k)p(⃗ θk|k), and the p(k) terms cancel out because the chain is moving within the same model. Since the evidence is a normalization constant in the posterior probabilities, it is the same across all states, therefore it cancels out in the acceptance probability, and we need to compute only the likelihood and the prior of each state. In the between-model move , instead, the acceptance ratio derived for the general and trans-dimensional case in Eq. (A33) must be used. This time, the chain is in a state x = ( ⃗θk, k ) and wants to move to x′ = ( ⃗ θ′ 
+
+> k′
+
+, k ′). Again writing explicitly the stationary distribution as the joint posterior p(⃗ θk, k |d), we find 
+
+α(x, x ′) = min 
+
+(
+
+1, L(d|⃗ θ′ 
+
+> k′
+
+, k ′)p(k′,⃗ θ ′ 
+
+> k′
+
+)
+
+L(d|⃗ θk, k )p(k,⃗ θ k)
+
+g′(⃗u ′)
+
+g(⃗u)
+
+∂h (⃗θk,⃗ u)
+
+∂(⃗θk,⃗ u)
+
+)
+
+= min 
+
+(
+
+1, L(d|⃗θ′ 
+
+> k′
+
+, k ′)p(k′)p(⃗θ′ 
+
+> k′
+
+|k′)
+
+L(d|⃗ θk, k )p(k)p(⃗θk|k)
+
+g′(⃗u ′)
+
+g(⃗u)
+
+∂h (⃗ θk,⃗ u)
+
+∂(⃗θk,⃗ u)
+
+)
+
+,
+
+(A35) where the evidence cancels out. We also used the fact that the state prior can be written as p(k,⃗ θ k) = p(k)p(⃗θk|k), however, this time the term describing the model prior does not cancel out since different models can have different prior probabilities.  
+
+> Appendix B: RJMCMC details for t-roo 1. Full proposal derivation and inverse moves
+
+In the following, we show how the move proposals in Eqs. (15) to (17) in Sec. III are derived, and how we obtain the proposals for the inverse move. Let us start from the proposal for the tidal parameters and look at the case BNS →BBH as an example. As discussed in the main text, we update the tidal parameter through a stretch move according to Eq. (16). If now we want to go back to the BNS case, we write the proposal for the new Λ ′ 
+
+> 1
+
+in the BNS model as Λ′ 
+
+> 1,bns
+
+= Λ 1,j + u1 (Λ 1,bbh − Λ1,j ) . (B1) For the transformation to be reversible, we want that this proposal allows us to go back to the “original” point in the BNS model, i.e., to the Λ 1,bns from which we proposed the move to Λ 1,bbh in Eq. (15). Substituting the Λ 1,bbh 
+
+proposal in Eq. (16) into Eq. (B1) leads to Λ′ 
+
+> 1,bns
+
+= Λ 1,j + u1 (Λ 1,j + w1 (Λ 1,bns − Λ1,j ) − Λ1,j ) (B2) = Λ 1,j − u1w1Λ1,j + u1w1Λ1,bns (B3) = (1 − u1w1)Λ 1,j + u1w1Λ1,bns , (B4) This shows that the condition for this move to be reversible is 
+
+u1w1 = 1 . (B5) Similarly, one can show that the reversibility condition for the Λ 2 proposal reads 
+
+u2w2 = 1 . (B6) Therefore the move between auxiliary variables is BNS → BBH: u1 = 1
+
+w1
+
+, u 2 = 1
+
+w2
+
+and BBH → BNS: w1 = 1
+
+u1
+
+, w 2 = 1
+
+u2
+
+. (B7) 24 In the case of moves between an NSBH and a BBH model, both Λ 1,bbh and Λ 1,nsbh are pseudo-parameters. Hence, we do not propose a stretch move in this case and instead just keep the same values when jumping to the other model. This also implies that the auxiliary variables u1, v 1 are not needed in this proposal 15 .For the chirp mass and mass ratio proposals, the idea, outlined in Sec. III A,is to move along a line with slope determined by the likelihood center-of-mass samples in the preliminary sampling, translating this line in the Mc − ˜Λor q − ˜Λ space to make it pass through the current sample point. Following the slope definition in Eq. (13), the line equation, in the BBH →BNS case, reads (Mc, bbh − M c, bns ) = sMc, (bbh ,bns ) · (¯˜Λbbh − ˜Λbns ), (B8) where the bar on ˜Λ denotes that ˜Λ is computed assuming, for the pseudo -parameters, the physical values Λ 1,bbh =Λ2,bbh = Λ 1,nsbh = 0, which therefore imply ¯˜Λbbh = 0. Therefore, the chirp-mass proposal in Eq. (16) becomes 
+
+Mc, bbh = Mc, bns + sMc(bbh ,bns )
+
+¯˜Λbbh − ˜Λbns 
+
+
+
+(B9) = Mc, bns − sMc(bbh ,bns ) ˜Λbns , (B10) and similarly we can derive the proposal for the mass ratio. Since the mapping in RJMCMC must be invertible, the proposals for the moves in the opposite direction, i.e., BBH →BNS, can be found by simply inverting this mapping. In the specific case of the chirp mass proposal when going from the BBH to the BNS model, we have to use 
+
+M′ 
+
+> c, bns
+
+= Mc, bbh + sMc(bbh ,bns ) ˜Λ′
+
+> bns
+
+, (B11) where the prime denotes the new point proposed in the BNS space. For the transformation to be reversible, we need to ensure that we can go back to the starting point in the BNS space, i.e., that we can have M′ 
+
+> c, bns
+
+= Mc, bns . Plugging Eq. (B10) into Eq. (B11) 
+
+M′ 
+
+> c, bns
+
+= Mc, bns − sMc(bbh ,bns ) ˜Λbns + sMc(bbh ,bns ) ˜Λ′ 
+
+> bns
+
+(B12) = Mc, bns − sMc(bbh ,bns )
+
+˜Λbns − ˜Λ′
+
+> bns
+
+
+
+. (B13) This shows that the transformation is reversible when ˜Λbns = ˜Λ′
+
+> bns
+
+, which in turn is ensured by the conditions u1w1 = 1 and u2w2 = 1 derived above. In the same way one can derive the full proposals for the moves between BBH →NSBH and NSBH →BNS (see Eqs. (15) and (17), respectively), and their inverse. For completeness, we list the the inverse mappings here 
+
+NSBH to BBH 
+
+⃗
+
+Θbbh ,i +1 =⃗ Θnsbh ,i 
+
+Λ1,bbh ,i +1 = Λ 1,nsbh ,i 
+
+Λ2,bbh ,i +1 = Λ 2,j,i + v2 (Λ 2,nsbh ,i − Λ2,j,i )
+
+Mc, bbh ,i +1 = Mc, nsbh ,i − sMc(nsbh ,bbh ) · ¯˜Λnsbh ,i 
+
+qbbh ,i +1 = qbbh ,i − sq(nsbh ,bbh ) · ¯˜Λnsbh ,i 
+
+u2 = 1 /v 2
+
+(B14) 
+
+BBH to BNS 
+
+⃗
+
+Θbns ,i +1 =⃗ Θbbh ,i 
+
+Λ1,bns ,i +1 = Λ 1,j,i + u1 (Λ 1,bbh ,i − Λ1,j,i )Λ2,bns ,i +1 = Λ 2,j,i + u2 (Λ 1,bbh ,i − Λ2,j,i )
+
+Mc, bns ,i +1 = Mc, bbh ,i + sMc(bbh ,bns ) ˜Λbns ,i +1 
+
+qbns ,i +1 = qbbh ,i + sq(bbh, bns) ˜Λbns ,i +1 
+
+w1 = 1 /u 1
+
+w2 = 1 /u 2
+
+(B15)   
+
+> 15 We remind that we have auxiliary variables ( u1, u 2), ( v1, v 2), and (w1, w 2) in the BBH, NSBH, and BNS space, respectively.
+
+25 
+
+BNS to NSBH 
+
+⃗
+
+Θnsbh ,i +1 =⃗ Θbns ,i 
+
+Λ1,nsbh ,i +1 = Λ 1,j,i + w1 (Λ 1,bns ,i − Λ1,j,i )Λ2,nsbh ,i +1 = Λ 2,j,i + w2 (Λ 1,bns ,i − Λ2,j,i )
+
+Mc, nsbh ,i +1 =Mc, bns ,i + sMc(bns ,nsbh )
+
+¯˜Λnsbh ,i +1 − ˜Λbns ,i 
+
+
+
+qbns ,i +1 = qnsbh ,i + sq(bns ,nsbh )
+
+¯˜Λnsbh ,i +1 − ˜Λbns ,i 
+
+
+
+v1 = 1 /w 1
+
+v2 = 1 /w 2
+
+. (B16) 
+
+2. Jacobians 
+
+As discussed in Sec. A 5, it is essential to include the Jacobian in the acceptance-ratio computation for the between-model move. In the following we compute the Jacobian specifically for the move BNS →BBH, i.e., for the mapping in Eq. (16). The Jacobians for all the other transformations can be computed with the same procedure. The Jacobian for the transformation between the BNS and BBH space, i.e., from (⃗Θbns , Λ1,bns , Λ2,bns , Mc, bns , q bns , w 1, w 2) to ( ⃗Θbbh , Λ1,bbh , Λ2,bbh , Mc, bbh , q bbh , u 1, u 2), is given by 
+
+Jbns,bbh =
+
+∂⃗ Θbbh 
+
+∂⃗ Θbns 
+
+∂⃗ Θbbh 
+
+∂Λ1,bns 
+
+∂⃗ Θbbh 
+
+∂Λ2,bns 
+
+∂⃗ Θbbh 
+
+∂Mc, bns 
+
+∂⃗ Θbbh 
+
+∂q bns 
+
+∂⃗ Θbbh 
+
+∂w 1
+
+∂⃗ Θbbh 
+
+∂w 2
+
+∂Λ1,bbh 
+
+∂⃗ Θbns 
+
+∂Λ1,bbh 
+
+∂Λ1,bns 
+
+∂Λ1,bbh 
+
+∂Λ2,bns 
+
+∂Λ1,bbh 
+
+∂Mc, bns 
+
+∂Λ1,bbh 
+
+∂q bns 
+
+∂Λ1,bbh 
+
+∂w 1
+
+∂Λ1,bbh 
+
+∂w 2
+
+∂Λ2,bbh 
+
+∂⃗ Θbns 
+
+∂Λ2,bbh 
+
+∂Λ1,bns 
+
+∂Λ2,bbh 
+
+∂Λ2,bns 
+
+∂Λ2,bbh 
+
+∂Mc, bns 
+
+∂Λ2,bbh 
+
+∂q bns 
+
+∂Λ2,bbh 
+
+∂w 1
+
+∂Λ2,bbh 
+
+∂w 2
+
+∂Mc, bbh 
+
+∂⃗ Θbns 
+
+∂Mc, bbh 
+
+∂Λ1,bns 
+
+∂Mc, bbh 
+
+∂Λ2,bns 
+
+∂Mc, bbh 
+
+∂Mc, bns 
+
+∂Mc, bbh 
+
+∂q bns 
+
+∂Mc, bbh 
+
+∂w 1
+
+∂Mc, bbh 
+
+∂w 2
+
+∂q bbh 
+
+∂⃗ Θbns 
+
+∂q bbh 
+
+∂Λ1,bns 
+
+∂q bbh 
+
+∂Λ2,bns 
+
+∂q bbh 
+
+∂Mc, bns 
+
+∂q bbh 
+
+∂q bns 
+
+∂q bbh 
+
+∂w 1
+
+∂q bbh 
+
+∂w 2
+
+∂u 1
+
+∂⃗ Θbns 
+
+∂u 1
+
+∂Λ1,bns 
+
+∂u 1
+
+∂Λ2,bns 
+
+∂u 1
+
+∂Mc, bns 
+
+∂u 1
+
+∂q bns 
+
+∂u 1
+
+∂w 1
+
+∂u 1
+
+∂w 2
+
+∂u 2
+
+∂⃗ Θbns 
+
+∂u 2
+
+∂Λ1,bns 
+
+∂u 2
+
+∂Λ2,bns 
+
+∂u 2
+
+∂Mc, bns 
+
+∂u 2
+
+∂q bns 
+
+∂u 2
+
+∂w 1
+
+∂u 2
+
+∂w 2 .
+
+(B17) Looking at the mapping in Eq. (16) and computing all the derivatives, we find 
+
+Jbns,bbh =
+
+1 0 0 0 0 0 00 w1 0 0 0 (Λ 1,bns − Λ1,j ) 00 0 w2 0 0 0 (Λ 2,bns − Λ2,j )0 −sMc, (bbh, bns )
+
+∂ ˜Λbns 
+
+∂Λ1,bns −sMc, (bbh, bns )
+
+∂ ˜Λbns 
+
+∂Λ2,bns 1 0 0 00 −sq(bbh, bns )
+
+∂ ˜Λbns 
+
+∂Λ1,bns −sq(bbh, bns )
+
+∂ ˜Λbns 
+
+∂Λ2,bns 0 1 0 00 0 0 0 0 − 1
+
+w21
+
+00 0 0 0 0 0 − 1
+
+w22
+
+= w1w2
+
+1 0 0 00 1 0 00 0 − 1
+
+w21
+
+00 0 0 − 1
+
+w22
+
+= 1
+
+w1w2
+
+.
+
+(B18) When we compute the acceptance ratio for this move, i.e., Eq. (18), we need to include this Jacobian and the probability of drawing the auxiliary variables, which are given by g(z) = 1 /√z (see Sec. III). For the auxiliary variables in the BNS we have gbns (w1) = 1 /√w1 and gbns (w2) = 1 /√w2. In the BBH space, instead, gbbh (u1) = 1 /√u1 = √w1
+
+and gbbh (u2) = 1 /√u2 = √w2, where we have used the reversibility condition u1w1 = 1 and u2w2 = 1. Together with the Jacobian, the factor in the acceptance probability becomes 
+
+gbbh (u1, u 2)
+
+gbns (w1, w 2) Jbns,bbh =
+
+√w1w21√w1w2
+
+· 1
+
+w1w2
+
+= 1 . (B19) Similarly one can compute the Jacobian for all the other moves, finding in all cases 
+
+g′(x′)
+
+g(x) Jxx ′ = 1 , (B20) 26 as shown in Eq. (19).  
+
+> 3. Symmetry conditions for stretch moves
+
+The stretch move employed in t-roo proposals is described in Sec. II A. The acceptance ratio for the stretch move shown in Eq. (5) includes a term to preserve the symmetry condition in the proposal. Note that this is different from the detailed balance condition, which includes in its definition the acceptance ratio itself. Here, we are interested in enforcing that the kernel to propose a new point given the current one is symmetric. This simplifies the calculation of the acceptance probability in the algorithm, but is not a necessary condition such as the detailed balance one, which is instead needed to ensure that the limiting distribution of the chain is stationary. Assume the chain is in Xk and we use a stretch move to propose a new point Y with 
+
+Y = Xj + z(Xk − Xj ), (B21) where Xj is the current position of another chain chosen randomly and z is a random variable drawn from a distribution 
+
+g(z). Then, from Y we propose a new point Y ′ with 
+
+Y ′ = Xj + z′(Y − Xj ). (B22) To ensure that the proposal is symmetric, i.e., that the probability of going in one direction or the other is the same, we first then need to check whether it is possible that Y ′ = Xk. Combining Eq. (B21) and Eq. (B22) 
+
+Y ′ = Xj + z′(Y − Xj ) (B23) = Xj + z′(Xj + z(Xk − Xj ) − Xj ) (B24) = Xj + z′zX k − zz ′Xj . (B25) Therefore, in order to have Y ′ = Xk, we need zz ′ = 1. To find the general symmetry condition for the proposal, we now consider the probability of proposing one point from another one, integrated over all the possible starting points. For the proposals in Eqs. (B21)-(B22), 
+
+Z
+
+P (Y |Xk)dY =
+
+Z
+
+g(z)dz, (B26) 
+
+Z
+
+P (Y ′|Y )dY ′ =
+
+Z
+
+g(z′)dz ′, (B27) since the probability of a specific point being proposed with a stretch move corresponds to the probability of a certain value for z being chosen. Stretch moves can be pictured as moving on a sphere with the radius given by the distance to the position of the other randomly selected chain Xj , and centered in the origin Xj , and. Switching to radial coordinates, in a 
+
+n-dimensional space 
+
+dY = dΩn−1/, dr/, r n−1 with radius r = z|Xk − Xj |n (B28) 
+
+dY ′ = dΩn−1/, dr ′/, r ′n−1 with radius r′ = z′|Y − Xj |n. (B29) Changing variables with dr = |Xk − Xj |dz and dr ′ = |Y − Xj |dz ′, from Eqs. (B27) we find: 
+
+P (Y |Xk) = g(z)dz dΩn−1dz |Xk − Xj |zn−1|Xk − Xj |n−1 (B30) and 
+
+P (Y ′|Y ) = g(z′)dz ′
+
+dΩn−1dz ′|Y − Xj |z′n−1|Y − Xj |n−1 . (B31) In a symmetric proposal, we want to go back to the starting point, i.e., P (Y |Xk) = P (Y ′|Y ). Therefore, we can 27 find the symmetry condition as 1 = P (Y |Xk)
+
+P (Y ′|Y ) (B32) = g(z)
+
+g(z′)
+
+z′n−1|Y − Xj |n
+
+zn−1|Xk − Xj |n (B33) = g(z)
+
+g(1 /z )
+
+ 1
+
+z
+
+2n−2 zn|Xk − Xj |n
+
+|Xk − Xj |n (B34) = g(z)
+
+g(1 /z ) z2−n, (B35) where in the third line we imposed Y ′ = Xk, i.e., z′ = 1 /z , and in the end we used |Y − Xj |n = zn|Xk − Xj |n, from Eq. (B21). Therefore, the most general condition in n dimensions is: 
+
+g(z)
+
+g(1 /z ) z2−n = 1 . (B36) If we consider the one-dimensional case, n = 1 and 
+
+g(z)z = g(1 /z ). (B37) Adding the generic symmetric factor to the acceptance probability in Eq. (A10), allows us to cancel out the specific proposal distributions, i.e., 
+
+α = min 
+
+
+
+1, π(θi+1 )q(θi+1 |θi)
+
+π(θi)q(θi|θi+1 )
+
+g(z)
+
+g(1 /z ) z2−n g(1 /z )
+
+g(z) zn−2
+
+
+
+(B38) = min 
+
+
+
+1, π(θi+1 )
+
+π(θi)
+
+g(1 /z )
+
+g(z) zn−2
+
+
+
+. (B39) With the specific random variable distribution g(z) in Eq. (4) 
+
+g(1 /z )
+
+g(z) zn−2 = 1
+
+p1/z 
+
+11/√z zn−2 = zn−1, (B40) and therefore we recover the expression for the acceptance ratio in Eq. (A10). 
+
+4. Priors on pseudo-parameters 
+
+As explained in Sec. III, in t-roo we add the pseudo-parameters Λ 1,bbh , Λ 2,bbh , and Λ 1,nsbh to store the information about tidal parameters in models that would not include such parameters. In this section, we show that the prior on these pseudo-parameters has to (crucially) be included in the acceptance ratio in order to preserve detailed balance. For simplicity, let us look at the case where we attempt a move between a BBH and NSBH model, with the proposal in Eq. (15). The move happens between the spaces ( ⃗θbbh , Λ1,bbh , Λ2,bbh , u 2) for the BBH model and ( ⃗θnsbh , Λ1,nsbh , v 2)for the NSBH one, with u2 and v2 being the auxiliary variables. In the detailed balance condition in Eq. (A32) 
+
+π(x)g(⃗u)α(x, x ′) = π(x′)g′(⃗u ′)α(x′, x ) ∂h (x,⃗ u)
+
+∂(x,⃗ u) , (B41) in this specific case the state x corresponds to ( k = bbh ,⃗ θ k =⃗ θbbh ), while the state x′ corresponds to ( k = nsbh ,⃗ θ k =⃗θnsbh ). The stationary distribution π corresponds to the posterior probability densities π(x) = p(k = bbh ,⃗ θ bbh |d) := 
+
+pos bbh (⃗θbbh ) and π(x′) = p(k = nsbh ,⃗ θ nsbh |d) := pos nsbh (⃗ θnsbh ), and the deterministic mapping ( ⃗θbbh ,⃗ u ) = h(⃗ θnsbh ,⃗ v)and ( ⃗θnsbh ,⃗ v) = h −1⃗ θbbh ,⃗ u ) are given by Eqs. (15)-(15), respectively. In the following, we explicitly write the model label as pos k, instead of including it in the state as in π(k,⃗ θ k). Therefore, 
+
+pos bbh g(⃗u) α bbh →nsbh = pos nsbh g′(⃗v) α nsbh →bbh Jbbh →nsbh , (B42) 28 where Jbbh →nsbh denotes the Jacobian relative to the mapping between the NSBH and BBH space, and for now we dropped the parameters’ dependence in the posterior for simplicity. Following the derivation of the expression for the acceptance ratio discussed in Sec. A 3, we can define 
+
+αbbh →nsbh = sbbh →nsbh 
+
+1 + pos bbh g(u) 
+
+> pos nsbh g′(v)Jbbh →nsbh
+
+(B43) and similarly for αnsbh →bbh . As before, the only constraint is that s is symmetric, i.e., sbbh →nsbh = snsbh →bbh . Hence, we can define 
+
+sbbh →nsbh =
+
+(1 + pos bbh g(u)  
+
+> pos nsbh g′(v)Jbbh →nsbh
+
+if pos nsbh g′(v)Jbbh →nsbh  
+
+> pos bbh g(u)
+
+≥ 11 + pos nsbh g′(v)Jbbh →nsbh  
+
+> pos bbh g(u)
+
+if pos nsbh g′(v)Jbbh →nsbh  
+
+> pos bbh g(u)
+
+< 1, (B44) which results in 
+
+αbbh →nsbh =
+
+(1 if pos nsbh g′(v)Jbbh →nsbh  
+
+> pos bbh g(u)
+
+≥ 1 
+
+> pos nsbh g′(v)Jbbh →nsbh
+> pos bbh g(u)
+
+if pos nsbh g′(v)Jbbh →nsbh  
+
+> pos bbh g(u)
+
+< 1. (B45) Focusing on the case pos nsbh g′(v)Jbbh →nsbh  
+
+> pos bbh g(u)
+
+< 1, since in the other one simply αbbh →nsbh = 1, we can use Bayes’ theorem to write the acceptance probability as 
+
+αbbh →nsbh = pos nsbh g′(v)Jbbh →nsbh 
+
+pos bbh g(u) = Lnsbh (⃗θnsbh , Λ1,nsbh )pnsbh (⃗ θnsbh , Λ1,nsbh )g′(v)Jbbh →nsbh 
+
+Lbbh (⃗ θbbh , Λ1,bbh , Λ2,bbh )pbbh (⃗θbbh , Λ1,bbh , Λ2,bbh )g(u) , (B46) where L denotes the likelihood and p the prior. Factorizing the prior we obtain 
+
+αbbh →nsbh = = Lnsbh (⃗θnsbh , Λ1,nsbh )pnsbh (⃗ θnsbh )pnsbh (Λ 1,nsbh )g′(v)Jbbh →nsbh 
+
+Lbbh (⃗θbbh , Λ1,bbh , Λ2,bbh )pbbh (⃗ θbbh )pbbh (Λ 1,bbh )pbbh (Λ 2,bbh )g(u) (B47) = Lnsbh (⃗θnsbh )pnsbh (⃗θnsbh )pnsbh (Λ 1,nsbh )g′(v)Jbbh →nsbh 
+
+Lbbh (⃗ θbbh )pbbh (⃗θbbh )pbbh (Λ 1,bbh )pbbh (Λ 2,bbh )g(u) , (B48) where in the last step we used the fact that the likelihood does not depend on the pseudo-parameters. Equation (B48) shows how, even if the pseudo- parameters do not enter the likelihood calculation, we have to include their prior in the acceptance ratio calculation in order to respect the detailed balance. 
+
+Appendix C: Convergence criteria 
+
+As discussed in Sec. IV C, it is not trivial to establish a criterion to automatically check the convergence of RJMCMC analyses (see, e.g., Refs. [87, 88] for some examples and discussion). By default, t-roo runs for a set number of steps and, if needed, the run can be resumed and run for longer. However, we also implemented some “empirical” convergence criteria that can be used to decide when to stop the sampler, both in the preliminary and main RJMCMC sampling phases. All the different stopping criteria available in t-roo are described below. For the preliminary sampling stage, we implemented two stopping criteria: 
+
+• Number of steps (default): the preliminary sampling is stopped after a given number of steps, defined by the user. Although different analyses might require a different number of steps, we find that in general O(10 3) is sufficient and not too computationally expensive. 
+
+• Likelihood convergence : the preliminary sampling is stopped when 80% of the walkers have converged to the maximum likelihood among them within a given tolerance, where the default tolerance is set to 0 .1. The idea behind this criterion is that when the sampler finishes exploring the parameter space and finds the region(s) where the support for each model lives, the likelihood of the samples around that region will stabilize around the maximum value and yield similar values among the various walkers. For the main RJMCMC sampling, we explored three different stopping criteria. In this case, we do not look at the likelihood but at the model probabilities, because in RJMCMC the number of samples in each model should converge to the respective probabilities of that model. The underlying idea is that, once the sampler is converged, each walker will ideally spend an amount of time (i.e., samples) in each model corresponding to that model probability: 29 
+
+• Number of steps (default): the run is stopped after a specified number of iterations. 
+
+• Walkers mean : we compute the average probability among walkers of each model in the last n steps, and we stop the run when this average does not change for a given number of steps. 
+
+• Multinomial : the run is stopped when the standard deviation between each model probability as computed from different walkers is less than 1.3 times the standard deviation expected from a multinomial distribution for Nw
+
+walkers. In order to save computational time, the users can decide after how many iterations to start checking whether stopping criteria are satisfied, and how often to check after. In any case, the run can always be resumed and run for more steps. 
+
+Appendix D: Robustness of evidence estimation 
+
+FIG. 8. Comparison between odds ratios for the nsbh lam600 run with different samplers. The gray shaded area marks the region in which the BBH model is incorrectly favored. The blue and red Gaussians show the expected distributions of odds ratio from dynesty and t-roo , respectively, as inferred from the results of 10 analyses with different sampling seeds. The markers show the ln Obbh nsbh recovered by each run, with the larger marker highlighting the run whose results are reported in Table II; in the case of dynesty , the error bar corresponds to the conservative estimate of the uncertainty as described in Sec. V. For eryn 
+
+runs, “th” and “st”, refer to evidences computed via the thermodynamic integration and stepping stone methods, respectively, while “eryn-32” refers to the eryn runs with 32 temperatures. 
+
+Throughout this work, we have compared the t-roo model probabilities to the ones obtained by the default nested sampler in bilby , i.e., dynesty . In order to check the robustness of the evidence calculation, we here compare its results to evidences obtained by different methods, focusing on the injection nsbh lam600 ; results are shown in Fig. 8. We repeat the dynesty analysis for the nsbh lam600 injection with different sampling seeds, using 2000 live points in all cases 16 . The odds ratio estimate within dynesty is robust, with the fluctuations due to different sampling seeds lying within the uncertainty band, therefore it constitutes an appropriate reference to assess the reliability of the sampler we developed. Similarly, we repeat the t-roo analysis with different sampling seeds: also in this case we see fluctuations in the recovered odds ratio value, but the estimate is overall consistent across the different sampling seeds. The blue and red Gaussians in Fig. 8 represent the distribution of odds ratio values from the dynesty and t-roo analyses of this      
+
+> 16 Ref. [89] showed in Sec. A2 that the true evidences consistently lie within the errors provided by dynesty 68% of the times when more than 1000 live points are used, even though the error on
+> dynesty evidences is not technically Gaussian.
+
+30 injection, respectively, with mean and standard deviation derived from the distribution of 10 runs with different sampling seeds. Furthermore, we also analyze this injection with a different nested sampler, i.e., pymultinest [90, 91]. In this case, the recovered ln Obbh nsbh deviates substantially from the ones recovered by dynesty , even favoring the BBH model instead of the NSBH one. Since t-roo is based on eryn , we finally check the evidences obtained by single-model eryn runs, without the specific within- and between- model moves described above. MCMC algorithms sample directly the target posterior distribution, and consequently do not automatically provide Bayesian evidences. However, one can exploit the parallel tempering chains to compute them. In particular, two different methods are implemented in eryn : thermodynamic integration [92] and stepping stone [93]. Given that the accuracy in evidence estimates increases with the number of parallel temperature chains employed, we additionally repeated these runs with 32 temperatures instead of 16. The odds ratios obtained with eryn show large differences not only with respect to the dynesty runs, lying well outside the uncertainty region and, in the case of thermodynamic integration, even favoring the wrong model. However, it is known that accurate thermodynamic evidences require a sufficiently large number of temperatures, and that evidences computed with the stepping stone algorithm require fewer temperatures than standard thermodynamic integration. Therefore, we expect the eryn32-st evidences to be most accurate, and this is indeed the run that agrees with the t-roo evidence. Most likely the inaccuracies in the other odds ratio estimations are due to insufficient temperatures. This shows another advantage of t-roo , meaning that it can obtain good estimates of odds ratios with less temperatures (i.e., further reducing the computational cost of the analysis). Overall, Fig. 8 shows how different methods can provide quite different estimates of evidence values, and conse-quently odds ratios, calling for general caution when basing strong claims on them. Nevertheless, the odds ratio estimation in t-roo appears to be quite robust, with minimum fluctuations across the results for different sampling seeds. 
+
+[1] A. G. Abac et al. (LIGO Scientific, VIRGO, KA-GRA), arXiv preprint arXiv:2605.27225 (2026), arXiv:2605.27225 [gr-qc]. [2] N. Abac et al. (LIGO Scientific, VIRGO, KA-GRA), arXiv preprint arXiv:2605.27226 (2026), arXiv:2605.27226 [astro-ph.HE]. [3] B. P. Abbott et al. (LIGO Scientific, Virgo), PRL 119 ,161101 (2017), arXiv:1710.05832 [gr-qc]. [4] B. P. Abbott et al. (LIGO Scientific, Virgo, Fermi GBM, INTEGRAL, IceCube, AstroSat Cadmium Zinc Telluride Imager Team, IPN, Insight-Hxmt, ANTARES, Swift, AGILE Team, 1M2H Team, Dark Energy Camera GW-EM, DES, DLT40, GRAWITA, Fermi-LAT, ATCA, ASKAP, Las Cumbres Observatory Group, OzGrav, DWF (Deeper Wider Faster Program), AST3, CAAS-TRO, VINROUGE, MASTER, J-GEM, GROWTH, JAGWAR, CaltechNRAO, TTU-NRAO, NuSTAR, Pan-STARRS, MAXI Team, TZAC Consortium, KU, Nordic Optical Telescope, ePESSTO, GROND, Texas Tech University, SALT Group, TOROS, BOOTES, MWA, CALET, IKI-GW Follow-up, H.E.S.S., LOFAR, LWA, HAWC, Pierre Auger, ALMA, Euro VLBI Team, Pi of Sky, Chandra Team at McGill University, DFN, AT-LAS Telescopes, High Time Resolution Universe Survey, RIMAS, RATIR, SKA South Africa/MeerKAT), ApJL 
+
+848 , L12 (2017), arXiv:1710.05833 [astro-ph.HE]. [5] B. P. Abbott et al. (LIGO Scientific, Virgo, 1M2H, Dark Energy Camera GW-E, DES, DLT40, Las Cum-bres Observatory, VINROUGE, MASTER), Nature 551 ,85 (2017), arXiv:1710.05835 [astro-ph.CO]. [6] T. Dietrich, M. W. Coughlin, P. T. H. Pang, M. Bulla, J. Heinzel, L. Issa, I. Tews, and S. Antier, Science 370 ,1450 (2020), arXiv:2002.11355 [astro-ph.HE]. [7] A. G. Abac et al. (LIGO Scientific, VIRGO, KA-GRA), arXiv preprint arXiv:2605.27227 (2026), arXiv:2605.27227 [astro-ph.CO]. [8] R. Abbott et al. (LIGO Scientific, VIRGO, KAGRA), Phys. Rev. D 112 , 084080 (2025), arXiv:2112.06861 [gr-qc]. [9] A. G. Abac et al. (LIGO Scientific, VIRGO, KA-GRA), arXiv preprint arXiv:2603.19019 (2026), arXiv:2603.19019 [gr-qc]. [10] A. G. Abac et al. (LIGO Scientific, VIRGO, KA-GRA), arXiv preprint arXiv:2603.19020 (2026), arXiv:2603.19020 [gr-qc]. [11] A. G. Abac et al. (LIGO Scientific, VIRGO, KA-GRA), arXiv preprint arxiv:2603.19021 (2026), arXiv:2603.19021 [gr-qc]. [12] J. Skilling, Bayesian Analysis 1, 833 (2006). [13] N. Metropolis, A. W. Rosenbluth, M. N. Rosenbluth, A. H. Teller, and E. Teller, J. Chem. Phys. 21 , 1087 (1953). [14] W. K. Hastings, Biometrika 57 , 97 (1970), https://academic.oup.com/biomet/article-pdf/57/1/97/23940249/57-1-97.pdf. [15] J. Aasi et al. (LIGO Scientific), Class. Quant. Grav. 32 ,074001 (2015), arXiv:1411.4547 [gr-qc]. [16] F. Acernese et al. (VIRGO), Class. Quant. Grav. 32 ,024001 (2015), arXiv:1408.3978 [gr-qc]. [17] T. Akutsu, M. Ando, K. Arai, Y. Arai, S. Araki, A. Araya, N. Aritomi, Y. Aso, S. Bae, Y. Bae, L. Baiotti, R. Bajpai, M. A. Barton, K. Cannon, E. Capocasa, M. Chan, C. Chen, K. Chen, Y. Chen, H. Chu, Y. K. Chu, S. Eguchi, Y. Enomoto, R. Flaminio, Y. Fujii, M. Fukunaga, M. Fukushima, G. Ge, A. Hagiwara, S. Haino, K. Hasegawa, H. Hayakawa, K. Hayama, Y. Himemoto, Y. Hiranuma, N. Hirata, E. Hirose, Z. Hong, B. H. Hsieh, C. Z. Huang, P. Huang, Y. Huang, 31 
+
+B. Ikenoue, S. Imam, K. Inayoshi, Y. Inoue, K. Ioka, Y. Itoh, K. Izumi, K. Jung, P. Jung, T. Kajita, M. Kami-izumi, N. Kanda, G. Kang, K. Kawaguchi, N. Kawai, T. Kawasaki, C. Kim, J. C. Kim, W. S. Kim, Y. M. Kim, N. Kimura, N. Kita, H. Kitazawa, Y. Kojima, K. Kokeyama, K. Komori, A. K. H. Kong, K. Kotake, C. Kozakai, R. Kozu, R. Kumar, J. Kume, C. Kuo, H. S. Kuo, S. Kuroyanagi, K. Kusayanagi, K. Kwak, H. K. Lee, H. W. Lee, R. Lee, M. Leonardi, L. C. C. Lin, C. Y. Lin, F. L. Lin, G. C. Liu, L. W. Luo, M. Mar-chio, Y. Michimura, N. Mio, O. Miyakawa, A. Miyamoto, Y. Miyazaki, K. Miyo, S. Miyoki, S. Morisaki, Y. Mori-waki, K. Nagano, S. Nagano, K. Nakamura, H. Nakano, M. Nakano, R. Nakashima, T. Narikawa, R. Negishi, W. T. Ni, A. Nishizawa, Y. Obuchi, W. Ogaki, J. J. Oh, S. H. Oh, M. Ohashi, N. Ohishi, M. Ohkawa, K. Okutomi, K. Oohara, C. P. Ooi, S. Oshino, K. Pan, H. Pang, J. Park, F. E. P. Arellano, I. Pinto, N. Sago, S. Saito, Y. Saito, K. Sakai, Y. Sakai, Y. Sakuno, S. Sato, T. Sato, T. Sawada, T. Sekiguchi, Y. Sekiguchi, S. Shiba-gaki, R. Shimizu, T. Shimoda, K. Shimode, H. Shinkai, T. Shishido, A. Shoda, K. Somiya, E. J. Son, H. Sotani, R. Sugimoto, T. Suzuki, T. Suzuki, H. Tagoshi, H. Taka-hashi, R. Takahashi, A. Takamori, S. Takano, H. Takeda, M. Takeda, H. Tanaka, K. Tanaka, K. Tanaka, T. Tanaka, T. Tanaka, S. Tanioka, E. N. Tapia San Mar-tin, S. Telada, T. Tomaru, Y. Tomigami, T. To-mura, F. Travasso, L. Trozzo, T. Tsang, K. Tsubono, S. Tsuchida, T. Tsuzuki, D. Tuyenbayev, N. Uchikata, T. Uchiyama, A. Ueda, T. Uehara, K. Ueno, G. Ueshima, F. Uraguchi, T. Ushiba, M. H. P. M. van Putten, H. Vocca, J. Wang, C. Wu, H. Wu, S. Wu, W.-R. Xu, T. Yamada, K. Yamamoto, K. Yamamoto, T. Yamamoto, K. Yokogawa, J. Yokoyama, T. Yokozawa, T. Yoshioka, H. Yuzurihara, S. Zeidler, Y. Zhao, and Z. H. Zhu, Progress of Theoretical and Experimental Physics 2021 ,05A101 (2021), https://academic.oup.com/ptep/article-pdf/2021/5/05A101/37974994/ptaa125.pdf. [18] J. S. Speagle, Mon. Not. Roy. Astron. Soc. 493 , 3132 (2020), arXiv:1904.02180 [astro-ph.IM]. [19] G. Ashton and C. Talbot, Mon. Not. Roy. Astron. Soc. 
+
+507 , 2037 (2021), arXiv:2106.08730 [gr-qc]. [20] G. Ashton et al. , Astrophys. J. Suppl. 241 , 27 (2019), arXiv:1811.02042 [astro-ph.IM]. [21] G. Ashton and T. Dietrich, Nature Astron. 6, 961 (2022), arXiv:2111.09214 [gr-qc]. [22] A. Puecher, A. Samajdar, G. Ashton, C. Van Den Broeck, and T. Dietrich, Phys. Rev. D 109 , 023019 (2024), arXiv:2310.03555 [gr-qc]. [23] A. G. Abac et al. (LIGO Scientific, VIRGO, KA-GRA), arXiv preprint arxiv:2508.18083 (2025), arXiv:2508.18083 [astro-ph.HE]. [24] https://emfollow.docs.ligo.org/userguide/ (2026), LIGO/Virgo Public Alerts User Guide. [25] R. Abbott et al. (LIGO Scientific, Virgo), Astrophys. J. Lett. 896 , L44 (2020), arXiv:2006.12611 [astro-ph.HE]. [26] A. G. Abac et al. (LIGO Scientific, KAGRA, VIRGO), Astrophys. J. Lett. 970 , L34 (2024), arXiv:2404.04248 [astro-ph.HE]. [27] B. P. Abbott et al. (LIGO Scientific, Virgo), Astrophys. J. Lett. 892 , L3 (2020), arXiv:2001.01761 [astro-ph.HE]. [28] C. Barbieri, O. S. Salafia, M. Colpi, G. Ghirlanda, and A. Perego, Astron. Astrophys. 654 , A12 (2021), arXiv:2002.09395 [astro-ph.HE]. [29] R. Dudi, A. Adhikari, B. Br¨ ugmann, T. Dietrich, K. Hayashi, K. Kawaguchi, K. Kiuchi, K. Kyutoku, M. Shibata, and W. Tichy, Phys. Rev. D 106 , 084039 (2022), arXiv:2109.04063 [astro-ph.HE]. [30] R. J. Foley, D. A. Coulter, C. D. Kilpatrick, A. L. Piro, E. Ramirez-Ruiz, and J. Schwab, Mon. Not. Roy. Astron. Soc. 494 , 190 (2020), arXiv:2002.00956 [astro-ph.HE]. [31] K. Kyutoku, S. Fujibayashi, K. Hayashi, K. Kawaguchi, K. Kiuchi, M. Shibata, and M. Tanaka, Astrophys. J. Lett. 890 , L4 (2020), arXiv:2001.04474 [astro-ph.HE]. [32] M.-Z. Han, S.-P. Tang, Y.-M. Hu, Y.-J. Li, J.-L. Jiang, Z.-P. Jin, Y.-Z. Fan, and D.-M. Wei, Astrophys. J. Lett. 
+
+891 , L5 (2020), arXiv:2001.07882 [astro-ph.HE]. [33] S. Khadkikar and D. Singh, Phys. Rev. D 113 , 023029 (2026), arXiv:2507.07895 [astro-ph.HE]. [34] I. Tews, P. T. H. Pang, T. Dietrich, M. W. Coughlin, S. Antier, M. Bulla, J. Heinzel, and L. Issa, Astrophys. J. Lett. 908 , L1 (2021), arXiv:2007.06057 [astro-ph.HE]. [35] L. L. Lopes and D. P. Menezes, Astrophys. J. 936 , 41 (2022), arXiv:2111.02247 [hep-ph]. [36] B. K. K. Lee, M.-c. Chu, and L.-M. Lin, Astrophys. J. 
+
+922 , 242 (2021), arXiv:2110.05538 [astro-ph.HE]. [37] B. Biswas, R. Nandi, P. Char, S. Bose, and N. Ster-gioulas, Mon. Not. Roy. Astron. Soc. 505 , 1600 (2021), arXiv:2010.02090 [astro-ph.HE]. [38] I. Bombaci, A. Drago, D. Logoteta, G. Pagliara, and I. Vida˜ na, Phys. Rev. Lett. 126 , 162702 (2021), arXiv:2010.01509 [nucl-th]. [39] H. Koehn, T. Wouters, H. Rose, P. T. H. Pang, R. Soma-sundaram, I. Tews, and T. Dietrich, Phys. Rev. D 110 ,103015 (2024), arXiv:2407.07837 [astro-ph.HE]. [40] J. Janquart et al. , Mon. Not. Roy. Astron. Soc. 537 , 1001 (2025), arXiv:2409.07298 [gr-qc]. [41] I. Markin, A. Puecher, M. Bulla, and T. Dietrich, Phys. Rev. D 113 , 024031 (2026), arXiv:2508.08750 [gr-qc]. [42] P. J. GREEN, Biometrika 82 , 711 (1995), https://academic.oup.com/biomet/article-pdf/82/4/711/699533/82-4-711.pdf. [43] D. Hastie and P. Green, Statistica Neerlandica 66 (2012), 10.1111/j.1467-9574.2012.00516.x. [44] N. Karnesis, M. L. Katz, N. Korsakova, J. R. Gair, and N. Stergioulas, Mon. Not. Roy. Astron. Soc. 526 , 4814 (2023), arXiv:2303.02164 [astro-ph.IM]. [45] R. Umstatter, N. Christensen, M. Hendry, R. Meyer, V. Simha, J. Veitch, S. Vigeland, and G. Woan, Class. Quant. Grav. 22 , S901 (2005), arXiv:gr-qc/0503121. [46] R. Umstatter, N. Christensen, M. Hendry, R. Meyer, V. Simha, J. Veitch, S. Vigeland, and G. Woan, Phys. Rev. D 72 , 022001 (2005), arXiv:gr-qc/0506055. [47] W. M. Farr, I. Mandel, and D. Stevens, Royal Society Open Science 2, 150030 (2015), arXiv:1104.0984 [astro-ph.IM]. [48] N. J. Cornish and T. B. Littenberg, Class. Quant. Grav. 
+
+32 , 135012 (2015), arXiv:1410.3835 [gr-qc]. [49] T. B. Littenberg and N. J. Cornish, Phys. Rev. D 91 ,084034 (2015), arXiv:1410.3852 [gr-qc]. [50] H. Tong et al. , Astrophys. J. Suppl. 276 , 50 (2025), arXiv:2404.04460 [gr-qc]. [51] K. Chatziioannou, N. Cornish, M. Wijngaarden, and T. B. Littenberg, Phys. Rev. D 103 , 044013 (2021), arXiv:2101.01200 [gr-qc]. [52] S. Y. Cheung, R. Udall, D. Davis, P. D. Lasky, and E. Thrane, arXiv preprint arxiv:2607.09111 (2026), arXiv:2607.09111 [gr-qc]. 32 
+
+[53] W. K. Hastings, Biometrika 57 , 97 (1970), https://academic.oup.com/biomet/article-pdf/57/1/97/23940249/57-1-97.pdf. [54] D. Foreman-Mackey, D. W. Hogg, D. Lang, and J. Good-man, Publications of the Astronomical Society of the Pa-cific 125 , 306 (2013), arXiv:1202.3665 [astro-ph.IM]. [55] J. Goodman and J. Weare, Communications in Applied Mathematics and Computational Science 5, 65 (2010). [56] J. Wang and R. H. Swendsen, Progress of Theoreti-cal Physics Supplement 157 , 317 (2005), arXiv:cond-mat/0407273 [cond-mat.stat-mech]. [57] W. R. Gilks, G. O. Roberts, and S. K. Sahu, Journal of the American Statistical Association 93 , 1045 (1998). [58] D. J. Earl and M. W. Deem, Physical Chemistry Chemi-cal Physics (Incorporating Faraday Transactions) 7, 3910 (2005), arXiv:physics/0508111 [physics.comp-ph]. [59] W. D. Vousden, W. M. Farr, and I. Mandel, Mon. Not. Roy. Astron. Soc. 455 , 1919 (2016), arXiv:1501.05823 [astro-ph.IM]. [60] E. Thrane and C. Talbot, Publications of the As-tronomical Society of the Pacific 36 , e010 (2019), arXiv:1809.02293 [astro-ph.IM]. [61] S. Morisaki, Phys. Rev. D 104 , 044062 (2021), arXiv:2104.07813 [gr-qc]. [62] B. Zackay, L. Dai, and T. Venumadhav, arXiv preprint arxiv:1806.08792 (2018), arXiv:1806.08792 [astro-ph.IM]. [63] R. Smith, S. E. Field, K. Blackburn, C.-J. Haster, M. P¨ urrer, V. Raymond, and P. Schmidt, Phys. Rev. D 94 , 044031 (2016), arXiv:1604.08253 [gr-qc]. [64] M. Favata, Phys. Rev. Lett. 112 , 101101 (2014), arXiv:1310.8288 [gr-qc]. [65] LIGO Scientific Collaboration, Noise Curves Used for Simulations in the Update of the Observing Scenarios Paper , Tech. Rep. LIGO-T2000012-v2 (LIGO Scientific Collaboration, 2022). [66] LIGO Scientific Collaboration, Virgo Collaboration, and KAGRA Collaboration, Living Reviews in Relativity 23 ,3 (2020). [67] J. E. Thompson, E. Fauchon-Jones, S. Khan, E. Nitoglia, F. Pannarale, T. Dietrich, and M. Hannam, Phys. Rev. D 101 , 124059 (2020), arXiv:2002.08383 [gr-qc]. [68] F. Pannarale, E. Berti, K. Kyutoku, B. D. Lackey, and M. Shibata, Phys. Rev. D 92 , 084050 (2015), arXiv:1509.00512 [gr-qc]. [69] S. Khan, S. Husa, M. Hannam, F. Ohme, M. P¨ urrer, X. Jim´ enez Forteza, and A. Boh´ e, Phys. Rev. D 93 ,044007 (2016), arXiv:1508.07253 [gr-qc]. [70] T. Dietrich, A. Samajdar, S. Khan, N. K. Johnson-McDaniel, R. Dudi, and W. Tichy, Phys. Rev. D 100 ,044003 (2019), arXiv:1905.06011 [gr-qc]. [71] G. Pratten, S. Husa, C. Garcia-Quiros, M. Colleoni, A. Ramos-Buades, H. Estelles, and R. Jaume, Phys. Rev. D 102 , 064001 (2020), arXiv:2001.11412 [gr-qc]. [72] L. Pompili et al. , Phys. Rev. D 108 , 124035 (2023), arXiv:2303.18039 [gr-qc]. [73] A. Abac, T. Dietrich, A. Buonanno, J. Steinhoff, and M. Ujevic, Phys. Rev. D 109 , 024062 (2024), arXiv:2311.07456 [gr-qc]. [74] M. Branchesi et al. , JCAP 07 , 068 (2023), arXiv:2303.15923 [gr-qc]. [75] A. Abac et al. (ET), JCAP 03 , 081 (2026), arXiv:2503.12263 [gr-qc]. [76] S. Danilishin and T. Zhang, Einstein Telescope sensitiv-ity curves used for CoBA Science study , Tech. Rep. ET-0304A-22 (Einstein Telescope Collaboration, 2022). [77] A. Gelman and D. B. Rubin, Statistical Science 7, 457 (1992). [78] E. E. Flanagan and T. Hinderer, Phys. Rev. D 77 , 021502 (2008), arXiv:0709.1915 [astro-ph]. [79] L. Wade, J. D. E. Creighton, E. Ochsner, B. D. Lackey, B. F. Farr, T. B. Littenberg, and V. Raymond, Phys. Rev. D 89 , 103012 (2014), arXiv:1402.5156 [gr-qc]. [80] https://doi.org/10.7935/ggb8-1v94 , GWOSC data release GW190425. [81] https://doi.org/10.7935/6xqf-ba54 , GWOSC data release GW230529. [82] https://dcc.ligo.org/LIGO-P2000026/public (2020), Parameter estimation sample release for GW190425. [83] https://doi.org/10.5281/zenodo.10845779 (2020), Parameter estimation sample release for GW230529. [84] F. A. Ramis Vidal, A. Abac, M. Colleoni, T. Di-etrich, P. Mourier, A. Gonzalez, I. Markin, and A. Puecher, arXiv preprint arXiv:2606.04810 (2026), arXiv:2606.04810 [gr-qc]. [85] N. Metropolis, A. W. Rosenbluth, M. N. Rosenbluth, A. H. Teller, and E. Teller, J. Chem. Phys. 21 , 1087 (1953). [86] P. H. PESKUN, Biometrika 60 , 607 (1973), https://academic.oup.com/biomet/article-pdf/60/3/607/576888/60-3-607.pdf. [87] Y. Fan, S. A. Sisson, and L. Davies, arXiv e-prints , arXiv:1001.2055 (2010), arXiv:1001.2055 [stat.ME]. [88] S. P. Brooks and P. Giudici, Journal of Computational and Graphical Statistics 9, 266 (2000). [89] I. M. Romero-Shaw et al. , Mon. Not. Roy. Astron. Soc. 
+
+499 , 3295 (2020), arXiv:2006.00714 [astro-ph.IM]. [90] F. Feroz, M. P. Hobson, and M. Bridges, Mon. Not. Roy. Astron. Soc. 398 , 1601 (2009), arXiv:0809.3437 [astro-ph]. [91] J. Buchner, A. Georgakakis, K. Nandra, L. Hsu, C. Rangel, M. Brightman, A. Merloni, M. Salvato, J. Donley, and D. Kocevski, Astron. Astrophys. 564 ,A125 (2014), arXiv:1402.0004 [astro-ph.HE]. [92] N. Lartillot and H. Philippe, Systematic Biology 55 ,195 (2006), https://academic.oup.com/sysbio/article-pdf/55/2/195/26557316/10635150500433722.pdf. [93] W. Xie, P. O. Lewis, Y. Fan, L. Kuo, and M.-H. Chen, Systematic Biology 60 , 150 (2011), https://academic.oup.com/sysbio/article-pdf/60/2/150/24552358/syq085.pdf.
