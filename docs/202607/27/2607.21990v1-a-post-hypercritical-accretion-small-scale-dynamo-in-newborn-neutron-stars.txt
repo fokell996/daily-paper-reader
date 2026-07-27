@@ -1,0 +1,980 @@
+A post-hypercritical accretion small-scale dynamo in newborn neutron stars
+David F. Bambague
+a, Cristian G. Bernal
+b, J. A. Rueda
+d,e,f,c,g
+aObservatorio Astronómico Nacional, Universidad Nacional de Colombia, Bogotá, Colombia
+bDepartamento de Física, Facultad de Ciencias, Universidad Nacional de Colombia, Bogotá, Colombia
+cDipartimento di Fisica e Scienze della Terra, Università degli Studi di Ferrara, Via Saragat 1, 44122 Ferrara, Italy
+dICRANet, Piazza della Repubblica 10, 65122 Pescara, Italy
+eICRA, Dipartimento di Fisica, Sapienza Università di Roma, Piazzale Aldo Moro 5, I-00185 Roma, Italy
+fICRANet-Ferrara, Dipartimento di Fisica e Scienze della Terra, Università degli Studi di Ferrara, Via Saragat 1, 44122 Ferrara, Italy
+gINAF, Istituto di Astrofisica e Planetologia Spaziali, Via Fosso del Cavaliere 100, I-00133 Rome, Italy
+Abstract
+Hypercritical fallback accretion can advect the surface magnetic field of a newborn neutron star into the newly accreted outer layers.
+Before this material joins the solid crust and enters the Hall-Ohmic regime, part of it may remain hot, dense, and liquid. This short-
+lived fluid stage may support turbulent magnetic amplification. We test whether a small-scale dynamo (SSD) can be activated under
+thermodynamic conditions of the liquid post-hypercritical layer. We quantify the associated growth rates, amplification factors,
+and saturation levels, adopting a matter density ρ0 = 1010 g cm−3 and a temperature T0 = 2 × 109 K. We perform six local 3D
+resistive MHD simulations with flash 4.7 in a (100 m)3 periodic domain with externally forced subsonic turbulence. The reference
+model uses the Helmholtz equation of state (EOS) and neutrino cooling. Three runs with a 1283 mesh resolution vary the magnetic
+Reynolds number (Rm ∼700–3700), two control runs isolate the effect of the EOS and neutrino cooling, and one 2563 resolution
+run tests the robustness of the reference case. For Rm ∼700–3700, the magnetic field grows exponentially from B0 = 1012 G and
+saturates at Bsat ∼3–7 × 1013 G within millisecond timescales. The saturated magnetic energy remains sub-equipartition, with a
+magnetic-to-kinetic energy ratio fsat = Emag/Ekin ≈0.2–0.3, consistent with an SSD behavior at magnetic Prandtl number Pm ∼1.
+The results of the 1283 and 2563 reference runs agree to within a few percent. Neutrino cooling does not affect the dynamics over
+the simulated time, and the choice of EOS changes the dynamo metrics only weakly in the subsonic regime explored here. These
+simulations show that a forced local SSD can operate efficiently in a liquid post-hypercritical accretion layer. Further simulations in
+a stratified, decaying post-fallback flow over the lifetime and energy reservoir of the inherited turbulence are needed for assessing
+the global model of magnetic reemergence and amplification.
+Keywords: magnetohydrodynamics (MHD), dynamo, stars: neutron, stars: magnetic field, methods: numerical
+Accepted for publication in the Journal of High Energy Astro-
+physics (JHEAP).
+1. Introduction
+Hypercritical fallback accretion can substantially modify the
+magnetic-field structure of a newborn neutron star (NS). If the
+fallback rate is sufficiently high, the ram pressure of the ac-
+creting material overwhelms the magnetic pressure and advects
+the surface magnetic field into the newly deposited outer layers
+[1, 2, 3, 4]. This process, commonly referred to as magnetic-
+field burial or submergence, has been investigated through an-
+alytic models and numerical simulations [5, 6, 7] and is fre-
+quently invoked to explain young NSs whose inferred external
+dipole fields appear much weaker than the internal magnetic
+fields suggested by their thermal or high-energy emission prop-
+erties [8, 9, 10, 11, 12].
+Email addresses: dbambague@unal.edu.co (David F. Bambague
+),
+cribernal@unal.edu.co (Cristian G. Bernal
+), jorge.rueda@icra.it
+(J. A. Rueda
+)
+Most studies of buried magnetic fields focus on either of
+two evolutionary stages. The first is the field-generation phase
+inside the proto-NS, where convection, differential rotation,
+and magnetorotational instabilities can amplify magnetic fields
+shortly after core collapse [13, 14, 15, 16, 17, 18, 19]. The sec-
+ond is the long-term evolution of the solid crust, where Hall
+drift and Ohmic dissipation govern the transport and reemer-
+gence of magnetic flux [20, 21, 22, 23, 24, 25, 26, 27, 28]. Lit-
+tle attention has been devoted to the intermediate stage between
+these two regimes.
+After hypercritical accretion ceases, the freshly deposited
+material is hot, dense, and liquid (see Sec. 2) before eventu-
+ally crystallizing and entering the Hall-Ohmic regime. During
+this transient phase, the buried magnetic field is embedded in a
+conducting fluid that may still contain turbulent motions inher-
+ited from the fallback flow. This naturally raises the question of
+whether magnetic amplification can continue after field burial
+and before crust crystallization.
+A possible mechanism is the small-scale turbulent dynamo
+(SSD), in which random three-dimensional motions stretch
+and fold magnetic field lines, leading to exponential growth
+arXiv:2607.21990v1  [astro-ph.HE]  24 Jul 2026
+
+
+of magnetic energy once the magnetic Reynolds number ex-
+ceeds a critical threshold [29, 30, 31, 32].
+SSD action has
+been extensively studied in laboratory plasmas, the interstellar
+medium, and numerical simulations of compressible turbulence
+[33, 34, 35, 36, 37, 38, 39]. However, its possible operation in
+the liquid post-hypercritical accretion layer of a newborn NS
+has received little attention. To our knowledge, the occurrence
+of SSD amplification during this pre-crystallization stage has
+not been investigated using dedicated MHD simulations.
+This possibility is particularly interesting in the context
+of Central Compact Objects (CCOs) and low-field magnetars
+[40, 41]. Timing observations of several CCOs indicate external
+dipole fields of only 1010–1011 G [42, 43], while pulse-profile
+modeling and thermal anisotropies often require substantially
+stronger internal magnetic structures [44, 45, 46, 47]. Likewise,
+low-field magnetars display magnetar-like activity despite rela-
+tively modest inferred dipole fields [48, 49, 50]. These systems
+motivate scenarios in which a significant fraction of the mag-
+netic energy remains hidden beneath the stellar surface during
+the early stages of evolution.
+The purpose of this work is to investigate whether a local
+SSD can operate under the thermodynamic conditions of the
+liquid post-hypercritical accretion layer.
+We perform three-
+dimensional resistive MHD simulations using FLASH 4.7 [51]
+in a locally periodic domain with externally driven subsonic tur-
+bulence. Our goal is not to model the global fallback flow or
+subsequent crustal evolution, but to determine the local turbu-
+lent magnetic amplification under the physical conditions ex-
+pected in the post-fallback liquid layer and to quantify the as-
+sociated growth rates and saturation levels.
+The paper is organized as follows. In Sec. 2, we estimate
+the viability of a liquid post-hypercritical window and com-
+pare cooling, crystallization, and dynamo timescales.
+Sec-
+tion 3 describes the numerical model, including the MHD equa-
+tions, microphysics, forcing prescription, resistivity, and run
+matrix. Section 4 presents the magnetic-energy growth, sat-
+uration behavior, dependence on magnetic Reynolds number,
+control runs, and resolution check. In Sec. 5, we discuss the
+limitations of the present model and numerical setup. Section 6
+summarizes the main conclusions.
+2. Is the post-hypercritical accretion layer liquid?
+We start by evaluating whether the material in the local com-
+putational domain can be treated as a fluid.
+Three cooling
+regimes must be distinguished in the early evolution of a new-
+born NS. During the proto-NS phase (∼10−3–101 s), neutrinos
+are trapped in the hot interior and the cooling is controlled by
+diffusion from the core to the neutrinosphere [52, 53]. After
+the crust has crystallized, the magnetic and thermal evolution
+is governed by Hall drift, Ohmic dissipation, and heat transport
+in a solid medium [24, 27]. The conditions considered here be-
+long to the intermediate, neutrino-transparent envelope regime,
+in which the outer layers at ρ ∼108–1011 g cm−3 cool through
+local volumetric neutrino emissivity, mainly pair annihilation
+at high temperature and plasmon decay at lower temperature
+[54, 55, 56]. We show that our fiducial state, ρ0 = 1010 g cm−3
+and T0 = 2 × 109 K, lies in this neutrino-transparent, non-
+crystallized regime.
+The crystallization state of a Coulomb plasma is character-
+ized by the ionic coupling parameter (see, e.g., [57])
+Γ = Z2e2
+aikBT ,
+ai =
+ 3Amu
+4πρ
+!1/3
+,
+(1)
+where Z and A are the ionic charge and mass number, respec-
+tively. For a classical one-component plasma, Monte Carlo and
+molecular-dynamics calculations place the freezing transition
+at Γm ≃175 [58, 59]. Solving Eq. (1) for Γ = Γm gives
+Tmelt = Z2e2
+ΓmkB
+ 4πρ
+3Amu
+!1/3
+= 7.1 × 106 Z
+2
+2 4
+A
+ρ
+ρ0
+!1/3
+K, (2)
+which is much lower than T0. Indeed, from Eq. (1), we ob-
+tain Γ(T0) ≈0.62 ≪Γm.
+The material is therefore better
+described as a non-crystallized weakly coupled ionic plasma.
+This conclusion is not sensitive to the assumed composition:
+for C12 and O16, Tmelt ∼a few × 108 K, and even for Fe56,
+Tmelt ≈5 × 108 K ≈T0/4. Thus, the fiducial state is on the
+liquid side of the freezing boundary for all compositions con-
+sidered here. Figure 1 summarizes the result.
+Figure 1: ρ–T phase diagram for the local post-hypercritical accretion condi-
+tions considered in this work. Curves show the melting temperature Tmelt(ρ)
+from Eq. (2) for representative compositions. The shaded regions mark the
+solid phase (Γ > 175) and the strongly coupled liquid regime (1 < Γ < 175)
+for He4. The star marks the fiducial simulation point, ρ0 = 1010 g cm−3 and
+T0 = 2 × 109 K, for which Γ ≃0.62. The point lies well above the melting
+curves; even for Fe56, T0 is several times larger than Tmelt.
+We now estimate the cooling timescale and compare it with
+that of the SSD. The thermal reservoir for the neutrino cooling
+is the heat capacity, cv. The degenerate-electron thermal cor-
+rection is smaller in the fiducial state, and the electron Fermi-
+sea energy is not a radiative heat reservoir for the local cool-
+ing. Thus, using the total specific internal energy instead of
+cvT would overestimate the cooling time. At fixed density, the
+2
+
+
+dominant contribution is the ionic thermal heat capacity
+cion
+v
+= 3
+2
+kB
+Amu
+≈
+ 4
+A
+!
+3.12 × 107 erg g−1 K−1
+(3)
+where mu is the atomic mass unit. At (ρ0, T0), the dominant
+neutrino emission channel is the plasmon decay [60]. The cor-
+responding emissivity is [61] Qplasmon ≈8.4×1019 erg cm−3 s−1,
+well above the photo-neutrino and pair-annihilation contribu-
+tions under these conditions (see also, Appendix B in [62]). The
+local cooling time may then be estimated as
+tcool =
+ρ cvT
+Qtot(ρ, T),
+(4)
+which, for the fiducial state, gives tcool ≈7.4 × 106 s ≈86 d.
+The dynamical time associated with the turbulent amplifica-
+tion is many orders of magnitude shorter. In the simulations
+discussed below, the eddy turnover time is teddy ∼5.0 × 10−5 s,
+and the magnetic field reaches the nonlinear stage on millisec-
+ond timescales. Equivalently,
+teddy ≪tdyn ≪tcool,
+teddy ∼5 × 10−5 s,
+tdyn ∼10−3 s,
+tcool ∼107 s.
+(5)
+Thus, the cooling timescale exceeds the dynamo one by roughly
+ten orders of magnitude, and exceeds the eddy turnover time
+by more than eleven orders of magnitude. We conclude that
+neutrino cooling does not modify the MHD dynamics during
+the simulated time evolution.
+Thermal conduction does not alter the ordering (5) at the
+level required for the present argument.
+For a buried layer
+of thickness ∆∼102–103 m and crustal thermal diffusion co-
+efficient κth ∼102–104 cm2 s−1 [63, 56], one obtains tcond ∼
+∆2/κth ∼104–108 s, again far longer than the millisecond MHD
+evolution of the present problem. Residual compressional or
+nuclear heating, if present after fallback, would increase the
+thermal lifetime of the liquid layer rather than shorten it [64].
+The above calculation establishes the consistency of treat-
+ing the local fiducial layer as non-crystallized during the MHD
+experiment.
+It does not determine the global crystallization
+front, the detailed temperature profile of the newly accreted
+crust, or the composition produced by burning and electron cap-
+tures. Those quantities depend on the fallback history, heat con-
+duction, nuclear processing, and the coupling between the ac-
+creted envelope and the underlying NS. They should therefore
+be checked in a thermal-evolution calculation.
+3. MHD model and numerical setup
+3.1. Equations and numerical method
+We solve the compressible resistive-MHD equations in a lo-
+cal Cartesian domain using flash 4.7 [51]. The simulations em-
+ploy the unsplit staggered-mesh (USM) solver [65, 66], with
+magnetic fields represented on staggered faces and advanced
+by constrained transport. The equations below are written in
+the units used by the code, i.e., Gaussian-cgs units. The gov-
+erning equations are
+∂ρ
+∂t + ∇· (ρ v) = 0,
+(6)
+∂(ρv)
+∂t
++ ∇·Π = ρ fstir,
+(7)
+∂B
+∂t −∇×(v×B) = −∇×(η ∇×B) ,
+(8)
+∇·B = 0,
+(9)
+with total energy evolved according to
+∂E
+∂t + ∇·
+" 
+E + P + 1
+2B2
+!
+v −B (v·B)
+#
+= ρ v·fstir −Qν(ρ, T) + ∇·η B×(∇×B) .
+(10)
+where
+Π = ρ vv −BB +
+ 
+P + 1
+2B2
+!
+I,
+(11)
+E = ρeint + 1
+2ρ v2 + 1
+2B2.
+(12)
+The source terms are the imposed turbulent acceleration fstir, the
+neutrino emissivity Qν, and the explicit Ohmic resistivity η.
+The pressure and specific internal energy are obtained from
+the Helmholtz EOS [67], evaluated for our fiducial composition
+of a single fully ionized He4 species with A = 4, Z = 2, and
+Ye = 0.5. In the EOS-control run P-C, the Helmholtz closure is
+replaced by an ideal gas with P = (γ −1)ρeint and γ = 5/3.
+The USM scheme is second-order accurate in space and time
+for smooth flows. We use the HLLD Riemann solver [68], the
+van Leer slope limiter with characteristic limiting, and an ex-
+plicit Courant-Friedrichs-Lewy number CFL = 0.4, including
+the restriction from the resistive diffusion step. The divergence
+constraint is controlled by the constrained-transport update of
+the staggered magnetic field; in the periodic-box runs presented
+here, ∇·B remains at round-off level.
+The simulations represent a local, non-stratified patch of the
+liquid post-hypercritical accretion layer. We adopt a fiducial
+thermodynamic state (ρ0, T0), initial uniform magnetic field
+B0 = B0 ˆz with B0 = 1012 G, and initial velocity zero. The
+magnetic field strength is chosen to match a buried-strength
+seed field, but the initial geometry is not intended to represent
+a global buried configuration.
+The computational domain is a cube of side L = 100 m with
+periodic boundary conditions in all directions. The production
+runs use a uniform 1283 mesh, corresponding to ∆x = 0.78 m,
+while the resolution check P-A2 HR uses 2563 cells, corre-
+sponding to ∆x = 0.39 m.
+We adopt a constant gravitational acceleration representative
+of the expected value at the NS surface: for M = 1.4 M⊙,
+R = 10 km NS, gNS = GM/R2 ≃1.86×1014 cm s−2. At the fidu-
+cial density and electron fraction, the relativistic degenerate-
+electron pressure is approximately [57], Pe ≃Krel(ρYe)4/3 ≃
+1.06 × 1028 erg cm−3, where Krel = 1.244 × 1015 in cgs units,
+3
+
+
+so HP = Pe/(ρ gNS) ≈53 m, and L ≃1.9HP. Therefore, the
+box is comparable to the local pressure scale height. The pe-
+riodic setup should consequently be understood as a controlled
+turbulence experiment under post-hypercritical thermodynamic
+conditions. A self-consistent hydrostatic model accounting for
+a stratified crustal layer, buoyancy, vertical transport, compo-
+sitional gradients, and a moving crystallization front is beyond
+the scope of the present simulations (see Sec. 5).
+3.2. Source terms
+Turbulence is driven by an externally imposed stochastic ac-
+celeration field fstir(x, t). The forcing is constructed in Fourier
+space as an Ornstein-Uhlenbeck process [69, 70, 71]. For each
+excited mode, the forcing amplitude evolves as
+dˆfk = −
+ˆfk
+τcorr
+dt + σk P⊥
+k · dWt,
+(13)
+where τcorr is the autocorrelation time, dWt is a Wiener in-
+crement, and P⊥
+i j = δij −ˆkiˆk j projects out the compressive
+component. Therefore, the forcing is, by construction, purely
+solenoidal, ∇·fstir = 0.
+The forcing is applied over the band kmin = 6.28×10−4 cm−1,
+kmax = 1.885 × 10−3 cm−1, corresponding to wavelengths be-
+tween the box size and one-third of the box size. The parabolic
+forcing envelope peaks at kpeak = (kmin + kmax)/2, i.e.
+at
+an injection scale λpeak ≃L/2. The autocorrelation time is
+τcorr = 10−4 s, comparable to the eddy turnover time in the ref-
+erence run. The forcing normalization εst controls the resulting
+turbulent velocity and hence the magnetic Reynolds number.
+The values are listed in Table 1.
+As for the neutrino cooling term, we adopt a volumetric rate
+Qν = Qpair + Qphoto + Qplasmon
+(14)
+that includes pair annihilation, photo-neutrino, and plasmon de-
+cay terms computed from the analytic fits in [61]. The high-
+density URCA cooling channel is inactive at the fiducial den-
+sity. The cooling update solves deint/dt = −Qν/ρ and applies
+the corresponding change to the total energy. A temperature
+floor T ≥107 K keeps the update within the validity range of
+the tabulated emissivity fits. In the control run P-B, cooling is
+switched off by setting Qν = 0.
+We use a constant isotropic magnetic resistivity η = 109 cm2
+s−1. This value is not a physical estimate of the resistivity of
+the post-hypercritical layer. It is a numerical choice that keeps
+the resistive scale marginally resolved while placing the sim-
+ulations in a dynamo-active regime. The magnetic Reynolds
+number is therefore much smaller than the physical value ex-
+pected for a newborn NS envelope, but large enough to test SSD
+growth in a controlled resistive-MHD calculation. For the refer-
+ence run, the resistive scale is resolved by only a few grid cells.
+This limitation is addressed through the 2563 resolution check
+and discussed further in Sec. Appendix A.
+The Ohmic contribution is included consistently in the induc-
+tion and energy equations. The resistive dissipation rate is
+˙eOhm = η (∇×B)2 ,
+(15)
+and the dissipated magnetic energy is returned to the internal
+energy reservoir.
+3.3. Control parameters
+The magnetic Reynolds number, Mach number, and effective
+magnetic Prandtl number are defined as
+Rm = vrmsL
+η
+,
+M = vrms
+cs
+,
+Pm = νnum
+η ,
+(16)
+where vrms = ⟨v2⟩1/2 is a volume average speed, cs is the sound
+speed, and νnum is the effective numerical viscosity of the USM
+solver. At the resolutions used here, νnum is comparable to the
+explicit magnetic diffusivity, so the simulations operate at an
+effective numerical Pm ∼1, set by the scheme and the adopted
+resistivity rather than by the microphysics. In the freshly ac-
+creted post-hypercritical layer modeled here, the electrons are
+strongly degenerate and the electrical conductivity is high, so
+the microscopic magnetic diffusivity η = c2/(4πσ) is many or-
+ders of magnitude smaller than the value adopted here, imply-
+ing a microscopic magnetic Prandtl number Pm ≫1 [63, 56].
+Reaching this regime numerically is not feasible, so, as is stan-
+dard in dynamo and MRI simulations of compact-object plas-
+mas, an order-unity value is adopted as a compromise [14, 19].
+Thus, our conclusions are restricted to the resolved, numerical-
+Pm regime explored in the simulations.
+We monitor the volume-averaged kinetic and magnetic en-
+ergies, Ekin and Emag, the rms magnetic field Brms, the tur-
+bulent Mach number, and the magnetic-to-kinetic energy ra-
+tio fsat = Emag/Ekin in the saturated phase. Growth rates are
+measured from the exponential phase of Emag(t) before non-
+linear magnetic back-reaction becomes important.
+We use
+Emag/Ekin = 0.05 as indicative of the onset of nonlinear back-
+reaction. This threshold is used only to compare runs consis-
+tently, not as a universal saturation criterion.
+Table 1 summarizes the values of the parameters of the six
+simulations used in this work. Runs P-A1, P-A2, and P-A3
+form the 1283 magnetic-Reynolds-number survey with identi-
+cal microphysics and different forcing amplitudes. Runs P-A2,
+P-B, and P-C form the physics-control set: P-A2 and P-B iso-
+late the effect of neutrino cooling, while P-B and P-C isolate
+the effect of the thermodynamic closure. Run P-A2 HR is the
+2563 counterpart of P-A2 and provides a resolution check for
+the reference case.
+Table 1: Production run matrix and key measurements. εst is the stochastic-
+forcing normalization; Rm = vrmsL/η is the box-scale magnetic Reynolds num-
+ber; M = vrms/cs is the turbulent Mach number; Bsat/B0 is the saturation ampli-
+fication factor; and fsat = Emag/Ekin is the saturated magnetic-to-kinetic energy
+ratio.
+Run
+EOS
+Cool.
+εst
+Rm
+M
+Bsat/B0
+fsat
+P-A1
+Helm.
+ON
+1017
+670
+0.06
+8.4
+0.13
+P-A2
+Helm.
+ON
+1019
+2150
+0.21
+34.5
+0.20
+P-A2 HR
+Helm.
+ON
+1019
+2280
+0.22
+35.5
+0.21
+P-A3
+Helm.
+ON
+1020
+3700
+0.37
+68.4
+0.28
+P-B
+Helm.
+OFF
+1019
+2050
+0.20
+39.5
+0.30
+P-C
+Ideal
+OFF
+1019
+2100
+0.19
+40.4
+0.35
+4
+
+
+4. Results
+Figure 2 shows that in all six runs, the rms magnetic field
+grows from the seed value B0 = 1012 G and reaches a sta-
+tistically steady saturated level, Bsat.
+Panel (a) shows the
+amplification factor Brms/B0. There is a monotonic increase
+in the saturation amplitude with the Reynolds number, hence
+with increasing forcing strength. Run P-A1, with Rm ≃670,
+reaches Brms/B0 ≃8. Run P-A2, with Rm ≃2150, reaches
+Brms/B0 ≃35, corresponding to Bsat ≃3.5 × 1013 G. Run P-A3,
+with Rm ≃3700, reaches Brms/B0 ≃70, or Bsat ≃7 × 1013 G.
+Because the run suite does not include a subcritical case, these
+simulations do not determine Rm,crit, but show that for the range
+Rm ≃700–3700, the system lies in a dynamo-active regime
+with the saturation level increasing with Rm.
+The runs P-B
+and P-C, both close to the reference forcing amplitude, reach
+Brms/B0 ≃40. Their saturation values are slightly higher than
+that of P-A2, but the difference is modest compared with the
+change between the low-, reference-, and high-Rm cases. This
+behavior is consistent with small differences in the measured
+turbulent velocities and with realization-to-realization scatter in
+the saturated state (see Sec. Appendix A).
+Panel (b) shows the ratio Emag/Ekin. At the beginning of
+the run, the velocity field is still being established by the
+stochastic forcing, so the initial value of this ratio is not phys-
+ically meaningful. After a short transient, the kinetic energy
+reaches the forced-turbulence level, and the magnetic energy
+enters an exponential growth phase. Nonlinear magnetic back-
+reaction becomes visible when Emag/Ekin approaches a few per-
+cent. The saturated states are in sub-equipartition. We measure
+fsat = Emag/Ekin ≃0.13 for P-A1, fsat ≃0.20–0.21 for P-A2
+and P-A2 HR, fsat ≃0.28 for P-A3, fsat ≃0.30 for P-B, and
+fsat ≃0.35 for P-C. These values are consistent with the range
+commonly found in numerical studies of subsonic SSDs at nu-
+merical Pm ∼1 [33, 31, 34, 36, 38].
+Panel (c) shows that all simulations remain subsonic. The
+four runs with the reference forcing amplitude, P-A2, P-A2 HR,
+P-B, and P-C, cluster at M ≃0.19–0.22. The low- and high-
+forcing runs bracket this range, with M ≃0.06 for P-A1 and
+M ≃0.37 for P-A3. The small Mach numbers explain why
+density fluctuations remain weak and why the induction equa-
+tion is controlled primarily by the velocity field and the mag-
+netic diffusivity, rather than by compressible shocks or large
+thermodynamic fluctuations.
+We turn to the morphology of the magnetic field and the
+density.
+Figure 3 shows midplane slices of the density and
+magnetic-field strength for the reference run P-A2. The mag-
+netic field evolves from a uniform seed into a tangled, intermit-
+tent structure. During the kinematic stage, the flow stretches the
+field into narrow sheets and filaments. By t ≃0.4–0.5 ms the
+magnetic structure is fully developed, and the run has entered
+the nonlinear saturated regime. The density field, by contrast,
+remains nearly uniform: fluctuations are of order δρ/ρ ∼10−4,
+consistent with the low Mach number. This weak compressibil-
+ity indicates that magnetic growth is driven by turbulent stretch-
+ing and folding of field lines rather than by compression, con-
+sistent with a local SSD at work.
+The spectral signature of the dynamo provides the most strin-
+gent test of its small-scale character. Figure 4 shows the kinetic
+[Panel (a)] and magnetic [Panel (b)] energy spectra of run P-
+A2 at five representative times. During the kinematic phase
+(t ≲0.15 ms), the magnetic spectrum EM(k) peaks at scales
+well below the forcing scale and exhibits a positive slope in
+the large-scale range consistent with the Kazantsev k3/2 pre-
+diction [29, 31], characteristic of a stochastically driven SSD.
+The kinetic spectrum EK(k) displays a well-developed inertial
+range with a slope compatible with the Kolmogorov k−5/3 scal-
+ing, confirming that the turbulent cascade is properly resolved
+at the simulation resolution.
+As the dynamo enters saturation, the magnetic spectrum am-
+plifies by more than three orders of magnitude across all scales,
+but its shape changes: the peak shifts slightly toward smaller
+scales, and the spectrum flattens at large k, indicating satura-
+tion due to back-reaction on the smallest turbulent eddies. Cru-
+cially, the saturated EM(k) remains sub-equipartition at large
+and intermediate scales, with EM(k)/EK(k) ∼10−2–10−1, and
+approaches equipartition only near the resistive scale.
+This
+residual deficit of large-scale magnetic energy is the canonical
+SSD signature reported in incompressible [31, 30], and com-
+pressible [34, 36, 72] simulations, and confirms that the field
+amplification in our setup is driven by the SSD mechanism.
+We measure the kinematic growth rate from the exponen-
+tial rise of the magnetic energy. Since Emag ∝B2, we write
+Emag(t) ∝exp(2γt), where γ is the magnetic-field growth rate.
+The fitting interval starts after the initial forcing transient, at the
+global minimum of Emag(t), and ends when Emag/Ekin = 0.05.
+This choice avoids both the artificial start-up phase and the non-
+linear saturation stage. For the reference run P-A2, we obtain
+γteddy ≃2.6, where teddy = L/vrms is the box-scale eddy turnover
+time. The high-resolution run P-A2 HR gives a value within
+≃7% of the reference result (Table A.2). The measured value
+falls within the broad range reported in numerical SSD studies
+at comparable numerical Pm and moderate Rm [34, 73, 36, 72].
+The saturation field can be understood from a simple energy ar-
+gument. In the saturated state, the magnetic energy reaches a
+fraction fsat of the turbulent kinetic energy. Expressed in phys-
+ical Gaussian units, this gives
+Bsat = vrms
+p
+4π fsat ρ0.
+(17)
+For P-A2, using vrms ≃2.1 × 108 cm s−1, ρ0 = 1010 g cm−3, and
+fsat ≃0.20, Eq. (17) gives Bsat ≃3.3 × 1013 G, in agreement
+with the measured value ≃3.5×1013 G. For P-A3, using vrms ≃
+3.7 × 108 cm s−1 and fsat ≃0.28, the same estimate gives Bsat ≃
+6.9 × 1013 G, again consistent with the numerical simulation.
+This scaling indicates that once the SSD reaches saturation,
+Bsat is set primarily by the turbulent kinetic energy reservoir
+and the density, and is independent of the initial seed amplitude.
+The role of B0 is to set the duration of the kinematic phase. For
+a weaker seed, the same saturated state would be reached later,
+provided the forcing persists long enough.
+5
+
+
+Figure 2: Global evolution of the six simulations. (a) Magnetic-field amplification, Brms/B0. The right axis gives Brms in physical units. (b) Magnetic-to-kinetic
+energy ratio, Emag/Ekin. (c) Turbulent Mach number, M = vrms/cs. The runs with Rm ≳2000 (P-A2, P-A2 HR, P-B, and P-C) saturate at Brms/B0 ≃35–40, while
+the highest-Rm case P-A3 reaches Brms/B0 ≃70. The lowest-Rm case P-A1 shows weaker amplification and saturates at Brms/B0 ≃8. The dotted horizontal line in
+panel (b) marks the threshold Emag/Ekin = 0.05, used here to identify the onset of nonlinear magnetic back-reaction.
+Figure 3: Morphological evolution of the reference run P-A2, shown as two-dimensional slices through the box midplane (z = L/2) at four selected times. Top row:
+log10 ρ [g cm−3], displayed with a diverging colormap centered on the mean density ρ0 = 1010 g cm−3 to highlight the small compressive fluctuations. Bottom row:
+log10 |B| [G], with a sequential colormap spanning the seed-field value B0 = 1012 G and the amplified state. From left to right: initial condition (t = 0), kinematic
+phase (t = 0.19 ms), nonlinear onset (t = 0.35 ms), and saturated state (t = 0.52 ms). The initially uniform seed field is stretched and folded into intermittent sheets
+and filaments characteristic of the SSD action. Density fluctuations remain small, δρ/ρ ∼10−4, consistent with the subsonic, nearly incompressible regime.
+5. Limitations
+Before concluding, we summarize and discuss the main lim-
+itations that circumscribe the validity of the results of the nu-
+merical simulations presented in this article.
+Sustained versus decaying turbulence. The simulations use
+continuous Ornstein-Uhlenbeck forcing to obtain growth rates
+and saturation levels under statistically controlled conditions.
+In the post-hypercritical accretion layer, turbulence inherited
+from the accretion envelope may decay after fallback subsides.
+In this context, our saturated amplitudes should be interpreted
+as the outcome if turbulent motions persist for several eddy
+turnover times. A decaying-turbulence calculation is needed
+to determine whether the kinetic-energy reservoir is sufficient
+to reach the same saturation level.
+Forcing geometry. The forcing is purely solenoidal, which fa-
+vors SSD growth relative to compressive forcing [34, 73]. Real
+post-fallback turbulence is unlikely to be purely solenoidal.
+Mixed or more compressive forcing could reduce the growth
+rate and possibly the saturation fraction at fixed Rm.
+6
+
+
+Figure 4: Spectral signature of the SSD in run P-A2. (a) Kinetic energy spectrum EK(k) at saturation (solid black) and magnetic energy spectra EM(k) at five
+selected times spanning the kinematic phase (t = 0.05, 0.10 ms, dashed) and the saturated phase (t = 0.20, 0.50, 1.00 ms, solid). Dotted lines indicate the Kazantsev
+k3/2 slope characteristic of kinematic SSD growth and the Kolmogorov k−5/3 inertial-range slope. The vertical grey line marks the forcing scale kf ≃2π/L. (b)
+Ratio EM(k)/EK(k) during the kinematic phase (t = 0.10 ms) and at saturation (t = 1.00 ms). The horizontal dashed line indicates spectral equipartition.
+Resolution and resistive scale. The 1283 runs marginally re-
+solve the resistive scale. The 2563 reference run shows that
+Brms/B0, fsat, vrms, and M are robust to a factor-of-two increase
+in linear resolution, but this is not a formal convergence study
+of the turbulent spectrum or of the dissipation-range struc-
+ture. Higher-resolution calculations are required to measure the
+growth rate and magnetic spectra with greater precision.
+Magnetic Prandtl number. The simulations operate at an effec-
+tive numerical Pm ∼1 because the explicit magnetic diffusiv-
+ity is comparable to the scheme’s effective numerical viscos-
+ity. The microscopic transport coefficients in a hot newborn
+NS envelope are uncertain and vary with density, temperature,
+and composition. Our conclusions are restricted to the resolved
+finite-Rm, numerical-Pm regime studied here.
+Periodic geometry and stratification. The domain is periodic,
+uniform, and has constant gravitational acceleration. While tur-
+bulent stretching is captured, hydrostatic stratification, buoy-
+ancy, vertical transport, compositional gradients, and the mo-
+tion of a crystallization front are not considered. This idealiza-
+tion could be significant as the box size is comparable to the
+local pressure-gradient scale height.
+Initial magnetic geometry. The seed magnetic field is uniform.
+This is adequate for a controlled SSD test, but is probably not
+representative of a realistic buried configuration. Multidimen-
+sional MHD simulations of magnetic submergence by hyper-
+critical fallback find that the advected field is left with a compli-
+cated, predominantly non-dipolar geometry, sheared and con-
+centrated near the interface between the newly accreted material
+and the underlying pre-existing layers [5, 6, 7]. Such a config-
+uration could modify both the onset of local amplification and
+the subsequent magnetic topology.
+Composition and thermal evolution. The fiducial model uses
+He4 (Z = 2, A = 4). The post-hypercritical accretion layer may
+contain heavier ashes and evolve through burning, electron cap-
+ture, and compositional separation. These effects can change
+the EOS, conductivities, neutrino emissivities, and freezing
+temperature. The composition considered in Sec. 2 shows that
+the fiducial state remains liquid for representative species, but
+does not replace a full compositional-evolution calculation.
+Connection to observable magnetar fields. The simulations
+amplify the local rms magnetic field to ∼1013–1014 G. They
+do not show that this energy becomes an observable external
+dipole, nor that it produces a magnetar. The calculation con-
+strains a possible local source of internal small-scale magnetic
+energy, but its subsequent conversion, survival, or reorganiza-
+tion belongs to the solid-crust Hall-Ohmic stage.
+6. Conclusions
+We have carried out a local 3D resistive-MHD study of SSD
+action under thermodynamic conditions motivated by the liquid
+post-hypercritical accretion layer of a newborn NS. The calcu-
+lations are designed as a controlled viability test of SSD action
+under post-hypercritical accretion conditions. Within this scope
+and the limitations discussed in Sec. 5, our main conclusions
+are as follows.
+7
+
+
+1. The fiducial thermodynamic state, ρ0 = 1010 g cm−3 and
+T0 = 2×109 K, lies well on the liquid side of the Coulomb
+freezing boundary. The local cooling time is many orders
+of magnitude longer than the eddy turnover and magnetic-
+amplification times. This supports the use of fluid MHD
+to test local magnetic amplification during early post-
+hypercritical accretion.
+2. Externally forced subsonic turbulence drives exponential
+magnetic growth in all simulations with Rm ≃700–3700.
+Starting from B0 = 1012 G, the rms magnetic field satu-
+rates at Bsat ≃3 × 1013–7 × 1013 G in the reference and
+high-Rm cases, corresponding to amplification factors of
+∼35–70 on millisecond timescales.
+3. The saturated states remain sub-equipartition, with fsat =
+Emag/Ekin ≃0.2–0.3 for the main dynamo-active runs.
+The saturation fields obey the scaling (17), indicating that
+the final field strength is determined primarily by the tur-
+bulent kinetic energy reservoir and the density, indepen-
+dent of the seed-field amplitude.
+4. The control runs show that, in the subsonic regime ex-
+plored here, neutrino cooling has no measurable dynam-
+ical effect on the magnetic growth over the simulated in-
+terval, and the choice between the Helmholtz and ideal-gas
+closures weakly affects the results. The 2563 reference run
+confirms that Brms/B0, fsat, vrms, and M are robust to a
+factor-of-two increase in linear resolution.
+The field strengths reached in the saturated runs, Bsat ∼(3–
+7) × 1013 G, are comparable to the internal multipolar fields
+commonly invoked in hidden-field models of CCOs and low-
+field magnetars [44, 45, 46, 47]. These results indicate that
+SSD action in the liquid post-hypercritical layer may provide
+an additional source of small-scale magnetic energy prior to the
+onset of Hall-Ohmic evolution. If even a modest fraction of
+this energy survives, it could contribute to the hidden magnetic
+reservoir inferred in CCOs and low-field magnetars. Further
+simulations of the subsequent Hall-Ohmic evolution are needed
+to determine how much of this magnetic energy survives crys-
+tallization, how it couples to Hall drift in the solid crust, or how
+it reorganizes into a large-scale component capable of affecting
+the external dipole.
+Acknowledgments
+D.F.B. acknowledges the support of the Observatorio As-
+tronómico Nacional, Universidad Nacional de Colombia, and
+the fellowship support received during his M.Sc.
+studies in
+Astronomy. C.G.B. acknowledges support from the Universi-
+dad Nacional de Colombia, where he is a faculty member in
+physics and astrophysics at the Departamento de Física, Fac-
+ultad de Ciencias. J.A.R. acknowledges support from the Uni-
+versità degli Studi di Ferrara and ICRANet at the University
+of Ferrara. The authors acknowledge the FLASH Center for
+Computational Science at the University of Rochester for mak-
+ing the flash code available to the astrophysical community.
+The simulations presented in this work were performed on the
+high-performance computing facilities of the Centre for Analyt-
+ics, Informatics and Research (CAIR) at Memorial University
+of Newfoundland, Canada, whose computational resources and
+technical support are gratefully acknowledged.
+References
+[1] R. A. Chevalier, ApJ 346 (1989) 847.
+[2] J. C. Houck, R. A. Chevalier, ApJ 376 (1991) 234.
+[3] A. Muslimov, D. Page, ApJ 440 (1995) L77.
+[4] C. L. Fryer, W. Benz, M. Herant, The Dynamics and
+Outcomes of Rapid Infall onto Neutron Stars, ApJ460
+(1996) 801.
+arXiv:astro-ph/9509144, doi:10.
+1086/177011.
+[5] U. Geppert, D. Page, T. Zannias, A&A 345 (1999) 847.
+[6] C. G. Bernal, D. Page, W. H. Lee, ApJ 770 (2013) 106.
+[7] A. Torres-Forné, P. Cerdá-Durán, J. A. Pons, J. A. Font,
+MNRAS 456 (2016) 3813.
+[8] C. G. Bernal, N. Fraija, MNRAS 462 (2016) 3646.
+[9] N. Fraija, C. G. Bernal, A. M. Hidalgo-Gámez, MNRAS
+442 (2014) 239.
+[10] N. Fraija, C. G. Bernal, MNRAS 451 (2015) 455.
+[11] N. Fraija, C. G. Bernal, G. Morales, R. Negreiros, JCAP
+12 (2018) 023.
+[12] N. Fraija, C. G. Bernal, MNRAS 484 (2019) 3262.
+[13] R. C. Duncan, C. Thompson, ApJ 392 (1992) L9.
+[14] C. Thompson, R. C. Duncan, ApJ 408 (1993) 194.
+[15] S. Akiyama, J. C. Wheeler, D. L. Meier, I. Lichtenstadt,
+ApJ 584 (2003) 954.
+[16] M. Obergaulinger, P. Cerdá-Durán, E. Müller, M. A. Aloy,
+A&A 498 (2009) 241.
+[17] P. Mösta, C. D. Ott, D. Radice, et al., Nature 528 (2015)
+376.
+[18] R. Raynaud, J. Guilet, H.-T. Janka, T. Gastine, Sci. Adv.
+6 (2020) eaay2732.
+[19] A. Reboul-Salze, J. Guilet, R. Raynaud, M. Bugli, A&A
+645 (2021) A109.
+[20] P. Goldreich, A. Reisenegger, ApJ 395 (1992) 250.
+[21] A. Cumming, P. Arras, E. Zweibel, ApJ 609 (2004) 999.
+[22] J. A. Pons, U. Geppert, A&A 470 (2007) 303.
+[23] J. A. Pons, J. A. Miralles, U. Geppert, A&A 496 (2009)
+207.
+8
+
+
+[24] D. Viganò, N. Rea, J. A. Pons, et al., MNRAS 434 (2013)
+123.
+[25] K. N. Gourgouliatos, A. Cumming, MNRAS 438 (2014)
+1618.
+[26] K. N. Gourgouliatos, T. S. Wood, R. Hollerbach, Proc.
+Natl. Acad. Sci. 113 (2016) 3944.
+[27] J. A. Pons, D. Viganò, Liv. Rev. Comput. Astrophys. 5
+(2019) 3.
+[28] A. P. Igoshev, S. B. Popov, R. Hollerbach, Universe 7
+(2021) 351.
+[29] A. P. Kazantsev, Soviet Phys. JETP 26 (1968) 1031.
+[30] A. Brandenburg, K. Subramanian, Phys. Rep. 417 (2005)
+1.
+[31] A. A. Schekochihin, S. C. Cowley, S. F. Taylor, J. L.
+Maron, J. C. McWilliams, ApJ 612 (2004) 276.
+[32] A. A. Schekochihin, S. C. Cowley, J. L. Maron, J. C.
+McWilliams, Phys. Rev. Lett. 92 (2004) 054502.
+[33] N. E. L. Haugen, A. Brandenburg, W. Dobler, Phys. Rev.
+E 70 (2004) 016308.
+[34] C. Federrath, G. Chabrier, J. Schober, et al., Phys. Rev.
+Lett. 107 (2011) 114504.
+[35] J. Schober, D. Schleicher, C. Federrath, R. Klessen,
+R. Banerjee, Phys. Rev. E 85 (2012) 026303.
+[36] A. Seta, C. Federrath, MNRAS 499 (2020) 2076.
+[37] A. Seta, C. Federrath, MNRAS 502 (2021) 2220.
+[38] A. Seta, C. Federrath, MNRAS 514 (2022) 957.
+[39] N. Kriel, J. R. Beattie, A. Seta, C. Federrath, MNRAS 513
+(2022) 2457.
+[40] A. De Luca, in: AIP Conf. Ser., Vol. 983, 2008, p. 311.
+[41] E. V. Gotthelf, J. P. Halpern, ApJ 632 (2005) 1075.
+[42] J. P. Halpern, E. V. Gotthelf, ApJ 709 (2010) 436.
+[43] E. V. Gotthelf, J. P. Halpern, J. Alford, ApJ 765 (2013) 58.
+[44] N. Shabaltas, D. Lai, ApJ 748 (2012) 148.
+[45] S. Bogdanov, ApJ 790 (2014) 94.
+[46] J. Luo, C.-Y. Ng, W. C. G. Ho, et al., ApJ 808 (2015) 130.
+[47] A. P. Igoshev, K. N. Gourgouliatos, R. Hollerbach, T. S.
+Wood, ApJ 909 (2021) 101.
+[48] N. Rea, P. Esposito, R. Turolla, et al., Science 330 (2010)
+944.
+[49] N. Rea, G. L. Israel, P. Esposito, et al., ApJ 754 (2012) 27.
+[50] N. Rea, D. Viganò, G. L. Israel, J. A. Pons, D. F. Torres,
+ApJ 781 (2014) L17.
+[51] B. Fryxell, K. Olson, P. Ricker, F. X. Timmes, M. Zin-
+gale, D. Q. Lamb, P. MacNeice, R. Rosner, J. W. Truran,
+H. Tufo, Flash: An adaptive mesh hydrodynamics code
+for modeling astrophysical thermonuclear flashes, Astro-
+physical Journal Supplement Series 131 (2000) 273–334.
+[52] A. Burrows, J. M. Lattimer, ApJ 307 (1986) 178.
+[53] J. A. Pons, S. Reddy, M. Prakash, J. M. Lattimer, J. A.
+Miralles, ApJ 513 (1999) 780.
+[54] R. Negreiros, R. Ruffini, C. L. Bianco, J. A. Rueda, A&A
+540 (2012) A12.
+[55] R. Negreiros,
+L. Tolos,
+M. Centelles,
+A. Ramos,
+C. Providência, ApJ 895 (2020) 112.
+[56] A. Y. Potekhin, J. A. Pons, D. Page, Space Sci. Rev. 191
+(2015) 239.
+[57] S. L. Shapiro, S. A. Teukolsky, Black Holes, White
+Dwarfs, and Neutron Stars: The Physics of Compact Ob-
+jects, Wiley, New York, 1983.
+[58] R. T. Farouki, S. Hamaguchi, Phys. Rev. E 47 (1993)
+4330.
+[59] A. Y. Potekhin, G. Chabrier, Phys. Rev. E 62 (2000) 8554.
+[60] M. Haft, G. Raffelt, A. Weiss, ApJ 425 (1994) 222.
+[61] N. Itoh, H. Hayashi, A. Nishikawa, Y. Kohyama, ApJS
+102 (1996) 411.
+[62] L. Becerra, C. L. Bianco, C. L. Fryer, J. A. Rueda,
+R. Ruffini, On the Induced Gravitational Collapse Sce-
+nario of Gamma-ray Bursts Associated with Supernovae,
+ApJ833 (1) (2016) 107. arXiv:1606.02523, doi:10.
+3847/1538-4357/833/1/107.
+[63] D. G. Yakovlev,
+A. D. Kaminker,
+O. Y. Gnedin,
+P. Haensel, Phys. Rep. 354 (2001) 1.
+[64] P. Haensel, J. L. Zdunik, A&A 480 (2008) 459.
+[65] D. Lee, A. E. Deane, J. Comput. Phys. 228 (2009) 952.
+[66] D. Lee, J. Comput. Phys. 243 (2013) 269.
+[67] F. X. Timmes, F. D. Swesty, ApJS 126 (2000) 501.
+[68] T. Miyoshi, K. Kusano, J. Comput. Phys. 208 (2005) 315.
+[69] V. Eswaran, S. B. Pope, Comput. Fluids 16 (1988) 257.
+[70] W. Schmidt, C. Federrath, M. Hupp, S. Kern, J. C.
+Niemeyer, A&A 494 (2009) 127.
+[71] C. Federrath, J. Roman-Duval, R. S. Klessen, W. Schmidt,
+M.-M. Mac Low, A&A 512 (2010) A81.
+9
+
+
+[72] R. Achikanath Chirakkara, C. Federrath, P. Trivedi,
+R. Banerjee, Phys. Rev. Lett. 126 (2021) 091103.
+[73] C. Federrath, J. Schober, S. Bovino, D. R. G. Schleicher,
+ApJ 797 (2014) L19.
+Appendix A. Resolution and microphysical checks
+We simulate the reference case P-A2 at 2563 cells to assess
+the sensitivity of the main simulation parameters to resolution.
+The comparison with the 1283 run is shown in Table A.2.
+Table A.2: Resolution check for the reference model: P-A2 (1283) versus P-A2
+HR (2563). The quoted difference is relative to the 1283 value.
+Metric
+1283
+2563
+∆
+Rm
+2150
+2280
++5.9 %
+M
+0.213
+0.218
++2.3 %
+vrms [cm s−1]
+2.13 × 108
+2.18 × 108
++2.3 %
+γ teddy
+2.58
+2.76
++7.0 %
+Bsat [G]
+3.45 × 1013
+3.55 × 1013
++2.9 %
+Bsat/B0
+34.5
+35.5
++2.9 %
+fsat
+0.203
+0.213
++4.5 %
+The two resolutions agree at the few-percent level in vrms, M,
+Bsat/B0, and fsat, while the fitted growth rate differs by about
+7%. Thus, we can consider that the obtained values are robust
+to this factor-of-two increase in linear resolution. A detailed
+spectral convergence is left for a future higher-resolution work.
+Regarding the microphysics, the runs assess two choices:
+neutrino cooling and the thermodynamic EOS. P-A2 and P-B
+differ by the presence or absence of the neutrino-cooling source
+term. P-B and P-C both omit cooling but use the Helmholtz
+and ideal-gas EOS, respectively. Runs P-A2 and P-B show very
+similar magnetic growth and saturation. The measured satura-
+tion factors are Bsat/B0 = 34.5 and 39.5, respectively. This dif-
+ference is modest compared with the variation across the Rm
+survey and is consistent with the slightly different measured
+turbulent velocities and the scatter in saturation levels. More
+importantly, no qualitative change appears in the growth curve
+when cooling is removed.
+This behavior is expected from the timescale estimate [see
+Eq. (5)]. At the fiducial thermodynamic state (ρ0, T0), the neu-
+trino cooling time is many orders of magnitude longer than the
+eddy turnover and magnetic-amplification times. During the
+simulated millisecond interval, turbulent driving and dissipa-
+tion dominate the energy evolution. Thus, in the regime ex-
+plored here, cooling sets the long-term thermal lifetime of the
+liquid layer but does not affect the short-time SSD growth.
+Runs P-B and P-C produce almost identical saturated am-
+plification factors, Bsat/B0 = 39.5 and 40.4, and similar Mach
+numbers, M ≈0.20 and 0.19. This result does not imply that
+the EOS is generally unimportant in newborn NS envelopes.
+It indicates that, for the present conditions (subsonic, nearly
+incompressible, solenoidal forced flow), the SSD is controlled
+mainly by Rm and the velocity field. The weak EOS sensitivity
+agrees with the small density fluctuations seen in Fig. 3. For
+weak compressibility, the induction equation is governed by
+stretching, folding, and diffusion of the magnetic field by the
+velocity field. Thermodynamic differences could be more im-
+portant in regimes with stronger compressibility, shocks, buoy-
+ancy, stratification, or larger temperature and composition con-
+trasts, which are absent from the present setup.
+10

@@ -1,0 +1,479 @@
+From the Early Slope to Curvature: Future Prospects and
+challenges for Astrophysical Parameter Estimation Using the
+Core-Collapse Supernova High-Frequency Feature
+Alejandro Casallas-Lagos
+∗
+Faculty of Physics, University of Warsaw, Warsaw, Poland
+Marek Szczepańczyk
+Faculty of Physics, University of Warsaw, Warsaw, Poland
+Michele Zanolin
+Department of Physics and Astronomy, ERAU, Arizona, U.S.
+Anthony Mezzacappa
+Department of Physics and Astronomy, University of Tennessee, Knoxville, U.S.
+Abstract
+Gravitational-wave (GW) signals from core-collapse supernovae (CCSNe) contain both
+stochastic and deterministic components. Among these, the High-Frequency Feature (HFF),
+associated with PNS oscillations, has emerged as a robust observable for probing dense-
+matter physics. Previous studies of the HFF have primarily focused on the early-time slope
+as a diagnostic of PNS contraction and its dependence on the equation of state (EOS). In this
+work, we extend the analysis beyond the early-time linear regime. In particular, we discuss
+how higher-order features of the HFF evolution, such as its curvature, may encode additional
+information about the time-dependent structure of the PNS and the transition between
+oscillation modes. Using real interferometric noise and reconstruction techniques on detected
+candidates by the coherent WaveBurst (cWB) algorithm in its cWB-XP implementation, we
+illustrate how such features can be accessed. By comparing reconstructed signals at different
+source distances, we assess the relative impact of detector noise.
+Keywords: gravitational waves; core-collapse supernovae; deterministic features in CCSN GW
+signals; multimessenger astronomy; parameter estimation
+1
+Introduction
+Numerical relativity and data analysis communities have made substantial progress in devel-
+oping models for the characterization of gravitational-wave (GW) signals from core-collapse
+supernovae (CCSNe). These collaborative efforts have established that CCSN GW signals are
+predominantly stochastic, reflecting the turbulent and nonlinear dynamics of the explosion [1–6].
+Nevertheless, they also exhibit robust deterministic structures that encode key physical processes
+of the source [2,5–16]. Among these features, a prominent signature, present in all modern nu-
+merial simulations, is associated with oscillations of the proto-neutron star (PNS), commonly
+identified as fundamental f- and g-mode activity. In this work, we refer to this structure as the
+High-Frequency Feature (HFF); a detailed discussion of this terminology, along with its physical
+motivation, is provided in [17]. In time–frequency representations, the HFF appears as a contin-
+uous, rising ridge, typically originating around 150˘250 Hz and evolving toward frequencies of
+∼1–2 kHz, following an approximately linear trajectory at early times.
+∗Corresponding author: a.casallas-lagos@uw.edu
+1
+arXiv:2607.21925v1  [gr-qc]  24 Jul 2026
+
+
+Physically, the HFF is associated with oscillation modes of the PNS excited by accretion
+flows and hydrodynamic instabilities, particularly Ledoux convection [18].
+The initial slope
+of its frequency evolution reflects the contraction rate of the PNS, which depends on its mass,
+radius, equation of state (EOS), and neutrino cooling efficiency [9,13,19]. Recent studies suggest
+that the HFF may not correspond to a single g-mode, but rather to alternating f- and g-
+modes [9, 15, 20–22], or even to multiple distinct g-modes originating from different regions of
+the PNS (e.g., surface versus interior layers). These findings highlight the potential of the HFF
+as a powerful probe of dense-matter physics accessible through GW observations.
+Recent data analysis efforts have focused on quantifying the early-time slope of the HFF
+under realistic interferometric noise conditions [23,24]. Initial approaches employed chi-squared
+minimization of low-order polynomial fits to increasing frequency track reconstructed using
+the coherent WaveBurst (cWB) burst-detection algorithm [25].
+Complementary methodolo-
+gies [10,13,22,26,27] combine normal-mode decomposition, polynomial interpolation, and syn-
+thetic Gaussian noise injections to infer the time evolution of the remnant’s mass and radius.
+Collectively, these studies establish the HFF as one of the most promising observational diag-
+nostics linking CCSN GW phenomenology to the microphysics of the PNS.
+Over time, the cWB algorithm has undergone significant developments to enhance its sensitiv-
+ity to different classes of GW transients. In particular, two major variants, Coherent WaveBurst
+2G (cWB-2G) and Coherent WaveBurst-XP (cWB-XP), have been designed to address comple-
+mentary detection regimes. While cWB-2G serves as a general-purpose burst search pipeline, ,
+high-frequency transients, making it particularly relevant for CCSN signal reconstruction.
+This paper presents a synthesis of recent efforts aimed at establishing a framework for CCSN
+GW parameter estimation within the LVK observational context. The primary focus is on the
+extraction and interpretation of the HFF, in the presence of realistic detector noise. Here we
+operate in a post procesing mode of events detected by cWB XP [28]. These efforts were recently
+consolidated at the SN2025gw: The First IGWN Symposium on Core-Collapse Supernova Grav-
+itational Wave Theory and Detection, held in Warsaw, where future directions for CCSN GW
+research were actively discussed. Central topics included methodological advances for accurately
+estimating the HFF from interferometric data and for establishing quantitative relationships be-
+tween its measurable properties and the underlying physical parameters of the source, including
+the asymptotic properties of the PNS. The results presented here were developed in preparation
+for this symposium and reflect the collective progress and ongoing discussions within the com-
+munity. Beyond summarizing recent advancements, this work highlights the key challenges that
+remain in fully characterizing the HFF and emphasizes the developments required to unlock its
+full potential as a diagnostic of CCSN physics.
+2
+The Core-Collapse Supernova Gravitational Wave High Fre-
+quency Feature
+Across a wide range of CCSN simulations, the HFF appears as a persistent feature in time–frequency
+representations of the signal [1, 5, 7, 9, 29–37]. Its evolution can be naturally divided into two
+regimes. During the early post-bounce phase (∼150–250 ms), the HFF follows an approximately
+linear frequency evolution, as illustrated in Fig. 1. This early-time behavior can be quantified
+through the initial slope of the feature, typically measured up to ∼1 kHz, where the cWB
+algorithm reconstructed the detected events approximately linearly.
+The initial slope encodes direct information about the contraction dynamics of the PNS. For
+non-rotating progenitors, it provides a measure for the contraction rate, since the characteristic
+oscillation frequencies scale with bulk properties such as the surface gravity (M/R2) or mean
+density (M/R3) [2,9,10,31,32,38]. As a result, the slope is sensitive to the EOS and to neutrino
+transport processes that regulate PNS cooling [25].
+Rotation introduces an important modification to this picture. Centrifugal support effectively
+2
+
+
+counteracts gravity, leading to a slower PNS contraction with lower mean density and reduced
+surface gravity. [39] it is showed that a centrifugally supported PNS produces an HFF shifted
+to lower frequencies with a reduced slope. Physically, this behavior arises from two coupled
+effects: (i) the decrease in the restoring force governing g-mode oscillations, which lowers their
+frequencies, and (ii) a slower contraction rate, which reduces the rate at which these frequencies
+increase over time. Consequently, rotation acts as a key degeneracy in the interpretation of
+cWB-XP has a wavelet basis with a finer time frequency, minimal frequency leakage, which is
+optimized for extremely short-duration HFF measurements.
+In Fig. 1, we present results from two-dimensional simulations belonging to the CHIMERA
+[40] E-series [41], designed to examine the impact of different EOS. Each simulation adopts the
+15 M⊙, non-rotating, solar-metallicity progenitor of [42] and employs one of five EOS: DD2,
+FSUgold, IUS, SFHo, and SFHx. The left column displays the GW strain for each EOS, while
+the middle column shows the estimated initial HFF slope in the absence of detector noise,
+following [23, 24]. The right column presents two regression fits characterizing the temporal
+evolution of the HFF: (i) light-gray dashed curves correspond to fits obtained below 1 kHz,
+assuming an approximately linear trend, and (ii) dark-gray dashed curves use coefficients derived
+from the HFF signal below 2 kHz. These results highlight two key aspects. First, they expose
+the intrinsically non-linear evolution of the HFF beyond the early phase. Second, they show
+that the initial slope varies systematically with the chosen EOS, even when estimated in realistic
+LVK O3b data.
+3
+Un-modeled Gravitational Wave Searches
+The characterization of the HFF discussed in the previous section critically depends on our
+ability to reconstruct its time–frequency evolution in the presence of realistic detector noise.
+The cWB-2G algorithm employs an adaptive wavelet decomposition, typically based on the
+Wilson–Daubechies–Meyer (WDM) transform, to identify coherent excess power across multiple
+detectors. It is designed to balance time–frequency resolution for signals with durations ranging
+from ∼10 ms to several seconds. The algorithm operates in two principal stages:
+(i) Production Stage: Multi-detector strain data are transformed into a WDM time–frequency
+representation at multiple resolutions. Pixels exhibiting statistically significant excess power
+are combined coherently across detectors using appropriate time delays and antenna-pattern
+responses over a predefined sky grid. Network-based statistics—such as the likelihood ratio L,
+coherent energy Ec, and null energy N—are computed to evaluate signal coherence and suppress
+instrumental noise. Clusters of coherent pixels that satisfy thresholds on correlation and energy
+balance are identified as candidate events.
+(ii) Post-Production Stage: Candidate events are ranked, validated, and reconstructed. This
+stage includes waveform reconstruction (yielding the signal vector s[i]), as well as the estimation
+of sky localization, polarization, and coherent signal-to-noise ratio within a maximum-likelihood
+framework that optimizes consistency with the detector data x[i].
+The cWB-XP version introduces key improvements in the reconstruction stage, specifically
+targeting short-duration, high-frequency transients such as those associated with CCSN signals.
+These enhancements are centered on the Wavescan [28] procedure, which enables more pre-
+cise localization and reconstruction of transient structures embedded in non-stationary noise.
+Standard multiresolution wavelet decompositions are limited by the Heisenberg–Gabor trade-
+off: each wavelet basis provides a fixed time–frequency resolution, which may lead to spectral or
+temporal leakage when the signal exhibits rapid variations. The wavescan approach mitigates
+this limitation by scanning across a bank of wavelets with different resolutions and selecting, at
+each time–frequency location, the representation that minimizes leakage while maximizing inter-
+detector coherence. In this sense, wavescan dynamically identifies the locally optimal wavelet
+basis for the signal.
+3
+
+
+Figure 1: The figure illustrates the strains and the spectrograms of the CCSN GW signals from
+the CHIMERA [40] E-series [41] simulations for the five EOS considered in [24]: DD2, FSUgold,
+IUSFU, SFHo, and SFHx. The middle column shows the estimated HFF early slopes, in the
+presence of real O3b interferometric noise. In the right column, the light-gray curve represents
+the second-order regression of the HFF signal below 1 kHz, while the dark-gray curve corresponds
+to the regression derived from the HFF signal below 2 kHz. As reported by [24], the 1 kHz-based
+regression tends to overestimate the curvature relative to the 2 kHz-based fit. The first-order
+coefficients below 1 kHz remain broadly consistent with those obtained below 2 kHz when higher-
+order terms are included, the overall trend clearly deviates from purely linear behavior.
+4
+
+
+While cWB-2G and cWB-XP share the same core framework—wavelet-based decomposi-
+tion, coherent clustering across detector networks, time-lag background estimation, and trigger
+ranking—their primary distinction lies in the reconstruction stage.
+The 2G algorithm relies
+on a fixed multi-resolution decomposition, reconstructing s[i] from pre-selected pixels via a
+maximum-likelihood approach. In contrast, cWB-XP extends this framework through the adap-
+tive wavescan procedure, dynamically optimizing the time–frequency resolution at each pixel.
+This refinement significantly reduces spectral leakage, enhances waveform reconstruction
+fidelity, and improves the accuracy of inferred astrophysical parameters. In the context of CCSN
+signals, and in particular for the reconstruction of the HFF, these capabilities are essential: they
+enable the recovery of fine time–frequency structures beyond the early linear regime, thereby
+providing access to the full temporal evolution of the signal. The additional information from
+estimating the curvature of the HFF has the potential to break degeneracies present in initial
+slope-only analyses and to establish a more robust mapping between observed GW features and
+the physical properties of the source.
+The interpretation of HFF curvature is closely linked to the EOS, which governs the mass–radius
+relation and internal stratification of the PNS. Rather than treating EOS differences solely as
+categorical labels (e.g., SFHo, SFHx, DD2, IUSFU, FSUgold), curvature-based analyses enable a
+continuous mapping between observable GW features and the underlying nuclear-matter param-
+eter space [43]. In this context, including EOS models that lie near or beyond current constraints
+provides a useful reference for assessing the sensitivity of HFF observables to extreme physical
+scenarios.
+From a practical standpoint, the extraction of HFF curvature must account for both detec-
+tor noise and reconstruction systematics. In current interferometers, the noise power spectral
+density increases above ∼800 Hz, reducing the effective signal-to-noise ratio (SNR) in the fre-
+quency range where curvature becomes most relevant. As a result, uncertainties in curvature
+estimates grow for signals extending to higher frequencies, leading to increased scatter in early
+slope–curvature relations.
+To disentangle these effects, distance-dependent diagnostics can be employed. In principle,
+if curvature estimates are dominated by detector noise, one expects the spread in reconstructed
+quantities to decrease with increasing SNR, for example when comparing sources at different dis-
+tances. Conversely, if the spread persists even at high SNR, it indicates that intrinsic variability
+across CCSN models dominates the observed dispersion. This distinction between measurement-
+induced uncertainty and intrinsic physical variability will be explored explicitly in the following
+section.
+4
+The landscape of the High-Frequency Feature in CCSN Grav-
+itational Waves for the next few years
+While the complete evolution of the HFF is currently investigated through different approaches
+such as asteroseismology, numerical simulations, data analysis and modal and spatial decom-
+position, estimating its early slope in the presence of real interferometric noise has emerged as
+a powerful first diagnostic tool for inferring the physical properties of the GW source. How-
+ever, the process of characterizing the HFF should be regarded as a marathon rather than a
+sprint: the early slope estimation represents only the first step in extracting quantitative physi-
+cal information from the signal, as the community prepares for the first Galactic supernova GW
+detection.
+A concrete example of this approach’s utility is provided by Murphy et al. (2024) [24], who
+investigated the impact of the EOS on early slope estimation by varying the EOS while keeping
+progenitor properties fixed, the authors demonstrated that HFF slope measurements, under
+O3b LVK noise conditions, serve as a practical diagnostic for assessing EOS–HFF correlation
+sensitivity. This establishes a framework for evaluating how accurately such features might be
+5
+
+
+extracted by next-generation detectors, such as the Einstein Telescope [44], Cosmic Explorer [45],
+and LISA [46].
+As part of the ongoing effort to characterize the HFF, the next stage involves implementing
+an optimized version of the cWB-XP algorithm. This version enables a more detailed recon-
+struction of HFFs across CCSN models, specifically incorporating late-time evolution. In this
+regard, Figure 2 displays reconstructed events obtained via cWB-XP, illustrating the temporal
+evolution of the HFF at a fixed SNR of 25. These results highlight how the reconstructed sig-
+nals tend toward an asymptotic frequency, though the specific path to stability varies across
+models. Notably, while some models (e.g., s15) exhibit clear curvature, others (e.g., s25) remain
+essentially linear, indicating that HFF curvature is highly model-dependent adding an additional
+complexity to the proper characterization of this feature.
+(a) E-series models across different EOS.
+(b) Comparison of model s15 (Kuroda et al. 2016) and s25 (Radice et al. 2019).
+Figure 2: Reconstructed CCSN GW signals (wavescan) using the cWB-XP algorithm at a fixed
+SNR of 25 in LVK O4b noise. (a) illustrates the HFF transition starting from the early slope
+to the asymptotic frequency.
+In all cases the curvature is recognizable at a fixed SNR. (b)
+demonstrates that curvature is model-dependent: model s15 shows significant curvature, while
+s25 remains essentially linear.
+As anticipated in the previous section, curvature-based observables enable a natural diag-
+nostic to disentangle measurement uncertainty from intrinsic model variability. A particularly
+important consequence of extending the analysis from the early-time slope to HFF curvature
+is the emergence of a natural diagnostic to disentangle measurement uncertainty from intrin-
+sic model variability. Unlike the peak frequency or early slope—which are largely independent
+of source distance—the estimation of curvature depends on the fidelity of the reconstructed
+time–frequency track, and is therefore sensitive to detector noise.
+For a source at distance d, the observed strain scales as h ∝1/d, while the detector noise re-
+mains fixed by the power spectral density. As a result, the SNR scales approximately as ρ ∝1/d,
+and the uncertainty in reconstructed quantities follows σ ∼1/ρ. This implies that curvature es-
+timates are expected to exhibit a distance-dependent spread, even when the underlying physical
+signal is identical. This effect can be exploited as a diagnostic tool. By comparing curvature
+distributions for the same set of CCSN models, see table 1, placed at different distances (e.g.,
+1 kpc versus 10 kpc), one can directly assess the origin of the observed scatter (see Figure 3).
+If the spread in curvature measurements decreases significantly at smaller distances (higher
+SNR), this indicates that detector noise is the dominant source of uncertainty. Conversely, if
+the spread remains substantial even at high SNR, it reflects intrinsic variability across CCSN
+6
+
+
+Table 1: Overview of 3D CCSN GW Models
+Model / Study
+Prog.
+Mass (M⊙)
+EOS
+Primary GW Feature
+Mezzacappa (2020) D15-3D
+WH07
+15.0
+SFHo
+PNS g-modes & matter convection.
+O’Connor (2018)mesa20_pert
+MESA
+20.0
+SFHo
+Early SASI & convection excitation.
+Powell (2019)
+s18
+S16
+18.0
+SFHo
+Strong low-frequency SASI, g-modes.
+Radice (2019)
+s25
+WH07
+25.0
+SFHo
+High-frequency PNS f/g-modes.
+Kuroda (2016)
+SFHx
+WW95
+15.0
+SFHx
+HFF, SASI.
+models, driven by differences in progenitor structure, EOS, and dynamical evolution.
+This
+separation between measurement-induced spread and intrinsic physical dispersion is critical for
+the interpretation of future CCSN detections. In particular, it determines whether the observed
+diversity in HFF curvature can be used to constrain nuclear and stellar physics, or whether it is
+primarily limited by detector sensitivity. As such, curvature-based diagnostics provide not only
+an extension of slope-based analyses, but also a fundamentally new framework for assessing the
+information content of CCSN GW signals in realistic observational conditions.
+Figure 3: Distribution of inferred M/R3 (proportional to the asymptotic frequency) for five dif-
+ferent CCSN GW models summarized in table 1 reconstructed at two different source distances:
+1 kpc (orange) and 10 kpc (blue). While the underlying physical signals are identical, the ob-
+served distributions exhibit a clear distance-dependent broadening, with the 10 kpc case showing
+a significantly larger spread. This behavior reflects the impact of detector noise on the reconstruc-
+tion of high-frequency features. Since the GW strain scales as h ∝1/d, the signal-to-noise ratio
+decreases with distance, leading to increased uncertainty in the estimation of curvature-related
+quantities. The narrowing of the distribution at 1 kpc indicates that a substantial fraction of the
+observed scatter at larger distances is measurement-driven. This comparison demonstrates that
+curvature-based observables provide a natural diagnostic to disentangle intrinsic model variabil-
+ity from noise-induced uncertainty. In particular, the degree to which the distribution contracts
+at higher signal-to-noise ratio can be used to assess whether the spread is dominated by detector
+sensitivity or by genuine physical differences across CCSN models.
+Acknowledgements
+A.C. and M.S. acknowledge Polish National Science Centre Grant No. UMO-2024/03/1/ST9/00005,
+and the Polish National Agency for Academic Exchange within Polish Returns Programme Grant
+No. BPN/PPO/2023/1/00019. M.S. acknowledges also Polish National Science Centre Grant
+7
+
+
+No. UMO-2023/49/B/ST9/02777. M.Z. is supported by the National Science Foundation Grav-
+itational Physics Experimental and Data Analysis Program through awards PHY-2110555 and
+PHY-2405227.
+A.M. acknowledges support from National Science Foundation Gravitational
+Physics Theory under awards PHY-1806692, 2110177, 2409148.
+References
+[1] H. Andresen, B. Müller, E. Müller, and H.-Th. Janka. Gravitational wave signals from 3d
+neutrino hydrodynamics simulations of core-collapse supernovae. Monthly Notices of the
+Royal Astronomical Society, 468(2):2032–2051, mar 2017.
+[2] Sean M. Couch and Christian D. Ott. Revival of the stalled core-collapse supernova shock
+triggered by precollapse asphericity in the progenitor star.
+The Astrophysical Journal,
+778(1):L7, oct 2013.
+[3] Harald Dimmelmeier, Christian D. Ott, Andreas Marek, and H.-Thomas Janka. Gravita-
+tional wave burst signal from core collapse of rotating stars. Physical Review D, 78(6), sep
+2008.
+[4] Hans-Thomas Janka. Explosion mechanisms of core-collapse supernovae. Annual Review
+of Nuclear and Particle Science, 62(1):407–451, nov 2012.
+[5] Christian D. Ott, Ernazar Abdikamalov, Philipp Mösta, Roland Haas, Steve Drasco,
+Evan P. O'Connor, Christian Reisswig, Casey A. Meakin, and Erik Schnetter. General-
+relativistic simulations of three-dimensional core-collapse supernovae. The Astrophysical
+Journal, 768(2):115, apr 2013.
+[6] David Radice, Viktoriya Morozova, Adam Burrows, David Vartanyan, and Hiroki Nagakura.
+Characterizing the gravitational wave signal from core-collapse supernovae. The Astrophys-
+ical Journal, 876(1):L9, apr 2019.
+[7] P. Astone, P. Cerdá -Durán, I. Di Palma, M. Drago, F. Muciaccia, C. Palomba, and F. Ricci.
+New method to observe gravitational waves emitted by core collapse supernovae. Physical
+Review D, 98(12), dec 2018.
+[8] Pablo Cerdá-Durán, Nicolas DeBrye, Miguel A. Aloy, José A. Font, and Martin Ober-
+gaulinger. Gravitational wave signatures in black hole forming core collapse. The Astro-
+physical Journal, 779(2):L18, dec 2013.
+[9] Viktoriya Morozova, David Radice, Adam Burrows, and David Vartanyan. The gravita-
+tional wave signal from core-collapse supernovae. The Astrophysical Journal, 861(1):10, jun
+2018.
+[10] Marie-Anne Bizouard, Patricio Maturana-Russel, Alejandro Torres-Forné , Martin Ober-
+gaulinger, Pablo Cerdá-Durán, Nelson Christensen, José A. Font, and Renate Meyer. In-
+ference of protoneutron star properties from gravitational-wave data in core-collapse super-
+novae. Physical Review D, 103(6), mar 2021.
+[11] Evan O'Connor and Christian D. Ott. Black hole formation in failing core-collapse super-
+novae. The Astrophysical Journal, 730(2):70, mar 2011.
+[12] Jade Powell and Bernhard Müller. Three-dimensional core-collapse supernova simulations
+of massive and rotating progenitors. Monthly Notices of the Royal Astronomical Society,
+494(4):4665–4675, apr 2020.
+8
+
+
+[13] Jade Powell and Bernhard Müller. Inferring astrophysical parameters of core-collapse su-
+pernovae from their gravitational-wave emission. Physical Review D, 105(6), mar 2022.
+[14] Anthony Mezzacappa, Pedro Marronetti, Ryan E. Landfield, Eric J. Lentz, R. Daniel Mur-
+phy, W. Raphael Hix, J. Austin Harris, Stephen W. Bruenn, John M. Blondin, O. E. Bron-
+son Messer, Jordi Casanova, and Luke L. Kronzer. Core collapse supernova gravitational
+wave emission for progenitors of 9.6, 15, and 25 M⊙. Phys. Rev. D, 107(4):043008, feb 2023.
+[15] R. Daniel Murphy, Anthony Mezzacappa, Eric J. Lentz, and Pedro Marronetti.
+Core
+collapse supernova gravitational wave sourcing and characterization based on three-
+dimensional models. Phys. Rev. D, 112:063062, Sep 2025.
+[16] Hajime Sotani, Tomoya Takiwaki, and Hajime Togashi. Universal relation for supernova
+gravitational waves. Phys. Rev. D, 104:123009, Dec 2021.
+[17] A. Mezzacappa and M. Zanolin. Colloquium: Gravitational waves from neutrino-driven
+core collapse supernovae. Rev. Mod. Phys., 97:041002, Dec 2025.
+[18] Anthony Mezzacappa, Pedro Marronetti, Ryan E. Landfield, Eric J. Lentz, R. Daniel Mur-
+phy, W. Raphael Hix, J. Austin Harris, Stephen W. Bruenn, John M. Blondin, O. E. Bron-
+son Messer, Jordi Casanova, and Luke L. Kronzer. Core collapse supernova gravitational
+wave emission for progenitors of 9.6, 15, and 25 M⊙. Physical Review D, 107(4):043008,
+February 2023.
+[19] Bernhard Müller, Thomas M Tauris, Alexander Heger, Projjwal Banerjee, Yong-Zhong
+Qian, Jade Powell, Conrad Chan, Daniel W Gay, and Norbert Langer. Three-dimensional
+simulations of neutrino-driven core-collapse supernovae from low-mass single and binary
+star progenitors. Monthly Notices of the Royal Astronomical Society, 484(3):3307–3324, jan
+2019.
+[20] John Ryan Westernacher-Schneider, Evan O’Connor, Erin O’Sullivan, Irene Tamborra,
+Meng-Ru Wu, Sean M. Couch, and Felix Malmenbeck. Multimessenger asteroseismology of
+core-collapse supernovae. Phys. Rev. D, 100:123009, Dec 2019.
+[21] John Ryan Westernacher-Schneider. Consistent perturbative modeling of pseudo-newtonian
+core-collapse supernova simulations. Phys. Rev. D, 101:083021, Apr 2020.
+[22] Alejandro Torres-Forné , Pablo Cerdá-Durán, Martin Obergaulinger, Bernhard Müller, and
+José A. Font. Universal relations for gravitational-wave asteroseismology of protoneutron
+stars. Physical Review Letters, 123(5), jul 2019.
+[23] Alejandro Casallas-Lagos, Javier M. Antelis, Claudia Moreno, Michele Zanolin, Anthony
+Mezzacappa, and Marek J. Szczepańczyk. Characterizing the temporal evolution of the
+high-frequency gravitational wave emission for a core collapse supernova with laser interfer-
+ometric data: A neural network approach. Phys. Rev. D, 108:084027, Oct 2023.
+[24] R. Daniel Murphy, Alejandro Casallas-Lagos, Anthony Mezzacappa, Michele Zanolin,
+Ryan E. Landfield, Eric J. Lentz, Pedro Marronetti, Javier M. Antelis, and Claudia
+Moreno. Dependence of the reconstructed core-collapse supernova gravitational wave high-
+frequency feature on the nuclear equation of state in real interferometric data. Phys. Rev.
+D, 110:083006, Oct 2024.
+[25] Zidu Lin, Abhinav Rijal, Cecilia Lunardini, Manuel D. Morales, and Michele Zanolin. Char-
+acterizing a supernova’s standing accretion shock instability with neutrinos and gravita-
+tional waves. Phys. Rev. D, 107:083017, Apr 2023.
+9
+
+
+[26] Tristan Bruel, Marie-Anne Bizouard, Martin Obergaulinger, Patricio Maturana-Russel,
+Alejandro Torres-Forné, Pablo Cerdá-Durán, Nelson Christensen, José A. Font, and Re-
+nate Meyer. Inference of protoneutron star properties in core-collapse supernovae from a
+gravitational-wave detector network. Phys. Rev. D, 107:083029, Apr 2023.
+[27] P. Cerdá-Durán, M. López, A. Favali, I. Di Palma, M. Drago, and F. Ricci. Phenomeno-
+logical gravitational waveforms for core-collapse supernovae. Phys. Rev. D, 111(8):083022,
+April 2025.
+[28] Sergey Klimenko. Wavescan: multiresolution regression of gravitational-wave data. In APS
+April Meeting Abstracts, volume 2022 of APS Meeting Abstracts, page E17.004, April 2022.
+[29] Ernazar Abdikamalov, Sarah Gossan, Alexandra M. DeMaio, and Christian D. Ott. Mea-
+suring the angular momentum distribution in core-collapse supernova progenitors with grav-
+itational waves. Physical Review D, 90(4), aug 2014.
+[30] H. Andresen, E. Müller, H. Th. Janka, A. Summa, K. Gill, and M. Zanolin. Gravitational
+waves from 3D core-collapse supernova models: The impact of moderate progenitor rotation.
+Mon. Not. Roy. Astron. Soc., 486(2):2238–2253, 2019.
+[31] Bernhard Müller, Hans-Thomas Janka, and Andreas Marek.
+A new multi-dimensional
+general relativistic neutrino hydrodynamics code for core-collapse supernovae. ii. relativistic
+explosion models of core-collapse supernovae. The Astrophysical Journal, 756(1):84, aug
+2012.
+[32] Bernhard Müller, Hans-Thomas Janka, and Andreas Marek. A new multi-dimensional gen-
+eral relativistic neutrino hydrodynamics code of core-collapse supernovae. iii. gravitational
+wave signals from supernova explosion models. 766(1):43, mar 2013.
+[33] Tobias Melson, Hans-Thomas Janka, Robert Bollig, Florian Hanke, Andreas Marek, and
+Bernhard Müller. Neutrino-driven explosion of a 20 solar-mass star in three dimensions
+enabled by strange-quark contributions to neutrino–nucleon scattering. The Astrophysical
+Journal, 808(2):L42, jul 2015.
+[34] Anthony Mezzacappa.
+Toward Realistic Models of Core Collapse Supernovae: A Brief
+Review. IAU Symposium, 362:215–227, January 2023.
+[35] Takami Kuroda, Tomoya Takiwaki, and Kei Kotake. A new multi-energy neutrino radiation-
+hydrodynamics code in full general relativity and its application to the gravitational collapse
+of massive stars. The Astrophysical Journal Supplement Series, 222(2):20, feb 2016.
+[36] Evan P. O’Connor and Sean M. Couch. Exploring fundamentally three-dimensional phe-
+nomena in high-fidelity simulations of core-collapse supernovae. The Astrophysical Journal,
+865(2):81, sep 2018.
+[37] M Obergaulinger and M Á Aloy. Magnetorotational core collapse of possible GRB progen-
+itors – III. three-dimensional models. Monthly Notices of the Royal Astronomical Society,
+503(4):4942–4963, feb 2021.
+[38] MacKenzie L. Warren, Sean M. Couch, Evan P. O’Connor, and Viktoriya Morozova. Con-
+straining properties of the next nearby core-collapse supernova with multimessenger signals.
+The Astrophysical Journal, 898(2):139, jul 2020.
+[39] Michael A. Pajkos, Sean M. Couch, Kuo-Chuan Pan, and Evan P. O’Connor. Features
+of accretion-phase gravitational-wave emission from two-dimensional rotating core-collapse
+supernovae. The Astrophysical Journal, 878(1):13, jun 2019.
+10
+
+
+[40] Stephen W. Bruenn, John M. Blondin, W. Raphael Hix, Eric J. Lentz, O. E. Bronson Messer,
+Anthony Mezzacappa, Eirik Endeve, J. Austin Harris, Pedro Marronetti, Reuben D. Budi-
+ardja, Merek A. Chertkow, and Ching-Tsai Lee. Chimera: A massively parallel code for core-
+collapse supernova simulations. The Astrophysical Journal Supplement Series, 248(1):11,
+apr 2020.
+[41] Ryan E. Landfield.
+Sensitivity of neutrino-driven core-collapse supernova models to the
+microphysical equation of state. Ph.d. thesis, University of Tennessee, Knoxville, Knoxville,
+TN, USA, 2018.
+[42] S. E. Woosley and A. Heger. Nucleosynthesis and Remnants in Massive Stars. Phys. Rep.,
+442:269–350, 2007.
+[43] I. Tews, J. M. Lattimer, A. Ohnishi, and E. E. Kolomeitsev. Variable Equation of State for
+Core-collapse Supernova Simulations. Astrophys. J., 848:105, 2017.
+[44] M Punturo et al. The Einstein Telescope. Class. Quantum Grav., 27:194002, 2010.
+[45] David Reitze et al. Cosmic Explorer. In Bulletin of the AAS, volume 51, 2019.
+[46] Pau Amaro-Seoane et al. Laser Interferometer Space Antenna. arXiv, 2017.
+11

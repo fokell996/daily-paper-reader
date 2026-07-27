@@ -1,0 +1,1760 @@
+Classifying the nuclear equation of state in LVK interferometric
+noise through core-collapse supernova gravitational-wave
+signatures using convolutional neural networks
+Alejandro Casallas-Lagos1
+∗, Marek J. Szczepańczyk1 ,
+Michele Zanolin2, Anthony Mezzacappa3, Javier M. Antelis4,
+Daniel Murphy3, and Claudia Moreno5
+1University of Warsaw, Faculty of Physics, Institute of Theoretical Physics, Warsaw, Poland
+2Department of Physics and Astronomy, Embry-Riddle Aeronautical University, Prescott, AZ 86301, USA
+3Department of Physics and Astronomy, University of Tennessee, Knoxville, TN 37996-1200, USA
+4Tecnológico de Monterrey, Escuela de Ingeniería y Ciencias, Monterrey, N.L., 64849, México
+5Departamento de Física, Universidad de Guadalajara, Guadalajara, Jal., 44430, México
+Abstract
+This paper presents a convolutional neural network (CNN) approach to classifying the
+nuclear equation of state (EOS). We use as illustrative examples five two-dimensional sim-
+ulations of core collapse supernovae (CCSN) varying only the EOS. We use the estimation
+of the high-frequency feature (HFF) initial slope in real interferometric data from the O3b
+LVK scientific run at Galactic distances of 1 kpc, 5 kpc, and 10 kpc. Our CNN model
+classifier achieves an overall accuracy of 98.58% at a distance of 1 kpc and 52.43% at 5
+kpc for each class. This accuracy progressively declines at an extended distance of 10 kpc,
+where the capacity of the classifier vanishes. The model’s success in EOS differentiation at 1
+kpc suggests scalability for next-generation observatories; we expect the order-of-magnitude
+sensitivity improvements of Cosmic Explorer and the Einstein Telescope to enable similar
+classification performance at ten times the current distance. The implementation of more
+specific performance metrics, such as the macro-average one-vs-rest (OvR) area under the
+curve (AUC), reveals an overall macro-average OvR AUC of 0.97 and 0.98 at 1 kpc. This
+performance stands both collectively across all classes and individually.
+Keywords: core-collapse supernovae; gravitational waves; nuclear equation of state; convolu-
+tional neural networks; Coherent WaveBurst; LVK detector noise
+1
+Introduction
+The first detection of a gravitational wave (GW) by LIGO [1] in September 2015, event GW 150914
+[2], gave birth to GW astronomy. Since then, the collaborative efforts of LIGO, VIRGO [3], and
+KAGRA [4] LVK collaboration have validated the detection of more than 400 events related to
+compact binary systems [5, 6, 7]. This remarkable contribution has motivated the improvement
+of detector network sensitivity to explore new, non detected, sources of GWs, such as those pro-
+duced by core-collapse supernovae (CCSNe) [8]. CCSNe are multimessenger astronomy (MMA)
+systems characterized by the emission of different carriers of physical information; electromag-
+netic radiation (photons), neutrinos, and GWs, making them exceptional laboratories that con-
+tain diverse sources of physical information, all coexisting in a single event [9, 10, 11, 12, 13].
+∗Corresponding author: a.casallas-lagos@uw.edu.pl
+1
+arXiv:2607.21924v1  [gr-qc]  24 Jul 2026
+
+
+Despite the low estimated rate of core-collapse supernova (CCSN) events in our Galaxy—approximately
+two per century [14, 15]—significant progress has been made in preparing for the inaugural de-
+tection of a Galactic or near-Galactic CCSN GW event. This extensive preparatory work spans
+diverse fields, encompassing theoretical investigations into the nuclear equation of state (EOS)
+for dense matter and various explosion mechanisms, including the neutrino-driven mechanism
+[16, 17, 18, 19, 20, 21]. At the same time, dedicated software has been developed to detect and
+characterize burst transients and to implement noise reduction techniques in LVK interferometric
+data [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32], alongside advances in observational and theoretical
+techniques in asteroseismology analysis [33, 34, 35, 36, 37, 38, 39, 40, 41]. Furthermore, robust
+CCSN numerical simulations have played a crucial role in modeling these complex phenomena
+[42, 9, 43, 44, 17, 45, 46, 47, 48, 49, 50, 51, 16, 52, 53, 54, 55, 56, 20, 57, 58, 59, 60, 61, 62, 63, 11],
+complemented by significant breakthroughs in laser interferometry that enhance GW detector
+capabilities [64]. The future detection of GW from CCSNe promises to deliver a wealth of in-
+formation essential for understanding their explosion mechanisms. Achieving such a detection
+would stand as a monumental success for the LVK collaboration, marking a significant leap
+forward in the field of GW physics and MMA.
+Numerical simulations of CCSNe from GW signals are inherently stochastic due to the tur-
+bulent and nonlinear dynamics of the post-bounce phase. Nevertheless, their time–frequency
+evolution exhibits robust and reproducible features that can be treated as quasi-deterministic.
+One of the most prominent of these features is what we referred to as the high frequency fea-
+ture (HFF) (see [12] for a discussion of the terminology). In time–frequency spectrograms, this
+feature appears as a continuous, upward-trending track, typically emerging at frequencies of
+∼250–400 Hz at ∼100 ms after core bounce and increasing up to ∼1–2 kHz as the PNS
+evolves. Recent studies have shown that the HFF arises from a combination of PNS oscilla-
+tion modes, including both f- and g-modes, whose relative contributions evolve over time. A
+significant challenge in GW astronomy and MMA is accurately estimating the astrophysical
+parameters of GW sources using ground-based GW detectors data [12]. Recent research shows
+that the high-frequency feature (HFF) can be correlated with progenitor’s physical properties of
+the emitted GWs [47, 48, 65, 66, 37, 38, 39, 67] providing a framework for using interferometric
+data to understand the physical characteristics of the GW sources.
+Our prior investigations [68, 69] laid the groundwork for the current study, focusing on two
+key areas: (i) HFF Initial Slope Estimation in LVK noise: we developed a machine learning
+(ML) methodology to estimate the dominant linear component of the High-Frequency Feature
+(HFF) slope embedded in CCSN GW signals. This method uses GW events reconstructed with
+Coherent WaveBurst (cWB) [22, 24, 23, 70], a software designed for detecting and reconstructing
+GW bursts with minimal assumptions about signal morphology. Our analysis characterized the
+feasibility of training a ML algorithm [71, 72, 73, 74] to estimate the HFF initial slope in real
+interferometric LVK noise and across different Galactic distances. We found that the estimation
+of the HFF slope is influenced by several Proto-Neutron Star (PNS) parameters, including mass,
+angular velocity, EOS, and progenitor metallicity. (ii) The impact of the EOS in the HFF slope
+estimation: We conducted a detailed examination of how variations in the EOS influence HFF
+slope estimation within the noise environment of the LVK interferometers, investigating EOS
+variations in the absence of rotation and magnetic fields (see [69], Section V, Tables II and III
+for details).
+Building on our previous research [68, 69] this study presents a systematic investigation of the
+influence of EOS on HFF initial slope estimation by isolating EOS variations while maintaining
+constant progenitor parameters. We use a methodology based on an image recognition model,
+specifically a Convolutional Neural Network (CNN), designed to distinguish between five EOSs,
+2
+
+
+specifically DD2, FSUgold, IUSFU, SFHo, and SFHx, for the Chimera E-series at three Galactic
+distances of 1 kpc, 5 kpc and 10 kpc in real interferometric noise of the LVK scientific run O3b
+[75]. Our methodology involves a three-phase approach to evaluate the EOS classification per-
+formance. First, we trained and tested our CNN model for EOS multi-class classification using
+data derived from cWB event production. This initial dataset is extracted from a one-week
+Time Window (TW1) during the second half of the LVK scientific run O3b. Second, we inde-
+pendently trained and tested the CNN model using data from a second, one-week Time Window
+(TW2), acquired one week after TW1. Finally, to assess the CNN model’s robustness and effi-
+ciency against temporal variations within LVK noise, we trained the CNN on data from TW1
+and evaluated its performance using data from TW2. In future works we plan to include also
+the role of progenitor mass [44, 52], rotation rate [76, 77, 78, 56, 79], and magnetic fields [80, 81].
+Our method analyzes input images from cWB events using a CNN multi-classifier algorithm
+[82, 83]. Inspired by the human visual cortex, these architectures are highly effective for im-
+age classification and object detection tasks. While Receiver Operating Characteristic (ROC)
+curves are traditionally employed for signal detection purposes, they have recently been imple-
+mented for the astrophysical interpretation of CCSN data [84]. Here, we introduce them as a
+metric for evaluating EOS classification performance, where each operating point on the curve
+is obtained by varying the discrimination threshold of the CNN’s output probabilities. This
+framework, alongside the methodology for HFF initial slope estimation presented in [68, 69],
+enriches the suite of computational tools for contemporary CCSN gravitational-wave parameter
+estimation, offering expanded avenues to investigate the fundamental physics encoded within
+these astrophysical signals. The goal of the CNN algorithm implementation is to assign class
+labels correlated with a specific EOS HFF slope value for each Galactic distance considered in
+this study.
+The manuscript is organized as follows. Section 2 presents numerical evidence for the corre-
+lation between the estimation of the HFF slope and the EOS in LVK data. Section 3 provides
+an overview of recent advances detailing the link between the estimation of the HFF slope and
+the progenitor parameters. Section 4 outlines the different stages of constructing the CNN algo-
+rithm aimed at EOS classification, which is based on the estimated HFF derived from cWB-XP
+event production, as well as the architecture, evaluation, and validation of the classifier. In
+section 5, we deliver the findings from the implementation and validation of the CNN model.
+The investigation into the CNN architecture’s validation focuses on evaluating the algorithm’s
+performance in classifying the EOS for three Galactic distances. To evaluate the accuracy of the
+CNN classifier, we provide a set of performance metrics, including the receiver operating char-
+acteristic for the One-vs-Rest multiclass scheme and the associated confusion matrices. Finally,
+section 8 presents the conclusions and future research directions for this work.
+2
+HFF slope estimation and the EOS
+Tables 2 and 3 illustrate the noise-free estimated HFF initial slope (s) and the mean estimated
+slope (ˆ¯s) derived from LVK strain data from the second part of the third observing run (O3b).
+Additionally, for each detection distance, we report the standard deviation (STD) and root-mean-
+square error (RMSE) associated with (ˆ¯s). These latter metrics serve as a measure of agreement
+between the noise-free HFF slope and the mean slope estimated by the DNN across different
+noise realizations.
+The study presented in this paper is based on GW signals generated from two-dimensional,
+axisymmetric CCSN simulations conducted with the Chimera code [85]. Our analysis incorpo-
+rates five specific EOS models (DD2, FSUGold, IUFSU, SFHo, SFHx) that dictated the nuclear
+3
+
+
+physics in these simulations, and will be collectively designated as the CCSN GW Chimera
+E-series throughout this paper. The selection of these EOS is justified by their compatibility
+with contemporary experimental and observational constraints [86]. We acknowledge, however,
+that this set of EOS does not include all permissible nuclear matter equations of state. The
+cWB analysis is executed independently using a two-detector network (L1H1) in two open data
+intervals, designated as Time Windows TW1 and TW2, each lasting one week; Details regard-
+ing the exact durations and GPS times of these windows are listed in Table 1.
+Each cWB
+Table 1: Total time of detectors network (L1H1) for the two stretches of open O3b LIGO data
+implemented in this study.
+Time Window
+TW1
+TW1 (GPS time)
+TW2
+TW2 (GPS time)
+Initial time
+2019 −11 −03T00 : 00 : 01
+1256774419
+2019 −11 −17T00 : 00 : 01
+1257465617
+Final time
+2019 −11 −10T23 : 59 : 59
+1257984019
+2019 −11 −24T23 : 59 : 59
+1258675217
+analysis generates datasets of identified events aimed at training and testing a CNN for multi-
+class classification designed to distinguish among five EOS variations in the Chimera E-series
+model, based on their estimated HFF slopes reported in [69]. We previously reported the DNN
+model’s performance in estimating the HFF slope within TW1 in Table 2; a detailed explanation
+can be found in [69]. For the study presented in this paper, we extended our analysis to the
+second time window (TW2), whose results in estimating the HFF slope are presented in Table 3.
+Figure 1 illustrates how the EOS influences the HFF slope estimation; This figure displays
+the range of variability of the estimated HFF slopes for the CCSN GW signals considered in
+this study. The gray band represents the estimated HFF slopes for the SFHo and SFHx mod-
+els, while purple and violet stripes denote the DD2, FSUgold, and IUSFU models (all derived
+using the methodology in [69]) within the time window TW1. For a comparative analysis, we
+introduce the range of variability in the HFF slope estimation derived from the TW2 dataset,
+keeping the same color code as described before. This visualization clarifies the fact that, at
+1 kpc, the five EOS models, analyzed with LVK noise, can be categorized into two main, and
+distinct, groups based on their HFF estimated slopes. However, as the distance increases, the
+distinction between these groups progressively diminishes, as is evident in the plots for 5 kpc
+and 10 kpc, where the groups progressively merge and become indistinguishable. The variability
+of the estimated HFF slope within the TW2 reveal a more marked separation between the two
+groups, compared to the TW1. This fact can be attributed to the estimated slope of HHF of
+the FSUgold model in the TW2 dataset, which exhibits the largest variation (s−ˆ¯s = 67 Hz s−1)
+accounting for the difference between the slope in absence of noise, s and the mean estimated
+slope in TW2, ˆ¯s, the highest variation in the estimation of the slope of HFF in the TW1 and
+TW2 datasets.
+3
+HFF evolution in time and its relation with parameters of the
+PNS source
+Pajkos et al. (2019) [77] conducted a comprehensive investigation into GW emission from CC-
+SNe, focusing on the influence of progenitor mass and rotation in the absence of noise. In the
+rest of this section, we use the term progenitor mass to describe the mass of a star just before it
+explodes as a supernova. This differs, in general, from the ZAMS mass, as significant mass could
+be lost in the pre-explosion evolution. Their studies utilized 15 two-dimensional (2D) neutrino
+radiation-hydrodynamics simulations, spanning the critical period from initial stellar collapse
+to approximately 300 milliseconds after core bounce. The research systematically explored the
+impact of progenitor characteristics by varying four progenitor masses, specifically 12, 20, 40,
+and 60 M⊙, alongside four core rotation rates ranging from 0 to 3 rads−1. The study specifically
+4
+
+
+1 kpc
+5 kpc
+10 kpc
+EOS
+s
+ˆ¯s
+STD
+RMSE
+ˆ¯s
+STD
+RMSE
+ˆ¯s
+STD
+RMSE
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+DD2
+1398
+1402
+103.54
+301.72
+1742
+293.13
+223.11
+2377
+765.30
+635.93
+FSUGold
+1665
+1610
+126.93
+228.84
+2002
+258.56
+332.91
+2544
+678.70
+468.19
+IUFSU
+1502
+1566
+100.66
+229.11
+1812
+201.69
+154.25
+2404
+555.41
+526.20
+SFHo
+2131
+2092
+52.63
+249.39
+2501
+313.45
+256.74
+2670
+401.92
+486.82
+SFHx
+2000
+2003
+60.43
+159.30
+2311
+298.12
+106.10
+2687
+368.12
+416.60
+Table 2: Results of the HFF slope estimation in real interferometric LVK noise using the method-
+ology described in [69] (refer to Section V, Table II). The analysis was conducted for Galactic
+distances of 1 kpc, 5 kpc, and 10 kpc, focusing on the Time Window 1 (TW1) data. The sec-
+ond column of the table reports the HFF slope estimation for each Chimera E-series signal in
+absence of noise. For each specified detection distance, we provide the mean estimated slope,
+ˆ¯s, along with its corresponding standard deviation (STD) and root-mean-square error (RMSE).
+These metrics quantify the accuracy and precision of the HFF slope estimations in the presence
+of realistic LVK detector noise.
+1 kpc
+5 kpc
+10 kpc
+EOS
+s
+ˆ¯s
+STD
+RMSE
+ˆ¯s
+STD
+RMSE
+ˆ¯s
+STD
+RMSE
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+[Hz s−1]
+DD2
+1381
+1394
+113.87
+334.08
+1797
+313.23
+276.99
+2412
+835.15
+697.87
+FSUGold
+1653
+1586
+112.83
+222.43
+2031
+277.31
+350.01
+2587
+728.10
+496.21
+IUFSU
+1543
+1565
+110.31
+211.65
+1895
+265.91
+185.34
+2512
+598.35
+586.13
+SFHo
+2147
+2098
+61.01
+200.32
+2567
+365.76
+232.23
+2688
+387.76
+512.66
+SFHx
+1988
+2018
+56.97
+176.14
+2365
+300.55
+122.18
+2695
+400.07
+445.44
+Table 3: Results of the HFF slope estimation using the methodology from [69], applied to real
+interferometric noise data collected during the TW2, which was taken a week after TW1 within
+the LVK O3b dataset. The HFF estimation for TW2 shows that the estimated slopes differ by
+less than 5% compared to those from TW1, and the associated standard deviation (STD) and
+root-mean-square error (RMSE) values do not exceed 7% of their TW1 counterparts. The data
+provided in this table also indicates that the FSUgold model manifests a significant variation
+with respect to the slope in the noiseless case 5.7%. Comparatively this variation is the highest
+over the TW1 and TW2 datasets, corresponding to (s −ˆ¯s = 67 Hz s−1). Such deviation from
+the noiseless case can be used to explain the clearer separation, at 1 kpc, between the two EOS
+groups illustrated in the bottom panel Figure 1.
+investigated how these progenitor properties influence the GW emission during the post-bounce,
+pre-explosion, and accretion phases. They concluded that the overall duration of the major GW
+emission phase was found to vary with the specific exploding progenitor, and a strong correla-
+tion exists between the total GW energy radiated and the progenitor’s compactness. They also
+identified a critical role for centrifugal support in shaping the CCSN GW signal. They observed
+that PNSs exhibiting larger radii are characterized by a strong degree of centrifugal support.
+A distinct observation is that increasing the rate of rotation in the core essentially flattens the
+slope of the HFF. This spectral flattening is a direct consequence of the rotational effects that
+suppress high-frequency turbulent activity, leading to a redistribution of GW power towards
+lower frequencies.
+An alternative approach to characterize the HFF signal component present in the GW emission
+from CCSNe has been systematically explored in the studies of [46] and Murphy [39]. Andresen
+5
+
+
+Figure 1: Range of variability of the estimated HFF slopes for the Chimera E-series CCSN
+GW signals. These signals, described in [87], are used to estimate the HFF slope in real LVK
+data across five different EOS: DD2, FSUgold, IUSFU, SFHo, and SFHx, with the full analysis
+detailed in [69]. The figure shows that at a Galactic distance of 1 kpc, the predicted HFF slopes,
+associated with each EOS, naturally arrange into two primary clusters: a gray group comprising
+SFHo and SFHx, and a purple/violet group consisting of DD2, FSUgold, and IUSFU. The
+analysis is performed using the independent TW1 and TW2 datasets described in Table 1. The
+top panel shows the results associated with both TW1 and TW2 across 1 kpc, 5 kpc, and 10 kpc.
+At 1 kpc the two EOS groups are clearly separable. However, as the Galactic distance increases,
+this clear distinction progressively fades, leading to a merger of the clusters. This merging trend
+suggests a growing difficulty in differentiating between individual EOS based on their estimated
+HFF slopes at greater distances. The figure visually confirms the convergence of the two main
+EOS groups until they become indistinguishable at 10 kpc, reinforcing the conclusions drawn in
+[69].
+et al. (2017) provided GW signal predictions for four models derived from three nonrotating
+progenitors with masses of 11.2, 20, and 27 M⊙, using 3D multigroup neutrino hydrodynam-
+ics simulations of CCSNe. They observed that the HFF component primarily originates from
+aspherical mass movements within and adjacent to the overshooting region of PNS convection
+in 3D, whereas in two-dimensional (2D) simulations, it is related to mass motion near the gain
+radius. This suggests that quasi-oscillatory mass motions at high frequencies are instigated exclu-
+sively by PNS convection in 3D, even during the pre-explosion phase, while in 2D, the standing
+accretion shock instability (SASI) and convection in the gain region predominate. More recently,
+Murphy et al. (2025) proposed a study aimed at characterizing both the source and the emis-
+sion processes of CCSN GWs, emphasizing the spatial decomposition analysis of the HFF GW
+emission from PNS based on 3D CCSNe simulations starting from a 15 M⊙progenitor and
+a zero-metallicity 25 M⊙progenitor. Their results indicate that the GW emission is initially
+dominated by the surface layers of the PNS due accretion onto the PNS surface as the explosion
+develops. Subsequently, as the explosion progresses and accretion decreases, the GW emission
+becomes dominated by the regions of sustained Ledoux convection and convective overshoot
+6
+
+
+deep within the PNS.
+Morozova et al. (2018)[65] conducted a foundational study on GWs from a set of two-dimensional
+multi-group neutrino radiation hydrodynamic simulations of CCSNe. Their primary objective
+was to systematize the current knowledge regarding the post-bounce CCSN GW signal and to
+identify “templatable features" that could be effectively utilized by ground-based laser interfer-
+ometers for detection and analysis. The study specifically compared calculated PNS oscillation
+frequencies from a modal analysis directly with the GW signals produced from their 2D CCSN
+simulations, focusing on progenitor masses of 10, 13, and 19 M⊙. They employed a linear pertur-
+bation analysis of the angle-averaged PNS profile, demonstrating its accuracy in reproducing the
+dominant GW signal components. The authors also reported notable quantitative differences
+in GW amplitudes, total GW energy emitted, and the frequencies of PNS quasi-normal-mode
+oscillations when comparing results across the three different EOSs they considered and for each
+progenitor mass. Their collection of models highlighted the strong dependence of the CCSN GW
+HFFs on the progenitor mass, EOS, many-body corrections to neutrino opacity, and rotation.
+A recent study specifically examining the relationship between the HFF slope and progenitor
+properties, with a focus on varying the EOS for the Chimera E-series, has been published by
+[69]. In this investigation, the authors present how the EOS impacts the estimation of the HFF
+slope in the presence of LVK noise at different Galactic distances when varying the EOS with-
+out altering progenitor parameters. The study reveals that while parameters like rotation rate
+and mass influence the HFF slope, their simultaneous variation creates more complex effects.
+Specifically, when the internal structure and rotation rate vary together, the reduction in the
+HFF slope is less pronounced than when the internal structure remains unchanged. This finding
+is consistent with Wang and Pan [56]. Similarly, Jardine et al. [57] show that the presence of
+strong magnetic fields also affects these dynamics.
+Studies have shown that the CCSN GW signal is strongly influenced by its progenitor’s core struc-
+ture, the EOS, and the neutrino interaction properties responsible for PNS cooling [88, 89, 90].
+These factors play a leading role in setting the slope of the GW signal’s HFF. To analyze these
+signals, universal relations have been investigated to describe the evolution of the GW peak
+frequency as either an f- or g-mode [48]. Bizouard et al. (2021) [91] and Bruel et al. (2023) [92]
+used these relations to perform parameter estimation in Gaussian simulated noise, discussing
+the accuracy of the parameterization regardless of the specific EOS considered. Further work by
+O’Connor et al. (2013) [93] explored the parameters that describe the PNS’s post-bounce evolu-
+tion and its relationship with progenitor core properties, specifically highlighting the non-trivial
+link between the progenitor’s mass and the core’s compactness parameter.
+4
+Methodology
+The current study combines the initial HFF slope estimation technique [68] with an image-
+based pattern recognition model, specifically a CNN [82, 83] as follows: (i) Generation of
+cWB events and processing of likelihood time-frequency maps: The cWB algorithm is
+used to generate likelihood time-frequency maps, L, for events identified through event produc-
+tion analysis. The configuration parameters for cWB align with those used in [68, 69]. These
+likelihood time-frequency maps are further analyzed to extract the physical information, as elab-
+orated in Sections II-B, II-C of [68], IV-A and IV-B of [69]. (ii) DNN model: The primary
+instrument for estimating the initial slope of the HFF is the DNN, as elaborated in [68] and
+more recently in [69]. (iii) A multiclassifier CNN model: A CNN is employed to distinguish
+between the EOS as in [69]. The CNN model receives images as input, specifically processed
+likelihood time-frequency maps, L, and produces multiclass labels reflecting the estimated slopes
+7
+
+
+Table 4: Total number of detections obtained from the cWB event production for the five
+EOS; DD2, FSUgold, IUSFU, SFHo and SFHx for the two stretches of open O3b LIGO data
+implemented in this study.
+EOS
+TW1 1kpc
+TW1 5kpc
+TW1 10kpc
+TW2 (1kpc)
+TW2 (5kpc)
+TW2 (10kpc)
+DD2
+1002
+913
+613
+1044
+922
+631
+FSUgold
+987
+801
+601
+966
+754
+567
+IUSFU
+1034
+987
+687
+1066
+1000
+702
+SFHo
+3787
+3215
+2215
+3821
+3299
+2199
+SFHx
+3211
+3034
+2034
+3266
+3087
+2021
+Total
+10.021
+8.950
+6.150
+10.163
+9.062
+6.120
+related to each EOS. Our classification algorithm includes: (A) a CNN model configured for
+multi-classification, which aids in distinguishing the estimated slopes at three Galactic distances;
+(B) independently trained and tested CNN models, using data from TW1 and TW2. To assess
+the generalizability and robustness of the multiclassifier CNN model it was trained using the
+TW1 dataset and then tested on an TW2 dataset. This approach ensures a more robust evalu-
+ation of the model’s performance and operation [82]. Finally, (D) a set of performance metrics
+[83, 94, 95] to evaluate the model’s accuracy in classifying the HFF slopes for each category are
+introduced, this includes: accuracy, the micro and macro average one vs rest (OvR) area under
+the curve (AUC), and the receiver operating characteristics curve (ROC).
+4.1
+Generation of cWB Events and Processing of Likelihood Maps
+The CCSN GW signals were injected into detector strain data of the second half of the third
+observing run O3b, in two different time windows TW1 and TW2, at intervals of 50 seconds,
+at 1 kpc, 5 kpc, and 10 kpc. Every signal is modeled to propagate in an equatorial orientation
+relative to the detector. Our findings cover the Galactic distances examined at this equatorial
+alignment. However, different orientations can be realized by modifying the factor 1/r to in-
+corporate multiplication by the cosine of the angle of orientation θ, as explained in [96]. The
+number of detections varied with Galactic distances and cWB operational settings. The detec-
+tions recorded during TW1 and TW2 are presented in Table 4. Analysis of detected events
+reveals a significant class imbalance [97, 98] across both TW1 and TW2 datasets. Specifically,
+the SFHo and SFHx classes represent the most dominant signals, a fact in agreement with what
+was reported in [69], consistently exhibiting the largest number of detections throughout both
+time windows. In contrast, the DD2, FSUgold and IUSFU classes account for approximately
+30% of the detections compared to SFHo and SFHx.
+The distribution of detections indicates that the datasets implemented for estimating the HFF
+from CCSN GW signals present a class imbalance persisting in TW1 and TW2. The distribution
+of EOS classes reveals that DD2, FSUgold, and IUSFU classes are underrepresented, compared
+to the predominant SFHo and SFHx classes. This imbalance stems from the inherent physics
+of how these EOSs influence GW emission and their subsequent detectability. Specifically, the
+underrepresented EOSs likely yield GW signals that are intrinsically weaker or possess HFF
+characteristics (e.g., lower amplitude, less distinct time evolution) that place their energy pre-
+dominantly in frequency bands with higher LVK noise. Following the results of [87] softer EOS
+models, such as SFHo and SFHx, describe more compressible matter. This produces a PNS with
+a smaller radius and higher central density. The compact structure supports higher-frequency
+oscillation modes, especially the surface g-mode, which dominates the late post-bounce GW
+emission. As a result, the GW spectrum for soft EOSs is shifted toward the kilohertz range,
+with sharper peaks that are well matched to power-based burst search algorithms such as cWB.
+8
+
+
+In contrast, stiffer EOS models like DD2 and FSUGold describe less compressible matter. The
+resulting PNS has a larger radius and lower central density, which shifts its oscillation frequen-
+cies downward. The GW emission from these models is typically weaker at high frequencies
+and instead dominated by longer-duration, lower-amplitude contributions from neutrino-driven
+convection and the standing accretion shock instability (SASI). While energetically significant,
+these signals distribute their power over longer timescales and at lower frequencies, making them
+harder to distinguish above the detector noise floor.
+4.2
+Convolutional neural network architecture
+Unlike our previous works [68, 69], which employed a Deep Neural Network (DNN) that pro-
+cessed a standardized vector representation of the data to estimate the HFF slope, the CNN
+developed here directly processes time-frequency likelihood maps (See section IV-A in [69] for
+details) as image inputs. Each image visually encodes the likelihoods maps associated with dif-
+ferent HFF slope values for a given EOS.
+For this study, we used a CNN for multi-classification because of its versatility in : (i) per-
+forming pattern recognition within images, by learning from internal features organized in grids
+of neurons that can be used across the entire image, piece by piece [29, 97], (ii) it requires fewer
+parameters [94] to achieve learning compared to a DNN, thus enhancing efficiency [98], (iii) it
+is specifically designed to learn and generalize features directly from images provided as input
+[82, 83, 99], and (iv) it demands less pre-processing than other classification algorithms [94, 100].
+In a CNN model, the input data is passed through a series of layers that are designed to extract,
+in a hierarchical structure, increasingly abstract features embedded within images, and then do
+the classification [95]. The basic building blocks of a CNN (see Appendix A), unlike DNN, are
+convolutional layers, which use filters to extract features from input data, and pooling layers,
+which down-sample the output of the convolutional layers to reduce the dimensionality of the
+data [97, 82]. After passing through several convolutional and pooling layers, the output is then
+transformed into a single vector and fed into a series of fully connected layers that perform
+classification or regression of the extracted features [99]. Convolution, responsible for executing
+an affine transform [101], detection [95], aimed at recognizing nonlinearities, and pooling [100],
+which serves the function of downsampling, constitute the fundamental substages implemented
+within layers that collectively form a stack. Subsequently, this stack can be sequentially con-
+nected to additional stacks, culminating in the final stack interfacing with the classifier. Figure
+2 illustrates the operation of the single-stack CNN model designed for EOS classification. For
+further details regarding the internal composition of the CNN, we refer to Appendices A and
+A. In this study, we employed a single-stack CNN architecture. Our primary objective is not to
+optimize classification efficiency through architectural variations, but rather, we aim to ascer-
+tain the viability of differentiating among the five equations of state (EOS) across three Galactic
+distances. The CNN architecture designed for this research is detailed in Table 5. This CNN
+model contains a total of 545,589 trainable parameters.
+5
+Results
+The effectiveness and reliability of the proposed CNN multi-class classification were first assessed
+using a Monte Carlo cross-validation approach on each time window (TW1 and TW2) dataset
+(see Appendix B). In each iteration, the datasets were randomly split into training (70%) and
+testing (30%) sets, a procedure repeated 30 times to mitigate the impact of random partitioning
+and to rigorously evaluate the distinguishability among the five EOS classes. Building on this
+validation, the following section evaluates the performance of the architecture across three differ-
+ent studies: Studies 1 and 2 (TW1 and TW2) assess the model’s performance within consistent
+9
+
+
+Figure 2:
+Single-stack CNN architecture implemented for the classification of the EOS at
+different Galactic distances within LVK noise. CNN input consists of time-frequency likelihood
+maps (Li), which are derived from cWB event production using wavescan. Each time-frequency
+likelihood map encodes the CCSN GW HFF slope within its internal pixel configuration. The
+CNN extracts spatial features from these input images using a convolution layer (Equation 1),
+where a filter slides across the entire image. This is followed by a non-linear activation function,
+such as ReLU (Equation 3), which allows the network to learn complex patterns. A subsequent
+max-pooling layer reduces the spatial dimensions, while finally a fully-connected layer merges
+the learned features to make a classification decision (Equation 2). For a detailed description of
+the CNN architecture and its performance, refer to Appendices A and B.
+Table 5: Architectural description of the single stack CNN multi-classifier model implemented
+to classify the EOS from the Chimera E-series using cWB detections.
+Layer
+Output Shape
+Conv2d_23 (Conv2D)
+(None,28, 28, 32)
+leaky_re_lu_25 (LeakyReLU)
+(None,28, 28, 32)
+max_pooling2d_21 (MaxPooling2D)
+(None,14, 14, 32)
+Conv2d_24 (Conv2D)
+(None,14, 14, 64)
+leaky_re_lu_26 (LeakyReLU)
+(None,14, 14, 64)
+max_pooling2d_22 (MaxPooling2D)
+(None,7, 7, 64)
+Conv2d_25 (Conv2D)
+(None,7, 7, 128)
+leaky_re_lu_27 (LeakyReLU)
+(None,7, 7, 128)
+max_pooling2d_23 (MaxPooling2D)
+(None,4, 4, 128)
+flatten_7 (Flatten)
+(None,2048)
+dense_14 (Dense)
+(None,128)
+leaky_re_lu_28 (LeakyReLU)
+(None,128)
+dense_15 (Dense)
+(None,5)
+time windows, while Study 3 (TW1–TW2) examines cross-temporal robustness by testing the
+TW1-trained model on the independent TW2 dataset.
+5.1
+Comparative Analysis of EOS Classification
+Figure 3 presents the full suite of confusion matrices for all three studies across Galactic dis-
+tances of 1, 5, and 10 kpc. These matrices are globally normalized, where each cell represents the
+10
+
+
+fraction of total predictions for a specific (true, predicted) category. Elements along the main
+diagonal represent correctly classified instances, while off-diagonal elements indicate specific mis-
+classified elements. As summarized in Table 6, the CNN model demonstrates high accuracy at
+Figure 3: Confusion matrices for Study 1 (top), Study 2 (middle), and Study 3 (bottom) at
+distances of 1, 5, and 10 kpc (columns). At 1 kpc, the CNN model demonstrates high accuracy
+across all studies, successfully distinguishing between all EOS classes. As distance increases,
+the signal-to-noise ratio decreases, leading to a systematic degradation of the diagonal elements.
+The SFH-series shows the highest resilience to noise, while the IUSFU class exhibits the most
+significant misclassification rates at larger distances, aligning with the HFF slope deviations
+reported in [69].
+1 kpc across all considered datasets, with per-class classification rates consistently exceeding
+96%. This high performance at close range indicates that the model has successfully learned the
+unique HFF features associated with each EOS. As expected, the predictive capacity diminishes
+with increasing distance. At 5 kpc, a notable drop in performance occurs. While the SFHo and
+SFHx models remain relatively resilient, the correct classification rates for DD2, FSUgold, and
+IUSFU fall significantly. Notably, Study 2 (TW2) and Study 3 (TW1–TW2) exhibit slightly
+higher accuracy scores at 1 kpc and 5 kpc compared to Study 1. This improvement is consis-
+tent with the higher micro- and macro-average training scores obtained for the TW2-related
+models (refer to Tables 7 and 8). At a distance of 10 kpc, the results reveal a near-total loss
+of classification ability for most classes, as the interferometric noise dominates the underlying
+signal. The misclassification rates at this distance become comparable to the correct classifi-
+cation rates, marking the effective limit of the current algorithm’s sensitivity for the Chimera
+E-series. However, the robustness demonstrated in Study 3 suggests that once trained, the CNN
+model remains effective against the temporal non-stationarity of the O3b data, preserving its
+classification logic across different observation windows.
+6
+Dataset Balancing and SMOTE Implementation
+As previously noted in section 4, datasets derived from cWB-XP event production for estimating
+the initial slope of the HFF in CCSN GW Chimera E-series exhibit an unbalanced configuration.
+Specifically, the DD2, FSUgold, and IUSFU classes contain fewer elements compared to the
+SFHo and SFHx classes, which have a significantly larger number of elements (see table 4). To
+address the underrepresentation of the DD2, FSUgold, and IUSFU classes, we used the Synthetic
+Minority Over-sampling Technique (SMOTE). This widely used preprocessing method mitigates
+class imbalance by generating synthetic examples of minority classes [97, 98], thus creating
+11
+
+
+Table 6: Per-class classification accuracy (percentage of correctly predicted samples) for the three
+studies across Galactic distances. Values are derived from the consolidated confusion matrices
+in Fig. 3.
+1 kpc
+5 kpc
+10 kpc
+Class
+TW1
+TW2
+TW1-2
+TW1
+TW2
+TW1-2
+TW1
+TW2
+TW1-2
+DD2
+96.19
+98.14
+99.68
+28.84
+30.09
+33.78
+20.25
+20.56
+21.83
+FSUgold
+97.38
+98.92
+99.61
+40.88
+40.07
+34.25
+12.38
+18.86
+15.38
+IUSFU
+98.70
+99.47
+99.84
+23.77
+28.49
+28.33
+7.51
+14.49
+14.54
+SFHo
+99.38
+99.83
+99.97
+58.05
+65.64
+57.19
+22.33
+24.71
+23.15
+SFHx
+99.34
+99.85
+99.96
+55.61
+63.41
+53.76
+21.62
+23.24
+21.65
+a more balanced dataset for testing our multi-class CNN architecture for EOS classification.
+SMOTE generates new synthetic minority instances situated between existing minority instances
+by means of linear interpolation for the minority class. These synthetic instances are created by
+randomly choosing one or more of the k-nearest neighbors for each minority class example [102,
+82]. Figures 4 present the confusion matrices obtained after the implementation of the SMOTE
+technique at 1 kpc for the TW1, TW2, and TW1-TW2 datasets. Following the implementation
+Figure 4: Applying the SMOTE technique to balance the datasets did not significantly alter the
+total prediction rates in the confusion matrices for the TW1, TW2, and TW1-TW2 datasets
+at 1 kpc. The fraction of total detections showed a minimal increase, less than 5%, suggesting
+that SMOTE did not generate a sufficient number of synthetic samples to effectively equalize
+the imbalanced datasets.
+of the SMOTE technique, a slight increase in the overall fraction of correctly predicted EOS
+classes is observed in Figure 4. A comparison of the confusion matrices before and after SMOTE
+(Figures 3, and 4) reveals that the number of synthetic samples does not significantly alter
+the results.
+The data particularly indicates that, at a distance of 1 kpc, the percentage of
+accurate predictions rises by under 5% with the application of SMOTE. Although slight, this
+increase highlights the reliability of the CNN model. Both the algorithm’s effectiveness and the
+distribution of its predicted probabilities are stable, showing uniformity in the density of correctly
+classified samples by class, in all three studies, irrespective of the initial class distribution detailed
+in Table 4.
+7
+Receiver operating curves for EOS identification
+As illustrated by the ROC curves in Figure 5, the CNN model demonstrates a robust ability
+to distinguish between EOS classes at 1 kpc across all considered datasets. First row in Figure
+5 shows that at 1 kpc, the CNN model demonstrates strong performance in distinguishing be-
+tween EOS classes. This is evidenced by high ROC AUC scores for individual EOSs: DD2 (0.97),
+FSUgold (0.98), IUSFU (0.96), SFHo (0.98), and SFHx (0.97). Furthermore, the micro-average
+AUC of 0.89 and macro-average AUC of 0.80 provide a strong global indication of the model’s
+efficacy in a one-vs-all multiclassification scheme. As expected, the model’s ability to correctly
+classify the EOSs diminishes significantly at 10 kpc.
+12
+
+
+Figure 5: Receiver Operating Characteristic (ROC) curves and corresponding Area Under the
+Curve (AUC) values for EOS multiclassification across TW1, TW2, and TW1–TW2.
+Rows
+represent the time windows, while columns correspond to source distances of 1 kpc, 5 kpc, and
+10 kpc. Results include individual EOS classes (one-vs-rest), as well as micro- and macro-average
+AUCs, obtained from the CNN model described in Section 4.
+13
+
+
+The second and third rows of Figure 5 demonstrate that the CNN model’s performance in distin-
+guishing between EOS classes at 1 kpc remains consistent across both the TW2 and TW1–TW2
+datasets. This preservation of accuracy indicates that the model’s efficacy is robust regardless
+of the specific time window used for analysis. Individual ROC (AUC) scores are high: DD2
+(0.97), FSUgold (0.96), IUSFU (0.97), SFHo (0.98), and SFHx (0.97). The micro-average AUC
+of 0.81 and macro-average AUC of 0.80 further provide a strong global indication of the model’s
+efficacy, comparable to the results obtained in studies 1 and 2. At 5 kpc, the model’s recognition
+capabilities for different EOSs is reduced, as indicated by the ROC AUC scores: DD2 (0.82),
+FSUgold (0.86), IUSFU (0.82), SFHo (0.94), and SFHx (0.94). The micro-average AUC (0.81)
+and macro-average AUC (0.80) are very similar to the corresponding scores from previous stud-
+ies, demonstrating sustained performance across different time periods for training and testing.
+At 10 kpc, the performance of the CNN model shows expected degradation with lower individual
+ROC AUC scores: DD2 (0.61), FSUgold (0.69), IUSFU (0.63), SFHo (0.67), and SFHx (0.65).
+The microaverage AUC (0.70) and macroaverage AUC (0.60) are indicative of the difficulties
+experienced in the operation of the algorithm to classify EOS at larger distances.
+8
+Summary
+The design and implementation of the single-stack CNN architecture (described in Section 4)
+demonstrate the ability to correctly classify the five EOS classes, at 1 kpc, using the HFF es-
+timated slope in LVK interferometric data. At 5 kpc and 10 kpc, the CNN model exhibits a
+degradation of its ability to differ between the distinct EOS classes. Loss values show minor
+fluctuations or marginal increases both prior to and following the application of the SMOTE
+technique. In contrast, the micro-average and macro-average OvR (AUC) scores exhibit modest
+enhancements post-SMOTE, particularly at distances of 5 kpc and 10 kpc. This outcome sug-
+gests that, despite the inherent imbalanced characteristics observed in the datasets, the CNN
+algorithm maintains a consistent proportion of accurate classifications predicted by the model
+across the studies conducted, regardless of the number of instances present in the datasets.
+The OvR (AUC) scores presented in Table 9 provide an evaluation of the CNN’s ability to
+classify the five EOS classes at varying Galactic distances across the three studies developed.
+The distribution of macro-average AUC indicates that the application of the SMOTE technique
+has positively influenced the CNN’s capability to classify the under-represented EOS classes.
+Specifically, the implementation of the SMOTE approach enables the inference of result consis-
+tency across all studies, thereby demonstrating the algorithm’s robustness in classifying distinct
+EOS classes, regardless of the density of samples presented by the datasets and the temporal
+variations observed in TW1 and TW2. It also shows that the integration of combined data from
+both TW1 and TW2 provides an efficient training landscape, enhancing the CNN’s ability to
+reliably classify all EOS types under challenging detection conditions involving time variations
+in LVK data.
+Our results, derived using noise characteristics consistent with the LVK O3b run,
+underscore the challenges and opportunities in GW data analysis. With the recent availability
+of data from the LIGO O4 observing run, characterized by improved detector sensitivity, we an-
+ticipate enhanced capabilities for estimating and classifying the HFF slope, particularly below
+1 kHz. Furthermore, next-generation GW observatories, such as Cosmic Explorer [103] and the
+Einstein Telescope [104], herald order-of-magnitude improvements in detection sensitivity. This
+study highlights the potential of using the CCSN GW HFF to enhance our comprehension of
+the intricate physical processes that control stellar collapse and the EOS. Given that GW signal
+amplitude scales inversely with distance, this increased sensitivity directly translates into an
+effectively greater detection range. Conservatively, the high classification performance achieved
+in our 1 kpc models could become representative of detections at 10 kpc or beyond with these
+future instruments.
+14
+
+
+Table 7: Accuracy, loss, micro-average OvR (AUC), and macro-average OvR (AUC) for the
+multi-classifier CNN before and after the application of the SMOTE technique on TW1 dataset.
+BEFORE SMOTE
+Metric
+1 kpc
+5 kpc
+10 kpc
+Accuracy
+0.93
+0.82
+0.73
+Loss
+0.32
+0.43
+0.57
+Micro-Average OvR (AUC)
+0.89
+0.89
+0.73
+Macro-Average OvR (AUC)
+0.80
+0.80
+0.68
+AFTER SMOTE
+Metric
+1 kpc
+5 kpc
+10 kpc
+Accuracy
+0.95
+0.83
+0.74
+Loss
+0.36
+0.47
+0.59
+Micro-Average OvR (AUC)
+0.91
+0.89
+0.65
+Macro-Average OvR (AUC)
+0.82
+0.81
+0.64
+Table 8: Accuracy, loss, micro-average OvR (AUC), and macro-average OvR (AUC) for the
+multi-classifier CNN before and after the application of the SMOTE technique on TW2 dataset.
+BEFORE SMOTE
+Metric
+1 kpc
+5 kpc
+10 kpc
+Accuracy
+0.90
+0.80
+0.70
+Loss
+0.30
+0.40
+0.59
+Micro-Average OvR (AUC)
+0.97
+0.82
+0.65
+Macro-Average OvR (AUC)
+0.97
+0.79
+0.64
+AFTER SMOTE
+Metric
+1 kpc
+5 kpc
+10 kpc
+Accuracy
+0.93
+0.82
+0.71
+Loss
+0.32
+0.44
+0.62
+Micro-Average OvR (AUC)
+0.97
+0.83
+0.65
+Macro-Average OvR (AUC)
+0.97
+0.81
+0.65
+Acknowledgements
+This research has made use of data or software obtained from the Gravitational Wave Open Sci-
+ence Center (gwosc.org), a service of the LIGO Scientific Collaboration, the Virgo Collaboration,
+and KAGRA. This material is based upon work supported by NSF’s LIGO Laboratory which
+is a major facility fully funded by the National Science Foundation, as well as the Science and
+Technology Facilities Council (STFC) of the United Kingdom, the Max-Planck-Society (MPS),
+and the State of Niedersachsen/Germany for support of the construction of Advanced LIGO and
+construction and operation of the GEO600 detector. Additional support for Advanced LIGO
+was provided by the Australian Research Council. Virgo is funded, through the European Grav-
+itational Observatory (EGO), by the French Centre National de Recherche Scientifique (CNRS),
+the Italian Istituto Nazionale di Fisica Nucleare (INFN) and the Dutch Nikhef, with contribu-
+tions by institutions from Belgium, Germany, Greece, Hungary, Ireland, Japan, Monaco, Poland,
+Portugal, Spain. KAGRA is supported by Ministry of Education, Culture, Sports, Science and
+Technology (MEXT), Japan Society for the Promotion of Science (JSPS) in Japan; National
+Research Foundation (NRF) and Ministry of Science and ICT (MSIT) in Korea; Academia
+Sinica (AS) and National Science and Technology Council (NSTC) in Taiwan. A.C. and M.S.
+15
+
+
+Table 9: Receiver operating characteristic to One-vs-Rest area under the curve for multiclass
+classification, at Galactic distances of 1 kpc, 5 kpc, and 10 kpc, involving the three studies
+developed in this research.
+OvR (AUC) (%)
+1 kpc
+5 kpc
+10 kpc
+CLASS
+TW1
+TW2
+TW1-TW2
+TW1
+TW2
+TW1-TW2
+TW1
+TW2
+TW1-TW2
+DD2
+0.97
+0.97
+0.97
+0.82
+0.80
+0.82
+0.61
+0.61
+0.61
+FSUgold
+0.98
+0.97
+0.96
+0.86
+0.86
+0.86
+0.66
+0.67
+0.69
+IUSFU
+0.96
+0.96
+0.97
+0.82
+0.83
+0.82
+0.64
+0.64
+0.63
+SFHo
+0.98
+0.98
+0.98
+0.95
+0.94
+0.94
+0.68
+0.64
+0.67
+SFHx
+0.97
+0.97
+0.97
+0.92
+0.93
+0.94
+0.69
+0.67
+0.65
+acknowledge Polish National Science Centre Grant No. UMO-2024/03/1/ST9/00005, and the
+Polish National Agency for Academic Exchange within Polish Returns Programme Grant No.
+BPN/PPO/2023/1/00019. M.S. acknowledges also Polish National Science Centre Grant No.
+UMO-2023/49/B/ST9/02777. M.Z. was supported in part by the National Science Foundation
+Gravitational Physics Experimental and Data Analysis Program through award PHY 2110555.
+AM and DM were supported in part by the National Science Foundation gravitational physics
+theory program through grant PHY-2409148.
+A
+Convolutional Neural Networks
+The architecture of the single CNN stack model implemented to classify the EOS by using the
+estimation of the HFF slope and the cWB event production is described in the following items
+1. Input layer [97]: The input layer receives input images consisting of likelihood time-
+frequency maps L. Formally, these maps are represented as matrices of pixels
+Li ∈RNtime×Nfreq×C,
+where Ntime and Nfreq correspond to the number of rows and columns representing time
+and frequency dimensions, respectively, while C denotes the channel. A channel designates
+a specific data dimension that encapsulates distinct types of information within single array
+of numbers. Typically, for input images, channels are associated with color components,
+with grayscale images containing a single channel.
+These maps are converted to high-
+resolution grayscale images and resized to dimensions Ntime = Nfreq = 28. These images
+are fed directly into the initial layer for further processing. This data set, known as the
+training data set Dtrain, consists of all processed images derived from the cWB event
+production analysis. In subsequent stages, following the classification process, each image
+in the dataset will be categorized into one of five distinct classes: DD2, FSUgold, IUSFU,
+SFHo, and SFHx based on their HFF slopes, estimated from the second half of the LVK
+O3b scientific run using the methodology described in [68] and [69].
+2. Convolution Process [82]: The convolutional layer applies filters or kernels K ∈Rktime×kfreq×C×n
+of dimensionality ktime × kfreq, where n represents the number of filters. These filters con-
+volve over each image Li, and the sliding kernels extract spatial features from the input
+data. The kernel is applied to each overlapping region of the input image, and for each
+position (i, j), the pixel values are multiplied by the kernel weights, and subsequently these
+products are added to derive a single value. Each filter within a convolutional layer gener-
+ates one feature map, and for n filters, the layer produces n feature maps that are stacked
+along the channel dimension. The convolution operation for the n-th filter, at position
+16
+
+
+(i, j) in the feature map, is represented by:
+z(n)
+i,j =
+C−1
+X
+c=0
+ktime−1
+X
+m=0
+kfreq−1
+X
+n=0
+Li·s+m,j·s+n,c · K(n)
+m,n,c + b(n),
+(1)
+where s denotes the stride (or the step size of the kernel K), b(n) is the bias term for filter
+n, and the indices i · s + m and j · s + n account for the padding, p. Subsequently, a
+nonlinear function f is applied to produce the final feature map:
+Z(n)
+i,j = f
+
+z(n)
+i,j
+
+.
+(2)
+In practical applications, feature maps are instrumental in detecting simple patterns, such
+as edges and corners. Feature maps in deeper layers integrate lower-level features into
+more intricate structures, such as shapes or objects. Furthermore, visualization of feature
+maps enables the interpretation of what the network “perceives" at each layer. A pertinent
+observation is that, in contrast to DNN models, CNNs offer parameter efficiency by sharing
+weights across spatial positions, thereby mitigating overfitting.
+3. ReLU Function [98]: The Rectified Linear Unit (ReLU) is a type of nonlinear activation
+function used extensively in neural networks. Within a CNN, the ReLU processes neurons
+from the convolutional layers, functioning to inject nonlinearity into the network. This
+allows for the learning of intricate patterns through operations that are performed element-
+wise, working independently on each value in input images. ReLU layers are generally
+located after convolutional layers and before grouping layers or additional convolutions.
+The ReLU function is mathematically expressed as:
+f(Zi,j,c) = max(0, Zi,j,c)
+(3)
+where Zi,j,c represents the preactivation value at the spatial position (i, j) within the
+channel C. In the absence of nonlinear activations, sequential linear layers, such as con-
+volutional layers, would degenerate to a mere linear transformation, hindering the net-
+work’s capacity to learn complex functions. By nullifying negative inputs, ReLU leads to
+sparse data representations, potentially enhancing computational efficiency and diminish-
+ing overfitting. In contrast to saturating functions like sigmoid or tanh, ReLU maintains
+a non-decreasing gradient for positive inputs, facilitating the training of deep networks.
+4. Max Pooling [83]: The pooling layer is a critical component in CNNs used to reduce
+the spatial dimensions (width and height) of input feature maps while retaining the most
+important information.
+This process, known as downsampling, involves sliding a two-
+dimensional filter over each channel of a feature map and summarizing the features within
+that region. The incorporation of pooling layers in the CNN architecture is essential for
+several reasons, it achieves dimensionality reduction, decreasing the number of parame-
+ters and computations, making the model faster and more efficient; it helps the network
+become invariant to small translations or distortions in the input image; it prevents over-
+fitting by creating a more generalized representation; and it aids in building a hierarchical
+representation of features, where lower layers capture fine details and higher layers cap-
+ture more abstract, global features. Ultimately, the stacking of convolution and pooling
+layers is a fundamental architectural pattern in typical CNN models. The max pooling is
+mathematically defined as follows:
+Zi,j =
+max
+m,n∈window Xi·s+m,j·s+n.
+17
+
+
+Zi,j represents a single value in the output feature map at position (i, j) after the pooling
+operation. maxm,n∈window is the operation that selects the maximum value from the ele-
+ments within a specific window of the input. The variables m and n are the indices that
+iterate through the rows and columns of this window. X is the input feature map. The
+indices i · s + m and j · s + n specify the exact location of the element being considered
+within this input map. Finally, s, is the stride, which dictates how many steps the pooling
+window shifts across the input feature map after each computation.
+5. Fully-Connected: A fully connected layer (FC) within a CNN acts as the final phase
+to merge features and make decisions. It integrates the high-level features identified by
+earlier convolutional or pooling layers into either class scores or regression results. The
+FC layer receives a 3D tensor as input from the final convolutional/pooling layer, with
+dimensions H × W × C. By flattening, this 3D tensor is transformed into a 1D vector:
+x ∈RD,
+D = H × W × C. For an FC layer containing N neurons, the transformation is
+y = Wx + b, where W ∈RN×D represents the weight matrix, b ∈RN is the bias vector,
+and y ∈RN is the output logits (pre-activation stage).
+6. Softmax [98]: The Softmax Layer is an essential component in CNNs used for classification
+tasks. It transforms raw output scores, known as logits, from the network into probabilities,
+thereby allowing the model to allocate confidence scores to each class. A vector of logits
+is obtained from the final fully connected (FC) layer, with
+z = [z1, z2, ..., zK] ∈RK,
+representing the number of classes. For each class i, the probability pi is calculated as
+pi =
+ezi
+PK
+j=1 ezj ,
+ensuring both normalization PK
+i=1 pi = 1 and probabilistic interpretation 0 ≤pi ≤1. The
+purpose of the softmax function is to enhance interpretability by converting abstract logits
+into probabilities. It facilitates the generation of class confidence, wherein the class with
+the highest probability is deemed the model’s prediction, and provides differentiability that
+supports gradient-based optimization techniques, such as backpropagation.
+7. Loss Function[97]: A loss function is a mathematical tool used to measure the difference
+between a model’s predictions and the actual target values evaluating how closely these
+predictions align with the real output. In the context of CNNs the loss function similarly
+assesses the error between predicted outcomes and the true labels. This function acts as a
+training signal for fine-tuning the model’s parameters through gradient-based techniques
+such as backpropagation. A loss function is a scalar-valued function that translates the
+relationship between the model’s predictions and the actual labels into a single real number.
+Formally, it is expressed as:
+L : Y × Y →R,
+where Y represents the set of predictions (e.g., class probabilities, regression outcomes) and
+Y denotes the set of true labels. Given a data set {(xi, yi)}N
+i=1, the overall loss is usually
+calculated as the average across all samples: L(θ) =
+1
+N
+PN
+i=1 ℓ(fθ(xi), yi) + λ · Reg(θ),
+where ℓis the per sample loss (e.g., cross-entropy, MSE). fθ represents the model with
+parameters θ. Reg(θ) indicates the regularization component (e.g., L1/L2 penalties), and
+λ is the regularization strength.
+8. Learning [100]: We focus on multi-class classification, meaning there are multiple classes,
+but each object belongs to a single class. Our objective is to use the training dataset to
+18
+
+
+determine the characteristics of each class. This process is known as classifier training
+or model learning. The output generated by the model is a label or class assigned to
+each sample within the training dataset.
+Specifically, our classifier will be capable of
+distinguishing among five different EOS based on the HFF slope values once they are
+estimated in different realizations of LVK noise.
+9. Evaluation and Validation [29, 82]: We evaluated the efficacy of our classifier by em-
+ploying a Monte Carlo method, in which the dataset is divided with 70% allocated for
+training and the remaining 30% allocated for testing. This approach is implemented using
+two distinct time windows, TW1 and TW2 [see table 1], which are associated with the
+LVK Scientific Run O3b. To further evaluate the classifier’s performance, we employ a
+Monte Carlo method that involves training with time window TW1 while testing with time
+window TW2. Throughout these validation processes, we derive the confusion matrix, as
+well as the micro and macro average (OvR) ROC, in addition to the ROC for each class
+within the two time windows.
+B
+Performance metrics
+The CNN model’s effectiveness is validated on previously unseen data; therefore, accurately
+evaluating performance metrics during testing is crucial.
+We used the following metrics to
+evaluate the ability of the proposed model to classify the EOS.
+(i) Confusion Matrix[82]: The confusion matrix stands as a fundamental tool for system-
+atically evaluating the performance of classification models. This tabular representation offers a
+visualization that directly compares the model’s predicted class labels against the ground truth
+labels present in the dataset [97], providing a detailed breakdown of both correct and incorrect
+classifications, For binary classification problems, the confusion matrix is a 2 × 2 table com-
+prising four key metrics: True Positives (TP), True Negatives (TN), False Positives (FP), and
+False Negatives (FN). In the context of multiclass classification problems, the confusion matrix
+naturally extends from this 2 × 2 structure to an n × n structure, where n represents the total
+number of distinct classes [83]. In this expanded matrix, each row conventionally represents the
+actual (true) class of the instances, while each column corresponds to the class predicted by the
+model. The diagonal elements of the confusion matrix indicate the number of instances that
+were correctly classified for each specific class. Conversely, the off-diagonal elements represent
+misclassifications, meaning, the number of instances that truly belonged to a specific class but
+were incorrectly predicted as belonging to a different one. Analyzing these off-diagonal values is
+relevant for identifying specific types of errors the model makes (e.g., discerning which classes
+are frequently confused with others), thereby providing actionable insights for model refinement
+and improvement.
+(ii) The AUC-ROC Curve[29]: The Area Under the Curve (AUC) Receiver Operating
+Characteristics (ROC) curve is a widely accepted graphical tool for evaluating the performance
+of classification models. It illustrates the ability of a classifier system as its discrimination thresh-
+old is varied. Specifically, the ROC curve plots the TPR, also known as sensitivity or recall,
+against the False Positive Rate (FPR) for different threshold settings.
+Although fundamentally designed for binary classification, ROC analysis can be extended to
+evaluate models in multiclass classification problems through established strategies. The most
+common and intuitive approach is the One-vs-Rest (OvR) (also known as One-vs-All, OvA)
+method. This technique effectively decomposes the multiclass prediction task into a series of
+independent binary classification problems. For each class in the multiclass set, the OvR strat-
+egy treats that specific class as the “positive" class and groups all other classes as the “negative"
+class. For an N-class problem, the OvR approach thus generates N distinct binary classifiers.
+19
+
+
+An independent ROC curve and a corresponding AUC score are computed for each of these N
+binary classification problems. Each individual ROC curve and its AUC value then specifically
+illustrate the model’s ability to discriminate its respective "positive" class from all other classes
+combined. Higher AUC scores for individual classes indicate a more robust ability of the model
+to correctly identify instances of that specific class while correctly rejecting instances belonging
+to any of the other classes. This detailed per-class analysis is crucial for understanding specific
+strengths and weaknesses of the multiclass model across its different output categories.
+(iii) Macro and Micro Average[98]: In the evaluation of multi-class classification models,
+particularly in ML and pattern recognition, the choice between micro- and macro-averaging for
+performance metrics is crucial and depends heavily on the characteristics of the dataset. These
+two averaging techniques provide distinct perspectives on model performance, especially when
+dealing with imbalanced datasets. The macro-averaging can be considered as a “class-centric
+evaluation" meaning it computes a given performance metric independently for each class and
+then calculates the arithmetic mean of these per-class scores. Formally, if we have C classes and
+Mi is the metric score for class i, the macro-averaged metric Mmacro is given by
+Mmacro = 1
+C
+C
+X
+i=1
+Mi .
+(4)
+The fundamental principle of macro-averaging is to assign equal weight to each class, regardless
+of its prevalence in the dataset. This means that the performance on a minority class contributes
+as much to the overall macro-average score as the performance on a majority class. Consequently,
+macro-averaging is highly sensitive to the model’s performance on minority classes. A poor per-
+formance on even a single rare class can significantly depress the macro-averaged score. This
+makes it an ideal choice when all classes are considered equally important from an application
+standpoint, and misclassification of minority instances is as critical as misclassification of major-
+ity instances. Macro-averaging is particularly valuable in the presence of class imbalance, where
+the number of instances varies significantly across different class labels. In such scenarios, if
+a model performs poorly on under-represented classes, the macro-average will reflect this defi-
+ciency, providing a more realistic assessment of the model’s generalized performance across all
+categories, rather than being skewed by high accuracy on over-represented classes.
+Micro-averaging, conversely, aggregates the counts of TP, FP, and false negatives (FN) across
+all classes first, and then calculates the performance metric based on these global sums. The
+micro-averaged precision (Pmicro) and recall (Rmicro) are defined as follows:
+Pmicro =
+PC
+i=1 TPi
+PC
+i=1 TPi + PC
+i=1 FPi
+(5)
+Rmicro =
+PC
+i=1 TPi
+PC
+i=1 TPi + PC
+i=1 FNi
+(6)
+Micro-averaging effectively treats every individual instance equally, regardless of its class label.
+This means that the performance on larger classes will have a disproportionately greater influence
+on the micro-averaged score compared to smaller classes. In the presence of class imbalance,
+micro-averaging will be dominated by the performance on the majority classes. A model that
+performs exceptionally well on large classes but poorly on small classes might still achieve a high
+micro-averaged score. This can be misleading if the objective is to ensure robust performance
+across all categories. Micro-averaging is appropriate when the primary concern is the overall
+correctness of predictions across the entire dataset, irrespective of class distribution. It is often
+used when the goal is to optimize for global performance and when errors in majority classes
+are considered more impactful due to their sheer number (e.g., in very large-scale classification
+systems where overall throughput accuracy is paramount, or when the cost of misclassification
+is uniform across instances).
+20
+
+
+References
+[1] J. Aasi et al. Advanced LIGO. Classical and Quantum Gravity., 32:074001, 2015.
+[2] B. P. Abbott et al. Observation of Gravitational Waves from a Binary Black Hole Merger.
+Phys. Rev. Lett., 116:061102, Feb 2016.
+[3] F Acernese, M Agathos, K Agatsuma, D Aisa, N Allemandou, A Allocca, J Amarni, P As-
+tone, G Balestri, G Ballardin, F Barone, J-P Baronick, M Barsuglia, A Basti, F Basti,
+Th S Bauer, V Bavigadda, M Bejger, M G Beker, C Belczynski, D Bersanetti, A Bertolini,
+M Bitossi, M A Bizouard, S Bloemen, M Blom, M Boer, G Bogaert, D Bondi, F Bondu,
+L Bonelli, R Bonnand, V Boschi, L Bosi, T Bouedo, C Bradaschia, M Branchesi, T Bri-
+ant, A Brillet, V Brisson, T Bulik, H J Bulten, D Buskulic, C Buy, G Cagnoli, E Cal-
+loni, C Campeggi, B Canuel, F Carbognani, F Cavalier, R Cavalieri, G Cella, E Cesarini,
+E Chassande Mottin, A Chincarini, A Chiummo, S Chua, F Cleva, E Coccia, P-F Cohadon,
+A Colla, M Colombini, A Conte, J-P Coulon, E Cuoco, A Dalmaz, S D’Antonio, V Dattilo,
+M Davier, R Day, G Debreczeni, J Degallaix, S Deléglise, W Del Pozzo, H Dereli, R De
+Rosa, L Di Fiore, A Di Lieto, A Di Virgilio, M Doets, V Dolique, M Drago, M Ducrot,
+G Endrőczi, V Fafone, S Farinon, I Ferrante, F Ferrini, F Fidecaro, I Fiori, R Flaminio, J-
+D Fournier, S Franco, S Frasca, F Frasconi, L Gammaitoni, F Garufi, M Gaspard, A Gatto,
+G Gemme, B Gendre, E Genin, A Gennai, S Ghosh, L Giacobone, A Giazotto, R Gouaty,
+M Granata, G Greco, P Groot, G M Guidi, J Harms, A Heidmann, H Heitmann, P Hello,
+G Hemming, E Hennes, D Hofman, P Jaranowski, R J G Jonker, M Kasprzack, F Kéfélian,
+I Kowalska, M Kraan, A Królak, A Kutynia, C Lazzaro, M Leonardi, N Leroy, N Letendre,
+T G F Li, B Lieunard, M Lorenzini, V Loriette, G Losurdo, C Magazzù, E Majorana,
+I Maksimovic, V Malvezzi, N Man, V Mangano, M Mantovani, F Marchesoni, F Mar-
+ion, J Marque, F Martelli, L Martellini, A Masserot, D Meacher, J Meidam, F Mezzani,
+C Michel, L Milano, Y Minenkov, A Moggi, M Mohan, M Montani, N Morgado, B Mours,
+F Mul, M F Nagy, I Nardecchia, L Naticchioni, G Nelemans, I Neri, M Neri, F Nocera,
+E Pacaud, C Palomba, F Paoletti, A Paoli, A Pasqualetti, R Passaquieti, D Passuello,
+M Perciballi, S Petit, M Pichot, F Piergiovanni, G Pillant, A Piluso, L Pinard, R Pog-
+giani, M Prijatelj, G A Prodi, M Punturo, P Puppo, D S Rabeling, I Rácz, P Rapagnani,
+M Razzano, V Re, T Regimbau, F Ricci, F Robinet, A Rocchi, L Rolland, R Romano,
+D Rosińska, P Ruggi, E Saracco, B Sassolas, F Schimmel, D Sentenac, V Sequino, S Shah,
+K Siellez, N Straniero, B Swinkels, M Tacca, M Tonelli, F Travasso, M Turconi, G Va-
+jente, N van Bakel, M van Beuzekom, J F J van den Brand, C Van Den Broeck, M V
+van der Sluys, J van Heijningen, M Vasúth, G Vedovato, J Veitch, D Verkindt, F Vetrano,
+A Viceré, J-Y Vinet, G Visser, H Vocca, R Ward, M Was, L-W Wei, M Yvert, A Zadro
+żny, and J-P Zendri. Advanced virgo: a second-generation interferometric gravitational
+wave detector. Classical and Quantum Gravity, 32(2):024001, December 2014.
+[4] Yoichi Aso, Yuta Michimura, Kentaro Somiya, Masaki Ando, Osamu Miyakawa, Takanori
+Sekiguchi, Daisuke Tatsumi, and Hiroaki Yamamoto. Interferometer design of the KAGRA
+gravitational wave detector. Physical Review D, 88(4), aug 2013.
+[5] R. at. al. Abbott. GWTC-2.1: Deep extended catalog of compact binary coalescences
+observed by LIGO and Virgo during the first half of the third observing run. Phys. Rev.
+D, 109:022001, Jan 2024.
+[6] R. et. al. Abbott. GWTC-3: Compact Binary Coalescences Observed by LIGO and Virgo
+during the Second Part of the Third Observing Run. Phys. Rev. X, 13:041039, Dec 2023.
+21
+
+
+[7] LIGO Scientific Collaboration and Virgo Collaboration and KAGRA Collaboration.
+GWTC-4.0: Updating the Gravitational-Wave Transient Catalog with Observations from
+the First Part of the Fourth LIGO-Virgo-KAGRA Observing Run. 2025.
+[8] Jade Powell, Alberto Iess, Miquel Llorens-Monteagudo, Martin Obergaulinger, Bernhard
+Müller, Alejandro Torres-Forné, Elena Cuoco, and José A. Font. Determining the core-
+collapse supernova explosion mechanism with current and future gravitational-wave obser-
+vatories. Phys. Rev. D, 109(6):063019, 2024.
+[9] Takami Kuroda, Kei Kotake, Tomoya Takiwaki, and Friedrich-Karl Thielemann. A full
+general relativistic neutrino radiation-hydrodynamics simulation of a collapsing very mas-
+sive star and the formation of a black hole. Monthly Notices of the Royal Astronomical
+Society: Letters, 477(1):L80–L84, apr 2018.
+[10] David Radice, Viktoriya Morozova, Adam Burrows, David Vartanyan, and Hiroki Na-
+gakura. Characterizing the gravitational wave signal from core-collapse supernovae. The
+Astrophysical Journal, 876(1):L9, apr 2019.
+[11] Hans-Thomas Janka, Tobias Melson, and Alexander Summa. Physics of Core-Collapse Su-
+pernovae in Three Dimensions: A Sneak Preview. Annual Review of Nuclear and Particle
+Science, 66(1):341–375, October 2016.
+[12] Anthony Mezzacappa and Michele Zanolin. Gravitational Waves from Neutrino-Driven
+Core Collapse Supernovae: Predictions, Detection, and Parameter Estimation. arXiv e-
+prints, page arXiv:2401.11635, January 2024.
+[13] B. Müller.
+The Status of Multi-Dimensional Core-Collapse Supernova Models.
+Proc.
+Astron. Soc. Pac., 33:e048, September 2016.
+[14] A. Burrows and D. Vartanyan.
+Core-collapse supernova explosion theory.
+Nature,
+589(7840):29–39, jan 2021.
+[15] Ernazar Abdikamalov, Giulia Pagliaroli, and David Radice. Gravitational Waves from
+Core-Collapse Supernovae. In Handbook of Gravitational Wave Astronomy. Edited by C.
+Bambi, page 21. 2022.
+[16] Tobias Melson, Hans-Thomas Janka, Robert Bollig, Florian Hanke, Andreas Marek, and
+Bernhard Müller. Neutrino-driven explosion of a 20 solar-mass star in three dimensions
+enabled by strange-quark contributions to neutrino–nucleon scattering. The Astrophysical
+Journal, 808(2):L42, jul 2015.
+[17] Anthony Mezzacappa, Eirik Endeve, O. E. Bronson Messer, and Stephen W. Bruenn.
+Physical, numerical, and computational challenges of modeling neutrino transport in core-
+collapse supernovae, 2020.
+[18] Hans-Thomas Janka. Explosion mechanisms of core-collapse supernovae. Annual Review
+of Nuclear and Particle Science, 62(1):407–451, nov 2012.
+[19] Anthony Mezzacappa. Toward Realistic Models of Core Collapse Supernovae: A Brief
+Review. IAU Symposium, 362:215–227, January 2023.
+[20] Jeremiah W. Murphy, Christian D. Ott, and Adam Burrows. A model for gravitational
+wave emission from neutrino-driven core-collapse supernovae. The Astrophysical Journal,
+707(2):1173–1190, dec 2009.
+22
+
+
+[21] Tomoya Takiwaki and Kei Kotake. Anisotropic emission of neutrino and gravitational-
+wave signals from rapidly rotating core-collapse supernovae. Mon. Not. Roy. Astron. Soc.
+, 475(1):L91–L95, March 2018.
+[22] S. Klimenko, S. Mohanty, M. Rakhmanov, and G. Mitselmakher. Constraint likelihood
+analysis for a network of gravitational wave detectors. Physical Review D, 72(12), dec
+2005.
+[23] S Klimenko, I Yakushin, A Mercer, and G Mitselmakher. A coherent method for detection
+of gravitational wave bursts. Classical and Quantum Gravity, 25(11):114029, may 2008.
+[24] S. Klimenko, G. Vedovato, M. Drago, F. Salemi, V. Tiwari, G. A. Prodi, C. Lazzaro,
+K. Ackley, S. Tiwari, C. F. Da Silva, and G. Mitselmakher. Method for detection and re-
+construction of gravitational wave transients with networks of advanced detectors. Physical
+Review D, 93(4), feb 2016.
+[25] Sergey Klimenko. Wavescan: multiresolution regression of gravitational-wave data. In
+APS April Meeting Abstracts, volume 2022 of APS Meeting Abstracts, page E17.004, April
+2022.
+[26] Marek J. Szczepań czyk, Javier M. Antelis, Michael Benjamin, Marco Cavaglià, Dorota
+Gondek-Rosińska, Travis Hansen, Sergey Klimenko, Manuel D. Morales, Claudia Moreno,
+Soma Mukherjee, Gaukhar Nurbek, Jade Powell, Neha Singh, Satzhan Sitmukhambetov,
+Paweł Szewczyk, Oscar Valdez, Gabriele Vedovato, Jonathan Westhouse, Michele Zanolin,
+and Yanyan Zheng. Detecting and reconstructing gravitational waves from the next galac-
+tic core-collapse supernova in the advanced detector era. Physical Review D, 104(10), nov
+2021.
+[27] S. Mukherjee, L. Salazar, J. Mittelstaedt, and O. Valdez.
+New method for enhanced
+efficiency in detection of gravitational waves from supernovae using coherent network of
+detectors. Phys. Rev. D., 96(10):104033, November 2017.
+[28] Soma Mukherjee, Gaukhar Nurbek, and Oscar Valdez.
+Study of efficient methods of
+detection and reconstruction of gravitational waves from nonrotating 3d general relativistic
+core collapse supernovae explosion using multilayer signal estimation method. Phys. Rev.
+D, 103:103008, May 2021.
+[29] Javier M. Antelis, Marco Cavaglia, Travis Hansen, Manuel D. Morales, Claudia Moreno,
+Soma Mukherjee, Marek J. Szczepańczyk, and Michele Zanolin. Using supervised learning
+algorithms as a follow-up method in the search of gravitational waves from core-collapse
+supernovae. Phys. Rev. D, 105:084054, Apr 2022.
+[30] T. Z. Summerscales, Adam Burrows, Lee Samuel Finn, and Christian D. Ott. Maximum
+Entropy for Gravitational Wave Data Analysis: Inferring the Physical Parameters of Core-
+Collapse Supernovae. Astrophys. J., 678:1142–1157, 2008.
+[31] J. Logue, C. D. Ott, I. S. Heng, P. Kalmus, and J. H. C. Scargill. Inferring Core-Collapse
+Supernova Physics with Gravitational Waves. Phys. Rev. D, 86:044023, 2012.
+[32] M. López Portilla, I. Di Palma, M. Drago, P. Cerdá-Durán, and F. Ricci. Deep learning
+for core-collapse supernova detection. Phys. Rev. D, 103(6):063011, 2021.
+[33] C. Aerts. Probing the interior physics of stars through asteroseismology. Rev. Mod. Phys.,
+93:015001, Jan 2021.
+[34] Gerald Handler. Asteroseismology. In Planets, Stars and Stellar Systems, pages 207–241.
+Springer Netherlands, 2013.
+23
+
+
+[35] Donald Kurtz.
+Asteroseismology across the HR diagram.
+In Annual Conference and
+General Assembly of the, page 1, March 2022.
+[36] M. C. Rodriguez, Ignacio F. Ranea-Sandoval, C. Chirenti, and D. Radice.
+Three ap-
+proaches for the classification of protoneutron star oscillation modes. Monthly Notices of
+the Royal Astronomical Society, 523(2):2236–2246, August 2023.
+[37] Alejandro Torres-Forné, Pablo Cerdá-Durán, Andrea Passamonti, and José A. Font. To-
+wards asteroseismology of core-collapse supernovae with gravitational-wave observations - I.
+Cowling approximation. Monthly Notices of the Royal Astronomical Society, 474(4):5272–
+5286, March 2018.
+[38] Alejandro Torres-Forné, Pablo Cerdá-Durán, Martin Obergaulinger, Bernhard Müller, and
+José A. Font. Universal Relations for Gravitational-Wave Asteroseismology of Protoneu-
+tron Stars. Physical Review Letters, 123(5):051102, August 2019.
+[39] R. Daniel Murphy, Anthony Mezzacappa, Eric J. Lentz, and Pedro Marronetti.
+Core
+collapse supernova gravitational wave sourcing and characterization based on three-
+dimensional models, 2025.
+[40] John Ryan Westernacher-Schneider, Evan O’Connor, Erin O’Sullivan, Irene Tamborra,
+Meng-Ru Wu, Sean M. Couch, and Felix Malmenbeck. Multimessenger asteroseismology
+of core-collapse supernovae. Phys. Rev. D, 100:123009, Dec 2019.
+[41] John Ryan Westernacher-Schneider.
+Consistent perturbative modeling of pseudo-
+newtonian core-collapse supernova simulations. Phys. Rev. D, 101:083021, Apr 2020.
+[42] Takami Kuroda, Tomoya Takiwaki, and Kei Kotake.
+A new multi-energy neutrino
+radiation-hydrodynamics code in full general relativity and its application to the gravita-
+tional collapse of massive stars. The Astrophysical Journal Supplement Series, 222(2):20,
+feb 2016.
+[43] Anthony Mezzacappa, Eirik Endeve, Bronson Messer, and Stephen Bruenn.
+Physical,
+numerical, and computational challenges of modeling neutrino transport in core-collapse
+supernovae. Living Reviews in Computational Astrophysics, 6, 12 2020.
+[44] Anthony Mezzacappa, Pedro Marronetti, Ryan E. Landfield, Eric J. Lentz, R. Daniel Mur-
+phy, W. Raphael Hix, J. Austin Harris, Stephen W. Bruenn, John M. Blondin, O. E. Bron-
+son Messer, Jordi Casanova, and Luke L. Kronzer. Core collapse supernova gravitational
+wave emission for progenitors of 9.6, 15, and 25 M⊙. Physical Review D, 107(4):043008,
+February 2023.
+[45] H. Andresen, E. Müller, H. Th Janka, A. Summa, K. Gill, and M. Zanolin.
+Gravita-
+tional waves from 3D core-collapse supernova models: The impact of moderate progenitor
+rotation. Mon. Not. Roy. Astron. Soc. , 486(2):2238–2253, June 2019.
+[46] H. Andresen, B. Müller, E. Müller, and H.-Th. Janka. Gravitational wave signals from 3d
+neutrino hydrodynamics simulations of core-collapse supernovae. Monthly Notices of the
+Royal Astronomical Society, 468(2):2032–2051, mar 2017.
+[47] Bernhard Müller, Hans-Thomas Janka, and Andreas Marek. A new multi-dimensional gen-
+eral relativistic neutrino hydrodynamics code for core-collapse supernovae. ii. relativistic
+explosion models of core-collapse supernovae. The Astrophysical Journal, 756(1):84, aug
+2012.
+24
+
+
+[48] Bernhard Müller, Hans-Thomas Janka, and Andreas Marek. A new multi-dimensional gen-
+eral relativistic neutrino hydrodynamics code of core-collapse supernovae. iii. gravitational
+wave signals from supernova explosion models. 766(1):43, mar 2013.
+[49] Bernhard Müller, Tobias Melson, Alexander Heger, and Hans-Thomas Janka. Supernova
+simulations from a 3d progenitor model – impact of perturbations and evolution of explo-
+sion properties. Monthly Notices of the Royal Astronomical Society, 472(1):491–513, aug
+2017.
+[50] Bernhard Müller and Vishnu Varma. A 3d simulation of a neutrino-driven supernova explo-
+sion aided by convection and magnetic fields. Monthly Notices of the Royal Astronomical
+Society: Letters, 498(1):L109–L113, aug 2020.
+[51] Florian Hanke, Bernhard Müller, Annop Wongwathanarat, Andreas Marek, and Hans-
+Thomas Janka. Sasi activity in three-dimensional neutrino-hydrodynamics simulations os
+supernova cores. The Astrophysical Journal, 770(1):66, may 2013.
+[52] David Vartanyan, Adam Burrows, David Radice, M Aaron Skinner, and Joshua Dolence.
+A successful 3d core-collapse supernova explosion model. Monthly Notices of the Royal
+Astronomical Society, 482(1):351–369, sep 2018.
+[53] Evan P. O’Connor and Sean M. Couch. Exploring fundamentally three-dimensional phe-
+nomena in high-fidelity simulations of core-collapse supernovae. The Astrophysical Journal,
+865(2):81, sep 2018.
+[54] Jade Powell and Bernhard Müller. Gravitational wave emission from 3d explosion models
+of core-collapse supernovae with low and normal explosion energies. Monthly Notices of
+the Royal Astronomical Society, 487(1):1178–1190, may 2019.
+[55] Jade Powell and Bernhard Müller. Three-dimensional core-collapse supernova simulations
+of massive and rotating progenitors. Monthly Notices of the Royal Astronomical Society,
+494(4):4665–4675, apr 2020.
+[56] Takashi Yoshida, Tomoya Takiwaki, David R Aguilera-Dena, Kei Kotake, Koh Takahashi,
+Ko Nakamura, Hideyuki Umeda, and Norbert Langer. A three-dimensional hydrodynamics
+simulation of oxygen-shell burning in the final evolution of a fast-rotating massive star.
+Monthly Notices of the Royal Astronomical Society: Letters, 506(1):L20–L25, jun 2021.
+[57] Takami Kuroda, Tobias Fischer, Tomoya Takiwaki, and Kei Kotake. Core-collapse Su-
+pernova Simulations and the Formation of Neutron Stars, Hybrid Stars, and Black Holes.
+Astrophys. J., 924(1):38, January 2022.
+[58] Kei Kotake, Wakana Iwakami, Naofumi Ohnishi, and Shoichi Yamada. Stochastic Na-
+ture of Gravitational Waves from Supernova Explosions with Standing Accretion Shock
+Instability. Astrophys. J. Lett., 697(2):L133–L136, June 2009.
+[59] Kei Kotake, Wakana Iwakami-Nakano, and Naofumi Ohnishi.
+Effects of Rotation on
+Stochasticity of Gravitational Waves in the Nonlinear Phase of Core-collapse Supernovae.
+Astrophys. J., 736(2):124, August 2011.
+[60] Kei Kotake, Katsuhiko Sato, and Keitaro Takahashi.
+Explosion mechanism, neutrino
+burst and gravitational wave in core-collapse supernovae. Reports on Progress in Physics,
+69(4):971–1143, April 2006.
+[61] David Vartanyan, Adam Burrows, and David Radice. Temporal and angular variations
+of 3D core-collapse supernova emissions and their physical correlations. Mon. Not. Roy.
+Astron. Soc. , 489(2):2227–2246, October 2019.
+25
+
+
+[62] S. E. Woosley and A. Heger.
+Nucleosynthesis and remnants in massive stars of solar
+metallicity. Phys. Rep. , 442(1-6):269–283, April 2007.
+[63] Stirling A. Colgate and Richard H. White. The Hydrodynamic Behavior of Supernovae
+Explosions. Astrophys. J., 143:626, March 1966.
+[64] R. Abbott et. al. Open Data from the Third Observing Run of LIGO, Virgo, KAGRA,
+and GEO. The Astrophysical Journal Supplement Series, 267(2):29, jul 2023.
+[65] Viktoriya Morozova, David Radice, Adam Burrows, and David Vartanyan. The gravita-
+tional wave signal from core-collapse supernovae. The Astrophysical Journal, 861(1):10,
+jun 2018.
+[66] Sean M. Couch and Christian D. Ott. Revival of the stalled core-collapse supernova shock
+triggered by precollapse asphericity in the progenitor star.
+The Astrophysical Journal,
+778(1):L7, oct 2013.
+[67] R. Daniel Murphy, Elle Brinkman, Colter J. Richardson, Evan Semenak, Anthony Mezza-
+cappa, Pedro Marronetti, Eric J. Lentz, and Stephen W. Bruenn. Gravitational waves as
+a probe of core collapse supernova progenitor structure. Phys. Rev. D, 113:084005, Apr
+2026.
+[68] Alejandro Casallas-Lagos, Javier M. Antelis, Claudia Moreno, Michele Zanolin, Anthony
+Mezzacappa, and Marek J. Szczepańczyk. Characterizing the temporal evolution of the
+high-frequency gravitational wave emission for a core collapse supernova with laser inter-
+ferometric data: A neural network approach. Phys. Rev. D, 108:084027, Oct 2023.
+[69] R. Daniel Murphy, Alejandro Casallas-Lagos, Anthony Mezzacappa, Michele Zanolin,
+Ryan E. Landfield, Eric J. Lentz, Pedro Marronetti, Javier M. Antelis, and Claudia
+Moreno. Dependence of the reconstructed core-collapse supernova gravitational wave high-
+frequency feature on the nuclear equation of state in real interferometric data. Phys. Rev.
+D, 110:083006, Oct 2024.
+[70] Marco Drago, Sergey Klimenko, Claudia Lazzaro, Edoardo Milotti, Guenakh Mitsel-
+makher, Valentin Necula, Brendan O’Brian, Giovanni Andrea Prodi, Francesco Salemi,
+Marek Szczepanczyk, Shubhanshu Tiwari, Vaibhav Tiwari, Gayathri V, Gabriele Vedovato,
+and Igor Yakushin. coherent waveburst, a pipeline for unmodeled gravitational-wave data
+analysis. SoftwareX, 14:100678, 2021.
+[71] Man Leong Chan, Ik Siong Heng, and Chris Messenger. Detection and classification of su-
+pernova gravitational wave signals: A deep learning approach. Phys. Rev. D, 102(4):043022,
+2020.
+[72] Y. Sultan Abylkairov, Matthew C. Edwards, Daniil Orel, Ayan Mitra, Bekdaulet Shukir-
+galiyev, and Ernazar Abdikamalov. Evaluating machine learning models for supernova
+gravitational wave signal classification. Mach. Learn. Sci. Tech., 5(4):045077, 2024.
+[73] Ayan Mitra, Bekdaulet Shukirgaliyev, Y. Sultan Abylkairov, and Ernazar Abdikamalov.
+Exploring supernova gravitational waves with machine learning. Mon. Not. Roy. Astron.
+Soc., 520(2):2473–2483, 2023.
+[74] Alberto Iess, Elena Cuoco, Filip Morawski, Constantina Nicolaou, and Ofer Lahav. LSTM
+and CNN application for core-collapse supernova search in gravitational wave real data.
+Astron. Astrophys., 669:A42, 2023.
+26
+
+
+[75] R. Abbott, H. Abe, F. Acernese, K. Ackley, S. Adhicary, N. Adhikari, R. X. Adhikari, V. K.
+Adkins, V. B. Adya, C. Affeldt, D. Agarwal, M. Agathos, O. D. Aguiar, L. Aiello, A. Ain,
+P. Ajith, T. Akutsu, S. Albanesi, R. A. Alfaidi, A. Al-Jodah, C. Alléné, A. Allocca, M. Al-
+mualla, P. A. Altin, A. Amato, L. Amez-Droz, A. Amorosi, S. Anand, A. Ananyeva, R. An-
+dersen, S. B. Anderson, W. G. Anderson, M. Andia, M. Ando, T. Andrade, N. Andres,
+M. Andrés-Carcasona, T. Andrić, S. Ansoldi, J. M. Antelis, S. Antier, M. Aoumi, T. Apos-
+tolatos, E. Z. Appavuravther, S. Appert, S. K. Apple, K. Arai, A. Araya, M. C. Araya,
+J. S. Areeda, M. Arène, N. Aritomi, N. Arnaud, M. Arogeti, S. M. Aronson, K. G. Arun,
+H. Asada, G. Ashton, Y. Aso, M. Assiduo, S. Assis de Souza Melo, S. M. Aston, P. Astone,
+F. Aubin, K. Aultoneal, S. Babak, A. Badalyan, F. Badaracco, C. Badger, S. Bae, S. Bag-
+nasco, Y. Bai, J. G. Baier, L. Baiotti, J. Baird, R. Bajpai, T. Baka, M. Ball, G. Ballardin,
+S. W. Ballmer, G. Baltus, S. Banagiri, B. Banerjee, D. Bankar, P. Baral, J. C. Barayoga,
+J. Barber, B. C. Barish, D. Barker, P. Barneo, F. Barone, B. Barr, L. Barsotti, M. Barsug-
+lia, D. Barta, S. D. Barthelmy, M. A. Barton, I. Bartos, S. Basak, A. Basalaev, R. Bassiri,
+A. Basti, M. Bawaj, J. C. Bayley, A. C. Baylor, M. Bazzan, B. Bécsy, V. M. Bedakihale,
+F. Beirnaert, M. Bejger, A. S. Bell, V. Benedetto, D. Beniwal, W. Benoit, J. D. Bentley,
+M. Ben Yaala, S. Bera, M. Berbel, F. Bergamin, B. K. Berger, S. Bernuzzi, M. Beroiz,
+C. P. L. Berry, D. Bersanetti, A. Bertolini, J. Betzwieser, D. Beveridge, N. Bevins, R. Bhan-
+dare, A. V. Bhandari, U. Bhardwaj, R. Bhatt, D. Bhattacharjee, S. Bhaumik, A. Bianchi,
+I. A. Bilenko, M. Bilicki, G. Billingsley, S. Bini, O. Birnholtz, S. Biscans, M. Bischi,
+S. Biscoveanu, A. Bisht, B. Biswas, M. Bitossi, M. A. Bizouard, J. K. Blackburn, C. D.
+Blair, D. G. Blair, R. M. Blair, F. Bobba, N. Bode, M. Boër, G. Bogaert, G. Boileau,
+M. Boldrini, G. N. Bolingbroke, L. D. Bonavena, R. Bondarescu, F. Bondu, E. Bonilla,
+G. S. Bonilla, R. Bonnand, P. Booker, R. Bork, V. Boschi, N. Bose, S. Bose, V. Bossilkov,
+V. Boudart, Y. Bouffanais, A. Bozzi, C. Bradaschia, P. R. Brady, M. Braglia, A. Branch,
+M. Branchesi, J. E. Brau, M. Breschi, T. Briant, A. Brillet, M. Brinkmann, P. Brockill,
+A. F. Brooks, J. Brooks, D. D. Brown, S. Brunett, G. Bruno, R. Bruntz, J. Bryant,
+F. Bucci, J. Buchanan, O. Bulashenko, T. Bulik, H. J. Bulten, A. Buonanno, K. Burtnyk,
+R. Buscicchio, and D. Buskulic. Open Data from the Third Observing Run of LIGO, Virgo,
+KAGRA, and GEO. Astrophys. J. Supp. Ser. , 267(2):29, August 2023.
+[76] H. Andresen, E. Müller, H. Th. Janka, A. Summa, K. Gill, and M. Zanolin. Gravita-
+tional waves from 3D core-collapse supernova models: The impact of moderate progenitor
+rotation. Mon. Not. Roy. Astron. Soc., 486(2):2238–2253, 2019.
+[77] Michael A. Pajkos, Sean M. Couch, Kuo-Chuan Pan, and Evan P. O’Connor. Features of
+accretion-phase gravitational-wave emission from two-dimensional rotating core-collapse
+supernovae. The Astrophysical Journal, 878(1):13, jun 2019.
+[78] Kuo-Chuan Pan, Matthias Liebendörfer, Sean M. Couch, and Friedrich-Karl Thielemann.
+Equation of state dependent dynamics and multi-messenger signals from stellar-mass black
+hole formation. The Astrophysical Journal, 857(1):13, apr 2018.
+[79] Carlos Pastor-Marcos, Pablo Cerdá-Durán, Daniel Walker, Alejandro Torres-Forné, Er-
+nazar Abdikamalov, Sherwood Richers, and José Antonio Font. Bayesian inference from
+gravitational waves in fast-rotating, core-collapse supernovae. Phys. Rev. D, 109(6):063028,
+2024.
+[80] Kuo-Chuan Pan, Matthias Liebendörfer, Sean M. Couch, and Friedrich-Karl Thielemann.
+Stellar mass black hole formation and multimessenger signals from three-dimensional ro-
+tating core-collapse supernova simulations. The Astrophysical Journal, 914(2):140, jun
+2021.
+27
+
+
+[81] M Obergaulinger and M Á Aloy. Magnetorotational core collapse of possible GRB progen-
+itors – III. three-dimensional models. Monthly Notices of the Royal Astronomical Society,
+503(4):4942–4963, feb 2021.
+[82] Salman Khan, Hossein Rahmani, and Syed Afaq Ali Shah. A Guide to Convolutional
+Neural Networks for Computer Vision. Morgan & Claypool Publishers, 2018.
+[83] Iffat Zafar, Giounona Tzanidou, Richard Burton, Nimesh Patel, and Leonardo Araujo.
+Hands-On Convolutional Neural Networks with TensorFlow: Solve computer vision prob-
+lems with modeling in TensorFlow and Python. Packt Publishing, 2018.
+[84] Zidu Lin, Abhinav Rijal, Cecilia Lunardini, Manuel D. Morales, and Michele Zanolin.
+Characterizing a supernova’s standing accretion shock instability with neutrinos and grav-
+itational waves. Phys. Rev. D, 107:083017, Apr 2023.
+[85] Stephen W. Bruenn, John M. Blondin, W. Raphael Hix, Eric J. Lentz, O. E. Bron-
+son Messer, Anthony Mezzacappa, Eirik Endeve, J. Austin Harris, Pedro Marronetti,
+Reuben D. Budiardja, Merek A. Chertkow, and Ching-Tsai Lee.
+CHIMERA: A Mas-
+sively Parallel Code for Core-collapse Supernova Simulations. The Astrophysical Journal
+Supplement Series, 248(1):11, May 2020.
+[86] Ingo Tews, James M. Lattimer, Akira Ohnishi, and Evgeni E. Kolomeitsev. Symmetry
+Parameter Constraints from a Lower Bound on Neutron-matter Energy. The Astrophysical
+Journal, 848(2):105, October 2017.
+[87] Ryan E. Landfield. Sensitivity of Neutrino-Driven Core-Collapse Supernova Models to the
+Microphysical Equation of State. PhD thesis, Univeristy of Tennessee Knoxville, 2018.
+[88] Jade Powell and Bernhard Müller.
+Inferring astrophysical parameters of core-collapse
+supernovae from their gravitational-wave emission. Physical Review D, 105(6), mar 2022.
+[89] Hajime Sotani, Tomoya Takiwaki, and Hajime Togashi. Universal relation for supernova
+gravitational waves. Phys. Rev. D, 104:123009, Dec 2021.
+[90] Alejandro Torres-Forné , Pablo Cerdá-Durán, Martin Obergaulinger, Bernhard Müller, and
+José A. Font. Universal relations for gravitational-wave asteroseismology of protoneutron
+stars. Physical Review Letters, 123(5), jul 2019.
+[91] Marie-Anne Bizouard, Patricio Maturana-Russel, Alejandro Torres-Forné , Martin Ober-
+gaulinger, Pablo Cerdá-Durán, Nelson Christensen, José A. Font, and Renate Meyer. In-
+ference of protoneutron star properties from gravitational-wave data in core-collapse su-
+pernovae. Physical Review D, 103(6), mar 2021.
+[92] Tristan Bruel, Marie-Anne Bizouard, Martin Obergaulinger, Patricio Maturana-Russel,
+Alejandro Torres-Forné, Pablo Cerdá-Durán, Nelson Christensen, José A. Font, and Re-
+nate Meyer. Inference of protoneutron star properties in core-collapse supernovae from a
+gravitational-wave detector network. Phys. Rev. D, 107:083029, Apr 2023.
+[93] Christian D. Ott, Ernazar Abdikamalov, Philipp Mösta, Roland Haas, Steve Drasco,
+Evan P. O'Connor, Christian Reisswig, Casey A. Meakin, and Erik Schnetter. General-
+relativistic simulations of three-dimensional core-collapse supernovae. The Astrophysical
+Journal, 768(2):115, apr 2013.
+[94] Ond řej Zelenka, Bernd Brügmann, and Frank Ohme. Convolutional neural networks for
+signal detection in real ligo data. Phys. Rev. D, 110:024024, Jul 2024.
+28
+
+
+[95] Timothy D. Gebhard, Niki Kilbertus, Ian Harry, and Bernhard Schölkopf.
+Convolu-
+tional neural networks: A magic bullet for gravitational-wave detection?
+Phys. Rev.
+D, 100:063015, Sep 2019.
+[96] Jolien D. E. Creighton and Warren G. Anderson. Gravitational-wave physics and astron-
+omy: An introduction to theory, experiment and data analysis. 2011.
+[97] Aurelien Geron. Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow:
+Concepts, Tools, and Techniques to Build Intelligent Systems. O’Reilly Media, Inc., 2nd
+edition, 2019.
+[98] David James. Introduction to Machine Learning with Python: A Guide for Beginners in
+Data Science. CreateSpace Independent Publishing Platform, North Charleston, SC, USA,
+1st edition, 2018.
+[99] Ayan Mitra, Daniil Orel, Sultan Abylkairov, Bekdaulet Shukirgaliyev, and Ernazar Abdika-
+malov. Probing nuclear physics with supernova gravitational waves and machine learning.
+In EAS2024, European Astronomical Society Annual Meeting, page 76, July 2024.
+[100] Seiya Sasaoka, Naoki Koyama, Diego Dominguez, Yusuke Sakai, Kentaro Somiya, Yuto
+Omae, and Hirotaka Takahashi. Visualizing convolutional neural network for classifying
+gravitational waves from core-collapse supernovae. Phys. Rev. D, 108:123033, Dec 2023.
+[101] Grégory Baltus, Justin Janquart, Melissa Lopez, Amit Reza, Sarah Caudill, and Jean-
+René Cudell. Convolutional neural networks for the detection of the early inspiral of a
+gravitational-wave signal. Phys. Rev. D, 103:102003, May 2021.
+[102] Solange Nunes, Gabriel Escrig, Osvaldo G. Freitas, José A. Font, Tiago Fernandes, Antonio
+Onofre, and Alejandro Torres-Forné. Deep-learning classification and parameter inference
+of rotational core-collapse supernovae, 2024.
+[103] David Reitze, Rana X. Adhikari, Stefan Ballmer, Barry Barish, Lisa Barsotti, GariLynn
+Billingsley, Duncan A. Brown, Yanbei Chen, Dennis Coyne, Robert Eisenstein, Matthew
+Evans, Peter Fritschel, Evan D. Hall, Albert Lazzarini, Geoffrey Lovelace, Jocelyn Read,
+B. S. Sathyaprakash, David Shoemaker, Joshua Smith, Calum Torrie, Salvatore Vitale,
+Rainer Weiss, Christopher Wipf, and Michael Zucker. Cosmic Explorer: The U.S. Con-
+tribution to Gravitational-Wave Astronomy beyond LIGO. In Bulletin of the American
+Astronomical Society, volume 51, page 35, September 2019.
+[104] Michele Maggiore, Chris Van Den Broeck, Nicola Bartolo, Enis Belgacem, Daniele
+Bertacca, Marie Anne Bizouard, Marica Branchesi, Sebastien Clesse, Stefano Foffa, Juan
+García-Bellido, Stefan Grimm, Jan Harms, Tanja Hinderer, Sabino Matarrese, Cristiano
+Palomba, Marco Peloso, Angelo Ricciardone, and Mairi Sakellariadou. Science case for the
+Einstein telescope. Journal of Cosmology and Astroparticle Physics, 2020(3):050, March
+2020.
+29
