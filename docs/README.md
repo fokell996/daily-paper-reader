@@ -6,40 +6,44 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-27
-- 运行时间：2026-07-27 20:09:18 UTC
+- 最新运行日期：2026-07-28
+- 运行时间：2026-07-28 21:46:34 UTC
 - 运行状态：成功
-- 本次总论文数：6
-- 精读区：2
-- 速读区：4
+- 本次总论文数：8
+- 精读区：5
+- 速读区：3
 
 ### 今日简报（AI）
-今日研究聚焦于利用多普勒测量确定地球轨道参数、以及通过超新星引力波信号分类核物质状态方程，均获高分评价。  
-最值得关注：地球轨道参数精确测量方法（9.0分）和利用神经网络从干涉仪噪声中提取超新星引力波特征（8.0分），为天体物理参数估计提供新思路。  
-建议普通读者优先精读这两篇高分论文，把握前沿方法论，速读材料可作为理解超新星高能辐射及中子星动力学的补充。
-- 详情：[/202607/27/README](/202607/27/README)
+今日8篇论文中5篇精读，重点关注中间质量黑洞伴星探测和原中子星引力波普适关系。最值得关注的是脉冲星计时探测人马座A*伴星（9.0分）及三维超新星模拟的引力波研究（8.0分）。普通读者可跟进脉冲星计时和连续引力波搜索的最新分析模型。
+- 详情：[/202607/28/README](/202607/28/README)
 
 ### 精读区论文标签
-1. [Determination of Earth's Orbital Parameters Using Doppler Measurements](/202607/27/2607.21812v1-determination-of-earths-orbital-parameters-using-doppler-measurements)  
+1. [Probing an Intermediate-Mass Black Hole Companion of Sagittarius A* with Pulsar Timing](/202607/28/2607.24201v1-probing-an-intermediate-mass-black-hole-companion-of-sagittarius-a-with-pulsar-timing)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：利用脉冲星定时测量地球轨道参数
-2. [Classifying the nuclear equation of state in LVK interferometric noise through core-collapse supernova gravitational-wave signatures using convolutional neural networks](/202607/27/2607.21924v1-classifying-the-nuclear-equation-of-state-in-lvk-interferometric-noise-through-core-collapse-supernova-gravitational-wave-signatures-using-convolutional-neural-networks)  
+   evidence：利用脉冲星计时探测Sgr A*的IMBH伴星
+2. [Universal relations applied to proto-neutron star generated gravitational waves from three-dimensional core collapse supernova simulations](/202607/28/2607.22909v1-universal-relations-applied-to-proto-neutron-star-generated-gravitational-waves-from-three-dimensional-core-collapse-supernova-simulations)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：利用超新星引力波信号分类核物态方程
+   evidence：原中子星EOS无关的引力波普适关系
+3. [On the Nucleon Effective Mass in Neutron Stars Cooling](/202607/28/2607.23253v1-on-the-nucleon-effective-mass-in-neutron-stars-cooling)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：研究有效核子质量如何影响中子星冷却，与状态方程关联
+4. [Transport Properties of the MRI in Differentially Rotating Neutron Stars](/202607/28/2607.24457v1-transport-properties-of-the-mri-in-differentially-rotating-neutron-stars)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：中子星内部磁旋转不稳定性输运模拟
+5. [Evolution of Calvera and Descendants of Calvera-like Central Compact Objects](/202607/28/2607.24458v1-evolution-of-calvera-and-descendants-of-calvera-like-central-compact-objects)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：研究了一颗中子星的演化及其射电辐射特性
 
 ### 速读区论文标签
-1. [From the Early Slope to Curvature: Future Prospects and challenges for Astrophysical Parameter Estimation Using the Core-Collapse Supernova High-Frequency Feature](/202607/27/2607.21925v1-from-the-early-slope-to-curvature-future-prospects-and-challenges-for-astrophysical-parameter-estimation-using-the-core-collapse-supernova-high-frequency-feature)  
+1. [The macroscopic precession model of quasi-periodic oscillations for rotating compact objects](/202607/28/2607.22322v1-the-macroscopic-precession-model-of-quasi-periodic-oscillations-for-rotating-compact-objects)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：状态方程，原中子星振荡
-2. [A post-hypercritical accretion small-scale dynamo in newborn neutron stars](/202607/27/2607.21990v1-a-post-hypercritical-accretion-small-scale-dynamo-in-newborn-neutron-stars)  
+   evidence：用宏观进动模型解释中子星准周期振荡，可用于约束状态方程
+2. [Diverse Morphologies of GRB X-Ray Plateaus within a Common Magnetar Framework](/202607/28/2607.23114v1-diverse-morphologies-of-grb-x-ray-plateaus-within-a-common-magnetar-framework)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：中子星状态方程，发电机
-3. [The Extended Ultrahigh-energy Gamma-Ray Emission in the Vicinity of PSR J2238+5903](/202607/27/2607.21026v1-the-extended-ultrahigh-energy-gamma-ray-emission-in-the-vicinity-of-psr-j22385903)  
+   evidence：伽马暴X射线平台中磁星参数的层级群体推断
+3. [Search for continuous gravitational waves from the pulsar J0435+3233](/202607/28/2607.18219v2-search-for-continuous-gravitational-waves-from-the-pulsar-j04353233)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：脉冲星PSR J2238+5903附近的高能伽马射线发射
-4. [The macroscopic precession model of quasi-periodic oscillations for rotating compact objects](/202607/27/2607.22322v1-the-macroscopic-precession-model-of-quasi-periodic-oscillations-for-rotating-compact-objects)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：中子星X射线双星准周期振荡模型
+   evidence：搜索脉冲星J0435+3233的连续引力波，涉及脉冲星观测
 
 
 <div class="dpr-home-promo-card">
