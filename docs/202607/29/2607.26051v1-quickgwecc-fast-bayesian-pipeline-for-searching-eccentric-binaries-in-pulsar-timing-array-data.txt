@@ -1,0 +1,742 @@
+Title: QuickGWecc: Fast Bayesian pipeline for searching eccentric binaries in pulsar timing array data
+
+URL Source: https://arxiv.org/pdf/2607.26051v1
+
+Published Time: Wed, 29 Jul 2026 01:24:40 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# QuickGWecc : Fast Bayesian pipeline for searching eccentric binaries in pulsar timing array data 
+
+Lankeswar Dey, 1, ∗ Bence B´ ecsy, 2 Abhimanyu Susobhanan, 3 and Maria Charisi 1, 4 
+
+> 1
+
+Institute of Astrophysics, Foundation for Research & Technology – Hellas, GR-71110, Heraklion, Greece 
+
+> 2
+
+Institute for Gravitational Wave Astronomy and School of Physics and Astronomy, University of Birmingham, Edgbaston, Birmingham B15 2TT, UK 
+
+> 3
+
+School of Physics, Indian Institute of Science Education and Research Thiruvananthapuram, Maruthamala PO, Thiruvananthapuram, Kerala 695551, India 
+
+> 4
+
+Department of Physics and Astronomy, Washington State University, 1245 Webster Hall, Pullman, WA 99164, USA 
+
+(Dated: July 29, 2026) Recent pulsar timing array (PTA) results have provided evidence for the presence of a nanohertz gravitational wave (GW) background, most likely originating from a population of supermassive black hole binaries (SMBHBs). The next major milestone is the detection of continuous GWs (CGWs) from an individual SMBHB and the identification of its electromagnetic counterpart. Typ-ically, searches for CGWs in PTA data assume binaries in circular orbits. However, theoretical studies indicate that binaries emitting GWs in the PTA frequency band may retain significant ec-centricity. In this paper, we present a fast and efficient Bayesian pipeline to search for CGWs from individual SMBHBs in relativistic eccentric orbits in PTA datasets. Our approach extends the 
+
+QuickCW framework for circular binaries, in which model parameters are divided into projection and 
+
+shape parameters. Computational efficiency is achieved by performing many updates of the projec-tion parameters for a fixed set of shape parameters, an operation that is orders of magnitude faster than updating the shape parameters. We validate the pipeline through both detection and upper-limit analyses of simulated PTA datasets. This framework makes the search for eccentric SMBHBs computationally feasible, even in the next-generation PTA datasets with many more pulsars. 
+
+I. INTRODUCTION 
+
+Supermassive black hole binaries (SMBHBs) were first proposed to reside at the centers of some active galactic nuclei (AGNs) as a natural outcome of galaxy mergers in 1980 [1]. While galaxy mergers are expected to be common in hierarchical structure formation, the subsequent formation and long-term evolution of bound SMBHBs, particularly at sub-parsec separations, remains poorly understood [2]. Despite more than four decades of observational and theoretical efforts, direct observational confirmation of close (sub-parsec separation) SMBHBs remains elusive. In principle, two complementary messengers—electromagnetic (EM) radiation and gravitational waves (GWs)—provide independent avenues to detect and characterize these systems across different evolutionary stages. An AGN hosting an SMBHB may exhibit periodic or quasi-periodic variability in its light curve due to the orbital motion of the binary (see [3] for a review). Such signatures arise naturally from a variety of physical mechanisms, including relativistic Doppler boosting, gravitational self-lensing, and periodic modulation of accretion rate [3–5]. These expectations motivated systematic searches in photometric AGN surveys, which have revealed hundreds of SMBHB candidates [e.g., 6–10]. However, none of these candidates has been conclusively confirmed as alternative astrophysical explanations for the observed variability remain viable [see, e.g., 11]. Complementary to EM signatures, SMBHBs at sub-parsec separations are expected to emit GWs in the nanohertz (nHz) frequency band, making them accessible to pulsar timing array (PTA) experiments [12–14]. PTA experiments precisely monitor the times of arrival (TOAs) of radio pulses from an ensemble of millisecond pulsars distributed across the sky [15, 16]. Passing GWs induce characteristic, spatially correlated deviations in the TOAs of each pulsar, providing a distinctive observational signature [17, 18]. In 2023, multiple PTA collaborations have independently reported strong evidence for a stochastic nHz GW background (GWB) in their datasets [19–24]. The most plausible origin of this GWB is the incoherent superposition of GWs originating from a population of SMBHBs [25, 26], although alternative sources—such as cosmological phase transitions, inflationary relics, and cosmic strings—remain viable [27]. If the GWB is indeed produced by a population of SMBHBs, the loudest individual systems are expected to be resolved over the background and be detectable as continuous GW (CGW) sources [28, 29]. Detecting such CGWs is therefore critical both for confirming the astrophysical origin of the GWB and for establishing the existence  
+
+> ∗lankeswar.dey@nanograv.org arXiv:2607.26051v1 [astro-ph.HE] 28 Jul 2026
+
+2of sub-parsec SMBHBs. This further opens up the possibility of multi-messenger observation of SMBHBs if the host galaxy can be identified in the localization volume [30–32]. Several studies have searched for CGWs in different PTA datasets, with most analyses assuming binaries in circular orbits [e.g. 33–38]. This assumption is motivated by the expected circularization of binary orbits as they lose energy and angular momentum through GW emission, and by the relative computational simplicity of searches based on circular binary models. However, theoretical and numerical studies of SMBHB evolution indicate that the interactions of the binary with nearby starts and its circumbinary disk may induce significant orbital eccentricity as it enters the PTA frequency band [39–41]. Searches based on circular waveform models have lower sensitivity to eccentric systems and may miss detectable signals [42]. In Agazie et al. [43], we developed a pipeline for targeted searches of CGWs from eccentric SMBHBs in PTA data that uses enterprise [44], the standard PTA analysis package. Targeted searches aim to detect CGWs from known SMBHB candidates where EM observations of the host galaxy is used to inform parameters such as the sky location, distance, and sometimes the orbital frequency of the binary [45, 46]. In contrast, in all-sky searches these are treated as free parameters, significantly increasing the computational cost of the analysis [47]. The targeted search pipeline was applied to search for CGWs from an eccentric SMBHB in the candidate source 3C 66B using the NANOGrav 12.5-year dataset [43]. However, this method is computationally expensive, and it is not well-suited for all-sky searches for CGWs from eccentric SMBHBs, especially in the upcoming large PTA datasets. B´ ecsy et al. [48] introduced QuickCW , a method for fast Bayesian inference of CGWs from circular SMBHBs in PTA data. The speedup over conventional Bayesian search pipelines is achieved by separating the binary parameters into two classes: the shape parameters that determine the intrinsic morphology of the GW signal emitted by the SMBHB, and the projection parameters that describe how the signal is projected onto the line-of-sight of each pulsar [48]. This decomposition enables the computationally expensive waveform and noise-dependent quantities associated with the shape parameters to be reused across many likelihood evaluations. Consequently, updates to the projection parameters require only inexpensive recomputation of the projection coefficients, making likelihood evaluations for these updates orders of magnitude faster than those involving the shape parameters. Rather than sampling all binary, pulsar-term, and red-noise parameters simultaneously, QuickCW adopts a block-updating strategy in which the projection parameters are updated many times while keeping the shape parameters fixed. This approach substantially improves the overall sampling efficiency without compromising the correctness of the Bayesian inference. In this work, we extend this framework for SMBHBs in relativistic eccentric orbits and develop QuickGWecc , a fast and efficient Bayesian pipeline to search for CGWs from relativistic eccentric SMBHBs in PTA data. The paper is structured as follows. In Sec. II, we describe the PTA response to CGWs from an eccentric SMBHB, outline the evolution of orbital parameters for binaries in relativistic eccentric orbits, and present methods for efficient likelihood evaluation. In Sec. III, we present simulated eccentric CGWs signals and results from applying QuickGWecc 
+
+to recover these signals. Finally, we summarize our work and discuss its possible future applications and extensions in Sec. IV.  
+
+> II. PTA SIGNAL MODEL AND LIKELIHOOD CALCULATION
+
+In PTA analyses, we begin with the measured TOAs and a best-fit timing model for an ensemble of pulsars. The timing model is a mathematical model that describes various deterministic processes affecting the observed TOAs, including the rotation of the pulsar, its sky location and proper motion, its binary motion if applicable, the interstellar dispersion, as well as the instrumental effects [49]. The difference between the observed TOAs and the TOAs predicted by the timing model are known as the timing residuals. Non-zero timing residuals may arise due to a range of astrophysical and instrumental effects, including small deviations in the timing model parameters, the slow stochastic wandering of the pulsar’s rotational period known as spin noise, stochastic variations in interstellar dispersion and the solar wind, instrumental noise, etc. In addition, GWs passing between the pulsars and the Earth perturb the spacetime through which the pulsar’s electromagnetic signal travels, inducing deviations in the TOAs resulting in timing residuals correlated across different pulsars. Assuming the timing residuals δt to be much smaller than the rotational period of the pulsar, we may write them as a sum of several contributions: 
+
+δt = ∆ TM + ∆ WN + ∆ IRN + ∆ GWB + s , (1) where the term ∆ WN denotes uncorrelated white noise associated with the telescope receivers and the measurement process and ∆ IRN represents the intrinsic red noise of the pulsar. The red noise is characterized by a power-law spectrum with amplitude ARN and a spectral index γRN (see [50] for more details). The GW contribution to the timing residuals is separated into two components. The contributions from an isotropic stochastic background (the ∆ GWB term in Eq. 1) is modeled as a common red-noise process with a power-law spectrum, parameterized by an amplitude AGWB and spectral index γGWB , with Hellings-Downs (HD) spatial correlation between different pulsars [17]. The term s in Eq. (1) represents the timing delay induced by CGWs from an individual SMBHB. 3The marginalized timing model term ∆ TM allows the timing model parameters to be shifted from their best fit values as required by inclusion of these additional terms. Following standard practice in PTA analyses, we fix the white noise parameters to their best-fit values obtained from individual pulsar noise analyses [19, 51]. Variations in the ionized interstellar medium introduce delays in pulsar TOAs through changes in the dispersion measure (DM), defined as the integrated free electron density along the line-of-sight. These DM variations produce a chromatic timing delay that scales as ν−2, where ν is the observing radio frequency. In PTA analyses, DM variations are typically modeled either using a piecewise-constant function (the DMX model [51]), where the DM is allowed to vary independently in discrete time windows, or as a stochastic red-noise Gaussian process (GP) with a power-law spectrum [52]. In the latter approach, the DM-induced delays are treated analogously to intrinsic red noise but with the appropriate frequency dependence. For this work, we assume that DM variations are modeled using the DMX approach, which is incorporated as part of the pulsar timing model and comes into Eq. (1) through the term ∆TM. In the following subsections, we describe the modeling of the CGW signal s, the orbital evolution of eccentric binaries, and our method for fast likelihood evaluation.  
+
+> A. The PTA signal induced by CGWs from an eccentric binary
+
+The timing delay induced by CGWs from an individual SMBHB in a pulsar is given by [42, 53] 
+
+s(t) = F+ F×
+
+ cos 2 ψ − sin 2 ψ
+
+sin 2 ψ cos 2 ψ
+
+  s+(t − τp) − s+(t)
+
+s×(t − τp) − s×(t)
+
+
+
+, (2) where F+,× are the antenna pattern response functions that encode the geometric projection of the GW onto the pulsar line-of-sight and depend on the sky positions of the GW source and the pulsar, and ψ is the GW polarization angle [42]. The + and × symbols denote the plus and cross polarizations of GWs, respectively. The contributions to s(t) that depend on the current time t through s+,×(t) correspond to the so-called Earth term , as they represent the effect of the GWs passing the Earth at the time of observation. In contrast, the contributions that depend on an earlier time t − τp, are referred to as the pulsar term , since they encode the effect of the GWs passing the pulsar at the time of pulse emission. The geometric time delay τp between the Earth term and pulsar term contributions is given by 
+
+τp = dp (1 − cos μ)/c , (3) where dp is the distance to the pulsar, μ is the angle between the lines of sight to the pulsar and the GW source, and 
+
+c is the speed of light in vacuum. The Earth term is common to all pulsars, while the pulsar term depends on the individual pulsar location and distance, and probes the binary at an earlier evolutionary stage. Since typical pulsar distances are of O(kpc), the pulsar term provides a view of the binary evolution approximately 10 3 years prior to the present day. The analytic expressions of s+,×(t) induced by GWs from an SMBHB in a relativistic eccentric orbit are given by [12, 54] 
+
+s+(t) = H(t)
+
+n(t)
+
+(c2 
+
+> ι
+
++ 1)( −P (t) sin 2 ω(t) + Q(t) cos 2 ω(t)) + s2 
+
+> ι
+
+R(t) , (4a) 
+
+s×(t) = H(t)
+
+n(t) 2cι [P(t) cos 2 ω(t) + Q(t) sin 2 ω(t)] . (4b) Here, H = ( GM ηx )/(c2dL), G is the gravitational constant, M = m1 + m2 and η = m1m2/M 2 are the total mass and symmetric mass ratio of the binary, respectively, ( m1, m 2 are individual BH masses), and dL is the luminosity distance to the source. The parameter x =  GM (1 + k)n/c 32/3 is the dimensionless post-Newtonian expansion parameter, 
+
+n = 2 π/P is the mean motion, P is the orbital period of the binary, and k denotes the rate of advance of pericenter of the binary [55]. Further, cι = cos ι and sι = sin ι, where ι is the inclination angle of the orbital plane with respect to the sky plane (i.e., the angle between the orbital angular momentum and the line-of-sight), and ω is the argument of pericenter. The functions P, Q, and R are given by 
+
+P =
+
+p1 − e2 
+
+> t
+
+(cos 2 u − et cos u)1 − et cos u , (5a) 
+
+Q = (( e2 
+
+> t
+
+− 2) cos u + et) sin u
+
+1 − et cos u , (5b) 
+
+R = et sin u , (5c) 4where et is time eccentricity and u is eccentric anomaly [53, 55]. As the binary emits GWs, it loses orbital energy and angular momentum, leading to a gradual inspiral. Conse-quently, the orbital frequency (and hence n) increases with time, while the eccentricity et decreases. In addition, both the eccentric anomaly u and the argument of pericenter ω evolve due to the orbital motion and relativistic pericenter precession. In the following subsection, we describe how we model the evolution of these time-dependent parameters, which are required to compute the CGW-induced timing delay in the TOAs.  
+
+> B. Evolution of orbital parameters of relativistic eccentric binary
+
+The orbital evolution of a relativistic binary in an eccentric orbit can be separated into two parts: conservative and reactive evolution. The conservative part, as the name suggests, does not change the orbital energy or angular momentum and primarily manifests as the usual Keplerian orbital motion modified by the relativistic advance of pericenter. In contrast, the reactive part arises from the loss of orbital energy and angular momentum due to GW emission, leading to a secular evolution of the orbital period and eccentricity. To model the orbital evolution, we employ the post-Newtonian (PN) quasi-Keplerian formalism, which generalizes the Keplerian motion to incorporate relativistic corrections. This approximation is sufficiently accurate for the present work, as PTA experiments are expected to detect SMBHBs during the early inspiral phase, long before the binary approaches merger. In this approach, the evolution is governed by a set of four coupled differential equations [53, 55], 
+
+dn dt = 15
+
+ GM n c3
+
+5/3
+
+n2 η (96 + 292 e2 
+
+> t
+
++ 37 e4
+
+> t
+
+(1 − e2 
+
+> t
+
+)7/2 , (6a) 
+
+de t
+
+dt = − 115 
+
+ GM n c3
+
+5/3
+
+n η e t
+
+(304 + 121 e2
+
+> t
+
+(1 − e2 
+
+> t
+
+)5/2 , (6b) 
+
+dγ dt = k n , (6c) 
+
+dl dt = n , (6d) where l and γ denote the mean anomaly and the periastron angle, respectively. These equations are accurate to leading quadrupolar (2.5PN) order. Given the initial values of n, et, l, and γ at a reference time t0, the coupled differential equations (Eqs. 6) can be solved to obtain the temporal evolution of the orbital parameters. In this work, we use the analytic solution presented in Susobhanan et al. [53] to compute this evolution efficiently. Once the temporal evolution of l and et are known, the evolution of the eccentric anomaly u is obtained by solving the PN Kepler equation, 
+
+l = u − et sin u + Ft(u) , (7) where Ft(u) is a periodic function of u that first appears at the 2PN order. The true anomaly v is then given by 
+
+v = 2 arctan 
+
+"s 
+
+1 + eϕ
+
+1 − eϕ
+
+tan u
+
+2
+
+#
+
+, (8) where eϕ is the angular eccentricity. The evolution of the argument of pericenter ω(t) is computed as 
+
+ω = ϕ − v
+
+= γ + k(v − l) + Fϕ(u) , (9) where ϕ is the orbital phase and Fϕ(u) is another periodic function of u first appearing at the 2PN order. We thus obtain all the time-dependent orbital parameters required in Eqs. (4) and (5) to compute the CGW-induced timing delay s(t) in the pulsar TOAs. For further details on solving the coupled differential equations and implementing the orbital evolution, we refer the reader to Agazie et al. [43], Susobhanan et al. [53].  
+
+> C. Fast likelihood calculation
+
+The temporal evolution of ω(t) does not depend on its initial value ω0, and this allows us to rewrite Eqs. (4) by expressing ω as ω = ω(t) + ω0, where ω(t) denotes the evolution assuming ω0 = 0. With this decomposition, the 5CGW-induced timing delay for the ith pulsar, si(t), can be written using Eqs. (2) and (4) as 
+
+si(t) = 
+
+> 5
+
+X
+
+> j=1
+
+σ5( i−1)+ j (θ, ϕ, H 0, ι, ω 0, ω pi , ψ ) S5( i−1)+ j (t, θ, ϕ, M, η, e 0, f 0, l 0, l pi , d pi ) , (10) the coefficients σ and filter functions S are defined below. The parameters ( θ, ϕ ) = ( π/ 2 − decl. , R.A.) are the polar and azimuthal angle of the GW source denoting its sky location, H0 = ( GM ηx 0)/(c2dL), and dpi is the distance to the ith pulsar. The quantities x0, e0, l0, and ω0 denote the values of the respective parameters at the reference time t0, f0 = 1 /P 0 is orbital frequency at t0, while lpi and ωpi denote the mean anomaly and argument of pericenter for the pulsar term of the ith pulsar, evaluated at t0 − τpi . In principle, lpi and ωpi can be determined from the other binary parameters if the pulsar distances are known precisely. However, current uncertainties in pulsar distance measurements are typically orders of magnitude larger than the GW wavelength ( ∼pc), and that makes it impossible to phase-connect the Earth and the pulsar terms. Therefore, we treat these quantities as free parameters. Following B´ ecsy et al. [48], we separate the model parameters into two groups. Parameters that enter only through the coefficients σ—namely H0, ι, ω 0, ω pi , and ψ—are the projection parameters. The remaining parameters, which determine the functions S, are the shape parameters. This separation is key to enabling efficient likelihood evaluations. The explicit expressions for S and σ are given by 
+
+S5( i−1)+1 = x(t)
+
+x0 n(t)
+
+h
+
+P(t) sin (2 ω(t)) − Q (t) cos (2 ω(t)) 
+
+i
+
+, (11a) 
+
+S5( i−1)+2 = x(t)
+
+x0 n(t)
+
+h
+
+P(t) cos (2 ω(t)) + Q(t) sin (2 ω(t)) 
+
+i
+
+, (11b) 
+
+S5( i−1)+3 = x(tp)
+
+x0 n(tp)
+
+h
+
+P(tp) sin (2 ω(tp)) − Q (tp) cos (2 ω(tp)) 
+
+i
+
+, (11c) 
+
+S5( i−1)+4 = x(tp)
+
+x0 n(tp)
+
+h
+
+P(tp) cos (2 ω(tp)) + Q(tp) sin (2 ω(tp)) 
+
+i
+
+, (11d) 
+
+S5( i−1)+5 = 1
+
+x0
+
+ x(tp)R(tp)
+
+n(tp) − x(t)R(t)
+
+n(t)
+
+
+
+, (11e) where tp = t − τpi , denote the pulsar-term time for the ith pulsar, and 
+
+σ5( i−1)+1 = H0
+
+h
+
+(c2 
+
+> ι
+
++ 1) cos 2 ω0(F i 
+
+> +
+
+cos 2 ψ + F i 
+
+> ×
+
+sin 2 ψ) − 2cι sin 2 ω0(F i 
+
+> +
+
+sin 2 ψ − F i 
+
+> ×
+
+cos 2 ψ)
+
+i
+
+,σ5( i−1)+2 = H0
+
+h
+
+(c2 
+
+> ι
+
++ 1) sin 2 ω0(F i 
+
+> +
+
+cos 2 ψ + F i 
+
+> ×
+
+sin 2 ψ) + 2 cι cos 2 ω0(F i 
+
+> +
+
+sin 2 ψ − F i 
+
+> ×
+
+cos 2 ψ)
+
+i
+
+,σ5( i−1)+3 = −H0
+
+h
+
+(c2 
+
+> ι
+
++ 1) cos 2 ωi(F i 
+
+> +
+
+cos 2 ψ + F i 
+
+> ×
+
+sin 2 ψ) − 2cι sin 2 ωi(F i 
+
+> +
+
+sin 2 ψ − F i 
+
+> ×
+
+cos 2 ψ)
+
+i
+
+,σ5( i−1)+4 = −H0
+
+h
+
+(c2 
+
+> ι
+
++ 1) sin 2 ωi(F i 
+
+> +
+
+cos 2 ψ + F i 
+
+> ×
+
+sin 2 ψ) + 2 cι cos 2 ωi(F i 
+
+> +
+
+sin 2 ψ − F i 
+
+> ×
+
+cos 2 ψ)
+
+i
+
+,σ5( i−1)+5 = H0 s2 
+
+> ι
+
+(F i 
+
+> +
+
+cos 2 ψ + F i 
+
+> ×
+
+sin 2 ψ) . (12) The log-likelihood for the full PTA signal model (Eq. 1) is given by [14, 48] log L = − 12 (δt − s|δt − s) − 12 log det(2 πC ) , (13) where ( a|b) = aT C−1b, and C = N + T BT T is the TOA covariance matrix. Here, N is the white noise covariance matrix, T is the design matrix describing the timing model and red noise, and B is the prior covariance of the corresponding parameters [14]. Following B´ ecsy et al. [48], the log-likelihood can be rewritten as log L = − 12 (δt |δt ) − 12 log det(2 πC ) + 
+
+> 5Np
+
+X
+
+> k=1
+
+σkN k − 12
+
+> 5Np
+
+X
+
+> k=1 5Np
+
+X
+
+> l=1
+
+σkσlM kl , (14) where N k = ( δt |Sk) and M kl = ( Sk|Sl), and Np is the number of pulsars in the array. Evaluating these inner products N k and M kl is the most computationally expensive step in the likelihood calculation. Whenever the shape parameters, red noise parameters, or GWB parameters are updated, the quantities N k and M kl must be recomputed. However, for fixed values of these parameters, the likelihood depends on the projection parameters only through the 6coefficients σk, which are inexpensive to evaluate. Expressing the likelihood like this allows us to perform a large number of updates of the projection parameters for each update of the shape parameters, significantly accelerating the overall sampling by reducing the number of expensive likelihood evaluations. A summary of the shape and projection parameters, along with their scaling with the number of pulsars Np, is given in Table I.               
+
+> TABLE I. Shape and projection parameters and their scaling with the number of pulsars ( Np). The parameters ARN
+> piand γRN
+> pi
+> represent the red noise amplitude and spectral index of the ith pulsar. Shape parameters Projection parameters (9 + 4 ×Np)(4 + Np)
+> θ, ϕ, M, η, e 0, f 0, l 0, l pi, d pi, γ RN
+> pi, A RN
+> pi, γ GWB , A GWB ι, H 0, ψ, ω 0, ω pi
+
+With the likelihood formalism in place, the parameter estimation is carried out using Markov Chain Monte Carlo (MCMC) methods to sample the posterior distribution of the model parameters. Following B´ ecsy et al. [48], we employ a Metropolis-within-Gibbs sampler together with a block-update strategy that exploits the separation between shape and projection parameters. In this approach, the projection parameters are updated a large number of times (usually 
+
+O(10 3)) before attempting an update of the shape parameters. Since projection parameter updates require only recomputation of the coefficients σk, these updates are computationally inexpensive and can be performed rapidly. To improve the sampling efficiency of the computationally expensive shape parameter updates, we use a multiple-try MCMC scheme [56]. When an update to the shape parameters is proposed, the proposed shape parameters are combined with N (typically N = 10 4) different sets of proposed projection parameters. Among these N combined set of parameters, one is selected based on some importance weights, and the proposed update is accepted or rejected using an acceptance probability that depends on the likelihood values at all N trial points. See Sec. III of B´ ecsy et al. 
+
+[48] for more details about how the importance weight and acceptance probability are calculated. This ensures that the updates to the shape parameters are not rejected due to lack of an appropriate set of projection parameters with very little additional cost, as likelihood evaluation at different projection parameters is comparatively cheap. This approach significantly improves mixing and sampling efficiency in the high-dimensional parameter space. For proposing updates to the shape parameters, we use a combination of Fisher-matrix proposals, differential-evolution proposals, and prior draws [see 48, and references therein]. We also divide the shape parameters into the following groups: the seven common binary parameters ( θ, ϕ, M, η, e 0, f 0, and l0), pulsar distances and pulsar-term mean anomalies ( dpi and lpi ), and red-noise parameters ( ARN  
+
+> pi
+
+s, γRN  
+
+> pi
+
+, AGW B , and γGW B ). At each step, we only update a group of the shape parameters or all of them. For projection parameter updates, each parameter is proposed independently using an optimal jump scale determined from the local curvature of the likelihood, estimated through the second derivative along that parameter direction [see 48, for more details]. Combining the PTA signal model for relativistic eccentric binaries, the efficient calculation of the orbital evolution, and the fast likelihood formalism described above, we develop the QuickGWecc 1 pipeline. The pipeline provides a computationally efficient Bayesian framework for performing both all-sky and targeted searches for continuous GWs from eccentric SMBHBs in PTA datasets. In the following section, we demonstrate the performance of QuickGWecc 
+
+using simulated PTA datasets for both detection and upper-limit analyses.  
+
+> III. SIMULATIONS AND RESULTS
+
+In this section, we describe the procedure used to simulate PTA datasets containing white noise, intrinsic pulsar red noise, a stochastic GWB, and CGWs from a relativistic eccentric SMBHB. We then present the results obtained by applying the QuickGWecc pipeline to these simulated datasets for both all-sky and targeted searches.  
+
+> A. Simulating dataset
+
+To simulate PTA datasets containing a CGW signal from an eccentric SMBHB, we begin with the timing models (par files) of 25 longest timed pulsars from the NANOGrav 15-year dataset [51]. To simplify the dataset and reduce the computational cost of the analyses, we remove the ‘DMX’ and ‘JUMP’ parameters from the timing models and generate idealized TOAs for a single receiver and single observing frequency with bi-weekly cadence and 15 year data  
+
+> 1https://github.com/lanky441/QuickGWecc
+
+7span for each pulsar. We then add white noise with EFAC = 1 and log 10 EQUAD = −6.5, and injected intrinsic red noise using the best-fit red noise parameters obtained from the real NANOGrav observations for each pulsar. In addition, we include a stochastic GW background with log 10 AGWB = −14 .62 at GW frequency of yr −1, the value reported in Agazie et al. [19], and a spectral index γGWB = 4 .33, expected value for an isotropic GWB coming from a population of circular SMBHB. Finally, we inject the PTA signal from a relativistic eccentric SMBHB into the TOAs and refit the timing models to obtain updated best-fit par files for all pulsars.  
+
+> B. All-sky search
+
+We first apply the QuickGWecc pipeline to perform all-sky searches on the simulated datasets, assuming no prior information about the binary. We consider two separate analyses: (i) detection analysis where a strong, clearly detectable eccentric CGW signal is injected into the data, and (ii) upper limit analysis with a CGW signal just below the PTA sensitivity threshold. At present, QuickCW and its extension QuickGWecc do not support searches in the presence of a HD correlated GWB [17]. Therefore, in all analyses presented here, we model the GWB as a common uncorrelated red-noise (CURN) process, neglecting the spatial correlations between pulsars. Nevertheless, a likelihood reweighting scheme can be used to approximately recover the posterior distributions corresponding to an HD-correlated GWB model [36, 57].                                               
+
+> 1. Detection analysis
+> TABLE II. Injected values of the SMBHB parameters for the detection and upper limit analysis. The last column shows the prior used for the binary parameters for both the detection and upper limit analysis. Parameter Detection analysis Upper limit analysis Prior cos θ0.2 0.45 Uniform[-1, 1]
+> ϕ5.0 5.0 Uniform[0, 2 π]cos ι0.5 0.5 Uniform[-1, 1] log 10 H0-14.4 -14.5 Uniform[-20, -11] log 10 M(M⊙)9.5 9.5 Uniform[7, 10]
+> η0.2 0.2 Uniform[0.01, 0.25]
+> e00.45 0.5 Uniform[0.01, 6] log 10 f0(Hz) -8.2 -8.2 Uniform[-8.64, -7.52]
+> l03.5 4.0 Uniform[0, 2 π]
+> ω02.0 2.0 Uniform[0, 2 π]
+> ψ2.0 1.5 Uniform[0, π]S/N 12.3 5.7
+
+For the detection analysis, we inject a CGW signal with log 10 H0 = −14 .4 and the remaining binary parameters as listed in the second column of Table II, corresponding to a S/N of approximately 12 .3. The injected sky location is chosen to lie in a region of the sky with good PTA sensitivity due to the relatively large number of nearby pulsars. We adopt a moderately high eccentricity, consistent with theoretical expectations for SMBHBs emitting GWs in the PTA frequency band. The reference orbital frequency is selected to lie near the most sensitive frequency of our 15-year simulated PTA dataset, while the total mass is chosen to be sufficiently large that the orbital evolution between the Earth and pulsar terms is non-negligible. We search for this injected signal using the QuickGWecc pipeline and the prior distributions used for the binary parameters are shown in the last column of Table II. Figure 1 shows the resulting corner plot containing the one- and two-dimensional marginalized posterior distributions of the SMBHB parameters. The posterior distributions are shown in black, the green dot-dashed horizontal lines in the one-dimensional panels indicate the corresponding prior distributions, and the injected parameter values are marked in orange. For all binary parameters, the recovered posterior distributions are consistent with the injected values within the 2σ credible intervals. Several parameters, including the orbital frequency, sky location, and reference mean anomaly, are well constrained with narrow posterior distributions. This behavior is consistent with previous studies of circular SMBHBs in PTA data [29, 47]. In contrast, the posterior distributions of the signal amplitude (log 10 H0) and cosine of the inclination angle (cos ι) exhibit noticeable biases, with the former tending toward larger values and the latter toward smaller values than the injected parameters. This behavior is primarily driven by the strong covariance between these two parameters. The reference eccentricity ( e0) and symmetric mass ratio ( η) are only weakly constrained, reflecting the relatively limited information carried by the data about these parameters. This is consistent with the 8cos = 0.13 +0.04 0.06         
+
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+> cos
+> cos = 0.18 +0.18 0.10
+> 0.40
+> 0.44
+> 0.48
+> 0.52
+> 0.56
+> e0
+> e0= 0.49 +0.07 0.04
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> = 0.15 +0.07 0.08
+> 4.80
+> 4.88
+> 4.96
+> 5.04
+> = 4.97 +0.03 0.05
+> 2.7
+> 3.0
+> 3.3
+> 3.6
+> 3.9
+> l0
+> l0= 3.26 +0.22 0.18
+> 14.70
+> 14.55
+> 14.40
+> 14.25
+> 14.10
+> log 10  H0
+> log 10 H0=14.22 +0.09 0.13
+> 7.2
+> 7.8
+> 8.4
+> 9.0
+> 9.6
+> log 10  M
+> log 10 M= 8.81 +0.52 1.13
+> 0.00
+> 0.08
+> 0.16
+> 0.24
+
+cos 
+
+> 8.22
+> 8.21
+> 8.20
+> 8.19
+> log 10  f0
+> 0.00
+> 0.25
+> 0.50
+> 0.75
+
+cos 
+
+> 0.40
+> 0.44
+> 0.48
+> 0.52
+> 0.56
+
+e0
+
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 4.80
+> 4.88
+> 4.96
+> 5.04
+> 2.7
+> 3.0
+> 3.3
+> 3.6
+> 3.9
+
+l0
+
+> 14.70
+> 14.55
+> 14.40
+> 14.25
+> 14.10
+
+log 10 H0
+
+> 7.2
+> 7.8
+> 8.4
+> 9.0
+> 9.6
+
+log 10 M
+
+> 8.22
+> 8.21
+> 8.20
+> 8.19
+
+log 10 f0   
+
+> log 10 f0=8.21 +0.01 0.01
+
+FIG. 1. Corner plot showing the one- and two-dimensional marginalized posterior distributions of the SMBHB parameters for the detection analysis with an injected signal of S/N = 12 .3. The posterior distributions are shown in black, while the green horizontal dot-dashed curves in the one-dimensional distributions indicate the corresponding prior distributions. The injected parameter values are marked in orange. The total mass ( M ) is given in units of solar masses ( M⊙), and the initial orbital frequency ( f0) is expressed in Hz. 
+
+results of Agazie et al. [43], where we found similar weak constraints on e0 and η using an enterprise -based [44] targeted search pipeline for eccentric SMBHBs in PTA data. Although the peak of the posterior distribution for the total mass (log 10 M ) is consistent with the injected value, it exhibits a long tail toward lower masses. One contributing factor to the broad posterior distribution of log 10 M is likely the weak constraint on the pulsar-term contributions, arising from the limited precision of current pulsar distance measurements. To investigate this further, we examined the posterior distributions of the pulsar-term parameters dp,
+
+lp, and ωp. We find that the posterior distributions of the pulsar distances are largely uninformative, consistent with 90.0000 0.0001 0.0002 0.0003 0.0004         
+
+> |log | / (max(log )min(log ))
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Cumulative fraction
+> FIG. 2. Cumulative distribution function of the normalized absolute difference between the log-likelihood values computed using
+> QuickGWecc and enterprise for 1000 randomly drawn posterior samples from the detection analysis. The absolute difference is normalized by the peak-to-peak range of the log-likelihood values across the posterior samples. The small normalized differences demonstrate excellent agreement between the two likelihood implementations over the posterior region explored by the sampler.
+
+previous such studies for both circular binaries using QuickCW pipeline [48] and eccentric binaries using enterprise -based GWecc pipeline [43]. In contrast, for a subset of pulsars, the posterior distributions of lp and ωp while still relatively broad, are modestly informative. We further find that these pulsars are predominantly located close to the GW source on the sky, where the GW-induced timing residuals are strongest and the pulsar-term contribution is therefore better constrained. To validate the likelihood implementation in the QuickGWecc pipeline, we compare the log-likelihood values com-puted by QuickGWecc with those obtained using enterprise [44], the standard software package for PTA data analysis, for identical sets of model parameters randomly drawn from the posterior samples of the detection analysis. In enterprise , likelihood is evaluated using the CGW-induced timing delay given by Eq. (2), whereas in QuickGWecc 
+
+we use the decomposed form given in Eq. (10). Figure 2 shows the cumulative distribution of the normalized absolute difference between the log-likelihood values computed using the two implementations for 1000 randomly drawn pos-terior samples. The normalization is performed using the peak-to-peak range of the log-likelihood values across the posterior samples. We find that the normalized differences are negligible over the entire posterior region explored by the sampler, demonstrating excellent agreement between QuickGWecc and enterprise and validating the correctness of the likelihood implementation.  
+
+> 2. Upper-limit analysis
+
+For the upper-limit analysis, we inject a CGW signal from an eccentric SMBHB with log 10 H0 = −14 .5, corre-sponding to a S/N of approximately 5 .7. The remaining binary parameters are listed in the third column of Table II. The resulting Savage-Dickey Bayes factor for the presence of a CGW signal from our QuickGWecc pipeline run is 
+
+B = 0 .6337 ± 0.0007, indicating that the signal is not detectable in this dataset. Figure 3 shows the corresponding one- and two-dimensional marginalized posterior distributions of log 10 f0 and log 10 H0 and the posterior distributions of all other binary parameters are almost same as the prior. Since no significant evidence for a signal is found, we compute a 95% upper limit on the CGW amplitude using the prior reweighting method described in Agazie et al. 
+
+[43]. The red curve in the two-dimensional distribution in Fig. 3 shows the 95% upper limit on log 10 H0 as a function of the orbital frequency of the binary, while the overall upper limit is calculated to be log 10 H0|UL 95% = −14 .28.  
+
+> C. Targeted search
+
+We now turn to targeted searches for CGWs from eccentric SMBHB candidates using QuickGWecc . In targeted searches, prior information about the binary is available from electromagnetic observations, including the sky location (θ, ϕ ), luminosity distance dL, and, in some cases, the orbital frequency f0 [43, 45, 46]. Such information can be obtained for SMBHB candidates identified through photometric periodicity, spectroscopic variability, or other electromagnetic signatures. To naturally incorporate these observational constraints, we use dL as an independent 10 log 10 f0 (Hz) = 8.06 +0.36 0.38 
+
+> 8.50
+> 8.25
+> 8.00
+> 7.75
+
+log 10 f0 (Hz) 
+
+> 18
+> 16
+> 14
+> 12
+> log 10  H0
+> 18
+> 16
+> 14
+> 12
+
+log 10 H0          
+
+> log 10 H0=17.12 +1.95 1.96
+> FIG. 3. Corner plot showing the one- and two- dimensional marginalized posterior distributions of log 10 f0and log 10 H0for upper-limit analysis. The color scheme is same as Fig. 1. The red curve in the two-dimensional distributions shows the 95% upper limit on log 10 H0as a function of orbital frequency.
+
+sampling parameter instead of H0 in the targeted-search implementation, and H0 is calculated using the expression 
+
+H0 = ( GM ηx 0)/(c2dL). This version of the pipeline is available in the ‘targeted’ branch 2 of QuickGWecc .To test the targeted-search implementation, we apply it to the same simulated dataset with S/N = 5 .7 that was used for the all-sky upper-limit analysis. For this analysis, we fix the sky location ( θ, ϕ ), luminosity distance ( dL = 70 .827 Mpc; calculated from the injected values of H0, M , e0, η, and f0), and orbital frequency f0 to their injected values. The resulting Savage–Dickey Bayes factor for log 10 M is B = 64 .6 ± 6.8, indicating a detectable CGW signal in the targeted-search analysis. The corresponding corner plot for the SMBHB parameters is shown in Fig. 4. Compared to the all-sky analysis of the same dataset, the targeted search yields a substantially higher detection significance. This improvement arises because fixing a subset of the binary parameters reduces the effective search volume and allows the analysis to focus on a smaller region of parameter space. Consequently, targeted searches provide enhanced sensitivity compared to all-sky searches and represent a promising avenue for the first multi-messenger detection of an SMBHB [58]. Such searches will be particularly relevant for future PTA datasets, including the NANOGrav 20-year and IPTA DR3 datasets, together with the growing population of electromagnetic SMBHB candidates. At the same time, caution is warranted when interpreting candidate detections, as a significant fraction of the proposed electromagnetic SMBHB candidates may not correspond to genuine binaries. Robust statistical validation, including coherence tests and sky-scrambling analyses, will therefore be essential to distinguish true GW signals from statistical fluctuations or spurious electromagnetic associations [59]. Note that the original QuickCW 3 implementation did not include the capability for performing targeted searches for circular SMBHBs. In Agarwal et al. [46], QuickCW was used to perform targeted searches for CGWs from SMBHB candidates in the NANOGrav 15-year dataset by adopting very narrow priors on the sky location and GW frequency based on the electromagnetic observations (Agarwal et al., in prep.). However, the measured luminosity distance to the source was not incorporated directly into the Bayesian sampling. Instead, the distance information was imposed during post-processing through rejection sampling, where posterior samples were retained only if the luminosity distance inferred from the sampled values of H0, chirp mass, and GW frequency was consistent with the measured distance within its uncertainty. Although this approach is valid, it discards a large fraction of the posterior samples, reducing the effective sample size.By treating dL as an independent sampling parameter, the targeted implementation   
+
+> 2https://github.com/lanky441/QuickGWecc/tree/targeted
+> 3https://github.com/nanograv/QuickCW
+
+11 cos = 0.51 +0.31 0.31      
+
+> 0.15
+> 0.30
+> 0.45
+> e0
+> e0= 0.40 +0.10 0.10
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> = 0.10 +0.09 0.07
+> 1
+> 2
+> 3
+> 4
+> 5
+> l0
+> l0= 4.18 +0.33 0.36
+> 7.2
+> 7.8
+> 8.4
+> 9.0
+> 9.6
+> log 10  M
+> log 10 M= 9.62 +0.21 0.21
+> 1.5
+> 3.0
+> 4.5
+> 6.0
+> 0
+> 0= 3.25 +1.68 2.17
+> 0.4
+> 0.0
+> 0.4
+> 0.8
+
+cos 
+
+> 0.8
+> 1.6
+> 2.4
+> 0.15
+> 0.30
+> 0.45
+
+e0
+
+> 0.05
+> 0.10
+> 0.15
+> 0.20
+> 1
+> 2
+> 3
+> 4
+> 5
+
+l0
+
+> 7.2
+> 7.8
+> 8.4
+> 9.0
+> 9.6
+
+log 10 M
+
+> 1.5
+> 3.0
+> 4.5
+> 6.0
+> 0
+> 0.8
+> 1.6
+> 2.4
+> = 1.76 +1.07 1.15
+
+FIG. 4. Same as Fig. 1, but for the targeted search in the simulated dataset with S/N=5.7 used for the all-sky upper-limit analysis. 
+
+of QuickGWecc incorporates all available electromagnetic information directly into the Bayesian analysis, thereby avoiding the need for post-processing rejection sampling and making the search substantially more efficient. The same strategy can also be applied to targeted searches for circular SMBHBs using QuickCW , and has been implemented in the targeted 4 branch of QuickCW .
+
+IV. SUMMARY AND DISCUSSIONS 
+
+In this work, we developed QuickGWecc , a fast Bayesian pipeline to search for CGWs from SMBHBs in relativistic eccentric orbits in PTA datasets. The pipeline extends the QuickCW framework [48], originally developed for circular binaries, to eccentric SMBHBs motivated by theoretical studies suggesting that binaries emitting GWs in the PTA  
+
+> 4
+
+https://github.com/lanky441/QuickCW/tree/targeted 12 frequency band may retain significant eccentricity. The computational efficiency of QuickGWecc is achieved by sepa-rating the model parameters into shape and projection parameters, allowing repeated updates of the computationally inexpensive projection parameters while keeping the shape parameters fixed. For a NANOGrav 15-year-like dataset, the average likelihood evaluation time for a single update to the projection parameters in QuickGWecc , measured on a MacBook Pro equipped with an Apple M4 chip, is approximately 41 μs, while a shape parameter update requires approximately 580 ms. For comparison, the average likelihood evaluation time in enterprise is approximately 559 ms. Although the computational cost of updating the shape parameters in QuickGWecc is comparable to that of an update in enterprise , the extremely fast projection-parameter updates allow thousands of proposals to be explored in negligible amount of time. Combined with a Metropolis-within-Gibbs sampler and a multiple-try MCMC scheme, this enables efficient exploration of the high-dimensional parameter space relevant for eccentric SMBHB searches. We validated the likelihood implementation by comparing the likelihood values computed using QuickGWecc with those obtained from enterprise , finding excellent agreement between the two methods. Using simulated PTA datasets containing white noise, intrinsic pulsar red noise, a stochastic GW background, and CGWs from an eccentric SMBHB, we demonstrated the performance of the pipeline for both detection and upper-limit analyses. We also introduced a targeted-search implementation optimized for searching CGWs from electromagnetic SMBHB candidates. Although the current pipeline demonstrates the feasibility of efficient eccentric CGW searches in PTA data, we plan to address several remaining limitations in future works. At present, the pipeline assumes that DM variations are modeled using the DMX formalism incorporated into the timing model. However, future analyses of real PTA datasets would benefit from more flexible noise modeling approaches, such as replacing the DMX model with GP models for DM variations. Similarly, incorporating GP models for solar-wind-induced delays, particularly for pulsars located close to the ecliptic plane, would improve the characterization of low-frequency chromatic noise contributions [52]. This will become increasingly important with the inclusion of lower radio frequency observations from telescopes like uGMRT, CHIME, and LOFAR in future PTA datasets. Another important limitation of the current implementation is the treatment of the stochastic GWB as a CURN. The present version of QuickGWecc does not directly support searches in the presence of a HD correlated GWB. However, likelihood reweighting techniques can be used to approximately recover posteriors corresponding to an HD-correlated background model [57]. Extending the likelihood framework to directly incorporate HD correlations is an important direction for future development and will be particularly relevant for analyses of next-generation PTA datasets. The upcoming NANOGrav 20-year dataset and the third International Pulsar Timing Array data release (IPTA DR3) will provide significantly improved sensitivity to nanohertz GWs through longer baselines, larger pulsar samples, and improved timing precision. These datasets are expected to enhance the prospects for detecting both the stochastic GW background at the 5 σ level and the loudest individual CGW sources. The computational efficiency of QuickGWecc 
+
+makes it well suited for all-sky searches for eccentric SMBHBs in these larger datasets, where conventional eccentric searches may become prohibitively expensive. Furthermore, the targeted-search implementation provides a framework for systematic searches of electromagnetic SMBHB candidates identified through periodic variability, spectroscopic signatures, or multi-wavelength observations. The recent development of the discovery pipeline has further advanced rapid parameter estimation for PTA datasets [60]. Instead of relying on traditional MCMC methods, discovery employs stochastic gradient-based Bayesian variational inference and minimizes the Kullback–Leibler divergence to efficiently approximate the pos-terior distribution. Extending discovery to incorporate the CGW signal model for SMBHBs in relativistic eccentric orbits could further reduce the computational cost of eccentric CGW searches, making analyses of increasingly sen-sitive PTA datasets even more efficient. The detection of CGWs from an eccentric SMBHB would have important implications for understanding SMBHB formation and environmental interactions during binary evolution. Measure-ments of eccentricity in the PTA band can constrain dynamical processes such as stellar scattering, gas interactions, and triple-body encounters that govern the orbital evolution of SMBHBs. Therefore, QuickGWecc provides not only a computational tool for future PTA analyses but also a framework for probing the astrophysics of SMBHB evolution and enabling multi-messenger studies in the nanohertz GW regime. 
+
+> [1] M. C. Begelman, R. D. Blandford, and M. J. Rees, Massive black hole binaries in active galactic nuclei, Nature (London)
+> 287 , 307 (1980). [2] A. De Rosa, C. Vignali, T. Bogdanovi´ c, P. R. Capelo, M. Charisi, M. Dotti, B. Husemann, E. Lusso, L. Mayer, Z. Paragi, J. Runnoe, A. Sesana, L. Steinborn, S. Bianchi, M. Colpi, L. del Valle, S. Frey, K. ´E. Gab´ anyi, M. Giustini, M. Guainazzi, Z. Haiman, N. Herrera Ruiz, R. Herrero-Illana, K. Iwasawa, S. Komossa, D. Lena, N. Loiseau, M. Perez-Torres, E. Picon-
+
+13 
+
+celli, and M. Volonteri, The quest for dual and binary supermassive black holes: A multi-messenger view, New Astronomy Reviews 86 , 101525 (2019), arXiv:2001.06293 [astro-ph.GA]. [3] D. J. D’Orazio and M. Charisi, Observational Signatures of Supermassive Black Hole Binaries, arXiv e-prints ,arXiv:2310.16896 (2023), arXiv:2310.16896 [astro-ph.HE]. [4] D. J. D’Orazio, Z. Haiman, and D. Schiminovich, Relativistic boost as the cause of periodicity in a massive black-hole binary candidate, Nature (London) 525 , 351 (2015), arXiv:1509.04301 [astro-ph.HE]. [5] H. J. Lehto and M. J. Valtonen, OJ 287 Outburst Structure and a Binary Black Hole Model, Astrophys. J. 460 , 207 (1996). [6] A. Sillanpaa, S. Haarala, M. J. Valtonen, B. Sundelius, and G. G. Byrd, OJ 287: Binary Pair of Supermassive Black Holes, Astrophys. J. 325 , 628 (1988). [7] H. Sudou, S. Iguchi, Y. Murata, and Y. Taniguchi, Orbital Motion in the Radio Galaxy 3C 66B: Evidence for a Supermassive Black Hole Binary, Science 300 , 1263 (2003), arXiv:astro-ph/0306103 [astro-ph]. [8] M. J. Graham, S. G. Djorgovski, D. Stern, E. Glikman, A. J. Drake, A. A. Mahabal, C. Donalek, S. Larson, and E. Chris-tensen, A possible close supermassive black-hole binary in a quasar with optical periodicity, Nature (London) 518 , 74 (2015), arXiv:1501.01375 [astro-ph.GA]. [9] M. Charisi, I. Bartos, Z. Haiman, A. M. Price-Whelan, M. J. Graham, E. C. Bellm, R. R. Laher, and S. M´ arka, A population of short-period variable quasars from PTF as supermassive black hole binary candidates, MNRAS 463 , 2145 (2016), arXiv:1604.01020 [astro-ph.GA]. [10] L. Dey, M. J. Valtonen, A. Gopakumar, S. Zola, R. Hudec, P. Pihajoki, S. Ciprini, K. Matsumoto, K. Sadakane, M. Kidger, K. Nilsson, S. Mikkola, A. Sillanp¨ a¨ a, L. O. Takalo, H. J. Lehto, A. Berdyugin, V. Piirola, H. Jermak, K. S. Baliyan, T. Pursimo, D. B. Caton, F. Alicavus, A. Baransky, P. Blay, P. Boumis, D. Boyd, M. Campas Torrent, F. Campos, J. Carrillo G´ omez, S. Chandra, V. Chavushyan, J. Dalessio, B. Debski, M. Drozdz, H. Er, A. Erdem, A. Escartin P´ erez, V. Fallah Ramazani, A. V. Filippenko, E. Gafton, S. Ganesh, F. Garcia, K. Gazeas, V. Godunova, F. G´ omez Pinilla, M. Gopinathan, J. B. Haislip, J. Harmanen, G. Hurst, J. Jan´ ık, M. Jelinek, A. Joshi, M. Kagitani, R. Karjalainen, N. Kaur, W. C. Keel, V. V. Kouprianov, T. Kundera, S. Kurowski, A. Kvammen, A. P. LaCluyze, B. C. Lee, A. Liakos, E. Lindfors, J. Lozano de Haro, M. Mugrauer, R. Naves Nogues, A. W. Neely, R. H. Nelson, W. Ogloza, S. Okano, U. Pajdosz-´Smierciak, J. C. Pandey, M. Perri, G. Poyner, J. Provencal, A. Raj, D. E. Reichart, R. Reinthal, T. Reynolds, J. Saario, S. Sadegi, T. Sakanoi, J.-L. Salto Gonz´ alez, Sameer, T. Schweyer, A. Simon, M. Siwak, F. C. Sold´ an Alfaro, E. Sonbas, I. Steele, J. T. Stocke, J. Strobl, T. Tomov, L. Tremosa Espasa, J. R. Valdes, J. Valero P´ erez, F. Verrecchia, V. Vasylenko, J. R. Webb, M. Yoneda, M. Zejmo, W. Zheng, and P. Zielinski, Authenticating the Presence of a Relativistic Massive Black Hole Binary in OJ 287 Using Its General Relativity Centenary Flare: Improved Orbital Parameters, Astrophys. J. 866 ,11 (2018), arXiv:1808.09309 [astro-ph.HE]. [11] J. Robnik, A. E. Bayer, M. Charisi, Z. Haiman, A. Lin, and U. Seljak, Periodicity significance testing with null-signal templates: reassessment of PTF’s SMBH binary candidates, MNRAS 534 , 1609 (2024), arXiv:2407.17565 [astro-ph.GA]. [12] F. A. Jenet, A. Lommen, S. L. Larson, and L. Wen, Constraining the Properties of Supermassive Black Hole Systems Using Pulsar Timing: Application to 3C 66B, Astrophys. J. 606 , 799 (2004), arXiv:astro-ph/0310276 [astro-ph]. [13] S. Burke-Spolaor, S. R. Taylor, M. Charisi, T. Dolch, J. S. Hazboun, A. M. Holgado, L. Z. Kelley, T. J. W. Lazio, D. R. Madison, N. McMann, C. M. F. Mingarelli, A. Rasskazov, X. Siemens, J. J. Simon, and T. L. Smith, The astrophysics of nanohertz gravitational waves, The Astronomy and Astrophysics Review 27 , 5 (2019), arXiv:1811.08826 [astro-ph.HE]. [14] S. R. Taylor, The Nanohertz Gravitational Wave Astronomer, arXiv e-prints , arXiv:2105.13270 (2021), arXiv:2105.13270 [astro-ph.HE]. [15] M. V. Sazhin, Opportunities for detecting ultralong gravitational waves, Soviet Astronomy 22 , 36 (1978). [16] R. S. Foster and D. C. Backer, Constructing a Pulsar Timing Array, Astrophys. J. 361 , 300 (1990). [17] R. W. Hellings and G. S. Downs, Upper limits on the isotropic gravitational radiation background from pulsar timing analysis., apjl 265 , L39 (1983). [18] F. B. Estabrook and H. D. Wahlquist, Response of Doppler spacecraft tracking to gravitational radiation., General Rela-tivity and Gravitation 6, 439 (1975). [19] G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzoumanian, P. T. Baker, B. B´ ecsy, L. Blecha, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Burnette, R. Case, M. Charisi, S. Chatterjee, K. Chatziioannou, B. D. Cheeseboro, S. Chen, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, C. J. Cutler, M. E. Decesar, D. Degan, P. B. Demorest, H. Deng, T. Dolch, B. Drachler, J. A. Ellis, E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freedman, N. Garver-Daniels, P. A. Gentile, K. A. Gersbach, J. Glaser, D. C. Good, K. G¨ ultekin, J. S. Hazboun, S. Hourihane, K. Islo, R. J. Jennings, A. D. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, T. C. Klein, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, T. B. Littenberg, T. Liu, A. Lommen, D. R. Lorimer, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, M. A. Mattson, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, P. M. Meyers, C. M. F. Mingarelli, A. Mitridate, P. Natarajan, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, T. T. Pennucci, B. B. P. Perera, P. Petrov, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, S. C. Sardesai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, L. Schult, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Stovall, J. P. Sun, A. Susobhanan, J. K. Swiggum, J. Taylor, S. R. Taylor, J. E. Turner, C. Unal, M. Vallisneri, R. van Haasteren, S. J. Vigeland, H. M. Wahl, Q. Wang, C. A. Witt, O. Young, and Nanograv Collaboration, The NANOGrav 15 yr Data Set: Evidence for a Gravitational-wave Background, Astrophys. J. Letters 951 , L8 (2023), arXiv:2306.16213 [astro-ph.HE]. [20] EPTA Collaboration, InPTA Collaboration, J. Antoniadis, P. Arumugam, S. Arumugam, S. Babak, M. Bagchi, A.-S. Bak Nielsen, C. G. Bassa, A. Bathula, A. Berthereau, M. Bonetti, E. Bortolas, P. R. Brook, M. Burgay, R. N. Caballero, 14 
+
+A. Chalumeau, D. J. Champion, S. Chanlaridis, S. Chen, I. Cognard, S. Dandapat, D. Deb, S. Desai, G. Desvignes, N. Dhanda-Batra, C. Dwivedi, M. Falxa, R. D. Ferdman, A. Franchini, J. R. Gair, B. Goncharov, A. Gopakumar, E. Graikou, J.-M. Grießmeier, L. Guillemot, Y. J. Guo, Y. Gupta, S. Hisano, H. Hu, F. Iraci, D. Izquierdo-Villalba, J. Jang, J. Jawor, G. H. Janssen, A. Jessner, B. C. Joshi, F. Kareem, R. Karuppusamy, E. F. Keane, M. J. Keith, D. Khar-banda, T. Kikunaga, N. Kolhe, M. Kramer, M. A. Krishnakumar, K. Lackeos, K. J. Lee, K. Liu, Y. Liu, A. G. Lyne, J. W. McKee, Y. Maan, R. A. Main, M. B. Mickaliger, I. C. Nit ¸u, K. Nobleson, A. K. Paladi, A. Parthasarathy, B. B. P. Perera, D. Perrodin, A. Petiteau, N. K. Porayko, A. Possenti, T. Prabu, H. Quelquejay Leclere, P. Rana, A. Samajdar, S. A. Sanidas, A. Sesana, G. Shaifullah, J. Singha, L. Speri, R. Spiewak, A. Srivastava, B. W. Stappers, M. Surnis, S. C. Susarla, A. Susobhanan, K. Takahashi, P. Tarafdar, G. Theureau, C. Tiburzi, E. van der Wateren, A. Vecchio, V. Venkatraman Krishnan, J. P. W. Verbiest, J. Wang, L. Wang, and Z. Wu, The second data release from the European Pulsar Timing Array. III. Search for gravitational wave signals, A&A 678 , A50 (2023), arXiv:2306.16214 [astro-ph.HE]. [21] D. J. Reardon, A. Zic, R. M. Shannon, G. B. Hobbs, M. Bailes, V. Di Marco, A. Kapur, A. F. Rogers, E. Thrane, J. Askew, N. D. R. Bhat, A. Cameron, M. Curylo, W. A. Coles, S. Dai, B. Goncharov, M. Kerr, A. Kulkarni, Y. Levin, M. E. Lower, R. N. Manchester, R. Mandow, M. T. Miles, R. S. Nathan, S. Oslowski, C. J. Russell, R. Spiewak, S. Zhang, and X.-J. Zhu, Search for an Isotropic Gravitational-wave Background with the Parkes Pulsar Timing Array, Astrophys. J. Letters 
+
+951 , L6 (2023), arXiv:2306.16215 [astro-ph.HE]. [22] H. Xu, S. Chen, Y. Guo, J. Jiang, B. Wang, J. Xu, Z. Xue, R. N. Caballero, J. Yuan, Y. Xu, J. Wang, L. Hao, J. Luo, K. Lee, J. Han, P. Jiang, Z. Shen, M. Wang, N. Wang, R. Xu, X. Wu, R. Manchester, L. Qian, X. Guan, M. Huang, C. Sun, and Y. Zhu, Searching for the Nano-Hertz Stochastic Gravitational Wave Background with the Chinese Pulsar Timing Array Data Release I, Research in Astronomy and Astrophysics 23 , 075024 (2023), arXiv:2306.16216 [astro-ph.HE]. [23] M. T. Miles, R. M. Shannon, D. J. Reardon, M. Bailes, D. J. Champion, M. Geyer, P. Gitika, K. Grunthal, M. J. Keith, M. Kramer, A. D. Kulkarni, R. S. Nathan, A. Parthasarathy, J. Singha, G. Theureau, E. Thrane, F. Abbate, S. Buchner, A. D. Cameron, F. Camilo, B. E. Moreschi, G. Shaifullah, M. Shamohammadi, A. Possenti, and V. V. Krishnan, The MeerKAT Pulsar Timing Array: the first search for gravitational waves with the MeerKAT radio telescope, MNRAS 536 ,1489 (2025), arXiv:2412.01153 [astro-ph.HE]. [24] G. Agazie, J. Antoniadis, A. Anumarlapudi, A. M. Archibald, P. Arumugam, S. Arumugam, Z. Arzoumanian, J. Askew, S. Babak, M. Bagchi, M. Bailes, A.-S. Bak Nielsen, P. T. Baker, C. G. Bassa, A. Bathula, B. B´ ecsy, A. Berthereau, N. D. R. Bhat, L. Blecha, M. Bonetti, E. Bortolas, A. Brazier, P. R. Brook, M. Burgay, S. Burke-Spolaor, R. Burnette, R. N. Caballero, A. Cameron, R. Case, A. Chalumeau, D. J. Champion, S. Chanlaridis, M. Charisi, S. Chatterjee, K. Chatziioannou, B. D. Cheeseboro, S. Chen, Z.-C. Chen, I. Cognard, T. Cohen, W. A. Coles, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, M. Curylo, C. J. Cutler, S. Dai, S. Dandapat, D. Deb, M. E. DeCesar, D. DeGan, P. B. Demorest, H. Deng, S. Desai, G. Desvignes, L. Dey, N. Dhanda-Batra, V. Di Marco, T. Dolch, B. Drachler, C. Dwivedi, J. A. Ellis, M. Falxa, Y. Feng, R. D. Ferdman, E. C. Ferrara, W. Fiore, E. Fonseca, A. Franchini, G. E. Freedman, J. R. Gair, N. Garver-Daniels, P. A. Gentile, K. A. Gersbach, J. Glaser, D. C. Good, B. Goncharov, A. Gopakumar, E. Graikou, J.-M. Griessmeier, L. Guillemot, K. G¨ ultekin, Y. J. Guo, Y. Gupta, K. Grunthal, J. S. Hazboun, S. Hisano, G. B. Hobbs, S. Hourihane, H. Hu, F. Iraci, K. Islo, D. Izquierdo-Villalba, J. Jang, J. Jawor, G. H. Janssen, R. J. Jennings, A. Jessner, A. D. Johnson, M. L. Jones, B. C. Joshi, A. R. Kaiser, D. L. Kaplan, A. Kapur, F. Kareem, R. Karuppusamy, E. F. Keane, M. J. Keith, L. Z. Kelley, M. Kerr, J. S. Key, D. Kharbanda, T. Kikunaga, T. C. Klein, N. Kolhe, M. Kramer, M. A. Krishnakumar, A. Kulkarni, N. Laal, K. Lackeos, M. T. Lam, W. G. Lamb, B. B. Larsen, T. J. W. Lazio, K. J. Lee, Y. Levin, N. Lewandowska, T. B. Littenberg, K. Liu, T. Liu, Y. Liu, A. Lommen, D. R. Lorimer, M. E. Lower, J. Luo, R. Luo, R. S. Lynch, A. G. Lyne, C.-P. Ma, Y. Maan, D. R. Madison, R. A. Main, R. N. Manchester, R. Mandow, M. A. Mattson, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, P. M. Meyers, M. B. Mickaliger, M. Miles, C. M. F. Mingarelli, A. Mitridate, P. Natarajan, R. S. Nathan, C. Ng, D. J. Nice, I. C. Nit ¸u, K. Nobleson, S. K. Ocker, K. D. Olum, S. Oslowski, A. K. Paladi, A. Parthasarathy, T. T. Pennucci, B. B. P. Perera, D. Perrodin, A. Petiteau, P. Petrov, N. S. Pol, N. K. Porayko, A. Possenti, T. Prabu, H. Quelquejay Leclere, H. A. Radovan, P. Rana, S. M. Ransom, P. S. Ray, D. J. Reardon, A. F. Rogers, J. D. Romano, C. J. Russell, A. Samajdar, S. A. Sanidas, S. C. Sardesai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, L. Schult, A. Sesana, G. Shaifullah, R. M. Shannon, B. J. Shapiro-Albert, X. Siemens, J. Simon, and J. Singha, Comparing Recent Pulsar Timing Array Results on the Nanohertz Stochastic Gravitational-wave Background, Astrophys. J. 966 , 105 (2024), arXiv:2309.00693 [astro-ph.HE]. [25] EPTA Collaboration, InPTA Collaboration, J. Antoniadis, P. Arumugam, S. Arumugam, S. Babak, M. Bagchi, A.-S. Bak Nielsen, C. G. Bassa, A. Bathula, A. Berthereau, M. Bonetti, E. Bortolas, P. R. Brook, M. Burgay, R. N. Ca-ballero, A. Chalumeau, D. J. Champion, S. Chanlaridis, S. Chen, I. Cognard, S. Dandapat, D. Deb, S. Desai, G. Desvi-gnes, N. Dhanda-Batra, C. Dwivedi, M. Falxa, R. D. Ferdman, A. Franchini, J. R. Gair, B. Goncharov, A. Gopakumar, E. Graikou, J.-M. Grießmeier, A. Gualandris, L. Guillemot, Y. J. Guo, Y. Gupta, S. Hisano, H. Hu, F. Iraci, D. Izquierdo-Villalba, J. Jang, J. Jawor, G. H. Janssen, A. Jessner, B. C. Joshi, F. Kareem, R. Karuppusamy, E. F. Keane, M. J. Keith, D. Kharbanda, T. Kikunaga, N. Kolhe, M. Kramer, M. A. Krishnakumar, K. Lackeos, K. J. Lee, K. Liu, Y. Liu, A. G. Lyne, J. W. McKee, Y. Maan, R. A. Main, M. B. Mickaliger, I. C. Nit ¸u, K. Nobleson, A. K. Paladi, A. Parthasarathy, B. B. P. Perera, D. Perrodin, A. Petiteau, N. K. Porayko, A. Possenti, T. Prabu, H. Quelquejay Leclere, P. Rana, A. Samajdar, S. A. Sanidas, A. Sesana, G. Shaifullah, J. Singha, L. Speri, R. Spiewak, A. Srivastava, B. W. Stappers, M. Surnis, S. C. Susarla, A. Susobhanan, K. Takahashi, P. Tarafdar, G. Theureau, C. Tiburzi, E. van der Wateren, A. Vecchio, V. Venkatraman Krishnan, J. P. W. Verbiest, J. Wang, L. Wang, Z. Wu, P. Auclair, E. Barausse, C. Caprini, M. Crisostomi, F. Fastidio, T. Khizriev, H. Middleton, A. Neronov, K. Postnov, A. Roper Pol, D. Semikoz, C. Smarra, D. A. Steer, R. J. Truant, and S. Valtolina, The second data release from the European Pulsar Timing Array. IV. Implications for massive black holes, dark matter, and the early Universe, A&A 685 , A94 (2024), arXiv:2306.16227 [astro-ph.CO]. 15 
+
+[26] G. Agazie, A. Anumarlapudi, A. M. Archibald, P. T. Baker, B. B´ ecsy, L. Blecha, A. Bonilla, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Burnette, R. Case, J. A. Casey-Clyde, M. Charisi, S. Chatterjee, K. Chatziioannou, B. D. Cheeseboro, S. Chen, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, C. J. Cutler, D. J. D’Orazio, M. E. Decesar, D. Degan, P. B. Demorest, H. Deng, T. Dolch, B. Drachler, E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freedman, E. Gardiner, N. Garver-Daniels, P. A. Gentile, K. A. Gersbach, J. Glaser, D. C. Good, K. G¨ ultekin, J. S. Hazboun, S. Hourihane, K. Islo, R. J. Jennings, A. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, T. B. Littenberg, T. Liu, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, P. M. Meyers, C. M. F. Mingarelli, A. Mitridate, P. Natarajan, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, T. T. Pennucci, B. B. P. Perera, P. Petrov, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, J. C. Runnoe, S. C. Sardesai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, L. Schult, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Stovall, J. P. Sun, A. Susobhanan, J. K. Swiggum, J. Taylor, S. R. Taylor, J. E. Turner, C. Unal, M. Vallisneri, S. J. Vigeland, J. M. Wachter, H. M. Wahl, Q. Wang, C. A. Witt, D. Wright, O. Young, and Nanograv Collaboration, The NANOGrav 15 yr Data Set: Constraints on Supermassive Black Hole Binaries from the Gravitational-wave Background, Astrophys. J. Letters 952 , L37 (2023), arXiv:2306.16220 [astro-ph.HE]. [27] A. Afzal, G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzoumanian, P. T. Baker, B. B´ ecsy, J. J. Blanco-Pillado, L. Blecha, K. K. Boddy, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Burnette, R. Case, M. Charisi, S. Chatterjee, K. Chatziioannou, B. D. Cheeseboro, S. Chen, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, C. J. Cutler, M. E. Decesar, D. Degan, P. B. Demorest, H. Deng, T. Dolch, B. Drachler, R. von Eckardstein, E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freedman, N. Garver-Daniels, P. A. Gentile, K. A. Gersbach, J. Glaser, D. C. Good, L. Guertin, K. G¨ ultekin, J. S. Hazboun, S. Hourihane, K. Islo, R. J. Jennings, A. D. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, V. S. H. Lee, N. Lewandowska, R. R. Lino Dos Santos, T. B. Littenberg, T. Liu, D. R. Lorimer, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, P. M. Meyers, C. M. F. Mingarelli, A. Mitridate, J. Nay, P. Natarajan, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, T. T. Pennucci, B. B. P. Perera, P. Petrov, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, S. C. Sardesai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, T. Schr¨ oder, L. Schult, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Stovall, P. Stratmann, J. P. Sun, A. Susobhanan, J. K. Swiggum, J. Taylor, S. R. Taylor, T. Trickle, J. E. Turner, C. Unal, M. Vallisneri, S. Verma, S. J. Vigeland, H. M. Wahl, Q. Wang, C. A. Witt, D. Wright, O. Young, K. M. Zurek, and NANOGrav Collaboration, The NANOGrav 15 yr Data Set: Search for Signals from New Physics, Astrophys. J. Letters 
+
+951 , L11 (2023), arXiv:2306.16219 [astro-ph.HE]. [28] E. C. Gardiner, B. B´ ecsy, L. Z. Kelley, and N. J. Cornish, Characterizing Continuous Gravitational Waves from Super-massive Black Hole Binaries in Realistic Pulsar Timing Array Data, Astrophys. J. 988 , 222 (2025), arXiv:2502.16016 [astro-ph.CO]. [29] P. Petrov, L. Schult, S. R. Taylor, N. Pol, N. Laal, M. Charisi, and C.-P. Ma, Expectations for the first supermassive black-hole binary resolved by PTAs II: Milestones for binary characterization, arXiv e-prints , arXiv:2510.01316 (2025), arXiv:2510.01316 [astro-ph.IM]. [30] L. Kelley, M. Charisi, S. Burke-Spolaor, J. Simon, L. Blecha, T. Bogdanovic, M. Colpi, J. Comerford, D. D’Orazio, M. Dotti, M. Eracleous, M. Graham, J. Greene, Z. Haiman, K. Holley-Bockelmann, E. Kara, B. Kelly, S. Komossa, S. Larson, X. Liu, C.-P. Ma, S. Noble, V. Paschalidis, R. Rafikov, V. Ravi, J. Runnoe, A. Sesana, D. Stern, M. A. Strauss, V. U, M. Volonteri, and Nanograv Collaboration, Multi-Messenger Astrophysics With Pulsar Timing Arrays, Bulletin of the American Astronomical Society 51 , 490 (2019), arXiv:1903.07644 [astro-ph.HE]. [31] P. Petrov, S. R. Taylor, M. Charisi, and C.-P. Ma, Identifying the Host Galaxies of Supermassive Black Hole Binaries Found by Pulsar Timing Arrays, Astrophys. J. 976 , 129 (2024), arXiv:2406.04409 [astro-ph.GA]. [32] N. Veronesi, M. Charisi, P. Petrov, S. R. Taylor, J. Runnoe, D. J. D’Orazio, J. Pilawa, and C.-P. Ma, Prospects of resolving and localising individual supermassive black hole binaries with pulsar timing arrays: the host ranking challenge, arXiv e-prints , arXiv:2606.00218 (2026), arXiv:2606.00218 [astro-ph.GA]. [33] K. Aggarwal, Z. Arzoumanian, P. T. Baker, A. Brazier, M. R. Brinson, P. R. Brook, S. Burke-Spolaor, S. Chatterjee, J. M. Cordes, N. J. Cornish, F. Crawford, K. Crowter, H. T. Cromartie, M. DeCesar, P. B. Demorest, T. Dolch, J. A. Ellis, R. D. Ferdman, E. Ferrara, E. Fonseca, N. Garver-Daniels, P. Gentile, J. S. Hazboun, A. M. Holgado, E. A. Huerta, K. Islo, R. Jennings, G. Jones, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, J. S. Key, M. T. Lam, T. J. W. Lazio, L. Levin, D. R. Lorimer, J. Luo, R. S. Lynch, D. R. Madison, M. A. McLaughlin, S. T. McWilliams, C. M. F. Mingarelli, C. Ng, D. J. Nice, T. T. Pennucci, N. S. Pol, S. M. Ransom, P. S. Ray, X. Siemens, J. Simon, R. Spiewak, I. H. Stairs, D. R. Stinebring, K. Stovall, J. Swiggum, S. R. Taylor, J. E. Turner, M. Vallisneri, R. van Haasteren, S. J. Vigeland, C. A. Witt, W. W. Zhu, and NANOGrav Collaboration, The NANOGrav 11 yr Data Set: Limits on Gravitational Waves from Individual Supermassive Black Hole Binaries, Astrophys. J. 880 , 116 (2019), arXiv:1812.11585 [astro-ph.GA]. [34] Z. Arzoumanian, P. T. Baker, L. Blecha, H. Blumer, A. Brazier, P. R. Brook, S. Burke-Spolaor, B. B´ ecsy, J. A. Casey-Clyde, M. Charisi, S. Chatterjee, S. Chen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, M. E. Decesar, P. B. Demorest, T. Dolch, B. Drachler, J. A. Ellis, E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freedman, N. Garver-Daniels, P. A. Gentile, J. Glaser, D. C. Good, K. G¨ ultekin, J. S. Hazboun, R. J. Jennings, A. D. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, T. Liu, D. R. Lorimer, J. Luo, R. S. Lynch, D. R. Madison, A. McEwen, M. A. McLaughlin, C. M. F. Mingarelli, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, T. T. Pennucci, N. S. Pol, S. M. Ransom, P. S. Ray, J. D. Romano, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. Siwek, R. Spiewak, I. H. Stairs, D. R. Stinebring, K. Stovall, J. K. Swiggum, J. Sydnor, S. R. Taylor, J. E. 16 
+
+Turner, M. Vallisneri, S. J. Vigeland, H. M. Wahl, G. Walsh, C. A. Witt, O. Young, and Nanograv Collaboration, The NANOGrav 12.5 yr Data Set: Bayesian Limits on Gravitational Waves from Individual Supermassive Black Hole Binaries, Astrophys. J. Letters 951 , L28 (2023), arXiv:2301.03608 [astro-ph.GA]. [35] M. Falxa, S. Babak, P. T. Baker, B. B´ ecsy, A. Chalumeau, S. Chen, Z. Chen, N. J. Cornish, L. Guillemot, J. S. Hazboun, C. M. F. Mingarelli, A. Parthasarathy, A. Petiteau, N. S. Pol, A. Sesana, S. B. Spolaor, S. R. Taylor, G. Theureau, M. Vallisneri, S. J. Vigeland, C. A. Witt, X. Zhu, J. Antoniadis, Z. Arzoumanian, M. Bailes, N. D. R. Bhat, L. Blecha, A. Brazier, P. R. Brook, N. Caballero, A. D. Cameron, J. A. Casey-Clyde, D. Champion, M. Charisi, S. Chatterjee, I. Cognard, J. M. Cordes, F. Crawford, H. T. Cromartie, K. Crowter, S. Dai, M. E. DeCesar, P. B. Demorest, G. Desvignes, T. Dolch, B. Drachler, Y. Feng, E. C. Ferrara, W. Fiore, E. Fonseca, N. Garver-Daniels, J. Glaser, B. Goncharov, D. C. Good, J. Griessmeier, Y. J. Guo, K. G¨ ultekin, G. Hobbs, H. Hu, K. Islo, J. Jang, R. J. Jennings, A. D. Johnson, M. L. Jones, J. Kaczmarek, A. R. Kaiser, D. L. Kaplan, M. Keith, L. Z. Kelley, M. Kerr, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, K. Liu, T. Liu, J. Luo, R. S. Lynch, D. R. Madison, R. Main, R. Manchester, A. McEwen, J. McKee, M. A. McLaughlin, C. Ng, D. J. Nice, S. Ocker, K. D. Olum, S. Oslowski, T. T. Pennucci, B. B. P. Perera, D. Perrodin, N. Porayko, A. Possenti, H. Quelquejay-Leclere, S. M. Ransom, P. S. Ray, D. J. Reardon, C. J. Russell, A. Samajdar, J. Sarkissian, L. Schult, G. Shaifullah, R. M. Shannon, B. J. Shapiro-Albert, X. Siemens, J. J. Simon, M. Siwek, T. L. Smith, L. Speri, R. Spiewak, I. H. Stairs, B. Stappers, D. R. Stinebring, J. K. Swiggum, C. Tiburzi, J. Turner, A. Vecchio, J. P. W. Verbiest, H. Wahl, S. Q. Wang, J. Wang, J. Wang, Z. Wu, L. Zhang, S. Zhang, and IPTA Collaboration, Searching for continuous Gravitational Waves in the second data release of the International Pulsar Timing Array, MNRAS 521 ,5077 (2023), arXiv:2303.10767 [gr-qc]. [36] G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzoumanian, P. T. Baker, B. B´ ecsy, L. Blecha, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Case, J. A. Casey-Clyde, M. Charisi, S. Chatterjee, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, M. E. Decesar, P. B. Demorest, M. C. Digman, T. Dolch, B. Drachler, E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freedman, N. Garver-Daniels, P. A. Gentile, J. Glaser, D. C. Good, K. G¨ ultekin, J. S. Hazboun, S. Hourihane, R. J. Jennings, A. D. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, T. Liu, D. R. Lorimer, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, P. M. Meyers, C. M. F. Mingarelli, A. Mitridate, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, T. T. Pennucci, B. B. P. Perera, P. Petrov, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, S. C. Sardesai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Stovall, A. Susobhanan, J. K. Swiggum, J. Taylor, S. R. Taylor, J. E. Turner, C. Unal, M. Vallisneri, R. van Haasteren, S. J. Vigeland, H. M. Wahl, C. A. Witt, O. Young, and Nanograv Collaboration, The NANOGrav 15 yr Data Set: Bayesian Limits on Gravitational Waves from Individual Supermassive Black Hole Binaries, Astrophys. J. Letters 951 , L50 (2023), arXiv:2306.16222 [astro-ph.HE]. [37] EPTA Collaboration, InPTA Collaboration, J. Antoniadis, P. Arumugam, S. Arumugam, S. Babak, M. Bagchi, A.-S. Bak Nielsen, C. G. Bassa, A. Bathula, A. Berthereau, M. Bonetti, E. Bortolas, P. R. Brook, M. Burgay, R. N. Caballero, A. Chalumeau, D. J. Champion, S. Chanlaridis, S. Chen, I. Cognard, S. Dandapat, D. Deb, S. Desai, G. Desvignes, N. Dhanda-Batra, C. Dwivedi, M. Falxa, I. Ferranti, R. D. Ferdman, A. Franchini, J. R. Gair, B. Goncharov, A. Gopakumar, E. Graikou, J.-M. Grießmeier, L. Guillemot, Y. J. Guo, Y. Gupta, S. Hisano, H. Hu, F. Iraci, D. Izquierdo-Villalba, J. Jang, J. Jawor, G. H. Janssen, A. Jessner, B. C. Joshi, F. Kareem, R. Karuppusamy, E. F. Keane, M. J. Keith, D. Kharbanda, T. Kikunaga, N. Kolhe, M. Kramer, M. A. Krishnakumar, K. Lackeos, K. J. Lee, K. Liu, Y. Liu, A. G. Lyne, J. W. McKee, Y. Maan, R. A. Main, S. Manzini, M. B. Mickaliger, I. C. Nit ¸u, K. Nobleson, A. K. Paladi, A. Parthasarathy, B. B. P. Perera, D. Perrodin, A. Petiteau, N. K. Porayko, A. Possenti, T. Prabu, H. Quelquejay Leclere, P. Rana, A. Samajdar, S. A. Sanidas, A. Sesana, G. Shaifullah, J. Singha, L. Speri, R. Spiewak, A. Srivastava, B. W. Stappers, M. Surnis, S. C. Susarla, A. Susobhanan, K. Takahashi, P. Tarafdar, G. Theureau, C. Tiburzi, E. van der Wateren, A. Vecchio, V. Venkatraman Krishnan, J. P. W. Verbiest, J. Wang, L. Wang, and Z. Wu, The second data release from the European Pulsar Timing Array. V. Search for continuous gravitational wave signals, A&A 690 , A118 (2024), arXiv:2306.16226 [astro-ph.HE]. [38] S.-Y. Zhao, Z.-C. Chen, J. Cardinal Tremblay, B. Goncharov, X.-J. Zhu, N. D. R. Bhat, M. Curylo, S. Dai, V. Di Marco, H. Ding, G. Hobbs, A. Kapur, W. Ling, T. Liu, R. Mandow, S. Mishra, D. J. Reardon, C. J. Russell, R. M. Shannon, S. Wang, L. Zhang, and A. Zic, Searching for Continuous Gravitational Waves in the Parkes Pulsar Timing Array Data Release 3, Astrophys. J. 992 , 181 (2025), arXiv:2508.13944 [gr-qc]. [39] A. Sesana, Self Consistent Model for the Evolution of Eccentric Massive Black Hole Binaries in Stellar Environments: Implications for Gravitational Wave Observations, Astrophys. J. 719 , 851 (2010), arXiv:1006.0730 [astro-ph.CO]. [40] A. Sesana, Insights into the astrophysics of supermassive black hole binaries from pulsar timing observations, Classical and Quantum Gravity 30 , 224014 (2013), arXiv:1307.2600 [astro-ph.CO]. [41] A. Franchini, A. Prato, C. Longarini, and A. Sesana, The behaviour of eccentric sub-pc massive black hole binaries embedded in massive discs, A&A 688 , A174 (2024), arXiv:2402.00938 [astro-ph.HE]. [42] S. R. Taylor, E. A. Huerta, J. R. Gair, and S. T. McWilliams, Detecting Eccentric Supermassive Black Hole Binaries with Pulsar Timing Arrays: Resolvable Source Strategies, Astrophys. J. 817 , 70 (2016), arXiv:1505.06208 [gr-qc]. [43] G. Agazie, Z. Arzoumanian, P. T. Baker, B. B´ ecsy, L. Blecha, H. Blumer, A. Brazier, P. R. Brook, S. Burke-Spolaor, J. A. Casey-Clyde, M. Charisi, S. Chatterjee, B. D. Cheeseboro, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, M. E. Decesar, P. B. Demorest, L. Dey, T. Dolch, J. A. Ellis, R. D. Ferdman, E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freedman, N. Garver-Daniels, P. A. Gentile, J. Glaser, D. C. Good, A. Gopakumar, K. G¨ ultekin, J. S. Hazboun, R. J. Jennings, A. D. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, T. Liu, D. R. Lorimer, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, A. McEwen, J. W. McKee, M. A. McLaughlin, P. M. Meyers, C. M. F. Mingarelli, A. Mitridate, C. Ng, D. J. 17 
+
+Nice, S. K. Ocker, K. D. Olum, T. T. Pennucci, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, S. C. Sardesai, K. Schmitz, X. Siemens, J. Simon, M. S. Siwek, S. V. Sosa Fiscella, R. Spiewak, I. H. Stairs, D. R. Stinebring, K. Stovall, A. Susobhanan, J. K. Swiggum, S. R. Taylor, J. E. Turner, C. Unal, M. Vallisneri, S. J. Vigeland, C. A. Witt, O. Young, and NANOGrav Collaboration, The NANOGrav 12.5 yr Data Set: A Computationally Efficient Eccentric Binary Search Pipeline and Constraints on an Eccentric Supermassive Binary Candidate in 3C 66B, Astrophys. J. 963 ,144 (2024), arXiv:2309.17438 [astro-ph.HE]. [44] J. A. Ellis, M. Vallisneri, S. R. Taylor, and P. T. Baker, Enterprise: Enhanced numerical toolbox enabling a robust pulsar inference suite, Zenodo (2020). [45] Z. Arzoumanian, P. T. Baker, A. Brazier, P. R. Brook, S. Burke-Spolaor, B. B´ ecsy, M. Charisi, S. Chatterjee, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, M. E. Decesar, P. B. Demorest, T. Dolch, R. D. Elliott, J. A. Ellis, R. D. Ferdman, E. C. Ferrara, E. Fonseca, N. Garver-Daniels, P. A. Gentile, D. C. Good, J. S. Hazboun, K. Islo, R. J. Jennings, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, J. S. Key, M. T. Lam, T. J. W. Lazio, L. Levin, J. Luo, R. S. Lynch, D. R. Madison, M. A. McLaughlin, C. M. F. Mingarelli, C. Ng, D. J. Nice, T. T. Pennucci, N. S. Pol, S. M. Ransom, P. S. Ray, B. J. Shapiro-Albert, X. Siemens, J. Simon, R. Spiewak, I. H. Stairs, D. R. Stinebring, K. Stovall, J. K. Swiggum, S. R. Taylor, M. Vallisneri, S. J. Vigeland, C. A. Witt, W. Zhu, and NANOGrav Collaboration, Multimessenger Gravitational-wave Searches with Pulsar Timing Arrays: Application to 3C 66B Using the NANOGrav 11-year Data Set, Astrophys. J. 900 , 102 (2020), arXiv:2005.07123 [astro-ph.GA]. [46] N. Agarwal, G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzoumanian, J. G. Baier, P. T. Baker, B. B´ ecsy, L. Blecha, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Burnette, R. Case, J. A. Casey-Clyde, Y.-T. Chang, M. Charisi, S. Chatterjee, T. Cohen, P. Coppi, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, M. E. Decesar, P. B. Demorest, H. Deng, L. Dey, T. Dolch, D. J. D’Orazio, E. Eisenberg, E. C. Ferrara, G. Doskoch, W. Fiore, E. Fonseca, G. E. Freedman, E. C. Gardiner, N. Garver-Daniels, P. A. Gentile, K. A. Gersbach, J. Glaser, M. J. Graham, D. C. Good, K. G¨ ultekin, C. J. Harris, J. S. Hazboun, F. Hutchison, R. J. Jennings, A. D. Johnson, M. L. Jones, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, B. Larsen, T. J. W. Lazio, N. Lewandowska, T. Liu, D. R. Lorimer, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, C. Matt, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, P. M. Meyers, C. M. F. Mingarelli, A. Mitridate, P. Natarajan, C. Ng, D. J. Nice, S. Nichols, S. K. Ocker, K. D. Olum, T. T. Pennucci, B. B. P. Perera, P. Petrov, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, J. C. Runnoe, A. Saffer, S. C. Sardesai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, F. Semenzato, B. J. Shapiro-Albert, R. Shivakumar, X. Siemens, J. Simon, S. V. Sosa Fiscella, I. H. Stairs, D. R. Stinebring, K. Stovall, A. Susobhanan, J. K. Swiggum, J. A. Taylor, S. R. Taylor, M. S. Thompson, J. E. Turner, M. Vallisneri, R. van Haasteren, S. J. Vigeland, H. M. Wahl, L. Willson, K. P. Wilson, C. A. Witt, D. Wright, O. Young, Q. Zheng, and Nanograv Collaboration, The NANOGrav 15 yr Dataset: Targeted Searches for Supermassive Black Hole Binaries, Astrophys. J. Letters 998 , L11 (2026), arXiv:2508.16534 [astro-ph.HE]. [47] M. Charisi, S. R. Taylor, C. A. Witt, and J. Runnoe, Efficient Large-Scale, Targeted Gravitational-Wave Probes of Supermassive Black-Hole Binaries, Phys. Rev. Lett. 132 , 061401 (2024), arXiv:2304.03786 [gr-qc]. [48] B. B´ ecsy, N. J. Cornish, and M. C. Digman, Fast Bayesian analysis of individual binaries in pulsar timing array data, Phys. Rev. D 105 , 122003 (2022), arXiv:2204.07160 [gr-qc]. [49] G. B. Hobbs, R. T. Edwards, and R. N. Manchester, TEMPO2, a new pulsar-timing package - I. An overview, MNRAS 
+
+369 , 655 (2006), arXiv:astro-ph/0603381 [astro-ph]. [50] G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzoumanian, P. T. Baker, B. B´ ecsy, L. Blecha, A. Brazier, P. R. Brook, S. Burke-Spolaor, M. Charisi, S. Chatterjee, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, M. E. Decesar, P. B. Demorest, T. Dolch, B. Drachler, E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freedman, N. Garver-Daniels, P. A. Gentile, J. Glaser, D. C. Good, L. Guertin, K. G¨ ultekin, J. S. Hazboun, R. J. Jennings, A. D. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, T. Liu, D. R. Lorimer, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, C. M. F. Mingarelli, A. Mitridate, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, T. T. Pennucci, B. B. P. Perera, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, S. C. Sardesai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Stovall, A. Susobhanan, J. K. Swiggum, S. R. Taylor, J. E. Turner, C. Unal, M. Vallisneri, S. J. Vigeland, H. M. Wahl, C. A. Witt, O. Young, and Nanograv Collaboration, The NANOGrav 15 yr Data Set: Detector Characterization and Noise Budget, Astrophys. J. Letters 951 , L10 (2023), arXiv:2306.16218 [astro-ph.HE]. [51] G. Agazie, M. F. Alam, A. Anumarlapudi, A. M. Archibald, Z. Arzoumanian, P. T. Baker, L. Blecha, V. Bonidie, A. Brazier, P. R. Brook, S. Burke-Spolaor, B. B´ ecsy, C. Chapman, M. Charisi, S. Chatterjee, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, M. E. Decesar, P. B. Demorest, T. Dolch, B. Drachler, E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freedman, N. Garver-Daniels, P. A. Gentile, J. Glaser, D. C. Good, K. G¨ ultekin, J. S. Hazboun, R. J. Jennings, C. Jessup, A. D. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, A. Kuske, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, Y. Lin, T. Liu, D. R. Lorimer, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, K. Maraccini, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, C. M. F. Mingarelli, A. Mitridate, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, E. Panciu, T. T. Pennucci, B. B. P. Perera, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, L. Salo, S. C. Sardesai, C. Schmiedekamp, A. Schmiedekamp, K. Schmitz, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Stovall, A. Susobhanan, J. K. Swiggum, S. R. Taylor, J. E. Turner, C. Unal, M. Vallisneri, S. J. Vigeland, H. M. Wahl, Q. Wang, C. A. Witt, O. Young, and Nanograv Collaboration, The NANOGrav 15 yr Data Set: Observations and Timing of 68 Millisecond Pulsars, Astrophys. J. Letters 951 , L9 (2023), arXiv:2306.16217 [astro-ph.HE]. 18 
+
+[52] B. Larsen, J. G. Baier, D. J. Oliver, K. Wayt, Y.-T. Chang, J. S. Hazboun, C. M. F. Mingarelli, J. Simon, M. T. Miles, G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzoumanian, P. T. Baker, P. R. Brook, H. T. Cromartie, K. Crowter, M. E. DeCesar, P. B. Demorest, T. Dolch, E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freedman, N. Garver-Daniels, P. A. Gentile, J. Glaser, D. C. Good, R. J. Jennings, M. L. Jones, D. L. Kaplan, M. Kerr, M. T. Lam, D. R. Lorimer, J. Luo, R. S. Lynch, A. McEwen, M. A. McLaughlin, N. McMann, B. W. Meyers, C. Ng, D. J. Nice, T. T. Pennucci, B. B. P. Perera, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, A. Schmiedekamp, C. Schmiedekamp, B. J. Shapiro-Albert, I. H. Stairs, K. Stovall, A. Susobhanan, J. K. Swiggum, and H. M. Wahl, The NANOGrav 15 yr Dataset: Customized Chromatic Noise Models, Astrophys. J. 1005 , 29 (2026), arXiv:2606.28571 [astro-ph.HE]. [53] A. Susobhanan, A. Gopakumar, G. Hobbs, and S. R. Taylor, Pulsar timing array signals induced by black hole binaries in relativistic eccentric orbits, Phys. Rev. D 101 , 043022 (2020), arXiv:2002.03285 [gr-qc]. [54] A. Susobhanan, Post-Newtonian-accurate pulsar timing array signals induced by inspiralling eccentric binaries: accuracy, computational cost, and single-pulsar search, Classical and Quantum Gravity 40 , 155014 (2023), arXiv:2210.11454 [gr-qc]. [55] T. Damour, A. Gopakumar, and B. R. Iyer, Phasing of gravitational waves from inspiralling eccentric binaries, Phys. Rev. D 70 , 064028 (2004), arXiv:gr-qc/0404128 [astro-ph]. [56] L. Martino, A review of multiple try MCMC algorithms for signal processing, Digital Signal Processing 75 , 134 (2018), arXiv:1801.09065 [stat.CO]. [57] S. Hourihane, P. Meyers, A. Johnson, K. Chatziioannou, and M. Vallisneri, Accurate characterization of the stochastic gravitational-wave background with pulsar timing arrays by likelihood reweighting, Phys. Rev. D 107 , 084045 (2023), arXiv:2212.06276 [gr-qc]. [58] T. Liu and S. J. Vigeland, Multi-messenger Approaches to Supermassive Black Hole Binary Detection and Parameter Estimation: Implications for Nanohertz Gravitational Wave Searches with Pulsar Timing Arrays, Astrophys. J. 921 , 178 (2021), arXiv:2105.08087 [astro-ph.HE]. [59] B. B´ ecsy, N. J. Cornish, P. Petrov, X. Siemens, S. R. Taylor, S. J. Vigeland, and C. A. Witt, Towards robust gravitational wave detections from individual supermassive black hole binaries, Classical and Quantum Gravity 42 , 175016 (2025), arXiv:2502.18114 [gr-qc]. [60] M. Vallisneri, M. Crisostomi, A. D. Johnson, and P. M. Meyers, Rapid Parameter Estimation for Pulsar-Timing-Array Datasets with Variational Inference and Normalizing Flows, Phys. Rev. Lett. 135 , 071401 (2025), arXiv:2405.08857 [gr-qc].

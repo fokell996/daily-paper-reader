@@ -1,0 +1,2707 @@
+Title: Correlated signals of ultralight scalar dark matter in pulsar timing
+
+URL Source: https://arxiv.org/pdf/2607.24912v1
+
+Published Time: Wed, 29 Jul 2026 00:06:35 GMT
+
+Number of Pages: 33
+
+Markdown Content:
+Imperial–TP–2026–AM–03 
+
+## Correlated signals of ultralight scalar dark matter in pulsar timing 
+
+Joshua W. Foster ,1, ∗ Kimberly K. Boddy ,2 Jeff A. Dror ,3 Vincent S. H. Lee ,4, 5 
+
+Andrea Mitridate ,6 Tristan L. Smith ,7 Kelsie Taylor ,2 and Tanner Trickle 8
+
+> 1
+
+Department of Physics, University of Wisconsin-Madison, Madison, WI 53706, USA 
+
+> 2
+
+Texas Center for Cosmology and Astroparticle Physics, Weinberg Institute, Department of Physics, The University of Texas at Austin, Austin, TX 78712, USA 
+
+> 3
+
+Institute for Fundamental Theory, Physics Department, University of Florida, Gainesville, FL 32611, USA 
+
+> 4
+
+Department of Physics, University of California Berkeley, Berkeley, CA 94720, USA 
+
+> 5
+
+Department of Physics, University of California, San Diego, La Jolla, CA 92093-0319, USA 
+
+> 6
+
+Abdus Salam Centre for Theoretical Physics, Imperial College, London, SW7 2AZ, UK 
+
+> 7
+
+Department of Physics and Astronomy, Swarthmore College, Swarthmore, PA 19081, USA 
+
+> 8
+
+Department of Physics, Grainger College of Engineering, University of Illinois Urbana-Champaign, Urbana, IL 61801, USA 
+
+(Dated: July 29, 2026) Pulsar timing arrays (PTAs) are sensitive to ultralight dark matter (ULDM) in the 10 −24 –10 −20 eV mass range, with existing datasets already probing otherwise open parameter space and future PTAs promising substantial improvements in reach. Thus far, however, PTA searches for ULDM have typically been formulated using limiting descriptions. Analyses are performed in either the fully correlated limit, in which the local ULDM amplitude is shared across the array, or the fully uncorrelated limit, in which each pulsar has an independent local amplitude. Because the transition between these regimes occurs within the PTA-sensitive mass range, projected sensitivities and data-derived constraints can depend on which limiting description is assumed. For the first time, we develop a self-consistent analysis that treats the ULDM field as a Gaussian random field with finite spatial correlations, allowing the amplitude prior used in PTA signal models to interpolate continuously between the fully correlated and fully uncorrelated limits. We apply the framework to both linearly and quadratically coupled scalar ULDM, the latter including the universal gravitational signal sourced by the oscillating ULDM pressure. Pulsar-distance uncertainties are incorporated through an augmented latent-field prior, and the resulting distance-marginalized latent-amplitude distribution is represented with a normalizing-flow surrogate. We validate the method on mock PTA datasets, including blinded signal injection tests. 
+
+I. INTRODUCTION 
+
+Ultralight dark matter (ULDM) generates novel exper-imental signatures through its coherent oscillations over length scales comparable to its de Broglie wavelength (e.g., see Ref. [1]). These oscillations produce metric fluc-tuations that can have observable gravitational effects in the local region of our Galaxy [2]. Furthermore, if a scalar ULDM field is coupled to the Standard Model (SM), it can induce an oscillatory variation of fundamental con-stants [3–6]. Such variations can be tested in laboratory experiments [7–16] and can impact cosmological [17–23] and astrophysical [24–29] observations. In particular, these variations affect the arrival times of pulses from mil-lisecond pulsars monitored by pulsar timing array (PTA) experiments [25–29]. These PTA signals arise from fluc-tuations in the pulsar spin, deriving from changes in its moment of inertia and in the transition frequencies of the atomic clocks that serve as a reference to determine pulse arrival times. Most PTA searches for ULDM couplings to the SM (as well as searches for ULDM metric fluctuations [27, 30– 33]) focus on the “fast” mode, which imprints coherent  
+
+> ∗jwfoster@wisc.edu
+
+oscillations in timing residuals that are approximately monochromatic, at frequency ω ≈ mϕ or ω ≈ 2mϕ for PTA signals that scale linearly or quadratically with the ULDM field, respectively, where mϕ is the ULDM mass. There is also a ULDM slow mode, arising from the in-terference pattern of the ULDM field [29, 34], but we do not consider it here. Figure 1 illustrates how the ULDM field differs based on the locations of the pulsars and Earth versus the ULDM coherence regions of characteristic length ℓ =1/(mϕv0), where v0 is the local velocity dispersion of the ULDM field. There are two useful limiting cases. In the fully correlated limit, the coherence length is large compared to the relevant Earth-pulsar and pulsar-pulsar separations, so the local ULDM amplitudes are shared across the array. In the fully uncorrelated limit, the co-herence length is short compared to these separations, so the local amplitudes are effectively independent. Most current PTA searches extract limits by analyzing these two extreme cases over the full range of ULDM-mass sensitivity, 10 −24 eV ≲ mϕ ≲ 10 −20 eV, but the regime of validity for the fully correlated (uncorrelated) limit applies only to the smallest (largest) masses in this arXiv:2607.24912v1 [astro-ph.CO] 27 Jul 2026 2φ(x,  0)  Earth Pulsars   
+
+> φ(xi, t )
+> φ(x,  0)
+> φ(xi, t )
+> location xφ(x,  0)
+> time tφ(xi, t )
+> increasing  mφ
+
+Figure 1. Illustration of the ULDM scalar field ϕ for three ULDM masses mϕ (rows, increasing downward). We con-sider only one spatial dimension for clarity. Left panels: 
+
+Snapshots of the ULDM field at a given time ϕ(x, t =0) (gray solid lines), overlaid with the locations of Earth (globe icon) and three representative millisecond pulsars (colored icons) at various distances. Dashed vertical lines schematically indi-cate coherence regions of characteristic length ℓ = 1 /(mϕv0)as in Eq. (15). The field amplitude is approximately constant within each patch but exhibits stochastic variations between patches. Right panels: Time series ϕ(xi, t ) of the ULDM field sampled at each pulsar (colors match the left panels), oscillating at angular frequency ω ≈ mϕ with an amplitude set by the coherence patch in which the object resides. At low masses (top panels), the coherence length exceeds the relevant Earth-pulsar and pulsar-pulsar separations, and the local amplitudes are highly correlated. At high masses (bot-tom panels), the coherence length is shorter than any Earth-pulsar or pulsar-pulsar separation, so all objects reside in dis-tinct patches with uncorrelated amplitudes. At intermediate masses (middle panels), some but not all objects may reside in the same coherence patch. Our work addresses the full range of possible spatial correlations. 
+
+range. 1
+
+A proper treatment of the ULDM-induced correlations is needed for an analysis that applies across the full PTA-sensitive ULDM mass range, including the intermediate   
+
+> 1The PPTA collaboration considered only the uncorrelated limit for analyzing metric perturbations [30]. The EPTA collaboration considered three cases for analyzing metric perturbations [32, 33] and universal ULDM couplings [28, 33]: “uncorrelated,” “corre-lated,” and “pulsar-correlated” [28, 32, 33]. The “correlated” analysis combines two degenerate parameters into one, while the “pulsar-correlated” analysis leaves them as two parameters and is referred to as the correlated analysis by the NANOGrav col-laboration [27].
+
+regime between the fully correlated and fully uncorre-lated limits, illustrated in the middle panels of Fig. 1. References [35, 36] established the theoretical framework for understanding ULDM spatial correlations relevant for PTA searches, but an end-to-end numerical implementa-tion suitable for Bayesian data analysis has not yet been developed. In this paper, we develop such an implementation for the ULDM fast mode and apply it to both linearly and quadratically coupled scalar ULDM. For a linear cou-pling, the timing residual is linear in the field evaluated at the Earth and at the pulsars and oscillates at the Comp-ton frequency mϕ. For a quadratic coupling, the residual is quadratic in the field and oscillates at 2 mϕ; this class includes both quadratic couplings of the field to the SM and the universal gravitational signal sourced by the os-cillating ULDM pressure [2]. Because the two cases share the same underlying Gaussian field, they are described by a common finite-correlation prior and differ only in the deterministic map from the field to the timing residual. More generally, the formalism we develop is applicable to a broader range of signals, including vector dark matter, whose treatment we defer to upcoming work. Our analysis generalizes the limiting amplitude-phase approaches used in previous PTA searches for ULDM. These analyses typically impose one of two limiting de-scriptions: a fully correlated model, in which the local ULDM amplitude is shared across the array, or a fully uncorrelated model, in which each pulsar has an inde-pendent local amplitude. Rather than adopting either limit, we derive the joint prior over local ULDM ampli-tudes from the finite-distance ULDM covariance. Pulsar-distance uncertainties are incorporated into this prior, and the resulting distance-marginalized amplitude distri-bution is represented with a normalizing-flow surrogate. We test the robustness of our framework on mock PTA datasets, including null analyses, unblinded signal injec-tions, and blinded injections with unknown input masses. Together, these tests demonstrate that the method pro-vides a practical and robust approach to the inference challenges introduced by finite ULDM spatial correla-tions. Our implementation builds on enterprise [37], using it as the foundation for the PTA likelihood evalu-ation while adding the finite-correlation ULDM signal model, augmented latent-field prior, and normalizing-flow amplitude prior developed in this work. This paper is organized as follows. We describe the im-pact of linear and quadratic ULDM couplings, including the gravitational signal, on pulsar timing in Sec. II, and we discuss the correlations of the ULDM field in Sec. III. We present our deterministic analysis in Sec. IV. We vali-date the analysis on mock datasets and present projected sensitivities in Sec. V. We conclude in Sec. VI. 3 
+
+> II. ULDM SIGNALS IN PULSAR TIMING
+
+An oscillating ULDM field can affect pulsar timing whenever it induces a time-dependent change in the pulse arrival times. For linearly coupled signals, these effects are especially simple: the timing residual is proportional to the ULDM field evaluated at the Earth and at the pul-sar at the appropriate retarded time. Quadratically cou-pled signals, including the gravitational signal sourced by the oscillating ULDM pressure, are nearly as simple: the residual is then a quadratic function of the same field, with a fast mode oscillating at twice the Compton fre-quency. In either case, the simple response nevertheless has a nontrivial statistical structure, because a PTA does not observe a single field value, but rather many samples of the same stochastic field at widely separated spacetime points. We therefore begin by describing how an oscillating ULDM field appears in pulsar timing data and then iden-tify the field statistics needed to model the signal consis-tently across a PTA. In Secs. II A and II B, we describe the Earth-term and pulsar-term structure of the timing residual for the linear and quadratic scalar couplings. In Sec. II C, we discuss the statistical assumptions implicit in the fully correlated and fully uncorrelated signal mod-els used in previous PTA analyses, and we show how their limitations motivate a description based on the correla-tion structure of the underlying Gaussian ULDM field. In Sec. II D, we collect these ingredients into the signal parametrization used in our analyses, where we also re-strict the quadratic signal to its fast mode. Finally, in Sec. II E, we treat the universal gravitational signal as a special case of the quadratic fast mode.  
+
+> A. Linear couplings
+
+We first make the Earth-term and pulsar-term struc-ture of the timing response explicit. A linearly coupled signal is proportional to the ULDM field sampled at the spacetime points relevant to pulse emission and detec-tion. In a PTA, this gives an Earth term, associated with the field at the terrestrial reference clock, and a pulsar term, associated with the field at the pulsar at the re-tarded time of pulse emission. The relative importance of these two terms is fixed by the physical coupling under consideration. Specializing to scalar ULDM coupled linearly to the SM, we parametrize the couplings relevant to pulsar tim-ing as 
+
+L ⊃ ϕ
+
+Λ
+
+"
+
+dγ
+
+4e2 Fμν F μν + dg β3
+
+2g3
+
+GAμν Gμν A
+
+− X 
+
+> f=e,μ
+
+df mf ¯f f − X
+
+> q=u,d
+
+(dq + γq dg ) mq ¯qq 
+
+#
+
+, (1) where Λ ≡ MPl /√4π, MPl = 1 .22 × 10 19 GeV is the Planck mass, F μν is the electromagnetic field strength tensor, Gμν A is the QCD field strength tensor, f are the Dirac fermion lepton fields, q are the Dirac fermion light quark fields, e is the electromagnetic coupling, β3 is the QCD beta function, g3 is the QCD gauge coupling, mf
+
+are the lepton masses, mq are the light quark masses, γq
+
+are the light quark anomalous dimensions, and the vari-ous di are the dimensionless coupling coefficients. These interactions induce oscillatory variations of SM parame-ters [6, 9], 
+
+δα α = dγ
+
+ϕ
+
+Λ , δm e,μ 
+
+me,μ 
+
+= de,μ 
+
+ϕ
+
+Λ ,δm p,n 
+
+mp,n 
+
+≈ (dg + Cnd ˆm) ϕ
+
+Λ ,
+
+(2) where α is the fine-structure constant, Cn = 0 .048 [6] and d ˆm = ( mudu + mddd)/(mu + md). These variations affect pulsar timing through two ef-fects [26]. First, changes in the masses of pulsar con-stituents alter the pulsar moment of inertia and therefore its spin frequency. This produces a pulsar term, eval-uated at the retarded time of pulse emission. Second, changes in atomic energy levels alter the terrestrial clock standard used to record pulse arrival times. This pro-duces an Earth term, common to all pulsars. For weak couplings, both effects are linear in the ULDM field, and the timing residual for pulsar I can be written as 
+
+rI (t) = dSM 
+
+mϕΛ · yE ϕ(xE , t ) + yP ϕ(xI , t − xI ) , (3) where xE and xI are the locations of the Earth and the 
+
+Ith pulsar, respectively, and xI ≡ | xI |. Here 
+
+dSM = {dγ , d e, d μ, d g , d ˆm}, (4) while 
+
+yi = {yiγ , y ie, y iμ, y ig , y i
+
+> ˆm
+
+}, i ∈ { E, P }, (5) parametrizes the response of the Earth and pulsar terms to the different scalar couplings. The values of yi depend on the physical effect induced by ULDM. For the scalar effects considered here, the pulsar-spin response due to the pulsar moment of inertia fluctuation is approximately [26, 27] 
+
+yPg ≈ − 5, yP 
+
+> ˆm
+
+≈ − 0.24 ,yPμ ≈ 2 × 10 −3, yPe ≈ 1.7 × 10 −5. (6) with yPγ = 0. The clock response arises because pulse arrival times are referenced against an atomic clock stan-dard, primarily based on cesium atoms [38]. Therefore, any effect that shifts the relevant atomic energy levels appears as a fluctuation in the measured arrival times, common to all pulsars. For the scalar effects considered here, the clock response is approximately [26, 27]: 
+
+yEg ≈ 1, yE 
+
+> ˆm
+
+≈ 0.16 ,yEe ≈ 2, yEγ ≈ 4.8. (7) 4with yEμ = 0. Substituting these response coefficients into Eq. (3) specifies the timing signal for any choice of the underlying scalar couplings.  
+
+> B. Quadratic couplings
+
+The ULDM field may instead couple to the SM quadratically, which is the leading interaction when-ever a symmetry such as ϕ → − ϕ forbids the linear term [13, 18]. Following Ref. [29], the quadratic inter-actions relevant to pulsar timing parallel Eq. (1) with 
+
+ϕ/ Λ replaced by ϕ2/(2Λ 2): 
+
+L ⊃ ϕ2
+
+2Λ 2
+
+"
+
+d(2) 
+
+> γ
+
+4e2 Fμν F μν + d(2)  
+
+> g
+
+β3
+
+2g3
+
+GAμν Gμν A
+
+− X 
+
+> f=e,μ
+
+d(2)  
+
+> f
+
+mf ¯f f − X
+
+> q=u,d
+
+(d(2)  
+
+> q
+
++ γq d(2)  
+
+> g
+
+) mq ¯qq 
+
+#
+
+,
+
+(8) where Λ = MPl /√4π, as in the linear case, and the 
+
+d(2)  
+
+> i
+
+are the dimensionless quadratic coupling coefficients. These induce fractional variations of the SM parameters that are quadratic in the field, 
+
+δα α = d(2) 
+
+> γ
+
+ϕ2
+
+2Λ 2 , δm e,μ 
+
+me,μ 
+
+= d(2) 
+
+> e,μ
+
+ϕ2
+
+2Λ 2 ,δm p,n 
+
+mp,n 
+
+≈
+
+
+
+d(2)  
+
+> g
+
++ Cnd(2) ˆm
+
+ ϕ2
+
+2Λ 2 ,
+
+(9) in direct analogy with Eqs. (2). Because these variations act on the pulsar spin and the terrestrial clock through the same mechanisms as in the linear case, the response vectors yP and yE of Eqs. (6) and (7) are unchanged, but the variation is now quadratic in the field. The timing residual can then be written as 
+
+rI (t) = d(2) SM 
+
+2mϕΛ2 · yE ϕ(xE , t )2 + yP ϕ(xI , t − xI )2 ,
+
+(10) with d(2) SM = {d(2)  
+
+> γ
+
+, d (2)  
+
+> e
+
+, d (2)  
+
+> μ
+
+, d (2)  
+
+> g
+
+, d (2) ˆm }. Unlike the lin-early coupled field, the squared field is not monochro-matic: it contains a fast component at 2mϕ, itself monochromatic whenever the field is, together with a slowly varying part. A monochromatic field therefore produces a monochromatic fast-mode signal at 2 mϕ, just as the linear coupling produces one at mϕ. We re-strict to this fast mode when parameterizing the signal in Sec. II D. The slow mode is the low-frequency component at 
+
+ω ∼ ωp − ωq ∼ mϕv20 , the beat between two field modes of momenta p, q and nearly equal frequencies ωp, ω q. Its pulsar-timing phenomenology was studied in Ref. [29], which argued that it is approximately Gaussian, so we do not treat it in detail here. We show in App. C that it is in fact exactly Gaussian in the continuum limit, strength-ening that result and allowing it to be analyzed as an ordinary stationary Gaussian process. A quadratic coupling also makes the field’s dispersion relation density dependent, shifting the in-medium mass by ∆ m2 ≃ g ρ/ Λ2 inside a body of density ρ, with g
+
+the relevant effective coupling. For sufficiently large cou-plings, this screens the field within the Earth, Sun, or pulsar and suppresses the signal [29]; we restrict to the unscreened regime throughout.  
+
+> C. Signal statistics and limiting behaviors
+
+Equation (3) shows that, once the scalar response co-efficients have been specified, the remaining signal uncer-tainty is the ULDM field realization itself. The standard parametrization of this realization starts from a superpo-sition of nonrelativistic waves with random phases and Rayleigh-distributed amplitudes. Following Ref. [39], we write 
+
+ϕ(x, t ) ≈
+
+p2ρϕ
+
+mϕ
+
+X
+
+> v
+
+αv cos[ ωvt − mϕv · x + θv] , (11) where ρϕ ≃ 0.4 GeV /cm 3 is the local ULDM mass den-sity, which we approximate as spatially-constant over the PTA. The phases θv are independent random variables uniformly distributed on [0 , 2π], and the amplitudes αv
+
+are independent Rayleigh-distributed random variables with 
+
+⟨αvαv′ ⟩ = f (v) ∆ v δvv ′ . (12) The spacing ∆ v discretizes the velocity sum weighted by the velocity distribution f (v). The Rayleigh-amplitude and random-phase parametrization in Eq. (11) can equivalently be written in terms of Gaussian quadratures, 
+
+ϕ(x, t ) ≈
+
+p2ρϕ
+
+mϕ
+
+X
+
+> v
+
+
+
+Cv cos( ωvt − mϕv · x)+ Sv sin( ωvt − mϕv · x)
+
+
+
+,
+
+(13) where Cv and Sv are independent Gaussian random vari-ables with variances fixed by f (v)∆ v. We review this equivalence in App. A. The important consequence is that the ULDM field is Gaussian, since it is a linear combination of Gaus-sian mode variables. Its statistics are therefore fixed by the spatio-temporal two-point function ⟨ϕ(x, t ) ϕ(x′, t ′)⟩.We derive this correlation structure in Sec. III. Here we first identify the spatial coherence scale that controls its qualitative behavior. For cold dark matter following an isotropic Maxwell-Boltzmann velocity distribution, 
+
+f (v) = 1(2 πv 20 )3/2 exp 
+
+
+
+− v2
+
+2v20
+
+
+
+, (14) with v0 ≈ 155 km /s in the Standard Halo Model [40], the characteristic coherence length is 
+
+ℓ ≡ 1
+
+mϕv0
+
+≈ 1.2 kpc 
+
+ 10 −23 eV 
+
+mϕ
+
+  155 km /s
+
+v0
+
+
+
+. (15) 5This scale determines whether the Earth and pulsars sample nearly the same field realization or effectively in-dependent ones. Previous PTA searches have often adopted one of two corresponding limits [25–29]. In the amplitude-phase for-mulation used in these analyses, the rapidly varying re-tarded phases are treated as independent nuisance pa-rameters, while the limiting assumptions enter through the prior on the local ULDM amplitudes. When all relevant Earth-pulsar and pulsar-pulsar separations are small compared to ℓ, the array samples a fully correlated field realization and the sites share a single Rayleigh-distributed amplitude. When those separations are large compared to ℓ, the field values decohere and each pulsar receives an independent Rayleigh-distributed amplitude. These amplitude priors are useful limiting cases, but they are not separate signal models. They arise from the same underlying Gaussian random field in Eq. (11). Across the PTA-sensitive mass range, ℓ can be compa-rable to Earth-pulsar and pulsar-pulsar separations, so the sampled field values need not be either perfectly cor-related or completely uncorrelated. In this intermedi-ate regime, the correlations among the Earth and pul-sar terms must instead be determined from the finite-distance two-point function of the ULDM field. In Sec. III, we derive this correlation structure explic-itly for the ULDM field sampled across the PTA. We also show that the monochromatic description used in the analysis is an excellent approximation on the relevant timescales. This allows the finite-distance field correla-tions to be translated into correlations among the local amplitudes and phases used in the Bayesian analysis.  
+
+> D. Signal parametrization
+
+For the Bayesian analysis developed below, it is con-venient to express the timing residual in a compact form that separates the overall signal strength and coupling dependence from the underlying field realization. Both the linear and quadratic responses admit such a form: the residual is the sum of an Earth term and a pulsar term, each oscillating at the relevant frequency with an ampli-tude and phase fixed by the local field, modulated by an overall amplitude and a pair of coupling-dependent coef-ficients. We introduce this parametrization for the linear signal first and then for the quadratic and gravitational signals, which reuse the same field variables and differ only in the response map.  
+
+> 1. Linear signals
+
+Starting from Eq. (3), the response to a fixed choice of scalar couplings is controlled by the two scalar combina-tions 
+
+yE ≡ dSM · yE , yP ≡ dSM · yP . (16) The timing residual can therefore be written as 
+
+rI (t) = 1
+
+mϕΛ [yE ϕ(xE , t ) + yP ϕ(xI , t − xI )] . (17) To make the signal amplitude explicit, we define the dimensionless retarded-time field ˆϕI (t) ≡ mϕ
+
+p2ρϕ
+
+ϕ(xI , t − xI ), (18) with the convention that I = 0 denotes the Earth. Thus ˆϕ0(t) is the Earth-term field, while ˆϕI (t) for I =1, . . . , N p, where Np is the number of pulsars, is the field sampled at the pulsars. In the monochromatic approximation used for the de-terministic signal model, the dimensionless field sampled at each site can be written in amplitude–phase form as ˆϕJ (t) = AJ cos( mϕt − αJ ), J = 0 , . . . , N p. (19) The latent 2 amplitudes and phases ( AJ , α J ) are fixed by the local realization of the ULDM field, with their joint distribution determined by the finite-distance field corre-lations derived in Sec. III. In terms of these dimensionless fields, 
+
+rI (t) = AE ˆϕ0(t) + AP ˆϕI (t), (20) where 
+
+AE = yE
+
+p2ρϕ
+
+m2
+
+> ϕ
+
+Λ , AP = yP
+
+p2ρϕ
+
+m2
+
+> ϕ
+
+Λ . (21) Equivalently, using Eq. (19), the free coupling-ratio residual is 
+
+rI (t) = AE A0 cos( mϕt−α0)+ AP AI cos( mϕt−αI ). (22) Here AE and AP are timing-residual amplitude scales, while A0 and AI are dimensionless ULDM field ampli-tudes at the Earth and at pulsar I. The parametrization in Eq. (20) lends itself to an agnostic analysis, in which the Earth-term and pulsar-term signal strengths are al-lowed to vary independently. Since this approach does not impose a fixed relation between the Earth and pul-sar responses, we refer to it as the free coupling-ratio parametrization. We also use an alternative parametrization in which the relative Earth-term and pulsar-term responses are fixed by a specified scalar-coupling scenario. In this case, the overall signal strength can be factored out by defining 
+
+ymax = max {| yE |, |yP |} , (23)  
+
+> 2Throughout, “latent” variables are quantities that are not mea-sured directly but are introduced into the model, inferred as part of the fit, and then marginalized over.
+
+6and the dimensionless relative weights 
+
+wE = yE
+
+ymax 
+
+, wP = yP
+
+ymax 
+
+. (24) The corresponding timing-residual amplitude is 
+
+Aϕ = ymax 
+
+p2ρϕ
+
+m2
+
+> ϕ
+
+Λ ∼ 5 ns 
+
+ ymax 
+
+10 −7
+
+  10 −22 eV 
+
+mϕ
+
+2
+
+. (25) With these definitions, Eq. (20) becomes 
+
+rI (t) = Aϕ
+
+h
+
+wE ˆϕ0(t) + wP ˆϕI (t)
+
+i
+
+. (26) In amplitude–phase form, Eq. (26) becomes 
+
+rI (t) = Aϕ
+
+wE A0 cos( mϕt − α0)+ wP AI cos( mϕt − αI ). (27) We refer to this as the fixed coupling-ratio parametriza-tion: wE and wP are fixed numbers for a given coupling scenario in an analysis, and Aϕ is a varying parameter that controls the overall signal strength.  
+
+> 2. Quadratic signals
+
+The quadratically coupled signals of Sec. II B admit the same compact parametrization once we restrict to the fast mode. We write [ X]fast for the part of a quantity X
+
+quadratic in the field that oscillates at 2 mϕ, as distinct from the slowly varying remainder, namely the constant and difference-frequency parts that source the slow mode. Using the monochromatic form in Eq. (19), the fast part of the squared field is [ ˆϕ2 
+
+> J
+
+(t)] fast = 12 A2 
+
+> J
+
+cos(2 mϕt − 2αJ ). (28) Absorbing the factor of 12 into the amplitude, the residual takes the same Earth- and pulsar-term form as Eq. (26), now oscillating at 2 mϕ with phases 2 α0 and 2 αI ,
+
+rI (t) = Aϕ
+
+wE A20 cos(2 mϕt − 2α0)+ wP A2 
+
+> I
+
+cos(2 mϕt − 2αI ), (29) and analogously, in the free coupling-ratio parametriza-tion, 
+
+rI (t) = AE A20 cos(2 mϕt − 2α0)+ AP A2 
+
+> I
+
+cos(2 mϕt − 2αI ). (30) We retain the symbols Aϕ, AE , and AP used in the linear case, now with the quadratic amplitude scale. For the SM quadratic coupling, with yE,P = d(2) SM · yE,P , the free coupling-ratio amplitudes are 
+
+AE = yE ρϕ
+
+2m3
+
+> ϕ
+
+Λ2 , AP = yP ρϕ
+
+2m3
+
+> ϕ
+
+Λ2 , (31) mirroring Eq. (21), while the fixed coupling-ratio ampli-tude is 
+
+Aϕ = ymax ρϕ
+
+2m3
+
+> ϕ
+
+Λ2 , (32) with relative weights wE,P = yE,P /y max defined as in Eqs. (23) and (24). The universal gravitational signal is the special case wE = −wP = 1, treated in Sec. II E. In all cases the residual depends on the field only through the latent amplitudes and phases ( AJ , α J ), now through 
+
+A2 
+
+> J
+
+at frequency 2 mϕ, so the field statistics of Sec. III and the latent-amplitude prior of Sec. IV carry over un-changed, with only the deterministic response map mod-ified.  
+
+> E. Fast mode gravitational fluctuations as a quadratic observable
+
+Independently of any coupling to the SM, every ULDM produces a gravitational signal: the oscillating pressure sources an oscillating gravitational potential Ψ. Its fast part [Ψ] fast is local in the field, proportional to ϕ2 at each point, because the Poisson inversion of the sum-frequency source is cancelled by its kinetic structure. In the subcoherence limit, [Ψ( x, t )] fast = πG [ϕ(x, t )2]fast , (33) as we derive in App. B, with G Newton’s constant; we write Ψ fast ≡ [Ψ] fast hereafter. The potential per-turbs pulse arrival times through the metric, and for the fast mode, the gauge-invariant Einstein delay (the gravitational redshift) dominates, while the Doppler and Shapiro contributions are suppressed by the ULDM ve-locity; the hierarchy is reversed for the slow mode [34]. Integrating the redshift over time and differencing the Earth and pulsar contributions gives 
+
+rI (t) = πG 
+
+2mϕ
+
+ϕ(xE , t )2 − ϕ(xI , t − xI )2 
+
+> fast
+
+, (34) which is the universal-coupling special case of the quadratic residual of Eq. (10), restricted to the fast mode as in Sec. II D. In the fixed coupling-ratio parametriza-tion, it reads 
+
+rI (t) = Aϕ
+
+A20 cos(2 mϕt − 2α0) − A2 
+
+> I
+
+cos(2 mϕt − 2αI ) ,
+
+(35) that is, wE = −wP = 1, with amplitude 
+
+Aϕ = πGρ ϕ
+
+2m3
+
+> ϕ
+
+∼ 20 ns 
+
+ ρϕ
+
+0.4 GeV /cm 3
+
+  10 −23 eV 
+
+mϕ
+
+3
+
+,
+
+(36) up to an O(1) factor set by the redshift projection [2, 30]. Equation (34) is the fast mode, for which the poten-tial is local in ϕ2. The corresponding slow mode, at 
+
+ω ∼ mϕv20 , instead has a potential set by the ordinary Poisson equation, nonlocal in the field; it was studied 7in Ref. [34] and, as a special case of the quadratic slow mode of Sec. II B, is also exactly Gaussian in the contin-uum limit (App. C). 
+
+III. ULDM CORRELATIONS 
+
+Having established that ULDM signals depend on the field sampled at the Earth and at the pulsars at the ap-propriate retarded times, we now determine the corre-lations among these field values. These correlations are fixed by the spatio-temporal two-point function of the underlying ULDM field, and they control how the local amplitude prior interpolates between the fully correlated and fully uncorrelated limits. We derive this correlation structure in three steps. We first compute the retarded-time field covariance in the time domain in Sec. III A. We then express the same cor-relation structure in the frequency domain in Sec. III B. Finally, in Sec. III C, we translate the field covariance into the covariance of the local sine and cosine quadratures, which determines the amplitude and phase correlations used in the Bayesian analysis. 
+
+A. Covariance in the time domain 
+
+The two-point function for a Gaussian ULDM field ϕ,using Eq. (11) in the continuum limit, is 
+
+⟨ϕ(x, t )ϕ(x′, t ′)⟩ = ρϕ
+
+m2
+
+> ϕ
+
+Z
+
+d3v f (v)
+
+× cos[ ωv∆t − mϕv · ∆x] , (37) where f (v) is the unit-normalized three-velocity distri-bution, ωv ≈ mϕ(1 + v2/2) is the ULDM energy in the nonrelativistic limit, and ⟨· · · ⟩ indicates averages over the random variables αv and θv. Making the substitutions 
+
+x → xI , x′ → xJ , t → t − xI , and t′ → t′ − xJ , and using Eq. (37), we obtain the cross-correlation for the dimen-sionless retarded-time field at the Ith and Jth sites, the rescaling of Eq. (18) having reduced the ρϕ/m 2 
+
+> ϕ
+
+prefactor to 1 /2: 
+
+⟨ ˆϕI (t) ˆϕJ (t′)⟩ = 12
+
+Z
+
+d3v f (v) cos[ ωv∆tIJ − mϕv · ∆xIJ ] ,
+
+(38) where ∆ xIJ ≡ xI − xJ , ∆ t ≡ t − t′, and ∆tIJ ≡ ∆t − xI + xJ (39) is the retarded-time separation. The monochromatic approximation, which corre-sponds to taking ωv → mϕ in Eq. (38), is accurate when the dispersive contribution to the temporal phase satisfies (ωv − mϕ)∆ tIJ ≃ mϕv2∆tIJ /2 ≪ 1. For v ∼ 10 −3 and typical inter-pulsar distances of 1 kpc, this quantity can become O(1) or greater for mϕ ≳ 10 −21 eV. Physically, −0.4    
+
+> −0.20.00.20.4
+> 〈 ˆφ1(t) ˆφ2(t′)〉
+> Exact Approximate
+> 10 −24 10 −23 10 −22
+> mφ[eV]
+> −4
+> −2024
+> Difference
+> ×10 −7
+> Exact - Approximate
+
+Figure 2. Numerical comparison of the full nonrelativis-tic velocity integral and the monochromatic approximation 
+
+ωv ≃ mϕ for the retarded-time ULDM field covariance. We place two pulsars 2 kpc apart, with Earth at the midpoint, and evaluate the covariance between the retarded-time field at the first pulsar at t = 0 yr and the retarded-time field at the second pulsar at t′ = 15 yr. Top panel: The di-mensionless covariance ⟨ ˆϕ1(t) ˆϕ2(t′)⟩ as a function of ULDM mass for a Maxwell–Boltzmann velocity distribution with 
+
+v0 = 155 km /s. The solid curve shows the full nonrelativistic velocity integral in Eq. (38), while the dashed curve shows the monochromatic approximation in Eq. (40). Bottom panel: 
+
+The signed difference, plotted in the same absolute units as the covariance. Any differences are negligibly small. 
+
+when the light-travel time between pulsars exceeds the coherence time τ = 1 /(mϕv2), retaining the full velocity dependence in the phase can drive correlations between retarded-time fields toward zero. However, note that the spatial phase mϕv · ∆xIJ is also velocity dependent and is parametrically larger (by 1 /v ) than the dispersive con-tribution to the temporal phase. As a result, for suffi-ciently large velocities that allow ( ωv − mϕ)∆ tIJ to be non-negligible, the larger mϕv · ∆xIJ already causes the integrand in Eq. (38) to be rapidly oscillatory, driving the covariance toward zero. Therefore, while replacing 
+
+ωv → mϕ in the cosine argument can induce a large relative error at sufficiently large mϕ, it produces a neg-ligible absolute error, because the covariance is already exponentially suppressed by spatial dephasing (i.e., finite coherence length). Substituting ωv → mϕ in Eq. (38) and assuming the ULDM field in the Galaxy has the isotropic velocity dis-tribution in Eq. (14), the two-point correlation function for the dimensionless retarded-time field becomes 
+
+⟨ ˆϕI (t) ˆϕJ (t′)⟩ = 12 cos[ mϕ∆tIJ ] exp 
+
+
+
+− ∆x2
+
+> IJ
+
+2ℓ2
+
+
+
+(40) on all relevant timescales and spatial scales, where ℓ is the coherence length from Eq. (15). We define the magnitude 8of the spatial correlation RIJ and an effective distance phase ψI as 
+
+RIJ ≡ exp 
+
+
+
+− ∆x2
+
+> IJ
+
+2ℓ2
+
+
+
+(41) 
+
+ψI ≡ mϕxI (42) and the two-point function takes the compact form 
+
+⟨ ˆϕI (t) ˆϕJ (t′)⟩ = 12 cos[ mϕ∆t − ψI + ψJ ] RIJ , (43) where we leave the dependence of RIJ and ψI on mϕ
+
+and xI implicit. We verify the accuracy of this approx-imation in the sense relevant for our analysis in Fig. 2, which compares Eq. (40) with a numerical evaluation of the full nonrelativistic velocity integral in Eq. (38). The absolute difference remains small throughout the mass range shown. At larger masses, the relative difference can become large, but only after spatial decoherence has already strongly suppressed the covariance.  
+
+> B. Covariance in the frequency domain
+
+The correlation function in Eq. (43) depends only on the time difference ∆ t = t − t′ and therefore describes a stationary process, making it natural to work in the frequency domain. We use the Fourier convention ˆϕI (f ) = 
+
+Z
+
+dt e −2πif t ˆϕI (t). (44) In Fourier space, the correlation function takes the gen-eral form 
+
+⟨ ˆϕI (f ) ˆϕJ (f ′)⟩ = δ(f + f ′) ˆPIJ (f ) . (45) For a strictly monochromatic signal at angular frequency 
+
+mϕ, the support for ˆPIJ (f ) is confined to f = ±mϕ/(2 π), and an explicit Fourier transform of Eq. (43) yields ˆPIJ (f ) = 14
+
+h
+
+δ
+
+
+
+f − mϕ
+
+2π
+
+ ˆΓIJ + δ
+
+
+
+f + mϕ
+
+2π
+
+ ˆΓ∗
+
+> IJ
+
+i
+
+,
+
+(46) where ˆΓIJ = e−i(ψI −ψJ )RIJ (47) is the complex overlap reduction function (ORF), which is a function of {xI } through its dependence on ψI and 
+
+RIJ . The complex nature of ˆΓIJ arises from the retarded-time evaluation of the field at the pulsar locations, corre-sponding to a distance-dependent phase delay. However, the matrix with entries ˆΓIJ is Hermitian, which enforces the real-valuedness of the time-domain field.  
+
+> C. Gaussian amplitude covariance
+
+Since the ULDM field is approximately monochro-matic, we can write the dimensionless retarded-time field as ˆϕI (t) = ˆCI cos( mϕt) + ˆSI sin( mϕt) , (48) where ˆCI and ˆSI are constant-valued, i.e., time-independent, random variables associated with the Ith 
+
+location. We can evaluate these amplitudes as ˆCI = lim  
+
+> T→∞
+
+1
+
+T
+
+Z T
+
+> −T
+
+ˆϕI (t) cos( mϕt) dt, 
+
+ˆSI = lim  
+
+> T→∞
+
+1
+
+T
+
+Z T
+
+> −T
+
+ˆϕI (t) sin( mϕt) dt. 
+
+(49) Since they are obtained by linear projections of the Gaus-sian fields ˆϕI (t), they also obey Gaussian statistics. The covariances of these amplitudes are 
+
+⟨ ˆCI ˆCJ ⟩ = ⟨ ˆSI ˆSJ ⟩ = 12 Re( ˆΓIJ ),
+
+⟨ ˆCI ˆSJ ⟩ = −⟨ ˆSI ˆCJ ⟩ = 12 Im( ˆΓIJ ). (50) We provide the full details of this calculation in Ap-pendix D.  
+
+> IV. DETERMINISTIC ANALYSIS WITH FINITE ULDM CORRELATIONS
+
+In this section, we develop the deterministic analy-sis used in this work, including the finite-correlation latent-field prior needed to describe the ULDM field across the full PTA-sensitive mass range. We first re-view the background model for the non-ULDM tim-ing residuals in Sec. IV A. We then construct the PTA likelihood for a fixed latent ULDM field realization in Sec. IV B. In Sec. IV C, we specify the augmented latent-field prior that incorporates finite ULDM spatial corre-lations and pulsar-distance uncertainties. We describe the normalizing-flow surrogate for the resulting ampli-tude prior in Sec. IV D. Finally, in Sec. IV E, we summa-rize how the flow prior is used in the Bayesian analysis. We note that, for linearly coupled signals, the Gaus-sian statistics of the ULDM field permit an alternative but mathematically equivalent formulation in which the signal is modeled as a correlated time-domain Gaussian process. In this description, a signal covariance matrix encodes the spatial correlation structure set jointly by the pulsar locations and the ULDM mass, while its over-all normalization is controlled by the ULDM coupling strength. Such an analysis is possible, and we describe it in more detail in App. K. In practice, however, we find that it offers limited advantages over the latent-field for-mulation used in this work. The stochastic formulation requires the same distance-induced nuisance structure, often drives Monte Carlo sampling into numerically ill-conditioned regions of covariance-parameter space, and does not generalize to the nonlinear couplings considered in this work. 9 
+
+> A. Background model
+
+Our background model consists of three components: detector white noise, uncorrelated pulsar red noise, and a Hellings–Downs-correlated red-noise process due to a stochastic gravitational-wave background (SGWB). Our implementation of each component follows standard PTA analysis conventions, so we review their definitions only briefly. For more details, see, e.g., Refs. [27, 41, 42]. The white noise is assumed Gaussian and described by a covariance matrix N. By assumption, the white-noise contributions are uncorrelated between pulsars, endow-ing N with a block-diagonal structure. The white-noise covariance is specified by the standard PTA parameters: EFAC, EQUAD, and ECORR. For each pulsar, we model the white noise independently for each receiver backend with its own set of {EFAC , EQUAD , ECORR } parame-ters. Thus, the white-noise model includes three param-eters per backend per pulsar. The uncorrelated red noise is also taken to be Gaus-sian and statistically independent between pulsars. It is, therefore, described by a block-diagonal covariance matrix ΣRN . At each pulsar, we model the red-noise power spectral density as a power law with amplitude 
+
+ARN and spectral index γRN . Unlike the white noise, the red-noise parameters are shared across receiver backends for a given pulsar. Hence, the number of uncorrelated red-noise parameters in our model is 2 Np. We represent this process using a Fourier basis with the first 30 har-monics, fk = k/T obs for k ∈ { 1, . . . , 30 }, where Tobs is the total observing time. In addition to the uncorrelated processes modeled by 
+
+N and ΣRN , we include a Hellings–Downs correlated red-noise process ΣGW which models a possible SGWB. While the Hellings–Downs correlation couples the process across pulsars, ΣGW is otherwise constructed in analogy to ΣRN . We model the correlated red noise as a power law, and because it is common across pulsars, it is speci-fied by a single amplitude AGW and spectral index γGW .As with the uncorrelated red noise, we represent this pro-cess using 30 Fourier modes with frequencies fk = k/T obs 
+
+for k ∈ { 1, . . . , 30 }.In the interest of compact notational convenience, we denote the total background covariance by 
+
+Σbkg (θbkg ) = N(θWN )+ ΣRN (θRN )+ ΣGW (θGW ), (51) where θbkg is the total background parameter vector con-taining the parameter vectors θWN , θRN , and θGW for the white noise, uncorrelated red noise, and correlated red noise, respectively. The background model parameters and associated priors used in this analysis are summa-rized in Tab. I. We denote the joint prior for the back-ground parameter vector θbkg by πbkg .Additionally, using standard methods implemented in 
+
+enterprise , we analytically marginalize over the timing-model parameters for each pulsar. This procedure mod-ifies the likelihood evaluation but does not affect the ULDM signal parametrization or the latent-prior con-struction [43]. Because timing-model marginalization is standard in PTA analyses, we do not discuss it further.  
+
+> B. PTA likelihood for ULDM signals
+
+We now construct the PTA likelihood, separating the stochastic ULDM field realization from the determinis-tic map that turns it into timing residuals. The field statistics are fixed by the ULDM covariance, while the map depends on the coupling: it is linear in the field for a linear coupling and quadratic for the quadratic and gravitational signals. Conditioned on a realization, the likelihood has the same form in every case, and only this response map differs. Let d denote the timing residuals of the full PTA. For fixed background parameters θbkg , the non-ULDM contribution is a zero-mean Gaussian process with co-variance Σbkg (θbkg ). The approximately monochromatic ULDM realization is described by an amplitude and phase at each site, ˆϕI (t; AI , α I , m ϕ) = AI cos( mϕt − αI ), (52) where AI ≥ 0 and αI ∈ [0 , 2π). We collect the ampli-tudes and phases at Earth and at the pulsars into the vectors 
+
+A = A0 A1 · · · ANp
+
+T ,
+
+α = α0 α1 · · · αNp
+
+T .
+
+(53) Here I = 0 denotes Earth and I = 1 , . . . , N p denote the pulsars. The ULDM contribution to the residuals is the re-sponse map f (A, α; θsig ), with θsig the signal param-eters. For the linear signal, in the fixed coupling-ratio parametrization θfix sig = {Aϕ, m ϕ, w E , w P } (wE and 
+
+wP are fixed once a coupling scenario is chosen), the component-wise residual is 
+
+rfix  
+
+> I
+
+(t) = Aϕ
+
+wE A0 cos( mϕt − α0)+ wP AI cos( mϕt − αI ). (54) In the free coupling-ratio parametrization θfree sig =
+
+{AE , A P , m ϕ}, the component-wise residual is 
+
+rfree  
+
+> I
+
+(t) = AE A0 cos( mϕt − α0)+ AP AI cos( mϕt − αI ). (55) The quadratic and gravitational signals share this struc-ture with the field entering quadratically. In the fixed parametrization the component-wise residual is 
+
+rfix  
+
+> I
+
+(t) = Aϕ
+
+wE A20 cos(2 mϕt − 2α0)+ wP A2 
+
+> I
+
+cos(2 mϕt − 2αI ). (56) 10 
+
+Description Prior Comments Uncorrelated Red Noise 
+
+ARN red noise power-law amplitude log-uniform [ −20 , −11] one parameter per pulsar 
+
+γRN red noise power-law spectral index uniform [0 , 7] one parameter per pulsar 
+
+Hellings–Downs Correlated Noise 
+
+AGW common process strain amplitude log-uniform [ −18 , −11] one parameter for PTA 
+
+γGW common process spectral index uniform [0 , 7] one parameter for PTA 
+
+ULDM Signal [Fixed Coupling Ratio] 
+
+Aϕ overall ULDM signal strength log-uniform, mass-dependent one parameter for PTA 
+
+AI local ULDM field amplitude normalizing flow one parameter for Earth and one per pulsar 
+
+αI local ULDM phase uniform [0 , 2π) one parameter for Earth and one per pulsar 
+
+ULDM Signal [Free Coupling Ratio] 
+
+AE Earth-term signal strength log-uniform, mass-dependent one parameter for PTA 
+
+AP pulsar-term signal strength log-uniform, mass-dependent one parameter for PTA 
+
+AI local ULDM field amplitude normalizing flow one parameter for Earth and one per pulsar 
+
+αI local ULDM phase uniform [0 , 2π) one parameter for Earth and one per pulsar Table I. Model parameters, priors, and comments relevant for the analysis. While always log-uniform, the signal amplitude priors are taken to have mass-dependent bounds; see text for details. 
+
+In the free parametrization it is 
+
+rfree  
+
+> I
+
+(t) = AE A20 cos(2 mϕt − 2α0)+ AP A2 
+
+> I
+
+cos(2 mϕt − 2αI ). (57) The full vector f follows by evaluating the appropriate residual at every observing time and pulsar. The latent variables ( A, α) are the same in all cases; only f changes with the coupling. The data model is therefore 
+
+d = n + f (A, α; θsig ) , n ∼ N (0 , Σbkg (θbkg )) . (58) Conditioned on the latent realization, the likelihood is Gaussian in the shifted residual: 
+
+L(d | θbkg , θsig , A, α) = 1
+
+|2πΣbkg |1/2 exp 
+
+
+
+− 12 (d − f (A, α; θsig )) T Σ−1bkg (d − f (A, α; θsig )) 
+
+
+
+, (59) where we suppress the dependence of Σbkg on θbkg . It remains to specify the prior over the latent realization (A, α), which we turn to next. 
+
+C. Augmented latent-field prior 
+
+The likelihood in Eq. (59) is conditional on the latent ULDM realization, represented by ( A, α). The prior for these variables is fixed by the Gaussian statistics of the field. At fixed pulsar distances, the cosine-sine coeffi-cients in Eq. (48) are jointly Gaussian, with covariance given by Eq. (50). Transforming to the amplitude-phase variables defined in Eqs. (52) and (53) induces the prior 
+
+π(A, α | { xI }, m ϕ). The complication is that the pulsar distances are not known exactly. For a fixed set of distances, the same distances determine both the correlation magnitudes RIJ 
+
+and the effective distance phases ψI . The exact distance-marginalized latent prior is therefore 
+
+πexact (A, α | mϕ) = 
+
+Z Np
+
+Y
+
+> I=1
+
+dxI πI (xI ) π(A, α | { xI }, m ϕ).
+
+(60) This expression is straightforward to define, but difficult to use directly because changing the distances changes both the spatial-correlation envelope and the retarded-time phases. These two distance dependences have very different practical consequences. The correlation magnitudes RIJ 
+
+vary on the coherence length scale ℓ and determine whether the local ULDM amplitudes at two PTA sites are correlated. The phases ψI , by contrast, vary on the much shorter Compton wavelength scale and deter-mine the phase of the oscillating field at the retarded pulsar time. At the lowest mass considered in this 11 work, mϕ = 10 −24 eV, the reduced Compton wavelength 
+
+m−1 
+
+> ϕ
+
+is 6 .4 pc. Existing pulsar-distance uncertainties are typically larger than this scale, so the retarded-time phases are effectively unconstrained even when the same distance measurements still contain useful information about the correlation magnitudes. For larger masses, the phase scale becomes still shorter, while the distance un-certainties can also become comparable to the coherence length, so that the expected correlation magnitudes may vary appreciably across the distance posterior. If one samples directly in the pulsar distances, this creates a multi-scale inference problem. Changing a dis-tance by ∆ xI ∼ 2πm −1 
+
+> ϕ
+
+shifts the pulsar-term phase by ∆ψI ∼ 2π, while often leaving the correlation envelope nearly unchanged. The likelihood can therefore develop many nearly degenerate modes in each distance direction, separated by Compton-scale intervals. At the same time, the sampler must still track coherence-length variations in RIJ whenever the cor-relation envelope changes over the distance posterior. This motivates an augmented latent-field prior that sep-arates the slowly varying correlation magnitudes from the rapidly varying retarded-time phases. This is the same phase-augmentation logic underlying the limit-ing amplitude-phase models used in previous searches; the difference in this work is that we do not collapse the amplitude prior to either the independent-Rayleigh (fully uncorrelated) or common-Rayleigh (fully corre-lated) limit. In the augmented model, we keep the distance depen-dence of the correlation magnitudes but treat the effec-tive pulsar phases as independent nuisance variables. A draw from the augmented latent prior is defined by the following procedure: 1. Draw pulsar distances {xI } from their distance pri-ors πI (xI ). 2. Use these distances to compute the correlation magnitudes RIJ .3. Draw effective pulsar phases ψI independently and uniformly on [0 , 2π) for I ≥ 1, with ψ0 = 0 at Earth. 4. Construct the covariance matrix for the cosine-sine coefficients using Eq. (50). 5. Draw the cosine-sine coefficients from this Gaussian covariance and transform them to ( A, α). This procedure preserves the distance-dependent spatial correlations while avoiding the need to resolve Compton-scale phase windings when exploring pulsar distances. The phase augmentation has an important simplifying consequence. After marginalizing over the independent nuisance phases {ψI }, the physical phases {αI } are uni-formly distributed on [0 , 2π) and are independent of the amplitudes. As shown in Appendix G, the augmented latent prior factorizes as 
+
+π(A, α | mϕ) = π(A | mϕ)
+
+> Np
+
+Y
+
+> I=0
+
+12π . (61) All nontrivial information about ULDM spatial coher-ence is, therefore, contained in the joint amplitude prior 
+
+π(A | mϕ). The same prior applies to the quadratic and gravita-tional signals. Their residuals carry the phase through 2αI ; see Eqs. (56) and (57). Because each αI is uniform on [0 , 2π), so is 2 αI , and relabeling 2 αI → αI leaves the phase prior unchanged. The same invariance implies that the analysis depends on the coupling weights only through their magnitudes |wE | and |wP |: a sign flip of 
+
+wE or wP amounts to a constant shift of the correspond-ing phase α0 or αI by π/ 2, which the uniform prior ab-sorbs. In particular, the equal-weight case wE = wP = 1 and the gravitational case wE = −wP = 1 yield identi-cal latent-marginalized likelihoods. The latent-amplitude prior π(A | mϕ) is thus identical for the linear and quadratic signals, and only the deterministic response map differs. The likelihood marginalized over the latent ULDM re-alization is formally 
+
+Lmarg (d | θbkg , θsig ) = 
+
+Z
+
+dA dα L(d | θbkg , θsig , A, α)
+
+× π(A, α | mϕ).
+
+(62) This expression is useful conceptually, but we do not eval-uate the latent integral explicitly. Instead, we sample the latent amplitudes and phases together with the signal and background parameters. For each run, we fix mϕ and choose either the fixed or free coupling-ratio parametriza-tion. The sampled posterior is proportional to 
+
+p(θamp , θbkg , A, α | d, m ϕ) ∝ L (d | θbkg , θsig , A, α)
+
+× π(A | mϕ)
+
+> Np
+
+Y
+
+> I=0
+
+12π π(θamp ) πbkg (θbkg ).
+
+(63) Here 
+
+θamp =
+
+(
+
+{Aϕ}, fixed coupling ratio ,
+
+{AE , A P }, free coupling ratio , (64) with mϕ fixed in each run. In the fixed coupling-ratio case, wE and wP are also fixed by the chosen coupling scenario; therefore, the posterior in Eq. (63) depends on the signal parameters θsig only through the sampled am-plitudes θamp .Thus, the analysis is deterministic at fixed latent field realization, while the stochastic ULDM field statistics en-ter through the finite-correlation prior over the latent amplitudes and phases. The remaining technical task is to represent the correlated amplitude prior π(A | mϕ)accurately enough for Bayesian inference. 12  
+
+> D. Normalizing flow surrogates for latent field amplitudes
+
+The augmented latent-field prior reduces the nontrivial part of the latent distribution to the joint amplitude prior 
+
+π(A | mϕ). We approximate this distribution with a nor-malizing flow trained separately at each ULDM mass. A normalizing flow is a machine-learning model that rep-resents a complicated probability distribution as an in-vertible, differentiable transformation of a simple base distribution (here a multivariate Gaussian). Because the transformation is invertible and has a tractable Jacobian, a trained flow can both generate samples and return the exact probability density at any point in the phase space; “training” the flow means tuning the parameters of this transformation so that its density matches a target dis-tribution, given a set of samples drawn from that target. We refer to the trained flow as a “surrogate” because it serves as a fast, reusable stand-in for a distribution that would otherwise be expensive to evaluate. Normalizing flows have previously been applied to PTA analyses to accelerate posterior inference for the SGWB [44]; here we instead use a flow to represent the latent ULDM am-plitude prior π(A | mϕ). The training data are gener-ated by repeatedly drawing latent-field realizations from the augmented prior described in Sec. IV C and retaining only the amplitudes A. Figure 3 illustrates the perfor-mance of the flow surrogate relative to the augmented generative model used to produce the training data. We show results at two representative masses, one in the highly correlated regime and one in the nearly uncor-related regime. In both cases, the flow accurately repro-duces the one-dimensional Rayleigh marginals and the leading correlations among the amplitudes. In principle, one could model π(A | mϕ) with a sin-gle flow conditioned on mϕ. In practice, we find that this performs poorly. Changing mϕ changes the ULDM coherence length and therefore changes the structure of the correlation-envelope matrix RIJ . The target distri-bution must then interpolate between qualitatively dif-ferent regimes, including nearly low-rank behavior in the highly correlated limit and nearly independent Rayleigh amplitudes in the uncorrelated limit. We therefore train a separate flow for each mass value used in the analysis. This mass-by-mass strategy is more stable and gives better likelihood fidelity in our tests. Our flow mod-els are implemented as neural spline flows [45] using the 
+
+zuko package [46]. A neural spline flow is a particu-lar normalizing-flow architecture in which the invertible transformation is built from monotonic spline functions whose shapes are set by the outputs of a neural net-work. The splines make the map flexible enough to cap-ture the correlated, non-Gaussian amplitude distribution while remaining easy to invert. We denote the result-ing surrogate by πflow (A | mϕ) and use it in place of 
+
+π(A | mϕ) in the sampled posterior. Appendix H gives additional details on the training set generation, model architecture, and validation tests.  
+
+> E. Bayesian analysis with the flow prior
+
+The finite-correlation deterministic analysis used in our inference is obtained by replacing the amplitude prior in Eq. (63) with the trained surrogate πflow (A | mϕ). For each analysis run, we fix the ULDM mass mϕ and choose either the fixed or free coupling-ratio parametrization. In the fixed coupling-ratio case, we also fix wE and wP and sample the overall amplitude Aϕ. In the free coupling-ratio case, we instead sample the two residual-level am-plitudes AE and AP . In both cases, we sample the latent field realization and the background parameters θbkg us-ing the likelihood in Eq. (59). Marginalizing over the sampled nuisance and latent parameters gives the poste-rior for the relevant signal-amplitude parameters at fixed 
+
+mϕ, from which we infer upper limits or characterize sig-nal detections. In practice, we do not sample the physical amplitudes 
+
+A directly. Instead, we sample in the base space of the normalizing flow and use the flow as a forward transfor-mation into amplitude space. Writing the base variables as z, we take 
+
+A = Tflow (z; mϕ), (65) where Tflow is the trained flow map at fixed ULDM mass. We find this parametrization more stable than sampling directly in amplitude space and evaluating the flow den-sity πflow (A | mϕ). The remaining latent variables are the phases α, which are sampled with their periodic do-mains specified explicitly. The normalizing flow is not required in principle. One could instead sample the pulsar distances {xI } and ef-fective phases {ψI } explicitly, construct the conditional Gaussian prior for the cosine-sine coefficients at each point in the chain, and marginalize over these additional nuisance parameters directly. The flow performs this marginalization up front: the distance and phase nui-sance variables are integrated out during training, leav-ing a reusable prior for the latent amplitudes. This reduces the dimensionality of the Bayesian analysis by 2Np nuisance parameters while preserving the distance-dependent amplitude correlations relevant for the ULDM signal. Finally, this construction connects smoothly to the lim-iting amplitude priors commonly used in previous ULDM searches. As shown in Appendix G, the augmented prior reduces to independent Rayleigh amplitudes in the fully uncorrelated limit ℓ → 0, and to a single shared Rayleigh amplitude in the fully correlated limit ℓ → ∞ . The present analysis therefore keeps the familiar augmented amplitude-phase parametrization while extending it to the intermediate regime, where finite ULDM spatial cor-relations produce a nontrivial joint amplitude prior. 13 A0 = 0 .83 +0 .52      
+
+> −0.41
+> Generative Flow Expected
+> 0.61.21.82.43.0
+> A1
+> A1= 0 .83 +0 .53
+> −0.41
+> 0.61.21.82.43.0
+> A0
+> 0.61.21.82.43.0
+> A2
+> 0.61.21.82.43.0
+> A1
+> 0.61.21.82.43.0
+> A2
+> A2= 0 .83 +0 .52
+> −0.41 A0= 0 .83 +0 .53
+> −0.42
+> Generative Flow Expected
+> 0.61.21.82.43.0
+> A1
+> A1= 0 .83 +0 .53
+> −0.42
+> 0.61.21.82.43.0
+> A0
+> 0.61.21.82.43.0
+> A2
+> 0.61.21.82.43.0
+> A1
+> 0.61.21.82.43.0
+> A2
+> A2= 0 .84 +0 .52
+> −0.41
+
+Figure 3. Validation of the normalizing-flow surrogate for the amplitude prior. We compare samples from the augmented generative model used for training with samples drawn from the trained flow, showing the first three amplitudes in the latent vector A. Left panel : Results for mϕ = 10 −24 eV, where the coherence length is large compared to the inter-pulsar separations and the amplitudes are visibly correlated. Right panel : Results for mϕ = 10 −20 eV, where the coherence length is shorter and the amplitude correlations are suppressed. In each panel, blue contours show 10 , 000 samples from the augmented generative model, green contours show 10 , 000 samples from the normalizing flow, and black curves show the Rayleigh distribution expected for the one-dimensional amplitude marginals. The agreement demonstrates that the flow captures both the fixed Rayleigh marginals and the mass-dependent amplitude correlations. 
+
+V. PROJECTED SENSITIVITIES AND MOCK ANALYSES 
+
+In this section, we apply the finite-correlation deter-ministic analysis developed in Sec. IV to synthetic PTA datasets. These mock analyses serve two purposes. First, they validate the latent-prior construction in controlled settings where the injected ULDM signal, if present, is known. Second, they illustrate the projected sensitivity of PTA data analyses that retain finite ULDM spatial correlations rather than imposing the fully correlated or fully uncorrelated limits. We first summarize the mock data generation proce-dure in Sec. V A. We describe our Bayesian inference procedure in Sec. V B. The mock-data studies then pro-ceed in three stages. First, in Sec. V C, we analyze null datasets to characterize the expected sensitivity of the finite-correlation analysis in the absence of an injected ULDM signal. Second, in Sec. V D, we analyze un-blinded signal injections to test signal recovery when the injected mass and coupling structure are known. These first two studies use the fixed coupling-ratio parametriza-tion, which allows us to examine representative limiting response scenarios with specified Earth-term and pulsar-term weights. Finally, in Sec. V E, we consider blinded injection tests in which the signal masses are not spec-ified in advance. For these blinded tests, we use the free coupling-ratio parametrization, allowing the Earth-term and pulsar-term amplitudes to vary independently, as would be appropriate in a search where the relative response of a possible signal is not known a priori . To-gether, these tests demonstrate both the fidelity of the latent-prior construction and the practical power of the full analysis pipeline across null, unblinded, and blinded analysis settings. Within each study we treat the linearly coupled signal first and then the quadratically coupled and gravitational signals, which share the same pipeline with only the response map squared. 
+
+A. Mock data generation 
+
+The mock data are based on pulsars from the NANOGrav 15-year dataset [47]. To create a more man-ageable dataset, we chose the 30 best-timed pulsars. For our purposes, the ability to detect a sinusoidal signal with frequency f > 1/T obs in the timing residuals scales with the root-mean-square noise, σrms , and the inverse root of the effective number of independent samples, 
+
+N = 1 /(∆ f ∆t) = Tobs /∆t, where ∆ f = 1 /T obs is the frequency resolution, ∆ t is the cadence, which is roughly a few weeks for each pulsar, and Tobs is the length of 14 time the pulsar has been observed. Given this scaling, and the fact that the cadence is similar for all pulsars, we keep the 30 pulsars with the lowest σrms /√Tobs and 
+
+Tobs ≥ 6.5 years. We generate the mock data using a modified version of the Python package PTA Replicator to implement the timing residual given in Eq. (20). 3 The spatial correla-tion, given in Eq. (40), requires estimates of the distances between Earth and the pulsars. We use a combination of distance estimates from parallax and dispersion measure, as recorded in Table II. The times of arrival and deterministic parameters for each of these pulsars are then used to generate a mock dataset. The intrinsic white- and red-noise parameters correspond to maximum-likelihood values taken from in-dividual pulsar analyses. In addition, each mock dataset includes an SGWB with AGW = 6 .4 × 10 −15 and γGW =3.2. These values correspond to the posterior means for these parameters when an isotropic SGWB is fit to the NANOGrav 15-year data [48].  
+
+> B. Bayesian sampling and limit-setting
+
+In standard PTA analyses, the EFAC, EQUAD, and ECORR parameters are inferred in single-pulsar analy-ses before performing a full-array analysis. We emulate this procedure for our mock datasets. For each pulsar, we first infer the white-noise parameters independently, and then fix those values in the multi-pulsar ULDM analyses described below. This allows the full-array analyses to fo-cus on the red-noise, correlated-background, and ULDM signal parameters. For the fixed coupling-ratio analyses, each coupling scenario fixes wE and wP . We then perform Bayesian inference on a grid of fixed ULDM masses mϕ, obtain-ing the marginal posterior for the overall signal am-plitude Aϕ at each mass. This is the parametrization used for the null analyses and unblinded signal-injection tests. For the blinded injection tests, we instead use the free coupling-ratio parametrization, sampling AE and AP
+
+at fixed mϕ. In either parametrization, the latent-field prior πflow (A | mϕ) is the same; only the deterministic response map from the latent field to timing residuals changes. This mass-by-mass strategy differs from previous PTA analyses, which have typically sampled jointly in ampli-tude and mass for a fixed coupling scenario and then ex-tracted amplitude posteriors conditioned on mϕ. As dis-cussed in Appendix F, obtaining a converged joint anal-ysis over both amplitude and mass is computationally expensive, especially when the likelihood contains many     
+
+> 3This package can be found at https://github.com/bencebecsy/ pta_replicator.git . We also use the deterministic timing pack-age PINT , which can be found at https://github.com/nanograv/ PINT.git .
+
+latent field parameters. Working at fixed mass therefore provides a more controlled and computationally efficient way to obtain limits as a function of mϕ. The full set of nuisance and signal parameters used in the analysis is summarized in Table I. Unless otherwise stated, the bounds reported in this paper correspond to 95% up-per credible limits on the relevant marginalized signal-amplitude posterior at fixed mϕ. For fixed coupling-ratio analyses, this is the posterior for Aϕ; for free coupling-ratio analyses, we report limits in the two-dimensional (AE , A P ) amplitude space, or on one of these amplitudes after marginalizing over the other. This follows the limit-setting convention used in previous PTA searches for lin-early coupled ULDM [26, 27]. For the signal-amplitude parameters, we use log-uniform priors with mass-dependent bounds. Denoting by A any of the residual-level amplitudes Aϕ, AE , or AP ,we take 
+
+Amax (mϕ) = 
+
+
+
+10 −5 + 10 −1  mϕ
+
+10 −24 eV 
+
+−3
+
+s,Amin (mϕ) = 10 −5 Amax (mϕ).
+
+(66) For the free coupling-ratio parametrization, the same mass-dependent prior is applied independently to AE and 
+
+AP . These bounds were chosen to span the range from undetectable to detectable signals at each mass in the mock datasets considered here, while avoiding an unnec-essarily large amplitude range with substantial unused prior volume. The resulting prior is sufficient for the limit-setting procedure used in this work, but it should not be interpreted as a universal prescription: analy-ses with different datasets, noise levels, observing base-lines, or signal parametrizations may require different amplitude-prior bounds. We perform the Bayesian sampling with pocomc [49]. This sampler is well suited to the present analysis because our latent-field formulation introduces one phase latent and one amplitude latent for Earth and for each pul-sar, increasing the dimensionality relative to typical PTA analyses. The pocomc algorithm evolves an ensemble of particles using t-preconditioned Crank–Nicolson propos-als together with a finite-temperature ladder, allowing it to explore broad and correlated posterior structure. Its ensemble-based structure is also naturally paralleliz-able, making it advantageous compared to the standard 
+
+PTMCMC workflow for the higher-dimensional analyses con-sidered here.  
+
+> C. Null data tests
+
+We first apply the analysis to synthetic datasets with no injected ULDM signal. The data are generated follow-ing the procedure described in Sec. V A, including white noise, pulsar-intrinsic red noise, and a Hellings–Downs-correlated SGWB, but with Aϕ = 0. These null tests quantify the expected sensitivity of the analysis: at each 15 −10                          
+
+> −8
+> −6
+> −4
+> −2
+> log 10  Aφ
+> wE= 0 , w P= 1
+> Linear Coupling
+> wE= 1 , w P= 1
+> 10 −24 10 −23 10 −22 10 −21 10 −20
+> mφ[eV]
+> Finite correlation Fully correlated Fully uncorrelated
+> wE= 1 , w P= 0
+> 10 −24 10 −23 10 −22 10 −21 10 −20
+> mφ[eV]
+> −0.25 0.00 0.25
+> ∆ log 10  Aφ
+> 10 −24 10 −23 10 −22 10 −21 10 −20
+> mφ[eV]
+> Fully correlated −Finite Fully uncorrelated −Finite
+
+Figure 4. Projected sensitivity to linearly coupled ULDM in a synthetic null dataset with no injected ULDM signal. The curves show the 95% upper credible limit on the fixed-ratio signal amplitude Aϕ as a function of the ULDM mass mϕ. The three columns correspond to representative fixed coupling-ratio scenarios: pulsar-term only, wE = 0 , w P = 1; equal Earth and pulsar response, wE = 1 , w P = 1; and Earth-term only, wE = 1 , w P = 0. The gray band shows the support of the mass-dependent prior on Aϕ used in this analysis, while the dotted gray curve shows the corresponding prior-only 95th percentile. The posterior upper limits lie within the prior support but remain distinct from the prior-only percentile, indicating that the projected limits are not dominated by the prior cutoff. In the first two columns, we compare the finite-correlation analysis developed in this work with the two limiting amplitude priors commonly used in previous searches: the fully correlated and fully uncorrelated limits. These limiting analyses are recovered only in their appropriate asymptotic regimes; away from those regimes, they impose an incorrect prior on the latent ULDM field amplitudes. The lower panels show the difference between each limiting analysis and the finite-correlation result. At masses above 10 −23 eV, the fully correlated prior gives inferred upper limits that are systematically shifted relative to the finite-correlation result by up to about a factor of 2. Likewise, at masses below 10 −23 eV, the fully uncorrelated prior gives inferred upper limits that are shifted by up to about a factor of 2. For the Earth-term-only case, the signal depends only on the ULDM field at Earth, so the pulsar spatial-correlation structure does not enter; we include it for completeness. 
+
+fixed ULDM mass, we use the marginalized posterior for 
+
+Aϕ to derive a 95% upper credible limit. Because these limits are derived from a single background-only realiza-tion, they are subject to stochastic fluctuations associ-ated with the particular background realization. We do not quantify this realization-to-realization scatter here, since repeating the full analysis over many independent mock datasets and across the full mass range would be computationally prohibitive. The resulting curves should therefore be interpreted as representative expected sen-sitivities rather than ensemble-averaged limits. For each coupling scenario, we analyze 81 masses ge-ometrically spaced between 10 −24 eV and 10 −20 eV. As discussed in Appendix F, this spacing is not sufficient to resolve every possible narrow feature in the mass-dependent likelihood. Our goal in this section is in-stead to characterize the broad expected sensitivity of the analysis across the PTA-accessible ULDM mass range and to compare the finite-correlation treatment with the limiting-case approximations used in previous studies. A higher-resolution mass scan is deferred to the blinded-injection analysis in Sec. V E, where resolving the signal mass is essential. For each mass in the analysis grid, we sample the full posterior described in Sec. V B. The sampled parameters include the ULDM signal amplitude, the latent field am-plitudes and phases, the SGWB amplitude and spectral index, and the pulsar-intrinsic red-noise parameters. The reported limits are obtained from the marginalized poste-rior for Aϕ after marginalizing over all other parameters included in the analysis. We first present our results for a search for linearly cou-pled ULDM in our null dataset in Fig. 4, which should be interpreted as a test of the latent-field prior, rather than as a comparison of conservative and aggressive sen-sitivity estimates. At low masses, the ULDM coherence length is large compared to the relevant PTA baselines, and the finite-correlation analysis reduces to the fully cor-related limit. At high masses, the pulsar terms decohere, and the same analysis reduces to the fully uncorrelated limit for the pulsar contribution. The important regime is the transition between these limits, which lies within the PTA-sensitive mass range. There, the limiting anal-yses impose the wrong amplitude prior, and the resulting upper limits on Aϕ can shift by O(0 .1–0 .3) dex relative to the finite-correlation result. This shift is therefore a prior-induced bias from applying an asymptotic model outside its regime of validity, not a property of the data 16 themselves. The Earth-term-only case is included as a useful cross-check: because it depends only on the field at Earth, it is insensitive to the pulsar spatial-correlation structure. Figure 4 also includes two prior diagnostics: the gray band shows the support of the mass-dependent prior on 
+
+Aϕ, and the dotted gray curve shows the 95th percentile of that prior at each mass. These diagnostics help as-sess whether the reported upper limits are controlled by the likelihood or by the imposed prior range. At low masses, the prior upper bound scales approximately as 
+
+Amax ∝ m−3 
+
+> ϕ
+
+, matching the empirical mass dependence of the expected upper limits found in preliminary null runs. This scaling keeps the prior broad enough to con-tain the relevant posterior support across the mass range shown, without introducing a much larger unused ampli-tude range at low masses. The separation between the posterior upper-limit curves and the prior-only 95th per-centile provides a direct visual check that the reported sensitivities are not simply set by the imposed prior cut-off. We then repeat the null analysis for the quadratically coupled signals, which contain the gravitational signal as a special case. The pipeline is unchanged from the linear case, using the same mock datasets, sampler, and latent-amplitude prior πflow (A | mϕ), with only the linear response map replaced by its quadratic counterpart, see Eq. (29); because the squared field oscillates at 2 mϕ, a trial mass is probed through the Fourier content at twice the linear frequency. Figure 5 shows the projected 95% upper credible limit on the quadratic signal amplitude as a function of mass, comparing the finite-correlation anal-ysis with the fully correlated and fully uncorrelated limits as in Fig. 4. Here, we find that mismodeling the correla-tion structure through the limiting cases has a consider-ably larger impact on the inferred sensitivities, shifting the resulting upper limits on Aϕ by up to nearly 1 .0 dex. Notably, even at the lowest mass of mϕ = 10 −24 eV con-sidered in this work, where the fully correlated approxi-mation might be expected to perform accurately, we find a O(0 .2 dex) discrepancy with an analysis that treats the finite correlation structure in detail. It is straightforward to relate the projected sensitivities of Figs. 4 and 5 following Sec. II D. As a specific exam-ple, Fig. 6 translates the wE = wP = 1 null analysis into constraints on the local DM abundance. An inap-propriate assumption of the uncorrelated limit at lower masses results in projected sensitivity to sub-unity frac-tional abundance. By contrast, correctly accounting for the ULDM correlations weakens the projected sensitivi-ties to ρϕ ≈ 1 GeV /cm 3, a few times the local density.  
+
+> D. Unblinded injection tests
+
+We next test the analysis on mock datasets contain-ing injected ULDM signals with known parameters. As in Sec. V C, we generate synthetic background data fol-lowing the procedure of Sec. V A, but now add a ULDM signal with a priori known mass and amplitude Aϕ. We consider three injected masses: mϕ = 2 .2 × 10 −22 eV, 2.2 × 10 −23 eV, and 2 .2 × 10 −24 eV. Because the ULDM coherence length scales as ℓ ∝ m−1 
+
+> ϕ
+
+, these masses span the nearly uncorrelated, partially correlated, and highly correlated regimes, respectively. For the linearly cou-pled injections we focus on the pulsar-term scenario, 
+
+wE = 0 and wP = 1, because this is the case in which finite pulsar-to-pulsar correlations play the most impor-tant role. This provides a stringent stress test of the correlated-signal analysis. These unblinded tests are designed to verify that the full inference pipeline can recover a signal realization gen-erated from the physical finite-correlation ULDM model, even though the analysis is performed using the aug-mented latent-field model introduced in Sec. IV C. They therefore provide a nontrivial validation of the augmenta-tion procedure. We choose injected amplitudes Aϕ that are factors of a few larger than the 95% upper credible limits obtained from the null analysis in Sec. V C, en-suring that the signals are detectable while remaining in the weak-signal regime. We therefore perform signal in-jections for three mass-coupling scenarios for both linear and quadratic signals: 1. mϕ = 2 .2 × 10 −24 , Aϕ = 4 × 10 −4
+
+2. mϕ = 2 .2 × 10 −23 , Aϕ = 4 × 10 −7
+
+3. mϕ = 2 .2 × 10 −22 , Aϕ = 7 × 10 −8
+
+For linear coupling injections, we use wE = 0 and wP =1, corresponding to the scenario to which we expect the greatest sensitivity to the ULDM correlation structure. By contrast, for the quadratic coupling injections, we use 
+
+wE = wP = 1, which by the weight-sign independence noted in Sec. IV C is equivalent to the gravitational case 
+
+wE = −wP = 1, the physically motivated scenario of gravitational fluctuations associated with oscillations in the ULDM field. For each injected dataset and coupling scenario, we perform a fixed-mass Bayesian analysis as described in Sec. V B, with mϕ set equal to the injected value. The results of the linear coupling analysis for the mϕ = 2 .2 ×
+
+10 −24 eV scenario are summarized in Fig. 7, which shows the resulting marginalized posteriors for the three param-eters of interest, γGW , log 10 AGW , and log 10 Aϕ. Results for the unblinded linear analyses at mϕ = 2 .2 × 10 −23 eV and mϕ = 2 .2 × 10 −22 eV are presented in Fig. 11 in App. I. Likewise, the results of the quadratic coupling analysis for the mϕ = 2 .2 × 10 −24 eV scenario are shown in Fig. 8, with the additional cases presented in Fig. 12. The posterior structure changes qualitatively across the three masses. At high mass, the ULDM oscillation frequency lies above the red-noise-dominated band, so log 10 Aϕ is nearly nondegenerate with the SGWB param-eters. At lower masses, the ULDM signal overlaps more strongly with the SGWB-supported part of the spectrum, 17 −10         
+
+> −8
+> −6
+> −4
+> −2
+> log 10  Aφ
+> wE= 0 , w P= 1
+> Quadratic Coupling
+> wE= 1 , w P= 1
+> 10 −24 10 −23 10 −22 10 −21 10 −20
+
+mφ [eV]       
+
+> Finite correlation Fully correlated Fully uncorrelated
+> wE= 1 , w P= 0
+> 10 −24 10 −23 10 −22 10 −21 10 −20
+
+mφ [eV]     
+
+> −0.50.00.5
+> ∆ log 10  Aφ
+> 10 −24 10 −23 10 −22 10 −21 10 −20
+
+mφ [eV]     
+
+> Fully correlated −Finite Fully uncorrelated −Finite
+
+Figure 5. As in Fig. 4, but for the quadratically coupled ULDM signal. The quadratic signal analysis exhibits greater dependence on the ULDM correlation, leading to differences between the limiting-case analyses and the new finite-correlation analysis approaching an order of magnitude. −20246810      
+
+> log 10  ρφ
+> Finite correlation Fully correlated Fully uncorrelated
+> ρφ= 0 .4 GeV /cm 3
+> 10 −24 10 −23 10 −22 10 −21 10 −20
+
+mφ [eV]     
+
+> −0.50.00.5
+> ∆ log 10  ρφ
+> Fully correlated −Finite Fully uncorrelated −Finite
+
+Figure 6. Results of the wE = wP = 1 null analysis translated into upper limits on the local dark matter density ρϕ. See text for details. 
+
+allowing some power to be traded between the monochro-matic ULDM signal and the broadband red-noise model. Additionally, at the lowest masses, timing-model subtrac-tion removes large parts of the signal, hindering the sen-sitivity even in the white noise limit [26]. Nonetheless, across all three regimes, the injected values lie within the posterior support, demonstrating successful recovery of both the ULDM amplitude and the SGWB parameters in the full analysis. 
+
+E. Blinded injection tests 
+
+As a final validation of the analysis pipeline, we per-form blinded injection tests in which the signal masses are not known to the analyzer. We consider three sim-ulated datasets, each containing an injected ULDM sig-nal in the range 10 −24 eV to 10 −22 eV. We restrict the blinded scan to mϕ ≤ 10 −22 eV because larger masses are already deep in the uncorrelated regime for the PTA considered here. Extending the scan to 10 −20 eV would increase the computational cost by approximately an ad-ditional factor of 100 without testing a qualitatively new correlation regime. As in the unblinded tests, the in-jected amplitudes are chosen so that the signals are de-tectable with high significance while remaining outside the strong-signal regime. The blinded setup is designed to test the full end-to-end inference procedure. One author generated the six simulated datasets (three linear coupling scenarios and three quadratic coupling scenarios), while another au-thor performed the analysis without access to the injected masses or amplitudes. The analyzer was told whether the signal was linear or quadratic, but did not know which dataset corresponded to the low-, intermediate-, or high-mass injection. This procedure tests not only whether the analysis can recover a signal at a known mass, but whether the mass-grid analysis can identify the correct signal frequency without using injection information. For each dataset, we analyze an adaptive mass grid spanning 10 −24 eV ≤ mϕ ≤ 10 −22 eV. The grid is con-structed recursively from mϕ, 0 = 10 −24 eV, with each 18 γGW = 4.24 +0 .99                   
+
+> −0.85
+> −15 .6
+> −15 .2
+> −14 .8
+> −14 .4
+> −14 .0
+> log 10  AGW
+> log 10 AGW =−14 .49 +0 .32
+> −0.40
+> 3456
+> γGW
+> −4.2
+> −3.9
+> −3.6
+> −3.3
+> −3.0
+> log 10  Aφ
+> −15 .6
+> −15 .2
+> −14 .8
+> −14 .4
+> −14 .0
+> log 10 AGW
+> −4.2
+> −3.9
+> −3.6
+> −3.3
+> −3.0
+> log 10 Aφ
+> log 10 Aφ=−3.71 +0 .35
+> −0.29
+> Linear Coupling, mφ= 2 .2×10 −24 eV
+> wE= 0 , w P= 1 , A φ= 4 ×10 −4
+
+Figure 7. Representative posterior distributions for an un-blinded ULDM analysis at fixed mass mϕ = 2 .2 × 10 −24 eV. The corner plot shows the marginalized posterior over γGW ,log 10 AGW , and log 10 Aϕ, after marginalizing over the full pa-rameter set included in the analysis. The ULDM mass, mϕ,the coupling weights wE and wP , and the Aϕ used to generate the dataset are indicated in the inset text. Dashed vertical lines mark the 5th, 50th, and 95th percentiles of the one-dimensional marginals, while black contours enclose 68% and 95% posterior probability in the two-dimensional marginals. Orange lines indicate the injected parameter values used to generate the data. For this representative case, the true val-ues of the injected ULDM signal amplitude and SGWB am-plitude lie within their central 90% credible intervals, while the SGWB index lies slightly outside its central 90% credible interval. 
+
+new point chosen as 
+
+mϕ,i +1 = min 
+
+h
+
+mϕ,i + 4 × 10 −24 eV , 10 1/20 mϕ,i 
+
+i
+
+, (67) and with the final point clipped to the upper boundary of the search range. Thus neighboring grid points differ by no more than 4 × 10 −24 eV in absolute mass and have at least 20 grid points per decade in relative spacing. This adaptive construction satisfies the mass-resolution criterion discussed in Appendix F, while also maintaining good resolution across the low-mass interval 10 −24 eV ≲
+
+mϕ ≲ 10 −22 eV, where the spatial correlation structure changes appreciably. At each mass in the grid, we perform the fixed-mass Bayesian analysis described in Sec. V B, using the free coupling-ratio parametrization. The resulting posterior in the ( AE , A P ) plane indicates whether the data prefer a nonzero Earth-term or pulsar-term ULDM contribution at that trial mass. However, a nonzero amplitude poste-rior at a given mass is not by itself sufficient to identify γGW = 2.89 +0 .54                    
+
+> −0.45
+> −14 .75
+> −14 .50
+> −14 .25
+> −14 .00
+> log 10  AGW
+> log 10 AGW =−14 .04 +0 .13
+> −0.17
+> 2.43.24.04.8
+> γGW
+> −4.4
+> −4.0
+> −3.6
+> −3.2
+> −2.8
+> log 10  Aφ
+> −14 .75
+> −14 .50
+> −14 .25
+> −14 .00
+> log 10 AGW
+> −4.4
+> −4.0
+> −3.6
+> −3.2
+> −2.8
+> log 10 Aφ
+> log 10 Aφ=−3.47 +0 .32
+> −0.36
+> Quadratic Coupling, mφ= 2 .2×10 −24 eV
+> wE=wP= 1 , A φ= 4 .0×10 −4
+
+Figure 8. As in Fig. 7, but for a quadratic signal injected at an identical mass and Aϕ but with wE = wP = 1, corresponding to the equal-ratio coupling scenario of the gravitational fluc-tuations associated with ULDM. All of the ULDM and GW parameters have inferred 90% credible intervals which contain the true parameter values. 
+
+the injected signal mass. Because the PTA sampling is ir-regular and the timing uncertainties are heteroskedastic, power from a monochromatic signal can leak into neigh-boring or alias-like frequencies. As a result, fixed-mass analyses at masses different from the true injected value can sometimes show an apparent preference for a nonzero ULDM contribution. For this reason, the blinded analysis uses both the marginalized amplitude posterior at each fixed mass and the Bayesian evidence associated with that mass. Denot-ing the sampled non-mass parameters at fixed mass by 
+
+Θ, the evidence is 
+
+Z(mϕ) = 
+
+Z
+
+dΘ L(d | Θ, m ϕ) π(Θ | mϕ). (68) The evidence is estimated directly by pocomc during its standard sampling procedure, providing the normaliza-tion information needed to compare different fixed-mass analyses without requiring a separate evidence calcula-tion. For a discrete mass grid with prior weights π(mi), the posterior probability assigned to each trial mass is then 
+
+p(mi | d) = Z(mi) π(mi)
+
+P 
+
+> j
+
+Z(mj ) π(mj ) . (69) Thus, while the fixed-mass posterior in ( AE , A P ) diag-noses whether a signal-like component is preferred at a particular frequency, the evidence determines which mass 19 log 10 mφ = −23 .14 +0 .06                     
+
+> −0.08
+> −7.5
+> −6.0
+> −4.5
+> log 10  AE
+> log 10 AE=−5.49 +0 .52
+> −2.42
+> −23 .4
+> −23 .2
+> −23 .0
+> −22 .8
+> −22 .6
+> log 10 mφ
+> −5.6
+> −5.2
+> −4.8
+> −4.4
+> −4.0
+> log 10  AP
+> −7.5
+> −6.0
+> −4.5
+> log 10 AE
+> −5.6
+> −5.2
+> −4.8
+> −4.4
+> −4.0
+> log 10 AP
+> log 10 AP=−4.94 +0 .28
+> −0.27
+> Linear Coupling, Blinded Analysis
+> mφ= 7 .55 ×10 −24 eV log 10 AE=−5.01 ,log 10 AP=−4.82
+
+Figure 9. Evidence-weighted posterior from the blinded mass scan for one signal-injection test using the free coupling-ratio parametrization. The posterior is shown in terms of the scanned ULDM mass mϕ, the Earth-term amplitude AE ,and the pulsar-term amplitude AP . Fixed-mass posteriors are combined using their Bayesian evidences together with the log-uniform mass prior over the scanned range. Black contours enclose the 68% and 95% credible regions, while the one-dimensional panels show the marginalized posteriors with dashed lines indicating the 5th, 50th, and 95th percentiles. Orange lines and markers indicate the injected parameter val-ues. The true values of the ULDM mass, mϕ, and the signal amplitudes AE and AP used to generate the dataset are indi-cated in the inset text. The recovery of the injected mass and amplitudes within the posterior support demonstrates that the mass scan correctly identifies the blinded ULDM signal. 
+
+provides the best global explanation of the data after ac-counting for the full parameter volume. This distinction is essential in the blinded tests, where spectral leakage can produce secondary peaks in the fixed-mass ampli-tude posteriors away from the true injected mass. As a representative example, Fig. 9 shows the evidence-weighted posterior obtained from one of the blinded mass scans. In these blinded tests, the injected ULDM mass is not supplied to the analysis. We therefore analyze each mass in the grid independently using the free coupling-ratio parametrization and then combine the fixed-mass results using the evidence weights in Eq. (69). This pro-duces a joint posterior over the scanned mass and the two signal-amplitude parameters, AE and AP .In the example shown in Fig. 9, the posterior local-izes around the injected mass, and the injected values of 
+
+mϕ, AE , and AP all lie within their corresponding one-dimensional 90% credible intervals. As seen in the null analyses, the sensitivity to the Earth-term amplitude is log 10 mφ = −22 .60 +0 .02                     
+
+> −0.02
+> −7.0
+> −6.5
+> −6.0
+> −5.5
+> −5.0
+> log 10  AE
+> log 10 AE=−6.13 +0 .59
+> −0.44
+> −22 .7
+> −22 .6
+> −22 .5
+> −22 .4
+> log 10 mφ
+> −7.0
+> −6.5
+> −6.0
+> −5.5
+> −5.0
+> log 10  AP
+> −7.0
+> −6.5
+> −6.0
+> −5.5
+> −5.0
+> log 10 AE
+> −7.0
+> −6.5
+> −6.0
+> −5.5
+> −5.0
+> log 10 AP
+> log 10 AP=−6.62 +0 .20
+> −0.20
+> Quadratic Coupling, Blinded Analysis
+> mφ= 2 .50 ×10 −23 eV log 10 AE=−6.46 ,log 10 AP=−6.46
+
+Figure 10. Evidence-weighted posterior from the blinded mass scan for a quadratic signal injection, analogous to Fig. 9. 
+
+generally weaker than the sensitivity to the pulsar-term amplitude. The broader localization of AE in Fig. 9 re-flects this reduced sensitivity, together with the fact that the injected value of AE is somewhat smaller than that of AP . Two additional blinded signal-injection tests are shown in Fig. 13 of App. J. Taken as a whole, these blinded tests demonstrate that the analysis methodol-ogy provides a robust and accurate pipeline suitable for real-data applications. We repeat the blinded mass-scan test for the quadrati-cally coupled signal, combining the fixed-mass evidences over the adaptive grid to localize the injected mass. Figure 10 shows a representative example; two further blinded injections appear in Fig. 14 of App. J. In all three examples, unbeknownst to the analyzer, the blinded data were generated with equal Earth and pulsar couplings so as to realize a gravitational signal. As in the case of the linear signals, the analysis results in accurate and precise inferred parameters. Taken together, these tests demon-strate that the finite-correlation pipeline applies to the quadratically coupled and gravitational signals with no change beyond the squared response map. 
+
+VI. CONCLUSION 
+
+In this work, we have introduced a self-consistent de-terministic framework for analyzing the ULDM fast mode with PTA data while retaining the finite spatial correla-tions of the underlying ULDM field. We studied ULDM with linear couplings to the SM (Sec. II), for which the timing residual receives contributions from changes in the 20 pulsar moment of inertia, and hence its rotation rate, as well as from changes in the atomic transition frequencies used as the terrestrial timing reference. In this case, the map from a latent ULDM field realization to the pre-dicted timing residuals is especially simple: the resid-ual is linear in the field evaluated at the Earth and at the pulsars. We additionally treated quadratically cou-pled scalar ULDM and the universal gravitational signal (Secs. II B and II E), for which the residual is quadratic in the field and oscillates at 2 mϕ; because it remains a deterministic function of the same latent amplitudes, it is described by the same finite-correlation prior, with only the response map squared. We therefore use the finite correlation structure of the ULDM field (Sec. III) to define the prior over latent field realizations, and then forward model those realizations into timing residuals as part of the Bayesian inference (Secs. IV C–IV E). The main advance of this work is to replace the lim-iting amplitude priors used in previous deterministic searches with a finite-correlation prior derived from the ULDM covariance. Pulsar-distance uncertainties were incorporated through an augmented latent-field prior (Sec. IV C), and the resulting distance-marginalized am-plitude distribution was represented with a normalizing-flow surrogate (Sec. IV D). This construction preserves the familiar amplitude-phase parametrization used in previous PTA searches while extending it to the interme-diate regime where neither limiting description is valid. We extensively validated the method using mock PTA datasets (Sec. V). In the limiting regimes, we reproduced the behavior of the standard deterministic analyses. We also performed blinded analyses to test signal recovery when the ULDM mass and field realization were not spec-ified in advance. These tests show that the framework can be used for inference across the fully correlated, in-termediate, and fully uncorrelated regimes within a single self-consistent analysis. This work sets a new standard for PTA searches for lin-early and quadratically coupled ULDM: analyses should retain the finite spatial correlations of the ULDM field rather than impose either limiting description across the full mass range. Although we have applied the framework here only to mock datasets, the implementation builds on 
+
+enterprise and is readily applicable to real PTA data. While we have focused on scalar ULDM, the same finite-correlation perspective applies to other ULDM sig-nals not treated here. In particular, our methods extend to vector (dark-photon) dark matter, whose direct and gravitational signals require a vector-valued field and a correspondingly generalized latent prior; we leave this to upcoming work. More broadly, the finite spatial cor-relations of the ULDM field are essential to any PTA search that spans the transition between the fully corre-lated and fully uncorrelated regimes, and the latent-field framework developed here provides a practical and self-consistent way to incorporate them. 
+
+> ACKNOWLEDGMENTS
+
+We thank Hyungjin Kim for collaboration at early stages of the work, and we thank Dan Hackett and Mike Wagman for helpful conversations. KB acknowl-edges support from the National Science Foundation (NSF) under Grant No. PHY-2413016. VL is supported by the Network for Neutrinos, Nuclear Astrophysics and Symmetries (N3AS) through the National Science Foundation Physics Frontier Center, Grant No. PHY-2020275. AM acknowledges support from a Royal So-ciety University Research Fellowship (URF-R1-251896). KT acknowledges support from the U.S. Department of Defense through the National Defense Science and En-gineering Graduate (NDSEG) fellowship. TT is sup-ported by the DOE grant DE-SC0015655. All authors are members of the NANOGrav Collaboration, which is supported by NSF Physics Frontiers Center award #2020265. This research used resources of the National Energy Research Scientific Computing Center (NERSC), a U.S. Department of Energy Office of Science User Fa-cility located at Lawrence Berkeley National Laboratory, operated under Contract No. DE-AC02-05CH11231 us-ing NERSC award HEP-ERCAP0023978. This work made use of computing resources provided by the Cen-ter for High Throughput Computing at the University of Wisconsin, Madison [50] and by the Texas Advanced Computing Center (TACC) at The University of Texas at Austin. 
+
+> Appendix A: Gaussian statistics for the quadrature parametrization
+
+The Rayleigh-amplitude and random-phase parametrization in Eq. (11) can be rewritten mode by mode in terms of Gaussian quadratures. For an arbitrary velocity mode, define Θv = ωvt − mϕv · x, (A1) with the dependence of Θ v on t and x left implicit. Then 
+
+αv cos(Θ v + θv) = Cv cos Θ v + Sv sin Θ v, (A2) with 
+
+Cv = αv cos θv, Sv = −αv sin θv. (A3) The Rayleigh-phase parametrization takes θv to be uni-formly distributed on [0 , 2π) and αv to be Rayleigh dis-tributed with 
+
+α2 
+
+> v
+
+= f (v)∆ v. (A4) The joint density is therefore 
+
+p(αv, θ v) = αv
+
+πf (v)∆ v exp 
+
+
+
+− α2
+
+> v
+
+f (v)∆ v
+
+
+
+. (A5) 21 Changing variables from ( αv, θ v) to ( Cv, S v) gives 
+
+p(Cv, S v) = 1
+
+πf (v)∆ v exp 
+
+
+
+− C2 
+
+> v
+
++ S2
+
+> v
+
+f (v)∆ v
+
+
+
+. (A6) Thus the quadratures are independent Gaussian vari-ables, 
+
+Cv, S v ∼ N 
+
+
+
+0, 12 f (v)∆ v
+
+
+
+, (A7) which is the Gaussian-quadrature parametrization used in Eq. (13). 
+
+Appendix B: The gravitational signal 
+
+Here we derive the gravitational potential quoted in Sec. II E and isolate its fast and slow parts, the latter feeding the slow-mode analysis of App. C. The oscillat-ing ULDM sources the scalar potential, Ψ, through the Poisson equation [2], 
+
+∇2Ψ = 4 πGρ, ρ = 12
+
+h ˙ϕ2 + ( ∇ϕ)2 + m2
+
+> ϕ
+
+ϕ2i
+
+. (B1) We expand the field in the Gaussian quadratures of App. A, see Eq. (13), passing to the continuum limit with unit-normalized quadratures, 
+
+⟨CpCp′ ⟩ = ⟨SpSp′ ⟩ = δ(3) (p − p′),
+
+⟨CpSp′ ⟩ = 0 . (B2) Passing to the momentum p = mϕv, the discrete per-mode variance 12 f (v)∆ v becomes the explicit measure  
+
+> 12
+
+f (p), with f (p) the momentum-space distribution nor-malized to R d3p f (p) = 1. The field is 
+
+ϕ(x, t ) = 
+
+p2ρϕ
+
+mϕ
+
+Z
+
+d3p  12 f (p)1/2 Cp cos( ωpt − p·x) + Sp sin( ωpt − p·x). (B3) This reproduces ⟨ϕ2⟩ = ρϕ/m 2
+
+> ϕ
+
+. Collecting terms, the energy density separates into parts oscillating at the sum and difference of the mode frequencies, 
+
+ρ = ρϕ
+
+4m2
+
+> ϕ
+
+Z
+
+d3p d3q [f (p)f (q)] 1/2 h
+
+W−(p, q) (CpCq − SpSq) cos Θ + + ( CpSq + SpCq) sin Θ +
+
+
+
++W+(p, q) (CpCq + SpSq) cos Θ − + ( SpCq − CpSq) sin Θ −
+
+i
+
+,
+
+(B4) where Θ ± = ( ωp ± ωq)t − (p ± q)·x and 
+
+W±(p, q) = m2 
+
+> ϕ
+
+± (p·q + ωpωq). (B5) Each plane wave is an eigenfunction of ∇2, so Poisson’s equation is solved term by term, dividing the sum- and difference-frequency contributions by |p+q|2 and |p−q|2
+
+respectively, Ψ = − πGρ ϕ
+
+m2
+
+> ϕ
+
+Z
+
+d3p d3q [f (p)f (q)] 1/2 h W−(p, q)
+
+|p + q|2
+
+ (CpCq − SpSq) cos Θ + + ( CpSq + SpCq) sin Θ +
+
+
+
++ W+(p, q)
+
+|p − q|2
+
+ (CpCq + SpSq) cos Θ − + ( SpCq − CpSq) sin Θ −
+
+i
+
+.
+
+(B6) In the non-relativistic limit the kinematic factors reduce to 
+
+W−(p, q) → − 12 |p + q|2, W+(p, q) → 2m2
+
+> ϕ
+
+, (B7) so that in the sum-frequency term the |p + q|2 from the Poisson inversion cancels against W−, leaving it local in 22 the field, while the difference-frequency term retains a factor 2 m2
+
+> ϕ
+
+/|p−q|2 and is nonlocal. The potential there-fore splits into fast and slow parts, Ψ = Ψ fast + Ψ slow ,with Ψfast = πGρ ϕ
+
+2m2
+
+> ϕ
+
+Z
+
+d3p d3q [f (p)f (q)] 1/2 (CpCq − SpSq) cos Θ + + ( CpSq + SpCq) sin Θ +
+
+, (B8) Ψslow = −2πGρ ϕ
+
+Z d3p d3q
+
+|p − q|2 [f (p)f (q)] 1/2 (CpCq + SpSq) cos Θ − + ( SpCq − CpSq) sin Θ −
+
+. (B9) For the fast mode, the subcoherence limit ωpt ≃ mϕt
+
+sends Θ + → 2mϕt − (p + q)·x, so Ψ fast oscillates at 2 mϕ,while the difference-frequency phase Θ − loses its time dependence and Ψ slow is constant over the data span, degenerate with the timing model and unobservable at the masses relevant for the fast mode. Although Ψ fast is a non-Gaussian quadratic form in the quadratures, it can be sampled directly from a real-ization of the field. Squaring the field of Eq. (B3) in the subcoherence limit reproduces the same sum-frequency structure, 
+
+ϕ2 = ρϕ
+
+2m2
+
+> ϕ
+
+Z
+
+d3p d3q [f (p)f (q)] 1/2 (CpCq − SpSq) cos Θ + + ( CpSq + SpCq) sin Θ +
+
+ + [ ϕ2]slow , (B10) whose fast part matches the bracket in Eq. (B8). Hence Ψfast = πG [ϕ2]fast , (B11) so a realization of the oscillating potential is obtained by drawing a realization of the field, squaring it, and retain-ing the 2 mϕ component, which is the squared response map used in the main text. The slow potential Ψ slow of Eq. (B9) and the difference-frequency remainder [ ϕ2]slow 
+
+of Eq. (B10) are the slow-mode observables whose exact Gaussianity is established in App. C. 
+
+> Appendix C: Exact Gaussianity of the slow mode
+
+In addition to the fast mode at 2 mϕ, the quadratic and gravitational signals possess a slow mode: the low-frequency part of the quadratic observable, generated by the beat between field modes of nearly equal frequency, 
+
+ω ∼ ωp − ωq ∼ mϕv20 . Its pulsar-timing phenomenology was studied in Ref. [29], which argued that it is approx-imately Gaussian. Here we show that in the continuum limit it is exactly Gaussian, so that it may be treated as an ordinary stationary Gaussian process specified en-tirely by its power spectrum. We continue to work with the unit-normalized contin-uum quadratures introduced in App. B, see Eq. (B2). The slow-mode timing residual is sourced by the difference-frequency part of the quadratic response de-rived there. For a quadratic SM coupling, it is the time integral of δν/ν ∝ ϕ2, built from [ ϕ2]slow of Eq. (B10); for the gravitational signal, it arises from the Doppler shift of the slow potential, ∇Ψslow of Eq. (B9). At a fixed location, the spatial phase is absorbed into a redef-inition of the Gaussian quadratures and does not affect their statistics, so both reduce to a common quadratic form in the quadratures, the slow-mode residual rslow (t), 
+
+rslow (t) = 
+
+Z
+
+d3p d3q K(p, q)
+
+h
+
+(CpSq − SpCq) cos( ωpq t) + ( CpCq + SpSq) sin( ωpq t)
+
+i
+
+, ωpq ≡ ωp − ωq, (C1) with a scalar kernel K fixed by the observable. Time-integrating [ ϕ2]slow gives 
+
+K(p, q) ∝ d(2) SM · yE,P 
+
+Λ2
+
+1
+
+ωp − ωq
+
+[f (p)f (q)] 1/2 , (C2) while the line-of-sight Doppler ˆ n · ∇ Ψslow , with ˆ n the Earth-pulsar direction, gives 
+
+K(p, q) ∝ ˆn · (p − q)
+
+|p − q|2 [f (p)f (q)] 1/2 . (C3) 23 Both kernels are antisymmetric under p ↔ q, a prop-erty we use repeatedly below. To expose the frequency content we project rslow (t) onto cos ωt and sin ωt at fixed 
+
+ω > 0. Because cos( ωpq t) is even and sin( ωpq t) is odd in ωpq , the cosine projection adds the ωpq = ±ω contri-butions while the sine projection subtracts them, so the latter carries a factor sgn( ωpq ). The frequency content is then carried by the integrands 
+
+Ic(p, q) = K(p, q) ( CpSq − SpCq) δ(ω − | ωpq |), Is(p, q) = K(p, q) ( CpCq + SpSq) sgn( ωpq )δ(ω − | ωpq |), (C4) in terms of which 
+
+C(ω) = 
+
+Z
+
+d3p d3q Ic(p, q),S(ω) = 
+
+Z
+
+d3p d3q Is(p, q),
+
+(C5) and rslow (t) = R dω [C(ω) cos ωt +S(ω) sin ωt ]. For ω̸ = 0 the support requires p̸ = q, where K is smooth, and this support is noncompact. Both integrands have zero mean: ⟨Ic⟩ = 0 because 
+
+⟨CpSq − SpCq⟩ = 0, and ⟨Is⟩ = 0 because ⟨CpCq +
+
+SpSq⟩ = 2 δ(3) (p − q) vanishes on the support p̸ = q.We now evaluate their covariances, from which both the Gaussianity and the stationarity of rslow (t) follow. Expanding the cosine-integrand covariance by Wick contraction, and keeping only the pairings that join each 
+
+C to a C and each S to an S,
+
+⟨Ic(p, q) Ic(p′, q′)⟩ = K(p, q) K(p′, q′) (CpSq − SpCq)( Cp′ Sq′ − Sp′ Cq′ ) δ(ω − | ωpq |) δ(ω′ − | ωp′q′ |)= 2 K(p, q) K(p′, q′)δ(3) (p − p′)δ(3) (q − q′) − δ(3) (p − q′)δ(3) (q − p′)
+
+× δ(ω − | ωpq |) δ(ω′ − | ωp′q′ |).
+
+(C6) Integrating over all four momenta to form ⟨C(ω)C(ω′)⟩,the first delta pair sets ( p′, q′) = ( p, q) and the sec-ond sets ( p′, q′) = ( q, p), where the kernel changes sign, 
+
+K(q, p) = −K(p, q): 
+
+⟨C(ω) C(ω′)⟩ =
+
+Z
+
+d3p d3q d3p′ d3q′ ⟨Ic(p, q) Ic(p′, q′)⟩
+
+= 2 
+
+Z
+
+d3p d3q K(p, q)2 − K(p, q)K(q, p) δ(ω − | ωpq |) δ(ω′ − | ωpq |)= 4 
+
+Z
+
+d3p d3q K(p, q)2 δ(ω − | ωpq |) δ(ω − ω′) ≡ P (ω) δ(ω − ω′).
+
+(C7) The antisymmetry of K turns the relative minus sign into the sum of two equal terms, so the autocovariance is nonvanishing and defines the power spectrum P (ω) = 4 R d3p d3q K(p, q)2 δ(ω − | ωpq |). The sine integrand is treated identically. On the sup-port p̸ = q, the same Wick contraction, now with the symmetric quadrature combination and the signum fac-tor of each Is, gives 
+
+⟨Is(p, q) Is(p′, q′)⟩ = K(p, q) K(p′, q′) sgn( ωpq ) sgn( ωp′q′ ) (CpCq + SpSq)( Cp′ Cq′ + Sp′ Sq′ )
+
+× δ(ω − | ωpq |) δ(ω′ − | ωp′q′ |)= 2 K(p, q) K(p′, q′) sgn( ωpq ) sgn( ωp′q′ )δ(3) (p − p′)δ(3) (q − q′) + δ(3) (p − q′)δ(3) (q − p′)
+
+× δ(ω − | ωpq |) δ(ω′ − | ωp′q′ |).
+
+(C8) On the swapped pair ( p′, q′) = ( q, p) the kernel and the signum each change sign, K(q, p) = −K(p, q) and 24 sgn( ωqp ) = −sgn( ωpq ). The two flips cancel, converting the plus sign into the same positive contribution found above, so 
+
+⟨S(ω) S(ω′)⟩ = P (ω) δ(ω − ω′) = ⟨C(ω) C(ω′)⟩. (C9) The cross-covariance vanishes identically, ⟨C(ω) S(ω′)⟩ =0, since ⟨(CpSq − SpCq)( Cp′ Cq′ + Sp′ Sq′ )⟩ = 0: every Wick pairing leaves three quadratures of one type and one of the other. These covariances give the two properties we need. First, rslow (t) is stationary: the relations in Eqs. (C7) and (C9), together with the vanishing cross-covariance, are exactly the conditions for a stationary process with power spectrum P (ω). Second, C(ω) and S(ω) are Gaus-sian: each is an integral over the noncompact set of mode pairs of contributions that are uncorrelated be-tween distinct pairs, by the delta functions in Eqs. (C6) and (C8), and individually infinitesimal; with no sin-gle pair dominating, the central limit theorem makes the integral exactly Gaussian in the continuum limit. This is what separates the slow mode from the fast mode, where in the coherence limit the mode phases col-lapse to 2 mϕt, the response factorizes into the square of a single complex field amplitude and is strongly non-Gaussian. Being zero-mean, Gaussian, and stationary, 
+
+rslow (t) is completely specified by P (ω), strengthening the approximate-Gaussianity argument of Ref. [29]: it does not rely on a large but finite number of contribut-ing modes, but holds exactly in the continuum limit. 
+
+> Appendix D: Details of the Fourier basis covariance
+
+Here we derive the coefficient covariances quoted in Eq. (50) using the projectors defined in Eq. (49) and the frequency-domain covariance in Eq. (45). As a representative example, consider the cosine-cosine correlator: 
+
+⟨ ˆCI ˆCJ ⟩ = lim  
+
+> T→∞
+
+1
+
+T 2
+
+Z T
+
+> −T
+
+dt 
+
+Z T
+
+> −T
+
+dt ′⟨ ˆϕI (t) ˆϕJ (t′)⟩ cos( mϕt) cos( mϕt′)= lim  
+
+> T→∞
+
+1
+
+T 2
+
+Z T
+
+> −T
+
+dt 
+
+Z T
+
+> −T
+
+dt ′
+
+Z
+
+df df ′ e2πi (f t +f ′t′)⟨ ˆϕI (f ) ˆϕJ (f ′)⟩ cos( mϕt) cos( mϕt′)= lim  
+
+> T→∞
+
+14T 2
+
+Z T
+
+> −T
+
+dt 
+
+Z T
+
+> −T
+
+dt ′
+
+Z
+
+df df ′ e2πi (f t +f ′t′)δ(f + f ′)
+
+×
+
+
+
+δ
+
+
+
+f − mϕ
+
+2π
+
+ ˆΓIJ + δ
+
+
+
+f + mϕ
+
+2π
+
+ ˆΓ∗
+
+> IJ
+
+
+
+cos( mϕt) cos( mϕt′)= lim  
+
+> T→∞
+
+14T 2
+
+Z T
+
+> −T
+
+dt 
+
+Z T
+
+> −T
+
+dt ′
+
+
+
+eim ϕ(t−t′) ˆΓIJ + e−im ϕ(t−t′) ˆΓ∗
+
+> IJ
+
+
+
+cos( mϕt) cos( mϕt′)= 12 Re( ˆΓIJ ).
+
+(D1) Proceeding identically for the remaining projections yields 
+
+⟨ ˆSI ˆSJ ⟩ = 12 Re( ˆΓIJ ),
+
+⟨ ˆCI ˆSJ ⟩ = 12 Im( ˆΓIJ ),
+
+⟨ ˆSI ˆCJ ⟩ = 12 Im( ˆΓJI ) = − 12 Im( ˆΓIJ ),
+
+(D2) where in the last step we used ˆΓJI = ˆΓ∗ 
+
+> IJ
+
+. These expres-sions reproduce Eq. (50). 
+
+> Appendix E: Details of pulsar distance uncertainties
+
+In this appendix, we specify the pulsar distance pri-ors used in our analyses. Table II lists the 30 pulsars used in our analysis, selected from the NANOGrav 15-year dataset, together with the distance values and uncer-tainties adopted here. Pulsar distances are inferred either from parallax measurements, indicated by “PX,” or from dispersion measures using the NE2001 free-electron den-sity model, indicated by “DM.” For additional discussion of the distance determinations used in the NANOGrav dataset, see Refs. [51, 52]. Additional distance measure-ments not yet incorporated in NANOGrav analyses in-clude Refs. [53–55]. For pulsars with parallax-based distance measure-ments, we adopt a Gaussian prior, 
+
+π(x) = 1
+
+√2πσ x
+
+exp 
+
+
+
+− (x − μx)2
+
+2σ2
+
+> x
+
+
+
+, (E1) where μx is the tabulated distance and σx is the quoted uncertainty. For pulsars with distances inferred from dispersion 25 measures, we follow Refs. [51, 52] and adopt a prior cen-tered on the quoted DM distance xDM that is uniform on the interval 0 .8 xDM ≤ x ≤ 1.2 xDM , with half-Gaussian tails outside this range. With ∆ ± ≡ x − (1 ± 0.2) xDM ,
+
+π(x) ∝
+
+
+
+exp 
+
+h
+
+− ∆2
+
+> −
+> 2σ2DM
+
+i
+
+, x < 0.8 xDM ,
+
+1, 0.8 xDM ≤ x ≤ 1.2 xDM ,
+
+exp 
+
+h
+
+− ∆2+
+
+> 2σ2DM
+
+i
+
+, x > 1.2 xDM ,
+
+(E2) where σDM is taken to be one quarter of the quoted DM-distance uncertainty. 
+
+> Appendix F: Conditions on mass resolution
+
+In this appendix, we give a simple scaling argument for why it is computationally advantageous to analyze ULDM signals on a mass-by-mass grid, rather than treat-ing mϕ as a continuously sampled inference parameter. For a PTA dataset of duration Tobs , the Fourier fre-quency resolution is of order 1 /T obs . Since a ULDM field of mass mϕ oscillates at frequency fϕ = mϕ/(2 π), this corresponds to a mass resolution ∆mϕ ≈ 2πTobs 
+
+≃ 8.7 × 10 −24 eV 
+
+ 15 yr 
+
+Tobs 
+
+
+
+. (F1) Physically, shifting the ULDM mass by more than ∆ mϕ
+
+moves the signal by more than one resolved Fourier bin, so one expects the likelihood as a function of mϕ to vary on this scale. Across a search range [ mmin  
+
+> ϕ
+
+, m max  
+
+> ϕ
+
+], the number of independently resolvable ULDM masses is therefore ap-proximately 
+
+Nm ≈ mmax  
+
+> ϕ
+
+− mmin 
+
+> ϕ
+
+∆mϕ
+
+≈ 1.1 × 10 3
+
+ mmax 
+
+> ϕ
+
+10 −20 eV 
+
+  Tobs 
+
+15 yr 
+
+
+
+,
+
+(F2) where in the second estimate we assumed mmin  
+
+> ϕ
+
+≪ mmax  
+
+> ϕ
+
+.Thus even before considering any additional nuisance or latent parameters, the mass direction alone contains 
+
+O(10 3) independently resolved locations in parameter space. Now, consider an analysis in which mϕ is sampled directly with a local random-walk proposal. In order to resolve likelihood structure on the scale of distinct Fourier bins, the characteristic proposal size must satisfy 
+
+δm ϕ ≲ ∆mϕ. After N accepted random-walk updates, the typical excursion in mass space is then ∆M ∼ √N δm ϕ ≲ √N ∆mϕ. (F3) To explore the full prior range, this excursion must be at least as large as mmax  
+
+> ϕ
+
+− mmin  
+
+> ϕ
+
+, which implies 
+
+N ≳ mmax  
+
+> ϕ
+
+− mmin 
+
+> ϕ
+
+∆mϕ
+
+!2
+
+∼ N 2
+
+> m
+
+. (F4) For the mass range relevant to PTA ULDM searches, this already requires 
+
+N ≳ 10 6. (F5) This estimate is optimistic, since it assumes that all other parameters are fixed and ignores correlations between mϕ
+
+and the remaining nuisance, background, and latent vari-ables. For additional context, in our implementation even a baseline analysis with no ULDM signal already requires 
+
+≳ 5 × 10 6 Monte Carlo samples to achieve satisfactory convergence. Treating mϕ as a continuously sampled pa-rameter would therefore add a sampling burden compa-rable to that of the entire baseline inference problem. There is also a separate issue for the final scientific product of the search. ULDM results are usually reported as constraints on the signal coupling at fixed mϕ. If mϕ
+
+were sampled continuously, these fixed-mass constraints would have to be reconstructed by conditioning the joint posterior samples on a narrow mass interval of width ∼
+
+∆mϕ. For a search range containing Nm independently resolved masses, the effective sample size available in any one such interval is at best of order ESS bin ∼ ESS tot 
+
+Nm
+
+, (F6) up to variations in the posterior mass density and fur-ther losses from autocorrelation. Thus even a globally converged chain can have too few effectively independent samples in any particular mass bin to give reliable condi-tional marginals for the coupling. This problem is espe-cially acute for exclusion limits, where one requires trust-worthy coupling constraints across the full mass range rather than only near the masses favored by the data. Together, these considerations motivate our choice to perform ULDM analyses on a discrete mass grid, with independent inference at each mass, rather than sampling 
+
+mϕ continuously. 
+
+> Appendix G: Statistics of the latent variables
+
+This appendix derives the properties of the latent amplitude-phase variables used in our deterministic anal-ysis. The main results are as follows. First, at fixed pulsar distances, each local amplitude is Rayleigh dis-tributed and each local phase is uniform. Second, in the exact distance-uncertain model, the one-point marginals remain unchanged but the full joint prior generally does not factorize. Third, in the augmented model introduced in Sec. IV C, the phases are i.i.d. uniform and indepen-dent of the amplitudes, so all nontrivial spatial informa-tion is carried by the joint amplitude prior. 26 
+
+Pulsar Type xI [kpc] δx I [kpc] Pulsar Type xI [kpc] δx I [kpc] B1855+09 PX 1.18 0.12 [47, 56, 57] J0023+0923 PX 1.02 0.11 [47] J0030+0451 PX 0.3296 0.0036 [47, 58, 59] J0340+4130 DM 1.71 0.34 J0613 −0200 PX 1.07 0.10 [47, 60] J0645+5158 PX 1.37 0.19 [47, 61] J0931 −1902 DM 1.88 0.38 J1024 −0719 PX 1.080 0.042 [47, 58, 62] J1455 −3330 PX 1.01 0.22 [62] J1600 −3053 PX 1.84 0.26 [47] J1614 −2230 PX 0.699 0.026 [47, 62, 63] J1640+2224 PX 1.404 0.095 [58] J1713+0747 PX 1.138 0.019 [47, 56, 60, 64, 65] J1741+1351 PX 2.36 0.56 [47] J1832 −0836 PX 2.00 0.47 [47] J1853+1303 PX 1.91 0.17 [47, 58] J1909 −3744 PX 1.159 0.013 [47, 56, 60, 66] J1910+1256 PX 3.52 0.41 [58] J1911+1347 DM 2.08 0.42 J1918 −0642 PX 1.44 0.11 [47, 58] J1923+2515 PX 0.94 0.21 [47] J1944+0907 PX 1.38 0.36 [47] J2010 −1323 PX 1.94 0.41 [47] J2017+0603 DM 1.57 0.31 J2033+1734 DM 1.99 0.40 J2043+1711 PX 1.58 0.11 [47] J2214+3000 DM 1.54 0.31 J2229+2643 DM 1.43 0.29 J2234+0611 PX 1.23 0.17 [47] J2317+1439 PX 1.57 0.29 [47] Table II. The table of 30 pulsars included in our analysis, selected from the 15-year dataset generated by the NANOGrav collaboration. For each pulsar, we provide the distance of the pulsar from Earth, the reported error on that pulsar distance, and the method of distance measurement, with PX indicating a parallax measurement and DM indicating a dispersion-measure-based distance estimate. This table has been adapted from [52]. 
+
+1. Latent amplitude-phase statistics 
+
+For a specified ULDM mass mϕ, the monochromatic retarded-time field at location I may be written as ˆϕI (t) = ˆCI cos( mϕt) + ˆSI sin( mϕt), (G1) with {( ˆCI , ˆSI )} jointly Gaussian distributed according to Eq. (50). It is convenient to combine these variables into the complex amplitudes ˆzI ≡ ˆCI + i ˆSI = AI eiα I . (G2) In terms of Eq. (50), one finds 
+
+⟨ˆzI ˆzJ ⟩ = 0 ,
+
+⟨ˆzI ˆz∗ 
+
+> J
+
+⟩ = ˆΓ∗ 
+
+> IJ
+
+. (G3) Thus the latent vector ˆ z is jointly proper complex Gaus-sian. For fixed pulsar distances, the one-point marginal of each ˆ zI is completely determined by ˆΓII = 1, which im-plies 
+
+p(ˆ zI ) = 1
+
+π e−| ˆzI |2
+
+. (G4) Transforming to polar variables ˆ zI = AI eiα I gives 
+
+p(AI , α I ) = AI
+
+π e−A2 
+
+> I
+
+=
+
+
+
+2AI e−A2
+
+> I
+
+  12π
+
+
+
+. (G5) Hence, for each location I, the amplitude and phase are independent, with AI Rayleigh distributed and αI uni-form on [0 , 2π). In particular, ⟨AI ⟩ = √π/ 2. In the exact distance-uncertain model, both the corre-lation magnitudes RIJ and the effective distance phases 
+
+ψI , see Eqs. (41) and (42), depend on the pulsar dis-tances. The full latent prior at fixed mϕ is therefore the mixture 
+
+π(A, α | mϕ) = 
+
+Z Np
+
+Y
+
+> I=1
+
+dx I πI (xI ) π(A, α | { xI }, m ϕ).
+
+(G6) Because varying the distances changes both the correla-tion envelope and the pulsar-term phase delays, the re-sulting joint distribution generally does not admit a sim-ple factorization in ( A, α). This is the sense in which the exact distance-marginalized latent prior is complicated. Nevertheless, the one-point marginals remain un-changed. For any fixed choice of distances, the condi-tional marginal p(ˆ zI | { xI }, m ϕ) depends only on ˆΓII =1, and is therefore independent of the distances. It fol-lows that the distance-marginalized one-point density is still 
+
+p(ˆ zI | mϕ) = 1
+
+π e−| ˆzI |2
+
+. (G7) Equivalently, each AI remains Rayleigh distributed and each αI remains uniform at the one-point level. The complication lies only in the full joint prior across the PTA. A substantial simplification occurs in the augmented model of Sec. IV C, where the correlation magnitudes RIJ 
+
+are determined by the pulsar distances but the effective distance phases ψI for I ≥ 1 are treated as independent 27 nuisance parameters distributed uniformly on [0 , 2π). In that case, 
+
+⟨ˆzI ˆz∗ 
+
+> J
+
+⟩ = ei(ψI −ψJ )RIJ . (G8) Defining rotated latent variables ˆwI ≡ e−iψ I ˆzI = AI eiβ I , (G9) with ψ0 = 0 at Earth, we obtain a proper complex Gaus-sian vector ˆw with real covariance matrix R. Since this rotation changes only the phases, the amplitudes are un-changed. The joint density of ( A, β) at fixed distances depends on the phases only through differences βI −βJ . Therefore it is invariant under a common phase shift of all βI , which implies that the overall phase is uniform and independent of the amplitudes. Writing αI = βI + ψI mod 2 π, and using the fact that the nuisance phases ψI for I ≥ 1 are i.i.d. uniform, it follows that all physical phases αI are themselves i.i.d. uniform and independent of A. Hence the conditional prior factorizes as 
+
+π(A, α | { xI }, m ϕ) = π(A | { xI }, m ϕ)
+
+> Np
+
+Y
+
+> I=0
+
+12π . (G10) Marginalizing over the pulsar distance priors preserves this structure, so the augmented-model latent prior takes the form 
+
+π(A, α | mϕ) = π(A | mϕ)
+
+> Np
+
+Y
+
+> I=0
+
+12π . (G11) Thus, in the augmented model, the phases are i.i.d. uni-form and independent of the amplitudes, while all non-trivial spatial information is encoded in the correlated amplitude prior π(A | mϕ).  
+
+> 2. Relation to previous analyses
+
+The augmented formulation also makes it straightfor-ward to recover the limiting signal models used in previ-ous PTA analyses of ULDM. In the fully correlated limit, ℓ → ∞ , the correlation-envelope matrix approaches 
+
+RIJ → 1, R → 11 T . (G12) The rotated latent vector ˆ w therefore becomes rank one, so there exists a single proper complex Gaussian random variable ξ ∼ CN (0 , 1) such that ˆ wI = ξ for all I. Writing 
+
+ξ = A⋆eiβ ⋆ , one finds that all local amplitudes are equal, 
+
+AI = A⋆ ∀I, (G13) with A⋆ Rayleigh distributed; we denote this common amplitude by its Earth-term value, A0 ≡ A⋆. After marginalizing over the nuisance phases ψI , the physical phases remain independent and uniform, and the latent prior reduces to 
+
+πcorr (A, α) = 2A0e−A20
+
+2π
+
+> Np
+
+Y
+
+> I=1
+
+δ(AI − A0)2π . (G14) This is precisely the prior structure assumed in the fully correlated limit, where all locations share a common local ULDM amplitude. In the opposite limit, ℓ → 0, distinct locations fall into independent coherence patches, so 
+
+RIJ → δIJ , R → I. (G15) The rotated latent variables then become independent proper complex Gaussians, ˆwI ∼ CN (0 , 1) , (G16) and the latent prior factorizes across locations: 
+
+πuncorr (A, α) = 
+
+> Np
+
+Y
+
+> I=0
+
+
+
+2AI e−A2 
+
+> I
+
+12π
+
+
+
+. (G17) This reproduces the fully uncorrelated limit used in ear-lier analyses, in which each Earth or pulsar term carries an independent local amplitude and phase. Equations (G14) and (G17) show that the finite-correlation latent-field prior continuously interpolates be-tween the two limiting models adopted previously, while also providing a principled treatment of the intermediate partially correlated regime. 
+
+> Appendix H: Neural spline flow implementation
+
+The training samples for the normalizing-flow surro-gate are generated according to the procedure described in Sec. IV. At fixed ULDM mass mϕ, this yields samples from the distance-marginalized amplitude prior π(A |
+
+mϕ). This appendix records the additional implementa-tion details used to represent that distribution efficiently with a neural spline flow. A direct flow model for the amplitudes A is possible, but is inefficient because each component has a Rayleigh one-point marginal, while the flow is built on a Gaus-sian base distribution. To improve training efficiency, we therefore apply an analytic change of variables that maps each amplitude’s Rayleigh marginal onto a stan-dard normal, and train the flow only on the remaining joint dependence structure. Since each amplitude AI has marginal distribution 
+
+p(AI ) = 2 AI e−A2 
+
+> I
+
+, (H1) we define transformed variables 
+
+yI = Φ −1
+
+1 − e−A2
+
+> I
+
+
+
+, (H2) 28 where Φ is the standard normal cumulative distribution function. By construction, each yI has an exactly stan-dard normal marginal distribution. The transformed vec-tor y therefore has Gaussian one-point marginals, with all remaining nontrivial structure encoded in its correla-tions and higher-dimensional dependence. For each analysis mass, we model the transformed dis-tribution with a separate neural spline flow, 
+
+q(mϕ) 
+
+> θ
+
+(y). (H3) As discussed in Sec. IV, we found a single conditional flow in mϕ to be significantly less stable than training sepa-rate mass-specific models. Our implementation uses the 
+
+zuko package and a neural spline flow architecture with 8 spline transforms, hidden-layer widths (256 , 256), and 16 spline bins in each transform. These choices were found to provide adequate accuracy across the mass range con-sidered in this work. The training objective is the negative log-likelihood of the transformed samples, 
+
+L(θ) = − 1
+
+Nbatch 
+
+> Nbatch
+
+X
+
+> n=1
+
+log q(mϕ) 
+
+> θ
+
+(y(n)). (H4) Optimization is performed with Adam, using learn-ing rate 10 −3, batch size 2048, and a cosine-annealing learning-rate schedule over 1000 epochs. These settings were used uniformly across the mass-specific flow models. At inference time, the learned prior in amplitude space is recovered by a change of variables, log πflow (A | mϕ) = log q(mϕ) 
+
+> θ
+
+(y(A)) + 
+
+> Np
+
+X
+
+> I=0
+
+log ∂y I
+
+∂A I
+
+.
+
+(H5) Writing φ for the standard normal probability density function, the Jacobian factor is 
+
+∂y I
+
+∂A I
+
+= 2AI e−A2
+
+> I
+
+φ(yI ) . (H6) Thus the learned amplitude prior combines an analytic Gaussianization of the Rayleigh marginals with a flow-based representation of the remaining correlated struc-ture. This is the finite-correlation amplitude prior used in the deterministic analyses in Sec. IV. 
+
+> Appendix I: Additional unblinded analyses
+
+In this appendix, we present additional results from our unblinded signal injection tests. Complementing our accurate signal reconstruction in the main text for a signal in the highly correlated limit at mϕ = 2 .2 ×
+
+10 −24 eV, we demonstrate similarly successful signal re-constructions in the moderately correlated regime at 
+
+mϕ = 2 .2 × 10 −23 eV and in the uncorrelated regime at 
+
+mϕ = 2 .2 × 10 −22 eV for linearly coupled ULDM signals in Fig. 11 and for quadratically coupled ULDM signals in Fig. 12. See main text for details. 
+
+> Appendix J: Additional blinded analyses
+
+For the linearly coupled signal, Fig. 13 presents two further blinded injections, complementing the represen-tative example in the main text. Likewise, Fig. 14 presents two further blinded injections for the quadrati-cally coupled signal. 
+
+> Appendix K: Gaussian-process formulation of the linear signal
+
+For completeness, we describe an alternative formula-tion of the linearly coupled ULDM signal as a correlated Gaussian process in the timing residuals. This construc-tion follows directly from the Gaussian statistics of the ULDM field. It is mathematically interesting, but it is not the primary analysis used in this work because the distance-induced nuisance structure remains, and the re-sulting covariance likelihood can be numerically less sta-ble than the deterministic formulation.  
+
+> 1. Signal construction
+
+For the fixed coupling-ratio parametrization, starting from Eq. (26), we write the induced timing residual for pulsar I as 
+
+rI (t) = Aϕ [CI cos( mϕt) + SI sin( mϕt)] , (K1) where the residual-level cosine-sine coefficients are 
+
+CI ≡ wE ˆC0 + wP ˆCI , SI ≡ wE ˆS0 + wP ˆSI . (K2) Here I, J ≥ 1 label pulsars, while the index 0 denotes Earth. Using Eq. (50), these coefficients have covariance 
+
+⟨CI CJ ⟩ = ⟨SI SJ ⟩ = Re Γ IJ , (K3) 
+
+⟨CI SJ ⟩ = −⟨ SI CJ ⟩ = Im Γ IJ , (K4) with the residual-level complex overlap matrix ΓIJ = 12
+
+h
+
+w2 
+
+> E
+
++ wE wP
+
+ˆΓI0 + ˆΓ0J
+
+
+
++ w2 
+
+> P
+
+ˆΓIJ 
+
+i
+
+. (K5) This overlap matrix is defined for the timing residuals of the Np pulsars and should be distinguished from the field-level overlap matrix ˆΓIJ , which also includes the Earth index as a field location. We now collect the timing residuals into a single data vector. Let pulsar I have observing times tI , with length 
+
+NI , and define 
+
+cI = cos( mϕtI ), sI = sin( mϕtI ). (K6) The single-pulsar monochromatic design matrix is 
+
+FI = cI sI
+
+ , (K7) 29 γGW = 3.64 +0 .68 
+
+> −0.53
+> −14 .75
+> −14 .50
+> −14 .25
+> −14 .00
+> log 10  AGW
+
+log 10 AGW = −14 .21 +0 .18 
+
+> −0.31
+> 2.43.03.64.24.8
+
+γGW 
+
+> −6.75
+> −6.60
+> −6.45
+> −6.30
+> −6.15
+> log 10  Aφ
+> −14 .75
+> −14 .50
+> −14 .25
+> −14 .00
+
+log 10 AGW 
+
+> −6.75
+> −6.60
+> −6.45
+> −6.30
+> −6.15
+
+log 10 Aφ
+
+log 10 Aφ = −6.37 +0 .11 
+
+> −0.12
+
+Linear Coupling, mφ = 2 .2 × 10 −23 eV 
+
+wE = 0 , w P = 1 , A φ = 4 .0 × 10 −7γGW = 3.93 +0 .57 
+
+> −0.53
+> −15 .00
+> −14 .75
+> −14 .50
+> −14 .25
+> −14 .00
+> log 10  AGW
+
+log 10 AGW = −14 .48 +0 .21 
+
+> −0.24
+> 3.03.64.24.8
+
+γGW 
+
+> −7.35
+> −7.20
+> −7.05
+> −6.90
+> log 10  Aφ
+> −15 .00
+> −14 .75
+> −14 .50
+> −14 .25
+> −14 .00
+
+log 10 AGW 
+
+> −7.35
+> −7.20
+> −7.05
+> −6.90
+
+log 10 Aφ
+
+log 10 Aφ = −7.09 +0 .13 
+
+> −0.14
+
+Linear Coupling, mφ = 2 .2 × 10 −22 eV 
+
+wE = 0 , w P = 1 , A φ = 7 × 10 −8
+
+Figure 11. As in Fig. 7, but for mϕ = 2 .2 × 10 −23 eV in the left corner plot and for mϕ = 2 .2 × 10 −22 eV in the right corner plot. At these masses and associated signal frequencies, there is less overlap between SGWB power and signal power, leading to more precise SGWB parameter reconstruction in these examples than realized in the analysis at mϕ = 2 .2 × 10 −24 eV presented in the main text. γGW = 2.56 +0 .43 
+
+> −0.38
+> −14 .40
+> −14 .25
+> −14 .10
+> −13 .95
+> −13 .80
+> log 10  AGW
+
+log 10 AGW = −14 .01 +0 .13 
+
+> −0.15
+> 2.02.42.83.23.6
+
+γGW 
+
+> −6.45
+> −6.30
+> −6.15
+> −6.00
+> log 10  Aφ
+> −14 .40
+> −14 .25
+> −14 .10
+> −13 .95
+> −13 .80
+
+log 10 AGW 
+
+> −6.45
+> −6.30
+> −6.15
+> −6.00
+
+log 10 Aφ
+
+log 10 Aφ = −6.26 +0 .17 
+
+> −0.16
+
+Quadratic Coupling, mφ = 2 .2 × 10 −23 eV 
+
+wE = wP = 1 , A φ = 4 .0 × 10 −7γGW = 3.18 +0 .39 
+
+> −0.36
+> −14 .40
+> −14 .25
+> −14 .10
+> −13 .95
+> −13 .80
+> log 10  AGW
+
+log 10 AGW = −14 .09 +0 .13 
+
+> −0.15
+> 2.42.83.23.64.0
+
+γGW 
+
+> −9.6
+> −8.8
+> −8.0
+> −7.2
+> log 10  Aφ
+> −14 .40
+> −14 .25
+> −14 .10
+> −13 .95
+> −13 .80
+
+log 10 AGW 
+
+> −9.6
+> −8.8
+> −8.0
+> −7.2
+
+log 10 Aφ
+
+log 10 Aφ = −7.88 +0 .64 
+
+> −1.72
+
+Quadratic Coupling, mφ = 2 .2 × 10 −22 eV 
+
+wE = wP = 1 , A φ = 7 .0 × 10 −8
+
+Figure 12. As in Fig. 8, but for two additional unblinded injections of the quadratically coupled signal at the intermediate and uncorrelated masses. Parameter estimation continues to perform at a high level, though for the large mass example, we find the true value of Aϕ for which the data were generated to be slightly outside the 90% credible interval. 
+
+and the full PTA design matrix is the block-diagonal ma-trix 
+
+Fϕ = blockdiag  F1, F2, . . . , FNp
+
+ . (K8) We also define the coefficient vector 
+
+a = C1 S1 C2 S2 · · · CNp SNp
+
+T . (K9) 30 log 10 mφ = −22 .08 +0 .01 
+
+> −0.01
+> −6.9
+> −6.6
+> −6.3
+> −6.0
+> −5.7
+> log 10  AE
+
+log 10 AE = −6.24 +0 .33 
+
+> −0.25
+> −22 .12
+> −22 .08
+> −22 .04
+> −22 .00
+
+log 10 mφ
+
+> −7.05
+> −6.90
+> −6.75
+> −6.60
+> log 10  AP
+> −6.9
+> −6.6
+> −6.3
+> −6.0
+> −5.7
+
+log 10 AE
+
+> −7.05
+> −6.90
+> −6.75
+> −6.60
+
+log 10 AP
+
+log 10 AP = −6.85 +0 .10 
+
+> −0.10
+
+Linear Coupling, Blinded Analysis 
+
+mφ = 8 .29 × 10 −23 eV 
+
+AE = 5 .51 × 10 −7, A P = 1 .65 × 10 −7log 10 mφ = −22 .20 +0 .03 
+
+> −0.01
+> −9.6
+> −8.8
+> −8.0
+> −7.2
+> −6.4
+> log 10  AE
+
+log 10 AE = −8.69 +1 .35 
+
+> −1.14
+> −22 .32
+> −22 .24
+> −22 .16
+> −22 .08
+> −22 .00
+
+log 10 mφ
+
+> −6.90
+> −6.75
+> −6.60
+> −6.45
+> log 10  AP
+> −9.6
+> −8.8
+> −8.0
+> −7.2
+> −6.4
+
+log 10 AE
+
+> −6.90
+> −6.75
+> −6.60
+> −6.45
+
+log 10 AP
+
+log 10 AP = −6.71 +0 .09 
+
+> −0.09
+
+Linear Coupling, Blinded Analysis 
+
+mφ = 6 .57 × 10 −23 eV 
+
+AE = 0 , log 10 AP = −6.77 
+
+Figure 13. As in Fig. 9, but for two additional, independently generated blinded signal analysis tests. Parameter reconstruction continues to perform at the expected level. log 10 mφ = −22 .06 +0 .01 
+
+> −0.01
+> −9.0
+> −7.5
+> −6.0
+> −4.5
+> log 10  AE
+
+log 10 AE = −7.20 +1 .10 
+
+> −2.06
+> −22 .16
+> −22 .12
+> −22 .08
+> −22 .04
+> −22 .00
+
+log 10 mφ
+
+> −7.2
+> −6.9
+> −6.6
+> −6.3
+> −6.0
+> log 10  AP
+> −9.0
+> −7.5
+> −6.0
+> −4.5
+
+log 10 AE
+
+> −7.2
+> −6.9
+> −6.6
+> −6.3
+> −6.0
+
+log 10 AP
+
+log 10 AP = −6.83 +0 .18 
+
+> −0.19
+
+Quadratic Coupling, Blinded Analysis 
+
+mφ = 8 .70 × 10 −23 eV log 10 AE = −6.92 , log 10 AP = −6.92 log 10 mφ = −23 .60 +0 .02 
+
+> −0.02
+> −4.5
+> −4.2
+> −3.9
+> −3.6
+> −3.3
+> log 10  AE
+
+log 10 AE = −3.94 +0 .30 
+
+> −0.24
+> −23 .7
+> −23 .6
+> −23 .5
+> −23 .4
+
+log 10 mφ
+
+> −4.5
+> −4.2
+> −3.9
+> −3.6
+> −3.3
+> log 10  AP
+> −4.5
+> −4.2
+> −3.9
+> −3.6
+> −3.3
+
+log 10 AE
+
+> −4.5
+> −4.2
+> −3.9
+> −3.6
+> −3.3
+
+log 10 AP
+
+log 10 AP = −3.94 +0 .30 
+
+> −0.24
+
+Quadratic Coupling, Blinded Analysis 
+
+mφ = 2 .50 × 10 −24 eV log 10 AE = −4.28 , log 10 AP = −4.28 
+
+Figure 14. As in Fig. 10, but for two additional, independently generated blinded injections of the quadratically coupled signal. As before, signals were generated at identical wE = wP to realize the coupling-independent gravitational signal. 
+
+The ULDM timing residual vector is then 
+
+rϕ = AϕFϕa. (K10) Since a is Gaussian, rϕ is also Gaussian. The covariance of a is a 2 Np × 2Np block matrix, 
+
+Φϕ ≡ ⟨ aa T ⟩, Φϕ,IJ =
+
+ Re Γ IJ Im Γ IJ 
+
+−Im Γ IJ Re Γ IJ 
+
+
+
+. (K11) The induced ULDM covariance in the timing residuals is 31 therefore 
+
+Σϕ = A2
+
+> ϕ
+
+FϕΦϕFTϕ . (K12) This gives a low-rank representation of the time-domain covariance of the linearly coupled ULDM signal.  
+
+> 2. Gaussian-process likelihood
+
+At fixed pulsar distances and effective phases, the Gaussian-process likelihood is obtained by adding the ULDM signal covariance in Eq. (K12) to the background covariance, 
+
+Σtot = Σbkg + Σϕ. (K13) For a PTA residual vector dPTA , the corresponding like-lihood is 
+
+LGP (dPTA | θbkg , A ϕ, {xI }, {ψI }) = 1
+
+|2πΣtot |1/2
+
+× exp 
+
+
+
+− 12 dT
+
+> PTA
+
+Σ−1tot dPTA 
+
+
+
+.
+
+(K14) Here Σbkg contains the non-ULDM timing-residual co-variance, while Σϕ is the low-rank ULDM covariance constructed from the residual-level coefficient covariance 
+
+Φϕ. This formulation analytically marginalizes over the Gaussian coefficients a at fixed {xI , ψ I }.In the exact distance-dependent model, the same pul-sar distances determine both the correlation magnitudes 
+
+RIJ and the effective phases ψI appearing in the overlap matrix Γ IJ . The augmented model modifies this pre-scription in the same way as in Sec. IV C: the distances 
+
+{xI } are used to compute the correlation magnitudes 
+
+RIJ , while the phases {ψI } are treated as independent nuisance parameters with uniform priors on [0 , 2π), with 
+
+ψ0 = 0 at Earth. Thus, the residual-level overlap matrix in Eq. (K5) is evaluated with ˆΓIJ = RIJ e−i(ψI −ψJ ), (K15) where the amplitudes RIJ and phases ψI are no longer tied to the same distance variables. This prescription preserves the distance dependence of the spatial correla-tion envelope while treating the effectively unconstrained retarded-time phases as independent nuisance parame-ters. We implemented this covariance model in enterprise 
+
+by treating the ULDM signal as a low-rank correlated Gaussian process. In standard PTA applications, the Fourier-basis coefficient covariance is usually diagonal in the cosine-sine basis. The ULDM covariance in Eq. (K11) is more general: for each pulsar pair, the imaginary part of Γ IJ mixes sine and cosine coefficients across pulsars. Implementing the Gaussian-process formulation, there-fore, required an overlap-reduction function that returns the full 2 × 2 block 
+
+Φϕ,IJ =
+
+ Re Γ IJ Im Γ IJ 
+
+−Im Γ IJ Re Γ IJ 
+
+
+
+, (K16) rather than a diagonal covariance for independent sine and cosine modes. In total, the Gaussian-process formulation provides a compact representation of the linearly coupled sig-nal after analytic marginalization over the Gaussian co-efficients a. However, the covariance still depends on the distance-dependent correlation envelope through RIJ 
+
+and on the augmented phase variables through ψI . Thus, the main inference challenge is not removed; instead, it appears as repeated numerical linear algebra involving a signal covariance matrix whose entries vary nontrivially with the same nuisance parameters. More seriously, for the ULDM masses and pulsar distance priors considered here, we found that the Gaussian-process covariance can become numerically ill-conditioned, leading to inference failures. By contrast, the latent-field formulation proved more convenient and numerically robust, especially be-cause the distance and phase marginalization can be in-corporated into the flow prior described in Sec. IV D. We, therefore, use the deterministic latent-field formulation as our primary analysis framework.                        
+
+> [1] D. Antypas et al. , “New Horizons: Scalar and Vector Ultralight Dark Matter,” (3, 2022) , arXiv:2203.14915 [hep-ex] .[2] A. Khmelnitsky and V. Rubakov, “Pulsar timing signal from ultralight scalar dark matter,” JCAP 02 (2014) 019, arXiv:1309.5888 [astro-ph.CO] .[3] T. Damour and A. M. Polyakov, “The String dilaton and a least coupling principle,” Nucl. Phys. B 423
+> (1994) 532–558, arXiv:hep-th/9401069 .[4] T. Damour, F. Piazza, and G. Veneziano, “Violations of the equivalence principle in a dilaton runaway scenario,”
+> Phys. Rev. D 66 (2002) 046007, arXiv:hep-th/0205111 .[5] Y. M. Cho and J. H. Kim, “Dilatonic dark matter and its experimental detection,” Phys. Rev. D 79 (2009) 023504, arXiv:0711.2858 [gr-qc] .[6] T. Damour and J. F. Donoghue, “Equivalence Principle Violations and Couplings of a Light Dilaton,” Phys. Rev. D 82 (2010) 084033, arXiv:1007.2792 [gr-qc] .[7] K. A. Olive, M. Pospelov, Y.-Z. Qian, A. Coc, M. Casse, and E. Vangioni-Flam, “Constraints on the variations of the fundamental couplings,” Phys. Rev. D
+> 66 (2002) 045022, arXiv:hep-ph/0205269 .[8] V. V. Flambaum, D. B. Leinweber, A. W. Thomas, and R. D. Young, “Limits on the temporal variation of the
+
+32 
+
+fine structure constant, quark masses and strong interaction from quasar absorption spectra and atomic clock experiments,” Phys. Rev. D 69 (2004) 115006, 
+
+arXiv:hep-ph/0402098 .[9] T. Damour and J. F. Donoghue, “Phenomenology of the Equivalence Principle with Light Scalars,” Class. Quant. Grav. 27 (2010) 202001, arXiv:1007.2790 [gr-qc] .[10] K. Van Tilburg, N. Leefer, L. Bougas, and D. Budker, “Search for ultralight scalar dark matter with atomic spectroscopy,” Phys. Rev. Lett. 115 no. 1, (2015) 011802, arXiv:1503.06886 [physics.atom-ph] .[11] A. Hees, J. Gu´ ena, M. Abgrall, S. Bize, and P. Wolf, “Searching for an oscillating massive scalar field as a dark matter candidate using atomic hyperfine frequency comparisons,” Phys. Rev. Lett. 117 no. 6, (2016) 061301, arXiv:1604.08514 [gr-qc] .[12] J. Berg´ e, P. Brax, G. M´ etris, M. Pernot-Borr` as, P. Touboul, and J.-P. Uzan, “MICROSCOPE Mission: First Constraints on the Violation of the Weak Equivalence Principle by a Light Scalar Dilaton,” Phys. Rev. Lett. 120 no. 14, (2018) 141101, 
+
+arXiv:1712.00483 [gr-qc] .[13] A. Hees, O. Minazzoli, E. Savalle, Y. V. Stadnik, and P. Wolf, “Violation of the equivalence principle from light scalar dark matter,” Phys. Rev. D 98 no. 6, (2018) 064051, arXiv:1807.04512 [gr-qc] .[14] P. Wcislo et al. , “New bounds on dark matter coupling from a global network of optical atomic clocks,” Sci. Adv. 4 no. 12, (2018) eaau4869, arXiv:1806.04762 [physics.atom-ph] .[15] C. J. Kennedy, E. Oelker, J. M. Robinson, T. Bothwell, D. Kedar, W. R. Milner, G. E. Marti, A. Derevianko, and J. Ye, “Precision Metrology Meets Cosmology: Improved Constraints on Ultralight Dark Matter from Atom-Cavity Frequency Comparisons,” Phys. Rev. Lett. 
+
+125 no. 20, (2020) 201302, arXiv:2008.08773 [physics.atom-ph] .[16] H. Davoudiasl and P. B. Denton, “How fast can protons decay?,” Phys. Rev. D 111 no. 3, (2025) 035026, 
+
+arXiv:2410.19045 [hep-ph] .[17] J. D. Barrow and J. Magueijo, “Cosmological constraints on a dynamical electron mass,” Phys. Rev. D 72 (2005) 043521, arXiv:astro-ph/0503222 .[18] Y. V. Stadnik and V. V. Flambaum, “Can dark matter induce cosmological evolution of the fundamental constants of Nature?,” Phys. Rev. Lett. 115 no. 20, (2015) 201301, arXiv:1503.08540 [astro-ph.CO] .[19] S. Sibiryakov, P. Sørensen, and T.-T. Yu, “BBN constraints on universally-coupled ultralight scalar dark matter,” JHEP 12 (2020) 075, arXiv:2006.04820 [hep-ph] .[20] T. Bouley, P. Sørensen, and T.-T. Yu, “Constraints on ultralight scalar dark matter with quadratic couplings,” 
+
+JHEP 03 (2023) 104, arXiv:2211.09826 [hep-ph] .[21] M. Baryakhtar, O. Simon, and Z. J. Weiner, “Cosmology with varying fundamental constants from hyperlight, coupled scalars,” Phys. Rev. D 110 no. 8, (2024) 083505, arXiv:2405.10358 [astro-ph.CO] .[22] M. Baryakhtar, O. Simon, and Z. J. Weiner, “Searching for coupled, hyperlight scalars across cosmic history,” 
+
+Phys. Rev. D 111 no. 11, (2025) 115026, 
+
+arXiv:2502.04432 [hep-ph] .[23] S. Ghosh, K. K. Boddy, and T.-T. Yu, “Early Universe Constraints on Variations in Fundamental Constants Induced by Ultralight Scalar Dark Matter,” (11, 2025) , 
+
+arXiv:2511.14532 [astro-ph.CO] .[24] T. Chiba, T. Kobayashi, M. Yamaguchi, and J. Yokoyama, “Time variation of proton-electron mass ratio and fine structure constant with runaway dilaton,” 
+
+Phys. Rev. D 75 (2007) 043516, arXiv:hep-ph/0610027 .[25] P. W. Graham, D. E. Kaplan, J. Mardon, S. Rajendran, and W. A. Terrano, “Dark Matter Direct Detection with Accelerometers,” Phys. Rev. D 93 no. 7, (2016) 075029, arXiv:1512.06165 [hep-ph] .[26] D. E. Kaplan, A. Mitridate, and T. Trickle, “Constraining fundamental constant variations from ultralight dark matter with pulsar timing arrays,” Phys. Rev. D 106 no. 3, (2022) 035032, arXiv:2205.06817 [hep-ph] .[27] NANOGrav Collaboration, A. Afzal et al. , “The NANOGrav 15 yr Data Set: Search for Signals from New Physics,” Astrophys. J. Lett. 951 no. 1, (2023) L11, arXiv:2306.16219 [astro-ph.HE] . [Erratum: Astrophys.J.Lett. 971, L27 (2024), Erratum: Astrophys.J. 971, L27 (2024)]. [28] C. Smarra et al. , “Constraints on conformal ultralight dark matter couplings from the European Pulsar Timing Array,” Phys. Rev. D 110 no. 4, (2024) 043033, 
+
+arXiv:2405.01633 [astro-ph.HE] .[29] X. Gan, H. Kim, and A. Mitridate, “Probing quadratically coupled ultralight dark matter with pulsar timing arrays,” Phys. Rev. D 113 no. 6, (2026) 063034, 
+
+arXiv:2510.13945 [hep-ph] .[30] N. K. Porayko et al. , “Parkes Pulsar Timing Array constraints on ultralight scalar-field dark matter,” Phys. Rev. D 98 no. 10, (2018) 102002, arXiv:1810.03227 [astro-ph.CO] .[31] EPTA, InPTA Collaboration, J. Antoniadis et al. , “The second data release from the European Pulsar Timing Array - IV. Implications for massive black holes, dark matter, and the early Universe,” Astron. Astrophys. 
+
+685 (2024) A94, arXiv:2306.16227 [astro-ph.CO] .[32] European Pulsar Timing Array Collaboration, C. Smarra et al. , “Second Data Release from the European Pulsar Timing Array: Challenging the Ultralight Dark Matter Paradigm,” Phys. Rev. Lett. 
+
+131 no. 17, (2023) 171001, arXiv:2306.16228 [astro-ph.HE] .[33] X.-S. Hu et al. , “Constraints on Ultralight Scalar and Dark Photon Dark Matter from PPTA-DR3 and EPTA-DR2,” arXiv:2605.02172 [astro-ph.CO] .[34] H. Kim and A. Mitridate, “Stochastic ultralight dark matter fluctuations in pulsar timing arrays,” Phys. Rev. D 109 no. 5, (2024) 055017, arXiv:2312.12225 [hep-ph] .[35] K. K. Boddy, J. A. Dror, and A. Lam, “Ultralight Dark Matter Statistics for Pulsar Timing Detection,” Phys. Rev. Lett. 135 no. 10, (2025) 101001, 
+
+arXiv:2502.15874 [hep-ph] .[36] J. A. Dror and Q. Wei, “Pulsar timing detection of ultralight vector dark matter,” Phys. Rev. D 112 no. 7, (2025) 075024, arXiv:2505.22719 [hep-ph] .[37] J. A. Ellis, M. Vallisneri, S. R. Taylor, and P. T. Baker, “Enterprise: Enhanced numerical toolbox enabling a robust pulsar inference suite,” Zenodo, Sept., 2020. 
+
+https://doi.org/10.5281/zenodo.4059815 .[38] D. D. McCarthy, Time from Earth rotation to atomic physics . Wiley-VCH, 2009. 33 
+
+[39] J. W. Foster, N. L. Rodd, and B. R. Safdi, “Revealing the Dark Matter Halo with Axion Direct Detection,” 
+
+Phys. Rev. D 97 no. 12, (2018) 123006, 
+
+arXiv:1711.10489 [astro-ph.CO] .[40] K. Freese, M. Lisanti, and C. Savage, “Colloquium: Annual modulation of dark matter,” Rev. Mod. Phys. 
+
+85 (2013) 1561–1581, arXiv:1209.3339 [astro-ph.CO] .[41] S. R. Taylor, “The Nanohertz Gravitational Wave Astronomer,” (5, 2021) , arXiv:2105.13270 [astro-ph.HE] .[42] A. D. Johnson, P. M. Meyers, et al. , “The NANOGrav 15-year Gravitational-Wave Background Methods,” 
+
+Physical Review D 109 no. 10, (May, 2024) 103012. 
+
+http://arxiv.org/abs/2306.16223 .[43] R. van Haasteren, “fastshermanmorrison-pulsar: Fast sherman-morrison updates for pulsar timing.” 2023. 
+
+https://github.com/nanograv/fastshermanmorrison .Software for efficient Sherman-Morrison matrix updates in pulsar timing analysis. [44] D. Shih, M. Freytsis, S. R. Taylor, J. A. Dror, and N. Smyth, “Fast Parameter Inference on Pulsar Timing Arrays with Normalizing Flows,” Phys. Rev. Lett. 133 
+
+no. 1, (2024) 011402, arXiv:2310.12209 [astro-ph.IM] .[45] C. Durkan, A. Bekasov, I. Murray, and G. Papamakarios, “Neural spline flows.” 2019. 
+
+https://arxiv.org/abs/1906.04032 .[46] F. Rozet et al. , “Zuko: Normalizing flows in pytorch.” 2022. https://pypi.org/project/zuko .[47] NANOGrav Collaboration, G. Agazie et al. , “The NANOGrav 15 yr Data Set: Observations and Timing of 68 Millisecond Pulsars,” Astrophys. J. Lett. 951 
+
+no. 1, (2023) L9, arXiv:2306.16217 [astro-ph.HE] .[48] NANOGrav Collaboration, G. Agazie et al. , “The NANOGrav 15 yr Data Set: Evidence for a Gravitational-wave Background,” Astrophys. J. Lett. 
+
+951 no. 1, (2023) L8, arXiv:2306.16213 [astro-ph.HE] .[49] M. Karamanis, D. Nabergoj, F. Beutler, J. A. Peacock, and U. Seljak, “pocomc: A python package for accelerated bayesian inference in astronomy and cosmology,” arXiv preprint arXiv:2207.05660 (2022) . [50] Center for High Throughput Computing, “Center for high throughput computing.” 2006. 
+
+https://chtc.cs.wisc.edu/ .[51] NANOGrav Collaboration, Z. Arzoumanian et al. , “The NANOGrav 12.5 yr Data Set: Bayesian Limits on Gravitational Waves from Individual Supermassive Black Hole Binaries,” Astrophys. J. Lett. 951 no. 2, (2023) L28, arXiv:2301.03608 [astro-ph.GA] .[52] NANOGrav Collaboration, G. Agazie et al. , “The NANOGrav 15 yr Data Set: Bayesian Limits on Gravitational Waves from Individual Supermassive Black Hole Binaries,” Astrophys. J. Lett. 951 no. 2, (2023) L50, arXiv:2306.16222 [astro-ph.HE] .[53] C. M. F. Mingarelli, L. Anderson, M. Bedell, D. N. Spergel, and A. Moran, “Improving Binary Millisecond Pulsar Distances with Gaia,” Astrophys. J. 954 (2023) 89, arXiv:1812.06262 [astro-ph.IM] .[54] J. Antoniadis, “Gaia pulsars and where to find them,” 
+
+Mon. Not. Roy. Astron. Soc. 501 no. 1, (2021) 1116–1126, arXiv:2011.08075 [astro-ph.HE] .[55] B. Egleston, R. Ebadi, and R. Walsworth, “Measuring Pulsar Distances from Chirping Orbital Periods,” (2, 2026) , arXiv:2602.15110 [astro-ph.HE] .[56] J. P. W. Verbiest, M. Bailes, et al. , “Timing stability of millisecond pulsars and prospects for gravitational-wave detection,” Monthly Notices of the Royal Astronomical Society 400 no. 2, (Dec., 2009) 951–968, 
+
+arXiv:0908.0244 [astro-ph.GA] .[57] V. M. Kaspi, J. H. Taylor, and M. F. Ryba, “High-Precision Timing of Millisecond Pulsars. III. Long-Term Monitoring of PSRs B1855+09 and B1937+21,” Astrophys. J. 428 (June, 1994) 713. [58] H. Ding et al. , “The MSPSR π catalogue: VLBA astrometry of 18 millisecond pulsars,” Mon. Not. Roy. Astron. Soc. 519 no. 4, (2023) 4982–5007, 
+
+arXiv:2212.06351 [astro-ph.HE] .[59] A. N. Lommen, R. A. Kipphorn, D. J. Nice, E. M. Splaver, I. H. Stairs, and D. C. Backer, “The parallax and proper motion of psr j0030+0451,” Astrophys. J. 
+
+642 (2006) 1012–1017, arXiv:astro-ph/0601521 .[60] A. W. Hotan, M. Bailes, and S. M. Ord, “High-precision baseband timing of 15 millisecond pulsars,” Monthly Notices of the Royal Astronomical Society 369 no. 3, (July, 2006) 1502–1520. [61] K. Stovall et al. , “The Green Bank Northern Celestial Cap Pulsar Survey - I: Survey Description, Data Analysis, and Initial Results,” Astrophys. J. 791 no. 1, (2014) 67, arXiv:1406.5214 [astro-ph.HE] .[62] L. Guillemot, D. A. Smith, H. Laffon, G. H. Janssen, I. Cognard, G. Theureau, G. Desvignes, E. C. Ferrara, and P. S. Ray, “The gamma-ray millisecond pulsar deathline, revisited - New velocity and distance measurements,” Astron. Astrophys. 587 (2016) A109, 
+
+arXiv:1601.05987 [astro-ph.HE] .[63] Fermi-LAT Collaboration, A. A. Abdo et al. , “The Second Fermi Large Area Telescope Catalog of Gamma-ray Pulsars,” Astrophys. J. Suppl. 208 (2013) 17, arXiv:1305.4385 [astro-ph.HE] .[64] S. Chatterjee, W. F. Brisken, W. H. T. Vlemmings, W. M. Goss, T. J. W. Lazio, J. M. Cordes, S. E. Thorsett, E. B. Fomalont, A. G. Lyne, and M. Kramer, “Precision astrometry with the very long baseline array: Parallaxes and proper motions for 14 pulsars,” The Astrophysical Journal 698 no. 1, (May, 2009) 250–265. 
+
+http://dx.doi.org/10.1088/0004-637X/698/1/250 .[65] E. M. Splaver, D. J. Nice, I. H. Stairs, A. N. Lommen, and D. C. Backer, “Masses, parallax, and relativistic timing of the PSR J1713+0747 binary system,” 
+
+Astrophys. J. 620 (2005) 405–415, 
+
+arXiv:astro-ph/0410488 .[66] B. A. Jacoby, A. Hotan, M. Bailes, S. Ord, and S. R. Kulkarni, “The Mass of a millisecond pulsar,” 
+
+Astrophys. J. Lett. 629 (2005) L113–L116, 
+
+arXiv:astro-ph/0507420 .
