@@ -6,44 +6,38 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-29
-- 运行时间：2026-07-29 21:29:44 UTC
+- 最新运行日期：2026-07-30
+- 运行时间：2026-07-30 21:13:38 UTC
 - 运行状态：成功
-- 本次总论文数：8
-- 精读区：6
-- 速读区：2
+- 本次总论文数：6
+- 精读区：3
+- 速读区：3
 
 ### 今日简报（AI）
-今日共收录8篇论文，精读6篇，重点聚焦超轻标量暗物质与核物质状态方程两大前沿。最值得关注的是脉冲星计时中的暗物质相关信号（9.0/10）和核天体物理中的物态方程研究（9.0/10）。建议普通读者优先精读这两篇满分论文，深入理解暗物质探测与中子星内部结构的最新突破。
-- 详情：[/202607/29/README](/202607/29/README)
+今天精读3篇、速读3篇，聚焦年轻脉冲星r模自旋减速与动力学Love数界限。最值得精读《Braking indices》和《Dynamical Love Number》两篇高分论文，分别揭示自旋减速机制和引力波约束。下步可重点关注脉冲星制动指数及核塌缩超新星千赫兹引力波信号。
+- 详情：[/202607/30/README](/202607/30/README)
 
 ### 精读区论文标签
-1. [Correlated signals of ultralight scalar dark matter in pulsar timing](/202607/29/2607.24912v1-correlated-signals-of-ultralight-scalar-dark-matter-in-pulsar-timing)  
+1. [Braking indices as probes of r-mode spin-down in young pulsars](/202607/30/2607.27046v1-braking-indices-as-probes-of-r-mode-spin-down-in-young-pulsars)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：脉冲星计时阵列；超轻暗物质相关信号
-2. [Nuclear matter equation of state and astrophysics](/202607/29/2607.25854v1-nuclear-matter-equation-of-state-and-astrophysics)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：利用多信使观测约束中子星状态方程
-3. [QuickGWecc: Fast Bayesian pipeline for searching eccentric binaries in pulsar timing array data](/202607/29/2607.26051v1-quickgwecc-fast-bayesian-pipeline-for-searching-eccentric-binaries-in-pulsar-timing-array-data)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：用于在脉冲星计时阵列数据中搜索偏心双星的贝叶斯管道
-4. [R-process nucleosynthesis from magnetar giant flares in neutron star--white dwarf mergers: A unified picture for peculiar long gamma-ray bursts](/202607/29/2607.24531v1-r-process-nucleosynthesis-from-magnetar-giant-flares-in-neutron-star--white-dwarf-mergers-a-unified-picture-for-peculiar-long-gamma-ray-bursts)  
+   evidence：脉冲星计时框架用于解释制动指数
+2. [A Bound on the Dynamical Love Number](/202607/30/2607.26686v1-a-bound-on-the-dynamical-love-number)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：中子星-白矮星并合中磁星星暴的统一模型
-5. [Tidal deformation of an accreting compact object](/202607/29/2607.24938v1-tidal-deformation-of-an-accreting-compact-object)  
+   evidence：中子星动态Love数边界
+3. [Universality of dual mass-scaled fundamental modes in two-fluid neutron stars with mirror dark matter](/202607/30/2607.27005v1-universality-of-dual-mass-scaled-fundamental-modes-in-two-fluid-neutron-stars-with-mirror-dark-matter)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：致密天体潮汐形变是探测强引力和状态方程的灵敏探针
-6. [Fast optical spectroscopic observations of PSR J1023+0038 over one orbital period](/202607/29/2607.25544v1-fast-optical-spectroscopic-observations-of-psr-j10230038-over-one-orbital-period)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：对过渡毫秒脉冲星PSR J1023+0038进行快速光学光谱观测
+   evidence：包含暗物质的中子星振荡模式普适关系
 
 ### 速读区论文标签
-1. [Timing and Spectral Analysis of the 2024 Outburst of 2S 1553$-$542 with NuSTAR and NICER](/202607/29/2607.25548v1-timing-and-spectral-analysis-of-the-2024-outburst-of-2s-1553-542-with-nustar-and-nicer)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：对X射线脉冲星爆发的时变与谱分析
-2. [Localized magnetic pressure anisotropy in strange dwarfs with crystalline crusts](/202607/29/2607.25055v1-localized-magnetic-pressure-anisotropy-in-strange-dwarfs-with-crystalline-crusts)  
+1. [Exploring Physics beyond the Standard Model from kHz-Gravitational-Wave Signals of Core-Collapse Supernovae](/202607/30/2607.20921v2-exploring-physics-beyond-the-standard-model-from-khz-gravitational-wave-signals-of-core-collapse-supernovae)  
+   标签：评分：7.0/10、query:pulsar-frb
+   evidence：原中子星振荡模式与状态方程关联
+2. [Paleodetectors for neutrino signals from diverse Galactic stellar collapses](/202607/30/2607.26826v1-paleodetectors-for-neutrino-signals-from-diverse-galactic-stellar-collapses)  
+   标签：评分：7.0/10、query:pulsar-frb
+   evidence：中子星状态方程对中微子信号的影响
+3. [Modelling Radio Frequency Interference on the Lunar Farside](/202607/30/2607.24527v1-modelling-radio-frequency-interference-on-the-lunar-farside)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：磁化奇异矮星与结晶壳层的研究，影响质量-半径关系和状态方程
+   evidence：为月球背面观测建模射频干扰以改进快速射电暴和脉冲星探测
 
 
 <div class="dpr-home-promo-card">
