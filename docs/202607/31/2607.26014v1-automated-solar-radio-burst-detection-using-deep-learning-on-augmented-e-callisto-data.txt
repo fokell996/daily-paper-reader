@@ -1,0 +1,397 @@
+Title: Automated Solar Radio Burst Detection Using Deep Learning on Augmented e-Callisto Data
+
+URL Source: https://arxiv.org/pdf/2607.26014v1
+
+Published Time: Wed, 29 Jul 2026 01:22:49 GMT
+
+Number of Pages: 24
+
+Markdown Content:
+# AUTOMATED SOLAR RADIO BURST DETECTION USING DEEP 
+
+# LEARNING ON AUGMENTED E -C ALLISTO DATA 
+
+Vincenzo Timmel 
+
+Institute for Data Science, School of Computer Science University of Applied Sciences and Arts Northwestern Switzerland (FHNW) 5210 Windisch, Switzerland 
+
+vincenzo.timmel@fhnw.ch 
+
+André Csillaghy 
+
+Institute for Data Science, School of Computer Science University of Applied Sciences and Arts Northwestern Switzerland (FHNW) 5210 Windisch, Switzerland 
+
+andre.csillaghy@fhnw.ch 
+
+Christian Monstein 
+
+Istituto ricerche solari Aldo e Cele Daccò (IRSOL) Faculty of Informatics, Università della Svizzera italiana (USI) 6605 Locarno, Switzerland July 29, 2026 
+
+# ABSTRACT 
+
+Context: Solar radio bursts are signatures of energetic events associated with solar flares and coronal mass ejections and can interfere with terrestrial and space-based communication systems. Real-time automatic burst monitoring enables early warnings tens of minutes to hours before associated particles reach the Earth and provides the basis for long-term statistical studies. The e-Callisto network is a worldwide system of solar radio spectrometers providing continuous 24/7 observations, with individual instruments together covering frequencies from approximately 20 MHz up to 1 GHz 1.Detection and labeling currently rely largely on human experts, limiting scalability and real-time applicability due to hardware heterogeneity and low signal-to-noise ratios. 
+
+Aim: We aim to develop an automated solar radio burst detection system that processes each newly uploaded 15-minute observation and provides near-real-time information on solar activity approximately 30 seconds after the file becomes available. 
+
+Methods: We present FlareSense , an automated detection system based on a deep Residual Network (ResNet) trained on a large manually labeled dataset. To improve robustness to out-of-distribution data and newly added instruments, we apply data augmentation techniques adapted from speech processing, including SpecAugment and TimeWarp. 
+
+Results: The model achieves 93% precision and 73.15% recall on a manually curated test set. At the same precision as the routine expert catalog, FlareSense achieves higher recall than routine cataloging. Gradient-based explainable AI methods indicate that the network attributes its decisions to physically meaningful burst features even in the presence of noise and instrumental artifacts. 
+
+> 1
+
+The nominal per-instrument tuner range is 45–870 MHz, but individual stations are frequently upgraded with different tuners, converters, or antennas, extending coverage down to ∼20 MHz and up to 1 GHz at some sites; see the instrument qualification records at https://www.e-callisto.org/Qualification/applidocs.html for current per-instrument specifications. arXiv:2607.26014v1 [astro-ph.SR] 28 Jul 2026 A PREPRINT - J ULY 29, 2026 
+
+Conclusions: These results demonstrate that FlareSense can automate solar radio burst detection across the entire e-Callisto network for near-real-time space-weather applications. The labeled dataset, code, and a live demo are publicly available under an MIT license. 
+
+Keywords e-Callisto · solar radio bursts · deep learning · data augmentation · spectrogram analysis · explainable AI 
+
+# 1 Introduction 
+
+Solar radio bursts (SRBs) are intense radio signals triggered by solar activity such as flares and coronal mass ejections, typically produced by accelerated electrons interacting with the coronal plasma. These bursts are visualized in the form of spectrograms. A spectrogram represents the dynamic evolution of solar radio emission over time and frequency in the form of an image. The time is represented on the x-axis and the frequency on the y-axis. The pixel values correspond to the intensity of the radio emission. Figure 1 shows such a spectrogram, including a radio burst observed by an e-Callisto station in Australia ( 1 ). Characteristic morphological patterns, such as drifting structures, appear clearly and are directly related to electron beam velocities and ambient plasma density gradients. These features can serve as critical diagnostics for probing coronal magnetic fields, plasma densities, and the locations of particle acceleration sites. 
+
+Figure 1: A solar radio burst seen by one of the instruments of the e-Callisto network in Australia. Solar radio bursts can be classified into five types ( 2). Type I bursts are associated with noise storms from active regions. Type II bursts are linked with shock waves from coronal mass ejections. Type III bursts result from fast electron beams traveling along open magnetic field lines. Type IV bursts are thought to be related to continuum emission following flares. Finally, type V bursts may be a diffuse continuation of type III activity. While providing important physical observables, solar radio bursts do also significantly interfere with terrestrial and space-based radio communication systems. This is a strong motivation for continuously monitoring the Sun in the radio domain, and for the development of automated detection systems to track such events. In this context, this work does not attempt burst-type classification, but focuses solely on the setting of binary detection (burst vs. non-burst), with the aim of continuous (24/7) operation. In the deployed workflow, a new 15-minute observation is processed approximately 30 seconds after it becomes available. This setting is provided by the e-Callisto network ( 3 ), which is a global network of radio stations designed to observe solar radio activity continuously. As of 12 April 2026, 269 CALLISTO instruments have been deployed across all 2A PREPRINT - J ULY 29, 2026 continents; 113 of these have contributed data to the archive at least once, and 86 upload data regularly 2. The instruments in regular operation are sufficient to provide near real-time, 24/7 global coverage. The e-Callisto network monitors the Sun in the radio frequencies between 45 MHz and 870 MHz or any other range using a frequency converter. The data products generated by the e-Callisto network are spectrograms as shown in Figure 1 above (4). Detecting reliably the radio bursts in these spectrograms is challenging. The diversity of stations leads, both to strongly varying signal-to-noise ratio and to a diverse ‘zoo’ of radio frequency interference (RFI). Nonetheless, a comprehensive list of detected bursts, compiled manually, has been built up over several years and over all operating stations 3. This is a valuable asset for training machine learning models. The model we present is based on a ResNet detector ( 5 ), which we call FlareSense . The model is trained on the e-Callisto spectrograms that are associated with the list of detected bursts. Therefore, each entry of this list is considered as a label for the associated spectrogram. The trained model is then integrated into an automated software system that enables near-real-time operation, and supports ongoing space weather monitoring efforts. 
+
+# 2 Related Work 
+
+Over the past few years, several methods have been proposed for the automatic detection of solar radio bursts in spectrogram data ( 6; 7; 8 ; 9 ; 10 ; 11 ). Early works primarily focused on algorithmic approaches that relied on classical signal processing techniques. For instance, methods based on thresholding and mathematical morphology were developed to exploit the characteristic drifting patterns (e.g. the fast drift of type III bursts and the slower drift of type II bursts) in the time-frequency domain ( 12 ; 13 ). One such method, based on the Radon transform, was developed by Lobzin et al. (2009). All these techniques were able to detect bursts by transforming their curved trajectories into simpler geometric features (e.g. straight lines) that could be identified using standard image processing tools. However, they required careful manual tuning of parameters and were generally limited in their ability to generalize across different instruments or noise conditions. Following these, machine learning (ML) methods were introduced to improve detection accuracy by automatically learning discriminative features from the data. ML classifiers such as support vector machines and random forests ( 15 )have been applied to burst detection tasks ( 16 ); they provided improved robustness over purely algorithmic methods, but still depended heavily on features derived from statistical methods and were constrained by relatively small training datasets. More recently, deep learning (DL) approaches have gained prominence. Notably, Gordo et al. (2023) introduced the deARCE method, a deep neural network-based approach that uses a Convolutional Neural Network for both feature extraction and classification of solar radio bursts; in single-observatory mode, deARCE achieves a recall ( T P T P +F N ,where T P and F N denote true positives and false negatives) of around 86 % and a precision ( T P T P +F P , with F P 
+
+representing false positives) of approximately 92 %. These values correspond to a false-negative rate of 14% and a false-discovery rate of 8%, respectively, on a full year of data; the false-discovery rate should not be confused with the false-positive rate F P F P +T N . The hybrid deARCE models (trained across multiple stations) further improve these metrics. The deARCE associated data are publicly available via the Astrodoncel Data Centre. 4.Independently, He et al. (2023) showed that a transformer-based, lightweight MobileViT-SSDLite detector, combining transformer-based MobileViT blocks with an SSDLite object detection head, can detect and classify type II-V radio bursts in e-Callisto dynamic spectra with AP 50 ≈ 0.78 (i.e., the area under the precision-recall curve (obtained by varying the detection confidence threshold) at an intersection-over-union threshold of 0.5) and a recall of 92 %, achieving competitive detection performance on selected datasets. However, both models were trained on a limited subset of instruments and with relatively small datasets, leaving open the question of their generalization to a broader range of observational conditions. Beyond these two representative DL detectors, several related DL/ML systems have been proposed for SRB recognition and forecasting. For example, González Orué et al. (2023) trained a convolutional neural network on curated spectrogram data (from the CALLISTO network and a ground-based station) to automatically identify and classify solar radio bursts under low signal-to-noise and limited-label regimes. Liu et al. (2025) addressed the labeling bottleneck more explicitly by combining deep active learning with a progressive convolutional GAN; they report very strong    
+
+> 2Current deployment and operation counts are maintained in the official e-Callisto instrument-status document: https://www. e-callisto.org/Callisto_DataStatus_Vwww.pdf .
+> 3burst catalog, by C. Monstein and partly by deARCE University of Alcalá. Available at: https://soleil.i4ds.ch/ solarradio/data/BurstLists/2010-yyyy_Monstein/
+> 4https://astrodoncel.uah.es/dashboard/burst.php
+
+3A PREPRINT - J ULY 29, 2026 performance (e.g., 99.44% accuracy using only 20.5% labeled data, and per-class true-positive/false-positive trade-offs reported for multiple burst types), illustrating that query-efficient labeling can substantially reduce annotation cost while maintaining high classification quality. In a complementary direction, Wang et al. (2024) focus on prediction rather than spectrogram detection, using a multimodal model based on SOHO/MDI magnetic maps and sunspot parameters to forecast daily SRB occurrence; over 5449 days they report an accuracy of 0.898 ± 0.011 with precision 0.923 and recall 0.934, and highlight sunspot-count thresholds as a strong predictive signal. Finally, transfer-learning approaches have recently shown that strong performance can be obtained even with compara-tively small labeled SRB sets: Roux et al. (2025) fine-tune several pre-trained vision models (including YOLOv8) for Type II/III recognition and report test-set F1 scores in the ∼87–92% range, while also releasing code and processed data to support reproducibility. Several very recent works apply modern detection architectures directly to e-Callisto/CALLISTO spectrograms. Tassan-Din et al. (2026) detect and classify bursts across 49 CALLISTO stations with YOLOv5 and ensemble methods (F1 = 73.8%); they publicly release their labeled training data on Zenodo and build on the open-source YOLOv5 codebase, though we found no separate release of their own ensemble-method code. Deng et al. (2024) report a real-time YOLOv8-based detector (82.4% accuracy at 140.9 fps), also with no public code or data release found. Wang et al. propose two further e-Callisto detectors, one task-aligned (TOOD, i.e., a Task-aligned One-stage Object Detection model) (2025) and one based on Deformable DETR (2025); both publicly release code and data. For Type III bursts specifically, Scully et al. (2023) combine GAN-simulated bursts with LOFAR observations to train a YOLOv2 detector (mAP = 77.71%), with no code or data release found. A further shortcoming in the literature is that, despite these advances, the detection of solar radio bursts, particularly in the context of networks such as e-Callisto, is still largely performed manually by experts. In addition, while some operational systems exist (for example, one deployed by the HUMAIN group 5 and other systems developed in China or the one by Gordo et al., see further above), an SRB detector whose code, dataset and model are all open-sourced together remains elusive. Our work builds on these developments by leveraging deep learning and an extensive collection of e-Callisto spectro-grams from multiple e-Callisto instruments to develop a model that generalizes across diverse observational conditions. Because e-Callisto data are often affected by noise, calibration differences and a diverse ‘zoo’ of radio frequency interference, we further investigated the use of data augmentation methods to enhance model robustness. Specifically, we incorporated SpecAugment and TimeWarp (28 ), adapting these techniques for solar radio spectrograms to improve the model’s ability to handle real-world variability in RFI and changing / updating instruments. 
+
+# 3 SpecAugment and TimeWarp for Spectrogram Augmentation 
+
+Originally introduced in the field of speech recognition, SpecAugment modifies the time-frequency representation of a signal by uniformly masking random bands along the time or frequency axes. The masked regions can be filled with a constant value, the mean/max/min amplitude of the spectrogram, or random values (typically sampled uniformly between 0 and 1), depending on which strategy yields the best performance for the task. This simulates missing or distorted information and encourages the model to learn features that remain robust under such perturbations. TimeWarp ,in contrast, smoothly stretches or compresses regions of the spectrogram along the time axis, imitating variations in event duration or drift rate. Together, these augmentation techniques enhance the diversity of the training data and help the model generalize to heterogeneous and noisy observations, such as across different instruments or phases of the solar cycle. Figure 2 illustrates examples of these transformations. 
+
+> 5https://www.sidc.be/humain/callisto_burst_archives_AI
+
+4A PREPRINT - J ULY 29, 2026 
+
+Figure 2: Examples of spectrogram data augmentation methods being applied to a e-Callisto spectrogram. Top: Unaugmented spectrogram, showing a solar radio burst seen by the instrument AUSTRALIA-ASSA_01 on the 7th of May 2021. This example is shown for illustration only and is not part of the dataset described in Section 4.3. Bottom: TimeWarp smoothly deforms the spectrogram along the time axis, imitating variations in burst duration and drift rate and SpecAugment masks a random frequency band with 0, simulating missing or distorted information and improving robustness to frequency-dependent interference. 
+
+Although SpecAugment and TimeWarp are commonly applied to spectrograms, this is the first use of these methods on spectrograms generated from voltage signals induced by solar radio emission in antenna systems such as e-Callisto. 
+
+# 4 Data 
+
+4.1 Spectrograms 
+
+The raw spectrograms used in this work are obtained from stations participating to the e-Callisto network. They are archived at FHNW, which maintains the global e-Callisto public archive 6. Each spectrogram represents a 15-minute observation that captures the dynamic evolution of solar radio emission over time and frequency. The time axis is sampled mostly at a resolution of 250 ms. In contrast, the frequency axis generally spans a broad range, from approximately 20 MHz up to 1 GHz, although the exact frequency range and resolution may vary from one instrument to another. For instance, while many stations operate with a spectral resolution on the order of tens of kilohertz (commonly around 62.5 kHz per channel), differences in hardware configuration can lead to variations in the number of frequency channels available in each spectrogram. 
+
+4.2 Binary Labels 
+
+The fact that SRBs have been labeled by hand over many years is of extreme utility for training a model. The burst catalog introduced already in Section 1 can be considered as the ground truth. For our method the SRB classes are ignored, and spectrograms containing a burst are given the binary label 1 and spectrograms without a solar radio burst are given the binary label 0. In this work, we restrict the task to binary classification (burst vs. non-burst) but extending FlareSense to type-specific classification is planned as future work.  
+
+> 6The raw spectrograms of e-Callisto can be accessed at https://soleil.i4ds.ch/solarradio
+
+5A PREPRINT - J ULY 29, 2026 Nevertheless, as with any manual labeling process, ambiguous cases may occur. Therefore, the labels are not perfectly consistent and this should be considered during data creation, training, and evaluation. 
+
+4.3 Selected Stations and Instruments 
+
+The ground truth burst catalog mentioned above contains the station which has observed the solar radio burst. However, more than one instrument might be observing at the same station, and several instruments might perform the same observation. To uniquely associate the label in the burst catalog with a single spectrogram, we select the best instruments that have performed the specific observation, as seen in Table 1. Table 1: Detected Radio Bursts (excerpt from the e-Callisto burst catalog). The Type column follows the standard classification (I–V); RBR denotes a fixed-frequency radio burst. The full list of event codes used in the catalog is documented at https://e-callisto.org/eventSummaryExplanation.pdf . The station name is given (e.g., 
+
+Australia-ASSA ), but the exact instrument identifier, typically appended as a number (e.g., Australia-ASSA_01 ), is not specified in this list. Date Time (UT) Type Stations 2024-03-03 03:20–03:20 III Australia-ASSA, INDIA-UDAIPUR 2024-03-03 14:28–14:28 RBR Germany-DLR To construct the dataset, we examined how often each instrument appears in the burst catalog and selected 26 instruments such that no two are from the same station recording at the same time. This ensures continuous global coverage while avoiding redundant data (and perhaps data leakage) from co-located instruments. The selected instruments, their stations, and their geolocations are listed in Table A (Appendix). Detailed specifications of the stations and instruments used, including sensitivity, resolution, and frequency coverage, are available on the e-Callisto page 7.
+
+4.4 Generation of Training Data 
+
+Using the burst catalog described in Subsection 4.2, which provides the burst time and instrument, we extract the corresponding raw data and construct spectrograms containing each event. To reduce positional bias, the start is randomly shifted by a uniform offset in [0 , 10] minutes before the annotated time. The full procedure is given in Algorithm 2 (Appendix). For each burst spectrogram produced from the catalog, we additionally create ten spectrograms without a burst to provide negative examples and maintain a realistic class balance. We sample random 15-minute windows and discard any window that overlaps a burst reported in the catalog by any station, not only by the instrument being sampled; this is deliberately conservative, since a burst seen elsewhere in the network may well be faintly present in the window at hand. The remaining windows are kept if they meet basic data-quality criteria; see Algorithm 3 (Appendix). Overall, this method with the selected instruments and using the burst catalog up to May 2024 yields 304,750 total spectrograms. The dataset is publicly available on Hugging Face 8.For all data processing, the Python package ecallisto_ng (29) was used. To create a train, validation and test set, we perform a stratified split into 80% training, 10% validation, and 10% test (stratification was done by instrument and by class label). Although spectrograms are sampled randomly across multiple years (2022-2024) and instruments, the dataset does not explicitly control for the phase of the solar cycle. This limitation arises because no consistently labeled data exist across multiple solar cycles. Each 15-minute spectrogram is normalized independently; this largely mitigates long-term variations in background solar flux. Still, assessing how solar-cycle-dependent variations in burst rates affect model generalization remains an open question. Additionally, the test set labels were re-verified by the e-Callisto principal investigator (PI) in a dedicated second pass, in which every test spectrogram was inspected again without time pressure. The PI received the test spectrograms for       
+
+> 7See https://www.e-callisto.org/Qualification/applidocs.html and https://www.e-callisto.org/ GeneralDocuments/Callisto-General.html for more information.
+> 8e-Callisto Radio Sunburst Dataset. Available at: https://huggingface.co/datasets/i4ds/ecallisto_radio_ sunburst .
+
+6A PREPRINT - J ULY 29, 2026 re-inspection without access to the model predictions, so this second pass was blind to the model output. As a result, the test set contains fewer mislabeled (noisy) samples than the training and validation sets. We refer to these re-verified labels as the clean test labels, and use them as ground truth throughout Section 6. Before passing a training spectrogram to the model, it is preprocessed as shown in Algorithm 1. Validation and test spectrograms undergo the same median subtraction, resizing, and normalization, but not the stochastic TimeWarp or 
+
+SpecAugment steps. 
+
+Algorithm 1 Spectrogram Augmentation Pipeline 
+
+Require: Training dataset D = {Si}Ni=1 of raw spectrograms 
+
+Ensure: Augmented dataset Daug = {S(aug ) 
+
+> i
+
+}Ni=1 , each of shape 128 × 512  
+
+> 1:
+
+for each spectrogram S in D do  
+
+> 2:
+
+S ← MEDIAN SUBTRACT (S) ▷ subtract median per frequency channel  
+
+> 3:
+
+S ← TIME WARP (S; w) ▷ elastic deformation along time axis  
+
+> 4:
+
+S ← RESIZE (S, 128 , 512) ▷ torchvision.transforms.Resize  
+
+> 5:
+
+S ← SPEC AUGMENT (S; mf , m t) ▷ mask random frequency/time bands  
+
+> 6:
+
+S ← NORMALIZE TOUNIT INTERVAL (S) ▷ scale pixel values to [0 , 1]  
+
+> 7:
+
+S(aug ) ← S 
+
+> 8:
+
+append S(aug ) to Daug  
+
+> 9:
+
+end for 
+
+# 5 Model for FlareSense 
+
+A ResNet model ( 5 ) was adapted for binary classification. The network was initialized with random weights using standard Kaiming normal initialization, which He et al. (2015) demonstrated enables deep feedforward ReLU networks-including ResNet-to converge faster and more stably toward a low loss. Weighted binary cross-entropy ( BCE weighted ) was used as the loss function, defined as BCE weighted = −[ w1 y log(ˆ y) + (1 − y) log(1 − ˆy) ] , where y and ˆy denote the true and predicted labels, respectively, and w1 is the weight applied to the positive (burst) class. The weight was computed from the ratio of burst to non-burst samples, yielding w1 ≈ 10 
+
+because we defined that for each burst sample, there should be 10 non-burst samples, see Subsection 4.4. A low BCE weighted indicates that the model assigns large positive logits (and thus high probabilities) when a spectrogram contains a solar radio burst, and large negative logits when it does not. The optimal ResNet architecture and training settings were determined through hyperparameter tuning, i.e., systematic optimization of parameters such as learning rate and weight decay, using the validation set (see Section 5.2). The sweep trained candidate models on the training split and evaluated them on the validation split. The test set was not used for model selection or hyperparameter tuning. The single temperature scalar used for probability calibration was fitted separately on the training-set predictions (Appendix E). 
+
+5.1 Training Method 
+
+The model was trained for a fixed number of epochs using the AdamW optimizer ( 31 ), which decouples weight decay from the gradient update, leading to more stable convergence compared to the standard Adam optimizer. A linear learning rate decay with an initial warm-up phase was applied. The warm-up prevents instability during early training by starting with a smaller learning rate and gradually increasing it before decaying linearly. This scheduling strategy is commonly adopted in transformer-based models and contributes to smoother optimization and better generalization performance in neural networks (32). 
+
+5.2 Parameters and Hyperparameter Sweep 
+
+A Bayesian hyperparameter tuning ( 33 ) (using Weights & Biases ( 34 )) maximized the F1 score on the validation set. The F1 score, defined as the harmonic mean of precision and recall, was computed as an unweighted mean across all instruments; meaning that each instrument contributes equally, regardless of how many bursts it has detected. This choice was made to prioritize model robustness across diverse instruments. 7A PREPRINT - J ULY 29, 2026 Table 2 details the parameters used for FlareSense and the best-performing configuration identified during the sweep, i.e. the configuration with the highest validation F1 score. This configuration reached an F1 score of 80.53 % on the validation set. Table 2: Model Parameters, Ranges, and Best Run Values 
+
+Parameter Range/Value Best Run Value 
+
+Epochs 15–100 25 Warm-up Epochs 3–20 12 Learning Rate 1 × 10 −6–1 × 10 −3 2.4 × 10 −4
+
+Label Smoothing 0.0–0.2 0.1174 Model Type [ResNet34, ResNet50, ResNet101, ResNet152] ResNet34 
+
+Weight Decay 1 × 10 −9–1 × 10 −3 5.2 × 10 −4
+
+Frequency Masking Parameter 0–40 25 Time Masking Parameter 0–90 70 TimeWarp Width 300–450 389 Masking Method [Mean, Random, Max, Min] Random 
+
+Batch Size 64 64 
+
+5.3 Effectiveness of Data Augmentation 
+
+Feature-correlation and ablation analyses from the parameter sweep indicated that data augmentation had a strong positive influence on model performance. In particular, the Bayesian optimization sweep, which adaptively explores hyperparameter combinations by balancing exploration and exploitation, consistently selected configurations with data augmentation enabled. To further quantify this effect, three additional hyperparameter tuning runs were performed using the same parameter ranges described in Section 5.2: one with data augmentation disabled, one with only SpecAugment , and one with only TimeWarp . These were compared to the reference run from Section 5.2, which allowed both augmentations simultaneously. Candidate models were trained on the training split and compared during the sweeps on the validation split; Figure 3 reports their subsequent performance on the held-out test data. The median (and maximum) test F1-scores for the four conditions were 71.0 % (73.3 %), 72.6 % (75.1 %), 75.8 % (77.6 %), and 77.2 % (80.5 %) for no augmentation, SpecAugment only, TimeWarp only, and both augmentations, respectively. 8A PREPRINT - J ULY 29, 2026 
+
+Figure 3: Comparison of FlareSense test-set performance under different data augmentation strategies. Each box represents the distribution of test F1-scores across models produced by hyperparameter sweeps with identical search ranges (see Section 5.2); model optimization within each sweep used the validation split. The results show that both SpecAugment and TimeWarp independently improve detection accuracy, while their combination yields the highest median performance and lowest variance across experiments. 
+
+This confirms that both augmentation techniques individually improve performance, while their combination yields the highest accuracy and robustness across runs. 
+
+5.3.1 Effectiveness on Unseen Instruments 
+
+Additionally, we evaluated how data augmentation influences predictive quality on instruments excluded from model training (Figure 4). For this separate diagnostic experiment, nine instruments were randomly retained in the training sub-set: GLASGOW_01 , BIR_01 , ALASKA-HAARP_62 , ALASKA-COHOE_63 , AUSTRIA-UNIGRAZ_01 , Australia-ASSA_62 ,
+
+HUMAIN_59 , INDIA-OOTY_02 , and SWISS-Landschlacht_62 . The other 17 instruments were withheld from training and retained in the validation data. We then compared otherwise equivalent models trained with and without augmenta-tion on those 17 unseen instruments. This setting reflects the regular addition of new e-Callisto instruments and changes to the calibration of existing instruments. 9A PREPRINT - J ULY 29, 2026 
+
+Figure 4: Left: Validation precision across the 17 instruments withheld from training for models trained with and without data augmentation. Right: Corresponding validation recall for the same comparison. Both panels show results only for instruments unseen during training, illustrating how data augmentation improves cross-instrument generalization. 
+
+Figure 4 shows that data augmentation improves validation precision and recall on the 17 instruments excluded from training and reduces the per-instrument spread of both metrics. While precision and recall improved across most instruments, a few outliers remain, which likely reflect unique calibration or interference patterns. 
+
+5.4 Training Process 
+
+The final model is trained with the parameters presented in Table 2 on an A4500 with 20 GB of VRAM. Once the hyperparameters were fixed by the sweep, the final model was retrained on the union of the training and validation splits (90% of the data) for the selected number of epochs, so that no data is left unused; the test set is reserved for the final evaluation. It took 7 hours and 32 minutes to fully train FlareSense. 
+
+# 6 Evaluation 
+
+The dataset is severely unbalanced in both class distribution and instrument allocation; hence, we report both micro and macro metrics, stratified per instrument, for a more accurate assessment. We also compare our model’s performance against the routine expert catalog to highlight potential advantages or drawbacks. The human baseline is the burst catalog itself as it is produced in routine operation: the PI inspects the incoming spectrograms day by day and enters the bursts that are noticed at the time. These day-to-day catalog entries are the same labels used for training, and we score them against the clean test labels obtained in the dedicated second pass described in Subsection 4.4. The gap between the two therefore quantifies how many bursts are missed under realistic operational conditions, as opposed to careful re-inspection. To compare FlareSense with routine expert cataloging, we calibrated FlareSense’s probability outputs using temperature scaling fitted on the training-set predictions; see Appendix E and Figure 16. For the matched-precision comparison on the clean test set, we then used a calibrated probability threshold of 0.426, at which FlareSense has the same precision as the routine catalog baseline. As shown in Table 3, FlareSense achieves a recall of 73.15%, compared with 63% for the routine catalog. Thus, at equal precision, FlareSense recovers more of the bursts that were missed during routine day-to-day inspection. Table 3: Performance on the Clean Test Set (n=30,549). 
+
+Method Precision Recall 
+
+FlareSense (Ours) 93% 73.15% Routine expert catalog 93% 63% Figure 5 shows the precision-recall (PR) curves for the Test and Train datasets. The cleaner, double-checked test labels lead to a higher and more stable PR curve, showing that the model performs better when evaluated against verified labels. 10 A PREPRINT - J ULY 29, 2026 In contrast, the training set’s weaker performance reflects the noisier single-checked labels used during optimization. We use PR rather than ROC curves because precision-recall plots are more informative for imbalanced datasets such as ours.  
+
+> (a) Test set (b) Train set
+
+Figure 5: Precision-recall (PR) curves for the train and test datasets. Each point corresponds to a different probability threshold. Macro PR values are computed by averaging precision and recall across instruments (equal weight per instrument), while micro PR values are calculated globally over all samples (weighting instruments by the number of examples). The higher test-set curve reflects the cleaner, double-checked labels rather than a difference in generalization. 
+
+Generally, most of the false negatives are either very faint, Type III bursts or missed during annotation. If a burst is clearly visible and the model misses it at the selected operating point, the probabilities are often close to the relevant decision threshold. Selecting a lower threshold would also capture some of those cases if the user wishes to trade precision for recall. 
+
+# 7 Model Interpretability 
+
+We assessed the interpretability of FlareSense using Gradient SHAP ( 35 ; 36 ), which attributes each model prediction to specific spectro-temporal features (i.e., pixels on the spectrogram). These maps do not by themselves establish causal model behavior, but they allow us to check whether the prediction is attributed to the burst structure or to unrelated image regions. Figure 6 shows a typical true positive example: the attribution map concentrates on the intense, short-duration emission band that defines the burst. This is consistent with the model using physically meaningful burst features rather than incidental structure at the edges or in the background of the spectrogram. 11 A PREPRINT - J ULY 29, 2026 
+
+Figure 6: A true positive detection by FlareSense, with the corresponding Gradient SHAP attribution map below. The attribution is concentrated on the solar radio burst structure. 
+
+Figure 7: False negative by FlareSense. Before temperature scaling, the model assigns a burst probability of 45.9%, below the uncalibrated threshold of 0.5. With the fitted temperature, this corresponds to a calibrated probability of approximately 41.8%, which is also below the calibrated evaluation threshold of 0.426. In contrast, Figure 7 illustrates a false negative. Although the strongest attribution falls in the relevant region, it is weak, which is consistent with the signal’s low intensity or overlapping background reducing the model confidence. However, this event might not be a true burst, as there is essentially no frequency drift. The attribution pattern nevertheless follows a drift-like direction that is not clearly visible in the instrument spectrogram. As such, this example might represent a mislabeled data point, although this is difficult to determine from a single spectrogram. 12 A PREPRINT - J ULY 29, 2026 
+
+Figure 8: Apparent false positive originating from a ground-truth annotation miss. FlareSense assigns a burst probability of 87.73%, and the attribution map concentrates on the burst-like emission. During attribution-based review, we identified cases where the model highlighted physically plausible burst structure despite a negative label. Figure 8 shows one such instance: the model score is high (87.73%) and the attribution aligns with the emission band; upon manual reinspection, we concluded that this burst was missed during ground-truth creation and should be relabeled. We stress that no test-set label was changed as a result of these attribution-based inspections: the evaluation in Section 6 is computed against the clean labels produced in the PI’s independent second pass (Subsection 4.4), which was carried out without access to the model predictions. The cases discussed here are therefore reported as qualitative observations, and they mean that the precision of 93% in Table 3 is, if anything, a conservative estimate. Across the examples in Appendix D, the attribution maps consistently highlight visually meaningful structures. This provides qualitative evidence that the model uses burst-like signal patterns in these cases rather than unrelated regions of the images. Per-instrument F1, precision, and recall are reported in Table 5 (Appendix B). In general, XAI also clarified whether a case was a genuine false positive or a missed burst. When the model emphasized regions that appeared physically significant, further inspection often revealed that what was initially labeled as a false positive was in fact a true burst we had overlooked. 
+
+# 8 Discussion & Conclusion 
+
+In this work, we introduced FlareSense , a ResNet-based deep learning model designed to automatically detect solar radio bursts in e-Callisto spectrogram data. By adapting SpecAugment and TimeWarp to solar radio spectrograms and performing a hyperparameter sweep, our model matches the precision of the routine expert catalog while improving recall. Specifically, FlareSense reaches a precision of 93% and a recall of 73.15% on a clean, double-checked test set, compared with 63% recall for routine cataloging at the same precision. Our study demonstrates that incorporating data augmentation significantly enhances model robustness, especially when generalizing to unseen instruments. The ablation over augmentation strategies (Fig. 3) shows that runs without any augmentation are clearly the weakest, and that enabling SpecAugment and TimeWarp together yields both the highest median F1 score and the smallest spread across sweep runs. The per-instrument comparison on unseen instruments (Fig. 4) points in the same direction: augmentation raises precision and recall for most instruments and narrows their spread, underscoring the effectiveness of domain-adapted augmentation strategies. Additionally, the explainable AI (XAI) analysis provides qualitative evidence that, in the inspected examples, predictions are attributed to physically plausible emission structures rather than unrelated image regions. 13 A PREPRINT - J ULY 29, 2026 While our work addresses challenges such as class imbalance and noisy labels, it also opens several avenues for future research. Future efforts could explore more advanced techniques for handling label noise, such as semi-supervised or self-supervised learning methods ( 37 ; 38 ; 39 ) tailored to spectrogram data. Li et al. (2022) and Zhao et al. (2025) have already applied self-supervised pretraining (masked-autoencoding and stable-diffusion-based augmentation, respectively) to solar radio spectrograms; the former publicly releases code and data, and the latter’s formal data-availability statement reports no datasets generated, though the same group has released related code separately. Additionally, further refinement of augmentation methods and model architectures may yield even higher performance, especially in scenarios with extremely low signal-to-noise ratios. Overall, FlareSense represents a step toward fully automated solar radio burst detection, reducing the need for labor-intensive manual analysis and contributing to improved real-time space weather monitoring. FlareSense is available at https://huggingface.co/i4ds/flaresense-v2 and the code to reproduce our results at https: //github.com/i4Ds/FlareSense-v2 and the open-source dataset is available at https://huggingface.co/ datasets/i4ds/ecallisto_radio_sunburst .By releasing our dataset, model, and code as open source, we aim to promote reproducibility and accelerate collaborative advancements in the field of solar radio burst detection. Long-term support is planned through continued integration with the e-Callisto network and contributions from the community. We intend FlareSense to serve as a solid foundation for future work on solar radio burst detection and classification. 
+
+# 9 Outlook 
+
+Building on FlareSense’s promising results, several areas for improvement and expansion emerge. Most urgently, real-time deployment across the e-Callisto network would enable near-instant detection of solar radio bursts, thereby aiding space-weather forecasting. Beyond single-instrument input, incorporating multi-instrument fusion, by combining data from additional networks (e.g., LOFAR ( 42 ) or MWA ( 43 )), could enhance detection reliability and refine burst characterization. While FlareSense currently performs binary detection, classifying burst types (I-V) would further enrich its scientific value by illuminating the full spectrum of solar activity. In particular, fusing FlareSense outputs with localization cues from time-of-arrival pipelines such as BELLA ( 44 ), and exploiting the ever-growing, well-labelled e-Callisto archive, could supply the contextual information needed to train the network to discriminate reliably between burst morphologies and thus predict the specific burst type. For rare classes such as Type IV/V, few-shot approaches may help: Jiang et al. (2026) recently applied few-shot object detection to Type III identification on STEREO/WAVES data; their detection code and dataset are not released, though they open-source their annotation tool. In addition, handling noisy labels through refined annotations or semi-supervised learning techniques could boost performance, especially for faint or short-lived bursts. Building on model explainability, interactive interfaces that display attribution maps would also help observers validate detections and improve overall reliability. By pursuing these directions, FlareSense can evolve into a robust, real-time platform for solar radio burst monitoring, advancing both scientific research and operational space weather services. Furthermore, a more detailed investigation into how the burst-to-non-burst ratio during data generation and the tuning of class weights affects performance was deemed necessary. Generally, assigning a higher weight to burst samples usually improves recall, at the cost of precision. Exploring methods to leverage the vast amount of unlabeled data provided by e-Callisto represents an exciting avenue for future study. 
+
+# Acknowledgements 
+
+We are particularly grateful to Arnold O. Benz for generously sharing his expertise on solar radio spectrograms, which provided the foundation for this study. We also extend our sincere thanks to Brandon Panos and Simon Felix for their valuable proofreading and thoughtful feedback on this manuscript. 
+
+# Funding 
+
+The e-Callisto network is a community-driven effort supported by funding from multiple nations. We especially acknowledge the support of the “Programa Giner de los Ríos 2024-2025” for Invited Researchers at Universidad de Alcalá (UAH), and the ESA Space Weather Network (SWESNET), which partially funded the data provision. 14 A PREPRINT - J ULY 29, 2026 
+
+# Data Availability 
+
+The dataset used to produce FlareSense is available with an MIT license on Hugging Face at https://huggingface. co/datasets/i4ds/ecallisto_radio_sunburst . The demo is available at https://flaresense.ch .
+
+# References 
+
+[1] ASSA. Callisto radio spectrometer. https://www.assa.org.au/resources/radio-astronomy/ callisto-radio-spectrometer/ , 2023. Most recent update 2 Nov 2023; accessed 8 Oct 2025. [2] Stephen M White. Solar radio bursts and space weather. arXiv:2405.00959 , 2024. [3] AO Benz, C Monstein, H Meyer, PK Manoharan, R Ramesh, A Altyntsev, A Lara, J Paez, and K-S Cho. A world-wide net of solar radio spectrometers: e-callisto. Earth, Moon, and Planets , 104(1–4):277–285, 2009. doi: 10.1007/s11038-008-9267-6. URL https://doi.org/10.1007/s11038-008-9267-6 .[4] Christian Monstein, André Csillaghy, and Arnold O. Benz. Callisto quicklook solar spectrogram plots, 2023. URL 
+
+https://spase-metadata.org/ISWI/DisplayData/Callisto/FAS/PT15M .[5] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep residual learning for image recognition, 2015. URL https://arxiv.org/abs/1512.03385 .[6] Nur Zulaikha Mohd Afandi, N. H. Sabri, Roslan Umar, and Christian Monstein. Burst-finder: burst recognition for e-callisto spectra. Indian Journal of Physics , 94:947–957, 2020. doi: 10.1007/s12648-019-01551-2. URL 
+
+https://doi.org/10.1007/s12648-019-01551-2 .[7] Mario Fernández Ruiz, Javier Bussons Gordo, Manuel Prieto Mateo, and Christian Monstein. Automatic detection of e-callisto solar radio bursts by deep neural networks. In 2022 3rd URSI Atlantic and Asia Pacific Radio Science Meeting (AT-AP-RASC) , pages 1–4, 2022. doi: 10.23919/AT-AP-RASC54737.2022.9814298. [8] Lukas Höfig, M. Temmer, F. Koller, L. Drescher, Marcin Latocha, and C. Monstein. Robust – a radio burst identification algorithm for space weather warning using the e-callisto station at university of graz. 2023. 19th European Space-Weather Week ; Conference date: 20-11-2023 Through 24-11-2023. [9] N.Z. Mohd Afandi, R. Umar, N.H. Sabri, S. Safei, C. Monstein, C.C. Lau, and S.N.A. Syed Zafar. Burst-classifier: Automated classification of solar radio burst type ii, iii and iv for callisto spectra using physical properties during maximum of solar cycle 24. Advances in Space Research , 74(11):6104–6123, 2024. ISSN 0273-1177. doi: 10.1016/j.asr.2024.09.001. URL https://www.sciencedirect.com/science/article/ pii/S0273117724009207 .[10] YongLin Yu, ChengLong Qiao, Shuo Xu, QinZheng Li, YanRui Su, HongQiang Song, and FaBao Yan. A study of real-time detection methods for solar radio burst identification. The Astrophysical Journal Supplement Series , 276 (1):18, jan 2025. doi: 10.3847/1538-4365/ad91a2. URL https://dx.doi.org/10.3847/1538-4365/ad91a2 .[11] Yashan Hettiarachchi, Janaka Adassuriya, Chandana Jayaratne, Sasani Jayawardhana, and Christian Monstein. The analysis of type ii and type iii solar radio bursts: Gui for the e-callisto data. New Astronomy , 109:102194, 2024. doi: 10.1016/j.newast.2024.102194. URL https://doi.org/10.1016/j.newast.2024.102194 .[12] James Jones. Automated recognition of type iii solar radio bursts using mathematical morphology. In Proceedings of the Advanced Maui Optical and Space Surveillance Technologies Conference . Maui Economic Development Board, September 2014. Atmospherics/Space Weather track. [13] Houssam Salmane, Rodolphe Weber, Karim Abed-Meraim, Karl-Ludwig Klein, and Xavier Bonnin. A method for the automated detection of solar radio bursts in dynamic spectra. J. Space Weather Space Clim. , 8:A43, 2018. doi: 10.1051/swsc/2018028. URL https://doi.org/10.1051/swsc/2018028 .[14] V. V. Lobzin, I. H. Cairns, P. A. Robinson, G. Steward, and G. Patterson. Automatic recognition of type III solar radio bursts: Automated radio burst identification system method and first observations. Space Weather , 7:S04002, 2009. doi: 10.1029/2008SW000425. [15] Leo Breiman. Random forests. Machine Learning , 45(1):5–32, 2001. ISSN 1573-0565. doi: 10.1023/A: 1010933404324. URL https://doi.org/10.1023/A:1010933404324 .[16] Eoin P. Carley, Peter T. Gallagher, Joe McCauley, and Pearse Murphy. Using supervised machine learning to automatically detect type ii and iii solar radio bursts. In EGU General Assembly 2020 , EGU2020-5109, 2020. doi: 10.5194/egusphere-egu2020-5109. Online, 4-8 May 2020. [17] Javier Bussons Gordo, Mario Fernández Ruiz, Manuel Prieto Mateo, Jorge Alvarado Díaz, Francisco Chavez de la O, J. Ignacio Hidalgo, and Christian Monstein. Automatic burst detection in solar radio spectrograms 15 A PREPRINT - J ULY 29, 2026 using deep learning: dearce method. Solar Physics , 298(6):82, 2023. doi: 10.1007/s11207-023-02171-0. URL 
+
+https://doi.org/10.1007/s11207-023-02171-0 .[18] Hailan He, Guowu Yuan, Hao Zhou, Chengming Tan, and Shaojie Guo. Solar radio burst detection based on the mobilevit-ssdlite lightweight model. The Astrophysical Journal Supplement Series , 269(2):51, November 2023. doi: 10.3847/1538-4365/ad036c. [19] Iván González Orué, Diego H. Stalder, Luis Salgueiro, and Jorge Molina. Automatic solar radio burst detection using deep learning. In 2023 IEEE CHILEAN Conference on Electrical, Electronics Engineering, Information and Communication Technologies (CHILECON) , pages 1–6, 2023. doi: 10.1109/CHILECON60335.2023.10418691. URL https://doi.org/10.1109/CHILECON60335.2023.10418691 .[20] Yan Liu, HongQiang Song, Fabao Yan, and Yan-Rui Su. Deep active learning–based classification of solar radio spectrogram data. The Astrophysical Journal Supplement Series , 279(1):25, 2025. doi: 10.3847/1538-4365/adda30. URL https://doi.org/10.3847/1538-4365/adda30 .[21] Y. H. Wang, S. W. Feng, Q. F. Du, Y. Q. Zhong, J. Wang, J. Y. Chen, X. Yang, and Y. Zhou. Solar radio burst prediction based on a multimodal model. Solar Physics , 299(4):49, 2024. doi: 10.1007/s11207-024-02296-w. URL https://doi.org/10.1007/s11207-024-02296-w .[22] Herman le Roux, Ruhann Steyn, Du Toit Strauss, Mark Daly, Peter T. Gallagher, Jeremiah Scully, Shane A. Maloney, Christian Monstein, and Günther Drevin. Type ii and type iii solar radio burst classification using transfer learning. Solar Physics , 300(12):179, 2025. doi: 10.1007/s11207-025-02595-w. URL https://doi. org/10.1007/s11207-025-02595-w .[23] Elisa Tassan-Din, Akhil Gunessee, Philippe Vong, Christophe Marqué, Laurent Dolla, Antonio Martínez Picar, and Christian Monstein. Automated detection and classification of solar radio bursts in callisto spectrograms using deep-learning yolov5 model and ensemble methods. Journal of Space Weather and Space Climate , 16:16, 2026. doi: 10.1051/swsc/2026014. [24] Jingyu Deng, Guowu Yuan, Hao Zhou, Hao Wu, and Chengming Tan. Real-time automated detection of multi-category solar radio bursts. Astrophysics and Space Science , 369:99, 2024. doi: 10.1007/s10509-024-04364-w. [25] Mingming Wang, Guowu Yuan, Hailan He, Chengming Tan, Hao Wu, and Hao Zhou. Multi-category solar radio burst detection based on task-aligned one-stage object detection model. Astrophysics and Space Sci-ence , 370:23, 2025. doi: 10.1007/s10509-025-04414-x. URL https://github.com/onewangqianqian/ MobileNetVitv2-TOOD .[26] Mingming Wang, Guowu Yuan, Hao Zhou, Chengming Tan, and Hao Wu. Solar radio burst detection based on deformable detr. The Astrophysical Journal Supplement Series , 278(1):4, 2025. doi: 10.3847/1538-4365/adbf18. URL https://github.com/onewangqianqian/SSA-Co-Deformable-DETR .[27] J. Scully, R. Flynn, and P. T. Gallagher. Improved type iii solar radio burst detection using congruent deep learning models. Astronomy & Astrophysics , 674:A218, 2023. doi: 10.1051/0004-6361/202346404. [28] Daniel S. Park, William Chan, Yu Zhang, Chung-Cheng Chiu, Barret Zoph, Ekin D. Cubuk, and Quoc V. Le. Specaugment: A simple data augmentation method for automatic speech recognition. In Interspeech 2019 ,interspeech_2019. ISCA, September 2019. doi: 10.21437/interspeech.2019-2680. URL http://dx.doi.org/ 10.21437/Interspeech.2019-2680 .[29] Vincenzo Timmel and Gabriel Torres Gamez. i4ds/ecallisto_ng: Zenodo release, December 2024. URL https: //doi.org/10.5281/zenodo.14505852 .[30] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Delving deep into rectifiers: Surpassing human-level performance on imagenet classification. In Proc. IEEE Int. Conf. on Computer Vision (ICCV) , pages 1026–1034, 2015. doi: 10.1109/ICCV.2015.123. [31] Ilya Loshchilov and Frank Hutter. Decoupled weight decay regularization. arXiv preprint arXiv:1711.05101 ,2017. [32] Kaichao You, Mingsheng Long, Jianmin Wang, and Michael I. Jordan. How does learning rate decay help modern neural networks? arXiv preprint arXiv:1908.01878 , 2019. [33] Jasper Snoek, Hugo Larochelle, and Ryan P. Adams. Practical bayesian optimization of machine learning algorithms, 2012. URL https://arxiv.org/abs/1206.2944 .[34] Lukas Biewald. Experiment tracking with weights and biases, 2020. URL https://www.wandb.com/ . Software available from wandb.com. 16 A PREPRINT - J ULY 29, 2026 [35] Scott M Lundberg and Su-In Lee. A unified approach to interpreting model predictions. In I. Guyon, U. Von Luxburg, S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett, editors, Advances in Neural Information Processing Systems , volume 30. Curran Associates, Inc., 2017. URL https://proceedings. neurips.cc/paper_files/paper/2017/file/8a20a8621978632d76c43dfd28b67767-Paper.pdf .[36] Narine Kokhlikyan, Vivek Miglani, Miguel Martin, Edward Wang, Bilal Alsallakh, Jonathan Reynolds, Alexander Melnikov, Natalia Kliushkina, Carlos Araya, Siqi Yan, et al. Captum: A unified and generic model interpretability library for pytorch. arXiv:2009.07896 , 2020. [37] David Berthelot, Nicholas Carlini, Ian Goodfellow, Nicolas Papernot, Avital Oliver, and Colin Raffel. Mixmatch: A holistic approach to semi-supervised learning, 2019. URL https://arxiv.org/abs/1905.02249 .[38] Kihyuk Sohn, David Berthelot, Chun-Liang Li, Zizhao Zhang, Nicholas Carlini, Ekin D. Cubuk, Alex Kurakin, Han Zhang, and Colin Raffel. Fixmatch: Simplifying semi-supervised learning with consistency and confidence, 2020. URL https://arxiv.org/abs/2001.07685 .[39] Jure Zbontar, Li Jing, Ishan Misra, Yann LeCun, and Stéphane Deny. Barlow twins: Self-supervised learning via redundancy reduction, 2021. URL https://arxiv.org/abs/2103.03230 .[40] Siqi Li, Guowu Yuan, Jian Chen, Chengming Tan, and Hao Zhou. Self-supervised learning for solar radio spectrum classification. Universe , 8(12):656, 2022. doi: 10.3390/universe8120656. URL https://github. com/filterbank/spectrumcls .[41] Xinlei Zhao, Guowu Yuan, Hao Zhou, Chengming Tan, and Liang Dong. Detection of various solar radio bursts based on stable diffusion and self-supervised pretraining. Solar Physics , 300:171, 2025. doi: 10.1007/ s11207-025-02590-1. [42] M. P. van Haarlem, M. W. Wise, A. W. Gunst, G. Heald, J. P. McKean, J. W. T. Hessels, A. G. de Bruyn, R. Nijboer, J. Swinbank, R. Fallows, M. Brentjens, A. Nelles, R. Beck, H. Falcke, R. Fender, J. Hörandel, L. V. E. Koopmans, G. Mann, G. Miley, H. Röttgering, B. W. Stappers, R. A. M. J. Wijers, S. Zaroubi, M. van den Akker, A. Alexov, J. Anderson, K. Anderson, A. van Ardenne, M. Arts, A. Asgekar, I. M. Avruch, F. Batejat, L. Bähren, M. E. Bell, M. R. Bell, I. van Bemmel, P. Bennema, M. J. Bentum, G. Bernardi, P. Best, L. Bîrzan, A. Bonafede, A.-J. Boonstra, R. Braun, J. Bregman, F. Breitling, R. H. van de Brink, J. Broderick, P. C. Broekema, W. N. Brouw, M. Brüggen, H. R. Butcher, W. van Cappellen, B. Ciardi, T. Coenen, J. Conway, A. Coolen, A. Corstanje, S. Damstra, O. Davies, A. T. Deller, R.-J. Dettmar, G. van Diepen, K. Dijkstra, P. Donker, A. Doorduin, J. Dromer, M. Drost, A. van Duin, J. Eislöffel, J. van Enst, C. Ferrari, W. Frieswijk, H. Gankema, M. A. Garrett, F. de Gasperin, M. Gerbers, E. de Geus, J.-M. Grießmeier, T. Grit, P. Gruppen, J. P. Hamaker, T. Hassall, M. Hoeft, H. A. Holties, A. Horneffer, A. van der Horst, A. van Houwelingen, A. Huijgen, M. Iacobelli, H. Intema, N. Jackson, V. Jelic, A. de Jong, E. Juette, D. Kant, A. Karastergiou, A. Koers, H. Kollen, V. I. Kondratiev, E. Kooistra, Y. Koopman, A. Koster, M. Kuniyoshi, M. Kramer, G. Kuper, P. Lambropoulos, C. Law, J. van Leeuwen, J. Lemaitre, M. Loose, P. Maat, G. Macario, S. Markoff, J. Masters, R. A. McFadden, D. McKay-Bukowski, H. Meijering, H. Meulman, M. Mevius, E. Middelberg, R. Millenaar, J. C. A. Miller-Jones, R. N. Mohan, J. D. Mol, J. Morawietz, R. Morganti, D. D. Mulcahy, E. Mulder, H. Munk, L. Nieuwenhuis, R. van Nieuwpoort, J. E. Noordam, M. Norden, A. Noutsos, A. R. Offringa, H. Olofsson, A. Omar, E. Orrú, R. Overeem, H. Paas, M. Pandey-Pommier, V. N. Pandey, R. Pizzo, A. Polatidis, D. Rafferty, S. Rawlings, W. Reich, J.-P. de Reijer, J. Reitsma, G. A. Renting, P. Riemers, E. Rol, J. W. Romein, J. Roosjen, M. Ruiter, A. Scaife, K. van der Schaaf, B. Scheers, P. Schellart, A. Schoenmakers, G. Schoonderbeek, M. Serylak, A. Shulevski, J. Sluman, O. Smirnov, C. Sobey, H. Spreeuw, M. Steinmetz, C. G. M. Sterks, H.-J. Stiepel, K. Stuurwold, M. Tagger, Y. Tang, C. Tasse, I. Thomas, S. Thoudam, M. C. Toribio, B. van der Tol, O. Usov, M. van Veelen, A.-J. van der Veen, S. ter Veen, J. P. W. Verbiest, R. Vermeulen, N. Vermaas, C. Vocks, C. Vogt, M. de Vos, E. van der Wal, R. van Weeren, H. Weggemans, P. Weltevrede, S. White, S. J. Wijnholds, T. Wilhelmsson, O. Wucknitz, S. Yatawatta, P. Zarka, A. Zensus, and J. van Zwieten. Lofar: The low-frequency array. A&A , 556:A2, 2013. doi: 10.1051/0004-6361/201220873. URL https://doi.org/10.1051/0004-6361/201220873 .[43] S. J. Tingay, R. Goeke, J. D. Bowman, D. Emrich, S. M. Ord, D. A. Mitchell, M. F. Morales, et al. The murchison widefield array: The square kilometre array precursor at low radio frequencies. Publications of the Astronomical Society of Australia , 30:e007, 2013. doi: 10.1017/pasa.2012.007. URL https://doi.org/10.1017/pasa. 2012.007 .[44] L. A. Cañizares, S. T. Badman, S. A. Maloney, M. J. Owens, D. M. Weigt, E. P. Carley, and P. T. Gallagher. Tracking solar radio bursts using bayesian multilateration. A&A , 684:A182, 2024. doi: 10.1051/0004-6361/202347747. URL https://doi.org/10.1051/0004-6361/202347747 .[45] Haoxiang Jiang, Shoulin Wei, Linjie Chen, Bo Liang, Wei Dai, Zhijian Zhang, and Heng Zhang. Solar type iii radio burst identification using few-shot object detection. Universe , 12(5):139, 2026. doi: 10.3390/universe12050139. 17 A PREPRINT - J ULY 29, 2026 [46] Chuan Guo, Geoff Pleiss, Yu Sun, and Kilian Q. Weinberger. On calibration of modern neural networks, 2017. URL https://arxiv.org/abs/1706.04599 .[47] Christian Szegedy, Vincent Vanhoucke, Sergey Ioffe, Jon Shlens, and Zbigniew Wojna. Rethinking the inception architecture for computer vision. In Proceedings of the IEEE conference on computer vision and pattern recognition , pages 2818–2826, 2016. 
+
+# A Stations and Instruments Used 
+
+Table 4: Stations and corresponding instruments used to generate and evaluate FlareSense data. 
+
+Station Instrument 
+
+Cohoe Station (Alaska, USA) ALASKA-COHOE_63 HAARP (High Frequency Active Auroral Research Program) (USA) ALASKA-HAARP_62 CRAAG Station (Algeria) ALGERIA-CRAAG_59 Almaty Observatory (Almaty, Kazakhstan) ALMATY_58 University of Graz Radio Observatory (Austria) AUSTRIA-UNIGRAZ_01 ASSA Station (Australia) Australia-ASSA_02 & 62 Birr Castle Observatory (Ireland) BIR_01 Alexandria Observatory (Egypt) EGYPT-Alexandria_02 DLR Radio Station (Germany) GERMANY-DLR_63 Glasgow Radio Observatory (United Kingdom) GLASGOW_01 Humain Observatory (Belgium) HUMAIN_59 Gauri Station (India) INDIA-GAURI_01 Ooty Radio Telescope (India) INDIA-OOTY_02 KASI Radio Station (South Korea) KASI_59 MEXART (Mexican Array Radio Telescope) (Mexico) MEXART_59 FCFM-UANL Radio Station (Mexico) MEXICO-FCFM-UANL_01 LANCE-B Station (Mexico) MEXICO-LANCE-B_62 UB Station (University of Ulaanbaatar) (Mongolia) MONGOLIA-UB_01 Murchison Radio Observatory (Australia) MRO_59, MRO_61 Egersund Station (Norway) NORWAY-EGERSUND_01 SSRT (Siberian Solar Radio Telescope) (Russia) SSRT_59 Landschlacht Station (Switzerland) SWISS-Landschlacht_62 Trieste Radio Observatory (Italy) TRIEST_57 ERAU Radio Station (Embry-Riddle Aeronautical University) (USA) USA-ARIZONA-ERAU_01 18 A PREPRINT - J ULY 29, 2026 
+
+# B Per-instrument metrics 
+
+Table 5: Per-instrument F1, precision, and recall (%) 
+
+Instrument F1 (%) Precision (%) Recall (%) 
+
+ALASKA-COHOE_63 85.9 96.6 77.3 ALASKA-HAARP_62 88.4 97.4 80.9 ALGERIA-CRAAG_59 80 94.4 69.4 ALMATY_58 80.8 85.1 76.8 AUSTRIA-UNIGRAZ_01 81.9 89.3 75.6 Australia-ASSA_02 85.1 91.5 79.6 Australia-ASSA_62 80.7 95.5 69.8 BIR_01 91.2 92 90.5 EGYPT-Alexandria_02 86.3 91.5 81.7 GERMANY-DLR_63 77.6 97.2 64.5 GLASGOW_01 73 99.5 57.6 HUMAIN_59 89.6 92.5 86.8 INDIA-GAURI_01 67.9 94.8 52.9 INDIA-OOTY_02 76.7 92.9 65.3 KASI_59 82.6 100 70.4 MEXART_59 78.3 88.2 70.3 MEXICO-FCFM-UANL_01 90.9 100 83.3 MEXICO-LANCE-B_62 70.8 100 54.8 MONGOLIA-UB_01 93.1 97.9 88.7 MRO_59 61.9 68.4 56.5 MRO_61 74.9 88.5 64.9 NORWAY-EGERSUND_01 72.6 96.9 58 SSRT_59 75.4 91.1 64.3 SWISS-Landschlacht_62 77.4 90.2 67.8 TRIEST_57 92.4 94.4 90.5 USA-ARIZONA-ERAU_01 78.6 96.4 66.4 
+
+# C Data Generation Pipelines 
+
+Algorithm 2 Generate Burst Spectrograms 
+
+Require: Instrument list I; burst catalog B; offset range [0 , 10] minutes; minimum number of frequency channels 
+
+fmin =150 ; duration threshold dmin =14 minutes 
+
+Ensure: Set Dburst of labeled burst spectrograms  
+
+> 1:
+
+for each instrument x ∈ I do  
+
+> 2:
+
+Lx ← FILTER BYINSTRUMENT (B, x ) 
+
+> 3:
+
+for each entry e ∈ Lx do  
+
+> 4:
+
+t0 ← e. datetime  
+
+> 5:
+
+δ ← RANDOM OFFSET (0 , 10 min ) 
+
+> 6:
+
+τ ← t0 − δ ▷ small negative offset to capture pre-onset context  
+
+> 7:
+
+data ← LOAD DATA (x, τ ) 
+
+> 8:
+
+if FREQ COUNT (data ) ≥ fmin and DURATION (data ) ≥ dmin then  
+
+> 9:
+
+SAVE SPECTROGRAM (data ; label ="burst" ) 
+
+> 10:
+
+end if  
+
+> 11:
+
+end for  
+
+> 12:
+
+end for 
+
+19 A PREPRINT - J ULY 29, 2026 
+
+Algorithm 3 Generate Non-Burst Spectrograms 
+
+Require: Instrument list I; burst catalog B, each entry giving a burst time range and the stations that observed it; date range [tstart , t end ]; window length ∆=15 minutes; multiplier k=10 ; minimum number of frequency channels 
+
+fmin =150 ; duration threshold dmin =14 minutes 
+
+Ensure: Set Dnon of labeled non-burst spectrograms 
+
+1: T ← BURST INTERVALS (B) ▷ time ranges of all catalog bursts, from any station 
+
+2: for each instrument x ∈ I do 
+
+3: nx ← | FILTER BYINSTRUMENT (B, x )| ▷ number of catalog bursts for instrument x
+
+4: for i = 1 to k · nx do 
+
+5: τ ← RANDOM DATE (tstart , t end )
+
+6: if [τ, τ + ∆] overlaps any interval in T then 
+
+7: continue ▷ a burst was reported somewhere at this time; discard the window 
+
+8: end if 
+
+9: data ← LOAD DATA (x, τ )
+
+10: if AVAILABLE (data ) and FREQ COUNT (data ) ≥ fmin and DURATION (data ) ≥ dmin then 
+
+11: SAVE SPECTROGRAM (data ; label ="non-burst" )
+
+12: end if 
+
+13: end for 
+
+14: end for 
+
+# D Explainable AI Examples 
+
+Attribution examples. The XAI examples were generated before temperature scaling and therefore use the uncalibrated probability threshold of 0.5. The matched-precision evaluation in Section 6, by contrast, uses temperature-scaled probabilities and the calibrated threshold of 0.426. Captions emphasize what the attribution maps reveal about the image regions associated with each prediction. 
+
+Figure 9: True positive - BIR_01 . Attribution concentrates on the burst ridge and suppresses background structure. 
+
+20 A PREPRINT - J ULY 29, 2026 
+
+Figure 10: True positive - Australia-ASSA_62 . Attribution follows the salient emission trace, showing consistent behavior across instruments. 
+
+Figure 11: True positive - Germany-DLR_63 . Attribution localizes along the drift-like burst pattern. 
+
+21 A PREPRINT - J ULY 29, 2026 
+
+Figure 12: True positive - Glasgow_01 .
+
+Figure 13: True positive - Humain_59 .
+
+22 A PREPRINT - J ULY 29, 2026 
+
+Figure 14: False positive - India-Gauri_01 . This is another example for an annotation miss (see Section 7), so in effect, this case is another true positive. 
+
+Figure 15: True positive - SSRT_59 . Strong attribution along the emission band indicates sensitivity to real events. 
+
+# E Probability Calibration 
+
+Neural-network confidence scores are not necessarily calibrated probabilities ( 46 ). Additionally, label smoothing ( 47 )makes the distribution of the output probabilities less sharp. We therefore fitted a single temperature parameter by minimizing the negative log likelihood of the predictions on the training set. The resulting temperature was 0.4974. Because this value is below one, temperature scaling sharpens the probability distribution, counteracting part of the smoothing introduced during training. 23 A PREPRINT - J ULY 29, 2026 
+
+Figure 16: Distributions of model probabilities before and after temperature scaling. The fitted temperature of 0.4974 sharpens the probabilities relative to the uncalibrated outputs. 24

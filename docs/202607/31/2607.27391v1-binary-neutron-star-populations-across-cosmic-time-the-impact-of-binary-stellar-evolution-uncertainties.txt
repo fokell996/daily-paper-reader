@@ -1,0 +1,583 @@
+Title: Binary neutron star populations across cosmic time: the impact of binary stellar evolution uncertainties
+
+URL Source: https://arxiv.org/pdf/2607.27391v1
+
+Published Time: Fri, 31 Jul 2026 00:13:01 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+Astronomy & Astrophysics manuscript no. main ©ESO 2026 July 31, 2026 
+
+# Binary neutron star populations across cosmic time: the impact of binary stellar evolution uncertainties 
+
+Mathieu Venet 1 and Irina Dvorkin 1, 2 
+
+> 1
+
+Institut d’Astrophysique de Paris, UMR 7095, CNRS and Sorbonne Université, 98 bis boulevard Arago, 75014 Paris, France  
+
+> 2
+
+Institut Universitaire de France, Ministère de l’Enseignement Supérieur et de la Recherche, 1 rue Descartes, 75231 Paris Cedex F-05, France July 31, 2026 
+
+ABSTRACT 
+
+Context. Direct observations of binary neutron star (BNS) systems remain scarce, but their number is expected to increase significantly in the coming years through both electromagnetic and gravitational-wave observations. Preparing robust tools to interpret these forthcoming datasets is therefore essential. 
+
+Aims. We investigate the impact of uncertainties in binary stellar evolution on the formation efficiency and cosmological merger rate of BNS systems. In particular, we aim to determine whether robust signatures of binary evolution can be identified across a broad range of metallicities. 
+
+Methods. We perform a systematic exploration of 72 binary evolution models using the population synthesis code COSMIC . We vary four key parameters controlling the onset and efficiency of common-envelope evolution, the natal kick prescription, and the treatment of kicks during the common envelope phase. For each model, we compute the BNS formation efficiency and cosmological merger rate using several prescriptions for the cosmic metallicity-redshift relation. 
+
+Results. Despite the large uncertainties introduced by binary stellar evolution, we identify characteristic features in the metallicity dependence of the BNS formation efficiency that arise from specific evolutionary processes. These include the onset of first-giant-branch skipping at low metallicity and a non-monotonic evolution between 𝑍 = 10 −3 and 7.5×10 −3. All models also predict a bimodal distribution of BNS progenitor masses associated with two distinct formation channels. The common envelope ejection efficiency and natal kick prescription remain the dominant sources of uncertainty, producing variations of several orders of magnitude in both the BNS formation efficiency and the cosmological merger rate, and strongly affecting the prominence of the metallicity-dependent features. 
+
+Conclusions. Finally, we show that different combinations of binary-evolution parameters can produce similar merger-rate histories, highlighting significant degeneracies among population-synthesis models. Current gravitational-wave observations can rule out only the least efficient formation scenarios. Breaking these degeneracies will require larger samples of BNS mergers expected from future third-generation gravitational-wave observatories, and improved observational constraints on the evolution of metallicity across cosmic time. 
+
+1. Introduction 
+
+Binary neutron star (BNS) systems are associated with a wide range of high-energy phenomena across various messengers. These include double neutron star systems (pulsar with a neu-tron star companion) detected through radio emission (Manch-ester et al. 2005), BNS mergers observed through gravitational waves (Abbott et al. 2017a,b, 2020a), and phenomena such as kilonovae (Metzger 2019) and short gamma-ray bursts (Berger 2014). Furthermore, BNS mergers are believed to contribute sig-nificantly to the production of heavy elements through rapid neutron-capture nucleosynthesis (r-process), although their ex-act contribution remains an active area of research (Cowan et al. 2021). Despite their importance across several observational do-mains, the population of BNS systems remains poorly constrained by direct observations. To date, only slightly more than twenty Galactic double neutron stars have been accurately character-ized (Farrow et al. 2019). Likewise, the fifth Gravitational-Wave Transient Catalog (GWTC-5) of the LIGO-Virgo-KAGRA Col-laboration currently contains only two confidently identified BNS merger events (The LIGO Scientific Collaboration et al. 2026; Abbott et al. 2020a). However, the number of observed BNS sys-tems is expected to increase substantially in the coming years. The Square Kilometre Array (SKA; Dewdney et al. 2009) is ex-pected to detect several hundred double neutron star systems (see Stappers et al. 2018; Sgalletta et al. 2023) out of the ∼2500 pre-dicted to be currently present in the Milky Way (Chattopadhyay et al. 2020). Furthermore, the LIGO-Virgo-KAGRA Collabora-tion (Aasi et al. 2015; Acernese et al. 2015; Akutsu et al. 2021) is expected to greatly increase the number of detected BNS mergers as the detector network approaches its design sensitivity during the fifth observing run (Abbott et al. 2020b; Muccillo et al. 2026). Looking further ahead, third-generation gravitational-wave de-tectors such as the Einstein Telescope (Punturo et al. 2010; Hild et al. 2011) and Cosmic Explorer (Reitze et al. 2019; Evans et al. 2021), planned for the 2030s, are expected to detect up to 10 5 BNS mergers per year (Branchesi et al. 2023; Abac et al. 2026). De-veloping robust tools to analyse and interpret these forthcoming observations is therefore essential. Such tools are needed not only to prepare for the unprecedented volume of future data, but also to fully exploit current observations and assess the constraints that can already be placed on BNS formation and evolution. Population-synthesis codes (e.g. Hurley et al. 2002; Belczyn-ski et al. 2008; Giacobbo et al. 2018; Kruckow et al. 2018; Stan-way & Eldridge 2018; Giacobbo & Mapelli 2018; Breivik et al. 2020; Spera et al. 2019; Iorio et al. 2023; Fragos et al. 2023; Team Compas et al. 2025; Andrews et al. 2025) provide a pow-
+
+Article number, page 1 of 21 arXiv:2607.27391v1 [astro-ph.HE] 29 Jul 2026 A&A proofs: manuscript no. main 
+
+erful framework for interpreting the limited observational sam-ple of BNS systems while constructing self-consistent models of compact-object formation and binary stellar evolution. These codes follow the evolution of large populations of single and binary stars under a set of physical prescriptions, allowing syn-thetic populations to be directly compared with observations and thereby placing statistical constraints on the underlying evolu-tionary processes (e.g. Briel et al. 2022; Chu et al. 2022; Deng et al. 2024; Chattaraj et al. 2026; Toubiana et al. 2026). The canonical formation scenario of a BNS begins with a massive binary on the main sequence, with both stars typically having zero-age main-sequence masses above ∼ 8 𝑀 ⊙ (Tauris et al. 2017). As the stars evolve, they can undergo several phases of binary interaction before each experiences core collapse or electron capture supernovae explosions and, ultimately, two neu-tron stars are formed. A major challenge in forming BNS systems is that each supernova may impart a natal kick to the newly born neutron star owing to asymmetries in the explosion (e.g. Hobbs et al. 2005). These kicks frequently disrupt the binary, making surviving BNS systems intrinsically rare. Consequently, a suc-cessful BNS progenitor must remain gravitationally bound after both supernova explosions despite the associated mass loss and natal kicks. In addition to supernovae, binary interactions play a fundamental role in determining the final outcome of the sys-tem. Mass transfer may occur through stellar-wind accretion or Roche-lobe overflow (RLOF) (Wang 2016). Depending on the evolutionary stage of the donor star and the response of both the donor and its Roche lobe to mass loss, RLOF may proceed either stably or unstably (Soberman et al. 1997; Ge et al. 2015). In the latter case, the system may enter a common-envelope (CE) phase, during which the companion spirals into the envelope of the donor star (Hurley et al. 2002; Ivanova et al. 2013). The out-come of this poorly understood phase strongly affects the final orbital separation and therefore the likelihood of producing a merging BNS (e.g. Giacobbo & Mapelli 2018; Gallegos-Garcia et al. 2023). Population-synthesis codes generally model the onset and evolution of mass transfer and CE evolution using simpli-fied prescriptions based on parameters such as the binary mass ratio, the envelope binding energy, and the efficiency with which orbital energy is converted into envelope ejection (Hurley et al. 2002). Because the formation of BNS systems results from the interplay between stellar evolution, binary interactions, and su-pernova physics, population-synthesis models remain indispens-able for exploring their formation channels and predicting their observable properties. Their predictions can be confronted with radio pulsar surveys and gravitational-wave observations, provid-ing increasingly stringent constraints on the physical processes governing binary evolution. However, population-synthesis calculations rely on numer-ous analytical prescriptions and empirical models that attempt to describe complex processes in stellar and binary evolution. Several of these prescriptions remain affected by significant un-certainties, including models of single stellar evolution (Hurley et al. 2000; Bressan et al. 2012; Paxton et al. 2011), the treatment of CE evolution (Hurley et al. 2002; De Marco et al. 2011; Ricker et al. 2018), and supernova natal kick prescriptions (Beniamini & Piran 2016; Giacobbo & Mapelli 2020; Vigna-Gómez 2025; Disberg & Mandel 2025). Recent studies have even suggested that standard population-synthesis prescriptions may struggle to simultaneously reproduce the observed merger rates and proper-ties of compact-object binaries (Sgalletta et al. 2025; Boco et al. 2026). Exploring the parameter space of population-synthesis models is therefore essential for assessing the robustness of the-oretical predictions and identifying the physical processes that most strongly influence BNS formation. In this work, we perform a systematic exploration of the pa-rameter space of the population-synthesis code COSMIC . Since 
+
+COSMIC contains more than fifty adjustable parameters and over one hundred alternative physical prescriptions, a complete explo-ration of the full parameter space is computationally prohibitive. We therefore focus on a reduced set of parameters selected ac-cording to both their current theoretical uncertainties and their expected impact on BNS formation. Specifically, we identify four key parameters related to CE evolution, including the conditions required for CE initiation, the efficiency of envelope ejection, the treatment of natal kicks occurring during CE phases and the kick prescription in itself. We explore these parameters across several metallicity bins in order to probe different star-formation environments and cosmic epochs. Using this framework, we investigate how variations in these uncertain physical prescriptions affect BNS formation efficien-cies and merger rates. Furthermore, we explore in detail their dependence on metallicity. Indeed, while the variation in BNS formation efficiencies across various metallicities is significantly smaller that in the much more studied case of binary black holes (Santoliquido et al. 2021; Boesky et al. 2024; van Son et al. 2025), several key features can be identified that are directly linked to specific single and binary stellar evolution processes. This paper is structured as follows. In Section 2, we present our main framework, including our population-synthesis simula-tion setup, the parameters explored in this work, and our method-ology for calculating cosmological merger rates from the sim-ulated BNS populations. In Section 3, we describe the results obtained from our simulated populations. We first investigate the bimodal distribution of progenitor masses and the relevance of the explored parameters in shaping this feature in Section 3.1. We then present the obtained formation efficiencies and discuss the impact of the explored parameters and assumptions in Section 3.2. Finally, we present the cosmological merger rates derived from our simulated populations and discuss their associated fea-tures in Section 3.3. We conclude in Section 4. 
+
+2. Methodology 
+
+> 2.1. Population synthesis simulation set-up
+> 2.1.1. Population synthesis code: COSMIC
+
+In this work, we use the publicly available code COSMIC 1 (Com-pact Object Synthesis and Monte Carlo Investigation Code; Breivik et al. 2020), a rapid binary population-synthesis frame-work with a specific focus on the formation and evolution of compact-object binaries. 
+
+COSMIC implements stellar evolution using SSE (Hurley et al. 2000) and binary interactions using BSE (Hurley et al. 2002). Several modifications have been applied to the original BSE framework in order to incorporate more recent developments in binary evolution that are particularly relevant for compact-binary formation, such as metallicity-dependent stellar winds or updated prescriptions for black-hole natal kick strengths. A detailed description of these modifications is provided in Breivik et al. (2020). We use version 3.6 of COSMIC , which introduces signifi-cant changes in the treatment of contact and merger conditions during stable mass transfer in binary systems by implementing a periastron collision check. In later versions of COSMIC (from  
+
+> 1https://github.com/COSMIC-PopSynth/COSMIC
+> Article number, page 2 of 21 Mathieu Venet and Irina Dvorkin: Binary neutron star populations across cosmic time
+
+version 3.7.8 onwards), this check is deactivated until improved SSE models become available. We nevertheless adopt a slightly modified version of COSMIC 3.6, as this prescription provides a more consistent treatment within the assumptions adopted in our study. This difference naturally explains why identical sets of binary-evolution parameters can lead to significantly different BNS populations depending on the COSMIC version employed 2.One of our modifications consists in the implementation of a custom convergence criterion. Indeed, BNS populations ex-hibit particularly low formation efficiencies, making it essential to optimize the sampling procedure in order to avoid spending computational resources on already converged populations while still ensuring a robust characterization of rare-event tails. Since merging systems occupy only a small and highly localized re-gion of the binary parameter space, merger rates are primarily determined by the tails of the underlying distributions, which motivates a dedicated convergence treatment of these regions. For this reason, we adopt a tail-convergence criterion specifically designed to assess the stabilization of the low-probability regions of the distribution. To this end, the initial population is divided into 100 subsets, each containing 1% of the total number of sys-tems, which are evolved sequentially. After each subset has been processed, the resulting BNS population is cumulatively added to those obtained from the previous subsets, thereby progressively reconstructing the complete simulated population. At each step, both the cumulative BNS population and the subset of systems merging within a Hubble time are binned into 500 mass bins. We then identify the bins whose occupation fraction remains below 10% of the total population and evaluate the variation of their normalized bin probabilities between two consecutive cumula-tive populations. Convergence is considered to be achieved when this variation remains below a predefined threshold 𝑇 for all low-occupation bins. This criterion explicitly targets the convergence of the tails of the distribution, where statistical fluctuations are expected to be the largest and where standard global convergence metrics are generally less sensitive. Convergence is assessed in-dependently for both the complete population and the merging BNS population. It is declared only if all selected bins satisfy the convergence criterion and if the final population contains more than 1100 BNS systems in total and more than 80 merging BNS systems. These additional constraints ensure that convergence is driven by the stabilization of the distribution tails rather than by statistical noise in low-count regimes. We adopt thresholds of 
+
+𝑇 tot = 0.01 for the complete population and 𝑇 merge = 0.25 for the merging population, the latter being intentionally less strin-gent due to the intrinsically lower statistical support of merging systems. This asymmetry reflects the fact that the merger sam-ple probes a significantly rarer region of parameter space, where relative fluctuations are naturally larger. 
+
+> 2.1.2. Parameter space exploration
+
+In this work we explore four key parameters, expected to play a key role in BNS formation, across 20 metallicity bins. The latter  
+
+> 2The periastron collision check prevents binaries from undergoing stable mass transfer solutions when the stellar components would physi-cally overlap at periastron. Without this criterion, systems in which both stellar radii expand rapidly may continue their evolution despite enter-ing an unphysical configuration, without triggering any change in the adopted prescriptions. Including this additional condition significantly affects the predicted BNS formation efficiency: for specific regions of the initial parameter space, we find a decrease of more than one order of magnitude in the number of BNS systems produced from the same initial stellar population.
+
+span the range from 𝑍 = 10 −4 to 𝑍 = 𝑍 ⊙ , thereby covering environments from present-day star formation to Population II stellar populations (Mestichelli et al. 2025; Fang & Cen 2004). The specific metallicity bins explored in this study are described in Table 1. For this stellar population and metallicity range, we adopt the Chabrier (2003) initial mass function (IMF) to generate the initial binary population. While the analysis presented in Section 3 is primarily based on this IMF, we additionally explore an alterna-tive IMF in order to estimate the order of magnitude of formation and merger rates expected for Population II stars. Specifically, for the two lowest metallicity bins, 𝑍 = 0.0001 and 𝑍 = 0.00013 ,we rerun the same set of models assuming a top-heavy IMF with characteristic mass 𝑚 cut = 20 𝑀 ⊙ (Chabrier 2003) following : 
+
+𝜙 (𝑚 ) ∝ 
+
+ 𝑚 𝑀 ⊙
+
+ −2.3
+
+exp 
+
+
+
+−
+
+ 𝑚 cut 
+
+𝑚 
+
+1.6
+
+(1) Once implemented, this IMF is then normalized by COSMIC 
+
+using the fiducial lower and upper initial mass limits. This top-heavy IMF is intended to probe an extreme scenario for the BNS formation and merger rates at such low metallicities. To complete our initial sample characterization, we draw the initial separation and eccentricity from Sana et al. (2012). We adopt a metallicity-dependent treatment of stellar winds for O/B stars and Wolf-Rayet stars following Vink et al. (2001) and Vink & de Koter (2005), while including LBV-like mass loss for giants and non-degenerate stars beyond the Humphreys-Davidson limit ( windflag = 3 in COSMIC ). The treatment of stellar winds is central to describing mass loss and the amount of material potentially accreted by the companion, particularly for stars in the ∼ 6 to ∼ 30 𝑀 ⊙ range (Vink et al. 2001; Vink & de Koter 2005). The adopted prescription is similar to other works such as Ablimit & Maeda (2018); Broekgaarden et al. (2022); Pellouin et al. (2025). We explore four COSMIC parameters across the full range of metallicities and IMFs considered in this work. QCFLAG ,which selects the prescription used to determine the critical mass ratio 𝑞 = 𝑀 donor /𝑀 accretor for the onset of unstable mass trans-fer and CE evolution during RLOF; the efficiency parameter of CE ALPHA ; the natal kick prescription KICKFLAG ; and a parameter that determines the treatment of a supernova during CE CE_kickflag . We now describe in some detail each of these parameters. The critical mass ratio for the onset of unstable mass plays a central role in BNS formation and merger rates, as CE evolu-tion efficiently reduces the orbital separation and enables merger times shorter than a Hubble time. We consider three prescrip-tions: QCFLAG = 1 from Hurley et al. (2002) with Hjellming & Webbink (1987) prescriptions for GB/AGB stars, QCFLAG = 3 from Claeys et al. (2014) with Hjellming & Webbink (1987) prescriptions for GB/AGB stars, and QCFLAG = 5 from Neĳssel et al. (2019), which span a representative range of mass-transfer stability assumptions for the stellar types relevant to BNS forma-tion. In the case of QCFLAG = 1 , envelope-stripped stars outside the main sequence are assumed to become unstable to RLOF for critical mass ratios 𝑞 ≲ 1. Conversely, QCFLAG = 3 adopts significantly larger critical mass ratios ( 𝑞 > 1) for instability for the same stellar types. Finally, QCFLAG = 5 assumes that mass transfer is always stable for these stars, irrespective of the mass ratio. These differences directly control the occurrence of single or multiple CE phases and therefore have a strong impact on the predicted BNS formation and merger rates.  
+
+> Article number, page 3 of 21 A&A proofs: manuscript no. main
+
+We also explore six values of the ALPHA parameter, which characterizes the CE efficiency and quantifies how effectively orbital energy is converted into kinetic energy to eject the en-velope during a CE phase as described in Hurley et al. (2002) and developped more in details in Appendix A. We consider the following values: 0.5, 1.0, 1.5, 3.0, 5.0, and 7.0. These values correspond, respectively, to scenarios in which only a fraction of the available orbital energy contributes to envelope ejection, the full orbital energy budget is used, and additional energy reser-voirs, such as internal or recombination energy, can participate in unbinding the envelope (Webbink 2008; Li et al. 2026). We extend our exploration to such high values of ALPHA as several studies suggest that reproducing the observed BNS merger rates may require CE efficiencies significantly larger than unity, po-tentially reflecting the contribution of additional energy sources during envelope ejection or the limits of the 𝛼 − 𝜆 formalism (see Chu et al. 2021; Santoliquido et al. 2021; Deng et al. 2024; Li et al. 2026; Sgalletta et al. 2023; Chattaraj et al. 2026). We explore two parameters related to supernova natal kicks, which play a key role in BNS formation and remain subject to significant theoretical uncertainties. The primary kick-related parameter is KICKFLAG , which specifies the adopted natal kick prescription. We consider two alternative prescriptions. For 
+
+KICKFLAG = 1 , we adopt the standard COSMIC prescription, in which natal kicks are drawn from a bimodal distribution. In this framework, neutron stars formed through Fe core-collapse super-novae (CCSN) receive kicks drawn from a Maxwellian distribu-tion with dispersion 𝜎 , whereas neutron stars formed through electron-capture supernovae (ECSN) or ultra-stripped super-novae (USSN) are assigned reduced kicks as described in Hobbs et al. (2005). Throughout this work, we adopt the default COSMIC 
+
+values of 𝜎 CCSN = 265 km s −1 and 𝜎 ECSN = 𝜎 USSN = 20 km s −1.However, Disberg & Mandel (2025) argued that, due to an inconsistency in Hobbs et al. (2005), this Maxwellian fit, which peaks at 400 km .s−1 for CCSNe and 30 km .s−1 for ECSNe, is shifted towards high-kick values relative to observations (see Ap-pendix C). Although these natal kick amplitudes remain compat-ible with observational constraints, they correspond to a scenario in which supernova kicks are systematically quite strong. We also consider KICKFLAG = 2 , in which case natal kicks are initially drawn from a Maxwellian distribution with disper-sion 𝜎 and subsequently scaled by the ejecta mass and the rem-nant mass, following Eq. (1) of Giacobbo & Mapelli (2020), using their default parameters ( 𝑚 NS = 1.2 𝑀 ⊙ and 𝑚 ej = 9 𝑀 ⊙ ). This prescription introduces a progressive reduction of natal kicks for systems experiencing significant mass loss prior to the supernova. Finally, we explore the parameter CE_kickflag , which de-termines which stellar masses and orbital separations are used when a supernova occurs during a CE phase and a natal kick is applied. We consider two options: CE_kickflag = 1 , which uses pre-CE stellar masses and orbital separations, and CE_kickflag = 2, which uses post-CE values. This parameter plays a key role in linking common-envelope evolution with natal kick strength. In particular, the CE_kickflag = 2 prescription is more favorable to BNS formation, as it allows the orbital separation to be reduced immediately before the application of the natal kick. Moreover, when combined with KICKFLAG = 2 , the stellar mass at the time of the supernova directly impacts the kick magnitude, whereas for KICKFLAG = 1 the kick distribution is independent of mass. Taken together, these prescriptions allow us to bracket the impact of supernova kicks and common-envelope evolution by explor-ing both relatively favorable and unfavorable scenarios for BNS formation. We explore these four parameters using a grid approach, lead-ing to a total of 72 population models. Each model is simulated for our 20 + 2 metallicity bins, including the Chabrier (2003) prescription and an additional top-heavy IMF case. 
+
+> 2.2. Cosmological merger rate calculations
+
+In the following calculations, we assume 𝐻 0 = 68 km s −1 Mpc −1
+
+for the Hubble constant, ΩΛ = 0.69 and Ω𝑚 = 0.31 for the dark energy and matter density parameters, respectively, fol-lowing Planck Collaboration et al. (2016). We further adopt 
+
+𝑅 = 0.27 as the fraction of stellar mass returned to the in-terstellar medium, 𝑦 = 0.019 as the net metal yield, and 
+
+𝜌 𝑏 = 2.77 × 10 11 Ω𝑏 ℎ20 𝑀 ⊙ Mpc −3 as the present-day baryon density (Belczynski et al. 2016). In order to compute the cosmological merger rate for each of our populations we use cosmoRate (Santoliquido et al. 2020, 2021), a numerical framework designed to compute the properties and merger-rate distributions of compact-object binaries across cosmic time 3. It evaluates the contribution of star formation at different redshifts and metallicities through a double integral over redshift 𝑧 ′ and metallicity 𝑍 to the merger rate R ( 𝑧 ) :
+
+R ( 𝑧 ) = 𝑑 𝑑𝑡 lb (𝑧 )
+
+∫ 𝑧 𝑧 max 
+
+𝜓 (𝑧 ′) 𝑑𝑡 lb (𝑧 ′)
+
+𝑑𝑧 ′
+
+×
+
+∫ 𝑍 max (𝑧 ′ )  
+
+> 𝑍 min (𝑧 ′)
+
+𝜂 merge (𝑍 ) F ( 𝑧 ′, 𝑧, 𝑍 ) 𝑑𝑍 𝑑𝑧 ′ (2) Here, 𝑡 lb (𝑧 ) denotes the look-back time associated with redshift 𝑧 ,and 𝑧 max is the upper redshift limit considered. The function 𝜓 (𝑧 ′)
+
+corresponds to the cosmic star formation rate density, whereas 
+
+𝑍 min (𝑧 ′) and 𝑍 max (𝑧 ′) delimit the metallicity range of stars born at redshift 𝑧 ′. The quantity 𝜂 merge (𝑍 ) denotes the merger efficiency for a given metallicity 𝑍 . The function F ( 𝑧 ′, 𝑧, 𝑍 ) represents the fraction of compact binaries formed at redshift 𝑧 ′ and metallicity 
+
+𝑍 that merge at redshift 𝑧 , normalized with respect to all binary and single star systems formed at the same metallicity. In our models, we assume the star formation rate (SFR) de-scribed in Madau & Fragos (2017), given by : 
+
+𝜓 (𝑧 ′) = 0.01 (1 + 𝑧 )2.6
+
+1 +
+
+ 1 + 𝑧 
+
+3.2
+
+6.2 M⊙ yr −1 Mpc −3 (3) The merger efficiency of BNS is computed directly from our 
+
+COSMIC simulations at each metallicity bin and is defined as: 
+
+𝜂 merge (𝑍 ) = Nmerge (𝑍 )
+
+𝑀 ★(𝑍 ) (4) where Nmerge (𝑍 ) is the number of BNS systems formed in the simulation at metallicity 𝑍 and merging within a Hubble time, and 𝑀 ★(𝑍 ) = 𝑀 single + 𝑀 binary is the total stellar mass required to produce a statistically significant population of binaries. To facilitate the analysis in Section 3, we define the formation efficiency: 
+
+𝜂 (𝑍 ) = NTOT (𝑍 )
+
+𝑀 ★(𝑍 ) (5)  
+
+> 3https://gitlab.com/Filippo.santoliquido/cosmo_rate_ public
+> Article number, page 4 of 21 Mathieu Venet and Irina Dvorkin: Binary neutron star populations across cosmic time
+
+Table 1: Summary of the population-synthesis parameters explored and fixed assumptions used in this study. Parameter Number of values Values / description 
+
+Explored parameters 
+
+QCFLAG 3 Flags: 1, 3, 5 ALPHA 6 Values: 0.5, 1.0, 1.5, 3.0, 5.0 7.0 KICKFLAG 2 Flags: 1, 2 CE_kickflag 2 Flags: 1, 2 
+
+IMF and metallicity sampling 
+
+Metallicity grid ( 𝑍 ) 20 𝑍 = 10 −4, 1.3 × 10 −4, 1.6 × 10 −4, 1.9 × 10 −4, 2.2 ×
+
+10 −4, 2.25 × 10 −4, 3.8 × 10 −4, 5 × 10 −4, 6.3 × 10 −4, 7.5 ×
+
+10 −4, 8.8×10 −4, 10 −3, 2.5×10 −3, 3.8×10 −3, 5×10 −3, 6.3×
+
+10 −3, 7.5 × 10 −3, 8.8 × 10 −3, 10 −2, 1.4 × 10 −2
+
+IMF model used to create the initial population 2 Chabrier IMF (Chabrier 2003) sampled over the full metal-licity grid (20 models), and one top-heavy (Chabrier 2003) IMF model at fixed metallicitiy 𝑍 = 10 −4 and 𝑍 = 1.3 × 10 −4
+
+Sampling and orbital prescriptions 
+
+𝑃 orb distribution – sana12 (Sana et al. 2012) Eccentricity distribution – sana12 (Sana et al. 2012) 
+
+Other fixed parameters 
+
+𝑍 ⊙ – 0.014 q windflag – Model 3 (Vink et al. 2001; Vink & de Koter 2005) and the merger fraction: 
+
+𝜖 (𝑍 ) = Nmerge (𝑍 )NTOT (𝑍 ) (6) where NTOT (𝑍 ) denotes the total number of BNS systems formed at metallicity 𝑍 .The quantity 𝑀 ★(𝑍 ) depends on the adopted IMF and on the assumed binary fraction, taken here to be 50%. The function 
+
+F ( 𝑧 ′, 𝑧, 𝑍 ) is expressed as: 
+
+F ( 𝑧 ′, 𝑧, 𝑍 ) = N ( 𝑧, 𝑍 )NTOT (𝑍 ) 𝑝 (𝑧 ′ |𝑍 ) (7) where N ( 𝑧, 𝑍 ) is the number of BNS progenitors formed at metallicity 𝑍 that merge at redshift 𝑧 . This quantity is obtained from the delay-time distribution extracted from our COSMIC 
+
+simulations, which constitutes a second key input to cosmoRate .The term 𝑝 (𝑧 ′ |𝑍 ) models the metallicity distribution of star formation and is assumed to follow a log-normal distribution: 
+
+𝑝 (𝑧 ′ |𝑍 ) = 1
+
+√2𝜋𝜎 exp 
+
+"
+
+−
+
+ log (𝑍 /𝑍 ⊙ ) − log ( ¯𝑍 (𝑧 ′)/ 𝑍 ⊙ )2
+
+2𝜎 2
+
+#
+
+(8) Here, ¯𝑍 (𝑧 ′) is the mean metallicity of star formation at red-shift 𝑧 ′, and 𝜎 is the intrinsic dispersion of the metallicity distri-bution in log-space. In this work, we adopt 𝜎 = 0.2.The cosmological merger rate defined in Section 2 is subject to several sources of uncertainty. Beyond the BNS merger effi-ciency and the delay-time distribution, both derived from COS-MIC simulations and dependent on population synthesis assump-tions, several additional model ingredients remain uncertain. The main uncertainty factor that we decide to explore here is the mean metallicity model. We consider three prescriptions that are in-tended to span a representative range of uncertainties in merger rate predictions associated with metallicity evolution. The first two are already implemented in cosmoRate . The lin-ear prescription is based on observational fits to the evolution of stellar metallicity, combining measurements from the Sloan Dig-ital Sky Survey (SDSS) with metallicity estimates of damped Ly 𝛼 
+
+absorbers (DLAs) derived from absorption-line spectroscopy. It is given by 
+
+log 
+
+ ¯𝑍 (𝑧 )
+
+𝑍 ⊙
+
+
+
+= 𝑎 + 𝑏𝑧 (9) with 𝑎 = log (1.04 ) from Gallazzi et al. (2008) and 𝑏 = −0.25 
+
+from De Cia et al. (2018). The MandF2017 prescription is based on observational constraints on the evolution of the gas-phase metallicity of the galaxy population as a function of redshift. It is given by 
+
+log 
+
+ ¯𝑍 (𝑧 )
+
+𝑍 ⊙
+
+
+
+= 𝑎 − 𝑏 𝑧 𝑐 (10) with 𝑎 = 0.153 , 𝑏 = 0.074 , and 𝑐 = 1.34 (Madau & Fragos 2017). It should be noted that the parameters for both models origi-nate from observational fits and are defined for a solar metallicity of 𝑍 ⊙ = 0.02 . In this work, we consistently rescale these relations to a solar metallicity of 𝑍 ⊙ = 0.014 .Finally, we consider an alternative redshift–metallicity rela-tion based on the analytical expression from Belczynski et al. (2016): 
+
+¯𝑍 (𝑧 ) = 𝑦 (1 − 𝑅 )
+
+𝜌 𝑏 
+
+∫ 𝑧 max 
+
+> 𝑧
+
+10 0.5 𝜓 (𝑧 ′)
+
+𝐻 0 (1 + 𝑧 ′)√︁ Ω𝑚 (1 + 𝑧 ′)3 + ΩΛ
+
+𝑑𝑧 ′ 
+
+> Article number, page 5 of 21 A&A proofs: manuscript no. main
+
+(11) All these prescriptions lead to different redshift–metallicity relations as discussed in Appendix F, see Figure F.1. 
+
+3. Results 
+
+> 3.1. Bimodal progenitor mass distribution
+
+The first main result of our parameter space exploration is the bi-modal distribution of primary progenitor masses across all metal-licities and model configurations exhibited by our BNS popula-tion, as shown in Figure 1. Both the top and bottom panels exhibit a bimodal progenitor-mass distribution, with the two populations separated by a sparsely populated gap between approximately 
+
+6.8 𝑀 ⊙ and 10 𝑀 ⊙ . The bimodality reflects the existence of two dominant formation channels for BNS systems, associated with different physical processes such as distinct supernova types and the presence or absence of a CE phase. Low-mass progenitors usually undergo one or more stable mass transfer episodes dur-ing their evolution but do not experience a CE phase. In this case, their orbital separation typically remains relatively large prior to both supernova events. In this configuration the systems that survive binary disruption are the ones that usually undergo an ECSN, characterised by significantly smaller natal kicks (see Section 2.1.2). On the contrary, high-mass progenitors often need to undergo a CE phase, or in some cases a double CE phase, to reduce their final pre-supernova mass. In the delayed supernova prescription of Fryer et al. (2012), the amount of fallback depends on both the CO-core mass and the final stellar mass. Therefore, envelope stripping through CE evolution can decrease the fall-back contribution and allow some systems that would otherwise form black holes to produce neutron stars instead. These systems are typically above the ECSN mass range and experience CCSN events associated with stronger kicks. However, the strong re-duction in orbital separation induced by the CE phase limits the disruptive effect of these kicks. An example of such typical for-mation pathways between low-mass and high-mass progenitors can be found in Figure 2. This apparent desert of systems between the two progenitor mass populations can be explained as follows: in this interme-diate regime, systems are too light to survive undergoing a CE phase at low separation (see Appendix A), yet too massive to experience ECSN events. They therefore retain relatively wide separations while undergoing CCSN events with strong kicks, which explains the low probability of such systems surviving as bound BNS systems. It must be noted, however, that in very specific circumstances some systems can overcome these un-favourable conditions if the natal kick is favourably oriented or if a CE phase occurs very late in the evolution, when only a frac-tion of the system’s mass is lost. Consequently, a limited number of systems may populate this otherwise underpopulated region, particularly in optimistic models combining weak natal kicks with a high common-envelope survival probability at very low metallicity. Nevertheless, even in these cases the progenitor-mass distribution remains clearly bimodal, although the intermediate region becomes partially populated. Because the two components of this bimodal distribution are linked to different evolutionary processes, they do not respond in the same way to variations in metallicity or population synthesis parameters. As a result, the relative contribution and evolution of each progenitor population vary significantly throughout our parameter exploration. In the following sections, we therefore distinguish between low-mass and high-mass primary progenitors, where the primary 
+
+Fig. 1: Histograms of the 𝑑𝑁 /𝑑𝑀 distribution as a function of the primary progenitor mass of BNS systems for 𝑍 = 0.001 ,
+
+QCFLAG = 5 , CE_KICKFLAG = 2 , and a Chabrier (2003) IMF. The top panel shows the evolution of the distributions for different ALPHA values with a fixed KICKFLAG = 2 . The bottom panel presents similar distributions, this time highlighting the impact of different KICKFLAG prescriptions for a fixed value of ALPHA = 5 . Both panels exhibit a bimodal distribution in the progenitor masses of BNS systems and illustrate how this bimodality is affected by these two key parameters. corresponds to the initially more massive star in the binary system. The transition mass separating these two populations depends on metallicity, since stellar winds influence both the minimum and maximum stellar masses able to produce BNS systems. Taking this dependence into account, we identify low-mass primary progenitors in the range of ∼ 6.5 to ∼ 9 𝑀 ⊙ ,and high-mass primary progenitors in the range of ∼ 10 to 
+
+∼ 30 𝑀 ⊙ as seen in Figure 1. This bimodality is strongly affected by two specific param-eters: ALPHA and KICKFLAG . Indeed, the relative contribu-tion of low-mass and high-mass progenitors evolves significantly throughout the explored parameter space, as these two parameters strongly influence the dominant BNS formation pathways. We first focus on the impact of the ALPHA parameter. As shown in the top panel of Figure 1, varying ALPHA dramati-cally changes the relative contribution of low-mass and high-mass progenitors to the total BNS population. As discussed in Section 2.1.2, larger values of ALPHA increase the efficiency with which binaries can eject their envelope during the CE phase, thereby 
+
+> Article number, page 6 of 21 Mathieu Venet and Irina Dvorkin: Binary neutron star populations across cosmic time
+
+Fig. 2: Schematic representation of the typical differences be-tween the low-mass and high-mass BNS progenitor formation channels. Low-mass progenitors usually undergo one or multiple stable mass transfer episodes during their evolution and explode as ECSNe, which reduces the strength of the natal kick and helps to avoid binary disruption. On the contrary, high-mass progen-itors typically undergo a CE phase to lose a significant fraction of their mass and enter the NS mass range. They explode as CC-SNe, but the reduction in orbital separation due to the CE phase increases the probability of avoiding binary disruption. enhancing the probability for systems to survive CE evolution without merging. This effect is particularly important for high-mass progenitors. These systems require an efficient mechanism to reduce both their stellar mass in order to produce a neutron star rather than a black hole, and orbital separation prior to the first supernova to increase the probability that the binary survives the strong natal kicks generally associated with massive progenitors. CE evolution is especially effective at simultaneously shrinking the orbit and ejecting the stellar envelope. Consequently, higher 
+
+ALPHA values allow a larger fraction of high-mass systems to survive the CE phase and evolve into favourable BNS progeni-tors. As a result, increasing ALPHA significantly enhances the contribution of high-mass progenitors to the overall BNS popu-lation. In contrast, low-mass progenitors, which generally do not experience an early CE phase, remain comparatively unaffected by variations in this parameter. Both the increase in the high-mass progenitor population and the relative stability of the low-mass component can be clearly seen in the top panel of Figure 1. 
+
+KICKFLAG also has a major impact on this bimodal distri-bution. As described in Section 2.1.2, this parameter determines the natal-kick distribution from which supernova kicks are drawn. In this context, KICKFLAG = 2 corresponds to an overall less disruptive kick prescription, thereby increasing the probability for binaries to survive both supernovae and eventually form BNS systems. This effect influences both low-mass and high-mass progenitors, although its impact is significantly stronger for the high-mass population. Low-mass progenitors typically undergo at least one ECSN event. For both KICKFLAG = 1 and KICK-FLAG = 2 , ECSN kicks remain substantially lower than CCSN kicks, allowing a higher fraction of these systems to survive with-out disruption. The more permissive kick prescription associated with KICKFLAG = 2 mainly broadens the range of progenitors receiving relatively weak kicks beyond the narrow ECSN mass regime, thereby increasing the number of surviving low-mass systems. The situation is markedly different for high-mass pro-genitors. Under KICKFLAG = 1 , CCSN events produce a broad distribution of strong natal kicks, which disrupts a large fraction of binaries before they can form BNS systems. Reducing the kick amplitudes through the KICKFLAG = 2 prescription therefore dramatically increases the survival probability of these systems. As a consequence, while both low-mass and high-mass progeni-tor populations increase for KICKFLAG = 2 , the enhancement is considerably stronger for the high-mass channel, allowing it to become the dominant contribution to the total BNS population. This trend is clearly visible in the bottom panel of Figure 1. 
+
+> 3.2. Formation efficiency
+
+The formation efficiency, 𝜂 (𝑍 ), defined in equation 5, is one of the main quantities that can be directly derived from our simula-tions. Figures 3 and 4 show 𝜂 (𝑍 ) as a function of metallicity for a subset of the models explored in our parameter space. We observe a significant spread in formation efficiencies both across metal-licities and between models at fixed metallicity. We generally observe a decreasing trend of 𝜂 (𝑍 ) with increasing metallicity. Stronger stellar winds at high metallicity lead to enhanced mass loss, requiring initially more massive progenitor systems in order to remain within the BNS progenitor mass range. This reduces the formation efficiency, as these progenitors move further away from the maximum of the Chabrier (2003) IMF, resulting in fewer systems being formed. We note that while the variation of 𝜂 (𝑍 ) across metallicity is approximately one order of magni-tude between the lowest and highest explored metallicities, the spread in formation efficiency between models at fixed metallic- 
+
+> Article number, page 7 of 21 A&A proofs: manuscript no. main
+
+Fig. 3: Formation efficiency 𝜂 (𝑍 ) as a function of metallicity 
+
+𝑍 for the selected models with a Chabrier IMF, QCFLAG =5, and CE_kickflag = 2. Solid and dashed lines correspond to 
+
+KICK_FLAG = 2 and KICK_FLAG = 1 , respectively. Dif-ferent colors indicate different values of the common-envelope efficiency parameter, with ALPHA = 0.5, 1.0, 1.5, 3, 5, 7 shown in blue, orange, green, red, purple, and brown, respectively. The shaded regions highlight the two main metallicity-dependent fea-tures discussed in Section 3.2.1. The 𝑍 axis is not drawn to scale as each tick corresponds to one of the adopted metallicity bins in order to improve the readability of the figure. ity is significantly larger, reaching two orders of magnitude. This indicates that uncertainties associated with binary evolution pre-scriptions dominate over the sole effect of metallicity. Overall, we obtain values of 𝜂 (𝑍 ) ranging from a few 10 −8 𝑀 −1 
+
+> ⊙
+
+up to 
+
+∼ 7.10 −5 𝑀 −1 
+
+> ⊙
+
+for BNS formation, in agreement with the ranges reported by other population synthesis studies exploring broad parameter spaces (Santoliquido et al. 2020; Iorio et al. 2023; Sgalletta et al. 2023; Grichener 2023). 
+
+> 3.2.1. Parameter study
+
+In this section, we will describe how we can hierarchize and characterize the effects of the 4 main explored parameters on the BNSs formation efficiency 𝜂 (𝑍 ) and merger proportion 𝜖 (𝑍 ) as defined in equations 5 and 6. The parameter with the strongest impact on the formation rate of the different BNS populations is the KICKFLAG .As discussed in Section 1, supernova natal kicks are one of the main mechanisms responsible for the disruption of binary systems and therefore for the rarity of BNS formation. The 
+
+KICKFLAG = 1 prescription, described in Section 2.1.2, assumes a bimodal distribution of supernova kicks, CCSN and ECSN kicks are drawn from Maxwellian distributions with respectively 𝜎 CCSN ∼ 265 km s −1 and 𝜎 ECSN ∼ 20 km s −1.In this framework, the survival of a binary system after two successive supernovae requires very specific evolutionary 
+
+Fig. 4: Formation efficiency 𝜂 (𝑍 ) as a function of metallicity 𝑍 
+
+for the selected models with a Chabrier IMF, ALPHA = 1.0, and 
+
+KICK_FLAG = 1. Solid and dashed lines correspond respectively to CE_KICKFLAG = 1 and CE_KICKFLAG = 2 . Different colors indicate different values of the mass transfer instability prescription with QCFLAG = 1, 3, 5 shown respectively in red, purple and brown. The shaded regions represent the two main metallicity features discussed in Section 3.2.1. The 𝑍 axis is not drawn to scale as each tick corresponds to one of the adopted metallicity bins in order to improve the readability of the figure. pathways. Either the progenitor must evolve into the ECSN regime before explosion, allowing for a low-kick event, or the binary must become sufficiently tight during its prior evolution to increase its binding energy and thus improve its ability to survive high-velocity CCSN kicks. In both cases, these scenarios occupy a restricted region of the initial binary parameter space and rely on fine-tuned binary interactions. In contrast, the KICKFLAG = 2 prescription introduces a smoother transition between CCSN and ECSN regimes, depending on the pre-supernova core mass and the ejecta mass. This formulation allows a significant fraction of CCSN events to receive lower natal kicks, thereby increasing the probability of binary survival. As a consequence, the formation rate of BNS populations is significantly higher for the KICK_FLAG = 2 models compared to KICKFLAG = 1 , as shown in Fig. 3. The second most impactful parameter is the ALPHA 
+
+parameter. In our models, we observe the expected trend that the formation efficiency increases with increasing ALPHA ,as shown in Fig. 3. This behaviour can be understood through two complementary effects. First, as discussed in Section 3.1, high-mass progenitors require a CE phase in order to reduce both their fallback mass during CCSN and orbital separation and produce a neutron star rather than a black hole while surviving binary disruption by successive SN. A higher ALPHA value therefore allows a larger fraction of systems to successfully survive a CE phase without merging, increasing the number of binaries that can reach these favorable configurations. Systems 
+
+> Article number, page 8 of 21 Mathieu Venet and Irina Dvorkin: Binary neutron star populations across cosmic time
+
+that do not strictly require a CE phase to form BNSs (typically lower-mass progenitors that can directly evolve toward the ECSN regime) can also be affected in a less important way . A larger ALPHA extends the region of initial orbital parameter space in which a CE episode can occur without leading to a merger, thereby allowing specific systems with initially tighter separations to survive and evolve into BNSs rather than merging prematurely. Overall, ALPHA is therefore a key parameter, as it simultaneously affects the formation efficiency and the merger fraction (see annex G.1) through its influence on both high- and low-mass progenitor channels in a complex manner. The two remaining parameters have a lesser effect on the formation efficiency, as shown in Figure 4. We first examine the impact of the CE_KICKFLAG parameter. Models with 
+
+CE_KICKFLAG = 2 are systematically more efficient at forming BNS than their CE_KICKFLAG = 1 counterparts. This trend is expected, since, as defined in Section 2.1.2, 
+
+CE_KICKFLAG = 2 allows systems undergoing at least one supernova during a CE phase to account for their post-CE separation and mass when computing the kick velocity drawn from the natal kick distribution, as well as its effect on the binary orbit and potential disruption. Because both the separation and the component masses are reduced after the CE phase, the natal kick is less likely to disrupt the binary system. This is particu-larly relevant for KICK_FLAG = 2 models, in which the kick magnitude is drawn proportionally to the mass of the collapsing star and the ejected envelope, resulting in systematically lower kicks, and hence a lower probability of disruption. However, the significance of this parameter depends on several factors. For CE_KICKFLAG to have a strong impact, the population must be dominated by formation channels in which a supernova occurs during a CE phase. Such channels require a very specific region of the initial parameter space and are not always the most efficient at forming BNS across all parameter combinations or metallicity bins. Furthermore, the effect of CE_KICKFLAG 
+
+is naturally reduced in KICK_FLAG = 2 models, where natal kicks are already intrinsically lower, thereby reducing the overall disruption pressure on the population. Finally, the QCFLAG parameter has a notable impact on the population. As shown in Figure 4, while QCFLAG = 3 and 
+
+QCFLAG = 5 models exhibit very similar formation efficiencies, 
+
+QCFLAG = 1 models are systematically less efficient across all metallicity bins. As described in Section 2.1.2, the differences be-tween these models lie in the mass ratio stability criterion applied when a RLOF occurs. The key distinction between the two groups is that QCFLAG = 1 treats RLOF from naked helium stars as highly unstable, triggering a CE phase in most cases. In contrast, the other models adopt a significantly more permissive stability criterion, with QCFLAG = 5 treating all such RLOF episodes as dynamically stable. These stripped stellar phases are critical to BNS formation, as they represent the evolutionary continuation of stars that have already undergone an earlier CE phase. If mass transfer from the naked helium star is again deemed unstable, the binary separation at that stage is already sufficiently reduced that a second CE phase will typically lead to a merger rather than a surviving tight binary. QCFLAG = 1 models therefore suppress a significant fraction of BNS progenitors by channeling these systems into mergers during the second mass transfer episode. The small difference between QCFLAG = 3 and QCFLAG = 5 
+
+can be understood by noting that the stability threshold adopted in QCFLAG = 3 , while finite, is sufficiently permissive that it is rarely reached by the progenitor systems that contribute to BNS formation, making it effectively equivalent to the always-stable prescription of QCFLAG = 5 . As with the other parameters dis-cussed above, the overall impact of QCFLAG depends on the fraction of BNS progenitors that undergo a second mass transfer episode following an initial CE phase, and is therefore sensitive to both the metallicity and the broader parameter configuration of the model. 
+
+> 3.2.2. Metallicity-dependent features
+
+As discussed in Section 3.2.1, the parameter space explored in this work produces a wide range of BNS formation efficiencies, reflecting the strong impact of the adopted stellar evolution pre-scriptions. Despite these differences, the metallicity dependence exhibits two characteristic features that are present across all models. The first such feature is a sharp decrease in BNS formation efficiency between 𝑍 = 0.00016 and 𝑍 = 0.00019 . This be-haviour is again linked to the metallicity dependence of single-star evolution. High-mass progenitors systematically bypass the FGB, whereas low-mass progenitors generally evolve through this phase. This transition is associated with the onset of non-degenerate core helium ignition, which allows stars to skip the FGB entirely (Hurley et al. 2000). The threshold mass for this transition increases with metallicity. In COSMIC , this transition is modeled following Hurley et al. (2000) via the relation 
+
+𝑀 FGB = 13 .048 (𝑍 /0.02 )0.06 
+
+1 + 0.0012 (0.02 /𝑍 )1.27 , (12) At 𝑍 ≃ 0.0016 , the value of 𝑀 FGB is lower than the typical masses of the low-mass progenitors in our population (see 
+
+Fig. 5: Mean stellar radii across different evolutionary phases and metallicity bins for the model IMF = Chabrier, QCFLAG = 5, CE_KICKFLAG = 2, ALPHA = 7.0, KICKFLAG = 2 , shown separately for low- and high-mass progenitor stars. The mean radii during the First Giant Branch (FGB), Core Helium Burn-ing (CHeB), Asymptotic Giant Branch (AGB), and Thermally Pulsing Asymptotic Giant Branch (TPAGB) phases are repre-sented in dark blue, purple, pink, and yellow, respectively. Solid lines correspond to stars with masses between 6 and 9 𝑀 ⊙ , while dashed lines correspond to stars with masses above 10 𝑀 ⊙ . For high-mass progenitors, only the CHeB phase is shown, as the other evolutionary phases are skipped in this mass range.  
+
+> Article number, page 9 of 21 A&A proofs: manuscript no. main
+
+Fig. 6: Histogrammes of the 𝑑𝑁 /𝑑𝑀 distribution as a function of the primary progenitor mass of BNS systems for 𝑍 = 0.001 ,
+
+0.0025 , 0.005 , and 0.014 . All panels are extracted from models computed with the Chabrier (2003) IMF, QCFLAG = 5 , and 
+
+CE_KICKFLAG = 2 . The top panel shows the full histogram for a reference model with KICKFLAG = 2 and ALPHA = 7.0 . Two regions exhibiting distinct behaviours with respect to variations of these parameters are highlighted. The orange region corresponds to low-mass progenitors in the range 5.5–8.5, 𝑀 ⊙ . The bottom-right panel shows this same region for an otherwise identical model but with KICKFLAG = 1 , highlighting the impact of this parameter on the low-mass progenitor distribution. The green region corresponds to high-mass progenitors in the range 10 –24 .5, 𝑀 ⊙ . The bottom-left panel shows the same region for an otherwise identical model but with ALPHA = 0.5 , illustrating the effect of this parameter on the high-mass progenitor distribution. Overall, this figure highlights the bimodal progenitor-mass distribution obtained in our models, as well as its evolution with metallicity and with the two key parameters discussed in Section 3.2.1. Appendix D). Above this metallicity threshold, a large fraction of these progenitors therefore no longer bypasses the FGB phase. This stellar phase skip has important consequences for binary evolution. First, it suppresses the large radial expansion associated with the FGB, delaying the onset of mass transfer until later evolutionary stages, such as the Core Helium Burning (CHeB), Asymptotic Giant Branch (AGB), or Thermally Pulsing Asymptotic Giant Branch (TPAGB) phases. Second, it alters the stability of mass transfer. For all QCFLAG prescriptions considered in this work, the critical mass-ratio threshold for unstable mass transfer is significantly lower during the FGB phase than during these later evolutionary stages. Systems that would have entered a CE phase if mass transfer had occurred on the FGB can instead undergo stable mass transfer when the FGB is skipped. As a result, binaries with relatively short initial separations are more likely to avoid an early CE phase, which would otherwise lead to a merger before the formation of two neutron stars. Systems that skip the FGB can therefore continue their evolution and eventually form BNS systems, explaining the increase in formation efficiency observed below 𝑍 ≃ 0.0016 .Above this metallicity, the BNS formation efficiency decreases because part of the initial parameter space leading to successful BNS formation is no longer accessible. In particular, low-mass binaries with relatively short initial separations and high mass ratios are more likely to initiate a CE phase during the FGB and subsequently merge before BNS formation. Because this mechanism primarily affects low-mass progenitors, its impact depends on their relative contribution to the population. As discussed in Section 3.1, the fraction of high-mass progenitors increases with ALPHA which decreases the amplitude of this feature, consistent with the trends observed in Figs. 3 and 4. 
+
+> Article number, page 10 of 21 Mathieu Venet and Irina Dvorkin: Binary neutron star populations across cosmic time
+
+The second major feature is a non-monotonic variation in BNS formation efficiency between 𝑍 = 0.001 and the solar metallicity ( 𝑍 ⊙ = 0.014 ). This behaviour is visible across all model sets although with different amplitudes depending on the adopted prescriptions (see Figs. 3 and 4). It is directly linked to the metallicity dependence of single-star evolution, in partic-ular the evolution of stellar radii during advanced evolutionary phases. In this range, stellar radii can vary significantly during stages such as the FGB, CHeB, AGB, and TPAGB. The impact of these variations depends strongly on both stellar mass and evolu-tionary stage. High-mass progenitors follow a markedly different evolutionary path from lower-mass systems. In the SSE COSMIC 
+
+prescriptions, these stars bypass several late evolutionary phases such as the FGB and TPAGB, so their radius evolution is primarily governed by the CHeB phase. Figure 5 illustrates the metallicity dependence of stellar radii for different progenitor-mass ranges and evolutionary phases. For progenitors in the low-mass range, all late evolutionary phases exhibit a strong increase in radius at 
+
+𝑍 = 0.0025 , followed by a decrease up to 𝑍 = 0.005 , and then another increase toward solar metallicity. By contrast, high-mass progenitors show a smoother and more monotonic evolution, since only the CHeB phase contributes significantly to the evolu-tion in radii. In this regime, the CHeB radius increases gradually with metallicity, with a much steeper trend between 𝑍 = 0.001 
+
+and 𝑍 ⊙ .We first examine the impact of the evolution of high-mass progenitor radii as a function of metallicity. High-mass progeni-tors typically require a CE phase during the CHeB stage in order to form a BNS system. If the CE is triggered too early, the system is more likely to merge during the CE phase or to lose too much mass to remain a viable progenitor. Since stellar radii increase with metallicity, the range of initial separations leading to a CE at the appropriate evolutionary stage shifts toward larger values. The efficiency of envelope ejection, parametrized by the ALPHA 
+
+parameter in our models, is crucial for determining the fate of these systems. For high ALPHA values, systems with relatively small initial separations can still efficiently survive the CE phase. However, as metallicity increases and stellar radii expand, a pro-gressively larger fraction of systems is removed from the viable region of parameter space, leading to a strong decrease in for-mation efficiency. This effect is further amplified by the initial separation distribution of Sana et al. (2012), which favours low initial separations. This behaviour is visible in the top panel of Figure 6, where high ALPHA models rapidly lose systems with increasing metallicity for the high-mass progenitor channel. In contrast, models with low ALPHA exhibit a different be-haviour. In this regime, the increase in stellar radii with metallic-ity still shifts the initial separation to higher values. However, at low metallicity, this shift is initially beneficial because it moves the interacting systems away from the very shortest separations, where virtually no binary can survive a CE event with such a low 
+
+ALPHA . As a result, an increasing fraction of systems survives the CE phase, leading to a rise in the BNS formation efficiency. As the metallicity increases further, the required initial separations continue to grow. However, the newly selected systems already belong to a region of the initial parameter space where survival through the CE is possible. Increasing the separation therefore no longer improves the survival probability, but instead shifts the progenitor population towards increasingly wider binaries. Since the initial orbital-separation distribution of Sana et al. (2012) decreases towards large separations, progressively fewer bina-ries populate this region, resulting in a decline of the formation efficiency. While the increase in stellar radius shifts the range of initial separations leading to viable CE events towards larger values, its impact is determined by the competition between two effects. Larger initial separations allow a larger fraction of sys-tems to undergo a CE phase without merging. This increase in survivability depends on ALPHA . However, this gain is partially counterbalanced by the lower number of systems available at these larger initial separations, as predicted by the initial sepa-ration distribution (Sana et al. 2012). This competition naturally produces the turnover observed in the low-ALPHA models. This behaviour is illustrated in the bottom-right panel of Figure 6, which shows the high-mass region of the 𝑑𝑁 /𝑑𝑀 distribution for a model identical to that shown in the top panel but with AL-PHA = 0.5 . In this case, the formation efficiency increases with metallicity up to 𝑍 = 0.005 , before decreasing at 𝑍 = 0.014 .As shown in Figure 3, the turnover shifts towards lower metal-licities as ALPHA increases for KICKFLAG = 2 models, and disappears entirely for sufficiently large values of ALPHA , as illustrated by the ALPHA = 3 , KICKFLAG = 2 model. We now examine the impact of the evolution of low-mass progenitor radii as a function of metallicity. Most low-mass pro-genitors either undergo CE evolution only at relatively late evo-lutionary stages, after significant mass loss, or avoid CE episodes altogether. Therefore, the ALPHA parameter does not play an important role in the evolution of these systems. Instead, their fate is strongly affected by the adopted natal-kick prescription. At a given orbital separation, the sharp increase in stellar radius at 𝑍 = 0.0025 can trigger binary interactions at earlier evolu-tionary stages, either through stable mass transfer or through an early CE episode that is not always survivable. Such interactions may also drive the accretor out of the ECSN progenitor mass range, as a consequence of extended or enhanced mass-transfer phases. In the case of KICKFLAG = 1 , low-mass progenitors must remain within a relatively narrow ECSN mass range to avoid binary disruption by strong CCSN kicks. In this configuration, the evolution of the population is therefore tightly coupled to the metallicity-driven evolution of stellar radii through its effect on the range of viable initial separations. This behaviour is visible in the bottom left panel of Figure 6, where the number of low-mass progenitor systems decreases sharply between 𝑍 = 0.001 and 
+
+𝑍 = 0.0025 , following the rapid increase in stellar radii shown in Figure 5. The population then increases again at 𝑍 = 0.005 ,before decreasing once more at 𝑍 = 0.014 , consistent with the metallicity dependence of stellar radii in the low-mass regime. In KICKFLAG = 2 models, however, this effect is signif-icantly mitigated. In this prescription, natal kicks depend on the progenitor mass (see Section 2.1.2) and remain relatively low over the relevant mass range. As a result, systems that move slightly outside the strict ECSN channel can still survive supernova events due to the reduced kick amplitudes. Moreover, if an early mass-transfer or CE phase occurs, the resulting binary may evolve toward a smaller pre-supernova orbital separation, provided that the adopted ALPHA value allows the system to survive the interaction. Since the natal kicks remain comparatively unchanged while the orbital separation decreases, the probability of surviving both supernova events can even increase. Consequently, the strong increase in stellar radius at 𝑍 = 0.0025 may, in some cases, enhance the formation of low-mass BNS progenitors in KICKFLAG = 2 models. This behaviour is visible in the top panel of Figure 6, where a smoother decrease in the number of systems is observed between 𝑍 = 0.001 and 𝑍 = 0.0025 compared to the corre-sponding KICKFLAG = 1 model. The population remains approximately stable between 𝑍 = 0.0025 and 𝑍 = 0.005 ,highlighting the compensating effects discussed above, before decreasing again at 𝑍 = 0.014 . To further demonstrate the  
+
+> Article number, page 11 of 21 A&A proofs: manuscript no. main
+
+distinct impact of ALPHA and KICKFLAG on the two progenitor-mass regimes, we provide in Appendix E a com-plementary version of Figure 6. While Figure 6 highlights the changes induced by variations of these two parameters in their respective dominant mass regimes, the complementary figure shows that these effects are not interchangeable: variations of KICKFLAG have a negligible impact on the high-mass progenitor population, while variations of ALPHA have little effect on the low-mass progenitor population. Together, these two figures demonstrate the distinct roles played by 
+
+ALPHA and KICKFLAG in shaping the metallicity-dependent evolution of the low- and high-mass BNS progenitor populations. By combining the metallicity dependence of both low-mass and high-mass progenitors discussed above, the relative domi-nance of these two formation channels described in Section 3.1, and the overall decrease in formation efficiency with metallicity driven by stronger stellar winds discussed in Section 3.1, we can explain the different evolutionary behaviours observed in Figures 3 and 4. The metallicity evolution of each model is determined by two main factors: the dominant progenitor population (low-mass or high-mass) and the way this population responds to metallicity for a given parameter configuration. For example, the solid brown curve in Figure 3 represents an extreme case dominated by high-mass progenitors with a large 
+
+ALPHA value. As expected, the feature between 𝑍 = 0.0016 
+
+and 𝑍 = 0.0019 is almost absent, while the formation efficiency rapidly decreases between 𝑍 = 0.001 and 𝑍 = 0.0075 , reflecting the strong metallicity dependence of the high-mass channel. Conversely, the blue dashed curve in Figure 3 is dominated by low-mass progenitors in a KICKFLAG = 1 configuration. In this case, a pronounced increase is observed between 𝑍 = 0.0016 
+
+and 𝑍 = 0.0019 , followed by a more complex evolution between 
+
+𝑍 = 0.001 and 𝑍 = 0.0075 , consistent with the metallicity dependence of late-stage stellar radii discussed previously. Intermediate models can simultaneously exhibit features as-sociated with both progenitor populations, either because the relative contribution of each channel evolves with metallicity or because the rapid evolution of a subdominant population can still significantly affect the total formation efficiency. It should be emphasized that both of the features discussed in this section strongly depend on the adopted SSE prescriptions and, in particular, on the interpolation methods used in the stellar models. As discussed in Romagnolo (2022) and Xin et al. (2022), the evolution of stellar radii with mass and metallicity remains highly uncertain, making the second feature especially sensitive to the underlying interpolations. In particular, the abrupt radius evolution observed for low-mass progenitors around 𝑍 ≃ 0.0025 
+
+is suggested by Romagnolo (2022) to be an interpolation arte-fact that may not be physical. Nevertheless, stellar radii are still expected to increase with metallicity during the relevant evolu-tionary phases (Choi et al. 2016). Therefore, even if the sharp behaviour observed for low-mass progenitors were to disappear in more detailed stellar models, the qualitative trend identified for high-mass progenitors should remain similar. As a consequence, the overall dependence of the BNS formation efficiency on metal-licity and ALPHA is expected to persist, although the slopes and transition metallicities may differ. Similarly, the drop in formation efficiency at 𝑍 ≃ 0.00016 
+
+strongly depends on the adopted prescription for 𝑀 FGB , which itself remains uncertain and is actively debated (Hurley et al. 2000; Choi et al. 2016). Therefore, the metallicity at which this 
+
+Fig. 7: BNS formation efficiency as a function of metallicity for models with QCFLAG = 5 , CE_KICKFLAG = 2 , and KICK-FLAG = 2 . Solid lines show the formation efficiency obtained as-suming a Chabrier IMF down to 𝑍 = 0.00016 . For the two lowest metallicity bins, 𝑍 = 0.00013 and 𝑍 = 0.0001 , the models instead adopt top-heavy IMFs with 𝑚 cut = 20 , 𝑀 ⊙ and 𝑚 cut = 10 , 𝑀 ⊙ ,respectively, labelled Top-heavy 20 and Top-heavy 10 . These models are represented by solid and dashed lines, respectively. The lower-opacity lines show the corresponding Chabrier IMF models at the same metallicities for comparison. Different colors correspond to different values of ALPHA .drop occurs, as well as its amplitude and sharpness could vary significantly depending on the adopted stellar evolution model. 
+
+> 3.2.3. IMF models
+
+As discussed in Section 2.1.2, we simulated BNS populations using both a Chabrier IMF (Chabrier 2003) and a top-heavy 
+
+IMF with 𝑚 cut = 20 𝑀 ⊙ for the two lowest metallicity bins, 
+
+𝑍 = 0.00013 and 𝑍 = 0.0001 . The goal of this approach is to explore an extreme upper-limit scenario for the IMF at very low metallicity and to quantify its impact on the BNS formation efficiency. Figure 7 compares the resulting formation efficiencies ob-tained with both IMFs. The solid lines correspond to the top-heavy 𝑚 cut = 20 𝑀 ⊙ IMF models, while the lower-opacity lines show the corresponding Chabrier IMF models at the same metal-licities for comparison. An interesting trend emerges from this comparison. Relative to the Chabrier IMF, the top-heavy 20 
+
+IMF produces lower formation efficiencies for small values of 
+
+ALPHA . This behaviour is expected, since low-ALPHA models strongly suppress the contribution of high-mass progenitors to the BNS population. As ALPHA increases, the relative efficiency of the top-heavy IMF also increases. This behaviour can be directly linked to the fraction of high-mass progenitors contributing to BNS formation in the corresponding Chabrier IMF models (see Section 3.1. Changing the IMF does not fundamentally modify the dominant BNS formation channels, but rather changes their 
+
+> Article number, page 12 of 21 Mathieu Venet and Irina Dvorkin: Binary neutron star populations across cosmic time
+
+relative weight within the total population. Consequently, models in which the formation efficiency is primarily driven by low-mass progenitors become less efficient when adopting an IMF that fa-vors high-mass stars. We also note that, even for the highest ALPHA values ex-plored here, the top-heavy 20 IMF only marginally increases the BNS formation efficiency at very low metallicity. This suggests that the adopted IMF remains too strongly weighted toward pro-genitor masses that do not efficiently produce BNS systems. To further investigate this point, we simulated, for a specific subset of models, the BNS population assuming a top-heavy IMF with 
+
+𝑚 cut = 10 𝑀 ⊙ . The resulting formation efficiencies are shown as dashed lines in Fig. 7. For these models, we find that while the top-heavy 10 IMF consistently yields higher formation efficiencies than the top-heavy 20 case, it also exceeds the Chabrier (2003) IMF models already for lower ALPHA values (starting from AL-PHA = 1.5), whereas the top-heavy 20 models only begin to show a similar trend at higher ALPHA . In the most optimistic cases, the top-heavy 10 IMF reaches formation efficiencies approxi-mately a factor of two higher than the corresponding Chabrier 
+
+models. We therefore find that, while the extreme top-heavy 20 
+
+IMF considered here can be detrimental to BNS formation, since its peak lies outside the progenitor mass range associated with the most efficient formation channels, a top-heavy IMF peaking at lower characteristic masses can instead significantly enhance the formation efficiency under favorable conditions. 
+
+> 3.3. Cosmological merger rates
+> 3.3.1. Relative impact of stellar evolution parameters
+
+Figure 8 shows the cosmological merger rates obtained for dif-ferent parameter combinations, as well as for the three ¯𝑍 (𝑧 )
+
+prescriptions described in Section 2.2. This figure explores the same combinations of models as those presented in Section 3.2 and shown in Figs. 3 and 4. The left column illustrates the effects of the KICKFLAG and ALPHA parameters, while the right col-umn explores the effects of the QCFLAG and CE_KICKFLAG 
+
+parameters. The complete set of models explored in this work is shown in the Appendix in Fig. H.1. We find several features common to all three metallicity-redshift prescriptions. The most obvious one is the difference between the KICKFLAG = 1 and KICKFLAG = 2 models. As shown in Fig. 8, the latter models consistently yield higher merger rates at low redshifts (typically 𝑧 ≲ 5) across all metallicity mod-els. This is an expected result. As discussed in Section 3.2.1, the lower natal kick prescription ( KICKFLAG = 2 ) allows a larger fraction of systems to survive CCSN events, thereby increas-ing the formation efficiency of BNS. This effect is particularly important for high-mass progenitors, which are the dominant channel for CCSN events. These systems typically require CE evolution to sufficiently reduce the system’s mass and enter the NS mass range at the end of their evolution. In this context, CE events play a crucial role in shrinking orbital separations and enabling the formation of systems that merge within a Hubble time. Consequently, KICKFLAG = 2 favours the production of more high-mass progenitors undergoing CE phases, leading to a higher number of rapidly merging binaries that dominate the cosmological merger rate. We also note a second systematic difference between these model families. The KICKFLAG = 1 models reach their merger rate maximum at systematically higher redshift than the KICK-FLAG = 2 models. This behaviour can also be understood in terms of the underlying physical assumptions. In the high-kick scenario ( KICKFLAG = 1 ), the larger supernova kicks reduce the overall formation efficiency but preferentially select systems that experience strong orbital tightening in rare favourable con-figurations. In order for a binary to remain bound, the kick must be precisely oriented; otherwise, the system is disrupted due to the large imparted momentum. This introduces a survival bias, where only systems that benefit from a fortuitous kick geometry survive both supernova events. When such conditions are met, these strong kicks can significantly reduce the orbital separation more efficiently than in the lower-kick ( KICKFLAG = 2 ) case. This behaviour can be seen in Fig. 9, which shows the merger time-delay distributions for two representative models. Although the orange curve, corresponding to a KICKFLAG = 2 model, produces a larger number of systems merging within a Hubble time, the purple curve, corresponding to a KICKFLAG = 1 
+
+model, exhibits a merger time-delay distribution that is signifi-cantly shifted towards shorter merger times. The difference in merger delay-time distributions naturally explains the shift in the redshift of the peak merger rate. Both models exhibit a peak at a redshift close to the maximum of the Madau & Fragos (2017) SFR at 𝑧 ∼ 2, with their offset reflecting their respective merger time-delay distributions. The 
+
+KICKFLAG = 1 models peak closer to this redshift due to their shorter typical delay times, whereas the KICKFLAG = 2 
+
+models peak at lower redshift as a consequence of their longer merger delay-time distribution. We observe another key feature associated with the ALPHA 
+
+parameter. As described in Section 3.2.1, increasing ALPHA 
+
+leads to a larger fraction of high-mass progenitors, which natu-rally explains the tendency, across metallicity models, for higher 
+
+ALPHA values to be associated with higher local merger rates. However, a straightforward interpretation of the behaviour of each 
+
+ALPHA -dependent model family is non-trivial, since ALPHA 
+
+simultaneously affects the formation and merger efficiencies, as well as the post-CE orbital separations. For instance, for very low ALPHA , the formation efficiency can be significantly reduced. Nevertheless, systems that success-fully survive the CE phase are left with much tighter orbits, re-sulting in substantially shorter merger time delays. This explains the second merger rate bump observed in Figure H.1 for ALPHA = 0.5 at high redshift. 4 For the other parameters, the trends follow more clearly the formation efficiency hierarchy described in Sec-tion 3.2.1. In particular, QCFLAG = 3 and QCFLAG = 5 allow a larger fraction of systems to survive early CE phases, lead-ing to more efficient merger production compared to QCFLAG = 1 models. Similarly, CE_KICKFLAG = 2 improves the sur-vival probability of systems undergoing SN events during or after CE phases, resulting in higher merger rates compared to 
+
+CE_KICKFLAG = 1 .              
+
+> 4The cosmological merger rate can be enhanced if the resulting delay times align with epochs of high SFR. For example, in Fig. H.1, the model with ALPHA = 0.5 ,KICKFLAG = 2 ,QCFLAG = 5 , and
+> CE_KICKFLAG = 2 , under a Madau 2017 analytical prescription, exhibits an interesting feature: a secondary peak in the merger rate at
+> 𝑧 ∼4, which is comparable to or even exceeds its first peak at 𝑧 ∼2
+> associated with the SFR maximum. This behaviour can be explained by the enhanced formation efficiency at low metallicity as shown in Figure 3, combined with the suppression of the FGB channel (Section 3.2.1).In this regime, the low ALPHA value produces extremely compact post-CE systems, resulting in very short merger time delays that allow BNS systems to merge at a high redshift. Article number, page 13 of 21 A&A proofs: manuscript no. main
+
+Fig. 8: Cosmological merger rate as a function of redshift for three different methods described in Section 2.2. For all three approaches, we adopt the SFR from Madau & Fragos (2017) and implement different prescriptions for the evolution of the mean metallicity. The linear and MandF2017 models are already implemented in cosmo_Rate and are based on observational fits from Gallazzi et al. (2008), De Cia et al. (2018), and Madau & Fragos (2017), respectively. The Madau 2017 analytical model relies on an analytical expression for ¯𝑍 (𝑧 ) derived in Belczynski et al. (2016). The plots in the left column are obtained for the Chabrier (2003) IMF, with 
+
+QCFLAG = 5 and CE_KICKFLAG = 2 . For these models, the ALPHA values are represented by colors and the KICKFLAG by line styles. The plots in the right column are obtained for the Chabrier (2003) IMF, with ALPHA = 1 and KICKFLAG = 1 . The colors correspond to different QCFLAG values, while the line styles correspond to CE_KICKFLAG variations. The grey shaded area represents the LVK uncertainty band for detected BNS mergers, as reported by The LIGO Scientific Collaboration et al. (2026). Its extent along the redshift axis is shown for visual guidance only and does not represent the redshift range over which the constraint is measured. 
+
+> Article number, page 14 of 21 Mathieu Venet and Irina Dvorkin: Binary neutron star populations across cosmic time
+> 3.3.2. Metallicity-redshift relations
+
+We now focus on the differences in the BNS merger-rate predic-tions obtained with the three metallicity-redshift relations intro-duced in Section 2.2. The cosmological merger rates associated with these metal-licity prescriptions are primarily determined by two coupled ef-fects: the metallicity dependence of the BNS formation efficiency and merger fraction, and the correspondence between the adopted metallicity-redshift relation and the chosen cosmic SFR history. As discussed in Section 2.1.2, our models span a metallicity range from 𝑍 = 𝑍 ⊙ = 0.014 down to 𝑍 = 10 −4. Over this in-terval, we observe a significant increase in the BNS formation efficiency 𝜂 (𝑍 ) (eq. 5) as shown in Figures 3 and 4. In contrast, the merger fraction 𝜖 (𝑍 ) (eq. 6) remains of the same order of magnitude across this metallicity range (see G.1). Consequently, the metallicity-redshift prescriptions that maximize the cosmo-logical merger rate are those for which the metallicities associated with the highest formation efficiencies are reached close to the peak of the cosmic SFR, which is 𝑧 ∼ 2 for the Madau & Fragos (2017) SFR adopted in this work. The three main trends observed in Fig. 8 can therefore be understood from the metallicity evolution with redshift (see Ap-pendix F). For the MandF2017 prescription, the metallicity of 
+
+log 10 (𝑍 /𝑍 ⊙ ) ∼ − 1, which corresponds to high BNS formation efficiency (see Figure 3), is reached only at very high redshift, around 𝑧 ∼ 8.8 At such redshifts, the Madau & Fragos (2017) SFR has already declined by roughly one order of magnitude relative to its maximum. As a consequence, the resulting cosmo-logical merger rates are the lowest among our three metallicity-redhisft prescriptions. In this case, the merger rate is largely dominated by progenitors formed at relatively high metallicity around 𝑧 ∼ 2 − 3.
+
+Fig. 9: Merger time-delay distributions of systems merging within a Hubble time for two representative models at 𝑍 = 0.001 . Both models adopt ALPHA = 7 , QCFLAG = 5 , and CE_KICKFLAG = 2 . The purple curve corresponds to KICKFLAG = 1 , while the orange curve corresponds to KICKFLAG = 2 . This compari-son highlights that, although KICKFLAG = 2 models produce a larger number of systems merging within a Hubble time, KICK-FLAG = 1 models yield a significant fraction of systems with very short merger time delays ( ≲ 3×10 2 Myr), whereas in KICK-FLAG = 2 models the merger-time distribution is almost entirely shifted to values above this threshold. In contrast, the Madau 2017 analytical prescription reaches 
+
+log 10 (𝑍 /𝑍 ⊙ ) ∼ − 1 at 𝑧 ∼ 1.9, and log 10 (𝑍 /𝑍 ⊙ ) ∼ − 2 at 𝑧 ∼ 4.This alignment between low-metallicity environments and the peak of the cosmic SFR allows progenitors with the highest for-mation efficiencies to form during the epoch of strongest star-formation activity. This naturally explains why this prescription produces both the highest overall cosmological merger rates and the largest merger-rate peaks. In this regime, the merger popula-tion is strongly dominated by low-metallicity progenitors. The linear prescription reaches log 10 (𝑍 /𝑍 ⊙ ) ∼ − 1 at 𝑧 ∼ 4.5
+
+and log 10 (𝑍 /𝑍 ⊙ ) ∼ − 2 at 𝑧 ∼ 8.5. This intermediate behaviour leads to a merger population composed of both relatively high-and low-metallicity progenitors, resulting in cosmological merger rates that lie between those obtained for the MandF2017 and 
+
+Madau 2017 analytical prescriptions. Finally, we compare the local merger rates obtained across our explored parameter space with the BNS merger-rate interval of 5.1–154 .7 Gpc −3 yr −1 inferred by the LIGO-Virgo-KAGRA Collaboration (The LIGO Scientific Collaboration et al. 2026). We first observe that, for the MandF2017 prescription, none of our models falls within the LVK uncertainty band, as their pre-dicted cosmological merger rates are systematically lower than the observational constraints. The models that come closest to the lower edge of the observational uncertainty range are charac-terized by KICKFLAG = 2 , QCFLAG values in [3,5] , and low 
+
+ALPHA values. This indicates that, within the parameter space explored in this study, the MandF2017 metallicity prescription tends to underpredict the observed BNS merger rate and is there-fore marginally disfavoured compared to the other prescriptions considered. For the Madau 2017 analytical prescription, the explored models instead span nearly the entire LVK uncertainty range, with a large fraction of the parameter space remaining compati-ble with current observational constraints. In this configuration, models combining the lowest ALPHA values with QCFLAG = 1 can already be disfavoured by current observations. The most merger-rate-efficient models, characterised by ALPHA = [5,7] ,
+
+KICKFLAG = 2 , QCFLAG = [3,5] , and CE_KICKFLAG = 2, actually exceed the LVK merger rates based on GWTC-5.0 reported by The LIGO Scientific Collaboration et al. (2026) and are therefore inconsistent with the observational data. The re-maining models cover a broad range of merger rates; however, the current observational uncertainties do not yet allow us to ef-ficiently discriminate between the key parameters discussed in Section 3.2.1, such as the different KICKFLAG prescriptions or 
+
+ALPHA values below and above unity. For the linear prescription, we find an intermediate behaviour. A significant number of explored models remain compatible with the LVK uncertainty interval, while not reaching its upper end. In this case, although several models remain observationally degen-erate, the current constraints already allow partial discrimination between some model parameters. In particular, only models with 
+
+KICKFLAG = 2 are able to reproduce the observed local merger-rate estimates. 
+
+4. Discussion 
+
+In this work we have explored the parameter space of BNS for-mation models using the population synthesis code COSMIC . We have specifically focused on four parameters that encode the on-set of unstable mass transfer, the efficiency of CE ejection, natal kicks, and their treatment during the common envelope phase. This study revealed several noteworthy features.  
+
+> Article number, page 15 of 21 A&A proofs: manuscript no. main
+
+First, all our populations exhibit a bimodal distribution of BNS progenitors, across all parameters combinations and metal-licities. As discussed in Section 3.1, this bimodality reflects the two main formation channels identified in this work. The first channel involves low-mass progenitors, generally avoiding early CE events while evolving toward the ECSN mass range, thereby limiting the disruptive effects of SN kicks. The second channel is associated with high-mass progenitors and relies on early CE phases to both reduce the orbital separation and strip the stars suf-ficiently to enter the NS mass range, increasing the probability of surviving the stronger CCSN kicks. These two broad categories can be related to the compact-object binary formation channels described in Iorio et al. (2023): channels II and 0 largely corre-spond to our low-mass progenitor pathways, whereas channels III and IV are associated with our high-mass progenitor channels. Channel I can be found in both regimes, although with character-istics specific to each progenitor population. We therefore argue that this bimodality is physically motivated. This feature may still be absent from specific parameter combinations that either suppress one progenitor population or make the other sufficiently dominant to mask its presence, as observed for the high ALPHA 
+
+models discussed in Section 3.1. A second important result is the large spread in formation ef-ficiencies and merger rates obtained across our model grid, span-ning several orders of magnitude between the most pessimistic and optimistic scenarios. This outcome is expected, as the ex-plored parameters remain among the most uncertain aspects of binary evolution and are believed to play a fundamental role in BNS formation. The purpose of this study was therefore to charac-terize the effect of these uncertainties on direct observables, such as the cosmological BNS merger rate, and indirect quantities, such as the formation efficiencies discussed in Sections 3.2 and 3.3. Despite this important variation, our results remain broadly consistent with previous population-synthesis studies. In partic-ular, Santoliquido et al. (2020), using the MOBSE (Giacobbo & Mapelli 2018; Giacobbo et al. 2018) population synthesis code, reported comparable merger efficiencies, although with some-what higher merger rates. Similar conclusions were obtained by Iorio et al. (2023) and Sgalletta et al. (2023), both using the 
+
+Sevn (Spera et al. 2019) population synthesis code, as well as by Grichener (2023) with COMPAS (Riley et al. 2022; Team Com-pas et al. 2025). While these studies generally find formation and merger efficiencies comparable to ours, their predicted cosmo-logical merger rates are often higher, in some cases by up to an order of magnitude relative to our most optimistic models. We attribute this discrepancy primarily to two factors. First, earlier LVK data releases favored higher BNS merger rates than current estimates, leading previous studies to preferentially adopt combi-nations of lower kicks and higher ALPHA values. Second, for the 
+
+linear and MandF2017 metallicity-redshift relations, described in Section 2.2 we applied a correction to account for our adopted solar metallicity value of 𝑍 ⊙ = 0.014 . This correction lowers the predicted cosmological merger rate, since the original relations favored metallicities exceeding our maximum solar metallicity at low redshift. We have also identified the relative importance of the stud-ied parameters for BNS formation. We find that the dominant parameters are the efficiency of common envelope ejection, parametrized by ALPHA and SN natal kick prescription, encoded by the KICKFLAG parameter in our models. This finding is in accordance with previous studies (e.g. Santoliquido et al. 2020; Kruckow et al. 2021; Vigna-Gómez 2025) that explored the im-portance of the CE phase and natal kicks for compact binary formation. More specifically, we find that BNS formation efficiency sys-tematically increases with increasing ALPHA , as discussed in Section 3.2.1, although this trend appears to flatten at the high-est values explored, suggesting a possible saturation regime in which further increases in ALPHA would have a reduced im-pact on the efficiency. The cosmological merger rate shows a more complex dependence on ALPHA , since this parameter si-multaneously affects the number of formed BNS systems, their delay-time distribution, and their coupling with the adopted star formation history and metallicity–redshift relation. At the same time, it remains one of the largest sources of uncertainty in binary evolution models, as emphasized in works such as Ricker et al. (2018), which highlight the strong sensitivity of compact binary merger predictions to CE physics. Other formalisms beyond the 
+
+𝛼 − 𝜆 prescription have been proposed, such as the 𝛼 − 𝛾 for-malism (Nelemans et al. 2000; Nelemans & Tout 2005). Instead of assuming that the envelope is ejected through the release of orbital energy during a spiral-in phase, this approach describes the orbital evolution through the loss of angular momentum as-sociated with mass ejection. For the KICKFLAG prescriptions, we consistently find higher formation efficiencies and cosmological merger rates for the 
+
+KICKFLAG = 2 prescription compared to KICKFLAG = 1 , across all model combinations and metallicity bins considered. In addi-tion, the merger rate exhibits a shift in its redshift peak, indicating that natal kick assumptions not only regulate binary survival but also reshape the cosmic evolution of merger activity. In addition to these well-established trends, we identify two characteristic features in the metallicity dependence of the BNS formation efficiency that are present across all simulated models and can be directly linked to specific stages of stellar evolu-tion. The first is a decrease in the formation efficiency between 
+
+𝑍 = 0.00016 and 𝑍 = 0.0019 , which is associated with the onset of the FGB skip for low-mass progenitors at 𝑍 < 0.0019 . The second feature is a non-monotonic evolution of the formation efficiency between 𝑍 = 0.001 and 𝑍 = 0.0075 . All models ex-hibit significant changes in the slope of the formation efficiency within this metallicity range. The amplitude and shape of this variation strongly depend on the dominant progenitor popula-tion (low- or high-mass progenitors) and on the combination of 
+
+ALPHA and KICKFLAG parameters. As a result, the formation efficiency can display different behaviours, including increasing or decreasing trends and the presence of local maxima or minima. Both recurring features may be linked to potential observables in the cosmological merger rate and in the mass distribution of observed mergers. However, their interpretation remains strongly dependent on the adopted SSE method. The magnitude, slope, and even the existence of such features vary significantly be-tween population-synthesis codes, reflecting the current lack of convergence in SSE prescriptions. Finally, we find a significant degeneracy between models when considering the cosmological merger rate. Although each explored parameter has a measurable impact on this quantity, different combinations of prescriptions can produce remarkably similar merger-rate evolutions, both in terms of their redshift dependence and their local merger-rate density. As discussed in Section 3.3, our ability to break this degeneracy is currently lim-ited by two major factors: the still modest BNS merger sample available from the latest LVK release (The LIGO Scientific Col-laboration et al. 2026) and the substantial uncertainties affecting the metallicity-redshift relation used in the cosmological merger rate calculations. Under these conditions, it is possible to dis-favour some extreme parameter combinations, particularly those associated with very low BNS yields, such as KICKFLAG = 1 
+
+> Article number, page 16 of 21
+
+Mathieu Venet and Irina Dvorkin: Binary neutron star populations across cosmic time 
+
+combined with low ALPHA values. However, current BNS ob-servational merger data do not yet allow a clear preference for a specific parameter value or prescription. This limited discriminating power for key SSE and BSE parameters remains one of the main challenges for future population-synthesis studies. Recent investigations of BBH pop-ulations have already revealed tensions between population-synthesis predictions and LVK observations, as discussed in Boco et al. (2026). Although these discrepancies appear to depend on both the population-synthesis code considered and the specific combination of model parameters adopted (Broekgaarden 2026), such studies point to shortcomings in our current treatment of several critical evolutionary processes, including CE evolution and SN natal kicks. They also underscore the importance of sys-tematically exploring the parameter space to better quantify the uncertainties arising from both the underlying evolutionary pa-rameters and the specific assumptions and implementations of different population-synthesis codes. Further progress in this area will require a substantially larger sample of observed BNS mergers. This will be enabled by next-generation gravitational-wave observatories, such as the Einstein Telescope and Cosmic Explorer, which are expected to detect up to ∼ 10 5 BNS mergers per year and measure the BNS merger rate out to redshifts of 𝑧 ∼ 2 − 3 (Iacovelli et al. 2022). The result-ing population will provide significantly tighter constraints on the properties of BNS populations and their formation channels (Safarzadeh et al. 2019; Toubiana & Dvorkin 2026). In addition, improved observational constraints on the cosmic metallicity evo-lution, together with more realistic modelling of galaxy evolution and chemical enrichment (Neĳssel et al. 2019; Briel et al. 2022) will be essential for reducing the systematic uncertainties in pre-dictions of the cosmological BNS merger rate. Nevertheless, even with current observational data, part of this degeneracy may be alleviated by jointly considering multi-ple observational probes of the same underlying BNS popula-tion. For example, population-synthesis models can simultane-ously predict the properties and abundance of Galactic double neutron stars, the contribution of BNS mergers to the r-process enrichment of the Milky Way, and the cosmological merger rate. Combining these complementary observables could provide sig-nificantly stronger constraints on the underlying evolutionary prescriptions than any individual probe alone. Exploring such a multi-messenger and multi-observable approach is the subject of ongoing work and will be investigated in future studies. 
+
+Acknowledgements. This project was provided with computing HPC and stor-age resources by GENCI at IDRIS thanks to grants AD010416184 and AD010416184R1 on the supercomputer Jean Zay’s CSL partition. This work made use of the Infinity cluster, hosted by the Institut d’Astrophysique de Paris, on which some of the simulations were run and post-processed. The authors warmly thank S. Rouberol for running it smoothly. The authors thank M. Zevin and K. Breivik for useful discussions and the entire COSMIC team for making the code publicly available. This study is part of the EVOLVE project (ANR-24-CE31-3262-01, PI: I. Dvorkin), funded by the Agence Nationale de la Recherche (ANR). 
+
+References 
+
+Aasi, J., Abbott, B. P., Abbott, R., et al. 2015, Classical and Quantum Gravity, 32, 074001 Abac, A., Abramo, R., Albanesi, S., et al. 2026, Journal of Cosmology and Astroparticle Physics, 2026, 081 Abbott, B. P., Abbott, R., Abbott, T. D., et al. 2020a, ApJ, 892, L3 Abbott, B. P., Abbott, R., Abbott, T. D., et al. 2017a, ApJ, 848, L12 Abbott, B. P., Abbott, R., Abbott, T. D., et al. 2017b, Phys. Rev. Lett., 119, 161101 Abbott, B. P. et al. 2020b, Living Reviews in Relativity, 23, 3 Ablimit, I. & Maeda, K. 2018, The Astrophysical Journal, 866, 151 Acernese, F., Agathos, M., Agatsuma, K., et al. 2015, Classical and Quantum Gravity, 32, 024001 Akutsu, T., Ando, M., Arai, K., et al. 2021, Progress of Theoretical and Experi-mental Physics, 2021, 05A101 Andrews, J. J., Bavera, S. S., Briel, M., et al. 2025, ApJS, 281, 3 Belczynski, K., Holz, D. E., Bulik, T., & O’Shaughnessy, R. 2016, Nature, 534, 512 Belczynski, K., Kalogera, V., Rasio, F. A., et al. 2008, ApJS, 174, 223 Beniamini, P. & Piran, T. 2016, MNRAS, 456, 4089 Berger, E. 2014, ARA&A, 52, 43 Boco, L., Bosi, M., Sgalletta, C., Romagnolo, A., & Mapelli, M. 2026, arXiv e-prints, arXiv:2606.02725 Boesky, A. P., Broekgaarden, F. S., & Berger, E. 2024, ApJ, 976, 23 Branchesi, M., Maggiore, M., Alonso, D., et al. 2023, J. Cosmology Astropart. Phys., 2023, 068 Breivik, K., Coughlin, S., Zevin, M., et al. 2020, The Astrophysical Journal, 898, 71 Bressan, A., Marigo, P., Girardi, L., et al. 2012, MNRAS, 427, 127 Briel, M. M., Eldridge, J. J., Stanway, E. R., Stevance, H. F., & Chrimes, A. A. 2022, MNRAS, 514, 1315 Broekgaarden, F. S. 2026, arXiv e-prints, arXiv:2606.28515 Broekgaarden, F. S., Berger, E., Stevenson, S., et al. 2022, Monthly Notices of the Royal Astronomical Society, 516, 5737–5761 Chabrier, G. 2003, PASP, 115, 763 Chattaraj, A., Andrews, J. J., Bavera, S. S., et al. 2026, ApJ, 997, 52 Chattaraj, A., Andrews, J. J., Bavera, S. S., et al. 2026, The Astrophysical Journal, 997, 52 Chattopadhyay, D., Stevenson, S., Hurley, J. R., Rossi, L. J., & Flynn, C. 2020, MNRAS, 494, 1587 Choi, J., Dotter, A., Conroy, C., et al. 2016, ApJ, 823, 102 Chu, Q., Yu, S., & Lu, Y. 2021, Monthly Notices of the Royal Astronomical Society, 509, 1557–1586 Chu, Q., Yu, S., & Lu, Y. 2022, MNRAS, 509, 1557 Claeys, J. S. W., Pols, O. R., Izzard, R. G., Vink, J., & Verbunt, F. W. M. 2014, A&A, 563, A83 Cowan, J. J., Sneden, C., Lawler, J. E., et al. 2021, Reviews of Modern Physics, 93 De Cia, A., Ledoux, C., Petitjean, P., & Savaglio, S. 2018, A&A, 611, A76 De Marco, O., Passy, J.-C., Moe, M., et al. 2011, MNRAS, 411, 2277 Deng, Z.-L., Li, X.-D., Shao, Y., & Xu, K. 2024, ApJ, 963, 80 Dewdney, P. E., Hall, P. J., Schilizzi, R. T., & Lazio, T. J. L. W. 2009, IEEE Proceedings, 97, 1482 Disberg, P. & Mandel, I. 2025, The Astrophysical Journal Letters, 989, L8 Evans, M., Adhikari, R. X., Afle, C., et al. 2021, arXiv e-prints, arXiv:2109.09882 Fang, T. & Cen, R. 2004, ApJ, 616, L87 Farrow, N., Zhu, X.-J., & Thrane, E. 2019, The Astrophysical Journal, 876, 18 Fragos, T., J. Andrews, J., Bavera, S. S., et al. 2023, The Astrophysical Journal Supplement Series, 264, 45 Fryer, C. L., Belczynski, K., Wiktorowicz, G., et al. 2012, ApJ, 749, 91 Gallazzi, A., Brinchmann, J., Charlot, S., & White, S. D. M. 2008, MNRAS, 383, 1439 Gallegos-Garcia, M., Berry, C. P. L., & Kalogera, V. 2023, ApJ, 955, 133 Ge, H., Webbink, R. F., Chen, X., & Han, Z. 2015, ApJ, 812, 40 Giacobbo, N. & Mapelli, M. 2018, MNRAS, 480, 2011 Giacobbo, N. & Mapelli, M. 2020, ApJ, 891, 141 Giacobbo, N., Mapelli, M., & Spera, M. 2018, MNRAS, 474, 2959 Grichener, A. 2023, Monthly Notices of the Royal Astronomical Society, 523, 221–232 Hild, S., Abernathy, M., Acernese, F., et al. 2011, Classical and Quantum Gravity, 28, 094013 Hjellming, M. S. & Webbink, R. F. 1987, ApJ, 318, 794 Hobbs, G., Lorimer, D. R., Lyne, A. G., & Kramer, M. 2005, MNRAS, 360, 974 Hurley, J. R., Pols, O. R., & Tout, C. A. 2000, MNRAS, 315, 543 Hurley, J. R., Tout, C. A., & Pols, O. R. 2002, MNRAS, 329, 897 Iacovelli, F., Mancarella, M., Foffa, S., & Maggiore, M. 2022, ApJ, 941, 208 Igoshev, A. P., Chruslinska, M., Dorozsmai, A., & Toonen, S. 2021, MNRAS, 508, 3345 Iorio, G., Mapelli, M., Costa, G., et al. 2023, MNRAS, 524, 426 Iorio, G., Mapelli, M., Costa, G., et al. 2023, Monthly Notices of the Royal Astronomical Society, 524, 426–470 Ivanova, N., Justham, S., Chen, X., et al. 2013, A&A Rev., 21, 59 Kruckow, M. U., Neunteufel, P. G., Di Stefano, R., Gao, Y., & Kobayashi, C. 2021, The Astrophysical Journal, 920, 86 Kruckow, M. U., Tauris, T. M., Langer, N., Kramer, M., & Izzard, R. G. 2018, MNRAS, 481, 1908 Li, Z., Wei, D., Jia, S., et al. 2026, The Astrophysical Journal, 1004, 31 Madau, P. & Fragos, T. 2017, ApJ, 840, 39 Manchester, R. N., Hobbs, G. B., Teoh, A., & Hobbs, M. 2005, VizieR Online Data Catalog: ATNF Pulsar Catalog (Manchester+, 2005), VizieR On-line Data Catalog: VII/245. Originally published in: 2005AJ....129.1993M 
+
+Article number, page 17 of 21 A&A proofs: manuscript no. main 
+
+Mestichelli, B., Mapelli, M., Santoliquido, F., et al. 2025, A&A, 704, A54 Metzger, B. D. 2019, Living Reviews in Relativity, 23 Muccillo, L., Patricelli, B., & Razzano, M. 2026, Journal of Physics: Conference Series, 3177, 012079 Neĳssel, C. J., Vigna-Gómez, A., Stevenson, S., et al. 2019, MNRAS, 490, 3740 Nelemans, G. & Tout, C. A. 2005, MNRAS, 356, 753 Nelemans, G., Verbunt, F., Yungelson, L. R., & Portegies Zwart, S. F. 2000, A&A, 360, 1011 Paxton, B., Bildsten, L., Dotter, A., et al. 2011, ApJS, 192, 3 Pellouin, C., Dvorkin, I., & Lehoucq, L. 2025, Astronomy & Astrophysics, 693, A283 Planck Collaboration, Ade, P. A. R., Aghanim, N., et al. 2016, A&A, 594, A13 Punturo, M., Abernathy, M., Acernese, F., et al. 2010, Classical and Quantum Gravity, 27, 194002 Reitze, D., Adhikari, R. X., Ballmer, S., et al. 2019, in Bulletin of the American Astronomical Society, Vol. 51, 35 Ricker, P. M., Timmes, F. X., Taam, R. E., & Webbink, R. F. 2018, Proceedings of the International Astronomical Union, 14, 449–454 Riley, J., Agrawal, P., Barrett, J. W., et al. 2022, ApJS, 258, 34 Romagnolo, A. 2022, in EAS2022, European Astronomical Society Annual Meet-ing, 1076 Safarzadeh, M., Berger, E., Ng, K. K. Y., et al. 2019, ApJ, 878, L13 Sana, H., de Mink, S. E., de Koter, A., et al. 2012, Science, 337, 444 Santoliquido, F., Mapelli, M., Bouffanais, Y., et al. 2020, The Astrophysical Journal, 898, 152 Santoliquido, F., Mapelli, M., Bouffanais, Y., et al. 2020, ApJ, 898, 152 Santoliquido, F., Mapelli, M., Giacobbo, N., Bouffanais, Y., & Artale, M. C. 2021, MNRAS, 502, 4877 Sgalletta, C., Iorio, G., Mapelli, M., et al. 2023, MNRAS, 526, 2210 Sgalletta, C., Mapelli, M., Boco, L., et al. 2025, A&A, 698, A144 Soberman, G. E., Phinney, E. S., & van den Heuvel, E. P. J. 1997, A&A, 327, 620 Spera, M., Mapelli, M., Giacobbo, N., et al. 2019, MNRAS, 485, 889 Stanway, E. R. & Eldridge, J. J. 2018, MNRAS, 479, 75 Stappers, B. W., Keane, E. F., Kramer, M., Possenti, A., & Stairs, I. H. 2018, Philosophical Transactions of the Royal Society of London Series A, 376, 20170293 Tauris, T. M., Kramer, M., Freire, P. C. C., et al. 2017, ApJ, 846, 170 Team Compas, Mandel, I., Riley, J., et al. 2025, ApJS, 280, 43 The LIGO Scientific Collaboration, the Virgo Collaboration, the KAGRA Col-laboration, et al. 2026, arXiv e-prints, arXiv:2605.27226 Toubiana, A. & Dvorkin, I. 2026, A&A, 711, A211 Toubiana, A., Gerosa, D., Mould, M., et al. 2026, Phys. Rev. D, 113, 083006 van Son, L. A. C., Roy, S. K., Mandel, I., et al. 2025, ApJ, 979, 209 Verbunt, F. & Cator, E. 2017, Journal of Astrophysics and Astronomy, 38, 40 Vigna-Gómez, A. 2025, Astronomy & Astrophysics, 701, L3 Vink, J. S. & de Koter, A. 2005, A&A, 442, 587 Vink, J. S., de Koter, A., & Lamers, H. J. G. L. M. 2001, A&A, 369, 574 Wang, J. 2016, Advances in Astronomy, 2016, 1–15 Webbink, R. F. 2008, in Astrophysics and Space Science Library, Vol. 352, Astrophysics and Space Science Library, ed. E. F. Milone, D. A. Leahy, & D. W. Hobill, 233 Xin, C., Renzo, M., & Metzger, B. D. 2022, MNRAS, 516, 5816 
+
+Article number, page 18 of 21 Mathieu Venet and Irina Dvorkin: Binary neutron star populations across cosmic time 
+
+Appendix A: 𝜶 − 𝝀 formalism 
+
+The common-envelope (CE) phase is described using the energy formalism implemented in BSE (Hurley et al. 2002), which fol-lows the prescription developed by Soberman et al. (1997). In this formalism, an unstable mass-transfer episode leads to the forma-tion of a common envelope surrounding both stellar components. A fraction of the orbital energy released during the inspiral phase is assumed to be transferred to the envelope and used to eject it from the system. The outcome of the CE phase is governed by two main param-eters. The first one, 𝛼 CE , is the common-envelope efficiency pa-rameter and quantifies the fraction of the released orbital energy that contributes to the envelope ejection. In its simplest interpre-tation, 𝛼 CE is expected to lie between 0 and 1. However, values larger than unity can be considered if additional energy sources, such as recombination energy or other internal energy contribu-tions, participate in the envelope ejection process (Ivanova et al. 2013). The second parameter, 𝜆 , describes the binding energy of the stellar envelope and accounts for the internal structure of the donor star. Its value depends on the evolutionary state of the star, including its density profile and the location of the core-envelope boundary. The interaction between these two parameters is de-scribed by the following energy balance: 
+
+𝐸 bind ,i = 𝛼 CE 
+
+ 𝐸 orb ,f − 𝐸 orb ,i
+
+ . (A.1) where the initial binding energy of the envelope is given by 
+
+𝐸 bind ,i = − 𝐺 𝜆 
+
+ 𝑀 1 𝑀 env ,1
+
+𝑅 1
+
++ 𝑀 2 𝑀 env ,2
+
+𝑅 2
+
+
+
+(A.2) and the initial and final orbital energies are 
+
+𝐸 orb ,i = − 𝐺 𝑀 c,1 𝑀 c,2
+
+2𝑎 i
+
+, (A.3) 
+
+𝐸 orb ,f = − 𝐺 𝑀 c,1 𝑀 c,2
+
+2𝑎 f
+
+. (A.4) Here, 𝐺 is the gravitational constant, 𝑀 1 and 𝑀 2 are the total masses of the two stars at the onset of the CE phase, and 𝑀 env ,1
+
+and 𝑀 env ,2 are their corresponding envelope masses. 𝑅 1 and 𝑅 2
+
+denote the stellar radii at the beginning of the CE phase. The quantities 𝑀 c,1 and 𝑀 c,2 correspond to the masses of the stellar cores remaining after envelope removal. Finally, 𝑎 i and 𝑎 f are the orbital separations before and after the CE phase, respectively. The CE phase is considered successful if the released orbital energy is sufficient to eject the envelope and if neither stellar core overfills its Roche lobe after the inspiral. Otherwise, the two cores are assumed to merge. In that case, systems experiencing an unsuccessful CE phase have no possibility of forming BNS systems. 
+
+Appendix B: Additional COSMIC parameters         
+
+> Parameter Values / description
+> Sampling
+> sampling_method Independent
+> Numerical time resolution
+> pts1 0.01 pts2 0.01 pts3 0.02
+> Other fixed parameters
+> Remnant_flag Model 4 (Fryer et al. (2012))
+> 𝑚 NS ,max 3wd_mass_lim 1
+
+Appendix C: KICKFLAG = 1 kicks distributions 
+
+Fig. C.1: Distribution of natal kicks for CCSN and ECSN events obtained with the KICKFLAG = 1 prescription from 2000 random realizations. The distributions peak at 425 𝑘𝑚.𝑠 −1 and 32 𝑘𝑚.𝑠 −1
+
+for CCSN and ECSN, respectively, as discussed it Disberg & Mandel (2025), whereas the most recent observational values are lower, with peak velocities at ∼ 200 𝑘𝑚.𝑠 −1 for CCSN (Verbunt & Cator 2017; Igoshev et al. 2021). 
+
+Appendix D: First Giant Branch Skip 
+
+Fig. D.1: The black curve shows the evolution of 𝑀 FGB as a function of metallicity. The dashed red curve represents the mean stellar mass at the end of the Hertzsprung Gap phase for low-mass progenitor stars for the model QCFLAG = 5, CE_KICKFLAG = 2, ALPHA = 7.0, KICKFLAG = 2 and a Chabrier (2003) IMF. For 𝑍 < 0.0019 , the majority of systems are expected to bypass the FGB phase.  
+
+> Article number, page 19 of 21 A&A proofs: manuscript no. main
+
+Appendix E: Complementary 𝒅𝑵 /𝒅𝑴 histogramms 
+
+Fig. E.1: Histograms of the 𝑑𝑁 /𝑑𝑀 distribution as a function of the primary progenitor mass of BNS systems for 𝑍 = 0.001 , 0.0025 ,
+
+0.005 , and 0.014 . All panels correspond to models computed with the Chabrier (2003) IMF, QCFLAG = 5 , and CE_KICKFLAG = 2 . The top panel shows the complete distribution for a reference model with KICKFLAG = 2 and ALPHA = 7.0 . Two regions exhibiting distinct behaviours with respect to variations of these parameters are highlighted. The orange region corresponds to low-mass progenitors in the range 5.5–8.5 𝑀 ⊙ . The bottom-right panel shows this same region for an otherwise identical model with 
+
+ALPHA = 0.5 , illustrating the weak impact of this parameter on the changes in formation efficiency evolution with 𝑍 in this mass range. The green region corresponds to high-mass progenitors in the range 10 –24 .5 𝑀 ⊙ . The bottom-left panel shows this same region for an otherwise identical model with KICKFLAG = 2 , illustrating the weak impact of this parameter on the high-mass progenitor distribution evolution with 𝑍 .
+
+Appendix F: Metallicity-redshift relation 
+
+Fig. F.1: Mean metallicity as a function of redshift for our three models. The red curve represents our integration method, de-scribed in Section 2.2, using the SFR from Madau & Fragos (2017). The blue and yellow dashed curves represent observa-tional fits from Gallazzi et al. (2008), De Cia et al. (2018), and Madau & Fragos (2017), respectively. 
+
+Appendix G: Merger proportions 
+
+Fig. G.1: Merger proportion 𝜖 (𝑍 ) as a function of metallicity 
+
+𝑍 for the selected models with a Chabrier IMF, QCFLAG = 5, and CE_kickflag = 2. 
+
+> Article number, page 20 of 21 Mathieu Venet and Irina Dvorkin: Binary neutron star populations across cosmic time
+
+Appendix H: Additional merger rates 
+
+Fig. H.1: Cosmological merger rate as a function of redshift for three different methods described in Section 2.2. For all three approaches, we adopt the star formation rate (SFR) from Madau & Fragos (2017) and implement different prescriptions for the mean metallicity evolution. The linear and MandF2017 models are already implemented in cosmo_Rate and are based on observational fits from Gallazzi et al. (2008), De Cia et al. (2018), and Madau & Fragos (2017), respectively. The Madau 2017 analytical model relies on an analytical expression for ¯𝑍 (𝑧 ) derived in Belczynski et al. (2016). Different curves correspond to various combinations of model parameters: ALPHA is represented by a color gradient, KICKFLAG by different line styles, and combinations of QCFLAG 
+
+and CE_KICKFLAG by varying opacity levels. The grey shaded area represents the LVK uncertainty band for detected BNS mergers, as reported by The LIGO Scientific Collaboration et al. (2026). Its extent along the redshift axis is shown for visual guidance only and does not represent the redshift range over which the constraint is measured.

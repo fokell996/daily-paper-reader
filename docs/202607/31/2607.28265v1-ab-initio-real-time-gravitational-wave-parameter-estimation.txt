@@ -1,0 +1,751 @@
+Title: Ab Initio Real-Time Gravitational-Wave Parameter Estimation
+
+URL Source: https://arxiv.org/pdf/2607.28265v1
+
+Published Time: Fri, 31 Jul 2026 01:07:54 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# Ab Initio Real-Time Gravitational-Wave Parameter Estimation 
+
+David Yallup, 1, ∗ Metha Prathaban, 2 James Alvey, 1 Thomas C. K. Ng, 3, 4 
+
+Thibeau Wouters, 4, 3 Nikhil Sarin, 1 and Will Handley 1
+
+> 1
+
+Institute of Astronomy, University of Cambridge, Madingley Road, Cambridge CB3 0HA, UK 
+
+> 2
+
+Cavendish Laboratory, University of Cambridge, JJ Thomson Avenue, Cambridge CB3 0US, UK 
+
+> 3
+
+Nikhef, Science Park 105, 1098 XG Amsterdam, The Netherlands 
+
+> 4
+
+Institute for Gravitational and Subatomic Physics, Universiteit Utrecht, Princetonplein 1, 3584 CC Utrecht, The Netherlands 
+
+(Dated: July 31, 2026) We present a specialised GPU-native nested sampling kernel targeting rapid parameter estimation for gravitational wave inference problems. Building upon a Slice-within-Gibbs (SwiG) structure for rapid mixing, we investigate how far we can push baseline stochastic sampling techniques on modern GPU hardware. We demonstrate that for typical long-duration binary neutron star signals observed by the LIGO and Virgo detectors, we can achieve well calibrated posterior inference on the full uncompressed data of a three detector network in a median of twelve minutes on a single GPU. This falls to five minutes when sharded across four devices. Utilising heterodyning to compress the data reduces the median wall time across an injection campaign to 89 seconds – less than the length of the segment itself – and enables inference with precessing spin, tidal waveforms on GW170817 in around two minutes. This pushes stochastic sampling techniques using full physical waveform calculations, launched from an uninformed prior state, towards real-time gravitational wave parameter estimation. 
+
+I. INTRODUCTION 
+
+Since the first direct detection [ 1], 390 gravitational waves (GWs) emitted by mergers between black holes (BHs) and neutron stars (NSs) have been confidently detected [ 2 ]. Binary neutron star (BNS) and neutron star-black hole (NSBH) mergers can give rise to electro-magnetic (EM) counterparts, allowing for multi-messenger observations. The gold standard detection of this type was GW170817 [ 3], where the rapid localisation within the de-tector network enabled full multi-messenger follow-up [ 4 ]. Indeed, the global co-ordination of telescope consortia led to the detection of the accompanying short gamma-ray burst GRB 170817A [ 5 , 6 ] and the detailed characterisa-tion of the ensuing kilonova AT 2017gfo [ 7]. This single event provided deep insight into the equation of state of neutron stars [ 8 ], the propagation speed of gravitational waves [ 5 ] and the expansion rate of the Universe [ 9]. So far, GW170817 has been the only multi-messenger obser-vation of this kind. For other BNS or NSBH mergers, no confident EM counterpart was detected [10, 11]. Future observing runs, with upgrades to existing fa-cilities and the commissioning of more sensitive GW de-tectors, hold the promise to advance these science cases further by enabling more multi-messenger detections [ 12 –15 ]. However, this hinges on our ability to detect the EM counterparts of bright GW signals as soon as possible for at least two reasons. First, earlier detections can track the full evolution of the light curve. Second, there is an intrinsic latency in requesting telescope observation time and pointing the telescopes to the correct regions in the sky. While skymaps can be produced quickly with 
+
+BAYESTAR [16 ], they get updated in alerts as soon as a  
+
+> ∗dy297@cam.ac.uk
+
+posterior distribution obtained with stochastic samplers is made available [ 17 ]. Therefore, the ability to run full inference pipelines at the speeds required for follow-up addresses a core bottleneck in providing full fidelity statis-tical information during the search for EM counterparts. Looking ahead, the necessity of fast parameter esti-mation (PE) for long-duration gravitational wave signals extends well beyond these rare multi-messenger events. For the next generation (XG) ground-based observatories, such as the Einstein Telescope (ET) [ 18 –21 ] and Cosmic Explorer (CE) [ 22 , 23 ], analysing BBH, NSBH, and BNS mergers will come with a high computational cost [ 24 , 25 ], mainly due to the predicted higher event rates. Moreover, the signals will stay in band for much longer compared to current detectors – BNS signals for hours to days, BBH signals for minutes – due to the proposed engineering innovations that allow these facilities to push to lower frequencies [26]. The high scientific value of fast PE has therefore mo-tivated an extensive programme of work on accelerating GW inference. The current community-standard analyses are built on stochastic sampling. Markov chain Monte Carlo and nested sampling [ 27 , 28 ] as implemented in 
+
+LALInference [29 ] and Bilby [30 , 31 ] have been estab-lished to deliver accurate, calibrated posteriors on wall times of hours to days, even when distributed across hun-dreds of CPU cores [ 32 ]. Acceleration efforts, which we review in Section II, have largely followed two complemen-tary tracks: compressing the data so that each likelihood evaluation is cheaper [ 33 – 36 ]1 and machine-learning meth-ods that either assist the stochastic sampler [ 40 – 43 ] or amortise the inference entirely into a pre-trained net-work [ 44 –46 ]. What has so far been missing is a demon-stration that the stochastic sampling paradigm itself —  
+
+> 1Or, similarly, using meshfree approximations [37–39] arXiv:2607.28265v1 [gr-qc] 30 Jul 2026
+
+2
+
+FIG. 1: Schematic detailing the main contributions of this work. Top: The conceptual flow of nested sampling, evolving a population of live points from an uninformed prior π(θ) over model parameters θ to the posterior p(θ|xobs )
+
+and evidence Z(xobs ) conditioned on some observation xobs . Bottom Left, Panel A: The development of the custom Slice-within-Gibbs (SwiG) inner kernel, which improves mixing and efficiency by partitioning the parameter space into “fast" (green) and “slow" (yellow) blocks and utilizing waveform caching. Bottom Right, Panel B: The three axes of GPU optimization: vectorization of the waveform across N f ∼ 10 5 frequency bins, parallel execution of k sampling chains, and optional multi-GPU sharding. exact likelihood evaluations, launched from an uninformed prior state, with no offline training stage — can operate at the latencies that multi-messenger astronomy demands. Operating on long-duration signals also serves as a proxy to test whether algorithmic innovation within Monte Carlo methods can meet the demands of XG GW inference. The core contribution of this work is twofold (for a schematic illustration, see Figure 1). Firstly, we imple-ment a new nested sampling algorithm, optimised for grav-itational waves, based on the Slice-within-Gibbs (SwiG) kernel structure of Ref. [ 47 ] and the vectorised, GPU-native nested sampling of Ref. [ 48 ]. This kernel explicitly leverages the internal structure of compact binary coa-lescence (CBC) signals. Secondly, we demonstrate that when this kernel is coupled with the latest GPU hardware, we can carry out well calibrated posterior inference on the uncompressed frequency grid of a 128 s BNS signal in a median of twelve minutes on a single GPU, falling to five minutes when the computation is sharded across four GPUs, all with no approximation to the likelihood. Mild compression of the data brings this wall time down to ∼ 90 s, below the duration of the data segment itself. Finally, we validate the algorithm on GW170817, showing that had it been deployed in 2017 it would have delivered full-fidelity PE on a timescale relevant for multi-messenger follow-up. As such, this work firmly pushes stochastic sampling towards the real-time paradigm in current detec-tors, and illustrates a possible pathway towards large-scale XG inference. The rest of the paper is organised as follows. Section II reviews the low-latency PE landscape, nested sampling, and the SwiG kernel construction. Section III instantiates this kernel for GW inference, specifying the likelihood and its analytic marginalisations, the fast-slow block struc-ture, and the multi-GPU sharding strategy. Section IV describes the injection campaign and the sampler con-figurations we test, and Section V presents the resulting calibration and timing studies, together with a re-analysis of GW170817. We discuss the implications and limitations of these results in Section VI, and conclude in Section VII with an outlook towards current and next-generation GW science. 3  
+
+> II. BACKGROUND A. Low latency parameter estimation for gravitational waves
+
+Innovations to reduce the latency of GW inference have broadly come in two directions. Firstly, one can try to downsample the number of frequency points at which waveforms are evaluated, to reduce the cost of each like-lihood call. Among such compression algorithms, the most frequently used are relative binning [ 33 , 34 , 49 ], reduced order quadrature (ROQ) [ 35 , 50 –52 ], multiband-ing [ 36 , 53 ], and Gaussian process interpolation [ 54 ]. For instance, during the past LIGO-Virgo-KAGRA (LVK) [ 55 –57 ] observing run, low-latency PE was achieved with ROQ acceleration, using the IMRPhenomD [ 58 , 59 ] waveform model. While sampling with this setup completes in less than 10 minutes [ 17 ], an analysis including spin preces-sion and tidal deformabilities in the waveform with the 
+
+IMRPhenomPv2_NRTidalv2 waveform [ 59 –61 ] takes well over an hour [ 52 ]. Moreover, ROQ likelihoods require additional effort in building the bases. Finally, it has been argued that ROQ can produce fast inference for next-generation BNS signals [ 35 ], although it requires a significant memory footprint [ 62 ] and correspondingly, additional techniques have to be developed to combat these memory requirements [63]. The other, complementary direction is to use machine learning techniques or advanced MCMC methods, ei-ther to accelerate stochastic samplers [ 40 , 42 , 43 , 64 –72 ], or through simulation-based inference [ 73 ]. The lat-ter overcomes the computational bottleneck by training deep neural network architectures (such as normalising flows [ 74 , 75 ]) on millions of simulated data examples to “amortise” the statistical information about gravita-tional wave parameters. After training, the networks can produce posterior samples of an event in seconds. Simulation-based inference has widely been used in GW inference [ 44 , 45 , 76 ], particularly for low-latency PE of BBH signals [ 77 , 78 ], long-duration BNS signals in cur-rent detectors [ 46 ] or next-generation detectors [ 79 , 80 ]. However, this comes with the burden of having to train these networks, which can easily take on the order of days [ 45 , 81 ] and requires additional effort to achieve the same flexibility as already offered by stochastic sam-plers [ 82 ]. Among these approaches, the DINGO-BNS 
+
+pipeline [ 46 ] arguably represents the current state of the art for real-time PE, producing complete BNS posteri-ors in around one second once trained; we return to a qualitative comparison with this approach in Section VI. In this work, we approach the bottleneck from a differ-ent perspective, driven by the large advances in graphics processing units (GPUs). Specifically, we extend our previous work [ 83 ] demonstrating the advantages of im-plementing nested sampling algorithms on a GPU for GW inference. For a given inference problem, vectorised nested sampling algorithms built on top of GPU-enabled wave-form and detector modelling codes [ 68 , 84 ] enable massive parallelism of the parameter estimation task [ 85 ]. For long-duration signals, the degree to which this parallelism can be achieved is determined by the GPU memory, which for state-of-the-art chips is approaching 100 GB, enough to parallelise over the full frequency grid of a 128 s signal. This hardware-based fact allows us to build algorithms on the full frequency grid, without relying on any of the aforementioned likelihood acceleration techniques, relax-ing the constraints on compression without additional cost. Beyond simple hardware acceleration, we also provide a complementary contribution that drives performance: a new nested sampling kernel designed specifically for grav-itational wave inference. This Slice-within-Gibbs (SwiG) kernel [ 47 ] is a GPU-native nested sampling outer loop, implemented within the BlackJAX ecosystem [ 86 , 87 ]. Its structure is explicitly optimised for compact binary co-alescence signals, with blocks chosen based on known modelling effects (specifically, that extrinsic parameters are much faster to sample by caching the generated GW waveform) and parameter degeneracies. The JAX-based waveform models that we utilise are developed within the 
+
+ripple framework [84, 88].  
+
+> B. Nested sampling and the constrained prior
+
+Nested sampling [ 27 , 28 ] is a Monte Carlo method that di-rectly computes the Bayesian evidence Z = ∫ L(θ)π(θ) d θ,the integral of the likelihood L over a prior π distribution over some parameters θ. By maintaining a population of m live points , initially sampled from the prior, subse-quently evolved to approximate the constrained prior, 
+
+π∗(θ) ∝ π(θ) 1[log L(θ) > log L∗] , (1) following a constraint threshold log L∗ that is monoton-ically raised. At each iteration the k live points with the lowest likelihood are removed (raising log L∗ to the next-worst live likelihood), their volume contributions are accumulated into the evidence estimator, and replaced by k new draws from Eq. (1) . The dominant cost is sampling the constrained prior; the standard remedy in high dimension is constrained slice sampling, originating in PolyChord [ 89 , 90 ], where each new live point is gen-erated by a short MCMC chain that respects the hard constraint log L > log L∗. We use the vectorised JAX implementation of nested sampling from Ref. [ 48 ], which runs all k replacement chains in parallel across particles.  
+
+> C. Slice-within-Gibbs
+
+When the parameter space splits into blocks θ =(θ(1) , . . . , θ (B)), writing θ(−b) for all blocks other than 
+
+b, the constrained prior factorises as a sequence of block-4
+
+conditional constrained priors, 
+
+π∗(θ(b) | θ(−b)) ∝ π(θ(b) | θ(−b))
+
+× 1
+
+[
+
+log L(θ = ( θ(1) , . . . , θ (b), . . . , θ (B))) > log L∗]
+
+,
+
+(2) and a Gibbs sweep over the B blocks, each sampled by a constrained slice update, leaves π∗ invariant. This is the core idea of Nested SwiG [ 47 ], an outer nested sam-pling loop driven by an inner Slice-within-Gibbs kernel on the constrained prior. Such an update is an instance of Metropolis-within-Gibbs (or coordinate-wise) sampling, a general-purpose family that leaves the full joint target invariant (up to MCMC convergence). Recent results establish dimension-robust convergence for Metropolis-within-Gibbs on broad classes of hierarchical models [ 91 ], and show that it can be competitive with gradient-based samplers at scale [ 92 ]. The slice primitive itself is the hit-and-run slice construction [ 90 , 93 ], with proposal direc-tions sampled from a block-diagonal covariance estimated from the live points, following Ref. [89]. Some form of alternating block Gibbs sampling also appears in other astrophysical inference codes, especially when scaling inference to high dimensions; the LISA global fit [ 94 ] and the Borg model for initial matter conditions from large scale cosmology [ 95 ] give two prominent exam-ples within the field. We differ primarily in exploiting this within nested sampling, and in applying these techniques to problems with less cleanly established decorrelation.  
+
+> D. What structure we exploit
+
+The setting that motivates Nested SwiG [ 47 ] has a likeli-hood that factors over J conditionally independent data groups, log L = ∑Jj=1 log Lj (θj , ψ ), and the core algorith-mic gain is the budget decomposition : the global constraint 
+
+log L > log L∗ rearranges into J per-block budgets check-able in O(1) , dropping the cost of a single Gibbs sweep from O(J2) to O(J). A secondary, but equally important, gain is the improved mixing the blocked Gibbs structure delivers. Each constrained slice update operates on a low-dimensional subspace where the constraint is locally simple, sidestepping the poor high-dimensional mixing of joint-space slice sampling. This mixing benefit is generic to the Gibbs decomposition itself, and does not require the data factorisation that powers the budget trick. Compact-binary parameter estimation does not have the strict structure required to decompose the budget. The matched-filter likelihood of Section III A is a single inner product over the frequency band, so the parameters are coupled in evaluation and every block proposal must still check the full likelihood against log L∗. There is, however, a clear hierarchy of parameter speeds between the intrinsic and extrinsic parameters of a CBC event. This mirrors the fast-slow -style decompositions used in CMB cosmology codes [ 89 , 96 ], which exploit a similar flavour of structure. By partitioning the parameters into expensive and cheap blocks with weakly coupled condi-tionals, the sampler gains its efficiency through cache reuse and improved mixing rather than through an O(1) 
+
+constraint check. The standard CBC posterior is able to exploit both of these aspects: (i) Cache reuse on the dominant cost. The wall-clock cost of a likelihood evaluation for ground-based detectors is dominated by waveform genera-tion [ 68 , 84 ]; detector projection and the analytic marginalisations of Section III A are computation-ally cheaper in comparison. Splitting the parameters into a slow block (intrinsic, regenerates the wave-form) and a fast block (extrinsic, reuses a cached whitened waveform) means a Gibbs sweep regen-erates the waveform only on slow-block proposals, so extrinsic moves run at the cost of the projection alone. (ii) Faster mixing under mild conditional dependence. 
+
+Although the likelihood couples all parameters in evaluation, the conditional coupling between intrin-sic and extrinsic blocks is mild. Slice-within-Gibbs operates on each of these sub-problems separately, so every constrained slice update sees a locally sim-pler geometry. Unblocked slice sampling on the equivalent joint space, by contrast, fails to mix at any practical inner-step budget (Figure 2c). The kernel of Section III B is therefore the SwiG construc-tion re-blocked along the fast-slow axis of CBC inference rather than along a data-factorisation axis.  
+
+> III. METHOD
+
+This section introduces the SwiG construction of Sec-tion II for compact-binary inference. We specify the matched-filter likelihood and its analytic marginalisations (Section III A), the fast-slow block structure and the con-strained slice kernel that operates on it (Section III B), the multi-GPU sharding strategy (Section III C), and the heterodyned likelihood used for the headline real-time result (Section III D). The outer loop and slice primitives follow Ref. [ 48 ], implemented in BlackJAX [ 86 ] on top of JAX [87].  
+
+> A. Likelihood and marginalisations
+
+For an event with Nd detectors, frequency-domain strain data di(f ) and one-sided noise power spectral densities 
+
+Sn,i (f ), the matched-filter log-likelihood is 
+
+log L(θ) = − 12
+
+> Nd
+
+∑
+
+> i=1
+
+⟨di − hi(θ)|di − hi(θ)⟩i, (3) with ⟨a|b⟩i = 4 Re ∫ fmax  
+
+> fmin
+
+a∗(f )b(f )/S n,i (f ) d f . Templates 
+
+hi(θ) are generated from the IMRPhenomPv2_NRTidalv2 5waveform evaluated by the differentiable JAX implemen-tation in ripple [ 84 ], following the modular pipeline of Ref. [68]. As is standard in GW PE [ 16 , 29 , 97 ], several pa-rameters can be marginalised out on-the-fly rather than stochastically sampled, each through a closed-form or a one-dimensional reduction far cheaper than an MCMC update. The coalescence phase ϕc marginalises to 
+
+log I0
+
+(2|⟨ d|h⟩| ) for the dominant (2 , ±2) mode. The lumi-nosity distance dL, entering as the scaling h ∝ 1/d L,reduces to a log-sum-exp over a 1D grid with prior 
+
+p(dL) ∝ d2
+
+> L
+
+. The coalescence time tc reduces to a log-sum-exp over a grid of time shifts, which can be computed by a single FFT on the uniform full-resolution grid, or by direct summation on the non-uniform heterodyned bins. On a GPU, using closed-form phase marginalisa-tion is more for convenience. The phase could equally be marginalised by brute-force summation over a dense grid, exactly as we already do for time and distance, at negli-gible additional cost and with no measurable change in accuracy. Empirically, we find that attempting to directly sample ϕc leads to poor mixing for almost any kernel, as the waveforms we employ are not sensitive to this phase; it only enters as a knife-edge degeneracy in the likelihood. As a consequence, we always marginalise the phase, and would broadly recommend a similar approach for any stochastic sampler (noting that for waveforms with higher order modes, a grid marginalisation should remain valid). For the remaining two parameters (time of coalescence 
+
+tc and luminosity distance dL) we explore the trade-off between sampling and marginalisation interchange-ably. As both utilise grid marginalisation, posteriors for these can be reconstructed after the run at negligi-ble cost (Appendix A). When performing the injection tests we marginalise the phase and distance, but keep the coalescence time as a sampled parameter in the Gibbs kernel. In practice, the time marginalisation is slightly more expensive than the distance marginalisation, as it sums the overlap over a grid of time shifts. At full fre-quency resolution either choice yields calibrated posteriors (Section V A); under the heterodyned likelihood of Sec-tion III D, however, in our implementation we find that the time parameter is undercovered. We discuss this further in Section III D and Appendix A. We use phase and time marginalisation when recovering the GW170817 event, but sample the distance. The expensive cost is mostly concentrated in evaluating the waveform h(f ; θintr )
+
+(where θintr refer to the intrinsic parameters of the wave-form model) and projecting it onto the detector network, both of which are dominated by the intrinsic parameter update.  
+
+> B. Blocked nested slice sampling kernel
+
+We sample over the remaining d = 15 parameters: chirp mass Mc, mass ratio q, six dimensionless component spins (sphere parameterisation, χ < 0.05 ), inclination 
+
+ι, two tidal deformabilities Λ1, Λ2, sky and polarisation 
+
+(α, δ, ψ ), and either the coalescence time tc or distance dL.The intrinsic parameters θs = {M c, q, s1, s2, ι, Λ1, Λ2} re-quire regenerating the waveform on every update and are termed slow 2; the projection-only parameters θf =
+
+{α, δ, ψ, t c/d L} reuse a cached whitened polarisation pair 
+
+(h+, h ×) and are termed fast . We utilise two reparameteri-sations that are standard in GW PE: the chirp-mass/mass-ratio parameterisation of the masses, and the detector-based sky frame (zenith and azimuth relative to a detector baseline) in which we sample the source direction rather than in equatorial (α, δ ) [30 ]. Both decorrelate parame-ters that are otherwise strongly coupled, complementing the block decomposition below. Additional standard repa-rameterisations — for example, detector-frame time — would likely help the blocked approach. Unless otherwise specified each nested sampling replace-ment deletes the k = 64 lowest-likelihood particles from a live set of m = 512 and resamples them under the con-straint log L > log L∗, where log L∗ is the next-worst live likelihood. The constrained inner step is a Gibbs sweep over seven sub-blocks of (θs, θ f ):
+
+• Slow blocks: {M c, q, Λ1, Λ2}, s1, s2, and ι.
+
+• Fast blocks: {α, δ } (sky-frame), ψ, and {tc/d L}.The grouping within each sub-block follows the converse of the weak-coupling argument used to justify the Gibbs structure. Parameters that we expect to be strongly 
+
+conditionally correlated are kept together, so that joint hit-and-run moves can mix along the local degeneracy direction rather than fighting it. Chirp mass, mass ratio and the tidal deformabilities all enter the inspiral phasing at adjacent post-Newtonian orders and trade off against one another in a well-known mass–tidal degeneracy, so 
+
+{M c, q, Λ1, Λ2} are grouped. Each spin couples its three sphere-parameter components {| si|, θ i, ϕ i} tightly through the spin-to-Cartesian conversion, so s1 and s2 are kept as joint sub-blocks; the small spin bound χmax = 0 .05 
+
+keeps the live points clear of the parameterisation’s coordi-nate singularities and we observe no associated pathology. Sky position (α, δ ) is jointly constrained by inter-detector arrival-time triangulation, and is grouped accordingly. In this setting, the remaining parameters ( ι, ψ, tc) couple to the rest of the space only weakly under the constraint and are updated as singletons. Within each sub-block a hit-and-run slice update [ 90 , 93 ] is applied along a ran-dom direction drawn from the block-diagonal covariance estimated from the live points, using the standard slice shrinking/expansion procedure [89]. The slow blocks share a single waveform cache. At the start of each replacement we recompute (h+, h ×) at the current intrinsic parameters, then pass the cache through     
+
+> 2The inclination would be more naturally considered an extrinsic parameter; however, due to how it enters the waveform calculation in the ripple code we include it as slow .
+
+6the slow sub-blocks, recomputing and overwriting the cache on a new slow-block proposal; on the fast blocks the cache is fixed, so only the projection and the analytic marginalisations are re-evaluated. The role of the Gibbs blocking is the same as in Nested SwiG [ 47 ]; the constrained prior is hard for joint-space slice sampling because the extrinsic projection couples poorly to the intrinsic chirp parameters, and unblocked nested slice sampling at any reasonable inner-step budget fails to mix on the resulting manifold (Figure 2c). Block-ing restricts each slice update to a subspace on which the constraint is locally simple and recovers calibrated posterior coverage at a much smaller compute budget. We expose the number of inner Gibbs sweeps per replacement, 
+
+M , as a tunable parameter, defaulting to a single sweep, 
+
+M = 1 . The outer loop is the standard NSS iteration, run to a termination threshold of log Zlive − log Zdead < −3. 
+
+> C. Exploiting parallelism
+
+In this work, we exploit parallelism at two complemen-tary levels: within-device parallelism and across-device parallelism. These provide complementary avenues for optimisation. 
+
+Within-device parallelism. In practice, established physics nested sampling codes ( PolyChord [89 ], dynesty [98 ], and similar) have historically favoured black-box kernels for ease of use, treating the sampler as a monolithic likelihood-constrained loop. We instead build on the composable transform system underlying BlackJAX [ 86 ], which lets custom kernels such as ours be prototyped rapidly and, crucially, lets us vectorise what would otherwise be a sequential, particle-by-particle Gibbs sweep across the full batch of replacement chains, distributing the work over the many threads of a single GPU to saturate it and achieve high throughput. The deletion count of the Baseline configuration, k = 64 (Section IV B), is chosen so that this per-replacement batch of constrained chains approximately saturates the target hardware for the uncompressed likelihood and chosen waveform; the optimal value should be re-evaluated for the available resources, compression level of the target problem and memory footprint of the waveform model. 
+
+Across-device parallelism. Where the problem permits, it is equally useful to exploit the trivial parallelism available across multiple devices. For CPU-based inference this has traditionally been essential, with samplers distributed across many cores via MPI [ 32 ]. The analogous strategy on GPUs — distributing across the devices of a multi-GPU node, such as the four GH200 superchips that make up an Isambard-AI node [ 99 ] — is a natural design target. The trade-off between compute and communication is dif-ferent on a GPU. The in-node NVLink fabric coupling the GPUs is faster than the network underpinning CPU MPI in both bandwidth and latency, but the per-device com-pute is so fast that cross-device synchronisation quickly becomes the bottleneck. A GPU-distributed inference algorithm is therefore more sensitive to how often the devices must synchronise than to the total volume of data they exchange. Vectorising the kernel across particles already saturates on-device memory for the 128 s segment on a single GPU. To extend beyond one device we shard the live set across 
+
+D = 4 GPUs using JAX’s shard_map , partitioning the particles along the live axis while replicating the integrator state (the running log Z estimator). Only two collective operations per replacement are then required: (i) an all-gather of the m live log-likelihoods, used to find the k global worst particles and the survivor pool; (ii) an all-gather of the full live particle states, used to sample k/D starting points per device. Each device then runs k/D = 16 constrained MCMC chains in parallel with the same Gibbs kernel described above, and both m and k are chosen divisible by D. The expensive likelihood and waveform work stays entirely local to each device, so a full outer iteration costs only these two all-gathers of communication.  
+
+> D. Likelihood compression
+
+For long-duration signals the vast number of frequency bins that are observed naturally motivates the use of some kind of data compression. For the compressed runs, we adopt a simple heterodyned (relative-binning) likelihood [ 33 , 34 , 49 , 100 ]. The 128 s segment at f ∈
+
+[20 , 2048] Hz contains ∼2.6 × 10 5 frequency bins per detec-tor, of which only a tiny fraction carry information once a reference waveform h0 near the peak likelihood is avail-able. We use Nb = 5000 bins of equal maximum phase change, following the implementation of Ref. [ 68 ]; the bin grid is set by the source phasing and shared across the network, while the per-detector summary data and the linearly-expanded waveform ratio ri(f ) = hi(f ; θ)/h 0,i (f )
+
+carry each detector’s antenna projection, time delay, and PSD weighting. Evaluating the network likelihood, for 
+
+Nd = 3 detectors, then costs NbNd = 1 .5 × 10 4 opera-tions rather than the ∼7.8 × 10 5 of the full-resolution sum, independent of the underlying frequency resolution, and the phase, time and distance marginalisations act on the binned inner products unchanged. The reference waveform is taken at the injected parameters; we return in Section VI to locating it from a coarse pre-run for real events. One parameter requires some care under this compres-sion. The binning assumes the waveform ratio ri(f ) varies smoothly across each bin, which holds for the intrinsic and most extrinsic parameters but is a poorer approximation for the coalescence time, whose effect is a rapidly winding phase that the coarse bins track only imperfectly. We find that sampling tc on a broad prior directly against the binned likelihood can fail the calibration test in tc
+
+while retaining good coverage in every other parameter 7(Appendix A). Whether this reflects a genuine limitation of heterodyning at this bin count or a detail of our im-plementation, it is easily sidestepped by marginalising the coalescence time in place of the distance, which we demonstrate in Appendix A restores coverage of all sam-pled parameters. We adopt this time-marginalised form for the GW170817 analysis (Section V B); both marginal-isation choices are validated in Appendix A. This kind of compression also acts as a guide for the throughput achievable for shorter duration segments. Combined with fast-alert non-precessing waveforms, typ-ical 4 s BBH segments can be analysed in comfortably less than a minute, even on commercial-grade hardware. We emphasise that the kernel is agnostic to the choice of compression: heterodyning is adopted here for its simple JAX implementation, but alternatives such as reduced order quadrature [ 35 , 50 , 52 ] or multibanding [ 36 , 53 ]expose the same cached fast-slow likelihood structure re-quired by Section III B, and could be substituted without modification to the sampler.   
+
+> IV. EXPERIMENTS A. Injection catalogue
+
+We validate the kernel on a catalogue of N = 1000 
+
+synthetic BNS injections generated under the recovery prior, of which the first 100 are used for the main-text P–P test and all 1000 are used in the stress test of Appendix B. Injection parameters are drawn indepen-dently per event from the priors in Table I, evaluated with IMRPhenomPv2_NRTidalv2 into the same H1, L1, V1 network used for recovery. Each signal is added to an inde-pendent realisation of coloured Gaussian noise drawn from the design-sensitivity PSDs ( aLIGO_O4_high for H1/L1, 
+
+AdV for V1, taken from Bilby [30 ]); the noise seed is fixed per event so the catalogue is reproducible. We use 128 sof data centred 2 s before merger, f ∈ [20 , 2048] Hz, and a fixed reference GPS time of 1 187 008 882 (the GW170817 trigger). The noise realisation itself is independent of this time, but it sets the Earth orientation (and hence the an-tenna patterns and inter-detector delays) that projects a given sky position onto the H1, L1, V1 network; injection and recovery share it, so its specific value is an arbitrary but self-consistent convention. Each injection’s catalogue entry stores the full set of parameters, the per-detector optimal SNRs, and per-event seeds for both the noise realisation and the sampler initialisation. Injection and recovery use identical priors in all 17 parameters, so the catalogue is drawn from the same uniform spin-sphere prior ( χmax = 0 .05 ) that the sampler explores — there are no zero-spin or aligned-spin injections. The network SNR distribution is right-skewed with median 24 (mean 27 ), ranging from 3.5 to 140 across the catalogue (Figure 7); GW170817, at network SNR ∼32 , sits comfortably within the bulk of this distribution. The dL prior [30 , 150] Mpc is deliberately narrow and matches the injection distri-TABLE I: Recovery (and injection) priors for the BNS cat-alogue. Spin sphere parameterisation uses |si| ∈ [0 , χ max ],polar angle θi uniform in cos θi, and azimuth ϕi uniform in [0 , 2π). Phase ϕc and luminosity distance dL are ana-lytically marginalised (Section III A); the dL range sets the marginalisation grid, not a sampled dimension. All other parameters, including tc, are sampled by the kernel of Section III B.                                                 
+
+> Parameter Range Prior
+> Mc[M⊙][1 .5,2.5] Uniform
+> q[0 .5,1.0] Uniform
+> |s1|,|s2|[0 ,0.05] Uniform
+> cos θsi[−1,1] Uniform
+> ϕsi[0 ,2π)Uniform
+> ι[0 , π ]sin ι
+> Λ1,Λ2[0 ,5000] Uniform
+> α[0 ,2π)Uniform
+> δ[−π/ 2, π/ 2] cos δψ[0 , π )Uniform
+> tc[s] [−0.1,0.1] Uniform
+> ϕc[0 ,2π)Uniform (marg.)
+> dL[Mpc] [30 ,150] ∝d2
+> L(marg.)
+
+bution exactly, so any truncation of the posterior at the prior edges is consistent between injection and recovery and does not bias the P–P calibration.  
+
+> B. Sampler configurations
+
+We test four different configurations for the sampler. All configurations share the catalogue, the waveform, the analytic marginalisations and the Gibbs block structure of Section III B; they differ only in the hyperparameters summarised in Table II. The Baseline uses m = 512 live points, deletes k = 64 per outer iteration, performs one Gibbs sweep per replacement and evaluates the likelihood at full frequency resolution. The High-Res variant runs 
+
+M = 3 sweeps to tighten posterior coverage at fixed live-point budget. The Sharded variant matches Baseline but distributes the m, k across D = 4 GPUs as described in Section III C. The Heterodyned variant replaces the full likelihood with the relative-binning likelihood of Sec-tion III D at Nb = 5000 phase-spaced bins, keeping all other settings identical to Baseline. A time-marginalised counterpart, used for the GW170817 analysis, is described and validated in Appendix A. We also include an un-blocked nested slice sampler (NSS) as a control for the role of the fast-slow block structure (Figure 2c). For NSS there are no blocks to sweep over; following the standard PolyChord convention [ 89 ] we instead set the 8TABLE II: Sampler configurations. All variants use the kernel of Section III B with grouped slow blocking; m
+
+is the live-set size, k the number of deletions per outer iteration, M the inner Gibbs sweep count, and D the number of GPUs. ∗NSS is an unblocked nested slice sampler used as a control in Figure 2c; having no blocks, it instead runs M joint slice steps per parameter-space dimension d (the standard PolyChord convention), with 
+
+M = 3 matching the work of the High-Res configuration.                               
+
+> Configuration mkMDLikelihood Baseline 512 64 11full High-Res 512 64 31full Sharded 512 64 14full Heterodyned 512 64 11relative bin. NSS 512 64 3∗1full, unblocked
+
+number of joint slice steps per outer iteration to M times the parameter-space dimension d, with M = 3 chosen to match the per-iteration work of the High-Res configura-tion.  
+
+> C. Hardware and software
+
+The pipeline is implemented on top of Jim [68 ] for the detector geometry and frequency-domain data interface, 
+
+ripple [84 ] for differentiable JAX waveforms, and a cus-tom matched-filter likelihood layer (Section III A) that exposes the cached slow-likelihood / cached fast-likelihood pair required by the Gibbs kernel. The nested sampling outer loop and slice primitives extend BlackJAX [ 86 ]; the SwiG construction follows Sections II and III B. All tim-ings are wall-clock on the Isambard-AI supercomputer [ 99 ]. Each compute node hosts four NVIDIA GH200 Grace Hopper Superchips, where each superchip pairs a 72-core Grace CPU (120 GB of memory) with an H100 Tensor Core GPU (96 GB of memory), the four superchips within a node being connected by NVIDIA NVLink-C2C. We run the single-GPU configurations on one GH200 superchip, while the Sharded variant uses all four GH200s within a node; per-event times exclude one-off JIT compilation. Posteriors are processed with anesthetic and reweight-ing is performed using the nested sampling weights di-rectly, with no resampling step.   
+
+> V. RESULTS A. Injection tests and P–P calibration
+
+We validate the kernel on N = 100 BNS injections drawn from the recovery prior, recovering with the same 
+
+IMRPhenomPv2_NRTidalv2 waveform used for the injec-tion (see Sections III and IV). For each injection and each parameter we compute the credible level of the true value, q = ∫ w 1(θ < θ true ) d θ, using the nested sampling weights w directly to avoid resampling artefacts. A well-calibrated posterior produces a uniform distribution of these credible levels; we summarise each run with per-parameter Kolmogorov–Smirnov p-values and a Fisher-combined p-value across all 15 sampled parameters. Only the analytically marginalised parameters are excluded; their posteriors are reconstructed post-hoc by resampling the exact per-sample conditional on the marginalisation grid, so they are calibrated by construction, but the grid quantises the credible levels and invalidates the continuous null distribution of the KS statistic (Appendix A). Figure 2 shows the P–P diagnostics for the three head-line configurations. The out-of-the-box Baseline kernel (with a single Gibbs sweep) is calibrated across all 15 
+
+sampled parameters with Fisher-combined p = 0 .17 (Fig-ure 2a). Increasing the number of inner sweeps to three (High-Res, Figure 2b) raises the combined p to 0.61 , tight-ening the agreement with the diagonal as the replacement chains decorrelate more fully — a point we return to in Section VI D — at the cost of a longer wall time. Sharding the live set across four GPUs does not affect the calibra-tion and produces consistent results with the Baseline, as expected for a faithful parallelisation. By contrast, removing the block structure altogether is catastrophic. The unblocked nested slice sampler (Figure 2c), run with 
+
+M = 3 slice steps to match the total work of High-Res, has a Fisher-combined p-value of essentially zero, with every parameter severely under-covered. This confirms that the fast-slow blocking of Section III B is what enables calibrated posteriors at these wall times; unblocked slice sampling in the full parameter space fails to mix at any reasonable computational budget. The Heterodyned likelihood reproduces this calibration at a fraction of the cost in every parameter but the sam-pled coalescence time. This is confined to tc; coverage of the physically relevant parameters remains valid with a combined p = 0 .15 , so the configuration is usable as-is. Marginalising tc instead, as in the GW170817 analysis of Section V B, restores full calibration. Compressed in-ference is therefore exact once the coalescence time is handled on the grid rather than sampled, as detailed in Appendix A. Due to the success of the Baseline configura-tion, which otherwise shares all relevant nested sampling parameters, we conclude that the algorithm explores the space adequately, and that the miscalibration stems from a detail of our relative-binning implementation. Figure 3 quantifies the speed–accuracy trade-off. The Baseline delivers calibrated posteriors in a median of 
+
+∼ 12 min; High-Res triples this for the additional precision. Sharding reduces the Baseline time by a factor of ∼ 2.4
+
+to a median of ∼ 5 min, bringing wall time to within a small multiple of the segment length. The Heterodyned likelihood achieves fastest throughput, with a median wall time of 89 s, shorter than the 128 s of data. Marginalising the coalescence time in addition, the configuration used 90.0 0.2 0.4 0.6 0.8 1.0 
+
+C.I. 
+
+0.0 
+
+0.2 
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+> Fraction of truths in C.I.
+
+Baseline                    
+
+> dLmarg.
+> M= 1
+> N= 100
+> p= 0 .17
+> Mc(0.97)
+> q(0.27)
+> |s1|(0.74)
+> θ1(0.97)
+> φ1(0.89)
+> |s2|(0.39)
+> θ2(0.35)
+> φ2(0.27)
+> ι(0.49)
+> ψ(0.96)
+> α(0.80)
+> δ(0.06)
+> Λ1(0.09)
+> Λ2(0.02)
+> tc(0.04)
+
+(a) Baseline (full resolution, M = 1 ). 0.0 0.2 0.4 0.6 0.8 1.0 
+
+C.I. 
+
+0.0 
+
+0.2 
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+> Fraction of truths in C.I.
+
+High-Res                     
+
+> dLmarg.
+> M= 3
+> N= 100
+> p= 0 .61
+> Mc(0.87)
+> q(0.29)
+> |s1|(0.55)
+> θ1(1.00)
+> φ1(0.93)
+> |s2|(0.38)
+> θ2(0.66)
+> φ2(0.16)
+> ι(0.65)
+> ψ(0.80)
+> α(0.50)
+> δ(0.07)
+> Λ1(0.54)
+> Λ2(0.40)
+> tc(0.06)
+
+(b) High-Res (full resolution, M = 3 ). 0.0 0.2 0.4 0.6 0.8 1.0 
+
+C.I. 
+
+0.0 
+
+0.2 
+
+0.4 
+
+0.6 
+
+0.8 
+
+1.0 
+
+> Fraction of truths in C.I.
+
+NSS                    
+
+> dLmarg.
+> M= 3
+> N= 100
+> p= 0 .00
+> Mc(0.01)
+> q(0.00)
+> |s1|(0.00)
+> θ1(0.00)
+> φ1(0.00)
+> |s2|(0.00)
+> θ2(0.00)
+> φ2(0.00)
+> ι(0.00)
+> ψ(0.00)
+> α(0.01)
+> δ(0.00)
+> Λ1(0.00)
+> Λ2(0.00)
+> tc(0.00)
+
+(c) Unblocked NSS ( M = 3 ). 
+
+FIG. 2: P–P diagnostics on the first 100 injections, over all 15 sampled parameters including tc: (a) the out-of-the-box Baseline kernel, calibrated at a single Gibbs sweep per replacement; (b) the High-Res kernel ( M = 3 ), which produces the tightest agreement with the diagonal; and (c) the unblocked nested slice sampler, run with M = 3 to match the work of High-Res, for which removing the fast-slow block structure leaves every parameter severely under-covered and collapses the Fisher-combined p-value to essentially zero. Shaded bands are the 1/2/3σ binomial confidence regions; legend entries give each parameter’s KS p-value and the in-panel annotation the Fisher-combined p.for GW170817 (Section V B), costs an approximate 1.5×
+
+premium, still keeping wall time on par with the segment duration. All configurations yield posteriors with an effective sample size of ∼4300 (median ∼4100 ), set by the live-point budget and the compression of the nested sampling run rather than by the likelihood, and each run returns the log-evidence as a by-product. We do not probe the accuracy of the evidence in this work; however, both the evidence accuracy and the ESS of the posterior samples are straightforward to increase. Scaling the live-set and deletion counts together, (m, k ) → κ(m, k ), leaves the number of outer iterations essentially unchanged while raising the effective sample size by a factor of ∼κ [48 ]. For the Heterodyned configuration in particular, where the per-likelihood cost is low enough that the device is far from saturated, this scaling is almost free, yielding κ
+
+times the posterior samples at little additional wall time, so the most compressed run can deliver a substantially larger sample set while remaining within the sub-segment regime. 10 10 2 10 3
+
+# Sampling time [s] 
+
+0
+
+20 
+
+40                
+
+> Count
+> Baseline
+> High-Res
+> Heterodyned
+> Sharded
+> Segment = 128 s
+> Configuration Median [s] Min [s] Max [s] Baseline 726 512 1017 High-Res 2378 1775 3252 Sharded 306 258 383 Heterodyned 89 59 126
+
+FIG. 3: Per-event sampling wall time across the four principal configurations over the 100 injections, shown both as the full distribution (histogram) and summarised by its median, minimum and maximum (table). Times exclude the one-off JIT compilation. The dotted line marks the 128 s data-segment duration; the Heterodyned configuration is the only one whose entire distribution, and hence worst case, falls below the segment length, i.e. true sub-segment, real-time inference.  
+
+> B. Analysis of GW170817
+
+We apply the same configurations tested in Section V A to the real BNS event GW170817 [ 3]. The data segment is 
+
+128 s long, centred on the trigger time GPS 1 187 008 882 ,and uses the same IMRPhenomPv2_NRTidalv2 waveform but swaps distance marginalisation for time marginalisa-tion. Every parameter shown in Figure 4 is sampled di-rectly by the kernel, with no post-hoc reconstruction step. The Baseline, High-Res, Sharded and Heterodyned config-urations are run with otherwise identical settings to those of Section V A. In this case the reference-waveform pa-rameters for the relative binning are found by maximum-likelihood optimisation, following the recipe of Ref. [42]. Figure 4 shows the posterior recovered for the GW170817 event across all 15 sampled parameters. The runs use the same priors as Table I, except for the chirp mass Mc ∈ [1 .18 , 1.21] M⊙, the mass ratio q ∈ [0 .125 , 1] ,and the luminosity distance dL ∈ [1 , 75] Mpc , narrowed to ranges appropriate for the event. The coalescence-time marginalisation window is narrowed to ±0.03 s around the trigger, matching the DINGO-BNS setup [ 46 ] to enable the comparison of Section VI B. As with the distance and phase marginalisations, this window sets only the extent of the marginalisation grid and not a sampled dimension: widening it back to the ±0.1 s of Table I enlarges the tc
+
+grid at modest additional cost (Appendix A). The cost grows linearly with the grid, however, so much wider windows eventually become prohibitive and are better handled by sampling tc directly. To demonstrate the run-to-run stability of the cheapest configuration we overlay 
+
+M = 1 runs from three consecutive random seeds against an M = 3 reference formed by combining three M = 3 
+
+seeds. We use a heterodyned likelihood, but include timing for full-resolution equivalents in Table III. The single-seed M = 1 contours are mutually consistent and reproduce the higher-resolution pooled M = 3 posterior to within the resolution of the sample set across every parameter, confirming that a single inexpensive M = 1 
+
+heterodyned run already recovers the converged posterior. Together with the P–P validation of Section V A, this establishes that the heterodyned likelihood and the cheap 
+
+M = 1 sweep introduce no measurable bias on real data. As a complementary check, we rerun the injection config-uration with the same time-marginalised likelihood and find this yields well-calibrated posteriors with a combined 
+
+p = 0 .51 (Appendix A). Table III reports the timing breakdown for the four algorithms on GW170817. The sampling time follows the per-event budget of Figure 3; the two one-off com-pilation costs — the likelihood and the sampler-kernel JIT — are paid once per run and are excluded from the quoted sampling times. We additionally list the number of waveform evaluations Nwf required to reach convergence, which is set by the number of Gibbs sweeps and the par-ticle count. The High-Res configuration ( M = 3 sweeps) converges in roughly an hour, without any data compres-sion and using broad, uninformative priors. The M = 1 
+
+configs require approximately 1 × 10 6 waveform evalua-tions ( ∼ 4 × 10 6 likelihood evaluations once the cached fast updates are included), scaling to 3 × 10 6 waveforms (∼ 19 ×10 6 likelihood) for the M = 3 configs. This is a sig-nificant efficiency gain in terms of waveform evaluations, and ensures that the algorithmic gains are compounded in situations where individual waveform evaluations become increasingly expensive.   
+
+> VI. DISCUSSION A. Comparison with CPU-based stochastic sampling
+
+A closely matched configuration of the same event is tested in the Bilby validation paper [ 31 ], using the pBilby [ 32 ]wrapper to distribute the dynesty [98 ] nested sampler across 560 CPU cores. The reported wall time with this setup is approximately 11 h. The comparison is not perfectly like-for-like: the Bilby analysis additionally samples detector calibration uncertainties (which we omit; Section VI C), but conditions on the known sky position of the optical counterpart, where we sample the full sky, two 11 0.3 
+
+> 0.6
+> 0.9
+> q
+> 0.02
+> 0.04
+> |s1|
+> 1.5
+> 3.0
+> θ1
+> 2.5
+> 5.0
+> φ1
+> 0.02
+> 0.04
+> |s2|
+> 1.5
+> 3.0
+> θ2
+> 2.5
+> 5.0
+> φ2
+> 2
+> 3
+> ι
+> 25
+> 50
+> dL
+> 1.5
+> 3.0
+> ψ
+> 3.36
+> 3.44
+> 3.52
+> α
+> 0.45
+> 0.30
+> δ
+> 600
+> 1200
+> Λ1
+> 1.19725
+> 1.19750
+> 1.19775
+
+Mc
+
+> 1000
+> 2000
+> Λ2
+> 0.3
+> 0.6
+> 0.9
+
+q
+
+> 0.02
+> 0.04
+
+|s1|
+
+> 1.5
+> 3.0
+
+θ1
+
+> 2.5
+> 5.0
+
+φ1
+
+> 0.02
+> 0.04
+
+|s2|
+
+> 1.5
+> 3.0
+
+θ2
+
+> 2.5
+> 5.0
+
+φ2
+
+> 2
+> 3
+
+ι
+
+> 25
+> 50
+
+dL
+
+> 1.5
+> 3.0
+
+ψ
+
+> 3.36
+> 3.44
+> 3.52
+
+α
+
+> 0.45
+> 0.30
+
+δ
+
+> 600
+> 1200
+
+Λ1
+
+> 1000
+> 2000
+
+Λ2     
+
+> 1.18 1.21
+> Mc[M¯]
+> Chirp mass over prior range
+> sky (α, δ ), full sky
+
+## GW170817 
+
+Heterodyned (SwiG M = 1 )
+
+Heterodyned (SwiG M = 3 pooled) 
+
+FIG. 4: Posterior for the GW170817 event over all 15 sampled parameters. Three independent Heterodyned (SwiG 
+
+M = 1 ) runs, each from a different random seed (blue 90% contours), are overlaid on the pooled Heterodyned (SwiG 
+
+M = 3 ) reference obtained by combining three M = 3 seeds (orange, filled 90% ). The M = 1 seeds are mutually consistent and reproduce the M = 3 pooled reference across every parameter, demonstrating run-to-run reproducibility and convergence in the number of Gibbs sweeps. differences that act in opposite directions on the difficulty of the inference. Setting aside the overhead of compile time (and finding a maximum-likelihood reference for the heterodyned likelihood), the Heterodyned configuration of this work produces a posterior we would expect to match in only ∼ 125 s, while the sampler can converge on the full uncompressed data in 450 –1090 s depending on resources. This represents a direct comparison speedup of up to a factor of ∼ 100 without any compression, and 
+
+∼ 300 when compressing the data. The unblocked NSS control of Figure 2c helps demon-strate the source of this gain. Joint-space slice sampling 12 TABLE III: Timings for the four algorithms on the real event GW170817 with the time-marginalised likelihood: post-JIT sampling time, one-off JIT compilation (likeli-hood + sampler-kernel), and the approximate waveform evaluation count ( Nwf , set by the number of Gibbs sweeps 
+
+M ). Values are averaged over three random-seed repeats. The Sharded sampler-kernel JIT is higher than the Base-line owing to the multi-GPU compilation.                  
+
+> Configuration Sampling [s] JIT [s] Nwf
+> Baseline 1090 15 + 164 10 6
+> High-Res 3766 11 + 221 3×10 6
+> Sharded 450 15 + 172 10 6
+> Heterodyned 125 7 + 164 10 6
+
+is a reasonable structural proxy for the adaptive random-walk (“acceptance-walk”) kernels that drive production 
+
+dynesty analyses [ 30 , 98 ]: both evolve all parameters jointly through a sequence of likelihood-constrained moves, differing in the proposal primitive rather than in their treatment of the parameter space. The production ker-nels preserve calibration by adaptively growing the chain length, in practice expending orders of magnitude more likelihood evaluations per replacement than the fixed bud-gets used here [ 83 ]. We would expect an acceptance-walk kernel constrained to our matched per-iteration budget to fail in much the same way as NSS, and once run at its na-tive adaptive budget it would only recover calibration by surrendering the wall-time gains. This is further exacer-bated on GPU hardware as adaptive walk lengths lead to underutilising the throughput potential. The comparison between Figure 2b and Figure 2c therefore isolates the fast-slow blocking, rather than raw hardware throughput, as the ingredient that makes calibrated inference possible at these budgets.  
+
+> B. Comparison with amortised inference
+
+The DINGO-BNS pipeline [ 46 ] uses the same waveform, sim-ilar data-compression techniques and comparable GPU hardware, so serves as the natural comparison point for this work. The two approaches sit at opposite ends of the amortisation spectrum, and their strengths are largely complementary. DINGO-BNS invests days of GPU time [ 45 , 81 ] in training an expressive flow-based model of the posterior, tailored to a chosen prior and wave-form model, as well as detector configuration and fre-quency ranges, unless masking is performed, e.g., with transformers [ 82 ]. Once trained, it produces posterior samples for any event matching that configuration in around one second, with importance sampling against the exact likelihood supplying a per-event accuracy di-agnostic. The SwiG sampler is instead ab initio : every analysis is launched cold from the prior with no offline stage, so a change of waveform model, prior range, noise spectrum, detector network or segment length carries no retraining cost. This freedom extends to the data com-pression itself. The heterodyning we adopt requires only a reference waveform, located per event, whereas reduced order quadrature — the compression underpinning most recent low-latency LVK analyses [ 17 , 52 ] — relies on a reduced basis built offline over the parameter space, a configuration-specific upfront cost of the same character as pretraining an amortised network. The same run re-turns the Bayesian evidence alongside the posterior, and its calibration is established directly by large-scale injec-tion campaigns (Appendix B). At one to two minutes per event this remains slower than a trained network, but it is comfortably within the latency at which alert informa-tion is consumed by observers, and it provides the robust, assumption-light complement that an amortised pipeline requires whenever the analysis configuration steps outside the trained one. In the interest of a fair comparison, we note that the configuration differences bearing on it are, if anything, con-servative. Our analyses retain the full [20 , 2048] Hz band — roughly twice the frequency content of the DINGO-BNS con-figuration — so adopting a matched band would roughly halve the cost of every full-resolution likelihood evalu-ation, and permit a proportionally coarser relative bin-ning, translating directly into throughput. Several of the accelerations developed for DINGO-BNS — notably event-adapted multibanded frequency grids and priors conditioned on information from the detection pipeline — are likewise sampler-agnostic, and nothing prevents their adoption here; we expect them to compound with the gains already demonstrated. For completeness, the coalescence-time window of our heterodyned GW170817 analysis is matched to the narrow DINGO-BNS setting (Sec-tion V B); because tc is marginalised there, its width has negligible bearing on cost either way. The two paradigms also compose naturally. For example, in situations where full precision is hard to amortise (e.g. very high SNR scenarios), SwiG nested sampling runs could be seeded by simulation-based inference proposals, refining the neural sampling results.  
+
+> C. Limitations
+
+The fastest inference results in this work come with two caveats: the compilation time and the reference waveform. The former is purely a technical obstacle, so we do not consider it as part of the inference time. The latter is a more intricate issue. We do not find the reference param-eters on the fly, so a realistic deployment would require a numerical routine to locate them. Prior work has estab-lished that reference-waveform parameters can be found in negligible time [ 46 ], and that JAX-based optimization algorithms (compatible with our PE setup) can recover template parameters to seed the reference waveform in less than a minute [ 101 ]. We present results compressed to 13 
+
+5000 bins per detector, a conservative choice that reduces the sensitivity to the reference waveform. Two physics simplifications additionally separate our configuration from a full production setup. Contrary to the setup used in the LVK collaboration [ 17 ], we do not include uncertainties in the detector calibration; as discussed in Section VI D, calibration parameters sit nat-urally in the fast parameter block, and we expect their inclusion to be computationally cheap. Moreover, we do not include higher-order waveform modes, which are subdominant for the near-equal-mass BNS systems con-sidered here, but have been shown to be important for systems with more unequal masses, such as NSBH mergers, where they carry significant information for low-latency follow-up [ 102 ]. Their inclusion raises the cost of the slow (waveform) block but leaves the kernel structure of Section III B untouched.  
+
+> D. Choice of blocking scheme
+
+The choice of blocking presented in Section III B was informed primarily by what empirically performed well on the problem as defined by Table I. Some of the cho-sen structure may not generalise to all problems in the GW phase space; however, we believe there are signifi-cant lessons that can be transposed from this work. An example choice that may not generalise is the choice to keep the spins uncoupled and in separate blocks, which we would not expect to generalise well to BBH analysis where spins can have a more pronounced effect and should be coupled. A second, subtler sign that the blocking is effective but not optimal is the sweep count itself. The 
+
+M = 1 Baseline already produces calibrated posteriors (combined p = 0 .17 ), but a third sweep raises this to 
+
+p = 0 .61 (Section V A). A perfectly decorrelating block structure would leave nothing for the extra sweeps to do; the improvement instead reveals a weak residual condi-tional correlation between blocks that a single sweep does not fully break. The effect is not damaging to the conclu-sions, the single-sweep configuration passes comfortably, and we adopt it as our default. However, it indicates that the grouping of Section III B, while sufficient, is not the last word, and that a better-adapted decomposition might recover the same coverage in a single sweep. Whilst choosing a blocking involves some manual experimenta-tion on the class of problems of interest, we propose that the massive increase in performance between the NSS and equivalent SwiG configuration demonstrates the potential payoff, as well as motivating investigation into tools that can automatically uncover this structure [103]. More broadly, the within-Gibbs structure exploited here is not specific to gravitational waves. While Slice-within-Gibbs is conceptually well established (Section II), to our knowledge it remains unexploited in the large-scale nested sampling codes used across cosmology and astro-physics, where joint-space slice sampling [ 89 ] is standard. Many nested sampling problems at scale separate natu-rally into weakly coupled blocks with a single dominant expensive subspace, and would stand to benefit from the same caching and mixing gains demonstrated here. The detector calibration uncertainty previously mentioned is a concrete example within gravitational wave PE [ 31 ]. Cal-ibration parameters sit firmly on the fast side of the fast-slow divide, re-weighting an already-generated waveform rather than regenerating it, and when grouped per detec-tor form separate low-dimensional subspaces on which a blocked kernel mixes efficiently. They are equally a can-didate for approximate marginalisation. Recent Laplace-based collapsed-sampling schemes [ 104 , 105 ] could remove this subspace from the sampled space entirely, in the same spirit as the phase and distance marginalisations of Sec-tion III A. We leave a full treatment of detector calibration to future work.  
+
+> VII. CONCLUSIONS
+
+In this work, we have developed a new, GPU-native nested sampling algorithm, optimised for gravitational waves, that brings ab initio stochastic sampling into the real-time regime for binary neutron star signals observed with the current generation of GW detectors. At the core of this advancement is our bespoke Slice-within-Gibbs (SwiG) kernel, which explicitly leverages the well-known structural hierarchy of compact binary coalescence pa-rameters. When combined with state-of-the-art GPU hardware, this allows us to establish four core results. 
+
+• Scalable, uncompressed inference. By exploiting the full memory capacity of modern GPUs alongside the SwiG kernel, we achieve fully calibrated parameter estimation on the uncompressed frequency grid of a 128 s BNS signal in a median of twelve minutes on a single GPU. We validate this with extensive full P–P calibration tests with up to 1000 binary neutron star injections (Figure 6). 
+
+• Sub-segment, real-time performance. Mild data com-pression via relative binning drops the sampling wall time to a median of 89 seconds, strictly shorter than the duration of the data segment itself, for every in-jection in the campaign. Analysing GW170817 with time marginalisation completes in around two min-utes, and multi-GPU sharding closes much of the same gap ( ∼5 minutes) with no data compression to the likelihood at all. 
+
+• High-fidelity validation on GW170817. Applying this framework to GW170817 recovers posteriors we would expect to match those of community-standard pipelines, converging in roughly two minutes rather — a speedup of up to two orders of magnitude de-pending on configuration — and, at the same time, returning the Bayesian evidence for model compari-son. 14 
+
+• The necessity of domain knowledge. Our ablation studies explicitly confirm that unblocked nested slice sampling fails to mix at these tight computational budgets. Injecting the physical conditional indepen-dence and degeneracy structures of gravitational waves into the sampler geometry is the essential ingredient that makes inference at this speed possi-ble, a lesson we expect to transfer well beyond the present application. Taken together, these results establish a likelihood-based, training-free approach that is highly complementary to modern machine learning methods (such as amortised inference via DINGO ), achieving comparable low-latency performance with classical sampling algorithms launched cold from the prior. Looking further ahead, rapid parameter estimation for long-duration gravitational wave signals will only grow in importance. As we approach the era of next-generation ground-based observatories such as the Einstein Telescope and Cosmic Explorer, BNS signals will remain in-band for hours or even days, and even BBH signals will constitute minutes of data. Without optimisation and acceleration, extracting the full scientific output of these facilities will present a formidable computational challenge. By demon-strating that highly parallelised stochastic sampling, to-gether with domain knowledge, can meet the extreme computational demands of modern long-duration signals, this work lays a robust, scalable, and exact foundation for next-generation GW science. 
+
+> ACKNOWLEDGEMENTS
+
+The authors acknowledge the use of resources provided by the Isambard-AI National AI Research Resource (AIRR). Isambard-AI is operated by the University of Bristol and is funded by the UK Government’s Department for Science, Innovation and Technology (DSIT) via UK Research and Innovation; and the Science and Technology Facilities Council [ST/AIRR/I-A-I/1023]. Supported by the grant award “Real Time Gravitational Wave Inference” 0251-3025-2136-1. DY and WH are supported by the UKRI Frontier Research Guarantee [EP/X035344/1]. JA and NS are supported by fellowships from the Kavli Foundation. TCKN acknowledges support by the research program of the Netherlands Organization for Scientific Research (NWO). TW is supported by the research program of the Netherlands Organization for Scientific Research (NWO) through grant number OCENW.XL21.XL21.038. MP was supported by the Harding Distinguished Postgraduate Scholars Programme (HDPSP). DY, MP and WH were supported by the research environment and infrastructure of the Handley Lab at the University of Cambridge. The code developed for this study will be released as part of the Jim package [ 68 ]. We thank the GW JAX Team 3 for their continued maintenance of Jim and ripple .This research has made use of data or software obtained from the Gravitational Wave Open Science Center [106], a service of the LIGO Scientific Collaboration, the Virgo Collaboration, and KAGRA. This material is based upon work supported by NSF’s LIGO Laboratory which is a major facility fully funded by the National Science Foun-dation, as well as the Science and Technology Facilities Council (STFC) of the United Kingdom, the Max-Planck-Society (MPS), and the State of Niedersachsen/Germany for support of the construction of Advanced LIGO and construction and operation of the GEO600 detector. Ad-ditional support for Advanced LIGO was provided by the Australian Research Council. Virgo is funded, through the European Gravitational Observatory (EGO), by the French Centre National de Recherche Scientifique (CNRS), the Italian Istituto Nazionale di Fisica Nucleare (INFN) and the Dutch Nikhef, with contributions by institutions from Belgium, Germany, Greece, Hungary, Ireland, Japan, Monaco, Poland, Portugal, Spain. KAGRA is supported by Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan Society for the Promotion of Science (JSPS) in Japan; National Research Founda-tion (NRF) and Ministry of Science and ICT (MSIT) in Korea; Academia Sinica (AS) and National Science and Technology Council (NSTC) in Taiwan.                     
+
+> [1] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 116 , 061102 (2016), arXiv:1602.03837 [gr-qc]. [2] N. Abac et al. (LIGO Scientific, VIRGO, KAGRA), (2026), arXiv:2605.27225 [gr-qc]. [3] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 119 , 161101 (2017), arXiv:1710.05832 [gr-qc]. [4] B. P. Abbott et al. (LIGO Scientific, Virgo, Fermi GBM, INTEGRAL, IceCube, AstroSat Cadmium Zinc Tel-luride Imager Team, IPN, Insight-Hxmt, ANTARES, Swift, AGILE Team, 1M2H Team, Dark Energy Camera GW-EM, DES, DLT40, GRAWITA, Fermi-LAT, ATCA,
+> 3https://github.com/GW-JAX-Team
+> ASKAP, Las Cumbres Observatory Group, OzGrav, DWF (Deeper Wider Faster Program), AST3, CAAS-TRO, VINROUGE, MASTER, J-GEM, GROWTH, JAGWAR, CaltechNRAO, TTU-NRAO, NuSTAR, Pan-STARRS, MAXI Team, TZAC Consortium, KU, Nordic Optical Telescope, ePESSTO, GROND, Texas Tech University, SALT Group, TOROS, BOOTES, MWA, CALET, IKI-GW Follow-up, H.E.S.S., LOFAR, LWA, HAWC, Pierre Auger, ALMA, Euro VLBI Team, Pi of Sky, Chandra Team at McGill University, DFN, ATLAS Telescopes, High Time Resolution Universe Survey, RI-MAS, RATIR, SKA South Africa/MeerKAT), Astrophys. J. Lett. 848 , L12 (2017), arXiv:1710.05833 [astro-ph.HE]. [5] B. P. Abbott et al. (LIGO Scientific, Virgo, Fermi-GBM, INTEGRAL), Astrophys. J. Lett. 848 , L13 (2017),
+
+15 
+
+arXiv:1710.05834 [astro-ph.HE]. [6] A. Goldstein et al. , Astrophys. J. Lett. 848 , L14 (2017), arXiv:1710.05446 [astro-ph.HE]. [7] D. A. Coulter et al. , Science 358 , 1556 (2017), arXiv:1710.05452 [astro-ph.HE]. [8] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. X 9, 011001 (2019), arXiv:1805.11579 [gr-qc]. [9] B. P. Abbott et al. (LIGO Scientific, Virgo, 1M2H, Dark Energy Camera GW-E, DES, DLT40, Las Cumbres Observatory, VINROUGE, MASTER), Nature 551 , 85 (2017), arXiv:1710.05835 [astro-ph.CO]. [10] M. Pillas et al. , Phys. Rev. D 112 , 083002 (2025), arXiv:2503.15422 [astro-ph.HE]. [11] T. Wouters, A. Puecher, P. T. H. Pang, and T. Dietrich, (2025), arXiv:2510.22290 [astro-ph.HE]. [12] R. W. Kiendrebeogo et al. , Astrophys. J. 958 , 158 (2023), arXiv:2306.09234 [astro-ph.HE]. [13] V. G. Shah, G. Narayan, H. M. L. Perkins, R. J. Foley, D. Chatterjee, B. Cousins, and P. Macias, Mon. Not. Roy. Astron. Soc. 528 , 1109 (2024), arXiv:2310.15240 [astro-ph.HE]. [14] S. Bhattacharjee, S. Banerjee, V. Bhalerao, P. Beni-amini, S. Bose, K. Hotokezaka, A. Pai, M. Saleem, and G. Waratkar, Mon. Not. Roy. Astron. Soc. 528 , 4255 (2024), arXiv:2401.13636 [astro-ph.HE]. [15] R. Kaur, B. O’Connor, A. Palmese, and K. Kunnumkai, Astrophys. J. 1000 , 74 (2026), arXiv:2410.10579 [astro-ph.HE]. [16] L. P. Singer and L. R. Price, Phys. Rev. D 93 , 024013 (2016), arXiv:1508.03634 [gr-qc]. [17] S. S. Chaudhary et al. , Proc. Nat. Acad. Sci. 121 ,e2316474121 (2024), arXiv:2308.04545 [astro-ph.HE]. [18] M. Punturo et al. , Class. Quant. Grav. 27 , 194002 (2010). [19] M. Maggiore et al. (ET), JCAP 03 , 050, arXiv:1912.02622 [astro-ph.CO]. [20] M. Branchesi et al. , JCAP 07 , 068, arXiv:2303.15923 [gr-qc]. [21] A. Abac et al. (ET), JCAP 03 , 081, arXiv:2503.12263 [gr-qc]. [22] D. Reitze et al. , Bull. Am. Astron. Soc. 51 , 035 (2019), arXiv:1907.04833 [astro-ph.IM]. [23] M. Evans et al. , (2021), arXiv:2109.09882 [astro-ph.IM]. [24] P. Couvares et al. , (2021), arXiv:2111.06987 [gr-qc]. [25] Q. Hu and J. Veitch, Phys. Rev. D 112 , 084039 (2025), arXiv:2412.02651 [gr-qc]. [26] S. Hild et al. , Class. Quant. Grav. 28 , 094013 (2011), arXiv:1012.0908 [gr-qc]. [27] J. Skilling, Bayesian Anal. 1, 833 (2006). [28] G. Ashton et al. , Nat. Rev. Methods Primers 2, 39 (2022). [29] J. Veitch et al. , Phys. Rev. D 91 , 042003 (2015). [30] G. Ashton et al. , Astrophys. J. Suppl. 241 , 27 (2019), 1811.02042. [31] I. M. Romero-Shaw et al. , Mon. Not. Roy. Astron. Soc. 
+
+499 , 3295 (2020), arXiv:2006.00714 [astro-ph.IM]. [32] R. J. E. Smith, G. Ashton, A. Vajpeyi, et al. , Mon. Not. Roy. Astron. Soc. 498 , 4492 (2020), arXiv:1909.11873 [gr-qc]. [33] N. J. Cornish, (2010), arXiv:1007.4820 [gr-qc]. [34] B. Zackay, L. Dai, and T. Venumadhav, (2018), arXiv:1806.08792 [astro-ph.IM]. [35] R. Smith, S. E. Field, K. Blackburn, C.-J. Haster, M. Pürrer, V. Raymond, and P. Schmidt, Phys. Rev. D 
+
+94 , 044031 (2016), arXiv:1604.08253 [gr-qc]. [36] S. Morisaki, Phys. Rev. D 104 , 044062 (2021), arXiv:2104.07813 [gr-qc]. [37] L. Pathak, A. Reza, and A. S. Sengupta, Phys. Rev. D 
+
+108 , 064055 (2023), arXiv:2210.02706 [gr-qc]. [38] L. Pathak, S. Munishwar, A. Reza, and A. S. Sengupta, Phys. Rev. D 109 , 024053 (2024), arXiv:2309.07012 [gr-qc]. [39] A. Sharma, L. Pathak, S. Roy, and A. S. Sengupta, (2025), arXiv:2508.04172 [gr-qc]. [40] M. J. Williams, J. Veitch, and C. Messenger, Phys. Rev. D 103 , 103006 (2021), arXiv:2102.11056 [gr-qc]. [41] K. W. k. Wong, M. Gabrié, and D. Foreman-Mackey, J. Open Source Softw. 8, 5021 (2023), arXiv:2211.06397 [astro-ph.IM]. [42] T. Wouters, P. T. H. Pang, T. Dietrich, and C. Van Den Broeck, Phys. Rev. D 110 , 083033 (2024), arXiv:2404.11397 [astro-ph.IM]. [43] M. Prathaban, C. Hoy, and M. J. Williams, (2026), arXiv:2601.21630 [gr-qc]. [44] S. R. Green, C. Simpson, and J. Gair, Phys. Rev. D 102 ,104057 (2020), arXiv:2002.07656 [astro-ph.IM]. [45] M. Dax, S. R. Green, J. Gair, J. H. Macke, A. Buonanno, and B. Schölkopf, Phys. Rev. Lett. 127 , 241103 (2021), arXiv:2106.12594 [gr-qc]. [46] M. Dax, S. R. Green, J. Gair, N. Gupte, M. Pürrer, V. Raymond, J. Wildberger, J. H. Macke, A. Buo-nanno, and B. Schölkopf, Nature 639 , 49 (2025), arXiv:2407.09602 [gr-qc]. [47] D. Yallup, Nested sampling with slice-within-Gibbs: Effi-cient evidence calculation for hierarchical Bayesian mod-els (2026), arXiv:2602.17414. [48] D. Yallup, N. Kroupa, and W. Handley, Transactions on Machine Learning Research (2026), arXiv:2601.23252 [stat.CO]. [49] K. Krishna, A. Vijaykumar, A. Ganguly, C. Talbot, S. Biscoveanu, R. N. George, N. Williams, and A. Zim-merman, (2023), arXiv:2312.06009 [gr-qc]. [50] P. Canizares, S. E. Field, J. Gair, V. Raymond, R. Smith, and M. Tiglio, Phys. Rev. Lett. 114 , 071104 (2015), arXiv:1404.6284 [gr-qc]. [51] S. Morisaki and V. Raymond, Phys. Rev. D 102 , 104020 (2020), arXiv:2007.09108 [gr-qc]. [52] S. Morisaki, R. Smith, L. Tsukada, S. Sachdev, S. Steven-son, C. Talbot, and A. Zimmerman, Phys. Rev. D 108 ,123040 (2023), arXiv:2307.13380 [gr-qc]. [53] C. García-Quirós, S. Husa, M. Mateu-Lucena, and A. Borchers, Class. Quant. Grav. 38 , 015006 (2021), arXiv:2001.10897 [gr-qc]. [54] J. Lange, R. O’Shaughnessy, and M. Rizzo, (2018), arXiv:1805.10457 [gr-qc]. [55] J. Aasi et al. (LIGO Scientific), Class. Quant. Grav. 32 ,074001 (2015), arXiv:1411.4547 [gr-qc]. [56] F. Acernese et al. (VIRGO), Class. Quant. Grav. 32 ,024001 (2015), arXiv:1408.3978 [gr-qc]. [57] T. Akutsu et al. (KAGRA), PTEP 2021 , 05A101 (2021), arXiv:2005.05574 [physics.ins-det]. [58] S. Husa, S. Khan, M. Hannam, M. Pürrer, F. Ohme, X. Jiménez Forteza, and A. Bohé, Phys. Rev. D 93 ,044006 (2016), arXiv:1508.07250 [gr-qc]. [59] S. Khan, S. Husa, M. Hannam, F. Ohme, M. Pürrer, X. Jiménez Forteza, and A. Bohé, Phys. Rev. D 93 ,044007 (2016), arXiv:1508.07253 [gr-qc]. [60] M. Hannam, P. Schmidt, A. Bohé, L. Haegel, S. Husa, F. Ohme, G. Pratten, and M. Pürrer, Phys. Rev. Lett. 16 
+
+113 , 151101 (2014), arXiv:1308.3271 [gr-qc]. [61] T. Dietrich, A. Samajdar, S. Khan, N. K. Johnson-McDaniel, R. Dudi, and W. Tichy, Phys. Rev. D 100 ,044003 (2019), arXiv:1905.06011 [gr-qc]. [62] A. M. Baker, P. D. Lasky, E. Thrane, and J. Golomb, Phys. Rev. D 112 , 102004 (2025), arXiv:2503.04073 [gr-qc]. [63] N. Guttman, A. M. Baker, P. D. Lasky, and E. Thrane, (2026), arXiv:2606.14197 [astro-ph.HE]. [64] M. Gabrié, G. M. Rotskoff, and E. Vanden-Eijnden, Proc. Nat. Acad. Sci. 119 , e2109420119 (2022), arXiv:2105.12603 [physics.data-an]. [65] M. Karamanis, F. Beutler, J. A. Peacock, D. Nabergoj, and U. Seljak, Mon. Not. Roy. Astron. Soc. 516 , 1644 (2022), arXiv:2207.05652 [astro-ph.IM]. [66] M. Karamanis, D. Nabergoj, F. Beutler, J. A. Peacock, and U. Seljak, J. Open Source Softw. 7, 4634 (2022), arXiv:2207.05660 [astro-ph.IM]. [67] M. J. Williams, J. Veitch, and C. Messenger, Mach. Learn. Sci. Tech. 4, 035011 (2023), arXiv:2302.08526 [astro-ph.IM]. [68] K. W. K. Wong, M. Isi, and T. D. P. Edwards, Astrophys. J. 958 , 129 (2023), arXiv:2302.05333 [astro-ph.IM]. [69] M. Prathaban, H. Bevins, and W. Handley, Mon. Not. Roy. Astron. Soc. 541 , 200 (2025), arXiv:2411.17663 [astro-ph.IM]. [70] L. Negri and A. Samajdar, Mon. Not. Roy. Astron. Soc. 
+
+546 , staf2145 (2026), arXiv:2509.17606 [astro-ph.HE]. [71] M. J. Williams, (2025), arXiv:2511.04218 [hep-ex]. [72] G. Demasi et al. , The Sequential Monte Carlo goes NUTS: Boosting Gravitational-Wave Inference (2026), arXiv:2601.02336 [gr-qc]. [73] K. Cranmer, J. Brehmer, and G. Louppe, Proc. Nat. Acad. Sci. 117 , 30055 (2020), arXiv:1911.01429 [stat.ML]. [74] I. Kobyzev, S. J. D. Prince, and M. A. Brubaker, IEEE Trans. Pattern Anal. Machine Intell. 43 , 3964 (2021), arXiv:1908.09257 [stat.ML]. [75] G. Papamakarios, E. Nalisnick, D. J. Rezende, S. Mo-hamed, and B. Lakshminarayanan, J. Machine Learning Res. 22 , 2617 (2021), arXiv:1912.02762 [stat.ML]. [76] J. Roulet, M. Crisostomi, L. M. Thomas, and K. Chatzi-ioannou, (2026), arXiv:2604.08897 [gr-qc]. [77] D. Chatterjee et al. , Mach. Learn. Sci. Tech. 5, 045030 (2024), arXiv:2407.19048 [gr-qc]. [78] E. Marx, D. Chatterjee, M. Desai, R. Kumar, W. Benoit, A. Sasli, L. Singer, M. W. Coughlin, P. Harris, and E. Katsavounidis, Phys. Rev. D 113 , 063020 (2026), arXiv:2509.22561 [gr-qc]. [79] Q. Hu, J. Irwin, Q. Sun, C. Messenger, L. Suleiman, I. S. Heng, and J. Veitch, Astrophys. J. Lett. 987 , L17 (2025), arXiv:2412.03454 [gr-qc]. [80] J. Alvey, U. Bhardwaj, V. Domcke, M. Pieroni, and C. Weniger, Phys. Rev. D 111 , 102006 (2025), arXiv:2408.00832 [gr-qc]. [81] M. Dax, S. R. Green, J. Gair, M. Pürrer, J. Wildberger, J. H. Macke, A. Buonanno, and B. Schölkopf, Phys. Rev. Lett. 130 , 171403 (2023), arXiv:2210.05686 [gr-qc]. [82] A. Kofler, M. Dax, S. R. Green, J. Wildberger, N. Gupte, J. H. Macke, J. Gair, A. Buonanno, and B. Schölkopf, Phys. Rev. Lett. 136 , 251401 (2026), arXiv:2512.02968 [gr-qc]. [83] M. Prathaban, D. Yallup, J. Alvey, M. Yang, W. Temple-ton, and W. Handley, RAS Techniques and Instruments 10.1093/rasti/rzag034 (2026). [84] T. D. P. Edwards, K. W. K. Wong, K. K. H. Lam, et al. ,Phys. Rev. D 110 , 064028 (2024), 2302.05329. [85] D. Yallup, M. Prathaban, J. Alvey, and W. Handley, in 
+
+2nd European AI for Fundamental Physics Conference 
+
+(2025) arXiv:2509.24949 [astro-ph.IM]. [86] A. Cabezas, A. Corenflos, J. Lao, et al. , Black-JAX: Composable Bayesian inference in JAX (2024), arXiv:2402.10797. [87] J. Bradbury, R. Frostig, P. Hawkins, et al. , JAX: com-posable transformations of Python+NumPy programs, 
+
+http://github.com/jax-ml/jax (2018). [88] R. Chan, H. Narola, T. C. K. Ng, T. Wouters, I. C. F. Wong, F. Gittins, J. Janquart, and C. Van Den Broeck, in prep. (2026). [89] W. J. Handley, M. P. Hobson, and A. N. Lasenby, Mon. Not. R. Astron. Soc. 453 , 4384 (2015). [90] R. M. Neal, Ann. Stat. 31 , 705 (2003). [91] F. Ascolani, G. O. Roberts, and G. Zanella, Scalability of metropolis-within-gibbs schemes for high-dimensional bayesian models (2026), arXiv:2403.09416 [stat.CO]. [92] S. Luu, Z. Xu, N. Surjanovic, M. Biron-Lattes, T. Camp-bell, and A. Bouchard-Côté, Is gibbs sampling faster than hamiltonian monte carlo on glms? (2025), arXiv:2410.03630 [stat.CO]. [93] R. L. Smith, Oper. Res. 32 , 1296 (1984). [94] T. Littenberg, N. Cornish, K. Lackeos, and T. Robson, Phys. Rev. D 101 , 123021 (2020), arXiv:2004.08464 [gr-qc]. [95] J. Jasche and G. Lavaux, Astron. Astrophys. 625 , A64 (2019), arXiv:1806.11117 [astro-ph.CO]. [96] A. Lewis, Phys. Rev. D 87 , 103529 (2013), 1304.4473. [97] E. Thrane and C. Talbot, Publ. Astron. Soc. Aust. 36 ,e010 (2019). [98] J. S. Speagle, Mon. Not. Roy. Astron. Soc. 493 , 3132 (2020), arXiv:1904.02180 [astro-ph.IM]. [99] S. McIntosh-Smith, S. Alam, and C. Woods, in Proceed-ings of the Cray User Group (2024) pp. 44–54. [100] N. J. Cornish, Phys. Rev. D 104 , 104054 (2021), arXiv:2109.02728 [gr-qc]. [101] S. Green and A. Lundgren, (2024), arXiv:2411.03207 [gr-qc]. [102] F. Iacovelli, D. Wadekar, J. Roulet, E. Berti, and A. Corsi, (2026), arXiv:2606.17137 [gr-qc]. [103] M. D. Hoffman, M. J. Johnson, and D. Tran, in Advances in Neural Information Processing Systems , Vol. 31 (Cur-ran Associates, Inc., 2018). [104] C. C. Margossian, A. Vehtari, D. Simpson, and R. Agrawal, Hamiltonian monte carlo using an adjoint-differentiated laplace approximation: Bayesian infer-ence for latent gaussian models and beyond (2020), arXiv:2004.12550 [stat.CO]. [105] T. Lovick, D. Yallup, and W. Handley, arXiv preprint arXiv:2603.26644 (2026). [106] R. Abbott et al. (LIGO Scientific, Virgo), SoftwareX 13 ,100658 (2021), arXiv:1912.11716 [gr-qc]. 
+
+Appendix A: Grid marginalisations and post-hoc reconstruction 
+
+The analytic marginalisations of Section III A share a sin-gle construction. Each of the three parameters {ϕc, t c, d L}17 enters the likelihood only through a cheap scalar oper-ation on cached inner products, so the marginal like-lihood over any subset of them can be evaluated by quadrature on a fixed grid. A Bessel function for ϕc,a grid sum over time shifts for tc, and a log-sum-exp over a one-dimensional distance grid for dL, all at neg-ligible cost relative to a waveform evaluation. The in-jection campaign of Section IV A marginalises {ϕc, d L}
+
+and samples tc, whereas the GW170817 analysis of Sec-tion V B marginalises {ϕc, t c} and samples dL. Because a marginalised parameter is removed from the sampled space entirely, the evidence and the joint posterior of the remaining parameters are immune to any mixing pathology in that direction and the marginal is computed exactly, up to grid resolution, at every likelihood call. Posterior samples for a marginalised parameter are re-constructed after the run. For each chosen point, the inner products defining the conditional posterior of the marginalised parameter on its grid can be evaluated, and a value drawn from this conditional directly. The re-construction is pure resampling so it is calibrated by construction; the grid does, however, quantise the credi-ble levels, invalidating the continuous null distribution of the KS statistic, which is why reconstructed parameters are excluded from the P–P tests of Section V A. The cost scales with the number of samples reconstructed, and since most dead points carry negligible posterior weight, it suffices to reconstruct the retained posterior samples. At ∼1 s per 1000 samples this amounts to a few seconds for the ∼4000 effective samples of a typical run, and even this could be eliminated entirely by caching the inner products from the sampling phase. A configuration that samples a parameter directly pays no reconstruction cost for it. The choice of which parameters to sample and which to marginalise interacts with the likelihood treatment. At full frequency resolution, sampling tc is unproblematic: the Baseline, High-Res and Sharded configurations are calibrated across all 15 sampled parameters, including tc
+
+(Figures 2 and 6). Under the heterodyned likelihood this no longer holds: as anticipated in Section III D, sampling 
+
+tc against the binned surface can leave it miscalibrated. The effect is confined to a single parameter: the distance-marginalised Heterodyned configuration is calibrated in every parameter except tc, whose lone KS p-value of 
+
+4 × 10 −5 collapses the Fisher-combined p from 0.15 (with 
+
+tc excluded) to 0.003 . Whether this is intrinsic to relative binning at Nb = 5000 or an artefact of our implementation, the physically relevant parameters retain valid coverage throughout, and the full-resolution results are unaffected. Marginalising the coalescence time instead, as in the time-marginalised heterodyned configuration of Figure 5, integrates the time-shift factor essentially exactly on a dense grid and removes the effect entirely. The com-bined p rises to 0.51 , and the sampled distance that takes tc’s place is cleanly calibrated as a directly tested parameter (KS p = 0 .49 ). This is the configuration adopted for the GW170817 analysis of Section V B, at 0.0 0.2 0.4 0.6 0.8 1.0 
+
+C.I. 
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Fraction of truths in C.I.
+
+Heterodyned                    
+
+> tcmarg.
+> M= 1
+> N= 100
+> p= 0 .51
+> Mc(0.59)
+> q(0.33)
+> |s1|(0.62)
+> θ1(0.48)
+> φ1(0.47)
+> |s2|(0.92)
+> θ2(0.76)
+> φ2(0.28)
+> ι(0.61)
+> dL(0.49)
+> ψ(0.03)
+> α(0.57)
+> δ(0.18)
+> Λ1(0.57)
+> Λ2(0.16)
+
+FIG. 5: P–P diagnostic for the time-marginalised hetero-dyned configuration ( tc marginalised, dL sampled) on 100 
+
+injections, with bands and legends as in Figure 2. All 
+
+15 sampled parameters, including the directly sampled 
+
+dL (KS p = 0 .49 ), are calibrated, with Fisher-combined 
+
+p = 0 .51 .an approximate 1.5× premium in sampling time over the distance-marginalised variant (median 132 s versus 
+
+89 s; Section V A). Every parameter shown in Figure 4 is therefore sampled directly by the kernel, and generally we recommend this as the baseline configuration. 
+
+Appendix B: Stress-test at N = 1000 0.0 0.2 0.4 0.6 0.8 1.0 
+
+C.I. 
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Fraction of truths in C.I.
+
+High-Res                    
+
+> dLmarg.
+> M= 3
+> N= 1000
+> p= 0 .06
+> Mc(0.22)
+> q(0.08)
+> |s1|(0.90)
+> θ1(0.89)
+> φ1(0.17)
+> |s2|(0.37)
+> θ2(0.13)
+> φ2(0.18)
+> ι(0.55)
+> ψ(0.36)
+> α(0.61)
+> δ(0.63)
+> Λ1(0.03)
+> Λ2(0.20)
+> tc(0.07)
+
+FIG. 6: P–P diagnostic for the High-Res configuration over the full catalogue of N = 1000 injections, over all 
+
+15 sampled parameters (excluding only the reconstructed 
+
+dL; Appendix A). All parameters lie within the binomial confidence bands and the Fisher-combined p-value is 0.06 .18 The P–P validation in the main text uses N = 100 in-jections, the standard budget in the GW literature. It is worth being precise about what passing such a test certifies. Under perfect calibration the credible levels are uniform whatever the catalogue size, so the p-value threshold is no harder to clear at large N ; what grows with N is the power of the test — the size of the miscali-bration a pass rules out. The resolvable deviations are set by the binomial band √p(1 − p)/N , which at N = 100 
+
+has a 1σ width of ∼ 4.7% . A parameter systematically under-covered by 5% at the 1σ level therefore produces only a ∼ 1σ excursion and passes far more often than not: a pass at N = 100 certifies only the absence of biases at or above the ∼ 5% level. Increasing the catalogue size tightens this certificate as 
+
+1/√N . At N = 1000 the band narrows to ∼ 1.5% , and the same 5% systematic, invisible at N = 100 , becomes a ∼ 3.5σ excursion that would collapse the combined p-value outright. Figure 6 shows the High-Res configuration applied to the full catalogue of 1000 injections, over all 15 
+
+sampled parameters including tc. The combined p-value of 
+
+0.06 passes this far more powerful test with no parameter falling outside its binomial confidence band. A pass at this budget certifies that any residual miscalibration is confined to the percent level — a factor √10 ∼ 3 tighter than the main-text test can establish. 0 25 50 75 100 125 
+
+# Network SNR 
+
+0
+
+50 
+
+100 
+
+> Count
+
+Median = 24 
+
+FIG. 7: Network SNR distribution of the full N = 1000 
+
+injection catalogue (median 24 , mean 27 , range 3.5–140 ). GW170817, at network SNR ∼32 , sits within the bulk of the distribution. Figure 7 shows the network SNR distribution of the full catalogue underlying this test, whose injection con-figuration is adapted from Ref. [ 42 ]: right-skewed, with median 24 and a loud tail extending to 140 , so the large-N
+
+test also probes the high-SNR regime where posteriors are tightest and miscalibration is most easily exposed. GW170817, at network SNR ∼32 , sits within the bulk of the distribution.
