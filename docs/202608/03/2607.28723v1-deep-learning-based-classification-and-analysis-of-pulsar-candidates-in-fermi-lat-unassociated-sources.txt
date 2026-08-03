@@ -1,0 +1,604 @@
+Title: Deep Learning-Based Classification and Analysis of Pulsar Candidates in Fermi-LAT Unassociated Sources
+
+URL Source: https://arxiv.org/pdf/2607.28723v1
+
+Published Time: Mon, 03 Aug 2026 00:03:43 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+Astronomy & Astrophysics manuscript no. main ©ESO 2026 August 3, 2026 
+
+# Deep Learning-Based Classification and Analysis of Pulsar Candidates in Fermi -LAT Unassociated Sources 
+
+C. Pozo González 1, R. López-Coto 1, J. Méndez-Gallego 1, E. de Oña Wilhelmi 2 
+
+> 1
+
+Instituto de Astrofísica de Andalucía, CSIC, Glorieta de la Astronomía s /n, E-18008 Granada, Spain  
+
+> 2
+
+Deutsches Elektronen-Synchrotron DESY, Platanenallee 6, 15738, Zeuthen, Germany 
+
+ABSTRACT 
+
+Context. The Fermi Large Area Telescope (LAT) has revolutionized our understanding of the high-energy sky, yet approximately one-third of the sources in the Fourth Fermi -LAT Source Catalog (4FGL) remain unassociated. Conventional machine learning, such as Decision Trees, often treat spectral features as independent tabular entries, neglecting the sequential topological information inherent in the Spectral Energy Distribution (SED). Additionally, they frequently rely on spatial coordinates, which introduces location bias. 
+
+Aims. We aim to classify unassociated Fermi -LAT sources by exploiting the intrinsic shape of their spectra and variability features, avoiding the use of galactic coordinates as training features. Our primary objective is to generate a high-confidence list of PSRs candidates, further distinguishing between Young Pulsars (YPs) and Millisecond Pulsars (MSPs) 
+
+Methods. We developed a hierarchical deep learning framework based on a 1D Convolutional Neural Network (1D-CNN), named 
+
+TabularResCNN . This architecture treats the spectral data from the 4FGL catalog, allowing the model spectral shape. The classification is performed in two stages: first discriminating between AGNs and PSRs, and subsequently categorizing PSRs into YPs and MSPs. We implemented a cost-sensitive learning strategy to handle class imbalance and utilized Grad-CAM techniques to ensure the physical interpretability of the model’s decisions. 
+
+Results. Applying this framework to 2563 unassociated sources, we identified 1136 AGNs and 202 high-confidence PSR candidates (166 YPs, 36 MSPs), increasing the pulsar population by more than 60%. They exhibit strong astrophysical consistency: YPs are confined to the Galactic plane, MSPs show a broader vertical distribution, and AGNs are isotropic. Furthermore, we identified 5 out of 5 PSRs recently confirmed by FAST. 
+
+Conclusions. The proposed 1D-CNN framework isolates PSRs candidates based on intrinsic spectral and temporal properties, mini-mizing spatial bias. The resulting catalog provides a robust set of targets for deep radio surveys with current and future facilities such as FAST, SKAO or CTAO. 
+
+Key words. Methods: analytical, Methods: data analysis, Gamma rays: general 
+
+1. Introduction 
+
+Since its launch in June 2008, the Fermi Gamma-ray Space Tele-scope, equipped with the Large Area Telescope (LAT), has been continuously surveying the γ-ray sky, significantly expanding our knowledge of high-energy sources (Atwood et al. 2009). The 
+
+Fermi -LAT Collaboration periodically publishes all-sky source catalogs derived from accumulated data. The Fourth Fermi -LAT Source Catalog (4FGL) initially detailed 5064 sources based on eight years of observations (Abdollahi et al. 2020). Subsequent incremental releases, such as DR3 and DR4, have extended this dataset to over fourteen years, refining spectral models and in-creasing the population of PSRs and blazars. Despite these catalog improvements, a significant subset of sources remains unassociated, lacking firm multi-wavelength counterparts. Proper classification of these objects is critical for understanding the demographics of the active galactic nu-clei (AGNs) and pulsar (PSRs) populations and for prioritiz-ing follow-up observations. Machine Learning (ML) has be-come the standard approach for this task. Early works ap-plied Random Forest and logistic regression to previous cata-logs, achieving high accuracies ( > 95%) in binary classification (Saz Parkinson et al. 2016; Zhu et al. 2020). Later studies re-fined these benchmarks using gradient boosting techniques like CatBoost and ensemble methods to tackle more granular sub-classification tasks (Coronado-Blázquez 2022; Zhu et al. 2023). However, as model complexity increases, methodological concerns regarding feature selection have emerged. For in-stance, Zhu et al. (2024) explicitly incorporated spatial coordi-nates (e.g., Galactic latitude) as dominant training features in their classification of 4FGL-DR3 sources. While this strategy yields high validation accuracy by exploiting the known concen-tration of YPs in the Galactic disk, it introduces a significant lo-cation bias. By conflating intrinsic astrophysical emission prop-erties with line-of-sight coordinates, such models risk overfitting to the telescope’s selection function and the structured Galactic background. Consequently, this approach compromises the abil-ity to detect outlier populations, such as high-latitude MSPs or halo candidates, which do not conform to the spatial priors of the training set. More recently, Pathania et al. (2026) established a state-of-the-art benchmark on the 4FGL-DR4 catalog using XGBoost and Random Forest. Their work emphasizes the role of data bal-ancing in addressing class disparity. However, while their results are statistically robust, tree-based models treat spectral and tem-poral properties strictly as independent tabular features. Consequently, they are permutation invariant e ff ectively ig-noring the sequential order of spectral bins, and struggle to cap-ture complex, non-linear interdependencies without extensive manual feature engineering. Furthermore, the aggressive syn-thetic oversampling often employed in these studies risks intro-
+
+Article number, page 1 arXiv:2607.28723v1 [astro-ph.HE] 30 Jul 2026 A&A proofs: manuscript no. main 
+
+ducing statistical artifacts that do not reflect the physical reality of faint sources. To transcend these limitations, we propose that the classi-fication of γ-ray sources requires models capable of exploiting the intrinsic topological structure of the data. In spectroscopic analysis, input parameters are not isolated entities; the flux in-tensity in a specific energy band is physically correlated with its neighboring bands. Convolutional Neural Networks (CNNs), particularly 1D-CNNs, provide a distinct advantage here. Unlike decision trees, 1D-CNNs utilize convolutional kernels to scan lo-cal neighborhoods, inherently learning shape-dependent features (such as spectral curvature, cuto ff s, and breaks) directly from the relative positions and gradients of adjacent input parameters. In this work, we introduce a two-stage 1D-CNN deep learn-ing framework tailored for tabular γ-ray features from the 4FGL-DR4 catalog. The first stage discriminates AGNs from PSRs, and the second further separates YPs from MSPs. To mitigate class imbalance, we applied class weighting to the loss func-tion when necessary. Furthermore, we used interpretability tech-niques (e.g., Grad-CAM) to highlight relevant physical features, and evaluated the model’s performance on both associated and unassociated sources. 
+
+2. Data and Preprocessing 
+
+This study utilizes the most recent γ-ray source catalog released by the Fermi -LAT collaboration, complemented by radio PSRs data for validation purposes. 
+
+> 2.1. The Fermi-LAT 4FGL-DR4 Catalog
+
+The primary dataset is derived from the Fourth Fermi -LAT Source Catalog, Data Release 4 (4FGL-DR4) 1, based on 14 years of observations in the 50 MeV to 1 TeV energy range. The catalog contains 7195 γ-ray sources, characterized by 79 distinct features including spectral parameters, spatial morphology, and variability indices. The catalog is dominated by AGNs, specifically Blazars (BLL, FSRQ, and BCU), which constitute approximately 54.7% of the population. PSRs represent a minority class, accounting for only 4.45% of the associated sources. A significant portion of the catalog (33.7%) remains unassociated, lacking firm coun-terparts at other wavelengths. Table 1 summarizes the class dis-tribution relevant to this work. 
+
+> 2.2. The ATNF PSRs Catalog
+
+To provide physical significance to our validation datasets, we cross-matched our sample with the Australia Telescope National Facility (ATNF) PSRs Catalogue (v2.6.3). 2. This catalog con-tains 4346 known radio PSRs and provides crucial timing pa-rameters, specifically the spin period ( P) and period derivative ( ˙ P), which are not available in the Fermi -LAT γ-ray data. 
+
+> 2.3. Training Dataset Construction
+
+The 4FGL-DR4 catalog sources will be structured into two clas-sification levels based on their physical and population proper-ties. The primary level will comprise 4261 sources, divided into      
+
+> 1Available at: https://fermi.gsfc.nasa.gov/ssc/data/ access/lat/14yr_catalog/
+> 2Available at: https://www.atnf.csiro.au/research/pulsar/ psrcat/
+
+AGNs ( N = 3941), encompassing BLL, FSRQ, and BCU sub-types, and PSRs ( N = 320), which will include both young and millisecond varieties. This distribution will exhibit a class im-balance of approximately 12:1. Data allocation will follow an 80% stratified split for training and 20% for validation, where the asymmetry will be managed via a cost-sensitive learning strategy. This approach will apply inverse class weights to the cross-entropy loss function to penalize misclassification of the minority class without introducing synthetic artifacts. Within the PSRs population, the sample will be categorized into 141 YPs ( P > 30 ms) and 179 MSPs ( P < 30 ms), represent-ing 44% and 56% of the subset, respectively. Given the relative equilibrium of this ∼ 1 : 1 .2 ratio, the model will learn directly from the original spectral distributions of confirmed sources, en-suring the capture of authentic physical features. Finally, a separate set of 2423 unassociated sources will be reserved exclusively for the inference phase following the model validation process. 
+
+3. Methodology 
+
+This section details the end-to-end Deep Learning framework developed for the classification of unassociated Fermi -LAT sources. Our approach prioritizes the identification of candidate PSRs through a hierarchical architecture that takes advantage of both the spectral and temporal structure of the 4FGL-DR4 data. 
+
+> 3.1. Feature Engineering
+
+The primary dataset is derived from the Fermi -LAT 4FGL-DR4 catalog (Abdollahi et al. 2020). The raw FITS data is processed to construct a high-dimensional feature space suitable for con-volutional analysis. We extract a comprehensive set of parameters characterizing the γ-ray emission: 
+
+– Spectral Features: Integrated flux, energy flux per band, spectral index, pivot energy, and spectral curvature signifi-cance. 
+
+– Variability Features: Variability Index ( T S var ) and fractional variability, which are critical for distinguishing stochastic AGNs flaring from stable PSR emission. 
+
+– Detectability: Detection significance and √T S across indi-vidual energy bands. A critical step in our pipeline is the Array Expansion. Multi-dimensional FITS columns, such as Flux_Band (spanning 7 en-ergy bands), are flattened and sequentially arranged. This pre-serves the energy-dependent ordering, allowing the subsequent CNN layers to interpret the SED as a coherent 1D signal rather than a set of disjoint features. Astronomical data often contain missing values or upper lim-its due to varying sensitivity across the sky. Standard imputation (e.g., mean substitution) destroys this information. To address this, we implement a Dual-Channel Input Strategy: 
+
+– Channel 1 (Value Map): Contains the normalized numeri-cal features. Missing entries are zero-filled to maintain input tensor shape. 
+
+– Channel 2 (Sensitivity Mask): A binary tensor where 1 de-notes a valid measurement and 0 denotes a missing value or upper limit. This architecture allows the network to explicitly learn the pat-terns of observability, distinguishing between a source that is physically faint (low flux) and one that is unobserved due to in-strumental limitations.                                      
+
+> Article number, page 2 C. Pozo González , et al: 1D-CNN to classify and analysis pulsars in Fermi -LAT Unassociated Sources
+> Table 1. Distribution of source classes in the 4FGL-DR4 catalog.
+> Class Description Sources Percentage
+> Training &Validation Classes
+> BLL BL Lac object 1,468 20.40% FSRQ Flat Spectrum Radio Quasar 776 10.79% BCU Blazar of Uncertain type 1,622 22.54%
+> AGNs Total (BLL +FSRQ +BCU) 3,866 53.73%
+> YPs Young Pulsar 141 1.96% MSPs Millisecond Pulsar 179 2.49%
+> PSRs Total (PSR +MSP) 320 4.45%
+> Target for Prediction
+> UNK Unassociated Sources 2,423 33.68%
+> 3.2. Hierarchical Classification Framework
+
+Given the class imbalance and the distinct physical nature of the background sources, we eschew a monolithic multi-class classi-fier in favor of a Hierarchical Stage-wise Approach: 
+
+Stage 1: Source Class Discrimination (AGNs vs. PSRs). A binary classifier separates sources into AGNs and PSRs. This segregation exploits the primary di-chotomy in the γ-ray sky: AGNs typically exhibit high variability and softer spectra, while PSRs are generally stable with curved spectra (cuto ff in the GeV range). 
+
+Stage 2: PSR Sub-typing (YPs vs. MSPs). Sources classified as PSRs with high confidence (PPS R > 0.5) are passed to a specialized secondary model. This stage distinguishes between YPs and MSPs, characterized by higher magnetic fields and slower rotation, and MSPs, which typically exhibit harder spectra and di ff erent orbital demographics. 
+
+> 3.3. Model Architecture: TabularResCNN
+
+The core of our classification engine is the TabularResCNN , a custom 1D Residual Convolutional Neural Network designed to extract local correlations from tabular data. Unlike fully connected networks, which treat inputs as permutation-invariant, TabularResCNN respects the topological structure of the expanded feature vector. The architecture con-sists of: 
+
+– 1D Convolutional Layers: Filters slide across the energy di-mension of the feature vector, detecting local gradients (e.g., spectral breaks) and inter-band correlations. 
+
+– Residual Blocks: We employ skip connections ( y = F(x) + x)to facilitate gradient flow, allowing the model to learn deep hierarchical representations without degradation. 
+
+– Global Average Pooling (GAP): Following feature extrac-tion, GAP aggregates the feature maps across the sequence dimension. This makes the model robust to minor shifts in feature ordering while reducing the parameter count, thereby mitigating overfitting. 
+
+– Classification Head: A multi-layer perceptron (MLP) maps the aggregated features to the final probability score. In the Appendix B you can check all the hyperparameters and the architectural designs in more detail. 
+
+> 3.4. Training and Optimization
+
+The models are trained using the Adam optimizer with a dy-namic learning rate scheduler ( ReduceLROnPlateau ), which decays the learning rate upon validation loss stagnation. To en-hance generalization: 
+
+– Loss Function: We utilize Cross-Entropy Loss with label smoothing ( ϵ = 0.1). This technique prevents the model from becoming over-confident in training labels, which is crucial given the potential for misclassified labels in the training cat-alogs. 
+
+– Validation Strategy: We employ a stratified 80 /20 train-test split to preserve the natural class distribution, ensuring that rare classes (e.g., PSRs) are adequately represented in the evaluation set. 
+
+> 3.5. Class Imbalance Mitigation
+
+The training dataset exhibits a significant class imbalance in stage 1, with AGNs outnumbering PSRs by a ratio of approx-imately 12 : 1. While traditional machine learning workflows frequently employ synthetic augmentation, such as SMOTE or ADASYN, to mitigate such disparities, we intentionally by-passed these techniques in favor of preserving the physical in-tegrity of the sample.We contend that within high-energy as-trophysical catalogs, synthetic oversampling introduces a funda-mental methodological risk: the amplification of detection bias. As noted by Malyshev (2025), these sources represent only the brightest and most spectrally distinct objects accessible to cur-rent instrumentation. Synthetic generation algorithms operate by interpolating be-tween existing minority samples in the feature space. Conse-quently, applying SMOTE to this specific dataset would artifi-cially populate the manifold of bright and clear PSRs, reinforc-ing a decision boundary that is biased towards high-significance sources. This is counterproductive for our primary objective: the classification of unassociated sources. These unassociated tar-gets are typically fainter, located in complex backgrounds, or possess lower detection significance than the training set. Therefore, training on synthetically augmented data would likely induce a covariate shift, where the training distribu-tion Ptrain (X) diverges from the target inference distribution 
+
+Ptarget (X). To mitigate this without compromising physical fi-delity, we adopted a Cost-Sensitive Learning strategy. We implemented a Weighted Cross-Entropy Loss function, where the contribution of each sample to the gradient is scaled                   
+
+> Article number, page 3 A&A proofs: manuscript no. main Dual-Channel Input (Values +Mask)
+> Residual Block 1
+> 1D Conv +BN
+> 1D Conv +BN
+> +
+> Residual Block 2
+> 1D Conv +BN
+> 1D Conv +BN
+> +
+> Residual Block 3
+> 1D Conv +BN
+> 1D Conv +BN
+> +
+> Global Average Pooling Fully Connected Head (MLP)
+> Output
+> Fig. 1. Architecture of the TabularResCNN model. Main flow enters the residual block boundary before processing.
+
+inversely proportional to its class frequency. The weight w j for class j is defined as: 
+
+w j = Ntotal 
+
+2 · N j
+
+(1) where Ntotal is the total number of samples and N j is the count of samples in class j. This forces the optimizer to penalize the mis-classification of a single real PSR significantly more than that of an AGNs, e ff ectively balancing the learning dynamics while en-suring the model learns exclusively from authentic, albeit sparse, physical data. 
+
+3.6. Cost-sensitive threshold optimization 
+
+In standard binary classification tasks, the decision boundary is typically set at a default probability threshold of PAGN s =
+
+PPS Rs = 0.5. However, evaluating model performance using metrics that treat false positives and false negatives symmetri-cally (such as accuracy or F1-score) fails to capture the opera-tional reality of astronomical follow-up campaigns. In our scien-tific context, the observational penalty of misclassifying a back-ground fluctuation as a PSR fundamentally di ff ers from the sci-entific penalty of missing a true PSR. To address this asymmetry, we implemented a cost-sensitive threshold optimization strategy. Rather than blindly maximiz-ing generic mathematical metrics, we shifted the paradigm from mathematical optimization to observational resource allocation. We evaluated the decision boundaries using observational e ffi -ciency curves (analogous to lift curves; see Appendix D), which quantify the expected target yield as a function of the candidate ranking against a random selection baseline. To mitigate the risk of threshold overfitting, a common pitfall where the optimal probability cuto ff becomes heavily biased by the specific statistical fluctuations of a limited validation set, we employed a bootstrapping technique. We generated 1000 random resamples (with replacement) of our validation dataset’s prob-ability predictions. For each bootstrap iteration, we calculated the threshold that maximized our predefined observational e ffi -ciency. The final operational thresholds applied to the unassoci-ated catalog were derived from the median of this bootstrapped distribution. Consequently, the network dynamically adapts its strictness: imposing stringent, high-purity boundaries for highly separable classes, while adjusting boundaries for classes that blend with the background to guarantee the creation of high-confidence candidate lists. 
+
+3.7. Model Interpretability 
+
+To identify which variables most influence the model’s predic-tions, the Grad-CAM technique (Selvaraju et al. 2019) was ap-plied. This method computes the gradients of the output with respect to internal feature maps, enabling visualization of how each parameter contributes to the final classification. The result-ing activation maps indicate that variables such as average sig-nificance, spectral index, and variability are particularly impor-tant for distinguishing between PSRs and AGNs. This approach provides a physically interpretable link between the machine-learning model and the underlying astrophysical properties. 
+
+3.8. Verification 
+
+To validate the astrophysical reliability of our candidates, we im-plement a post-inference analysis pipeline: 1. Spatial Cross-Matching: High-confidence candidates are cross-referenced with the ATNF PSRs Catalog. Matches are defined not by a simple radius, but by the intersection of the ATNF coordinates with the Fermi -LAT 95% confidence er-ror ellipses. 2. P-Pdot Diagram Validation: For candidates associated with known radio PSRs, we plot their spin period ( P) versus pe- 
+
+> Article number, page 4 C. Pozo González , et al: 1D-CNN to classify and analysis pulsars in Fermi -LAT Unassociated Sources
+
+riod derivative ( ˙ P). This serves as a physical sanity check to confirm that sources classified as MSPs dynamically reside in the recycled PSR region of the diagram. 3. External Validation (FAST Discoveries): The ultimate test of the methodology is its predictive power on unseen data. We benchmark our unassociated source candidates against recent blind-search discoveries from the Five-hundred-meter Aperture Spherical Radio Telescope (FAST), verifying if our model correctly flagged these sources prior to their radio confirmation. 
+
+4. Results 
+
+We first evaluate the statistical performance of the model on the labelled test set, followed by a detailed analysis of the physical properties and spatial distribution of the newly identified candi-dates. 
+
+> 4.1. Statistical Performance Assessment
+
+We first evaluate the pure discriminative power of the hier-archical framework on the labeled validation set. To establish the model’s peak mathematical performance before applying observational constraints, we derived the optimal probability thresholds that maximize the overall accuracy for each stage. In this binary context, where the probabilities are complemen-tary ( PAGN s = 1 − PPS Rs ), a source is classified as an AGNs if 
+
+PAGN s ≥ 0.53, and as a PSR if PPS Rs > 0.46. Evaluated at these boundaries, the metrics summarized in Tables 2 and 3 indicate that the model e ff ectively disentangles the spectral degeneracies inherent in γ-ray sources. In the first stage, tasked with separating AGNs from PSRs, the model demonstrates exceptional sensitivity and an overall accuracy of 96.7%. As detailed in Table 2, the performance is characterized by distinct behaviors for each class: 
+
+– AGNs: The network achieves near-perfect retrieval and pu-rity for extragalactic sources. This confirms that the stochas-tic flaring and softer power-law spectra characteristic of blazars are highly distinctive features successfully captured by the 1D-CNN. 
+
+– PSRs: While the classifier maintains high precision for the combined PSRs class, it exhibits a comparatively lower re-call. This relative drop is an expected physical limitation. The second stage, which distinguishes between YPs and MSPs, presents a significantly more complex challenge due to the intrinsic spectral and physical overlap between these two neutron star populations. Nevertheless, the model maintains a robust discriminative capacity (Table 3): 
+
+– MSPs: The classifier proves highly e ff ective at isolating MSPs, yielding strong precision and a well-balanced F1-Score that outperforms the YP classification. 
+
+– YPs: The performance on Young Pulsars reflects the inher-ent di ffi culty of this granular task. Misclassifications in this stage are primarily driven by older YPs entering the transi-tion phase, or extremely faint sources where the high-energy exponential cuto ff , a key discriminant for young pulsars, is not robustly resolved in the observations.  
+
+> 4.2. New
+
+γ-ray candidates 
+
+While the mathematically optimal thresholds derived in the pre-vious section ( PAGN s = 0.53 and PPS Rs = 0.46 ) establish the peak discriminative power of the network, applying them to gen-erate a target catalog is observationally sub-optimal. For con-text, applying standard symmetric-like cuts (e.g., a default 0 .5) to the unassociated sample yields 1514 AGNs and 1049 PSR candidates. This rigid mathematical approach needlessly con-taminates the highly separable AGNs sample with background fluctuations, while burdening the pulsar candidate list with low-confidence sources that would heavily dilute the e ffi ciency of radio follow-up campaigns.To address this, we applied the phys-ically motivated cuts derived from our observational e ffi ciency analysis (see Section 3.6 and Appendix D). By enforcing our op-timized, cost-sensitive thresholds, specifically P(AGNs) ≥ 0.86 to guarantee high purity, and P(PSR) ≥ 0.96 to maximize ob-servational e ffi ciency for radio follow-ups, the application of the trained hierarchy to the 2563 unassociated sources in the 4FGL-DR4 catalog resulted in the classification distribution shown in Figure 2. The model identifies: 
+
+– 1136 AGNs candidates (44 .3%). The strict probability cut ensures a highly pure catalog, filtering out 378 marginal sources that a 0.5 threshold would have loosely classified as AGNs. 
+
+– 202 PSRs candidates (7 .9%), significantly expanding the po-tential census of γ-ray PSRs. This subset is further resolved into 166 YPs and 36 MSPs. By elevating the decision bound-ary to prioritize sample purity over absolute completeness, we systematically filter out 847 low-confidence candidates (compared to the baseline 0.5 cut). This conservative strat-egy forms a high-confidence catalog, ensuring that multi-wavelength resources are exclusively allocated to the most robust targets. 
+
+> 4.3. Spatial Analysis and Galactic Structure
+
+A primary validation of our results is the spatial distribution of the candidates. Since the model was trained primarily on spectral and temporal features, the emergence of coherent galactic struc-tures in the predictions serves as strong independent evidence of physical validity. Figure 2 presents the distribution of candidates as a function of Galactic sine latitude (sin b). 
+
+– The predicted YPs (red triangles) are strictly confined to the thin Galactic disk ( |b| < 5◦), exhibiting a sharp peak at sin b ≈ 0. 
+
+– The MSP candidates (blue stars) show a broader vertical dis-tribution, extending to intermediate latitudes. This pu ff ed-up distribution is consistent with the kinematic heating of older stellar populations and the kick velocities imparted during supernova formation in binary systems. 
+
+– In contrast, the AGNs candidates (grey dots) display an isotropic distribution across the high-latitude sky, as ex-pected for an extragalactic population.  
+
+> 4.4.
+
+P − ˙P Diagram 
+
+Although the spin period ( P) and period derivative ( ˙ P) are not inputs to our model (as they are unknown for unassociated sources), we performed a cross-match validation. We success-fully associated 112 predictions with known PSRs in the ATNF catalog that have measured timing parameters.                                    
+
+> Article number, page 5 A&A proofs: manuscript no. main
+> Table 2. Performance Metrics for Stage 1: AGNs vs. Pulsar Candidates (Overall Accuracy: 96.7%)
+> Class Precision Recall F1-Score Support
+> AGNs 0.9853 0.9937 0.9895 473 PSRs 0.9500 0.8906 0.9194 64
+> Macro Average 0.9677 0.9421 0.9544 537 Table 3. Performance Metrics for Stage 2: Young PSR vs. MSP (Overall Accuracy: 81.4%)
+> Class Precision Recall F1-Score Support
+> MSPs 0.8824 0.8108 0.8451 37 PSRs 0.7200 0.8182 0.7660 22
+> Macro Average 0.8012 0.8145 0.8055 59
+
+-75° 
+
+-60° 
+
+-45° 
+
+-30° 
+
+-15° 
+
+0° 
+
+15° 
+
+30° 
+
+45° 
+
+60° 
+
+75° 
+
+> Galactic Latitude  b ( )
+
+0 5
+
+Relative Density 
+
+1.0 
+
+0.5 
+
+0.0 
+
+0.5 
+
+1.0  
+
+> sin( b)
+> Pred. AGNs
+> 4FGL AGNs
+> Pred. YPs
+> 4FGL YPs
+> Pred. MSPs
+> 4FGL MSPs
+> Fig. 2. Spatial distribution of classified candidates. Left: Sky map in Galactic coordinates. Right: Marginal histogram of sin( b) solid and the 4FGL dashed. Note the tight confinement of Young PSRs to the plane versus the broader distribution of MSPs.
+
+Figure 3 shows these sources on the canonical P− ˙P diagram. The results show a clear physical separation: 
+
+– Sources classified as Young PSRs cluster in the upper-right island ( P ∼ 0.1 − 1 s, ˙ P ∼ 10 −15 ), characteristic of isolated, rotation-powered PSRs. 
+
+– Sources classified as MSPs populate the lower-left region (P < 10 ms, low magnetic fields), aligning perfectly with the recycled pulsar population. This result confirms that the γ-ray spectral features learned by the TabularResCNN are direct proxies for the intrinsic magneto-spheric physics of the neutron stars. 
+
+4.5. External Verification 
+
+As a final test of predictive reliability, we cross-referenced our candidate list with the recent pulsar discoveries reported by the FAST (Five-hundred-meter Aperture Spherical Radio Tele-scope) survey. Our model correctly classified 5 out of 5 newly confirmed PSRs (Table 4) as high-confidence pulsar candidates prior to their radio confirmation. This 100% agreement with blind radio searches underscores the utility of our catalog to pri-oritize future observational campaigns. 
+
+5. Interpretability 
+
+To ensure that the high performance of our 1D-CNN is not driven by statistical artifacts, we employed Gradient-weighted Class Activation Mapping (Grad-CAM). This technique allows us to visualize which spectral and temporal features strictly influence the model’s decision-making process. The resulting activation maps demonstrate that the network has autonomously learned well-established astrophysical properties of γ-ray sources. 
+
+5.1. Stage 1: AGNs vs PSRs 
+
+The discrimination between AGNs and PSRs sources reveals a clear physical bifurcation in feature importance (see Figure 4): 
+
+– AGNs Identification: The Grad-CAM analysis for the AGNs class (Fig. 4) is dominated by low-energy flux components, specifically Flux_Band_0 (50 − 100 MeV) and Flux_Band_1 (100 − 300 MeV). Additionally, the 
+
+Variability_Index appears as a top-tier feature. This per-fectly aligns with the physical nature of blazars (FSRQs and BL Lacs), which typically exhibit softer power-law spectra and stochastic flaring activity compared to PSRs. 
+
+> Article number, page 6
+
+C. Pozo González , et al: 1D-CNN to classify and analysis pulsars in Fermi -LAT Unassociated Sources 
+
+Table 4. FAST Pulsar Candidates and predictions of our model. Where Flux 1 GeV = R ∞ 
+
+> 1 GeV
+> dN dA dt dE
+
+dE 
+
+Source Name ℓ b Class PPSRs PMSP σ Flux 1 GeV 
+
+(deg) (deg) (10 −11 ph cm −2 s−1)4FGL J0237.8 +5238 138.83 -6.92 MSP 0.98 0.85 26.9 129.5 4FGL J0533.6 +5945 152.26 14.17 MSP 0.92 0.84 17.6 70.0 4FGL J1730.4 −0359 19.74 16.00 MSP 0.98 0.86 21.6 142.5 4FGL J1827.5 +1141 40.75 10.55 MSP 0.93 0.94 18.9 94.9 4FGL J1904.7 −0708 28.07 -6.20 PSR 0.85 0.31 24.9 184.7 10 3 10 2 10 1 10 0 10 1                          
+
+> Period P(s)
+> 10 22
+> 10 20
+> 10 18
+> 10 16
+> 10 14
+> 10 12
+> 10 10
+> Period Derivative  P (s/s)
+> ATNF PSRs
+> Fermi 3PC PSRs
+> MSPs
+> YPs
+> = 10 4yr
+> = 10 6yr
+> = 10 8yr
+> = 10 10 yr
+> B= 10 9G
+> B= 10 10 G
+> B= 10 11 GE= 10 30 erg/s
+> E= 10 34 erg/s E= 10 38 erg/s
+> 1.0 (MSPs)
+> 0.75
+> 0.50
+> 0.00
+> 0.50
+> 0.75
+> 1.0 (YPs)
+> Prediction Confidence
+
+Fig. 3. Pulsar candidates for which we have a cross-match with ATNF PSRs in the diagram P− ˙P. Sources classified by our model as PSRs with 
+
+PPS Rs > 0.46 in stage 1 and successfully cross-matched with the ATNF Pulsar Catalogue are shown. YPs are represented by triangles, while MSPs are indicated by star symbols. Marker colors encode the classifi-cation confidence assigned by the network. The background grey distri-bution corresponds to the full ATNF pulsar population, and gamma-ray PSRs from the Third Fermi -LAT Catalog of Gamma-ray PSRs (3PC) are also displayed with orange triangles, for reference. Although timing parameters were not used during training, the model naturally recovers the two distinct physical populations in the plane, demonstrating that it implicitly captures underlying pulsar evolutionary properties. 
+
+– PSRs Identification: Conversely, for the PSRs candidate class (Fig. 4), the model shifts its attention to the high-energy regime. The most relevant features are the detection significance in high-energy bands ( Sqrt_TS_Band_6 and 
+
+Band_7 ). This confirms that the model utilizes the character-istic spectral hardness and stable GeV emission of PSRs as the primary discriminant, e ff ectively ignoring the low-energy bands where AGNs dominate. 
+
+5.2. Stage 2: YPs vs MSPs 
+
+The second stage, which separates YPs from MSPs, presents a more subtle spectral challenge. The Grad-CAM results (Figure 4) highlight how the model resolves this: 
+
+– YPs: The decision for YPs is overwhelmingly driven by the flux intensities in the highest energy bands ( Flux_Band_5 
+
+and Flux_Band_6 , 3 − 30 GeV). This reflects the fact that young, energetic PSRs often exhibit spectral cuto ff s at higher energies compared to the older, recycled MSP population, making them more prominent in the hard γ-ray band. 
+
+– MSPs: Interestingly, the MSPs classification relies heavily on uncertainty parameters ( Unc_Flux_Band ) across inter-mediate bands. This suggests that the model has learned to identify MSPs not just by their spectral shape, but by their characteristic faintness. 
+
+6. Discussion 
+
+The classification of unassociated Fermi -LAT sources has histor-ically been challenged by an inherent reliance on spatial priors and the black-box nature of traditional machine learning algo-rithms. The results obtained by our hierarchical TabularResCNN 
+
+framework o ff er several critical advancements in both method-ological robustness and astrophysical interpretation. A primary achievement of this work is the successful decou-pling of intrinsic emission physics from line-of-sight spatial bi-ases. Previous studies (e.g., Zhu et al. 2024) achieved high clas-sification accuracies by heavily weighting spatial coordinates, eff ectively training models to recognize the Galactic plane rather than the intrinsic nature of the sources. By utilizing spectral shape, variability, and detection significance as sequential in-puts, our 1D-CNN demonstrates that the intrinsic multi-band topology is su ffi cient for high-confidence classification. Conse-quently, our model is highly sensitive to the fainter, unassoci-ated sources that comprise the bulk of the unknown 4FGL-DR4 population. This is reflected in the identification of 202 high-confidence pulsar candidates. By substituting the ≈ 0.5 thresh-old with observationally motivated cuts (see Section 3.6), we distilled this pure sample from a baseline of 1049 marginal de-tections, ensuring a highly robust addition to the current Fermi -LAT pulsar census. Futhermore, on the training level we use weight loss function strategy instead of synthetic oversampling (eg. SMOTE) preventing the covariate shift that typically gener-ate biases (Malyshev 2025). The application of Grad-CAM reveals that the Tabular-ResCNN has autonomously learned fundamental high-energy as-trophysics. For Stage 1 (AGNs vs. PSRs), the model’s reliance on low-energy flux ( < 300 MeV) and variability indices to iden-tify AGNs. Conversely, the model identifies PSRs by focusing on the > 1 GeV bands, e ff ectively tracing the characteristic expo-nential cuto ff of pulsar magnetospheric emission. Interestingly, in Stage 2 (YPs vs. MSPs), the model leverages uncertainty parameters ( Unc_Flux_Band ) as key discriminants for MSPs. Rather than a statistical artifact, this represents a learned proxy for the characteristic lower signal-to-noise ratios of the MSPs population compared to the energetic YPs. This demonstrates that neural networks, when provided with a sensitivity mask (our Dual-Channel approach see section 3.1), can extract physical meaning from observational limitations. The spatial and dynamic properties of the newly classified candidates strongly validate the model’s predictive power. Even without spatial features in the training phase, the strict con-finement of the recovered YPs candidates to the Galactic plane 
+
+Article number, page 7 A&A proofs: manuscript no. main Energy Flux100  
+
+> Flux Band 0
+> Flux Band 1
+> Flux Band 2
+> Flux Band 3
+> Flux Band 4
+> Flux Band 5
+> Flux Band 6
+> Flux Band 7
+> Pivot Energy
+> Signif Avg
+> Sqrt TS Band 0
+> Sqrt TS Band 4
+> Sqrt TS Band 5
+> Sqrt TS Band 6
+> Sqrt TS Band 7
+> Unc Flux Band 0 high
+> Unc Flux Band 0 low
+> Unc Flux Band 1 high
+> Unc Flux Band 1 low
+> Unc Flux Band 2 high
+> Unc Flux Band 2 low
+> Unc Flux Band 3 high
+> Unc Flux Band 3 low
+> Unc Flux Band 4 high
+> Unc Flux Band 4 low
+> Unc Flux Band 5 high
+> Unc Flux Band 5 low
+> Unc Flux Band 6 low
+> Variability Index
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Importance
+> AGNs
+> PSRs
+> MSPs
+> YPs
+> Fig. 4. Average Grad-CAM feature importance for Stage 1 and 2
+
+confirms their identity as young objects born from recent core-collapse supernovae in the thin disk. In contrast, the broader vertical distribution of the MSPs candidates aligns with the ex-pected kinematic di ff usion of older systems (see Figure 2). Other important point is the flux distribution (Figure E), our high-confidence sample of predicted PSRs exhibits relatively high gamma-ray fluxes, comparable to those of known 3PC PSRs. Because these candidates do not su ff er from low photon statistics, their lack of detected Fermi -LAT pulsations cannot be easily attributed to observational limitations. Rather, it indicates that our model is preferentially selecting a distinct underlying population of PSRs with intrinsic properties that hinder pulsa-tion detection. This dichotomy is further evidenced by the P − ˙P
+
+diagram (Figure 3), which clearly shows our candidates cluster-ing in a separate parameter space from the standard Fermi -LAT pulsar population. While spatial coincidence with known ATNF PSRs provides strong physical validation, the high density of known PSRs along the Galactic plane ( |b| < 5◦) introduces a non-negligible prob-ability of chance associations. Consequently, a spatial cross-match in this crowded region yields inconclusive statistical sig-nificance when evaluated on a purely positional basis. Never-theless, independent of whether all crossmatched candidates are true associations, it is evident from Figure 3 that the YP and MSP populations remain distinctly isolated, accurately tracing their respective regimes in the P − ˙P plane. Furthermore, as observed, the pulsar candidates generally exhibit a lower spin-down luminosity ( ˙ E) compared to the detected 3PC Fermi -LAT sample. This likely explains why they have not been detected by the Fermi satelite. To rigorously evaluate the predictive power of our model against this chance-coincidence background, we ana-lyzed the relative enrichment of our candidate sample. We com-pared the fraction of successful ATNF cross-matches within our pulsar candidate list against the baseline cross-match rate of the general unassociated source population. Our analysis reveals a factor of ∼ 3 increase in the cross-match percentage when condi-tioning on our ML-classified pulsar candidates. This significant threefold enrichment demonstrates that the TabularResCNN is not merely reproducing the spatial distribution of the Galactic disk, but is actively and successfully isolating the intrinsic spec-tral and temporal signatures of PSRs. The full statistical valida-tion of which is detailed in Appendix C. To further validate the robustness and generalization capa-bilities of our classification framework, we conducted a series of stringent tests addressing minority classes and spatial biases. First, we evaluated the model on unmodeled minority popula-tions completely excluded from training. Theoretically, sources such as Supernova Remnants (SNRs) and gamma-ray binaries could be systematically confused with PSRs due to a curved spectra and a lack of significant time variability. However, em-pirical results demonstrate the high robustness of the learned feature space: the architecture resists this theoretical confusion by successfully isolating the unique spectral signature of gen-uine PSRs. Instead of being misclassified as PSRs, these mi-nority classes are heavily driven away from the PSRs decision boundary, with the majority of SNRs and Pulsar Wind Nebulae (PWNe) being assigned to the AGNs class with very low PSR probabilities. This allows them to be naturally filtered out via high-confidence selection cuts. Second, rigorous spatial cross-validation tests across di ff erent Galactic latitudes ( |b| ≤ 15 ◦ vs. 
+
+|b| > 15 ◦) and longitudes ( l < 0◦ vs. l > 0◦) demonstrated re-markable spatial invariance. This confirms that the architecture 
+
+> Article number, page 8
+
+C. Pozo González , et al: 1D-CNN to classify and analysis pulsars in Fermi -LAT Unassociated Sources 
+
+relies on intrinsic physical features rather than exploiting instru-mental background shortcuts or flux uncertainty proxies, main-taining stable performance across the sky. Building upon this demonstrated structural reliability, it is important to emphasize that the ultimate value of any predic-tive catalog lies in its utility for guiding future observations. The 100% agreement between our high-confidence PSRs pre-dictions and the recent independent blind-search discoveries by the FAST telescope (Table 4) validates the exceptional relia-bility of our pipeline. While Stage 2 exhibits a slightly lower accuracy (81.4%) due to the intrinsic spectral overlap between some YPs and MSPs, the primary AGNs vs PSRs separation is highly robust. Most importantly, the 202 high-confidence pul-sar candidates identified in this study provide a highly refined, bias-minimized target list for deep radio timing surveys, by opti-mizing our decision boundaries to maximize observational e ffi -ciency (Section 3.6). Consequently, upcoming and current facil-ities, such as FAST, MeerKAT, and eventually the Square Kilo-metre Array Observatory (SKAO), can allocate time to this cu-rated catalog with maximized expected discovery yields. 
+
+7. Conclusions 
+
+In this work, we develop a hierarchical deep learning framework, based on a custom 1D-CNN architecture ( TabularResCNN ), to resolve the nature of unassociated γ-ray sources in the Fermi -LAT catalog. By exploiting the intrinsic spectral and temporal topology of the data, our model transcends the limitations of tra-ditional spatial classifiers, o ff ering a robust probabilistic clas-sification for 2563 previously unidentified sources. While our baseline model demonstrates exceptional separability (achieving a symmetric accuracy of 97.9% in the primary AGNs vs PSRs discrimination), relying on generic mathematical metrics fails to account for the asymmetric costs of misclassification in observa-tional astrophysics. By implementing a cost-sensitive threshold optimization, we explicitly aligned our decision boundaries with the operational realities of radio follow-up campaigns. Prioritizing follow-up e ffi ciency over absolute completeness, we systematically filtered marginal detections (Section 3.6) to isolate a high-confidence catalog of 202 new pulsar candidates (comprising 166 YPs and 36 MSPs). This curated list increases the size of the 3PC catalog by more than 60%, providing an opti-mized target list for upcoming surveys with radio facilities such as FAST, MeerKAT, and the SKAO. Applying the same tech-nique to AGNs, we obtained a robust sample of 1136 new high-confidence AGNs candidates. Crucially, they exhibit strong consistency with astrophysical priors. The spatial distribution of predicted YPs shows a strict confinement to the Galactic Plane ( |b| ≈ 0◦). Conversely, the pre-dicted MSP population displays a broader vertical scale height, consistent with the kinematic heating expected from older PSR populations. Furthermore, the cross-matching of candidates with the ATNF database verifies that our model correctly maps the distinct regions of the P − ˙P diagram, separating canonical PSRs from the millisecond regime without explicit kinematic inputs. The predictive power of this framework is empirically validated by its ability to correctly classify 5 out of 5 sources recently confirmed as PSRs by the FAST telescope (Table 4). This perfect agreement with independent radio discoveries un-derscores the utility of our catalog as a prioritized roadmap for future multi-wavelength campaigns. As next-generation facili-ties like the Square Kilometre Array Observatory (SKAO) and the Cherenkov Telescope Array Observatory (CTAO) come on-line.   
+
+> Acknowledgements. C. Pozo González is hired under the Generation D initia-tive, promoted by Red.es, an organisation attached to the Ministry for Dig-ital Transformation and the Civil Service, for the attraction and retention of talent through grants and training contracts, financed by the Recovery, Transformation and Resilience Plan through the European Union’s Next Gen-eration funds. C.P.G., R.L.-C., J.M.-G. acknowledge financial support from the Spanish "Ministerio de Ciencia e Innovación" through grant PID2022-139117NB-C44 and grant CNS2023-144504. Authors also acknowledge fi-nancial support from the Severo Ochoa grant CEX2021-001131-S funded by MCIN /AEI /10.13039 /501100011033. This research work was funded by the European Commission – NextGenerationEU, through Momentum CSIC Pro-gramme: Develop Your Digital Talent. J.M.-G. acknowledges financial support from the FPI-Severo Ochoa grant CEX2021-001131-S-20-6, PRE2022-103386 funded by MICIU /AEI /10.13039 /501100011033 and ESF +. EdOW acknowl-edges the support of DESY (Zeuthen), a member of the Helmholtz Association HGF. We are grateful to Pablo Saz Parkinson for valuable discussions and com-ments during the paper drafting. We gratefully acknowledge the anonymous ref-eree for their valuable comments and suggestions, which significantly improved the quality of this manuscript.
+
+References 
+
+> Abdollahi, S., Acero, F., Ackermann, M., et al. 2020, ApJS, 247, 33 Atwood, W. B., Abdo, A. A., Ackermann, M., et al. 2009, ApJ, 697, 1071 Coronado-Blázquez, J. 2022, MNRAS, 515, 1807–1814 Malyshev, D. V. 2025, EPJ Web Conf., 319, 06009 Pathania, A., Singh, K. K., Singh, S. K., et al. 2026, Astropart. Phys., 175, 103185 Saz Parkinson, P. M., Xu, H., Yu, P. L. H., et al. 2016, ApJ, 820, 8 Selvaraju, R. R., Cogswell, M., Das, A., et al. 2019, Int. J. Comput. Vis., 128 Zhu, K., Kang, S.-J., & Zheng, Y.-G. 2020, ApJ, 891, 10 Zhu, K. R., Chen, J. M., Zheng, Y. G., & Zhang, L. 2023, Machine Learning Classification of Fermi-LAT Sources at Di ff erent Galactic Latitudes Zhu, K. R., Chen, J. M., Zheng, Y. G., & Zhang, L. 2024, MNRAS, 527, 1794
+
+Article number, page 9 A&A proofs: manuscript no. main 
+
+Appendix A: Implementation 
+
+The proposed framework was implemented using PyTorch 2.x , leveraging the PyTorch Lightning wrapper to standard-ize training loops and ensure checkpointing e ffi ciency. Data ingestion and manipulation utilized the Pandas library, with the Fermi -LAT 4FGL-DR4 catalog stored in the Apache Par-quet columnar format to optimize I /O throughput during high-frequency data loading. 
+
+> A.1. Data Preprocessing and Input Encoding
+
+Prior to ingestion, numerical features were standardized using a StandardScaler (z = (x − μ)/σ ), with statistics ( μ, σ ) com-puted strictly on the training partition to prevent look-ahead bias. Given the sparse nature of high-energy astronomical catalogs, we employed a Dual-Channel Input Strategy to handle missing values and upper limits without information loss: 
+
+– Channel 1 (Features): Standardized numerical values, where missing entries are zero-filled. 
+
+– Channel 2 (Sensitivity Mask): A binary mask concatenated channel-wise, where 1 denotes a valid measurement and 0 indicates a missing value or upper limit. This explicitly al-lows the convolutional kernels to weigh feature significance based on instrumental sensitivity. 
+
+> A.2. Training Protocol and Optimization
+
+Optimization was performed using the Adam algorithm with an initial learning rate of η = 10 −3. We employed a
+
+ReduceLROnPlateau scheduler, decaying the learning rate by a factor of γ = 0.5 following 5 epochs of validation loss stag-nation. To further improve generalization and calibration, we applied Label Smoothing ( ϵ = 0.1) to the Cross-Entropy loss function. Training was conducted with a batch size of 100 for a maximum of 50 epochs. An Early Stopping mechanism was configured to terminate training if validation loss failed to im-prove for 10 consecutive epochs, restoring the model weights associated with the highest validation accuracy. 
+
+Appendix B: TabularResCNN Architecture 
+
+The TabularResCNN is a 1-Dimensional Residual Convolutional Neural Network specifically designed to process tabular data with missing values. Its architecture can be conceptually divided into three stages: Input Formatting, Residual Feature Extraction, and Classification. 
+
+> B.1. Input Formatting
+
+The model takes two separate input tensors of size 
+
+(Batch_Size, Num_Features) :
+
+– Values ( x): The continuous or categorical representations of the features. 
+
+– Mask ( mask ): A binary placeholder mask indicating whether a feature was originally missing. These are stacked along the channel dimension to form a 3D tensor of shape (Batch_Size, 2, Num_Features) , where the channels explicitly map the feature values and their presence. 
+
+> B.2. Residual Blocks (1D)
+
+The core feature extractor uses standard 1D Residual Blocks. Each block ensures gradient stability through a shortcut connec-tion (skip connection). A standard block consists of: 1. Conv1D (Kernel =3, Padding =1) → BatchNorm1D → ReLU 2. Conv1D (Kernel =3, Padding =1) → BatchNorm1D 3. Shortcut Addition → ReLU If spatial downsampling is required (stride =2) or the number of channels changes, the shortcut connection uses a 1 ×1 Conv1D followed by BatchNorm1D to match the dimensions. 
+
+> B.3. Global Average Pooling and Classification Head
+
+Following the residual stages, an Adaptive Global Average Pool-ing ( AdaptiveAvgPool1d ) collapses the spatial /feature dimen-sion to 1. This removes strict sensitivity to the exact column or-dering. The flattened tensor is then passed to a Multi-Layer Per-ceptron (MLP) for final classification. 
+
+> B.4. Architectural Summary Tables
+
+Table B.1 provides a layer-by-layer overview of the feature ex-traction backbone, while Table B.2 details the final fully con-nected classification head. 
+
+Appendix C: Statistical Validation Methodologies 
+
+To robustly validate the physical association between our ML-classified candidates and known ATNF PSRs, we must account for the extreme surface density of sources along the Galactic plane. Both methods described below utilize a rigorous spatial cross-match algorithm that accounts for the positional uncer-tainty of Fermi sources. Rather than using simple radial dis-tances, the Mahalanobis distance is computed by rotating the coordinates along the positional angle and scaling by the semi-major and semi-minor axes of the 68% containment error el-lipses ( σa,b ≈ Conf 68 /1.517). The association probability is then exactly solved assuming a 2D Gaussian profile ( P = e−∆2/2). 
+
+> C.1. Absolute Spatial Coincidence (Monte Carlo Analysis)
+
+Initially, we sought to demonstrate that the absolute number of associations between our ML candidates and ATNF PSRs sig-nificantly exceeded random spatial alignments. We employed a Monte Carlo approach, creating N ≥ 10 , 000 mock implementa-tions of the target population by randomizing their Galactic lon-gitude ( ℓ) while keeping their Galactic latitude ( b) intact, draw-ing from a Kernel Density Estimation (KDE) to preserve large-scale structures. However, the results of this Monte Carlo analysis proved in-conclusive. The underlying surface density of the ATNF catalog within the Galactic disk ( |b| < 5◦) is so high that any random-ized catalog confined to this region yields a massive number of chance coincidences. Consequently, evaluating the classification framework based purely on the absolute number of spatial cross-matches lacks discriminative statistical power, as the background noise of chance alignments overwhelms the signal. 
+
+> C.2. Pulsar Enrichment Analysis
+
+Given the limitations of absolute spatial matching in the dense Galactic plane, we shifted our statistical approach to evaluate                                                                          
+
+> Article number, page 10 C. Pozo González , et al: 1D-CNN to classify and analysis pulsars in Fermi -LAT Unassociated Sources
+> Table B.1. Macro Architecture Overview. Let Nbe the number of initial tabular features, and Cthe number of target classes.
+> Stage Layer /Module Out. Channels Out. Length Stride /Details Input Tensor Stacking 2NConcats value and mask mappings
+> Res 1 Residual Block 1 16 NKernel =3, Stride =1, Padding =1
+> Res 2 Residual Block 2 32 ≈N/2Kernel =3, Stride =2, Downsample =True
+> Res 3 Residual Block 3 64 ≈N/4Kernel =3, Stride =2, Downsample =True
+> Pool Global Average Pool 64 1Reduces length dimension to 1
+> Flatten Reshape /Flatten --Shape becomes (Batch, 64)
+> FC Head Linear Block C-See Table B.2 for details
+> Table B.2. Classification Head Details
+> Layer Type Input Size Output Size Parameters /Notes
+> fc.0 Linear 64 128 Fully connected layer
+> fc.1 ReLU 128 128 In-place activation
+> fc.2 Dropout 128 128 Probability p=0.5
+> fc.3 Linear 128 CFinal logits projection
+
+the relative predictive power of the model. We quantified the model’s e ff ectiveness by comparing the ATNF catalog associa-tion rate of our highest-confidence ML pulsar candidates against the baseline chance-association rate of the remaining unassoci-ated sources. To ensure a fair spatial comparison, we restricted our analy-sis to a bounding box containing the central 80% of the ATNF pulsar population (31 .2◦ ≤ ℓ ≤ 310 ◦ and −3.9◦ ≤ b ≤ 4.6◦). This spatial filter isolated 347 unassociated 4FGL-DR4 sources located in the most densely populated region of the Galactic disk. We compared the fraction of successful ATNF cross-matches within our high-confidence ML candidates ( PML > 0.95, N =
+
+114) against the baseline group of remaining unassociated sources ( N = 233). The baseline group exhibited a chance as-sociation rate of 7.73% (18 matches). In stark contrast, the ML-selected candidate group achieved an association rate of 26.32% (30 matches). This yields an enrichment factor of 3 .4, indicating that the model concentrates true PSRs more than three times better than a random spatial sampling of the exact same region. A Fisher’s Exact Test confirms that this enrichment is highly statistically significant, returning a p-value of p = 5.2×10 −6, which is equiv-alent to a 4 .4σ confidence level. This strong evidence ( > 3σ)conclusively proves that, despite the overwhelming background density of the Galactic plane, the TabularResCNN actively and successfully isolates the intrinsic spectral and temporal signa-tures of PSRs. 
+
+Appendix D: Observational efficiency and the random selection baseline 
+
+To evaluate the operational impact of our CNN classification model on observational follow-up campaigns, we employ ob-servational e ffi ciency curves (analogous to lift or gain curves in the machine learning literature). In these representations, we benchmark the prioritization performance of our neural network against a control scenario denoted as random selection. 
+
+D.1. Mathematical definition of random selection 
+
+The random selection curve represents the expected discovery yield if telescope time were allocated to sources from the Fermi -LAT unassociated catalog entirely at random, essentially sim-ulating a blind survey with no prior spectral or morphological knowledge. Mathematically, let N be the total number of candidate sources in the catalog and Ntarget be the true number of sources belonging to the class of interest (e.g., PSRs and MSPs). The prior probability (or prevalence), p, of identifying the target class by pure chance is given by 
+
+p = Ntarget 
+
+N . (D.1) Given an observational budget that permits targeting a subset of K candidates, the expected number of successful discoveries under random selection, E[Drand ], follows a hypergeometric dis-tribution whose expected value is well approximated by a linear function: 
+
+E[Drand ]( K) = K · p. (D.2) This equation describes the linear baseline (labeled as random selection in our figures) whose slope is exactly the prevalence of the target class within the dataset. 
+
+D.2. Quantifying observational gain 
+
+The primary rationale for including this baseline is to strictly quantify the operational advantage provided by the deep learn-ing model over a naive approach. We define the observational gain (or lift ) metric at a specific follow-up cuto ff K as the ratio between the true discoveries achieved by the CNN (when sort-ing sources by their predicted probability in descending order), 
+
+DCNN (K), and the discoveries expected by chance: Lift( K) = DCNN (K)
+
+E[Drand ]( K) . (D.3) 
+
+D.3. Physical and operational implications 
+
+As demonstrated in our results, for restrictive observational thresholds (e.g., K = 50 targeted pointings), the CNN model yields a lift nearly an order of magnitude higher than random selection for the PSRs class. Physically, this implies that prioritizing targets based on the 
+
+PPSRs probability, extracted from underlying gamma-ray spatial and spectral signatures, rather than conducting unbiased catalog 
+
+> Article number, page 11
+
+A&A proofs: manuscript no. main 0.0 0.2 0.4 0.6 0.8 1.0 
+
+Probability Threshold (PSRs) 
+
+> 0
+> 10
+> 20
+> 30
+> 40
+> 50
+> 60
+> 70
+> Expected True PSRs Found
+> Expected Yield
+> Max Theoretical Yield
+> Random Selection
+> Optimal Cut (0.98) 0.0 0.2 0.4 0.6 0.8 1.0
+
+Probability Threshold (AGNs) 
+
+> 0
+> 100
+> 200
+> 300
+> 400
+> 500
+> Expected True AGNs Found
+> Expected Yield
+> Max Theoretical Yield
+> Random Selection
+> Optimal Cut (0.91)
+
+Fig. D.1. Observational e ffi ciency (expected yield) as a function of the sweeping probability threshold for the unassociated Fermi -LAT dataset. The solid purple line represents the model’s expected discovery yield, the grey dashed line illustrates the theoretical maximum yield of the dataset, and the dotted orange line represents the baseline random se-lection. The vertical dashed black lines mark our physically motivated operational cuts: PPS Rs = 0.96 and PAGN s = 0.86. 
+
+samplings, reduces the radio telescope integration time wasted on false positives (such as galactic background fluctuations or unresolved AGNs) by a factor equivalent to the lift. Conse-quently, the regime where the deviation between the model’s yield curve and the random selection baseline is maximized de-fines the most cost-e ff ective strategy for allocating resources in future follow-up campaigns. To visualize this operational advantage directly onto the de-cision boundaries applied in Section 4, Figure D.1 presents the expected discovery yield as a continuous function of the proba-bility threshold for both the PSRs and AGNs classes. Reading the x-axis from right to left (from P = 0.0 to strict confidence at P = 1.0), the curves illustrate the accumulation of true candidates. For the AGNs class (Figure D.1 Botton panel), the expected yield closely traces the maximum theoretical yield even at exceptionally high thresholds. This confirms the high separability of extragalactic sources, justifying our strict opera-10 11 10 10 10 9 10 8 10 7 10 6      
+
+> Flux >1 GeV [ph cm 2s1]
+> 0.0
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> 3.5
+> Density
+> 1e9
+> All Fermi sources (N=7195)
+> Unassociated sources (N=2423)
+> Predicted Pulsars (P 0.97) (N=202)
+> 3PC Known Pulsars (N=320)
+
+Fig. E.1. Density distribution of the gamma-ray flux ( > 1 GeV) for di ff erent source populations within the Fermi -LAT catalog. The his-togram compares all Fermi sources (green, N = 7195), unassociated sources (grey, N = 2423), our high-confidence predicted pulsar sam-ple ( P ≥ 0.97, red, N = 202), and known PSRs from the 3PC catalog (hatched purple, N = 320). The predicted candidates generally exhibit higher fluxes than the bulk of the unassociated sources, closely match-ing the typical flux distribution of confirmed 3PC PSRs. 
+
+tional cut at PAGN s = 0.86 to guarantee maximum purity without sacrificing completeness. Conversely, the PSRs curve (Figure D.1 Upper panel) demonstrates the inherent di ffi culty of isolating faint PSRs from the Galactic background. While the model achieves a massive lift over random selection across all thresholds, enforcing a stan-dard 0 .5 threshold would capture a high volume of candidates at the cost of a severely diluted observational e ffi ciency (as the curve flattens significantly past 0 .8). The selected optimal cut of PPS Rs = 0.96 (vertical dashed line) is strategically positioned near the knee of the e ffi ciency curve. This ensures that the gener-ated catalog captures the most confident pulsar candidates before the expected yield begins to plateau, thereby maximizing the re-turn on investment for subsequent radio telescope time. 
+
+Appendix E: PSRs flux distribution 
+
+As shown in the flux distribution (Figure E), our high-confidence sample of predicted PSRs exhibits relatively high gamma-ray fluxes, comparable to those of known 3PC PSRs and signif-icantly brighter than the bulk of unassociated Fermi sources. Given that these candidates do not su ff er from low photon statis-tics, the lack of detected pulsations by Fermi -LAT is unlikely to be an observational limitation due to low flux. Instead, this sug-gests that the absence of observed pulsed emission is driven by intrinsic properties of the sources themselves. 
+
+Article number, page 12
