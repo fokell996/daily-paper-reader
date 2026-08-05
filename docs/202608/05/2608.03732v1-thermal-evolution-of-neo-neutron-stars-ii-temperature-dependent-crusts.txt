@@ -1,0 +1,555 @@
+Title: Thermal evolution of neo-neutron stars. II. Temperature-dependent crusts
+
+URL Source: https://arxiv.org/pdf/2608.03732v1
+
+Published Time: Wed, 05 Aug 2026 01:27:04 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+Astronomy & Astrophysics manuscript no. Neo_NSs_AA ©ESO 2026 August 5, 2026 
+
+# Thermal evolution of neo-neutron stars. 
+
+# II. Temperature-dependent crusts 
+
+Sagnik Chatterjee 1, Mikhail V. Beznogov 1★, Dany Page 2, and Adriana R. Raduta 1 
+
+> 1
+
+National Institute for Physics and Nuclear Engineering (IFIN-HH), RO-077125 Bucharest, Romania  
+
+> 2
+
+Instituto de Astronomía, Universidad Nacional Autónoma de México, Ciudad de México, CDMX 04510, Mexico August 5, 2026  
+
+> ABSTRACT
+> Context.
+
+The neo-neutron star phase is an intermediate stage in the evolution from a hot lepton-rich compact object, which is formed in the aftermath of a core-collapse supernova or an accretion-induced collapse of a white dwarf, to a cold deleptonized neutron star (NS). Alternatively, this phase can occur after a binary NS merger if the final compact object does not collapse immediately into a black hole. Radial temperature profiles provided by numerical simulations of proto-NS evolution suggest that the composition and mechanical structure of the star’s core at the beginning of the neo-NS phase are, as a good approximation, identical to those of a cold NS. In contrast, the composition and mechanical structure of the outer layers (i.e., the crust) are expected to change as the star cools. The thermal evolution of neo-NSs with temperature-dependent (inner) envelopes was considered by Beznogov et al. (2020).  
+
+> Aims.
+
+Here, we investigated what happens if the equation of state (EoS) of the entire crust, including its composition, depends on temperature.  
+
+> Methods.
+
+We analyzed the thermal, mechanical, and chemical evolution of neo-NSs by further developing and employing neo-NSCool ,our NS thermal evolution code.  
+
+> Results.
+
+First, we proved that thermally dripped neutrons slightly slow down the cooling during the early thermal relaxation stage. Then, we showed that the EoSs with exotic light species in the deepest layers of the crust result in significantly slower cooling in the photon cooling era compared with the EoSs that favor massive nuclei. The crust’s composition also impacts the crystallization process as well as the way in which the crust contracts while it cools. The EoSs with light nuclei cause the innermost layers to remain liquid for a longer time than the EoSs with heavy nuclei.  
+
+> Key words.
+
+stars: neutron – dense matter – equation of state 
+
+1. Introduction 
+
+Neutron stars (NSs) are among the densest objects in the Universe. They correspond to the last stage in the evolution of core-collapse supernovae (CCSN; Baade & Zwicky 1934), accretion-induced collapses of white dwarfs (WDs; Canal & Schatzman 1976) or binary NS mergers ( Kluźniak & Ruderman 1998). In either of these scenarios, the precursor of what will become a NS is a hot, potentially lepton-rich, and potentially fast-rotating object, with convoluted radial profiles of density, temperature, entropy, lepton fraction, etc., all of which are strongly dependent on the characteristics of the progenitor star, microphysics and, in the case of mergers, details of the orbital dynamics in the inspiral phase. The evolution from a proto-neutron star (PNS), which is a central compact object left after the core of a collapsing mas-sive star had reached suprasaturation densities and bounced, to a cold deleptonized NS is relatively well understood ( Prakash et al. 1997; Pons et al. 1999; Pascal et al. 2022). It basically consists of three stages. The first stage corresponds to the fast contraction of the PNS from about 150 km in radius to about 20 km, due to neutrino leakage from the low-density outer layers that are thus deprived of pressure support. The next stage is characterized by neutrino diffusion from the central region of the star to the outer shells, which results in core heating and deleptonization. The third stage corresponds to the overall cooling of the PNS;  
+
+> ★
+
+Corresponding author: mikhail.beznogov@nipne.ro 
+
+during this epoch, both the entropy and its gradient steadily decrease. The later two stages are estimated to last for a few tens of seconds ( Pascal et al. 2022) or for several tens of sec-onds ( Pons et al. 1999), depending on whether convection, which allows for efficient heat and neutrino transport from the inner regions to the neutrinosphere ( Pascal et al. 2022), is accounted for. The numerical simulations of PNS evolution in ( Pons et al. 1999) end when the PNS has a radial profile of temperature that decreases from ∼ 5 MeV in the core to ∼ 1 MeV in the outer shells and is transparent to neutrinos. Had these simulations continued, the PNS would have cooled further, shrunk, and approached the cold catalyzed NS phase. The thermal properties of middle-aged ( 10 2 − 10 6 yr) iso-lated NSs are rather well known, too. This is due to both the availability of thermal surface emission data for two dozen stars and an array of dedicated numerical simulations ( Schaab et al. 1998; Yakovlev et al. 1999; Gnedin et al. 2001; Page et al. 2004; Yakovlev & Pethick 2004; Page et al. 2009; Tsuruta et al. 2009; Beznogov & Yakovlev 2015a,b). For a compilation of observa-tional data, see ( Potekhin et al. 2020). It was established that, once the star is thermally relaxed and for ∼ 10 5 yr, the sur-face temperature is mainly determined by the neutrino emis-sion from the core, which is intimately linked to the compo-sition of dense matter and superfluidity properties of various fermionic species. As such, studies of NS thermal evolution have the potential to reveal dense matter information comple-
+
+Article number, page 1 arXiv:2608.03732v1 [astro-ph.HE] 4 Aug 2026 A&A proofs: manuscript no. Neo_NSs_AA 
+
+mentary to that extracted from measurements of maximum NS masses ( Antoniadis et al. 2013; Cromartie et al. 2020), radii of NSs with masses 1.04 ≲ 𝑀 /𝑀 ⊙ ≲ 2.08 (Salmi et al. 2022, 2024; Vinciguerra et al. 2024; Miller et al. 2026), and tidal deformabil-ity from the GW170817 event ( Abbott et al. 2017), all of which probe only the mechanical structure, but not the composition. Numerical simulations of long-term thermal evolutions, in-cluding those cited in the paragraph before, consider that NSs’ mechanical structure and composition correspond to those at zero temperature. Considering that for 𝑡 ≳ 0.3 yr, the local temperature does not exceed ≈ 0.2 MeV, this approximation is very good. As soon as one aims to address earlier instances, when the NS temperature is of the order of 1 − 2 MeV, the fixed structure and fixed composition approximations become questionable. In the first place, finite temperatures increase the pressure in the low-density part of the equation of state (EoS), which translates into EoS softening and results in crusts that are thicker than those at 𝑇 = 0. Furthermore, the high temperature sensitivity of the elec-tron chemical potential means that the beta-equilibrium at finite temperature is achieved for values of the proton fraction other than those at zero temperature. It is clear that the neo-NS phase, which begins when the PNS becomes transparent to neutrinos, i.e., after 
+
+≈ 30 − 60 s after the core bounce, requires improved treatment. A first step in this direction was achieved in ( Beznogov et al. 2020), hereafter dubbed Paper I. In that paper, the authors allowed the (inner) envelope, which at 𝑡 = 0 corresponds to the density domain 10 5 ≤ 𝜌 ≤ 10 11 g/cm 3, to shrink while the NS cools down. They examined how long the star can sustain Eddington luminosity, how its inner envelope evolves with time, and, among other things, how the initial surface luminosity affects the star’s contraction. The aim of this paper is to further develop the treatment of neo-NSs that contract as they cool down. In addition to what was done in Paper I, we now also allow for temperature effects in the entire crust up to the crust-core transition. Here, we consider only the case of nucleonic NSs with 𝑀 = 1.4 𝑀 ⊙ . The remainder of the paper has the following structure. In Sec. 2, we review the formalism. The initial luminosity profiles and the computer code used for numerical simulations are presented in Sec. 3. Section 4 is devoted to crust models. Results on the thermal evolution, contraction of cooling NSs and crystallization of the crust are offered in Sec. 5. In Sec. 6, we draw the conclusions. 
+
+2. Formalism 
+
+In this paper, we assume that NSs are spherically symmetric and ignore rotation, magnetic fields, and accretion. For thermal evolution simulations, we employ the formalism proposed in (Potekhin & Chabrier 2018) and in Paper I. In the following, we provide a very basic description and refer the interested reader to the original publications. Thermal evolution is described by two equations 
+
+e𝐿 = −𝐾 (4𝜋𝑟 2)𝑛𝑒 𝜙 𝜕 e𝑇 𝜕𝑎 , (1) 
+
+𝑒 𝜙 𝜕 (e𝑇 𝑒 − 𝜙 )
+
+𝜕𝑡 = − 1
+
+𝐶 V
+
+( e𝑄 L + e𝑄 𝜈 + e𝑄 V), (2) where e𝐿 = 𝐿𝑒 2𝜙 and e𝑇 = 𝑇 𝑒 𝜙 are the red-shifted luminosity and temperature; 𝑒 2𝜙 is the time component of the metric; 𝑛 is the baryon number density; 𝐶 V and 𝐾 stand for heat capacity and thermal conductivity, respectively; 𝑟 and 𝑎 represent the circumferential radius of the star and the enclosed baryonic number; e𝑄 L, e𝑄 𝜈 , and e𝑄 V denote the heat lost (or gained) due to luminosity gradients, neutrino energy loss, and contraction energy, respectively; 𝑡 is the time. Since in our simulations the star structure evolves in time, we employ the enclosed baryonic number as an independent Lagrange radial variable. At the center of the star, the luminosity, radius, enclosed baryonic number, and enclosed gravitational mass vanish by definition. The equilibrium configuration of an NS is determined by the value of pressure at the center. The surface of the star corresponds to the photosphere ( Hansen et al. 2004). Surface luminosity ( 𝐿 s) and temperature ( 𝑇 s) are related by 
+
+𝐿 s = 4𝜋𝜎 SB 𝑅 2𝑇 4s , (3) where 𝑅 stands for the radius of the star and 𝜎 SB is the Stefan-Boltzmann constant. The pressure on the surface ( 𝑃 s) is related to 𝐿 s by means of the Eddington (photospheric) condition (Hansen et al. 2004): 
+
+𝑃 s = 23
+
+𝑔 s
+
+𝜅 s
+
+
+
+1 + 𝐿 s
+
+𝐿 Edd 
+
+
+
+, 𝐿 Edd = 4𝜋𝐺 𝑀𝑒 𝜆 
+
+𝜅 s
+
+, (4) where 𝑔 s = 𝑒 𝜆 𝐺 𝑀 /𝑅 2 is the surface free-fall acceleration ( 𝐺 
+
+is the gravitational constant, 𝑀 is the total gravitational mass of the star, and 𝑒 2𝜆 is the radial component of the metric), 𝜅 𝑠 
+
+represents the Rosseland mean opacity on the surface, and 𝐿 Edd 
+
+is the surface Eddington luminosity. On the surface of the star, 
+
+𝑒 𝜙 (𝑅 ) = 𝑒 −𝜆 (𝑅 ) =√︁ 1 − 2𝐺 𝑀 /𝑅𝑐 2, where 𝑐 is the speed of light in vacuum. The outermost layers of the NS constitute its envelope, which goes from the star’s surface to a bottom layer characterized by some pressure 𝑃 b and a corresponding density 𝜌 b. As in Paper I, we assume that the NS envelope consists of pure iron and fix the value of 𝜌 b at 𝑡 = 0 to 10 5 g/cm 3. However, as the star cools and shrinks, 𝜌 b will increase. The thickness of the envelope is of the order of a few hundred meters or less. The thermal relaxation timescale of this layer is much shorter than the cooling timescale of the interior, which allows us to treat it separately and in a time-independent way; see Paper I for more details. The temperatures at the bottom of the envelope and on its surface are related by the “ 𝑇 s-𝑇 b” relation ( Gudmundsson et al. 1982; Beznogov et al. 2021): 
+
+𝑇 s (𝑇 b, 𝑔 𝑠, 14 ) = 𝑔 1/4
+
+> 𝑠, 14
+
+𝑇 s (𝑇 b, 𝑔 𝑠, 14 = 1), (5) with 𝑔 s,14 = 𝑔 s/( 10 14 cm s −2). As in Paper I, we assume that there are no heat sources or sinks in the envelope and, consequently, the energy flux through it is constant (i.e., 𝐿 s = 𝐿 b). Hereafter, we adopt the common nomenclature, where the outflowing luminosity is written in terms of an effective tem-perature 𝑇 eff as 𝐿 = 4𝜋𝜎 SB 𝑅 2𝑇 4eff , with redshifted quantities as 
+
+𝐿 ∞ = 𝑒 2𝜙 𝐿 = e𝐿 s, 𝑇 ∞ 
+
+> eff
+
+= 𝑒 𝜙 𝑇 eff , and 𝑅 ∞ = 𝑒 − 𝜙 𝑅 ; for our study we have 𝑇 eff = 𝑇 s.Finally, a note on the naming conventions is necessary to avoid misunderstanding. In Paper I, the region with density 
+
+𝜌 < 10 5 g/cm 3 was referred to as the “outer envelope”, the region 
+
+10 5 < 𝜌 [g/cm 3] < 10 11 was referred to as the “inner envelope”, and the regions with 𝜌 > 10 11 g/cm 3 were referred to as the “crust”, “inner crust” and “core”, depending on the density. Here, we will refer to the region with 𝜌 < 10 5 g/cm 3 as the “(outer) envelope”, the region with 10 5 < 𝜌 [g/cm 3] < 4 × 10 11 as the “outer crust”, and the region with 4 × 10 11 g/cm 3 < 𝜌 < 𝜌 cc as the “inner crust”, where 𝜌 cc represents the crust-core transition density; its typical value is ≈ 1.7 × 10 14 g/cm 3. From a calculation point of view, the boundary between the envelope and the outer crust is the surface of the star. 
+
+> Article number, page 2 Chatterjee et al.: Thermal evolution of neo-neutron stars
+
+3. Setup 
+
+In this paper, we focus on the thermal evolution of isolated, non-rotating NSs with 𝑀 𝐺 = 1.4 𝑀 ⊙ , whose hadronic sector consists of neutrons and protons. We prefer the canonical mass for several reasons. First, it allows us to neglect the direct Urca processes, which are the most efficient cooling mechanisms and whose threshold density ( 𝑛 DU ) is highly uncertain. Indeed, state-of-the-art investigations of the EoS of dense matter fail to constrain 𝑛 DU despite employing phenomenological nuclear energy density functionals, Bayesian statistics and a wide array of nuclear and astrophysical constraints ( Beznogov & Raduta 2023, 2024b,a; Cartaxo et al. 2026). This situation stems from the scarcity of nuclear experimental information on neutron-rich dense matter, poorly understood sensitivities of astrophysical data to the behavior of dense isospin asymmetric matter, and the unknown composition of dense matter with densities of the order of a few 𝑛 sat , the latter being linked to the high density behavior of the nuclear symmetry energy. 𝑛 sat ≈ 0.16 fm −3 ≈ 2 × 10 14 g/cm 3
+
+represents the nuclear saturation density. Statistical analyses of the thermal evolution of isolated and especially accreting NSs support the hypothesis that the direct Urca processes should operate in sufficiently massive NSs (with masses exceeding the canonical mass; see ( Beznogov & Yakovlev 2015b)). Second, a moderate compactness prevents excessive compression of the crust and, thus, maximizes temperature-induced variations. Finally, it allows a straightforward comparison with the results of Paper I, which used the same 𝑀 𝐺 = 1.4 𝑀 ⊙ . In the following, we discuss the initial profiles of luminosity and temperature and the basic features of the computer code we employ. 
+
+> 3.1. Initial profiles of local luminosity and temperature
+
+The neo-NS phase being the intermediate phase in the evolution from a hot lepton-rich PNS to a cold deleptonized NS, it is natural to assume that the local temperature profiles at the beginning of the neo-NS phase coincide with the local temperature profiles at the end of the PNS phase. Numerical simulations of PNS evolu-tion ( Pons et al. 1999; Pascal et al. 2022) show that these profiles depend on the progenitor mass and a series of microphysics ingredients, e.g., neutrino interactions and EoS; simulation tech-nicalities, e.g., neutrino transport. Moreover, PNS calculations usually do not go far into the outer layers of the star; frequently the data is plotted as a function of the enclosed baryonic mass. In this case, the thermal profiles of the crust cannot be extracted as the crust contains a negligible amount of mass compared to the core. Thus, in the absence of necessary “starting” data, we model the initial configuration of the neo-NS by means of arbitrary schematic luminosity profiles A, B, and C, depicted in Fig. 1 (top panel). In all cases, the maximum local luminosity corresponds to the bottom of the envelope and is the same as the surface luminosity. For case A, the local luminosity at the surface is 
+
+≈ 75 % of the Eddington luminosity. Ideally, we would have preferred to start with the Eddington luminosity on the surface, as in Paper I, but unfortunately we were unable to make our code converge for surface luminosities exceeding 75% of the Eddington limit. For the same reason, profile A has a sharp decrease in luminosity starting at 10 7 g/cm 3. In two other cases (B and C), the local luminosity at the surface is much lower. Complementary information is provided in the bottom panel in terms of the initial local temperature profiles that correspond to the initial luminosity profiles A, B, and C and to various considered EoSs of the crust; for the latter, see Sect. 4. The 𝑇 0-profiles are obtained by solving an equation similar to Eq. (1) , which depends 6 8 10 12 14 
+
+## log ρ [g cm −3]
+
+0.51.01.52.02.53.03.54.0
+
+> L0 [erg s −1]
+
+×10 38  
+
+> Drip Outer Crust Inner Crust
+> ABC
+
+6 8 10 12 14 
+
+## log ρ [g cm −3]
+
+8.89.09.29.49.69.810 .010 .210 .4
+
+> log  T0[K]
+> AABC
+> Drip Outer Crust Inner Crust
+
+RB RB 0
+
+SRO SRO 0   
+
+> Fig. 1. Radial profiles of initial ( 𝑡 =0) local luminosity (top panel) and local temperature (bottom panel) as functions of density. Outer and inner crusts are indicated by background colors. The drip density, marked by a vertical line, corresponds to the cold HZD EoS (Haensel et al. 1989).
+
+on the thermal conductivity and mechanical structure. SRO 0 leads to slightly higher temperatures in the inner crust compared to SRO, suggesting that the former model has lower thermal conductivity than the latter. The difference between RB 0 and RB is more important, indicating more substantial differences among their thermal conductivities. As we shall detail in Sec. 4, SRO 0 and SRO (RB 0 and RB) use the same 𝑃 (𝜌, 𝑇 ) relation but differ in the composition of the crust. For all cases, the deep layers are warmer than the shallow ones, and higher luminosities get translated into higher temperatures. Also, had the high-luminosity plateaus of              
+
+> Article number, page 3 A&A proofs: manuscript no. Neo_NSs_AA
+> Table 1. EoS models for the crust composition in 𝛽 -equilibrium. The names are specified on col. 1, underlying effective interactions on col. 2, and temperatures at which the composition was computed on col. 3.
+> 𝑎 (Raduta & Beznogov 2025); 𝑏 (Schneider et al. 2019); 𝑐 (Akmal et al. 1998).
+
+Model Effective interaction Composition 
+
+RB 0 𝑎 BBSk1 𝑎 𝑇 = 0.1 MeV 
+
+RB 𝑎 BBSk1 𝑎 𝑇 (𝜌 )
+
+SRO 0𝑏 APR 𝑐 𝑇 = 0.1 MeV 
+
+SRO 𝑏 APR 𝑐 𝑇 (𝜌 )
+
+cases A and B been more extended, higher temperatures would have been obtained in the inner crust. We fixed the initial core temperature to the value obtained at the crust-core boundary. 
+
+> 3.2. Extension of NSCool
+
+We simulate the thermal evolution of NSs using an extension of the NS cooling code NSCool ( Page 2016; Beznogov et al. 2020). In addition to what was done in Paper I, here we evolve the entire crust over time, taking into account the temperature dependence of its mechanical structure and composition. Similarly to Paper I, this is done by solving the Tolman-Oppenheimer-Volkoff equations in the crust at each timestep in addition to the thermal evolution equations (1) and (2) . As in Paper I, only the thermal evolution equations are solved in the core. In both the core and the crust, we allow for all microphysics pro-cesses implemented in the standard version of NSCool ( Page et al. 2009) except for the heat capacity of the crust, which is discussed in Sect. 4.2. For the (outer) envelope, we employ the model described in Paper I. Neutron and proton pairing is disregarded throughout the star. 
+
+4. Models for Equation of State 
+
+In the following, we consider the term “EoS” in a generic sense, i.e., referring both to 𝑃 (𝜌, 𝑇 ) dependence and to the composition of matter at density 𝜌 and temperature 𝑇 .In all cases, for the NS core we use the zero-temperature APR EoS ( Akmal et al. 1998). Employment of a cold EoS for the core is not an issue as in the core the thermal energy at the considered temperatures of 1-2 MeV is negligible with respect to the Fermi energy. For the NS crust, we alternatively use the EoSs by Schneider et al. (2019) (hereafter dubbed SRO) and Raduta & Beznogov (2025) (hereafter dubbed RB). For 𝑇 ≥ 𝑇 lim ,the EoS information is extracted from the general purpose tables publicly available on the CompOSE online repository 1(Typel et al. 2022). 𝑇 lim denotes the minimum temperature for which the data exist in the CompOSE tables. For both SRO and RB, 𝑇 lim =
+
+0.1 MeV. For 𝑇 < 𝑇 lim and 𝜌 < 10 11 g/cm 3, we employ the 
+
+𝑃 (𝜌, 𝑇 ) dependence from ( Potekhin & Chabrier 2010) and the composition from the corresponding general purpose EoS taken at 𝑇 lim . For 𝑇 < 𝑇 lim and 𝜌 ≥ 10 11 g/cm 3, we use values from the corresponding general purpose EoS taken at 𝑇 lim both for the composition and for the 𝑃 (𝜌, 𝑇 ) dependence, which, obviously, becomes 𝑃 (𝜌, 𝑇 = 𝑇 lim ) dependence. In other words, we consider that for 𝑇 < 𝑇 lim and 𝜌 ≥ 10 11 g/cm 3 the temperature dependence of an EoS can be completely ignored.  
+
+> 1https://compose.obspm.fr/
+
+For densities lower than the crust-core transition density and temperatures lower than a few MeV, SRO and RB provide very similar 𝑃 (𝜌, 𝑇 )-relations in spite of differences in modeling and the underlying effective interaction ( Burrows & Lattimer 1984). In contrast with this, the crust composition is very model-dependent. In the first place, these differences arise from the pool of nuclei allowed by each model. As such, Schneider et al. (2019), who rely on the liquid drop approximation for the nuclear mass, predict that, at densities slightly lower than the crust-core transition density, the crust is made of extremely massive and neutron-rich nuclei, while Raduta & Beznogov (2025), who use experimental and/or evaluated nuclear masses, favor less massive nuclei with limited isospin asymmetry. Differences in composition arise also from the way in which nucleonic pairing and shell effects are implemented in the nuclear masses, but these effects are subdominant and rapidly washed out at finite temperature. In the crust, finite temperature effects modify both 𝑃 (𝜌 )-relations and the composition. For a given temperature, thermal effects increase with matter diluteness and are more important for pressure than for energy density ( Raduta et al. 2021). Also, the strong temperature dependence of the electron chemical potential entails a non-negligible modification of the proton fraction of the 
+
+𝛽 -equilibrated matter. The most notable model dependence of crust composition at finite temperature manifests whenever exotic light species are included in the nuclear pool. An example in this sense is provided in ( Beznogov & Raduta 2026), which used the RB EoS, and where the deep layers of the inner crust appear to be made of 14 He. Though it remains to demonstrate to what extent such species survive in-medium effects, it is easy to understand that they will modify the thermal properties of the crust and its crystallization. The latter aspect will be addressed in Sec. 5.3. The recipes used to portray the composition of the crust are listed in Table 1. The comparison between the cooling simulations that account for the temperature effects on the crust composition (models RB and SRO) is meant to highlight the composition dependence, including the role of exotic light species. Further comparison with the results of simulations with fixed crust com-position (models RB 0 and SRO 0) aims to gauge the importance of the “real-time” modifications of the composition. 
+
+> 4.1. Crust composition
+
+Figure 2 illustrates the composition of the crust at the initial time ( 𝑡 = 0) in terms of average mass number ⟨𝐴 ⟩ (top panel) and average charge number ⟨𝑍 ⟩ (bottom panel) as functions of density for the models listed in Table 1. For RB and SRO, we employ the profile A of the initial temperature; for RB 0 and SRO 0 this is irrelevant as the composition is fixed to the one at 𝑇 lim = 0.1 MeV. In the outermost shells, RB, which uses experimental ( Wang et al. 2021) and evaluated ( Duflo & Zuker 1995) nuclear masses and whose nuclear species distribution is reduced to a single nucleus ( Raduta & Beznogov 2025), predicts 
+
+> 56
+
+Fe. In contrast, SRO, which uses a liquid drop parametrization, favors 62 Fe. As the density increases, the results of RB 0 and SRO 0
+
+diverge. Also and especially for RB and RB 0, where the averages are computed over an increasingly wide distribution of species, 
+
+⟨𝐴 ⟩ and ⟨𝑍 ⟩ cease to be representative for any physical species. The reason why we consider these quantities here is that they enter 
+
+NSCool subroutines. The absence of restrictions on nuclear masses means that in SRO 0, deeper shells accommodate more massive nuclei than shallow shells. For RB 0, closed-shell features are so strong that, over two density domains, ⟨𝐴 ⟩ and ⟨𝑍 ⟩ decrease with 
+
+𝜌 . Before the crust-core transition, kinetic energy contributions present in RB 0 even at temperatures as low as 𝑇 = 0.1 MeV are 
+
+> Article number, page 4 Chatterjee et al.: Thermal evolution of neo-neutron stars
+
+6 8 10 12 14 log ρ [g cm −3]020 40 60 80 100 120 
+
+> 〈A〉
+> Drip Outer Crust Inner Crust
+
+RB; T A(ρ, t = 0) RB 0
+
+SRO; T A(ρ, t = 0) SRO 06 8 10 12 14 log ρ [g cm −3]0510 15 20 25 30 35 40 45  
+
+> 〈Z〉
+> Drip Outer Crust Inner Crust
+
+RB; T A(ρ, t = 0) RB 0
+
+SRO; T A(ρ, t = 0) SRO 0 
+
+> Fig. 2. Composition of the neo-NS crust in terms of the average mass (top panel) and charge (bottom panel) numbers as functions of density at the initial moment of time. For the theoretical approaches and profiles of local temperature, see Table 1.
+
+responsible for the replacement of heavy nuclei by the exotic 
+
+> 14
+
+He ( Beznogov & Raduta 2026). For 𝜌 ≲ 10 7 g/cm 3, SRO and RB provide the same compositions as SRO 0 and RB 0, respectively. Over 10 7 ≲ 𝜌 [g/cm 3] ≲ 10 12 , SRO and RB predict similar values of ⟨𝐴 ⟩ and a non-monotonic density dependence. The decreasing behavior over 10 7 ≲ 𝜌 [g/cm 3] ≲ 10 9 is due to the onset of other nuclear species: 4He and a distribution of light clusters for SRO and RB, respectively. Population of these new species also explains why ⟨𝐴 ⟩( 𝑇 ) < ⟨𝐴 ⟩( 𝑇 = 0.1 MeV ). As for 𝑇 = 0.1 MeV and for the same reason, the inner crust of RB is made of light species. Finally, nuclear structure effects are washed out at finite temperatures. 10 12 14 log ρ [g cm −3]
+
+−2.00 
+
+−1.75 
+
+−1.50 
+
+−1.25 
+
+−1.00 
+
+−0.75 
+
+−0.50 
+
+−0.25 0.00 log X n   
+
+> Drip Inner Crust Outer Crust
+> RB; T A(ρ, t = 0) RB 0
+> SRO; T A(ρ, t = 0) SRO 0
+> Fig. 3. Mass fractions of unbound neutrons in the neo-NS crust as a function of density at the initial moment of time. For theoretical approaches and profiles of local temperature, see Table 1.
+
+Complementary information is provided in Fig. 3 in terms of the mass fraction of unbound neutrons as a function of density at 𝑡 = 0. Differences in effective interactions and nuclear masses explain why 𝑋 n slightly differs for SRO 0 (SRO) with respect to RB 0 (RB). Also, 𝑋 n increases with temperature. Notice that, at finite temperature, unbound neutrons exist at densities orders of magnitude lower than the “classical” neutron drip density at 𝑇 = 0. As such, illustration of the drip density in Figs. 2, 3, 4, and 5 serves as a reference only. Also, we refer to unbound neutrons as dripped neutrons without assuming that the density where these neutrons exist corresponds to the density domain of the inner crust at 𝑇 = 0. To emphasize this, we will refer to the unbound neutrons present specifically in the outer crust as “thermally dripped” neutrons. Notice that the thermal drip of protons is also possible, but in our models it was completely negligible. 
+
+4.2. Specific heat 
+
+Equation (2) shows that the thermal evolution of as NS depends on its specific heat capacity at constant volume ( 𝐶 V). As such, in Fig. 4, we investigate the temperature and density dependence of this quantity. Various EoS models and temperature profiles are considered. For 𝑇 ≥ 𝑇 lim , 𝐶 V is extracted from the CompOSE 
+
+data by running the CompOSE software, which performs numerical differentiation of the total energy density. In this way, contributions from nuclei (via nuclear masses and their kinetic energy as well as excitation spectra), unbound nucleons, electrons, positrons, and photons are implicitly accounted for. For lower temperatures, we compute 𝐶 V using “native” subroutines of NSCool , which include contributions from ions (defined in terms of ⟨𝐴 ⟩ and ⟨𝑍 ⟩), degenerate neutrons and electrons, under the assumption that the composition is identical to the one at 𝑇 lim . For a fixed temperature, 
+
+log 𝐶 V (log 𝜌 ) has a complex structure. For 𝑇 = 1.16 × 10 8 K, the bump that extends over 10 13 g/cm 3 ≲ 𝜌 ≤ 𝜌 cc is due to the onset of 14 He. For 𝑇 = 1.16 × 10 10 K and 𝜌 ≲ 10 7.5 g/cm 3, log 𝐶 V is flat. 
+
+> Article number, page 5
+
+A&A proofs: manuscript no. Neo_NSs_AA 6 8 10 12 14 
+
+## log ρ [g cm −3]          
+
+> 14 16 18 20
+> log  CV [erg K −1 cm −3]
+> Drip Outer Crust Inner Crust
+> RB; T = 1.16 ×10 10 KRB; T = 1.16 ×10 8KRB; T A(ρ, t = 0) SRO; T A(ρ, t = 0)
+
+Fig. 4. Profiles of specific heat capacity at constant volume as a function of density for different EoS models and temperature profiles, as indicated in the legend. 
+
+This behavior comes from the photon gas and electron-positron pair contributions. Results of RB and SRO corresponding to the 
+
+𝑇 𝐴 (𝜌 )-profile are similar. In the first place, this is in line with the state variables’ insensitivity with respect to how nuclei are modeled at sub-saturation densities ( Burrows & Lattimer 1984). Then, it shows that the uncertainties related to the effective interactions do not manifest in the crust. To a good approximation, for the 𝑇 𝐴 (𝜌 )-profile, log 𝐶 V is a linear function of log 𝜌 .
+
+4.3. Thermal conductivity 
+
+In Fig. 5, we illustrate the thermal conductivity ( 𝐾 ) as a function of density as computed by NSCool for the models in Table 1 at the initial moment of time. For the details of the calculation, see Appendix A.2 of Paper I. Analyzing the 𝐾 (𝜌, 𝑇 ) dependence al-lows us to better understand the behavior of the initial temperature profiles in Fig. 1. More precisely, for a given initial luminosity, models with higher thermal conductivity provide lower tempera-ture gradients, which, based on the initial temperature equality at the bottom of the envelope, get translated into lower temperatures. For all models, log 𝐾 is a convoluted function of log 𝜌 . The departure between SRO and SRO 0 is smaller than the one between RB and RB 0, which is an obvious consequence of employing liquid drop vs experimental masses, respectively. Because of the onset of 14 He in the innermost shells of the crust, RB and RB 0
+
+predict significantly higher thermal conductivities than SRO. 
+
+5. Thermal evolution 
+
+In this section, we present the results of our simulations. In addition to cooling curves, we follow the evolution of the boundary radius as well as the phase properties of the crust. 6 8 10 12 14 
+
+## log ρ [g cm −3]
+
+> 19 .019 .520 .020 .521 .021 .522 .0
+> log  K[erg  s−1 K−1 cm −1]
+> Drip Outer Crust Inner Crust Core
+
+RB; T A(ρ, t = 0) RB 0; T A(ρ, t = 0) SRO; T A(ρ, t = 0) SRO 0; T A(ρ, t = 0) 
+
+Fig. 5. Profiles of thermal conductivity as a function of density at the initial moment of time. −2.5 0.0 2.5 5.0 7.5
+
+log t [s] 
+
+35 .035 .536 .036 .537 .037 .538 .038 .5  
+
+> log  L∞
+> eff  [erg s −1]
+> Neo −NS Thermal Relaxation
+> ABC
+
+RB RB 0
+
+SRO SRO 0
+
+Fig. 6. Thermal evolution in terms of redshifted effective luminosity as a function of time for 𝑡 < 1 yr. Predictions for various models of the crust composition and profiles of initial luminosity. For details, see Table 1 and Fig. 1. Different cooling stages are indicated in the background. 
+
+5.1. Cooling Curves 
+
+Figure 6 demonstrates the short-term thermal evolution of 1.4 𝑀 ⊙
+
+NSs whose crusts are modeled by the RB and SRO EoSs. As indicated on the figure, 𝑡 < 1 yr encompasses the whole neo-NS stage along with the early thermal relaxation stage. The results corresponding to the temperature-dependent compositions (RB and SRO) are confronted with those obtained for fixed compo-sitions (RB 0 and SRO 0) for each of the three initial luminosity profiles in Fig. 1. Over 0.3 ≲ 𝑡 [𝑠 ] ≲ 10 2, 𝐿 ∞;𝐵  
+
+> eff
+
+stays flat while 
+
+Article number, page 6 Chatterjee et al.: Thermal evolution of neo-neutron stars 0 2 4 6
+
+log t [yr] 
+
+32 .032 .533 .033 .534 .034 .535 .0           
+
+> log  L∞
+> eff  [erg s −1]
+> Thermal Relaxation Neutrino Cooling Photon Cooling
+> RB RB 0
+> SRO SRO 0
+> Fig. 7. Thermal evolution in terms of redshifted effective luminosity as a function of time for 0≤log 𝑡 [yr ] ≤ 6. Predictions for various models of the crust composition and the 𝐿 𝐴
+> 0(𝜌 )profile of initial luminosity. For details, see Table 1 and Fig. 1. Different cooling stages are indicated in the background.
+
+−2 0 2 4 6
+
+log t [s] 
+
+35 .035 .536 .036 .537 .037 .538 .0  
+
+> log  L∞
+> eff  [erg s −1]
+> Neo −NS
+
+RB RB 0
+
+RB ∗
+
+RB ∗   
+
+> 0
+> Fig. 8. The same as in Fig. 6. Calculations for RB and RB 0models and various recipes for calculating 𝐶 V. See text for details.
+
+𝐿 ∞;𝐶  
+
+> eff
+
+steadily decreases. This behavior replicates the behaviors of 
+
+𝐿 0 over 𝜌 b ≤ 𝜌 ≲ 10 7 g/cm 3. The plateau of 𝐿 ∞;𝐴  
+
+> eff
+
+lasts almost as long as the plateau of 𝐿 ∞;𝐵  
+
+> eff
+
+. This shows that the higher the initial luminosity, the earlier the drop of 𝐿 ∞ 
+
+> eff
+
+. At 𝑡 ≈ 10 4 s, the small discrepancies between the two low-luminosity initial profiles are washed out. At 𝑡 ≈ 3 × 10 4 s, all differences among the initial lumi-nosity profiles are washed out. Indeed, from this moment on, all 
+
+𝐿 ∞ 
+
+> eff
+
+(𝑡 ) curves are identical. We note that in Paper I, which only al-lowed for the temperature dependence of the mechanical structure of the layers with 10 5 ≤ 𝜌 [g/cm 3] ≤ 10 11 , the memory of the ini-tial luminosity profiles was washed out a bit earlier, i.e., at ≈ 10 4 s. The curves corresponding to RB 0 and SRO 0, which do not allow the composition to change with temperature, sit on top of the curves corresponding to RB and SRO. Moreover, no differences are obtained between 𝐿 ∞ 
+
+> eff
+
+predicted by RB and SRO. The obvious conclusion is that the crust composition has no effect on the thermal evolution during the neo-NS phase. This should not come as a surprise since these models feature minor differences in thermal conductivities and have almost identical specific heat capacities, with the exception of the innermost shells. Due to the thermal diffusion timescales from the inner crust to the surface, those differences in the inner crust cannot be observed on the surface during the neo-NS phase. Figure 7 investigates the long-term thermal evolution of the same NSs considered in Fig. 6. As before, the predictions of RB 0
+
+(SRO 0) are identical to those of RB (SRO). However, the results of RB are no longer identical with those of SRO. Indeed, during the thermal relaxation and neutrino cooling epochs, RB and SRO are slightly different, while starting from the photon cooling epoch, RB curves stay much warmer than SRO curves. The exact reason for the small differences during earlier cooling is not clear. The difference observed in the photon cooling epoch, however, comes from the very high specific heat capacity of 14 He that is present in the innermost shells of the crusts of RB models, see Fig. 4. In Fig. 8 we offer additional information about the neo-NS phase. The cooling curves RB ∗ and RB ∗ 
+
+> 0
+
+are counterparts of the cooling curves RB and RB 0 where, instead of using the accurate 
+
+𝐶 V computed by numerical differentiation of the energy density, we compute 𝐶 V via the subroutines of NSCool . Those subroutines calculate the contribution of dripped neutrons to the specific heat capacity ( 𝐶 V;n ) within the degenerate Fermi gas limit and ignore contributions from thermally excited states of the nuclei. For zero temperature EoSs, which are employed in most NSs’ cooling studies, the degenerate gas approximation is accurate everywhere except the outermost shells of the inner crust, where the density of dripped neutrons is low; discarding internal excitations is fully justified. Finite temperatures increase the number of dripped neutrons in the density domain that, at 𝑇 = 0, corresponds to the inner crust and lead to thermal dripping at densities lower than the drip density, see Fig. 3. Finite temperatures also allow for the population of nuclear excited states, whose numbers increase with the excitation energy and nuclear mass. The use of the degenerate approximation for neutrons in the temperature-density domain where they are not degenerate obviously leads to a significant overestimation of the neutron heat capacity (1-2 orders of magnitude, Constantinou et al. 2014). Discarding excited states leads to an underestimation of the total heat capacity. Now, for 𝑡 ≲ 1 yr the overestimated heat capacity of neutrons in the inner crust does not produce any effect on the surface, see the discussion below regarding RB ∗ 
+
+> 0
+
+curve. At later times, the inner crust is colder and the degenerate gas limit is applicable. Thus, the results of Paper I remain valid. The situation changes noticeably when the thermally dripped neutrons in the outer crust are taken into account. If their heat capacity is overestimated, this is observable on the surface, as demonstrated by the RB ∗ curve. RB ∗ shows a substantially slower cooling than RB and RB 0, which means that the overestimation of 
+
+𝐶 V;n in the outer crust has a much stronger impact than neglecting the contributions of the excited states. RB ∗ 
+
+> 0
+
+corresponds to the RB composition at 𝑇 = 𝑇 lim and 𝐶 V;n computed in the degenerate gas approximation; it is a proxy for the procedure adopted in Paper I (modulo the contribution of the nuclear excited states,  
+
+> Article number, page 7 A&A proofs: manuscript no. Neo_NSs_AA
+
+−10 −5 0 5
+
+log t [yr] 
+
+11 .60 11 .65 11 .70 11 .75 11 .80 11 .85 11 .90  
+
+> Rb [km]
+> RB RB 0
+> SRO SRO 0
+> Fig. 9. Time evolution of the boundary between the NS outer crust and the bottom of the envelope. Results corresponding to fixed and temperature-dependent crust compositions are confronted for two EoSs. All curves correspond to initial luminosity profile “A”.
+
+which were actually taken into account in Paper I). It does not have thermally dripped neutrons in the outer crust, nor does it account for their heat capacity. It does overestimate the heat capacity of the neutrons in the inner crust. Yet, we see that it cools much faster than RB ∗ and almost the same as RB and RB 0. This proves that the overestimation of the heat capacity of the inner crust is not observable, while the overestimation of the heat capacity of the outer crust is quite noticeable. The difference comes from the heat diffusion timescale from the given point inside the star to the surface (see Paper I). For the outer crust 𝑡 diff ≲ 𝑡 = 1 yr, for the inner crust 𝑡 diff ≳ 𝑡 = 1 yr. The fact that over 10 3.5 ≲ 𝑡 [𝑠 ] ≲ 10 6 RB ∗ 
+
+> 0
+
+predicts slightly faster cooling than RB/RB 0 demonstrates the impact of the heat capacity of thermally dripped neutrons in the outer crust and of the contribution from the nuclear excited states to 𝐶 V. As one can see, these contributions combined have little influence on the cooling curves. 
+
+> 5.2. Contraction of cooling down NSs
+
+In Fig. 9 we show the time evolution of the boundary between the NS outer crust and the bottom of the envelope, whose density at 
+
+𝑡 = 0 is 𝜌 b = 10 5 g/cm 3. It is clear that NSs shrink while cooling down. For some time after the beginning of the simulation, the 
+
+𝑅 b values are constant and their ordering replicates the ordering of 𝑇 0 in the inner crust, see the bottom panel in Fig. 1. This suggests that the star radius is dictated by the thickness of the inner crust, which increases with the temperature. Confrontation with the cooling curves in Fig. 6 shows that the boundary radii stay constant roughly as long as the corresponding surface luminosities (𝐿 ∞ 
+
+> eff
+
+) stay constant, i.e., for ≈ 300 s. The constancy of 𝑅 b lasts longer for RB than for RB 0. Also, {𝑅 b (𝑡 = 0; RB 0) − 𝑅 b (𝑡 = 0; RB )} exceeds 
+
+{𝑅 b (𝑡 = 0; SRO 0) − 𝑅 b (𝑡 = 0; SRO )} . This can be understood considering that the difference between the thermal conductivi-ties of SRO and SRO 0 is less than the corresponding difference between RB and RB 0, see Fig. 5. The small plateaus around 8 hr come from the fact that both RB and SRO EoSs have temperature-density domains where (𝜕𝑃 /𝜕𝑇 )𝑛 < 0. While this is insufficient to actually expand the star, it nevertheless pauses contraction for some time. Starting with 1 yr, 𝑅 b values remain constant with higher values for SRO than for RB, which reflect the stiffnesses of the two EoSs. 
+
+> 5.3. Crust crystallization
+
+Fig. 10 illustrates profiles of local temperature as a function of density at different moments during the thermal evolution ranging from 𝑡 = 0 to 0.5 Myr (RB) – 0.9 Myr (RB 0 and SRO). At the very beginning, the profiles show a monotonic decrease from the crust-core boundary toward the outer boundary. Over 300 s ≲ 𝑡 ≲ 30 yr , more complex temperature profiles are obtained. For 300 s ≲ 𝑡 < 0.3 yr , the temperature profiles exhibit pronounced local maxima in the intermediate layers, whose positions change with time. RB and RB 0 also show some small bumps that are most likely the outcome of irregularities in 
+
+𝐶 V (𝜌, 𝑇 ) extracted from CompOSE tables, see the corresponding curves in Fig. 4. Notice that such bumps are not present for the SRO profiles and the SRO 𝐶 V (𝜌, 𝑇 ) curve in Fig. 4 is smooth. The deep shells are colder than the intermediate ones due to the propagation of the cold wave from the core, whose high neutrino luminosity makes it cool faster than the crust. Similar profiles are obtained in classical papers on NS cooling ( Gnedin et al. 2001; Page 2013) as well as in Paper I. At later times, i.e., for 
+
+𝑡 ≳ 30 yr , the profiles are almost flat, signifying that the star has become almost isothermal inside. Note that formally the redshifted temperature is constant when the star is isothermal, but the variation of the redshift across the entire crust is relatively small. We note that the visual “clustering” of the curves is partially due to plateaus in the cooling curves and partially due to the way in which we sample the ages for which the curves are plotted. As the temperature decreases, we expect the inhomogeneous matter in the crust to switch from a liquid phase to a solid one. Following Potekhin & Chabrier (2010), we employ two criteria for distinguishing between the liquid and solid phases. The first one is the classical one-component plasma melting criterion, 
+
+𝑘 𝐵 𝑇 m (𝑛 i) = (⟨ 𝑍 ⟩𝑒 )2
+
+𝑎 iΓm
+
+, (6) where 𝑛 i is the number density of ions, 𝑎 i = (4𝜋𝑛 i/3)−1/3 is the ion-sphere radius and Γm = 175 is the Coulomb coupling strength at the melting point. Eq. (6) defines the melting temperature as a function of density. The second criterion regards “quantum melting”. It is defined by the value of the ion density parameter, 
+
+𝑅 𝑆 = 𝑎 i𝑚 i
+
+(⟨ 𝑍 ⟩𝑒 )2
+
+ℏ2 , (7) where 𝑚 i is the ion mass. We notice that 𝑅 𝑆 depends on the ion density and the temperature enters only via ⟨𝑍 ⟩. The critical value of 𝑅 𝑆 is taken as 140, which defines the corresponding critical density 𝜌 m. If the ion density exceeds this critical density, the ion liquid does not crystallize no matter the temperature. If 𝑇 < 𝑇 m (𝜌 ) and 𝜌 < 𝜌 m, we consider that the matter is solid. Corresponding segments of curves are marked in blue. Otherwise, the matter is in the liquid phase and corresponding segments are marked in red. 
+
+> Article number, page 8 Chatterjee et al.: Thermal evolution of neo-neutron stars
+
+5.0 7.5 10 .0 12 .5
+
+# log ρ [g cm −3]
+
+7.58.08.59.09.510 .010 .5
+
+> log  T [K]
+
+RB (a) 
+
+5.0 7.5 10 .0 12 .5
+
+# log ρ [g cm −3]
+
+RB 0
+
+(b) 
+
+5.0 7.5 10 .0 12 .5
+
+# log ρ [g cm −3]
+
+SRO (c) 
+
+Liquid Solid      
+
+> Fig. 10. Profiles of local temperature as a function of density at various instances during the whole cooling process (up to 1 Myr). Different panels correspond to different crust compositions; for legend, see table 1. All panels correspond to the initial luminosity profile “A”. 𝑇 −𝜌 domains where matter is solid (liquid) are marked in blue (red).
+
+Figure 10 shows that for 𝑇 ≲ 10 10 .3 K, RB and RB 0 (SRO) predict that the innermost shells of the crust are liquid (solid). This striking difference comes from the differences in compositions. In RB and RB 0 the deepest layers of the crust are made of 
+
+> 14
+
+He while in SRO they are made of heavy nuclei, see Fig. 2. An order of magnitude estimation based on Eq. (6) shows that 
+
+𝑇 RB m /𝑇 SRO m ≈ 1/100 . The predictions of RB and RB 0 on the one hand and SRO on the other hand differ also in the outer boundary. For SRO, these layers crystallize much earlier than for RB and RB 0. This situation is attributable to the faster cooling that SRO predicts in the photon cooling epoch, see Fig. 7. For the initial sub-Eddington luminosity profile considered here, the intermediate shells are always solid. Differences in composition between RB (which accounts for temperature-dependent composition) and RB 0 (which takes the composition at 𝑇 = 0.1 MeV) manifest at the earliest times. For the first model the solid phase extends over a narrower density domain than for the second model. Again, this is the outcome of lighter nuclei in RB than in RB 0, which lead to lower values for 𝑇 m and 𝜌 m and, thus, delay the crystallization. 
+
+5.4. On the effects of 1S0 neutron pairing 
+
+The impact of 1S0 neutron pairing on the long-term cooling of NSs is a well-studied question. Here, we briefly discuss how the pairing affects the cooling during the neo-NS phase. The short answer is the effect is negligible. From Fig. 11 one can see, first, that at the age of 1 day the temperature profile intersects with the neutron 1S0 critical temperature ( 𝑇 c;n ; Ding et al. 2016) only in the inner crust. Thus, as discussed in relation to Fig. 8, any changes in the temperature profile inside the star induced by superfluidity will be unobservable on the surface during the neo-NS phase. Second, while the 𝑇 c;n profile does extend into the outer crust, this happens only for the age 𝑡 ≲ 1 day when the temperature in the outer crust is much higher than 𝑇 c;n in the same region. Consequently, thermally dripped neutrons in the outer crust remain unpaired as long as they exist, which means, again, that the cooling curves are not affected during the neo-NS phase. This conclusion is rather trivial. As demonstrated by Fortin et al. (2010), the typical timescales to see the impact of 10 11 12 13 14 log ρ [g cm −3]8.08.59.09.510 .010 .5log  T [K]       
+
+> Drip Outer Crust Inner Crust
+> SRO; T A(ρ, t = 1 day) Tc;n (ρ, t = 1 day) Tc;n (ρ, t = 0 day)
+> Fig. 11. Profile of local temperature and profiles of critical temperature for 1S0neutron pairing (Ding et al. 2016) inside the crust.
+
+crustal superfluidity on the cooling curves are ≈ 10 − 20 yr, and here we are considering the situation happening at the age 𝑡 < 1 yr. 
+
+6. Summary and Conclusions 
+
+We built upon the work by Beznogov et al. (2020), who investi-gated the thermal evolution of young isolated neutron stars during the first ∼ 3 yr after birth. In addition to accounting for tempera-ture effects on the 𝑃 (𝜌 ) relation in the envelope, we accounted for temperature-induced modifications of the entire crust both in terms of the 𝑃 (𝜌, 𝑇 ) dependence and the composition. Our version of NSCool uses temperature-dependent compositions and 
+
+> Article number, page 9
+
+A&A proofs: manuscript no. Neo_NSs_AA 
+
+𝑃 (𝜌 )-relations for the whole crust and adjusts its mechanical struc-ture at each time step during the evolution. The EoS information is extracted from general purpose CompOSE tables assuming that the matter is in beta-equilibrium and this corresponds to the same relation among neutron, proton and electron chemical potentials as at 𝑇 = 0 but with the values that correspond to the current profile of local temperature. We conducted simulations for three profiles of initial local luminosity and two families of EoS models. Our results show that the memory of the initial profiles is washed out in ∼ 3 × 10 4 s, which is slightly longer than the time it took for neo-NSs in Paper I to forget the initial conditions. Confrontation of cooling curves obtained using the same 𝑃 (𝜌, 𝑇 ) relation and specific heat capacity but different compositions reveals that, while the composition changes noticeably, the thermal conductivity in the outer crust is almost the same and, thus, there are no differences in cooling. Conversely, when self-consistent composition and 
+
+𝑃 (𝜌, 𝑇 ) are implemented into simulations, temperature-induced modifications of the composition manifest through the total heat capacity. In particular, by somewhat increasing the heat capacity of the outer crust compared to the value this quantity has in cold NSs, thermally dripped neutrons are responsible for a bit slower cooling during the thermal relaxation phase. Extra composition effects manifest whenever the EoS model favors nucleation of light species in the deepest layers of the warm crust, as is the case of Beznogov & Raduta (2026). In these situations, the value of 𝐿 ∞
+
+> eff
+
+in the thermal relaxation phase is reduced and the cooling in both neutrino and, especially, photon cooling phases is slowed down. The latter effect is the obvious consequence of the increased heat capacity. During the neo-NS phase, 𝐿 ∞ 
+
+> eff
+
+is sensitive to the proper-ties of the outer crust, making it insensitive to 1𝑆 0 neutron pairing. Allowing for mechanical structure adjustments in the cooling process revealed that during the first ∼ 1 yr the radius of the star shrank by 0.25 km, with the most important modification occurring for 10 −7 ≲ 𝑡 [yr ] ≲ 10 −1. We also tracked the crystallization of the crust and investigated its EoS dependence. Our results indicate that EoS models that favor massive nuclei predict that the layers with densities 10 5 g/cm 3 ≤ 𝜌 ≤ 𝜌 cc solidify at 𝑡 ≈ 60 kyr, while models that allow light species in the deepest layers predict that these deepest layers remain liquid for a long time. Our models can maintain near-Eddington luminosity for about the same time as the baseline model of Paper I, i.e., ≈ 300 s. The whole neo-NS phase lasts about a day. Thus, the chances of detecting an NS during this phase are small. Indeed, after a CCSN, the ejected material has to become transparent to the thermal emission of a neo-NS, which takes, very approximately, half a year (Sec. 6.1 of Paper I). Obviously, this makes any detections of a neo-NS after a CCSN problematic. The youngest known (and not yet finally confirmed) NS is the one in SN1987A. It is almost 40 years old and was tentatively detected indirectly by the radio emission from the heated dust ( Cigan et al. 2019) and not by its thermal X-ray emission from the surface 2.The chances of detecting a neo-NS after an accretion-induced collapse of a WD are better, as there are significantly less ejecta. However, they can be confused with other thermal transients having similar timescales. Finally, the best chance to explicitly detect a neo-NS is after a binary NS merger seen off-axis. In that case, there are also much less ejecta than after a CCSN, and the material should become transparent on the timescale of days. For more details and references, see Sec. 6 of Paper I.  
+
+> 2
+
+Now it is also seen in the infrared by the James Webb Space Telescope (Larsson et al. 2025); still, no direct detection in X-rays. 
+
+We have ignored rotation and magnetic fields in our calcula-tions. Both aspects were discussed in Paper I, Secs. 5.4 and 5.6, respectively. We do not expect any differences here due to the temperature-dependent inner crusts. Employed software: neo-NSCool with temperature-dependent composition and EoS (not publicly available, built upon Page (2016); Beznogov et al. (2020)), python 
+
+( Python Software Foundation 2025), matplotlib ( Hunter 2007), 
+
+f90wrap (Kermode 2020), numpy (Harris et al. 2020), scipy 
+
+(Virtanen et al. 2020).  
+
+> Acknowledgements. S.C, M.B. and A.R. acknowledge support from a grant from the Ministry of Education and Research, CNCS/CCCDI–UEFISCDI, Project No. PN-IV-P1-PCE-2023-0324 and partial support from Project No. PN 23 21 01 02.
+
+References 
+
+> Abbott, B. P., Abbott, R., Abbott, T. D., et al. 2017, Phys. Rev. Lett., 119, 161101 Akmal, A., Pandharipande, V. R., & Ravenhall, D. G. 1998, Phys. Rev. C, 58, 1804 Antoniadis, J., Freire, P. C. C., Wex, N., et al. 2013, Science, 340, 448 Baade, W. & Zwicky, F. 1934, Proc. Nat. Acad. Sci., 20, 254 Beznogov, M., Potekhin, A., & Yakovlev, D. 2021, Phys. Rep., 919, 1–68 Beznogov, M. V., Page, D., & Ramirez-Ruiz, E. 2020, ApJ, 888, 97 Beznogov, M. V. & Raduta, A. R. 2023, Phys. Rev. C, 107, 045803 Beznogov, M. V. & Raduta, A. R. 2024a, Phys. Rev. C, 110, 035805 Beznogov, M. V. & Raduta, A. R. 2024b, ApJ, 966, 216 Beznogov, M. V. & Raduta, A. R. 2026, Phys. Rev. C, 113, 035801 Beznogov, M. V. & Yakovlev, D. G. 2015a, MNRAS, 447, 1598 Beznogov, M. V. & Yakovlev, D. G. 2015b, MNRAS, 452, 540 Burrows, A. & Lattimer, J. M. 1984, ApJ, 285, 294 Canal, R. & Schatzman, E. 1976, A&A, 46, 229 Cartaxo, J., Huang, C., Malik, T., et al. 2026, ApJS, 282, 33 Cigan, P., Matsuura, M., Gomez, H. L., et al. 2019, ApJ, 886, 51 Constantinou, C., Muccioli, B., Prakash, M., & Lattimer, J. M. 2014, Phys. Rev. C, 89, 065802 Cromartie, H. T., Fonseca, E., Ransom, S. M., et al. 2020, Nat. Astron., 4, 72 Ding, D., Rios, A., Dussan, H., et al. 2016, Phys. Rev. C, 94, 025802 Duflo, J. & Zuker, A. P. 1995, Phys. Rev. C, 52, R23 Fortin, M., Grill, F., Margueron, J., Page, D., & Sandulescu, N. 2010, Phys. Rev. C, 82, 065804 Gnedin, O. Y., Yakovlev, D. G., & Potekhin, A. Y. 2001, MNRAS, 324, 725 Gudmundsson, E. H., Pethick, C. J., & Epstein, R. I. 1982, ApJ, 259, L19 Haensel, P., Zdunik, J. L., & Dobaczewski, J. 1989, A&A, 222, 353 Hansen, C. J., Kawaler, S. D., & Trimble, V. 2004, Stellar Interiors: Physical Principles, Structure, and Evolution, 2nd edn., Astronomy and Astrophysics Library (New York: Springer) Harris, C. R., Millman, K. J., van der Walt, S. J., et al. 2020, Nature, 585, 357 Hunter, J. D. 2007, Computing in Science & Engineering, 9, 90 Kermode, J. R. 2020, f90wrap: an automated tool for constructing deep Python interfaces to modern Fortran codes, accessed: 2026-04-21 Kluźniak, W. & Ruderman, M. 1998, ApJ, 505, L113 Larsson, J., Fransson, C., Kavanagh, P. J., et al. 2025, ApJ, 991, 130 Miller, M. C. et al. 2026, ApJ, 1000, L48 Page, D. 2013, Pairing and the Cooling of Neutron Stars, 324–337 Page, D. 2016, NSCool: Neutron star cooling code, Astrophysics Source Code Library, record ascl:1609.009 Page, D., Lattimer, J. M., Prakash, M., & Steiner, A. W. 2004, ApJS, 155, 623 Page, D., Lattimer, J. M., Prakash, M., & Steiner, A. W. 2009, ApJ, 707, 1131 Pascal, A., Novak, J., & Oertel, M. 2022, MNRAS, 511, 356–370 Pons, J. A., Reddy, S., Prakash, M., Lattimer, J. M., & Miralles, J. A. 1999, ApJ, 513, 780 Potekhin, A. Y. & Chabrier, G. 2010, Contrib. Plasma Phys., 50, 82 Potekhin, A. Y. & Chabrier, G. 2018, A&A, 609, A74 Potekhin, A. Y., Zyuzin, D. A., Yakovlev, D. G., Beznogov, M. V., & Shibanov, Y. A. 2020, MNRAS, 496, 5052–5071 Prakash, M., Bombaci, I., Prakash, M., et al. 1997, Phys. Rep., 280, 1 Python Software Foundation. 2025, Python Language Reference, version 3.x, accessed: 2026-04-21 Raduta, A. R. & Beznogov, M. V. 2025, A&A, 701, A143 Raduta, A. R., Nacu, F., & Oertel, M. 2021, EPJA, 57, 329 Salmi, T. et al. 2022, ApJ, 941, 150 Salmi, T. et al. 2024, ApJ, 976, 58 Schaab, C., Balberg, S., & Schaffner-Bielich, J. 1998, ApJ, 504, L99 Schneider, A. S., Constantinou, C., Muccioli, B., & Prakash, M. 2019, Phys. Rev. C, 100 Tsuruta, S., Sadino, J., Kobelski, A., et al. 2009, ApJ, 691, 621 Typel, S. et al. 2022, EPJA, 58, 221 Vinciguerra, S. et al. 2024, ApJ, 961, 62 Virtanen, P., Gommers, R., Oliphant, T. E., et al. 2020, Nat. Methods, 17, 261 Wang, M., Huang, W. J., Kondev, F. G., Audi, G., & Naimi, S. 2021, Chin. Phys. C, 45, 030003 Yakovlev, D. G., Levenfish, K. P., & Shibanov, Y. A. 1999, Phys. Uspekhi, 42, 737 Yakovlev, D. G. & Pethick, C. J. 2004, Ann. Rev. Astron. Astrophys., 42, 169
+
+Article number, page 10

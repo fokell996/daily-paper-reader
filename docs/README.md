@@ -6,60 +6,49 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-04
-- 运行时间：2026-08-04 22:02:38 UTC
+- 最新运行日期：2026-08-05
+- 运行时间：2026-08-05 21:21:54 UTC
 - 运行状态：成功
-- 本次总论文数：12
-- 精读区：6
-- 速读区：6
+- 本次总论文数：9
+- 精读区：5
+- 速读区：4
 
 ### 今日简报（AI）
-今日审阅12篇论文，精读6篇，聚焦脉冲星与中子星物理。
-
-最值得关注的是脉冲星计时阵列方向各向异性灵敏度曲线，以及PSR J0435+3233三体系统，均获9.0高分。
-
-普通读者可从中子星g模频率与核饱和参数、以及未来引力波探测器DECIGO/BBO探测奇异夸克物质等速读文章入门。
-- 详情：[/202608/04/README](/202608/04/README)
+1) 今日精选9篇脉冲星与快速射电暴研究，重点关注引力波背景与中子星质量之谜。  
+2) 最值得看：印度脉冲星计时阵数据发布2（10分）搜寻随机引力波背景，及吸积致自旋对低质量X射线双星质量约束的启示（9分）。  
+3) 建议先精读这两篇高分论文，再以FRB暗物质限制和偏振光曲线作为延伸拓展。
+- 详情：[/202608/05/README](/202608/05/README)
 
 ### 精读区论文标签
-1. [Directional Anisotropic Sensitivity Curves for Pulsar Timing Arrays](/202608/04/2608.00250v1-directional-anisotropic-sensitivity-curves-for-pulsar-timing-arrays)  
+1. [The Indian Pulsar Timing Array Data Release 2: III. Search for a Stochastic Gravitational Wave Background](/202608/05/2608.02808v1-the-indian-pulsar-timing-array-data-release-2-iii-search-for-a-stochastic-gravitational-wave-background)  
+   标签：评分：10.0/10、query:pulsar-frb
+   evidence：利用脉冲星计时阵列数据搜索随机引力波背景
+2. [Accretion-induced spin-up: Implications for mass constraints of AMXPs](/202608/05/2608.02061v2-accretion-induced-spin-up-implications-for-mass-constraints-of-amxps)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：脉冲星计时阵列各向异性灵敏度曲线
-2. [The PSR J0435+3233 Triple System](/202608/04/2608.01227v1-the-psr-j04353233-triple-system)  
+   evidence：中子星态方程模型与吸积毫秒X射线脉冲星质量约束
+3. [Gamma-ray and radio populations of millisecond pulsars in globular clusters](/202608/05/2608.02768v1-gamma-ray-and-radio-populations-of-millisecond-pulsars-in-globular-clusters)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：通过脉冲星计时观测识别出处于层级三合星系中的伽马射线脉冲星
-3. [Propagation Diagnostics of Supernova Remnant Environments around Young Repeating FRBs. I. Hydrodynamic Evolution of the Source-Local Dispersion Measure](/202608/04/2608.01342v1-propagation-diagnostics-of-supernova-remnant-environments-around-young-repeating-frbs-i-hydrodynamic-evolution-of-the-source-local-dispersion-measure)  
+   evidence：通过伽马射线和射电模拟研究球状星团中毫秒脉冲星种群
+4. [Structural quasi-universality in highly magnetized differentially rotating neutron stars](/202608/05/2608.02824v1-structural-quasi-universality-in-highly-magnetized-differentially-rotating-neutron-stars)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：模拟年轻中子星风与超新星抛射物相互作用，直接关注重复FRB的前身环境。
-4. [Spectral decoherence without depolarization in curvature radiation](/202608/04/2608.01416v1-spectral-decoherence-without-depolarization-in-curvature-radiation)  
+   evidence：研究不同状态方程下中子星转动惯量与紧凑性的准普适关系，直接支持状态方程约束
+5. [First fast radio burst search campaign at the Argentine Institute of Radio Astronomy](/202608/05/2608.03914v1-first-fast-radio-burst-search-campaign-at-the-argentine-institute-of-radio-astronomy)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：直接研究作为快速射电暴辐射机制的曲率辐射
-5. [Accretion-induced spin-up: Implications for mass constraints of AMXPs](/202608/04/2608.02061v1-accretion-induced-spin-up-implications-for-mass-constraints-of-amxps)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：利用三种物态模型和 AMXP 观测约束致密星质量，直接对应物态方程观测约束
-6. [On Bimodality in the Eccentricity Distribution of Galactic Double Neutron Stars](/202608/04/2608.00174v1-on-bimodality-in-the-eccentricity-distribution-of-galactic-double-neutron-stars)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：利用脉冲星计时研究双中子星种群与演化
+   evidence：面向南天超星系团的快速射电暴搜寻
 
 ### 速读区论文标签
-1. [Probing strange quark matter objects with future space-based gravitational wave detectors DECIGO and BBO](/202608/04/2608.01408v1-probing-strange-quark-matter-objects-with-future-space-based-gravitational-wave-detectors-decigo-and-bbo)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：通过引力波观测探测奇异夸克物质致密天体，与致密物质状态方程约束直接相关
-2. [The $g$-mode frequencies in cold neutron stars and nuclear saturation parameters](/202608/04/2608.02463v1-the-g-mode-frequencies-in-cold-neutron-stars-and-nuclear-saturation-parameters)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：g模式频率关联中子星状态方程与核饱和参数
-3. [Gamma Rays from ALP-Photon Conversion and Inverse Compton Reprocessing in Neutron Star Magnetospheres](/202608/04/2608.00589v1-gamma-rays-from-alp-photon-conversion-and-inverse-compton-reprocessing-in-neutron-star-magnetospheres)  
+1. [Understanding constraints on primordial mass black holes made of dark matter using fast radio bursts](/202608/05/2607.28704v1-understanding-constraints-on-primordial-mass-black-holes-made-of-dark-matter-using-fast-radio-bursts)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：磁星磁层中的ALP-光子转换及逆康普顿再处理
-4. [Submillimeter Detectability of Gravitational-Wave Counterparts from Neutron-Star Mergers with the Xue-shan-mu-chang 15-meter Telescope](/202608/04/2608.00770v1-submillimeter-detectability-of-gravitational-wave-counterparts-from-neutron-star-mergers-with-the-xue-shan-mu-chang-15-meter-telescope)  
+   evidence：利用快速射电暴作为宇宙学探针，在修正引力下约束原初黑洞暗物质，属于快速射电暴综合主题
+2. [Polar cap plasma loading and the morphology of pulsar $γ$-ray light curves](/202608/05/2607.29126v1-polar-cap-plasma-loading-and-the-morphology-of-pulsar--ray-light-curves)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：中子星并合亚毫米波段后随观测，检验长寿命磁星遗迹的能量注入
-5. [Polar cap plasma loading and the morphology of pulsar $γ$-ray light curves](/202608/04/2607.29126v1-polar-cap-plasma-loading-and-the-morphology-of-pulsar--ray-light-curves)  
+   evidence：研究脉冲星γ射线光变曲线形态与电流片中的正负电子等离子体加载，属于脉冲星综合主题
+3. [The One-Loop Power Spectrum of Fast Radio Burst Dispersion Measures](/202608/05/2608.03235v1-the-one-loop-power-spectrum-of-fast-radio-burst-dispersion-measures)  
+   标签：评分：7.0/10、query:pulsar-frb
+   evidence：针对快速射电暴色散量成团构建单圈EFT模型以用于宇宙学分析
+4. [Thermal evolution of neo-neutron stars. II. Temperature-dependent crusts](/202608/05/2608.03732v1-thermal-evolution-of-neo-neutron-stars-ii-temperature-dependent-crusts)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：脉冲星伽马射线光变曲线形态建模
-6. [An Undergraduate Approach to the Quantum Hadrodynamics and the Physics of Neutron Stars Part II: Neutron Stars' Exotic Content](/202608/04/2608.00439v1-an-undergraduate-approach-to-the-quantum-hadrodynamics-and-the-physics-of-neutron-stars-part-ii-neutron-stars-exotic-content)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：讨论中子星核心非原子自由度，与物态方程物理相关
+   evidence：研究新中子星温度依赖的壳层结构，直接涉及中子星内部物理
 
 
 <div class="dpr-home-promo-card">
