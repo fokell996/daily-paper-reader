@@ -1,0 +1,984 @@
+Title: From Multimessenger Inference to Simulations: A Ranked Ensemble of Finite-Temperature Equations of State
+
+URL Source: https://arxiv.org/pdf/2608.04092v1
+
+Published Time: Thu, 06 Aug 2026 00:02:59 GMT
+
+Number of Pages: 22
+
+Markdown Content:
+# From Multimessenger Inference to Simulations: A Ranked Ensemble of Finite-Temperature Equations of State 
+
+Max Jacobi, Giulia Huez, and Sebastiano Bernuzzi 
+
+Theoretisch-Physikalisches Institut, Friedrich-Schiller-Universit¨ at Jena, 07743, Jena, Germany 
+
+David Radice 
+
+Institute for Gravitation and the Cosmos, The Pennsylvania State University, University Park, PA 16802, USA Department of Physics, The Pennsylvania State University, University Park, PA 16802, USA and Department of Astronomy & Astrophysics, The Pennsylvania State University, University Park, PA 16802, USA 
+
+(Dated: August 6, 2026) We construct a set of microphysical, finite-temperature equations of state (EOSs) for numerical simulations of neutron star mergers and core-collapse supernovae that is consistent with modern constraints from nuclear theory and multimessenger astronomy and systematically spans the pos-terior distribution of allowed EOSs. The EOSs are based on a simplified Skyrme functional whose inputs are nuclear matter saturation properties, extended to supra-saturation densities through the speed of sound at a set of reference densities. The models are assigned continuous likelihood weights from chiral effective field theory and perturbative quantum chromodynamics calculations, the grav-itational wave signal GW170817, the complete set of NICER mass–radius measurements, and the Shapiro-delay mass measurement of the radio pulsar J0348. From the resulting catalogue of 5.2 million EOSs, the posterior yields R1.4 = 11 .8+0 .8 
+
+> −0.7
+
+km, Λ 1.4 = 334 +193 
+
+> −113
+
+, and M TOV max = 2 .18 +0 .22  
+
+> −0.14
+
+M⊙
+
+(medians with 90% credible intervals). From this posterior we select a ranked 12-member ensemble, headed by a fiducial, central EOS, whose members are individually plausible while jointly bracketing the posterior spread of neutron-star observables. For all ensemble members we generate general-purpose finite-temperature tables with the SROEOS code, each accompanied by nucleon effective-mass variants that bracket the ensemble’s thermal-sector uncertainty, to be made publicly available upon publication. 
+
+I. INTRODUCTION 
+
+Numerical-relativity simulations carry the predictive burden for neutron star (NS) mergers [1–4]: the tidal phase of the inspiral waveform is calibrated against them [5, 6], and the postmerger gravitational-wave spectrum [7], the fate of the remnant [8, 9], and the mass and com-position of the ejecta that undergo r-process nucleosyn-thesis and power kilonovae [10–13] are direct simulation products. Among the physics inputs to these simula-tions, none is more consequential than the equation of state (EOS) of dense matter, which is highly uncertain in the very density range the mergers probe. The EOS dependence is sharpest in the fate of the merger remnant: whether the remnant collapses promptly, survives briefly, or persists is decided almost exclusively by the EOS once the component masses are fixed [3, 14]. That outcome gates every observable after the inspiral: the postmerger gravitational-wave signal, the ejecta and the associated kilonova, and the conditions for launching a jet [15–17]. Meanwhile, the cold EOS itself is increasingly well constrained. Chiral effective field theory ( χEFT) pre-dicts the energy and pressure of neutron matter close to the saturation density with quantified truncation er-rors [18–23], and perturbative quantum chromodynam-ics (pQCD) bounds the pressure at asymptotically high densities, reaching down into the NS regime through causality and thermodynamic consistency [24, 25]. As-trophysics constrains the region in between, namely via the tidal polarizability determined from GW170817 [26– 28], the NICER mass–radius measurements of four mil-lisecond pulsars [29–36], and the observation of radio pulsars with masses around 2 M ⊙ [37, 38]. Bayesian frameworks combine these data on flexible cold-EOS rep-resentations (piecewise polytropes [39], speed-of-sound parameterisations [40, 41], nonparametric Gaussian pro-cess (GP) priors [42]) into posterior distributions over the pressure–density relation and the derived NS observables [43–49]. A parallel line of work runs the same inference on microphysical nucleonic models, Skyrme-type energy-density functionals [50–53] and the nucleonic metamodel [54, 55], tying the posterior directly to nuclear-matter parameters. Merger simulations have not kept pace with this nar-rowing. A typical campaign adopts a handful of the pub-licly available general-purpose tables [e.g. 56–58], drawn from an ecosystem of more than a hundred [59, 60] and chosen largely by availability and numerical robustness. Many of these tables predate the constraints above, and some are in tension with them. The resulting sets are also heterogeneous (different functional forms, different treatments of inhomogeneous matter, different vintages of nuclear input), so the spread of simulation outcomes across a set confounds EOS physics with model hetero-geneity, and measures neither a credible interval nor any other defined statistic of the EOS uncertainty. There is, at present, no systematic route from the inferred EOS posterior to the EOS input of a simulation campaign. Two obstacles keep the inference and simulation com-munities working from different EOS sets. The first is arXiv:2608.04092v1 [astro-ph.HE] 4 Aug 2026 2how much of the EOS each community needs. The astro-physical observables entering multimessenger inference are properties of cold, isolated NSs, fixed by the one-dimensional, cold, β-equilibrated pressure–density rela-tion alone. Since sampling a posterior moreover takes millions of likelihood evaluations, inference has every reason to parameterise that curve directly rather than model the full composition and temperature dependence it never evaluates. A simulation instead evolves mat-ter across wide ranges of density, proton fraction, and temperature. Its complete EOS input is a thermody-namically consistent table in all three variables, joined continuously onto a microphysical description of inho-mogeneous low-density matter in nuclear statistical equi-librium [59]. This completeness matters most for the ejecta, their nucleosynthesis, and kilonova predictions [61, 62], while for the gravitational waveform alone sim-plified treatments are often adequate. Promoting an in-ferred cold curve to such a table after the fact requires an ad hoc thermal closure, usually a constant-Γ th prescrip-tion, whose error concentrates in exactly the postmerger observables the simulations exist to predict [63–65]. The 
+
+M ∗ framework of Raithel et al. [66] provides a more consistent closure, modelling the density dependence of the thermal pressure through the nucleon effective mass [67], but it still supplements the cold EOS with an as-sumed thermal sector rather than deriving both from a single microphysical model, and, being built on uniform-matter thermodynamics, it does not supply the inhomo-geneous low-density matter that a general-purpose ta-ble describes. The second obstacle is cost. Due to the large computational cost of merger simulations, a cam-paign fields around ten EOSs at most, so a posterior cat-alogue of O(10 5) EOSs is unusable without a principled way to reduce it to a few members. This work removes both obstacles with a single pipeline to create a small set of 12 EOSs that systematically explore the space of EOSs allowed under current nuclear and astrophysi-cal constraints. New GPU-accelerated, exascale-capable simulation codes now coming online for mergers [68–71] and core-collapse supernovae [72] open up the possibility of large-scale simulation campaigns, making the need for a systematic set of EOSs greater than ever. The existing work closest to ours comes from Bezno-gov and Raduta, who inferred Bayesian posteriors over extended-Skyrme parameter space [52, 53] and released families of constraint-compliant finite-temperature tables [73, 74], and from Du et al. [75], who propagate parame-ter probability distributions through a finite-temperature free-energy model and release seven representative tables. Both programs deliver simulation-ready tables, but nei-ther connects them to a modern multimessenger infer-ence, as neither includes the constraints from GW170817 and NICER. The Beznogov–Raduta constraints all act at or below saturation density, with astrophysics entering only as a maximum-mass cut, and the high-density input of Du et al. [75] is frozen to X-ray measurements predat-ing these missions. Furthermore, Skyrme-type function-als generically struggle to be flexible enough at supra-nuclear densities and overestimate the correlation of the high-density EOS with saturation-point properties. The few density exponents of common parameterisations fail to produce a maximum in the speed of sound, and in-stead tend to turn superluminal at densities reached in NS cores [53, 76]. Such a maximum is, however, favoured by pQCD, whose constraints propagate down to NS den-sities and soften the EOS there [24, 25]. Our procedure is designed to keep the supra-saturation sector as flexible as possible and essentially uncorrelated with the satura-tion properties while staying causal up to ten times the saturation density, allowing us to include modern astro-physical constraints that act on the density range mergers probe. Concretely, we run forward-model Bayesian inference directly on the Skyrme-type functional of the SROEOS 
+
+code [77], so every EOS we construct can be propa-gated by SROEOS into a complete general-purpose finite-temperature table. We define the prior by uniformly drawing six nuclear saturation properties and the speed of sound at a set of supra-saturation reference densi-ties, which together determine the functional’s coeffi-cients. Prescribing the speed of sound directly decouples the supra-nuclear sector from the saturation properties. Skyrme-type constructions usually adopt a small, fixed set of density exponents [50, 77]. We instead redeter-mine the exponents for every draw to ensure that the prescribed quantities are realised by a causal, thermo-dynamically consistent EOS. Each EOS in the resulting catalogue is then reweighted by a product of likelihoods from nuclear physics and astrophysics, yielding the EOS posterior on which the rest of the analysis builds. From this weighted catalogue we extract a 12-member ensem-ble by a nested max–min construction. Each member is additionally delivered with a set of nucleon effective-mass variants that bracket the theoretically allowed thermal response at fixed cold-sector behaviour. Throughout the sampling and reweighting, each EOS is represented only by a cheap one-dimensional cold β-equilibrium table with a simply matched crust. For the twelve selected members, we use the SROEOS code to prop-agate the same Skyrme coefficients into complete three-dimensional tables in density, temperature, and compo-sition, deriving the thermal sector and the inhomoge-neous low-density matter from the same functional. In these tables the crust is described by the single-nucleus approximation (SNA) and its low-density part is deter-mined by a nuclear statistical equilibrium (NSE) ensem-ble of thousands of nuclides with measured masses. These general-purpose tables will be made publicly available on Zenodo upon publication of this article. Although this work mostly targets NS mergers, the tables are not merger-specific. Core-collapse supernova simulations re-quire the same general-purpose finite-temperature EOS tables spanning wide ranges of density, composition, and temperature [59], and shock revival, protoneutron-star contraction, and black-hole formation respond to the 3same uncertain high-density physics [78, 79]. The paper is organised as follows. Section II specifies the functional, the prior on its parameters, and the ex-ponent existence search to obtain a valid EOS for each draw, and section III describes the likelihood reweight-ing. Section IV presents the production catalogue, the posterior, and its robustness, and section V constructs and validates the simulation ensemble. Section VI sum-marises the results, compares our work with constraint-compliant table sets from the literature, and discusses the limitations of the approach and its natural extensions.  
+
+> II. EOS MODEL AND PRIORS
+
+We use the SROEOS 1 code [77] to generate finite-temperature EOSs. We build on SROEOS because it is, to our knowledge, the only publicly available code that accepts an arbitrary parameterisation and propagates it self-consistently, thermal sector included, into a com-plete general-purpose table with a microphysical treat-ment of low-density inhomogeneous matter. In partic-ular, SROEOS places no limit on the number of density-dependent terms in the functional, a generality we exploit to achieve supra-saturation flexibility far beyond what standard few-term Skyrme parameterisations admit. The underlying functional gives the internal energy density e as 
+
+e(n, x, T ) = X
+
+> t
+
+τt(n, x, T )2m∗ 
+
+> t
+
+(n) − xn ∆+ X
+
+> i
+
+[ai + 4 x(1 − x)bi] nδi+1 , (1) where n is the baryon number density, x = np/n is the proton fraction ( x ≡ Ye in the astrophysical context), T is the temperature, t ∈ { p, n } labels the nucleon species, τt
+
+is the kinetic energy density of species t, ∆ = mn − mp is the neutron-proton mass difference, and ai, bi, δi are free parameters. Note that we have absorbed the coefficients 
+
+a, b, c i, d i from Schneider et al. [77] into common ai and 
+
+bi, with the result that the first exponent is fixed at δ1 =1. The Landau effective mass m∗ 
+
+> t
+
+is 12m∗ 
+
+> t
+
+(n) = 12mt
+
++ α1nt + α2n−t , (2) where mt is the vacuum mass of species t, nt its number density ( np = xn , nn = (1 − x)n, and n−t denotes the density of the opposite species), and α1, α2 are additional free parameters. None of the data employed in this work directly constrain m∗, and the effective mass acts mainly  
+
+> 1https://bitbucket.org/andschn/sroeos
+
+on the thermal sector, characterised by the thermal index Γth (n, x, T ) = 1 + P (n, x, T ) − P (n, x, 0) 
+
+ε(n, x, T ) − ε(n, x, 0) , (3) with P and ε the total pressure and energy density. The effective mass’s imprint on the cold EOS through 
+
+Pkin is small and easily compensated by the interaction terms. Rather than sampling parameters our data can-not constrain, we fix the effective masses at saturation density to sector-specific reference values from the litera-ture: the neutron effective mass in pure neutron mat-ter (PNM) ( n = n0, x = 0) to m∗
+
+> n
+
+/m n = 0 .95, the centre of the chiral many-body-perturbation-theory band [80, 81], and the effective mass in symmetric nuclear matter (SNM) ( x = 1 /2) to m∗/m = 0 .85, within the isoscalar range 0 .80 ± 0.10 spanned by many-body calcu-lations and optical-potential analyses [81, 82]. These two conditions fix α1 and α1 +α2 (hence α2) in closed form for every draw, and imply m∗ 
+
+> p
+
+< m ∗ 
+
+> n
+
+in neutron-rich matter, the correct sign of the isospin splitting [82]. The full the-oretically allowed thermal-response bracket is restored at the very end, for the released simulation ensemble only, through effective-mass variants that shift both sector tar-gets by ±0.10 for each EOS at fixed cold-sector behaviour (section V). Note that the monotonic SROEOS density pro-file of eq. (2) is simpler than the Brussels-extended and Skyrme-like forms of more recent work [83], but because 
+
+m∗ enters our tables only through the thermal sector this simplification is inconsequential for our purposes (see sec-tion VI). Henceforth, we consider only cold ( T = 0) nuclear mat-ter. The cold pressure is given by 
+
+P (n, x ) = n2 ∂ε ∂n x
+
+= Pkin (n, x ) + X
+
+> i
+
+[ai + 4 x(1 − x)bi] δi nδi+1 ,
+
+(4) where ε = e/n is the energy per baryon and the related kinetic pressure is 
+
+Pkin (n, x ) = X
+
+> t
+
+τt
+
+ 13m∗
+
+> t
+
++ α1nt + α2n−t
+
+
+
+, (5) with the cold kinetic energy density 
+
+τt = 35 (3 π2nt)2/3nt . (6) Our Skyrme functional has sixteen free linear coeffi-cients ( ai, b i) and seven free exponents ( δi). We repa-rameterise the functional in terms of sixteen prescribed physical quantities given in table I, namely six saturation parameters, described in section II A, and ten speed-of-sound targets at five supra-saturation anchor densities, described in section II B, from which the sixteen linear co-efficients are recovered by solving a linear system. Given 4                                
+
+> TABLE I. Sampling ranges for the prior. All parameters are drawn uniformly and independently. n0denotes absolute baryon density in fm −3.Parameter min max
+> n0[fm −3]0.155 0.165
+> B[MeV] −16.5 −15.5
+> K[MeV] 160 315
+> J[MeV] 28.6 38.1
+> L[MeV] 20 90 ˜Ksym [MeV] −400 800
+> c2
+> sat 2 ,4,6,8,10 n001
+
+the set of exponents, whose determination is described in section II C, the chosen physical parameters uniquely determine the linear coefficients via two decoupled linear systems, one per isospin channel, given in appendix A.  
+
+> A. Saturation parameters
+
+Two considerations set the prior range widths in ta-ble I. First, for several saturation parameters ( J, L, K,˜Ksym ) determinations from different probes disagree well beyond their quoted uncertainties, so no single measure-ment can serve as a prior. Second, the data we employ in section III constrain these parameters very unevenly: K
+
+and J are left essentially unconstrained (their reweighted marginals reproduce the prior). However, L and ˜Ksym ,which control the pressure of neutron-rich matter near saturation, are the parameters one would naturally ex-pect to imprint most strongly on NS observables. Fur-thermore, they are directly constrained by the χEFT band employed in section III A. We therefore adopt delib-erately broad uniform sampling intervals (“boxes” here-after) and let the likelihoods, not the box edges, carry the constraining power. The saturation density n0 (defined by P (n0, 1/2) = 0) and the binding energy B = ε(n0, 1/2) fix two SNM de-grees of freedom. Both are well constrained by nuclear masses and charge-radius systematics: n0 ≈ 0.160 ±
+
+0.005 fm −3 and B ≈ − 16 .0 ± 0.5 MeV [84]. Our boxes match these quoted uncertainties exactly. The incom-pressibility K = 9 ∂P/∂n |n0,1/2 is traditionally deter-mined from isoscalar giant monopole resonances, with a long-standing consensus value of K ≈ 240 ± 20 MeV [85]. Determinations beyond that canon disagree well outside its error bar. A recent reanalysis of the monopole data, the first to describe the tin and lead isotopes consistently, favours the lower K ≈ 227 MeV [86]. Heavy-ion flow measurements prefer K = 190 ± 30 MeV [46, 87], χEFT predicts K = 260 ±54 MeV [88], Bayesian Skyrme surveys report posteriors near 260 MeV [53], and an analysis of the surface-term systematics of the monopole extraction argues for values as high as 250–315 MeV [89]. Our range 160–315 MeV is the envelope of the quoted ±1σ intervals of these determinations: the lower edge is the reach of the heavy-ion constraint (190 ± 30 MeV), the upper edge the top of the surface-systematics range of Stone et al. [89], with the χEFT interval (reaching 314 MeV) sitting just inside. The wide envelope does not hinder the precision of our inference. The data we employ leave K uncon-strained (the reweighted marginal reproduces the prior), and the inferred observables are insensitive to the range (see section IV B). The symmetry energy J = ε(n0, 0) − B, its slope 
+
+L = 3 P (n0, 0) /n 0, and its curvature ˜Ksym = KPNM − K,fix the three PNM degrees of freedom. Here KPNM ≡
+
+9 ∂P/∂n |n0, x =0 is defined exactly as K but evaluated in PNM. Note that this is a difference of pressure-derivative incompressibilities, not the symmetry-energy expansion coefficient Ksym = 9 n20 d2Esym /dn2|n0 commonly quoted in the literature. The two differ by a large, slightly L-correlated offset (median ≈ +310 MeV), thus literature 
+
+Ksym ranges translate almost directly into ˜Ksym ranges. The symmetry energy is among the better-constrained saturation observables: nuclear structure systematics and χEFT calculations broadly favour J ≈ 30–35 MeV [84, 90], while the PREX-2 neutron-skin measurement of 
+
+> 208
+
+Pb yielded the notably larger value J = 38 .1±4.7 MeV [91], and analyses dominated by the CREX 48 Ca skin measurement [92] fall slightly below the consensus, e.g. 
+
+J = 29 .1+2 .1 
+
+> −1.8
+
+MeV [93]. Within any interval of this size the likelihoods of section III leave J essentially uncon-strained (the reweighted marginals reproduce the prior), such that the range itself is the effective prior on J. We therefore build the box so that both edges are directly linked to the literature values: the lower edge is the unitary-gas floor J ≥ 28 .6 MeV [94], a hard theoretical floor, and the upper edge is the PREX-2 central value 38 .1 MeV, the largest central value any modern determi-nation supports. Here, the envelope runs up the PREX-2 central value only (not over the ±1σ intervals as for 
+
+K), because PREX-2 is an outlier among J determina-tions, and its +1 σ reach (42 .8 MeV) would let a single tension-laden measurement stretch the box ∼5 MeV be-yond every other determination’s reach (the next-highest +1 σ endpoint lies near 35 MeV). The floor derives from the unitary-gas bound of Tews et al. [94], 
+
+εPNM (n) ≥ ξ ε FG (n) , (7) where εFG is the free Fermi-gas energy per baryon and 
+
+ξ = 0 .376 the Bertsch parameter. The constraint states that the energy per particle of cold dilute neutron matter cannot drop below that of the unitary Fermi gas. The same bound re-appears as a hard constraint of the exis-tence search (section II C), enforced there as a function of density rather than only through J.The slope L is considerably less tightly constrained: global analyses of nuclear observables find L ≈ 40– 80 MeV with substantial scatter [84, 95], and PREX-2 implies L ≈ 106 ± 37 MeV [91], in tension with most other probes. The CREX 48 Ca measurement pulls in the opposite direction, favouring L ≲ 40 MeV [92, 93], and the two skins have so far resisted a joint description 5within a single density functional [96]. Analyses that combine the skin data with other probes, or that rein-terpret the PREX-2 asymmetry together with the 208 Pb dipole polarizability, converge on L ≈ 50–60 MeV [97– 99], as does χEFT ( L = 59 .8 ± 4.1 MeV, 88). For L we therefore take the opposite approach to J: rather than curating a defensible interval, we choose a very broad box and rely on the χEFT reweighting later in the pipeline (section III A) to shape the marginal. In the production catalogue no hard filter imposes a floor on L. Survivors populate the box down to its 20 MeV edge, with about 4% of the catalogue below 23 MeV, and the likelihood reweighting alone closes the tail, leaving the posterior-weighted 5th percentile at L = 31 .7 MeV and only 0 .25% of the posterior mass below 23 MeV. Finally, we prescribe the PNM sector curvature ˜Ksym .No determination of the PNM curvature is precise enough to curate a defensible interval, so we take the same approach as for L: a deliberately broad box, [ −400 , 800] MeV, relying on the unitary-gas bound (eq. (7)) and the χEFT likelihood (section III A) to shape the final posterior.  
+
+> B. Speed-of-sound anchors
+
+At five reference densities nref ∈ { 2, 4, 6, 8, 10 } n0 we prescribe the squared speed of sound c2 
+
+> s
+
+of cold, charge-neutral nuclear matter at fixed proton fraction. At each anchor density we sample the target c2
+
+> s
+
+(nref , 0) for PNM directly, and independently c2
+
+> s
+
+(nref , 1/2) for SNM. The five anchors are evenly spaced in units of n0, extending to 10 n0 so that causality is enforced well past the densities any surviving star’s core actually reaches (section II C). All ten targets are drawn uniformly and independently from the full causal interval c2 
+
+> s
+
+∈ [0 , 1], with no order-ing imposed between anchors ( c2
+
+> s
+
+(n) does not need to be monotonic). In section IV B we test how much this modelling assumption of the prior influences the poste-rior by reweighting the prior to obtain a measure that is uniform in the pressure instead. Not every target com-bination is realisable within the SROEOS functional form. Such combinations are removed by the existence search (section II C). A natural cut-off for the density range over which the EOSs must be valid is the central density nTOV max 
+
+of the maximum-mass Tolman–Oppenheimer–Volkoff (TOV) star, which typically lies at nTOV max ≈ 4–7 n0 (sec-tion IV B). The placement of the two topmost anchors is therefore mostly a precaution, ensuring a physical EOS up to black-hole formation in simulations, and does not shape the astrophysically relevant part of the EOS. As a direct test of sensitivity to the anchor scheme itself, a companion catalogue using three anchors at {2, 5.5, 9} n0 (evenly spanning the same posterior-relevant density range with a coarser grid) is generated at matched statistics under the otherwise identical pipeline, and the headline results are compared across the two schemes (section IV B).  
+
+> C. Exponent existence search
+
+Not every draw of the sixteen parameters of table I, the six saturation parameters and the ten speed-of-sound targets, admits a valid EOS. The exponent vector [ δi] is the remaining freedom of the functional, and we use it to establish validity. For each draw we therefore search the exponent space for a vector under which the EOS is causal and physical up to n = 10 n0, and reject the draw outright if no such vector can be found. The search treats the exponents as free variables and minimises a smooth hinge penalty on causality violations (given explicitly in eq. (B1) of appendix B), i.e. on excursions of the squared sound speed 
+
+c2
+
+> s
+
+(n, x ) = (∂P/∂n )x
+
+h(n, x ) (8) outside [0 , 1], evaluated on a fine grid of densities and compositions, where h = mn + ε + P/n + x μ e is the specific enthalpy per baryon, including the neutron rest mass and, via charge neutrality ( ne = nx ), the electron enthalpy x μ e, with μe the chemical potential of the free ultrarelativistic electron gas. Two further requirements enter as hard constraints on the optimiser rather than penalty terms: the unitary-gas bound of eq. (7) is en-forced for n ∈ [0 .01 , 1.5] n0, and the symmetry energy is required to be positive over the full density range. The implementation is an outer loop of a local, gradient-based constrained optimiser (Sequential Least-Squares Programming, SLSQP) over the free exponents around the inner linear solve outlined in appendix A. The full protocol (objective grids, restart budget, convergence cri-teria) is given in appendix B. A failed search does not prove that no valid exponent vector exists. Certifying nonexistence would require a global search of the seven-dimensional exponent space for every draw, which is neither feasible nor necessary. Instead, the restart and polish protocol of appendix B is sized to the point of diminishing returns, beyond which additional attempts recover practically no further solu-tions. A rejected draw is therefore one for which no valid vector was found at this fixed search effort, frozen throughout production. The distinction matters little in practice, as the boundary between accepted and rejected draws is sharp when viewed in two-dimensional slices of the sampled parameters, so the search acts as a nearly deterministic feasibility criterion. Each accepted EOS is then solved for its stellar struc-ture. The cold β-equilibrium track is the proton fraction 
+
+xβ (n) satisfying 
+
+∂ε ∂x x=xβ
+
++ μe(nx β ) = 0 . (9) The resulting pressure table, truncated before any loss of monotonicity or causality, is matched to the BPS crust 6EOS [100] at low density (appendix C), and the TOV equations [101, 102] are integrated for a series of 50 cen-tral pressures to produce the full M –R sequence. This matched crust serves only the cold TOV solve of the cat-alogue stage. The finite-temperature tables published alongside this work build the low-density inhomogeneous phase within SROEOS itself, including the match to an NSE ensemble (section V). Finally, the EOS is required to remain valid (monotonic, causal, positive symmetry energy) up to 1 .1 × nTOV max , the central density of the maximum-mass configuration. Since the search already certifies causality to 10 n0 ≫ nTOV max , this removes only ex-ceptionally soft candidates with M TOV max ≪ 1.97 M ⊙ which are practically excluded by the pulsar mass measure-ments. Beyond that, no maximum-mass cut is applied. This construction defines the prior on EOS space im-plicitly: we sample the sixteen-dimensional box of table I uniformly and keep the sub-volume on which the exis-tence search succeeds. This defines a curved but sharp restricted volume in the box. Because the accepted sub-volume is not a product of the marginal intervals, the ef-fective prior is not uniform in any single parameter even before any likelihood is applied. Figure 1 shows the sur-vivor marginals, which gently slope away from flat for exactly this reason.  
+
+> III. CONSTRAINTS AS IMPORTANCE WEIGHTS
+
+Every constraint enters the analysis the same way: as a continuous likelihood evaluated per EOS of the prior catalogue and applied as an importance-sampling weight [e.g. 103, ch. 10], never as a hard cut. Note that this for-ward Monte-Carlo approach is sufficient for our purpose because the constraints retain substantial overlap with the unweighted catalogue distribution, so the reweighted posterior stays well-sampled (effective sample size (ESS) 
+
+∼ 1.1×10 4; section IV A) rather than concentrating in an undersampled tail of the prior. This section specifies the likelihoods, nuclear theory first, then the astrophysical measurements.  
+
+> A. Nuclear theory
+
+For each EOS in the catalogue, i.e. each draw that passed the validity requirements of section II C, we com-pute a continuous weight from a Gaussian likelihood built on the published N 3LO χEFT band of G¨ ottling et al. [23]. We do not train a GP ourselves. We take the published pointwise means and uncertainties and model the den-sity correlations between them with a fixed GP kernel, as detailed below. This is the only point in the pipeline where χEFT information enters explicitly. The underlying GP of G¨ ottling et al. [23] is defined on the energy per particle E/A (n, x ) with a squared-exponential (RBF) covariance kernel. Since pressure is a linear functional of E/A , namely P = n2 ∂(E/A )/∂n ,it inherits Gaussian marginals. However, the full trained GP (the fitted kernel hyperparameters and the joint density–composition covariance) is not part of the public deposit, which provides pointwise means and standard deviations of derived curves. We evaluate the likelihood on the β-equilibrium pres-sure Pβ (n), taking the tabulated mean μ(n) and standard deviation σ(n) directly from Zenodo [104] and modelling the missing density correlations explicitly with an RBF kernel of assumed length scale. The log-probability of the pressure curve is ln LxEFT = − 12 z⊤R−1z − 12 ln |R| , (10) where the residual vector has components 
+
+zi = Pβ (ni) − μ(ni)
+
+σ(ni) (11) and Rij is the RBF correlation matrix, 
+
+Rij = exp 
+
+
+
+− 12
+
+(ni − nj )2
+
+l2
+
+
+
++ ν δ ij , (12) with length scale l = 0 .04 fm −3 (matching the χEFT training-grid spacing) and diagonal nugget ν = 0.05. We test the sensitivity of our results to the assumed value of l in section IV B. At this length scale the 20 evaluation points are spaced closely enough that adja-cent RBF correlations exceed 0 .98, so the pure-RBF R is numerically near-singular. The nugget both regularises the inverse and represents the small point-to-point un-correlated component not captured by the smooth part (tabulation error and departures from an exactly-RBF kernel). Results are insensitive to its precise value. The GP is evaluated at 20 points uniformly spaced in 
+
+n ∈ [0 .5, 1.5] n0. The ln |R| term cancels in relative com-parisons and is only included for completeness. Analogously to the χEFT reweighting above, we com-pute a continuous weight for each surviving EOS from the marginalised pQCD likelihood of Komoltsev et al. [105], built on the thermodynamic-consistency construction of Komoltsev and Kurkela [24], evaluated only at the EOS’s own maximum-TOV-mass central density nTOV max . 
+
+> B. Astrophysical likelihoods
+
+In addition to the nuclear-theory-derived likelihood weights of section III A, we confront the catalogue with astrophysical measurements through a further set of con-tinuous weights, computed directly for every EOS. The shared kernel-density estimate (KDE) through which the GW and NICER channels enter is detailed in appendix D. Six astrophysical inputs enter the baseline analysis: the GW170817 posterior, the NICER mass–radius posteriors of four millisecond pulsars, and one massive-pulsar mass measurement. 7The GW170817 likelihood is built from a posterior over the component masses and dimensionless tidal po-larizability Λ( M ) = 23 k2 C−5, with k2 the quadrupole tidal Love number and C = GM/ (Rc 2) the compact-ness. We compute it by performing parameter estima-tion with the bajes code [106]. The priors and the set-tings for the analyses of the GW data [107] are the same as in [108] and we employ the effective-one-body model, 
+
+TEOBResumSPA [109, 110]. As a sensitivity check, we also employ a variant of the GW170817 constraint (section IV B): a joint poste-rior additionally informed by the electromagnetic coun-terparts, taken from Huez et al. (in preparation), who performed a joint and coherent analysis of GW170817, the kilonova AT2017gfo [111], and the GRB afterglow GRB170817A [112–114]. Their analysis combines the likelihoods of the different messengers and treats the inclination angle as a common parameter across all datasets. For the GW part, the priors are identical to those adopted in our GW parameter estimation. For the kilonova, they employed an anisotropic three-component model implemented in xkn [115]. The GRB afterglow is modelled with a Gaussian jet using afterglowpy [116]. The analysis also includes the VLBI astrometric obser-vation of the centroid motion of the jet [117–119]. Four NICER mass–radius posteriors enter: J0740+6620 [33], J0437–4715 [34], J0030+0451 with the 
+
+PDT-U hotspot-model samples of the six-year reanalysis [35], and J0614–3329 [36]. For J0437 we adopt the X-PSI analysis used throughout the recent inference literature. An independent reanalysis that additionally models the modulated nonthermal emission component favours somewhat larger radii [120]. For J0614 we likewise adopt the PDT-U hotspot-model samples, the marginally evidence-preferred solution of Mauviard et al. [36], matching the evidence-led choice for J0030. The assumed hotspot geometries of J0030 and J0614 are the largest single systematic among the four sources, so we investigate a sensitivity variant in section IV B which swaps both to their alternative hotspot models: for J0030 the ST+PDT model of the earlier analysis [121], and for J0614 the ST+PDT headline model of Mauviard et al. [36]. We do not include the fifth published NICER source, PSR J1231–1411, whose inference converges only under a restricted radius prior and whose radius is mutually inconsistent with an independent reanalysis [122, 123]. The mass of the massive pulsar PSR J0348+0432, 
+
+M = 2 .01 ±0.04 M ⊙ [37], enters as an error-function like-lihood in M TOV max with exactly those Gaussian parameters. J0348 is the only direct pulsar-mass channel. The mass of J0740 is already constrained within its NICER poste-rior and a separate mass likelihood would count the same measurement twice. In section IV B, we employ a sec-ond mass channel variant, the fast-spinning black-widow pulsar PSR J0952–0607 [124]. Its mass rests on optical light-curve and spectroscopic modelling of a strongly ir-radiated companion rather than the direct radio-timing Shapiro delay of J0348, so its systematics are larger and less controlled. We therefore keep it as a variant rather than a baseline channel.   
+
+> IV. RESULTS A. Posterior EOS catalogue
+
+The exponent existence search (section II C) rejects 95 .0% of the 1 .2 × 10 8 parameter draws, i.e. for these draws no exponent vector rendering the EOS causal and physical was found. A small further fraction of the can-didates is removed by the validity requirements of the subsequent TOV stage, with practically no consequence for the posterior after the likelihoods have been applied. They are either unphysical outright or typically reach masses of only ∼1.6 M ⊙, so the pulsar-mass and NICER likelihoods would suppress them regardless. The result-ing catalogue holds 5 209 453 EOSs, each with a com-bined likelihood weight wi. Under the full posterior weight the catalogue retains a Kish effective sample size, ESS = ( P 
+
+> i
+
+wi)2/ P 
+
+> i
+
+w2 
+
+> i
+
+[125], of 1 .1 × 10 4. Through-out this section, four weightings of the catalogue appear under fixed names: prior (uniform weights over the cat-alogue), only-nuclear ( χEFT + pQCD, section III A), only-astro (NICER + GW170817 + J0348, section III B), and posterior (all likelihoods combined). Figure 1 shows the marginals of the six saturation parameters. The curvature panel plots the literature symmetry-energy coefficient Ksym = 9 n20 d2Esym /dn2|n0
+
+rather than the PNM curvature ˜Ksym actually sampled because the two carry the same information and Ksym 
+
+is the coefficient in which literature ranges are quoted. The SNM parameters ( n0, B, K) mostly reproduce their priors, while the J prior is shaped by the correlation with L introduced through the unitary-gas constraint. With the nuclear-theory-derived likelihoods, the poste-rior slightly shifts to higher n0, lower K and higher J.However, as anticipated in section II A, the nuclear and astrophysical constraints carry very little information on the SNM-sector parameters or J. The two neutron-rich-sector parameters L and Ksym are instead visibly re-shaped: the slope L tightens to 49 +19  
+
+> −17
+
+MeV (medians with 90% credible intervals), and the symmetry-energy curva-ture Ksym is pulled toward softer values ( −190 +181  
+
+> −183
+
+MeV). The bulk of the reshaping is done by the nuclear-theory constraints, while the astrophysical data nudge the pos-teriors towards slightly softer values. To isolate which specific constraint pulls which way, we remove one likelihood at a time from the posterior and record the resulting shift, shown for L and Ksym 
+
+in fig. 2. Without the χEFT likelihood, almost all con-straining power on L and Ksym is lost and their poste-rior spans the entire prior range. Among the astrophysi-cal data, GW170817 and the NICER observations of the intermediate-mass pulsars J0437 and J0614 in particular 80.156 0.158 0.160 0.162 0.164 
+
+n0 [fm −3]    
+
+> probability density
+> prior
+> only nuclear
+> only astro
+> posterior
+> −16.4 −16.2 −16.0 −15.8 −15.6
+
+B [MeV]   
+
+> 200 250 300
+
+K [MeV]     
+
+> 30 32 34 36 38
+
+J [MeV]    
+
+> probability density
+> 20 40 60 80
+
+L [MeV]      
+
+> −750 −500 −250 0250 500
+
+Ksym [MeV]         
+
+> FIG. 1. Marginal distributions of the six saturation parameters under the prior (filled), only-nuclear, only-astro, and posterior weightings. Top row ( n0,B,K) and J: the reweighted marginals track the prior, whose gentle non-uniformity is the imprint of the exponent existence search (section II C), not of the box, which is uniform. The curvature panel shows the literature coefficient Ksym , not the sampled PNM curvature ˜Ksym (section II A).
+
+prefer softer values. Figure 3 shows the squared speed of sound at fixed composition (PNM and SNM, the two channels in which the c2 
+
+> s
+
+anchors of section II B are sampled). Although the c2 
+
+> s
+
+anchors are sampled over the full causal inter-val [0 , 1] at every density, the prior is not uniform. At saturation, K and Ksym fix the sound speed almost ex-actly. Above n0, a draw survives only where the SROEOS 
+
+functional form can realise its c2 
+
+> s
+
+targets given its satu-ration inputs with a valid EOS, which means the speed of sound cannot rise arbitrarily fast. At the same time, draws with low speeds of sound produce very soft EOSs with a maximum-mass-NS central density bigger than 10 n0 which are filtered out by the TOV validity check after construction (they produce very small maximum TOV masses and therefore do not contribute to the pos-terior). The only-astro weighting requires a relatively stiff rise of the sound speed around n = 2–4 n0, while the nuclear-theory constraints prefer slightly lower values here. Beyond ∼ 6 n0 the posterior relaxes back toward the prior. Those densities lie above the central densi-ties of most stars in the posterior, so the data provide no leverage there. Note that the pQCD weight is eval-uated only at each EOS’s own nTOV max (section III A). A treatment constraining all densities above nTOV max would pull the only-nuclear and posterior weightings to lower speeds of sound, without consequence for the astrophys-ical observables. Figure 4 shows the effect of the individual knockouts on the PNM speed of sound at 4 n0. The most impor-tant constraints come from χEFT, GW170817, and the NICER measurement of J0740 (the most massive of the four pulsars). Figure 5 shows the β-equilibrium pressure P (n, x β )and proton fraction xβ (n). At low density, the pressure posterior is driven by the χEFT likelihood while the as-trophysical constraints dominate the intermediate range of 2–3 n0. The high-density tail is clearly softened by the pQCD constraints. However, the lower edge of the pres-sure band is set by the astrophysical constraints. The 
+
+β-equilibrium proton-fraction posterior is largely uncon-strained by our data, as expected since the pQCD and as-trophysical constraints carry no direct information about the composition. Only the χEFT likelihood tightens the band close to the saturation density. At higher densities, the highest proton fractions in the prior are disfavoured by the astrophysical constraints: the isovector sector is generally softer, so high proton fractions cannot support 920 30 40 50 60 70 80 
+
+L [MeV]         
+
+> posterior
+> −GW170817
+> −J0030
+> −J0740
+> −J0437
+> −J0614
+> −χEFT
+> −pQCD
+> −J0348
+> +1.0
+> -0.1
+> +2.3
+> +0.6
+> +0.6
+> -4.7
+> +1.7
+> +0.2
+
+−400 −200 0 200 400 
+
+Ksym [MeV]         
+
+> posterior
+> −GW170817
+> −J0030
+> −J0740
+> −J0437
+> −J0614
+> −χEFT
+> −pQCD
+> −J0348
+> +50
+> -19
+> +9
+> +23
+> +22
+> +232
+> +7
+> +1
+
+FIG. 2. Knockout test for the symmetry-energy parameters 
+
+L and Ksym : posterior medians and 90% credible intervals af-ter removing one likelihood at a time. The vertical line marks the full-posterior median; the number above each marker gives the median shift relative to it. 
+
+the 2 M ⊙ pulsar masses. Figure 6 shows the resulting mass–radius bands, and fig. 7 the marginal distributions of the three stellar ob-servables R1.4, Λ 1.4, and M TOV max . In fig. 8, the same quantities are shown for the knockout cases. The radius and tidal polarizability at the 1 .4 M ⊙ reference mass are tightly correlated, so they follow the same trends. Rel-ative to the prior, the joint update shifts the R1.4 and Λ1.4 scales down and shrinks their 90% width. These shifts can mostly be attributed to GW170817 and the NICER measurements of J0437 and J0614. The mea-surements of J0030 and J0740 mainly act on the lower end of radii, so they pull the overall posterior towards higher R1.4 and Λ 1.4. Meanwhile, the χEFT likelihood prefers larger radii, shifting the posterior to the right by a slight amount. The maximum-mass posterior is most sensitive to the high-mass NICER pulsar J0740 and both nuclear-theory constraints, each pulling in opposite di-rections. 0.0      
+
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> c2
+> s (n, x = 0)
+> 123456
+
+n [n0]
+
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> c2
+> s (n, x = 1/2)
+> prior
+> only nuclear
+> only astro
+> posterior
+
+FIG. 3. Squared speed of sound at fixed composition in PNM (top) and SNM (bottom): 90% credible bands for the prior (filled) and the only-nuclear, only-astro, and posterior weightings. 0.5 0.6 0.7 0.8 0.9 
+
+c2
+
+> s, PNM
+
+(4 n0)        
+
+> posterior
+> −GW170817
+> −J0030
+> −J0740
+> −J0437
+> −J0614
+> −χEFT
+> −pQCD
+> −J0348
+> -0.019
+> +0.005
+> -0.053
+> -0.005
+> -0.005
+> +0.055
+> +0.014
+> -0.005
+
+FIG. 4. As in fig. 2, for the PNM squared speed of sound at 4 n0.10 10 0   
+
+> 10 1
+> 10 2
+> 10 3
+> P(n, xβ) [MeV/fm 3]
+> prior
+> only nuclear
+> only astro
+> posterior
+> χEFT
+> 2468
+
+n [n0]          
+
+> 0.0
+> 0.2
+> 0.4
+> xβ(n)
+> FIG. 5. β-equilibrium pressure (top) and proton fraction (bottom) versus baryon density: 90% credible bands for the prior (filled) and the only-nuclear, only-astro, and posterior weightings. Black lines: χEFT mean and 90% credible band [23], drawn over the reliable range of the N 3LO calculation (n≤1.5n0), which is also where the continuous χEFT likeli-hood of section III A acts. 10 11 12 13 14
+
+R [km]     
+
+> 0.5
+> 1.0
+> 1.5
+> 2.0
+> 2.5
+> 3.0
+> M [M ⊙ ]
+> prior
+> only nuclear
+> only astro
+> posterior
+> J0030
+> J0740
+> J0437
+> J0614
+> J0348
+> FIG. 6. Mass–radius diagram: 90% credible bands for the prior (filled) and the only-nuclear, only-astro, and posterior weightings. Thin black contours: 90% HPD regions of the four NICER ( M, R ) posteriors entering the astrophysical like-lihood; grey dash-dotted horizontal lines: 90% interval of the (Gaussian) J0348 mass measurement.
+> B. Robustness
+
+In this subsection we investigate the dependence of the posterior shape on the analysis choices we lay out in sections II and III. To this end, we swap one ingre-dient of the analysis pipeline at a time and report the resulting shifts in the headline observables R1.4, Λ 1.4,and M TOV max in fig. 9. The variations fall into three groups. For the astrophysical likelihoods, we replace the GW170817 posterior with the joint GW+kilonova+GRB afterglow+centroid motion analysis, swap the NICER J0030 and J0614 hotspot models from PDT-U to ST+PDT ,and add the black-widow pulsar J0952. The nuclear-physics inputs are probed by doubling the χEFT corre-lation length to l = 0 .08 fm −3. The prior construction is varied in three ways. We reweight the prior from uniform in the sampled c2 
+
+> s
+
+targets to uniform in the β-equilibrium pressure, we switch the speed-of-sound anchor scheme from five to three anchors, and we restrict the K and J
+
+saturation-parameter boxes to their literature-consensus intervals. Each swap is applied in isolation on the same catalogue, so the reported shift isolates a single analysis choice. The joint GW+kilonova+GRB afterglow+centroid motion analysis of Huez et al. (in preparation) predicts significantly larger values of the reduced tidal polarizabil-ity than our fiducial GW posterior. Hence, replacing the pure-GW posterior by the variant increases the median 
+
+R1.4 by 0 .6 km and Λ 1.4 by 126. Notably, other gravita-tional wave-only posteriors we tested, such as the LIGO– Virgo Collaboration’s own analysis based on a low-spin prior, do not shift our predictions by nearly as much. The anchor-scheme test of section II B evaluates the full posterior on the companion three-anchor catalogue and yields slightly higher R1.4 and Λ 1.4. This shift reflects the reduced flexibility of the coarser grid: with five an-chors, the pressure can stay soft around 2 n0, where R1.4
+
+is set, and rise steeply only at higher densities, so an EOS can reach low R1.4 while still fulfilling the 2 M ⊙ pulsar constraints. The three-anchor form ties these density re-gions together and excludes such late-stiffening solutions. This shows that the large number of degrees of free-dom in the supra-nuclear regime is needed to keep mod-elling assumptions from limiting the posterior. The joint swap of the J0030 and J0614 hotspot models shifts the 
+
+R1.4 posterior by −0.29 km. All remaining variants shift the posterior by comparatively small amounts: a prior reweighted to be uniform in the β-equilibrium pressures at {2, 4, 6} n0 instead of uniform in the sampled c2 
+
+> s
+
+tar-gets (+0 .02 km), the χEFT correlation length doubled to 
+
+l = 0 .08 fm −3 (−0.08 km), and adding the fast-spinning black-widow pulsar J0952–0607 [124], which mainly hard-ens the M TOV max constraint (+0 .10 M ⊙). The M TOV max pos-terior is most sensitive to the addition of the black-widow pulsar J0952, which is measured to be heavier than J0740 and J0348 and therefore shifts the distribution up. Re-stricting the catalogue to the giant-monopole consensus 
+
+K ∈ [210 , 250] MeV shifts the R1.4 posterior median by 11 10 11 12 13 14 
+
+R1.4 [km]      
+
+> probability density
+> prior
+> only nuclear
+> only astro
+> posterior
+> 0200 400 600 800 1000
+
+Λ1.4     
+
+> 1.0 1.5 2.0 2.5 3.0
+
+Mmax [M ⊙ ]
+
+FIG. 7. Marginal distributions of R1.4, Λ 1.4, and M TOV max under the prior, only-nuclear, only-astro, and posterior weightings. Axes are truncated; the prior’s upper tail in Λ 1.4 extends beyond the plotted range. 11.0 11.5 12.0 12.5 13.0 
+
+R1.4 [km]             
+
+> posterior
+> −GW170817
+> −J0030
+> −J0740
+> −J0437
+> −J0614
+> −χEFT
+> −pQCD
+> −J0348
+> +0.42
+> -0.19
+> -0.28
+> +0.21
+> +0.20
+> -0.19
+> -0.02
+> -0.01
+> 200 300 400 500 600
+
+Λ1.4   
+
+> +90
+> -33
+> -60
+> +43
+> +40
+> -12
+> -7
+> -2
+> 2.0 2.2 2.4
+
+Mmax [M ⊙ ]
+
+> +0.02
+> -0.01
+> -0.08
+> +0.01
+> +0.01
+> +0.04
+> +0.05
+> -0.01
+
+FIG. 8. As in fig. 2, for the headline observables R1.4, Λ 1.4, and M TOV max .
+
+less than 0 .01 km, confirming that the wide K box of sec-tion II A carries no constraining power of its own. The analogous restriction of the J box to the χEFT-based re-gion J = 31 .7 ± 1.1 MeV from Drischler et al. [88] shifts the R1.4 median by only 0 .05 km, likewise small against the width of the posterior. Restricting our EOS catalogue to be valid up to 10 n0
+
+also carries ample margin over the densities actually re-alised: the mass-constrained nTOV max distribution has me-dian 5 .4 n0, 90th percentile 6 .9 n0, and 99 .9th percentile 8.5 n0, and the posterior concentrates at still lower densi-ties (99th percentile 7 .6 n0), so the containment require-ment of section II C clips only the compact extreme of the prior and none of the posterior-relevant region. A final robustness check concerns the astrophysical importance estimator itself (appendix D), which carries Monte-Carlo noise from the finite KDE training, query-mass, and mass-marginal subsamples and depends on the kernel bandwidth. We set the bandwidth by Scott’s rule, the standard N −1/(d+4) scaling with sample size N in 
+
+d dimensions [126]. We quantify both the Monte-Carlo noise and the bandwidth dependence. Recomputing ev-ery astrophysical weight under three independent seeds, the per-EOS log-weight scatter has a median of 0 .03–0 .16, depending on the channel. These fluctuations largely av-erage out in the reweighted quantiles, leaving a seed-to-seed spread of the posterior R1.4 and M TOV max medians be-low 0 .05 km and 0 .01 M ⊙ respectively. Varying the kernel bandwidth by ±20% about the Scott value (at fixed seed) shifts those medians by at most 0 .01 km and 0 .001 M ⊙.
+
+V. SELECTION OF A SIMULATION ENSEMBLE 
+
+For numerical-relativity follow-up we select a small ranked ensemble of EOSs such that the spread of merger observables (ejecta masses and composition, nucleosyn-thesis yields, waveforms, postmerger spectral peaks) across simulations of the ensemble brackets the EOS-induced posterior uncertainty, while every member re-mains individually plausible under the posterior of the previous section. We characterise each EOS by the β-equilibrium pressure log Pβ (n) at a set of density anchors spanning 1–5 .5 n0. The β-equilibrium pressure in this range is the most relevant part of the EOS since it de-12 11.0 11.5 12.0 12.5 13.0 
+
+R1.4 [km]                 
+
+> baseline
+> GW →GW+KN+GRB
+> J0030+J0614 →ST+PDT
+> χEFT ℓ→0.08
+> + J0952
+> uniform-Pprior
+> K→[210, 250]
+> J→[30.6, 32.8]
+> 3-anchor catalog
+> +0.56
+> -0.29
+> -0.08
+> +0.11
+> +0.02
+> -0.00
+> +0.05
+> +0.26
+> 200 300 400 500 600
+
+Λ1.4  
+
+> +126
+> -49
+> -12
+> +29
+> +10
+> -1
+> +21
+> +55
+> 2.2 2.4
+
+Mmax [M ⊙ ]
+
+> +0.03
+> -0.01
+> -0.01
+> +0.10
+> +0.04
+> -0.00
+> +0.00
+> -0.02
+
+FIG. 9. Sensitivity test: posterior medians and 90% credible intervals under one-at-a-time swaps of the analysis inputs, relative to the baseline (top row; vertical line). From top to bottom, the swaps are the joint GW+kilonova+GRB afterglow+centroid motion GW170817 posterior in place of the pure-GW one, the ST+PDT hotspot models of J0030 and J0614, the doubled χEFT correlation length l = 0 .08 fm −3, the addition of the black-widow pulsar J0952, a prior uniform in the β-equilibrium pressures at {2, 4, 6} n0, a restriction of the K box to the giant-monopole consensus [210 , 250] MeV, a restriction of the J box to the 
+
+χEFT range [30 .6, 32 .8] MeV, and the companion three-anchor catalogue. The number above each marker gives the median shift relative to the baseline. 
+
+termines the NS’s structure during the inspiral and, to a good approximation, also the structure of the merger remnant. In addition we add the cold equilibrium pro-ton fraction at n = 2 n0 as the dominating composition-dependent factor. The motivation comes from the post-merger neutrino emission of a long-lived remnant. Such a remnant deleptonizes through an excess of electron an-tineutrinos over electron neutrinos, sourced by positron captures on shock-heated, still neutron-rich matter at densities around and above saturation [127, 128]. The luminosity and mean-energy ratio of the two species sets the electron fraction of the neutrino-driven and spiral-wave winds [129], which dominate the ejecta of long-lived remnants and whose nucleosynthesis yields and kilonova signal depend sensitively on the electron fraction in ex-actly this range [130, 131]. The dynamical ejecta, by con-trast, stay neutron-rich enough that their r-process yields are largely insensitive to the exact composition. The neu-tron richness that drives the antineutrino excess is set by the symmetry-energy sector at densities of one to a few 
+
+n0, and xβ (n) is its direct observable. The neutrinos themselves decouple far below saturation, so the compo-sition at these densities acts through the deleptonization budget of the remnant rather than at the emission sur-face. We anchor the feature at 2 n0 since the posterior pins the composition below ≈ 1.5 n0, whereas xβ (2 n0)traces the full supra-saturation rise across the catalogue. The log Pβ (n) anchors are reduced by a posterior-weighted principal-component analysis. We find that four principal components are enough to capture 98 .3% of the weighted variance. The four principal Pβ components are complemented by the weighted z-scored xβ (2 n0), resulting in a five-dimensional, variance-scaled feature space. We build our final EOS ensemble in two steps. First, we identify the highest-posterior-density region in this feature space from a weighted KDE of the EOS cata-logue and pick the closest EOS as our fiducial choice. Second, we cut the catalogue to only the plausible mem-bers, which we define as the highest-posterior-density re-gion [e.g. 103] of the KDE distribution containing 45% of the total posterior mass (the selection region) 2. Then a farthest-point (max–min) greedy traversal of that region [132] produces the ranked list. The first member is the fiducial choice. Each subsequent member is the catalogue point that maximises the Euclidean distance in the fea-ture space to its nearest already-selected neighbour. This maximised distance is the coverage radius rmax of the ensemble before the addition, the largest distance from any plausible catalogue EOS to its nearest member, and each new member shrinks it further. Since we retain the principal components at their eigenvalue scaling rather than sphered to unit variance, the distance in the feature space is variance-weighted and the most varying princi-pal component is traversed preferentially. The z-scored 
+
+xβ dimension has a variance of one by definition, below the three leading Pβ components (eigenvalues 2 .3, 1 .8, and 1 .3) though above the fourth (0 .5). This is intended, since we expect the influence of the composition on the simulation observables to be subdominant with respect to the main stiffness modes. The ranking is nested, so a simulation campaign can use a truncated selection or be extended by more EOSs later. We deliver 12 members: the fiducial and eleven ranked   
+
+> 2This might sound like an extremely narrow cut but only because most of the mass of a five-dimensional distribution sits far from its centre. For the 1-dimensional marginals of the distribution this cut is roughly equivalent to a standard 90% credible interval.
+
+13                                                                                                                                                                          
+
+> TABLE II. Properties of the 12 ranked ensemble members (rank 1 is the fiducial): incompressibility K, symmetry-energy parameters J,L, and Ksym = 9 n20d2Esym /dn2|n0, where Esym (n) = ε(n, 0) −ε(n, 1/2); the β-equilibrium sound speed at 2 and 5 n0and proton fraction at 2 n0; and TOV observables. The last column p/p 0gives the posterior density at each member in the five-dimensional selection feature space, evaluated with the weighted KDE used for the selection and normalised to the fiducial. rank KJLKsym cs(2 n0)cs(5 n0)xβ(2 n0)R1.4Λ1.4MTOV max RTOV max p/p 0
+> [MeV] [MeV] [MeV] [MeV] [km] [M ⊙][km] 1233 36.2 54.3 −291 0.47 0.78 0.065 12.24 397 2.19 11.11 1.00 2266 35.2 41.6 −363 0.33 0.63 0.029 11.05 234 2.15 10.85 0.50 3222 35.8 64.0 −13 0.31 0.89 0.118 11.31 215 2.09 10.30 0.53 4165 32.1 33.6 −290 0.53 0.56 0.023 11.81 402 2.19 11.97 0.55 5255 36.0 59.2 −336 0.34 0.92 0.087 11.27 236 2.29 10.61 0.52 6226 32.2 47.9 −153 0.59 0.48 0.043 12.76 587 2.32 12.52 0.49 7289 34.1 46.4 −372 0.51 0.49 0.023 12.11 406 2.40 11.73 0.50 8255 34.9 69.9 −136 0.40 0.90 0.129 12.24 381 2.32 10.99 0.51 9275 31.4 37.1 −432 0.50 0.89 0.027 11.94 396 2.35 11.16 0.58 10 271 33.3 51.9 −296 0.35 0.91 0.049 11.30 226 2.13 9.99 0.51 11 286 35.5 60.1 −96 0.44 0.81 0.101 12.53 462 2.10 10.69 0.53 12 234 37.3 50.2 −289 0.35 0.37 0.030 11.56 280 2.05 11.30 0.53
+
+alternatives shown in fig. 10. The top-left panel shows their M –R diagrams, the top-right their Pβ (n) curves. The first pick, the fiducial EOS, sits at R1.4 = 12 .24 km, Λ1.4 = 397, M TOV max = 2 .19 M ⊙. Grey bands show the full pointwise support of the selection region, so every pick lies inside it by construction. Table II lists each member’s saturation parameters, intermediate-density properties, and TOV observables. The last column reports the pos-terior density p at each member in the five-dimensional feature space, evaluated with the selection KDE and nor-malised to the density p0 at the fiducial. It quantifies how plausible each member is individually relative to the most likely delivered EOS. All ranked members cluster around 
+
+p/p 0 ≈ 0.5 by construction. The max–min step pushes every pick outward to the boundary of the plausible re-gion, and that boundary is an iso-density surface of the KDE, the density threshold of the 45% highest-density cut, which for this posterior lies at about half the fiducial density. Figure 11 quantifies the convergence of this construc-tion with the truncation depth N and motivates the de-livered ensemble size. The top panel follows the max–min objective itself. Around every plausible catalogue EOS one can draw the largest ball in the five-dimensional fea-ture space that contains no ensemble member, and the radius of the largest such ball over the whole region is the coverage radius rmax introduced above. Its volume r5max 
+
+measures the largest hole the truncated ensemble leaves in the plausible region, the neighbourhood of EOS space that simulations of the first N members probe least. For reference, the dashed curve shows the same statistic for ensembles of N EOSs drawn at random from the poste-rior, as the median over 16 realisations. At every depth the ranked ensemble leaves a hole 1 .5 to 4 .5 times smaller in volume, and the random curve reaches the coverage of the ranked ensemble at N = 12 only around N ≈ 27. For an ensemble that fills the region evenly the coverage radius falls as N −1/d with the feature-space dimension 
+
+d, so the hole volume rd 
+
+> max
+
+falls as 1 /N independent of the dimension. The measured curve follows this trend, a slow and steady improvement with no intrinsic stop-ping point, so the max–min objective alone cannot fix the delivered ensemble size. The bottom panel therefore scores the same nested en-sembles in terms of the physical observables the ensem-ble is meant to bracket. For each observable and each depth N we take the minimum and the maximum over the first N members as the bracket and sum the pos-terior mass of all plausible catalogue EOSs whose value falls inside it. A bracketed mass of 100% means simu-lations of the N members bound the plausible range of that observable from both sides, while the missing mass corresponds to EOSs more extreme than every member. In this view natural cut-offs do appear. Four members bracket the radii and the proton fraction to 86% or bet-ter after jumps in Rmax and xβ (2 n0), and with six the radii and the low-density pressure are essentially com-plete after further jumps in R1.4, R1.8, Pβ (2 n0), and 
+
+M TOV max . Past N = 6 the curves plateau until the twelfth member, a soft extreme with M TOV max = 2.05 M ⊙ and 
+
+xβ (2 n0) = 0 .030, lifts the M TOV max and Pβ (6 n0) brack-ets from 82% and 89% to 96%. We therefore deliver 
+
+N = 12 members, at which point every observable in fig. 11 is bracketed at the 93% level or better. Across the twelve members the ensemble spans R1.4 = 11 .1– 12 .8 km, Λ 1.4 = 215–587, M TOV max = 2 .05–2 .40 M ⊙, and 
+
+xβ (2 n0) = 0 .023–0 .129, covering the bulk of the poste-rior 90% interval of each observable. Applications need-ing fewer members can truncate the nested ranking at four or six, and later campaigns can extend it without 14 10 11 12 13 14 
+
+R [km]         
+
+> 1.0
+> 1.2
+> 1.4
+> 1.6
+> 1.8
+> 2.0
+> 2.2
+> 2.4
+> 2.6
+> M [M ⊙ ]
+> selection region
+> fi ducial (rank 1)
+> 1
+> 234
+> 56
+> 7
+> 89
+> 10 11
+> 12
+> 12345
+
+n/n0    
+
+> 10 0
+> 10 1
+> 10 2
+> Pβ [MeV fm −3]
+> 12345
+
+n/n0    
+
+> 0.0
+> 0.1
+> 0.2
+> 0.3
+> xβ
+> 12345
+
+n/n0
+
+> 1.6
+> 1.8
+> 2.0
+> 2.2
+> Γth
+
+T = 10 MeV       
+
+> m*P/S = 0.95/0.85
+> m*P/S = 0.85/0.75
+> m*P/S = 1.05/0.95
+
+FIG. 10. The delivered simulation ensemble: the fiducial member (rank 1) and the eleven further ranked members, over the full support of the selection region of section V (grey: the envelope, at each mass or density, of every catalogue member inside the region). Panels: mass–radius curves, cold β-equilibrium pressure Pβ (n), equilibrium proton fraction xβ (n), and the thermal index Γ th (n) at T = 10 MeV. In the first three panels the fiducial (rank 1) is the thick black curve and the remaining members are rank-coloured; each curve is numbered by its rank, inline in the mass–radius panel only. The Γ th panel shows the three delivered effective-mass levels as linestyle ( ±0.10 about the sector-split reference m∗
+
+> PNM
+
+/m ∗ 
+
+> SNM
+
+= 0 .95 /0.85); each shaded band is the member-to-member envelope, which the split (composition-dependent) effective masses render non-negligible (∆Γ th ∼ 0.1–0 .3 across the ensemble), unlike the flat-m∗ case. 
+
+invalidating earlier runs. The catalogue fixes the effective masses at the refer-ence values of section II for every member, so the selec-tion above ranks cold-sector diversity only and none of the data in this analysis directly constrain the nucleon ef-fective mass, which controls the thermal response of the EOS. We therefore augment each selected member with effective-mass variants that bracket the theoretically al-lowed thermal response at fixed cold-sector behaviour. The variants we supply are a low (strong-thermal) level at m∗
+
+> SNM
+
+/m = 0 .75, m∗
+
+> PNM
+
+/m = 0 .85 and a high (weak-thermal) level at 0 .95, 1 .05. With the reference level, each member is thus released at three effective-mass lev-els, for a total of 36 tables. The member’s full parame-ter set, the 16 cold-sector inputs (six saturation param-eters and ten speed-of-sound targets) together with the exponent vector δ, is held fixed, and only the effective-mass targets are shifted. This modification preserves the cold β-equilibrium pressure Pβ (n) and composition 
+
+xβ (n) to high accuracy. Across every member the vari-ants move the mass–radius sequence by at most 13 m in 
+
+R1.4 and the cold pressure by under 1 .5% out to 8 n0.The resulting spread in the thermal index Γ th (eq. (3)) at kB T = 10 MeV and x = xβ is shown in the bottom-right panel of fig. 10. The spread within each m∗ variant comes from the proton-fraction dependence of the ther-mal index through the member-to-member variation of 
+
+xβ .Each released EOS, the twelve ensemble members and their effective-mass variants, is propagated with 15 10 2         
+
+> 10 3
+> largest uncovered volume  r5max  ranked max-min ensemble
+> posterior-sampled ensembles
+> 246810 12 14 16 18 20
+
+ensemble size N                 
+
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> bracketed mass [%]
+> R(1.4)
+> R(1.8)
+> Rmax
+> Pβ(2 n0)
+> Pβ(4 n0)
+> Pβ(6 n0)
+> xβ(2 n0)
+> Mmax
+> FIG. 11. Convergence of the ranked ensemble with the number of delivered members N.Top: the volume r5max
+> of the largest member-free ball in the variance-scaled five-dimensional selection space, for the ranked max–min ensemble and for ensembles of Nrandom posterior draws (median over 16 realisations). Bottom: the posterior mass whose observ-able value lies between the member minimum and maximum, for each labelled observable. Catalogue EOSs for which an observable is undefined, e.g. Pβ(6 n0) when the table ends be-low 6 n0, count as not bracketed. The vertical line marks the delivered N= 12.
+
+the SROEOS code into a complete general-purpose finite-temperature table, tabulated in baryon density, tem-perature, and proton fraction ( Ye = x) on a grid of 400 × 200 × 96 points. The ranges are tailored per ta-ble: the temperature spans 0 .01–300 MeV, the proton fraction runs from 0 .01 up to 0 .6, bracketing the β-equilibrium composition and reaching proton-rich mat-ter, and the baryon density runs from far below neutron drip ( ≈ 10 −12 fm −3) up to that EOS’s own construction validity limit, the lowest density at which monotonicity or causality fails ( ≈ 10 n0 for the fiducial). Each table is assembled from two SROEOS solves shar-ing the member’s Skyrme coefficients. A single-nucleus approximation (SNA) solve covers the full density range and describes inhomogeneous matter as a dense phase, representing nuclei, coexisting with a dilute gas of alpha particles and unbound nucleons, with the dissolution of nuclei into uniform matter (crust melting) treated as a first-order phase transition. A companion NSE solve cov-ers the low-density regime with an ensemble of 3332 nu-clides whose masses and partition functions come from the JINA REACLIB compilation [133]. The two solu-tions are blended in the free energy with a smooth tanh weight in log 10 n, centred at the SROEOS default transition density nt = 10 −4 fm −3 with a width of 0 .33 dex. Be-low the transition the NSE ensemble with its experimen-tal masses is the more faithful description, while above it the SNA treatment, derived from the member’s own functional, better captures the increasingly neutron-rich matter approaching neutron drip and the crust-core tran-sition.  
+
+> VI. CONCLUSIONS
+
+We have presented an extensive multimessenger infer-ence of the nuclear EOS employing modern constraints from nuclear physics and astrophysics, based on the sim-plified Skyrme functional of the SROEOS code. Great care has been taken to maximise the flexibility of the parame-terisation to minimise model-dependent correlations and limitations of the prior. Based on the resulting EOS cat-alogue, we introduce a general and systematic method for reducing a weighted multimessenger EOS posterior to a small, ranked ensemble of finite-temperature EOSs ready for simulation. The construction is deliberately generic: the selection of section V takes any weighted EOS catalogue as input and applies regardless of how that posterior was produced, so it is not tied to the Skyrme sampling used here. With the large simulation campaigns that a new generation of GPU-accelerated, exascale-capable numerical-relativity codes is now mak-ing feasible, our catalogue enables the direct and sys-tematic propagation of nuclear- and astrophysics-derived constraints to the predictions of observables by numeri-cal simulations of compact object mergers or supernovae, such as the gravitational wave signal, the nucleosynthe-sis, or the electromagnetic transients. The works closest to the one presented here are the extended-Skyrme Bayesian inferences of Beznogov and Raduta [52, 53], together with their families of finite-temperature tables [73, 74], and the finite-temperature free-energy model of Du et al. [75]. Both programs de-liver small sets of simulation-ready general-purpose ta-bles, and both differ from this work in the same three respects: where the data act on the EOS, how flexibil-ity and causality are handled at supra-saturation den-sities, and how the released tables relate to the infer-ence. Neither includes the multimessenger constraints from GW170817 and NICER. In the Beznogov–Raduta inference every constraint acts, by deliberate design, at or near saturation density (nuclear empirical parameters together with χEFT PNM energies and effective masses at n ≤ n0), with astrophysics entering only as a hard 16 maximum-mass cut, and their own analysis concludes that the high-density behaviour of the posterior is dom-inated by the functional rather than by the constraints [52]. Du et al. [75] do constrain the high-density sector observationally, but through X-ray mass–radius analyses predating GW170817 and NICER, entering as a discrete set of samples that, as the authors note, disfavours strong phase transitions. Causality likewise separates the approaches: Skyrme-type parameterisations typically turn superluminal in the sound speed [76], so every program must contain this fail-ure mode somehow. The Brussels-extended functional draws its high-density freedom from three sampled den-sity exponents, and causality is imposed as cuts: the sound speed is checked only at the maximum-mass cen-tral density, not across the range their posterior probes [53]. Du et al. [75] restore causality post hoc, replacing the EOS with a constant-sound-speed solution wherever 
+
+c2 
+
+> s
+
+exceeds 0 .9. In our pipeline the exponent existence search instead certifies causality inside the functional out to 10 n0, and the ten speed-of-sound targets it realises are sampled degrees of freedom weighted by the GW, NICER, and pQCD likelihoods acting at exactly those densities. A further difference is internal consistency. The free energy of Du et al. [75] is assembled piecewise: the cold isoscalar sector is a Skyrme functional, but the symme-try energy, the high-density extension, and the thermal sector are separate ingredients, the last being one fixed auxiliary Skyrme interaction ( m∗/m = 0.904) shared by every released EOS, so their distribution carries no thermal-response spread (a restriction the authors note themselves). The Raduta–Beznogov tables derive homo-geneous matter from a single functional per model, but the crust is built on tabulated nuclear masses external to the functional [73]. In our tables the cold EOS, the thermal sector, and the high-density part of the inhomo-geneous phase (in the single-nucleus approximation) fol-low from the same Skyrme coefficients for every model. The fixed BPS crust of appendix C serves only the cold TOV solve of the catalogue stage and does not enter the released tables. Finally, neither program links its released tables to its inference. The five Brussels-extended tables were hand-picked at the extremes of the effective-mass distribution, two of them outside the authors’ own refined consistency set [74], and the seven tables of Du et al. [75] share a single nuclear-physics parameterisation. Our ensemble members are posterior draws themselves, ranked by the nested max–min construction into a defined statistical reduction of the multimessenger posterior, and each is delivered with effective-mass variants that bracket the thermal response at fixed cold-sector behaviour. The se-lection step takes only a weighted catalogue as input and applies unchanged to any EOS posterior, however pro-duced. At the same time, the SROEOS functional we employ has several shortcomings compared to more modern Skyrme-type functionals. The Brussels-extended effective mass reproduces the isospin splitting and non-monotonic den-sity dependence of ab initio predictions more closely than the simple SROEOS form (eq. (2)), so our thermal sec-tor spans the plausible response only through the dis-crete effective-mass variants and does not resolve a non-monotonic m∗(n). This limitation is mild in practice since the effective mass enters our tables only through the thermal sector, and the thermal contribution to the pressure becomes subdominant already above 1–2 n0
+
+[134]. The detailed m∗(n) shape at high density there-fore has little leverage on the remnant dynamics, and the sector-split variants bracket the response where it matters. Furthermore, nucleonic energy functionals with better-behaved high-density limits exist: the Skyrme-like extensions of Huth et al. [83] are built to approach a causal asymptote (a property relativistic mean-field mod-els share by construction), and related forms underpin the energy-density-functional inference of Lim and Holt [50] and the nucleonic metamodel [54]. An SROEOS -like table generator built on such a functional would simplify the causality search and remedy the m∗(n) shape limita-tion at once, and we consider it the natural next step for constraint-consistent table sets. The smooth Skyrme functional adopted here describes purely nucleonic matter with a quadratic isospin depen-dence, and by construction represents neither first-order phase transitions nor non-nucleonic degrees of freedom (hyperons, deconfined quark matter). The prior, and hence every posterior statement in this work, is condi-tional on this model space, and the quoted credible inter-vals do not bound the softening a strong hybrid transition could introduce. Because hybrid and phase-transition constructions are conventionally built by grafting a high-density branch onto a baryonic reference EOS, the re-leased ensemble can serve as such a reference set and be amended with these extensions after the fact, while a full Bayesian treatment of that larger model space is left to future work. The ranked selection lists of table II and the SROEOS 
+
+general-purpose tables for every delivered ensemble mem-ber and its effective-mass variants will be released on Zenodo upon publication of this article. 
+
+> ACKNOWLEDGMENTS
+
+MJ and SB acknowledge funding from the Deutsche Forschungsgemeinschaft (DFG) project MEMI number BE 6301/2-2 (project number 443239082). GH and SB acknowledge funding from the EU Horizon un-der ERC Consolidator Grant, no. InspiReM-101043372 and from the Deutsche Forschungsgemeinschaft, DFG, project MEMI number BE 6301/2-1. This work was sup-ported by the Deutsche Forschungsgemeinschaft (DFG) - BE 6301/8-1 (project number 563106943) and the Na-tional Science Foundation (NSF) - PHY-2512802 under the DFG-NSF Physics “Multimessenger Astronomy of 17 Neutron Star Mergers with Numerical Relativity”. SB acknowledges support from DFG BE 6301/8-1 (project number 563106943). DR acknowledges support from the U.S. Department of Energy, Office of Science, Di-vision of Nuclear Physics under Award Number(s) DE-SC0024388, and from the National Science Founda-tion under Grants PHY-2020275, PHY-2116686, PHY-2407681, PHY-2512802, and PHY-2621752. Simulations were performed on the Lichtenberg II clus-ter at TU Darmstadt and the ARA and DRACO clusters at Friedrich Schiller University Jena. The authors grate-fully acknowledge the computing time provided to them at the NHR Center NHR4CES at TU Darmstadt (project number p0026834 ). This is funded by the Federal Min-istry of Research, Technology and Space, and the state governments participating on the basis of the resolutions of the GWK for national high performance computing at universities ( www.nhr-verein.de/unsere-partner ). The ARA cluster is funded in part by DFG grants INST 275/334-1 FUGG and INST 275/363-1 FUGG, and ERC Starting Grant, grant agreement no. BinGraSp-714626. 
+
+> Appendix A: Skyrme coefficient linear system
+
+Given fixed density exponents {δi} (Nterms = 8 for the five-anchor scheme) and target values for the 2 Nterms 
+
+nuclear-physics observables in table I, the Skyrme coef-ficients ( ai, b i) are determined by solving two decoupled 
+
+Nterms × Nterms linear systems, one per isospin channel. 
+
+a. SNM channel. Using ˜ ai = ai + bi, the energy at 
+
+x = 1 /2 is εSNM pot = P 
+
+> i
+
+˜ainδi . The prescribed targets (B, n 0, K, c 2SNM ,1, . . . , c 2SNM ,m ) yield the linear system 
+
+MSNM ˜a = rSNM with row vectors [MSNM ]B = ( nδi 
+
+> 0
+
+) , (A1) [MSNM ]n0 = ( δi nδi 
+
+> 0
+
+) , (A2) [MSNM ]K = ( δi(δi + 1) nδi 
+
+> 0
+
+) , (A3) [MSNM ]c2SNM ,j =  (δi + 1) nδi 
+
+> j
+
+(δi − c2SNM ,j ) , j = 1 , . . . , m , 
+
+(A4) where nj runs over the m anchor densities of table I and 
+
+c2SNM ,j denotes the sampled SNM target c2
+
+> s
+
+(nj , 1/2). The right-hand side components are 
+
+rB = B + ∆ /2 − εkin (n0, 12 ) , (A5) 
+
+rn0 = −Pkin (n0, 12 )/n 0 , (A6) 
+
+rK = K/ 9 − (∂P kin /∂n )|n0, 1/2 , (A7) 
+
+rc2SNM ,j = c2SNM ,j hkin (nj , 12 ) − (∂P kin /∂n )|nj , 1/2 , (A8) where all kinetic quantities are evaluated with the effec-tive masses of eq. (2), at the α1,2 values fixed in closed form by the m∗ prescription of section II. The last row fol-lows from the causality equation c2 
+
+> s
+
+= ( ∂P/∂n )x/h eval-uated at n = nj , x = 1 /2. Here hkin follows the same convention as h in eq. (8) with only kinetic (and electron) contributions retained, hkin = mn + εkin + Pkin /n − x∆ + 
+
+x μ e. In particular it includes the neutron rest mass. 
+
+b. PNM channel. Only the coefficients ai ap-pear because at x = 0 the interaction reduces to εPNM pot = P 
+
+> i
+
+ainδi . The prescribed targets (J, L, ˜Ksym , c 2PNM ,1, . . . , c 2PNM ,m ) yield MPNM a = rPNM 
+
+with the same row structure as above (replacing x =1/2 → 0 and the target values accordingly), except for three right-hand sides: the J-row uses rJ = B + J −
+
+εkin (n0, 0), the L-row (the PNM analogue of the SNM 
+
+n0-row) uses rL = L/ 3 − Pkin (n0, 0) /n 0, and the curva-ture row uses r ˜Ksym = KPNM /9 − (∂P kin /∂n )|n0, 0. The two systems are solved independently by standard LU 
+
+decomposition. 
+
+> Appendix B: Exponent existence search: full protocol
+
+Section II C introduces the SLSQP existence search at a conceptual level. This appendix gives the numerical protocol used for the production catalogue of section IV. 
+
+a. Objective and constraints. The descent minimises 
+
+F ([ δi]) = 1
+
+G
+
+X
+
+> (n,x )
+
+h
+
+max  0, m − c2
+
+> s
+
+(n, x )3/2
+
++ max  0, c 2
+
+> s
+
+(n, x ) − (1 − m)3/2i
+
+− λ X
+
+> i
+
+ln( δi − δi−1) , (B1) where m = 0 .02 is a small margin inside the causal inter-val, λ = 10 −2, and the sum runs over a grid of G points, 55 densities evenly spaced in n/n 0 from 0 .5 to 11 (one 
+
+n0 beyond the topmost speed-of-sound anchor) times 21 values of x evenly spaced in [0 , 0.5]. The analytic depen-dency of c2
+
+> s
+
+(n, x ) on [ δi] is given by the linear solve of appendix A. The first term is a hinge penalty of power 1.5 on c2 
+
+> s
+
+excursions outside [ m, 1−m]. A quadratic hinge (power 2) was found to stall on shallow violations (van-ishing gradient as the violation depth → 0). A linear hinge (power 1) corrupts the optimiser’s quasi-Newton model with gradient discontinuities at the hinge. Power 1.5 keeps the objective continuously differentiable while remaining sensitive to shallow violations. The second term is a smooth log-barrier on the consecutive expo-nent gaps (including the fixed δ1 = 1), which steers the optimiser toward well-separated exponents without rejecting draws, backed by a hard minimum-gap con-straint of 0 .02 per pair. It counters near-degenerate ex-ponent pairs, which give large, cancelling Skyrme coeffi-cients that ill-condition the linear solve of appendix A. The barrier lowers the surviving catalogue’s linear-solve condition numbers by over an order of magnitude in the bulk at unchanged survivor yield and with no measurable shift of the effective prior. The two hard constraints of section II C (unitary-gas bound, symmetry-energy pos-itivity) carry small positive margins (0 .1 MeV each) so 18 that the optimiser’s own convergence tolerance cannot leave a solution just outside the bound. The actual ac-cept/reject decision tests the pure hinge term on a finer grid (240 density points to 10 n0, the topmost anchor) than the objective above (which extends one n0 further, nudging solutions to stay causal a little past their last explicit constraint). 
+
+b. Restarts and starting points. Up to 5 indepen-dent restarts are attempted per draw, stopping at the first one that finds a causal, constraint-satisfying solu-tion. Each restart draws a fresh set of starting expo-nent gaps ( δi − δi−1) from an exponential distribution and screens up to 20 such starting points before com-mitting to a full descent. The screen accepts a starting point if max |c2 
+
+> s
+
+− 1/2| < 1.5 over the objective grid, i.e. if c2 
+
+> s
+
+∈ (−1, 2) everywhere, at the cost of a single objec-tive evaluation per guess. Starting points failing this test lie so far from the causal band that descents from them rarely succeed. If no guess passes within the budget, the least-bad one (smallest max |c2 
+
+> s
+
+− 1/2|) is used instead of vetoing the draw. The selected starting point then seeds a single SLSQP descent (20 iterations, analytic Jacobian) run to completion. 
+
+c. Polish stage. If every restart fails but the best attempt is a near-miss (final penalty below a small threshold), one basinhopping chain (repeated perturb-and-redescend hops, each a further local SLSQP polish) is seeded at that near-miss before giving up on the draw. 
+
+> Appendix C: BPS crust matching
+
+The matching procedure operates in the space of en-ergy density ε and pressure P . First, we find εc, de-fined by minimising the pressure difference |Pcore (εc) −
+
+PBPS (εc)| over the overlap in energy density. The cor-responding baryon density nc is then obtained by linear interpolation. Between nc − ∆n and nc + ∆ n we con-nect Pcore (ε) and PBPS (ε) with a Piecewise Cubic Her-mite Interpolating Polynomial (PCHIP) spline fitted to both the BPS data below nc − ∆n and the Skyrme-core data above nc + ∆ n. Starting from ∆ n = 0 .05 fm −3, the gap is widened iteratively by a factor 1 .5 each step un-til the pressure increase across the gap, ∆ P = P (nc +∆n) − P (nc − ∆n), exceeds a minimum threshold of 0.01 MeV fm −3. The resulting composite EOS is smooth and monotone across the transition by construction. This matched barotrope P (ε) is all the catalogue stage needs, since it enters only the cold TOV solve. The released finite-temperature tables do not use it. There, the low-density inhomogeneous phase and all its thermodynamic derivatives are computed within the SROEOS code itself (section V). 
+
+> Appendix D: Astrophysical importance estimator
+
+The GW and NICER channels of section III B share one estimator. For each event k we fit a Gaussian KDE ˆpk to the published posterior samples in the event’s own measurement space: ( M, R ) for the NICER sources, and chirp mass, mass ratio, and the two tidal deformabili-ties for GW170817. The KDE is evaluated at the point the candidate EOS predicts for given source masses: the radius R(m; iEOS ) read off the candidate’s M –R
+
+curve, or the deformabilities Λ 1,2(m1,2; iEOS ) off its Λ( M )curve. The source masses are nuisance parameters and are marginalised with a flat prior, reusing the event’s own posterior mass samples m(s) as importance points: 
+
+p(dk | iEOS ) ∝
+
+P 
+
+> s
+
+ws ˆpk
+
+ x(m(s); EOS) P 
+
+> s
+
+ws
+
+, (D1) 
+
+ws = 1ˆp mk (m(s)) ,
+
+where x(m; EOS) is the predicted measurement-space point and ˆ p mk is a KDE of the event’s marginal mass distribution. The weights ws cancel the sampling den-sity of the mass samples, so the mass integral runs over a flat prior rather than over the event’s own mass pos-terior: a plain average over the samples would implic-itly re-impose that posterior as a mass prior and double-count the mass information. For GW170817, ws addi-tionally contains the Jacobian from the sampled ( M, q )coordinates to component masses, keeping a flat prior in (m1, m 2). Since ˆ pk is built from posterior samples, it esti-mates the event’s posterior, not its likelihood. Using it in place of the likelihood is justified if the original analysis’ prior is flat in the remaining measurement coordinates (radius for the NICER sources, tidal deformabilities for GW170817), so that posterior and likelihood are propor-tional there. The published priors for these data sets are approximately flat in those coordinates.                                                
+
+> [1] L. Baiotti and L. Rezzolla, Rept.Prog.Phys. 80 (2017), 10.1088/1361-6633/aa67bb, arXiv:1607.03540 [gr-qc]. [2] M. Shibata and K. Hotokezaka, Ann.Rev.Nucl.Part.Sci.
+> 69 , 41 (2019), arXiv:1908.02350 [astro-ph.HE]. [3] D. Radice, S. Bernuzzi, and A. Perego, Ann.Rev.Nucl.Part.Sci. 70 , 95 (2020), arXiv:2002.03863 [astro-ph.HE]. [4] S. Bernuzzi, Gen.Rel.Grav. 52 ,108 (2020), arXiv:2004.06419 [astro-ph.HE]. [5] S. Bernuzzi, A. Nagar, T. Dietrich, and T. Damour, Phys.Rev.Lett. 114 (2015), 10.1103/Phys-RevLett.114.161103, arXiv:1412.4553 [gr-qc]. [6] A. Abac, T. Dietrich, A. Buonanno, J. Steinhoff, and M. Ujevic, Phys.Rev.D 109 (2024), 10.1103/Phys-RevD.109.024062, arXiv:2311.07456 [gr-qc]. [7] M. Breschi, S. Bernuzzi, F. Zappa, M. Agathos, A. Perego, D. Radice, and A. Nagar, Phys.Rev.D
+> 100 (2019), 10.1103/PhysRevD.100.104029,
+
+19 
+
+arXiv:1908.11418 [gr-qc]. [8] R. Kashyap, A. Das, D. Radice, S. Padamata, A. Prakash, D. Logoteta, A. Perego, D. A. Godzieba, S. Bernuzzi, I. Bombaci, F. J. Fattoyev, B. T. Reed, and A. da Silva Schneider, Phys.Rev.D 105 (2022), 10.1103/PhysRevD.105.103022, arXiv:2111.05183 [astro-ph.HE]. [9] A. Perego, D. Logoteta, D. Radice, S. Bernuzzi, R. Kashyap, A. Das, S. Padamata, and A. Prakash, Phys.Rev.Lett. 129 (2022), 10.1103/Phys-RevLett.129.032701, arXiv:2112.05864 [astro-ph.HE]. [10] V. Nedora, S. Bernuzzi, D. Radice, B. Daszuta, A. En-drizzi, A. Perego, A. Prakash, M. Safarzadeh, F. Schi-anchi, and D. Logoteta, Astrophys.J. 906 , 98 (2021), arXiv:2008.04333 [astro-ph.HE]. [11] K. Kiuchi, S. Fujibayashi, K. Hayashi, K. Kyutoku, Y. Sekiguchi, and M. Shibata, Phys.Rev.Lett. 
+
+131 (2023), 10.1103/PhysRevLett.131.011401, arXiv:2211.07637 [astro-ph.HE]. [12] A. Neuweiler, H. Gieg, H. Rose, H. Koehn, I. Markin, F. Schianchi, L. Brodie, A. Haber, V. Nedora, M. Bulla, and T. Dietrich, Phys.Rev.D 113 (2026), 10.1103/mxlf-8sbm, arXiv:2510.14850 [astro-ph.HE]. [13] F. Magistrelli, S. Bernuzzi, A. Perego, M. Jacobi, and C. J. Fontes, Astron.Astrophys. 708 , A126 (2026), arXiv:2512.11032 [astro-ph.HE]. [14] A. Bauswein, T. Baumgarte, and H. T. Janka, Phys.Rev.Lett. 111 (2013), 10.1103/Phys-RevLett.111.131101, arXiv:1307.5191 [astro-ph.SR]. [15] K. Hayashi, S. Fujibayashi, K. Kiuchi, K. Kyutoku, Y. Sekiguchi, and M. Shibata, Phys.Rev.D 106 (2022), 10.1103/PhysRevD.106.023008, arXiv:2111.04621 [astro-ph.HE]. [16] K. Kiuchi, A. Reboul-Salze, M. Shibata, and Y. Sekiguchi, Nature Astron. 8, 298 (2024), arXiv:2306.15721 [astro-ph.HE]. [17] C. Musolino, L. Rezzolla, and E. R. Most, Astro-phys.J.Lett. 984 , L61 (2025), arXiv:2410.06253 [astro-ph.HE]. [18] K. Hebeler, J. Lattimer, C. Pethick, and A. Schwenk, Astrophys.J. 773 , 11 (2013), arXiv:1303.4662 [astro-ph.SR]. [19] J. Lynn, I. Tews, J. Carlson, S. Gandolfi, A. Gezerlis, K. Schmidt, and A. Schwenk, Phys.Rev.Lett. 
+
+116 (2016), 10.1103/PhysRevLett.116.062501, arXiv:1509.03470 [nucl-th]. [20] C. Drischler, R. Furnstahl, J. Melendez, and D. Phillips, Phys.Rev.Lett. 125 (2020), 10.1103/Phys-RevLett.125.202702, arXiv:2004.07232 [nucl-th]. [21] D. Lonardoni, I. Tews, S. Gandolfi, and J. Carl-son, Phys.Rev.Res. 2 (2020), 10.1103/PhysRevRe-search.2.022033, arXiv:1912.09411 [nucl-th]. [22] J. Keller, K. Hebeler, and A. Schwenk, Phys. Rev. Lett. 
+
+130 , 072701 (2023), arXiv:2204.14016 [nucl-th]. [23] H. G¨ ottling, L. Hoff, K. Hebeler, and A. Schwenk, Phys. Rev. C 113 , 055804 (2026), arXiv:2512.19593 [nucl-th]. [24] O. Komoltsev and A. Kurkela, Phys.Rev.Lett. 
+
+128 (2022), 10.1103/PhysRevLett.128.202701, arXiv:2111.05350 [nucl-th]. [25] T. Gorda, O. Komoltsev, and A. Kurkela, Astrophys. J. 950 , 107 (2023), arXiv:2204.11877 [nucl-th]. [26] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 119 , 161101 (2017), arXiv:1710.05832 [gr-qc]. [27] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 121 , 161101 (2018), arXiv:1805.11581 [gr-qc]. [28] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. X 9, 011001 (2019), arXiv:1805.11579 [gr-qc]. [29] T. E. Riley, A. L. Watts, S. Bogdanov, P. S. Ray, R. M. Ludlam, S. Guillot, Z. Arzoumanian, C. L. Baker, A. V. Bilous, D. Chakrabarty, K. C. Gendreau, A. K. Hard-ing, W. C. Ho, J. M. Lattimer, S. M. Morsink, and T. E. Strohmayer, Astrophys.J.Lett. 887 , L21 (2019), arXiv:1912.05702 [astro-ph.HE]. [30] M. Miller, F. Lamb, A. Dittmann, S. Bogdanov, Z. Arzoumanian, K. Gendreau, S. Guillot, A. Hard-ing, W. Ho, J. Lattimer, R. Ludlam, S. Mahmoodifar, S. Morsink, P. Ray, T. Strohmayer, K. Wood, T. Enoto, R. Foster, T. Okajima, G. Prigozhin, and Y. Soong, Astrophys.J.Lett. 887 , L24 (2019), arXiv:1912.05705 [astro-ph.HE]. [31] T. E. Riley, A. L. Watts, P. S. Ray, S. Bogdanov, S. Guillot, S. M. Morsink, A. V. Bilous, Z. Arzouma-nian, D. Choudhury, J. S. Deneva, K. C. Gendreau, A. K. Harding, W. C. Ho, J. M. Lattimer, M. Loewen-stein, R. M. Ludlam, C. B. Markwardt, T. Okajima, C. Prescod-Weinstein, R. A. Remillard, M. T. Wolff, E. Fonseca, H. T. Cromartie, M. Kerr, T. T. Pennucci, A. Parthasarathy, S. Ransom, I. Stairs, L. Guillemot, and I. Cognard, Astrophys.J.Lett. 918 , L27 (2021), arXiv:2105.06980 [astro-ph.HE]. [32] M. Miller, F. Lamb, A. Dittmann, S. Bogdanov, Z. Arzoumanian, K. Gendreau, S. Guillot, W. G. Ho, J. Lattimer, M. Loewenstein, S. Morsink, P. Ray, M. Wolff, C. Baker, T. Cazeau, S. Manthripra-gada, C. Markwardt, T. Okajima, S. Pollard, I. Cog-nard, H. Cromartie, E. Fonseca, L. Guillemot, M. Kerr, A. Parthasarathy, T. Pennucci, S. Ran-som, and I. Stairs, Astrophys.J.Lett. 918 , L28 (2021), arXiv:2105.06979 [astro-ph.HE]. [33] T. Salmi et al., Astrophys. J. 974 , 294 (2024), arXiv:2406.14466 [astro-ph.HE]. [34] D. Choudhury et al., Astrophys. J. Lett. 971 , L20 (2024), arXiv:2407.06789 [astro-ph.HE]. [35] Y. Kini, L. Mauviard, T. Salmi, A. L. Watts, S. Guillot, B. Dorsman, D. Choudhury, D. Gonz´ alez-Caniulef, M. Hoogkamer, D. Huppenkothen, C. Kazant-sev, M. Kerr, S. Nissanke, P. S. Ray, P. Stammler, and S. Vinciguerra, Astrophys.J. 1005 , 201 (2026), arXiv:2602.23743 [astro-ph.HE]. [36] L. Mauviard, S. Guillot, T. Salmi, D. Choudhury, B. Dorsman, D. Gonzalez-Caniulef, M. Hoogkamer, D. Huppenkothen, C. Kazantsev, Y. Kini, J.-F. Olive, P. Stammler, A. L. Watts, M. Mendes, N. Rutherford, A. Schwenk, I. Svensson, S. Bogdanov, M. Kerr, P. S. Ray, L. Guillemot, I. Cognard, and G. Theureau, Astro-phys.J. 995 , 60 (2025), arXiv:2506.14883 [astro-ph.HE]. [37] J. Antoniadis, P. C. Freire, N. Wex, T. M. Tauris, R. S. Lynch, M. H. van Kerkwijk, M. Kramer, C. Bassa, V. S. Dhillon, T. Driebe, J. W. Hessels, V. M. Kaspi, V. I. Kondratiev, N. Langer, T. R. Marsh, M. A. McLaugh-lin, T. T. Pennucci, S. M. Ransom, I. H. Stairs, J. van Leeuwen, J. P. Verbiest, and D. G. Whelan, Science 
+
+340 , 6131 (2013), arXiv:1304.6875 [astro-ph.HE]. [38] E. Fonseca et al., Astrophys. J. Lett. 915 , L12 (2021), arXiv:2104.00880 [astro-ph.HE]. [39] J. S. Read, B. D. Lackey, B. J. Owen, and J. L. Friedman, Phys.Rev.D 79 (2009), 10.1103/Phys-20 
+
+RevD.79.124032, arXiv:0812.2163 [astro-ph]. [40] I. Tews, J. Carlson, S. Gandolfi, and S. Reddy, Astro-phys.J. 860 , 149 (2018), arXiv:1801.01923 [nucl-th]. [41] S. Greif, G. Raaijmakers, K. Hebeler, A. Schwenk, and A. Watts, Mon.Not.Roy.Astron.Soc. 485 , 5363 (2019), arXiv:1812.08188 [astro-ph.HE]. [42] P. Landry and R. Essick, Phys.Rev.D 99 (2019), 10.1103/PhysRevD.99.084049, arXiv:1811.12529 [gr-qc]. [43] E. Annala, T. Gorda, A. Kurkela, and A. Vuori-nen, Phys.Rev.Lett. 120 (2018), 10.1103/Phys-RevLett.120.172703, arXiv:1711.02644 [astro-ph.HE]. [44] I. Legred, K. Chatziioannou, R. Essick, S. Han, and P. Landry, Phys.Rev.D 104 (2021), 10.1103/Phys-RevD.104.063003, arXiv:2106.05313 [astro-ph.HE]. [45] T. Dietrich, M. W. Coughlin, P. T. Pang, M. Bulla, J. Heinzel, L. Issa, I. Tews, and S. Antier, Science 370 ,1450 (2020), arXiv:2002.11355 [astro-ph.HE]. [46] S. Huth, P. Pang, I. Tews, T. Dietrich, A. L. F` evre, A. Schwenk, W. Trautmann, K. Agarwal, M. Bulla, M. Coughlin, and C. Van Den Broeck, Nature 606 ,276 (2022), arXiv:2107.06229 [nucl-th]. [47] H. Koehn, H. Rose, P. T. Pang, R. Somasundaram, B. T. Reed, I. Tews, A. Abac, O. Komoltsev, N. Kunert, A. Kurkela, M. W. Coughlin, B. F. Healy, and T. Dietrich, Phys.Rev.X 15 (2025), 10.1103/Phys-RevX.15.021014, arXiv:2402.04172 [astro-ph.HE]. [48] N. Rutherford et al., Astrophys. J. Lett. 971 , L19 (2024), arXiv:2407.06790 [astro-ph.HE]. [49] M. Mendes, H. G¨ ottling, A. Hensel, I. Svensson, K. Hebeler, A. Schwenk, N. Rutherford, and A. Watts, arXiv:2605.18560 (2026), arXiv:2605.18560 [nucl-th]. [50] Y. Lim and J. W. Holt, Phys.Rev.Lett. 121 (2018), 10.1103/PhysRevLett.121.062701, arXiv:1803.02803 [nucl-th]. [51] Y. Lim and A. Schwenk, Phys.Rev.C 109 (2024), 10.1103/PhysRevC.109.035801, arXiv:2307.04063 [nucl-th]. [52] M. V. Beznogov and A. R. Raduta, Astrophys.J. 966 ,216 (2024), arXiv:2308.15351 [astro-ph.HE]. [53] M. V. Beznogov and A. R. Raduta, Phys.Rev.C 
+
+110 (2024), 10.1103/PhysRevC.110.035805, arXiv:2403.19325 [nucl-th]. [54] J. Margueron, R. Hoffmann Casali, and F. Gulminelli, Phys.Rev.C 97 (2018), 10.1103/PhysRevC.97.025805, arXiv:1708.06894 [nucl-th]. [55] J. Margueron, R. Hoffmann Casali, and F. Gulminelli, Phys.Rev.C 97 (2018), 10.1103/PhysRevC.97.025806, arXiv:1708.06895 [nucl-th]. [56] D. Radice, A. Perego, K. Hotokezaka, S. A. Fromm, S. Bernuzzi, and L. F. Roberts, Astrophys.J. 869 , 130 (2018), arXiv:1809.11161 [astro-ph.HE]. [57] K. Kiuchi, K. Kawaguchi, K. Kyutoku, Y. Sekiguchi, and M. Shibata, Phys.Rev.D 101 (2020), 10.1103/Phys-RevD.101.084006, arXiv:1907.03790 [astro-ph.HE]. [58] A. Gonzalez, F. Zappa, M. Breschi, S. Bernuzzi, D. Radice, A. Adhikari, A. Camilletti, S. V. Chaura-sia, G. Doulis, S. Padamata, A. Rashti, M. Uje-vic, B. Br¨ ugmann, W. Cook, T. Dietrich, A. Perego, A. Poudel, and W. Tichy, Class.Quant.Grav. 40 (2023), 10.1088/1361-6382/acc231, arXiv:2210.16366 [gr-qc]. [59] M. Oertel, M. Hempel, T. Kl¨ ahn, and S. Typel, Rev.Mod.Phys. 89 (2017), 10.1103/RevMod-Phys.89.015007, arXiv:1610.03361 [astro-ph.HE]. [60] S. Typel, M. Oertel, and T. Kl¨ ahn, Phys.Part.Nucl. 46 ,633 (2015), arXiv:1307.5715 [astro-ph.SR]. [61] F. Foucart, D. Desai, W. Brege, M. D. Duez, D. Kasen, D. A. Hemberger, L. E. Kidder, H. P. Pfeiffer, and M. A. Scheel, Class. Quant. Grav. 34 , 044002 (2017), arXiv:1611.01159 [astro-ph.HE]. [62] F. Foucart, Liv. Rev. Comput. Astrophys. 9, 1 (2023), arXiv:2209.02538 [astro-ph.HE]. [63] A. Bauswein, H.-T. Janka, and R. Oechslin, Phys.Rev.D 82 (2010), 10.1103/PhysRevD.82.084043, arXiv:1006.3315 [astro-ph.SR]. [64] A. Figura, J.-J. Lu, G. Burgio, Z. Li, and H.-J. Schulze, Phys.Rev.D 102 (2020), 10.1103/Phys-RevD.102.043006, arXiv:2005.08691 [gr-qc]. [65] J. Fields, A. Prakash, M. Breschi, D. Radice, S. Bernuzzi, and A. da Silva Schneider, Astro-phys.J.Lett. 952 , L36 (2023), arXiv:2302.11359 [astro-ph.HE]. [66] C. A. Raithel, F. Ozel, and D. Psaltis, Astrophys.J. 
+
+875 , 12 (2019), arXiv:1902.10735 [astro-ph.HE]. [67] E. R. Most and C. A. Raithel, Phys.Rev.D 104 (2021), 10.1103/PhysRevD.104.124012, arXiv:2107.06804 [astro-ph.HE]. [68] J. Fields, H. Zhu, D. Radice, J. M. Stone, W. Cook, S. Bernuzzi, and B. Daszuta, Astrophys.J.Suppl. 276 ,35 (2025), arXiv:2409.10384 [astro-ph.HE]. [69] S. Shankar, P. M¨ osta, S. R. Brandt, R. Haas, E. Schnetter, and Y. de Graaf, Class.Quant.Grav. 
+
+40 (2023), 10.1088/1361-6382/acf2d9, arXiv:2210.17509 [astro-ph.IM]. [70] J. V. Kalinani, L. Ji, L. Ennoggi, F. G. L. Ar-mengol, L. T. Sanches, B.-J. Tsao, S. R. Brandt, M. Campanelli, R. Ciolfi, B. Giacomazzo, R. Haas, E. Schnetter, and Y. Zlochower, Class.Quant.Grav. 42 
+
+(2025), 10.1088/1361-6382/ad9c11, arXiv:2406.11669 [astro-ph.HE]. [71] C. Musolino, C. Ecker, K. Topolski, M. Cassing, K. Miler, H. H.-Y. Ng, K. Pierre, E. R. Most, and L. Rezzolla, arXiv:2607.09854 (2026), arXiv:2607.09854 [gr-qc]. [72] E. Endeve, V. Mewes, J. A. Harris, M. P. Laiu, R. Chu, S. A. Fromm, A. Mezzacappa, O. B. Messer, W. R. Hix, S. W. Bruenn, E. J. Lentz, K. Weide, C. Y. Cardall, A. S. Almgren, A. Dubey, S. M. Couch, P. Moesta, and D. E. Willcox, Astrophys.J.Suppl. 284 , 40 (2026), arXiv:2601.00976 [astro-ph.IM]. [73] A. R. Raduta and M. V. Beznogov, Astron.Astrophys. 
+
+701 , A143 (2025), arXiv:2504.21725 [nucl-th]. [74] A. R. Raduta and M. V. Beznogov, Astron.Astrophys. 
+
+705 , A151 (2026), arXiv:2509.23910 [nucl-th]. [75] X. Du, A. W. Steiner, and J. W. Holt, Phys. Rev. C 
+
+105 , 035803 (2022), arXiv:2107.06697 [nucl-th]. [76] M. Duan and M. Urban, Phys.Rev.C 108 (2023), 10.1103/PhysRevC.108.025813, arXiv:2305.09499 [nucl-th]. [77] A. S. Schneider, L. F. Roberts, and C. D. Ott, Phys. Rev. C 96 , 065802 (2017), arXiv:1707.01527 [astro-ph.HE]. [78] H. Yasin, S. Sch¨ afer, A. Arcones, and A. Schwenk, Phys.Rev.Lett. 124 (2020), 10.1103/Phys-RevLett.124.092701, arXiv:1812.02002 [nucl-th]. [79] A. Schneider, L. Roberts, C. Ott, and E. O’connor, Phys.Rev.C 100 (2019), 10.1103/Phys-RevC.100.055802, arXiv:1906.02009 [astro-ph.HE]. 21 
+
+[80] J. Keller, C. Wellenhofer, K. Hebeler, and A. Schwenk, Phys. Rev. C 103 , 055806 (2021), arXiv:2011.05855 [nucl-th]. [81] A. Carbone and A. Schwenk, Phys. Rev. C 100 , 025805 (2019), arXiv:1904.00924 [nucl-th]. [82] B.-A. Li, B.-J. Cai, L.-W. Chen, and J. Xu, Prog. Part. Nucl. Phys. 99 , 29 (2018), arXiv:1801.01213 [nucl-th]. [83] S. Huth, C. Wellenhofer, and A. Schwenk, Phys. Rev. C 103 , 025803 (2021), arXiv:2009.08885 [nucl-th]. [84] B.-A. Li, P. G. Krastev, D.-H. Wen, and N.-B. Zhang, Eur. Phys. J. A 55 , 117 (2019), arXiv:1905.13175 [nucl-th]. [85] U. Garg and G. Col` o, Prog. Part. Nucl. Phys. 101 , 55 (2018), arXiv:1801.03672 [nucl-ex]. [86] Z. Z. Li, Y. F. Niu, and G. Col` o, Phys. Rev. Lett. 131 ,082501 (2023), arXiv:2211.01264 [nucl-th]. [87] A. Le F` evre, Y. Leifels, W. Reisdorf, J. Aichelin, and C. Hartnack, Nucl. Phys. A 945 , 112 (2016), arXiv:1501.05246 [nucl-ex]. [88] C. Drischler, J. A. Melendez, R. J. Furnstahl, and D. R. Phillips, Phys. Rev. C 102 , 054315 (2020), arXiv:2004.07805 [nucl-th]. [89] J. R. Stone, N. J. Stone, and S. A. Moszkowski, Phys. Rev. C 89 , 044316 (2014), arXiv:1404.0744 [nucl-th]. [90] C. Drischler, J. W. Holt, and C. Wellenhofer, Ann. Rev. Nucl. Part. Sci. 71 , 403 (2021), arXiv:2101.01709 [nucl-th]. [91] B. T. Reed, F. J. Fattoyev, C. J. Horowitz, and J. Piekarewicz, Phys. Rev. Lett. 126 , 172503 (2021), arXiv:2101.03193 [nucl-th]. [92] D. Adhikari et al. (CREX), Phys. Rev. Lett. 129 ,042501 (2022), arXiv:2205.11593 [nucl-ex]. [93] Z. Zhang and L.-W. Chen, Phys. Rev. C 108 , 024317 (2023), arXiv:2207.03328 [nucl-th]. [94] I. Tews, J. M. Lattimer, A. Ohnishi, and E. E. Kolomeitsev, Astrophys. J. 848 , 105 (2017), arXiv:1611.07133 [nucl-th]. [95] J. M. Lattimer and Y. Lim, Astrophys. J. 771 , 51 (2013), arXiv:1203.4286 [nucl-th]. [96] P.-G. Reinhard, X. Roca-Maza, and W. Nazarewicz, Phys. Rev. Lett. 129 , 232501 (2022), arXiv:2206.03134 [nucl-th]. [97] P.-G. Reinhard, X. Roca-Maza, and W. Nazarewicz, Phys. Rev. Lett. 127 , 232501 (2021), arXiv:2105.15050 [nucl-th]. [98] R. Essick, I. Tews, P. Landry, and A. Schwenk, Phys. Rev. Lett. 127 , 192701 (2021), arXiv:2102.10074 [nucl-th]. [99] J. M. Lattimer, Particles 6, 30 (2023), arXiv:2301.03666 [nucl-th]. [100] G. Baym, C. Pethick, and P. Sutherland, Astrophys. J. 
+
+170 , 299 (1971). [101] R. C. Tolman, Phys.Rev. 55 , 364 (1939). [102] J. Oppenheimer and G. Volkoff, Phys.Rev. 55 , 374 (1939). [103] A. Gelman, J. B. Carlin, H. S. Stern, D. B. Dunson, A. Vehtari, and D. B. Rubin, Bayesian Data Analysis, 3rd ed. (Chapman & Hall/CRC, Boca Raton, 2013). [104] H. G¨ ottling, L. Hoff, K. Hebeler, and A. Schwenk, “Neutron star crust and outer core equation of state from chiral effective field theory with quantified uncer-tainties,” (2026). [105] O. Komoltsev, R. Somasundaram, T. Gorda, A. Kurkela, J. Margueron, and I. Tews, Phys.Rev.D 
+
+109 (2024), 10.1103/PhysRevD.109.094030, arXiv:2312.14127 [nucl-th]. [106] M. Breschi, R. Gamba, and S. Bernuzzi, Phys. Rev. D 
+
+104 , 042001 (2021), arXiv:2102.00017 [gr-qc]. [107] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. X 9, 031040 (2019), arXiv:1811.12907 [astro-ph.HE]. [108] M. Breschi, R. Gamba, G. Carullo, D. Godzieba, S. Bernuzzi, A. Perego, and D. Radice, Astron. Astro-phys. 689 , A51 (2024), arXiv:2401.03750 [astro-ph.HE]. [109] A. Nagar and P. Rettegno, Phys. Rev. D 99 , 021501 (2019), arXiv:1805.03891 [gr-qc]. [110] R. Gamba, S. Bernuzzi, and A. Nagar, Phys. Rev. D 
+
+104 , 084058 (2021), arXiv:2012.00027 [gr-qc]. [111] V. A. Villar et al., Astrophys. J. Lett. 851 , L21 (2017), arXiv:1710.11576 [astro-ph.HE]. [112] E. Troja, B. O’Connor, G. Ryan, L. Piro, R. Ricci, B. Zhang, T. Piran, G. Bruni, S. B. Cenko, and H. van Eerten, Mon. Not. Roy. Astron. Soc. 510 , 1902 (2022), arXiv:2104.13378 [astro-ph.HE]. [113] W.-f. Fong et al., Astrophys. J. Lett. 883 , L1 (2019), arXiv:1908.08046 [astro-ph.HE]. [114] S. Makhathini et al., Astrophys. J. 922 , 154 (2021), arXiv:2006.02382 [astro-ph.HE]. [115] G. Ricigliano, A. Perego, S. Borhanian, E. Lof-fredo, K. Kawaguchi, S. Bernuzzi, and L. C. Lip-pold, Mon. Not. Roy. Astron. Soc. 529 , 647 (2024), arXiv:2311.15709 [astro-ph.HE]. [116] G. Ryan, H. van Eerten, E. Troja, L. Piro, B. O’Connor, and R. Ricci, Astrophys. J. 975 , 131 (2024), arXiv:2310.02328 [astro-ph.HE]. [117] K. P. Mooley, A. T. Deller, O. Gottlieb, E. Nakar, G. Hallinan, S. Bourke, D. A. Frail, A. Horesh, A. Corsi, and K. Hotokezaka, Nature 561 , 355 (2018), arXiv:1806.09693 [astro-ph.HE]. [118] G. Ghirlanda et al., Science 363 , 968 (2019), arXiv:1808.00469 [astro-ph.HE]. [119] K. P. Mooley, J. Anderson, and W. Lu, Nature 610 ,273 (2022), arXiv:2210.06568 [astro-ph.HE]. [120] M. Miller, A. Dittmann, I. Holt, F. Lamb, C. Chirenti, Z. Arzoumanian, J. Berteaud, S. Bogdanov, K. Gen-dreau, W. G. Ho, S. Morsink, P. Ray, R. Remillard, Z. Wadiasingh, and M. Wolff, Astrophys.J.Lett. 1000 ,L48 (2026), arXiv:2512.08790 [astro-ph.HE]. [121] S. Vinciguerra et al., Astrophys. J. 961 , 62 (2024), arXiv:2308.09469 [astro-ph.HE]. [122] T. Salmi, J. S. Deneva, P. S. Ray, A. L. Watts, D. Choudhury, Y. Kini, S. Vinciguerra, H. T. Cromar-tie, M. T. Wolff, Z. Arzoumanian, S. Bogdanov, K. Gen-dreau, S. Guillot, W. C. Ho, S. M. Morsink, I. Cognard, L. Guillemot, G. Theureau, and M. Kerr, Astrophys.J. 
+
+976 , 58 (2024), arXiv:2409.14923 [astro-ph.HE]. [123] L. Qi, S. Zheng, J. Zhang, M. Ge, A. Li, S.-N. Zhang, F. Lu, F.-J. Lu, H. Peng, H.-L. Peng, L. Zhang, H. Feng, Z. Zhang, Y. Xu, Z.-W. Li, L.-M. Song, Z. Li, L. Song, S. Zhang, L. Tao, and W. Ye, Astrophys.J. 981 , 99 (2025), arXiv:2502.09147 [astro-ph.HE]. [124] R. W. Romani, D. Kandel, A. V. Filippenko, T. G. Brink, and W. Zheng, Astrophys. J. Lett. 934 , L17 (2022), arXiv:2207.05124 [astro-ph.HE]. [125] L. Kish, Survey Sampling (John Wiley & Sons, New York, 1965). [126] D. W. Scott, Multivariate Density Estimation (John Wiley & Sons, New York, 1992). 22 
+
+[127] Y. Sekiguchi, K. Kiuchi, K. Kyutoku, and M. Shi-bata, Phys. Rev. D 91 , 064059 (2015), arXiv:1502.06660 [astro-ph.HE]. [128] A. Perego, S. Bernuzzi, and D. Radice, Eur. Phys. J. A 
+
+55 , 124 (2019), arXiv:1903.07898 [gr-qc]. [129] Y. Z. Qian and S. E. Woosley, Astrophys. J. 471 , 331 (1996), arXiv:astro-ph/9611094. [130] S. Bernuzzi, F. Magistrelli, M. Jacobi, D. Logoteta, A. Perego, and D. Radice, Mon. Not. Roy. Astron. Soc. 
+
+542 , 256 (2025), arXiv:2409.18185 [astro-ph.HE]. [131] M. Jacobi, F. Magistrelli, E. Loffredo, G. Ricigliano, L. Chiesa, S. Bernuzzi, A. Perego, and A. Arcones, Astrophys. J. Lett. 999 , L16 (2026), arXiv:2503.17445 [astro-ph.HE]. [132] T. F. Gonzalez, Theoretical Computer Science 38 , 293 (1985). [133] R. H. Cyburt, A. M. Amthor, R. Ferguson, Z. Meisel, K. Smith, S. Warren, A. Heger, R. D. Hoffman, T. Rauscher, A. Sakharuk, H. Schatz, F. K. Thiele-mann, and M. Wiescher, Astrophys. J. Suppl. 189 , 240 (2010). [134] M. Jacobi, F. M. Guercilena, S. Huth, G. Ricigliano, A. Arcones, and A. Schwenk, Mon. Not. Roy. Astron. Soc. 527 , 8812 (2023), arXiv:2309.09233 [astro-ph.HE].

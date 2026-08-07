@@ -6,49 +6,35 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-05
-- 运行时间：2026-08-05 21:21:54 UTC
+- 最新运行日期：2026-08-07
+- 运行时间：2026-08-07 01:33:12 UTC
 - 运行状态：成功
-- 本次总论文数：9
-- 精读区：5
-- 速读区：4
+- 本次总论文数：5
+- 精读区：3
+- 速读区：2
 
 ### 今日简报（AI）
-1) 今日精选9篇脉冲星与快速射电暴研究，重点关注引力波背景与中子星质量之谜。  
-2) 最值得看：印度脉冲星计时阵数据发布2（10分）搜寻随机引力波背景，及吸积致自旋对低质量X射线双星质量约束的启示（9分）。  
-3) 建议先精读这两篇高分论文，再以FRB暗物质限制和偏振光曲线作为延伸拓展。
-- 详情：[/202608/05/README](/202608/05/README)
+今日阅读5篇论文，重点精读中子星致密物质与多信使模拟两篇高影响力研究。最值得关注的是贝叶斯推断未来中子星半径数据可精确约束致密物质精细特性，以及有限温度状态方程的多信使排序结果。普通读者可先看这两篇，速读内容涉及原初黑洞和LISA长周期瞬变源，适合扩展视野。
+- 详情：[/202608/07/README](/202608/07/README)
 
 ### 精读区论文标签
-1. [The Indian Pulsar Timing Array Data Release 2: III. Search for a Stochastic Gravitational Wave Background](/202608/05/2608.02808v1-the-indian-pulsar-timing-array-data-release-2-iii-search-for-a-stochastic-gravitational-wave-background)  
+1. [Bayesian Inference of fine-features of dense matter EOS from future high-precision data of neutron star radii](/202608/07/2608.04967v1-bayesian-inference-of-fine-features-of-dense-matter-eos-from-future-high-precision-data-of-neutron-star-radii)  
    标签：评分：10.0/10、query:pulsar-frb
-   evidence：利用脉冲星计时阵列数据搜索随机引力波背景
-2. [Accretion-induced spin-up: Implications for mass constraints of AMXPs](/202608/05/2608.02061v2-accretion-induced-spin-up-implications-for-mass-constraints-of-amxps)  
+   evidence：利用模拟高精度半径观测对中子星状态方程进行贝叶斯推断
+2. [From Multimessenger Inference to Simulations: A Ranked Ensemble of Finite-Temperature Equations of State](/202608/07/2608.04092v1-from-multimessenger-inference-to-simulations-a-ranked-ensemble-of-finite-temperature-equations-of-state)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：中子星态方程模型与吸积毫秒X射线脉冲星质量约束
-3. [Gamma-ray and radio populations of millisecond pulsars in globular clusters](/202608/05/2608.02768v1-gamma-ray-and-radio-populations-of-millisecond-pulsars-in-globular-clusters)  
+   evidence：构建与多信使观测一致并带排序的有限温度物态方程系综，直接约束中子星物态方程。
+3. [Profile Reconstruction from Temporally Stable Emission Components for Timing PSR J1713+0747](/202608/07/2608.04108v1-profile-reconstruction-from-temporally-stable-emission-components-for-timing-psr-j17130747)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：通过伽马射线和射电模拟研究球状星团中毫秒脉冲星种群
-4. [Structural quasi-universality in highly magnetized differentially rotating neutron stars](/202608/05/2608.02824v1-structural-quasi-universality-in-highly-magnetized-differentially-rotating-neutron-stars)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：研究不同状态方程下中子星转动惯量与紧凑性的准普适关系，直接支持状态方程约束
-5. [First fast radio burst search campaign at the Argentine Institute of Radio Astronomy](/202608/05/2608.03914v1-first-fast-radio-burst-search-campaign-at-the-argentine-institute-of-radio-astronomy)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：面向南天超星系团的快速射电暴搜寻
+   evidence：对PSR J1713+0747的脉冲星计时分析和脉冲轮廓稳定性研究
 
 ### 速读区论文标签
-1. [Understanding constraints on primordial mass black holes made of dark matter using fast radio bursts](/202608/05/2607.28704v1-understanding-constraints-on-primordial-mass-black-holes-made-of-dark-matter-using-fast-radio-bursts)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：利用快速射电暴作为宇宙学探针，在修正引力下约束原初黑洞暗物质，属于快速射电暴综合主题
-2. [Polar cap plasma loading and the morphology of pulsar $γ$-ray light curves](/202608/05/2607.29126v1-polar-cap-plasma-loading-and-the-morphology-of-pulsar--ray-light-curves)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：研究脉冲星γ射线光变曲线形态与电流片中的正负电子等离子体加载，属于脉冲星综合主题
-3. [The One-Loop Power Spectrum of Fast Radio Burst Dispersion Measures](/202608/05/2608.03235v1-the-one-loop-power-spectrum-of-fast-radio-burst-dispersion-measures)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：针对快速射电暴色散量成团构建单圈EFT模型以用于宇宙学分析
-4. [Thermal evolution of neo-neutron stars. II. Temperature-dependent crusts](/202608/05/2608.03732v1-thermal-evolution-of-neo-neutron-stars-ii-temperature-dependent-crusts)  
+1. [Understanding constraints on primordial mass black holes made of dark matter using fast radio bursts](/202608/07/2607.28704v1-understanding-constraints-on-primordial-mass-black-holes-made-of-dark-matter-using-fast-radio-bursts)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：研究新中子星温度依赖的壳层结构，直接涉及中子星内部物理
+   evidence：利用CHIME/FRB数据集和引力透镜效应约束原初黑洞暗物质，属于当前快速射电暴研究前沿
+2. [Population synthesis and detection prospects for Galactic long-period transients with LISA](/202608/07/2608.04628v1-population-synthesis-and-detection-prospects-for-galactic-long-period-transients-with-lisa)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：长周期射电暂现源的族群合成与LISA探测前景
 
 
 <div class="dpr-home-promo-card">
