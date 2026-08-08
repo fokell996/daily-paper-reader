@@ -1,0 +1,573 @@
+Title: Equivalence of mapping gravitational wave background anisotropy across bases at equal information content
+
+URL Source: https://arxiv.org/pdf/2608.05200v1
+
+Published Time: Fri, 07 Aug 2026 00:01:41 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+Equivalence of mapping gravitational wave background anisotropy across bases at equal information content 
+
+Deepali Agarwal ∗
+
+Department of Physics and Astronomy, University of Texas Rio Grande Valley, One West University Boulevard, Brownsville, TX 78520, USA 
+
+Mapping anisotropies in the gravitational-wave background (GWB) requires choosing a basis to represent the sky intensity, such as pixel and spherical harmonic bases. Each introduces a truncation—e.g., a number of pixels or a maximum multipole ℓmax —often set by a naive counting ar-gument that relate the number of measurable modes to the number of independent cross-correlations, 
+
+Npair , in a pulsar timing array (PTA). However, such truncations can lead to reconstruction arte-facts, as they do not reflect the true information content of the PTA response. Increasing the value of truncation parameters spans the observable space better but reveals poorly constrained modes, making the inverse problem ill-conditioned and requiring regularization. A natural approach is to restrict the reconstruction to a well-measured subspace via principal maps, defined by the dominant eigenmodes of the detector response (or Fisher) matrix. However, these maps are not a fundamental parameterization of the sky, but rather, are derived from an underlying representation—such as a pixelization or a spherical harmonic expansion. While their explicit form depends on basis choice, they can span the same subspace when the underlying representation is sufficiently complete. Here, we show that reconstructed anisotropy “maps” via different bases are equivalent, provided they re-tain the same information content, i.e., span the same principal subspace. As illustrative cases, we consider a toy model for PTA configuration and several GWB anisotropy shapes: point source, an extended source with deterministic anisotropy, and a statistical isotropic background, along with its summary statistic—the angular power spectrum. Although the reconstructions are equivalent, their computational costs can differ. We conclude with brief comments on the construction of principal maps for ground-based interferometers. 
+
+I. INTRODUCTION 
+
+Recent hints of a gravitational wave background (GWB) signal in pulsar timing array (PTA) observa-tions [1–5] have motivated the development of improved anisotropy reconstruction methods and a re-examination of systematic effects in existing approaches. A central question is whether the choice of sky basis used to decom-pose anisotropy affect the reconstruction results [6, 7]. We consider the frequentist formalism for anisotropy searches [10, 13, 14], commonly implemented using pixel [10, 13, 15] and the spherical harmonic (SpH) bases [10, 11, 14]. A Fisher matrix and principal maps (or eigenmaps) formulation based on the pairwise timing response (PTR) has also been developed by Ali-Haïmoud et al. [8, 9]. All of these approaches require choosing a finite-dimensional truncation of the sky, together with a regularization scheme for inverting the Fisher matrix when necessary: • Pixel basis: the number of pixels used to decom-pose the sky and regularization parameter used to obtain pseudo-inverse of Fisher information matrix (if required; computed via truncated singular value decomposition (SVD) here [12]); • SpH basis: the maximum multipole ℓrec max used to truncate SpH expansion and regularization param- 
+
+> ∗deepali.agarwal@utrgv.edu
+
+eter used to obtain pseudo-inverse of Fisher infor-mation matrix (if required; computed via truncated SVD here); • Principal maps basis: the pixelization/ ℓrec max used to construct the Fisher matrix in the PTR basis [12] (and the principal (eigen) maps) and number of eigenmodes used to reconstruct sky map (which is the same as truncated SVD regularization), (see Table I for summary of frequentist anisotropy recon-struction methods). In the PTA literature, these parameters in pixel and SpH searches are often chosen using a counting argu-ment [16, 17]. The idea is that, given Npair independent pulsar-pair correlation measurements, one has access to 
+
+Npair independent pieces of information. This reasoning is then translated into the number of parameters used in the basis decomposition, 
+
+12 N 2side = Npair , (ℓNpair  
+
+> max
+
++ 1) 2 = Npair (1.1) which defines the pixel resolution on a HEALPix [18] [19, 20] grid and harmonic truncation, respectively. An-other counting-based limit, originally derived for phase-coherent mapping [21], has also been adopted for in-tensity mapping and applied to PTA data, ℓrec max ∼pNpsr [10, 21–23]. This choice truncates the reconstruc-tion at an even smaller multipole, thus potentially en-hancing the artefacts. However, this choice does not represent a fundamen-tal information limit of the PTA. As shown by Grunthal et al. [24] in the context of point-source reconstruction arXiv:2608.05200v1 [astro-ph.IM] 5 Aug 2026 2                                                                                                                                                                              
+
+> GWB Directional Power P( ˆΩ)
+> Cross-correlations; Pulsar aand b⟨ρab ⟩=Rd2ˆΩγab ( ˆΩ) P( ˆΩ)
+> Pairwise Timing Response (PTR) [8, 9] γab ( ˆΩ)
+> Basis-independent Maximum Likelihood (ML) Estimation X( ˆΩ) = Rd2ˆΩ′F( ˆΩ,ˆΩ′) ˆP( ˆΩ′)
+> Assumption ρab ∼ N (⟨ρab ⟩, σ ab )Fisher kernel F( ˆΩ,ˆΩ′)≡P
+> ab γab ( ˆΩ) γab ( ˆΩ′)
+> σ2
+> ab
+> Dirty map X( ˆΩ) ≡P
+> ab γab ( ˆΩ) ρab
+> σ2
+> ab
+> Basis Decomposition Pixel [10] Spherical Harmonics [10, 11] Principal Maps [8, 9] True power P( ˆΩ) PNpix
+> p=1 Ppδ2( ˆΩ−ˆΩp)Pℓgwb max
+> ℓ=0
+> Pℓm=−ℓPℓm Yℓm ( ˆΩ) [12] PNpair
+> n=1 PnMn( ˆΩ)
+> Regularized Method Truncated SVD Truncated SVD Choosing Nmodes modes with highest eigenvalues
+> Regularized Clean Map
+> ˆPp=PNmodes
+> n=1 Mpn
+> Σ−1
+> nMnp ′Xp′
+> ˆPℓm =PNmodes
+> n=1 Mℓm ;n
+> Σ−1
+> nM∗
+> n;ℓ′m′Xℓ′m′
+> ˆP( ˆΩ) = PNmodes
+> n=1 ˆPnMn( ˆΩ) ˆP( ˆΩ) = P
+> ℓm ˆPℓm Yℓm ( ˆΩ)
+> Clean Map / ML Estimator of Coefficients ˆPp= ( F−1)pp ′Xp′ˆPℓm = ( F−1)ℓm,ℓ ′m′Xℓ′m′ˆPn= ( F−1)nn ′Xn′
+> PTA Basis Component γab ;p=γab ( ˆΩp)γab ;ℓm =Rd2ˆΩγab ( ˆΩ) Y∗
+> ℓm ( ˆΩ) γab ;n=Rd2ˆΩγab ( ˆΩ) Mn( ˆΩ)
+> Dirty Map Xp≡P
+> ab γab ;pρab
+> σ2
+> ab
+> Xℓm ≡P
+> ab γ∗
+> ab ;ℓm ρab
+> σ2
+> ab
+> Xn≡P
+> ab γab ;nρab
+> σ2
+> ab
+> Fisher Matrix Fpp ′≡P
+> ab γab ;pγab ;p′
+> σ2
+> ab
+> Fℓm,ℓ ′m′≡P
+> ab γ∗
+> ab ;ℓm γab ;ℓ′m′
+> σ2
+> ab
+> Fnn ′≡P
+> ab γab ;nγab ;n′
+> σ2
+> ab
+> Singular value decomposition Fpp ′=PNpix
+> n=1 Mpn ΣnMnp ′Fℓm,ℓ ′m′=PNSpH
+> n=1 Mℓm ;nΣnM∗
+> n;ℓ′m′[12] Regularized Fisher Inverse (F+)pp ′=PNmodes
+> n=1 Mpn Σ−1
+> nMnp ′(F+)ℓm,ℓ ′m′=PNmodes
+> n=1 Mℓm ;nΣ−1
+> nM∗
+> n;ℓ′m′
+> Noise Properties [12] Mean ⟨ˆP⟩=F+F P
+> Covariance [ˆP] = F+F F +
+
+TABLE I. Summary of directional GWB power estimation in the weak signal limit, showing the relationship between cross-correlations, the Fisher information matrix, and maximum likelihood map reconstruction in different bases. Importantly, the regularized clean map has an identical structure in the pixel, SpH and principal maps bases. In this article, we show that the numerical results are also identical when same the information content (i.e., the same set of reconstructed eigenmodes) are used in each basis. 
+
+using the SpH basis, the appropriate reconstruction mul-tipole ℓrec max need not coincide with ℓNpair 
+
+max . In fact, using a higher ℓrec max along with appropriate regularization scheme can yield a finer point-spread function. Moreover, the optimal truncation multipole depends on the pulsar sky configuration, not merely on Npair .Similarly, recent work [16] demonstrated that choos-ing ℓrec max = ℓNpair 
+
+max can lead to excess leakage from un-modeled but informative angular scales (referred to as “small scales” in [7, 16]) in the reconstruction of the an-gular power spectrum. In our follow-up work [12], we instead identified a maximum informative angular scale, 
+
+ℓres max , defined by the requirement that the chosen trun-cation parameter ℓrec max be sufficiently large to span the full observable space. Adopting ℓrec max = ℓres max removes leakage-induced bias, leaving only the bias associated with angular scales that are intrinsically suppressed by the PTA response. In other words, the recovered map and angular power spectrum are primarily influenced by information from scales ℓ ≤ ℓres max ; modes beyond ℓres max 
+
+do not contribute significantly to the reconstruction [12]. This demonstrates that ℓrec max should not be set based on 
+
+Npair , but according to a criterion that reflects the angu-lar scales to which the pulsar network is sensitive. It has been suggested that the Fisher matrix formal-ism developed in [8, 9] can mitigate issues such as small-scale leakage and provide advantage over SpH representa-tions [7]. Here, we clarify the origin of these differences. The Fisher matrix is the fundamental object that de-termines anisotropy information in any basis, including pixel [10, 23] and SpH bases [10, 24, 25]. All anisotropy reconstructions can be understood as projections onto the eigenmodes of this Fisher matrix. Principal maps formalism in [8, 9] make this structure explicit, but these maps do not contain information beyond that encoded in the Fisher matrix. Any apparent difference between bases arises only if the Fisher eigenspace is not fully re-solved. In that case, different choices of truncation (the pixel number, or ℓmax ) effectively retain different subsets of information, which can appear as a basis-dependent effect (see Fig. 1). Crucially, in the implementation of [8, 9], a sufficiently high-resolution pixelization is adopted to construct their 
+
+FIJ matrix, see [[8], (84)]—chosen based on conver-gence of the eigenvalues/eigenmaps rather than on Npair 
+
+counting—and only Npair principal maps are constructed. This procedure ensures that the finest angular informa-tion is preserved, while if Npix or ℓrec max is solely deter-mined by counting arguments, the eigenspace may not be fully converged [12], and reconstructions could effec-tively use different amounts of information, which could misleadingly appear as a basis-dependent effect. An al-ternative way to view this is that reconstruction using the formalism of [8, 9] is not immune to small-scale leak-age if pixelization used to construct the principal maps is too coarse to resolve the angular scales to which the PTA is sensitive. In this case, the reconstruction is subject to the same truncation effect that can affect any basis repre-sentation, including the SpH basis (see our simulations). In this article, we show analytically that the eigen-values and eigenmaps from the pixel-basis and the SpH Fisher matrices are directly related to those constructed using the formalism of [8, 9] (see Sec. II and Table I), with numerical equivalence previously demonstrated in [12]. 310 0 10 1 10 2 10 3 10 4
+
+10 15 
+
+10 11 
+
+10 7
+
+10 3
+
+100 200 300 400 500 600 
+
+> Normalized Singular Value
+
+## Singular Mode Index             
+
+> Pixel; Nside = 32 SpH; max = 52
+> PTR; Nside = 32 Pixel; Nside = 4 SpH; max = 22
+> PTR; Nside = 4
+
+FIG. 1. Singular value spectrum of the Fisher matrix in the pixel, spherical harmonic (SpH) and pairwise timing response (PTR; G, see Appendix A) bases, shown for different choices of Nside and ℓrec max . The PTA configuration is the same as in Fig. 2. Left panel: Truncation based on counting arguments (red solid for pixel, pink dashed for SpH and blue dot-dashed for PTR) do not fully span the observable space, whereas higher-resolution choices— Nside = 32 for the pixel (blue solid) and PTR (orange dashed) bases and ℓrec max = 52 for the SpH basis (orange dashed)—converge to the true singular value spectrum [12]. Right panel: Zoom-in of the small singular values. The vertical lines indicate the maximum singular mode index used in reconstruction for the eigenspace-converged setup (solid), pixel/PTR counting-based choice (dot-dashed) and SpH counting based choice (dashed). 
+
+Notably, the principal maps can be obtained far more ef-ficiently using the formalism by Ali-Haïmoud et al. [8, 9], as it requires diagonalizing only an Npair × Npair ma-trix rather than the full high-resolution Fisher matrix (when Npix ≫ Npair or (ℓres max + 1) 2 ≫ Npair ). We ex-plicitly demonstrate the equivalence of map-making with three bases—pixel, SpH, and principal maps—provided that the same information content is used in the recon-struction (see Sec. III). When the information content is mismatched, the results do not agree. We illustrate this equivalence and the origin of discrepancies for three classes of anisotropy: point-like sources (Figs. 2 and 6), extended sources with deterministic anisotropy (Fig. 3), and statistically isotropic anisotropy (Fig. 4), addition-ally characterized by an angular power spectrum (Fig. 5). We conclude with brief remarks on the construction of principal maps for ground-based detectors (Sec. IV) and a summary of our results in Sec. V. 
+
+II. FISHER MATRIX AND WAYS TO CONSTRUCT PRINCIPAL MAPS 
+
+Recently, to map the observable anisotropy, principal maps were proposed as a basis [8, 9]. These maps are constructed as linear combination of the PTR maps [8, 9, 11]: 
+
+Mn( ˆΩ) = X
+
+> ab
+
+Mn;ab 
+
+γab ( ˆΩ) 
+
+σab 
+
+(2.1) with the requirement that these maps are orthogonal and span the observable space of the Fisher kernel: 
+
+Z
+
+d2 ˆΩ d 2 ˆΩ′ Mn( ˆΩ) F ( ˆΩ, ˆΩ′) Mn′ ( ˆΩ′) = λn δnn ′ ,
+
+X
+
+> ab
+
+X
+
+> cd
+
+Mn;ab Fab,cd Mn′;cd = λn δnn ′ , (2.2) where Fab ;cd (denoted by FIJ in [9]) is given by 
+
+Fab ;cd ≡
+
+Z
+
+d2 ˆΩ d 2 ˆΩ′ γab ( ˆΩ) γcd ( ˆΩ′)
+
+σab σcd 
+
+F ( ˆΩ, ˆΩ′) . (2.3) i.e., Fisher kernel projected in the pairwise timing re-sponse basis [8, 9]. Then, v and λ represent eigenvectors and eigenvalues of a Npair × Npair matrix with elements 
+
+Fab ;cd .In practice the construction of matrix elements Fab ;cd 
+
+can be obtained only by discretizing the sky and per-forming a numerical integration. The pixel size is chosen to be sufficiently small to capture all significant informa-tion. A practical approach is to vary the pixel resolution 4and verify that the eigenvalue spectrum and eigenvectors converge, ensuring the discretization does not lose any information [12]. Additionally, the number of pixels does not need to match Npair exactly; it can be much larger depending on the structure of the Fisher kernel (and the pulsar configuration comprising a PTA). Now, with a suitable manipulation of Eq. (4.2) (see Appendix A), we obtain 
+
+X
+
+> q
+
+F ( ˆΩp, ˆΩq )Mn( ˆΩq ) = 
+
+√λn
+
+∆ ˆΩ Mn( ˆΩp) , (2.4) where Mn( ˆΩp) denotes the pixelized version of the con-tinuous principal map Mn( ˆΩ) . The eigenvalues of the pixel basis Fisher matrix are therefore √λn 
+
+> ∆ ˆΩ
+
+.Turning now to the SpH basis, the Fisher kernel can be written as 
+
+F ( ˆΩ, ˆΩ′) = X
+
+> ℓmℓ ′m′
+
+Fℓm,ℓ ′m′ Y ∗
+
+> ℓm
+
+( ˆΩ) Yℓ′m′ ( ˆΩ′) . (2.5) Then principal maps Mn( ˆΩ) satisfy the eigenvalue equa-tion (2.4) then, 
+
+X
+
+> q
+
+X
+
+> ℓmℓ ′m′
+
+Fℓm,ℓ ′m′ Y ∗
+
+> ℓm
+
+( ˆΩp) Yℓ′m′ ( ˆΩq ) Mn( ˆΩq )=
+
+√λn
+
+∆ ˆΩ Mn( ˆΩp) .
+
+(2.6) Expressed in harmonic coefficient form, this becomes 
+
+X
+
+> ℓm
+
+M ∗ 
+
+> n;ℓm
+
+Fℓm,ℓ ′m′ = ∆ ˆΩ pλn Mn;ℓ′m′ . (2.7) The above equation shows that the SpH basis representa-tion of principal maps Mn;ℓm = P 
+
+> p
+
+∆ ˆΩ Y ∗
+
+> ℓm
+
+( ˆΩp) Mn( ˆΩp)
+
+are eigenvectors of SpH basis Fisher matrix with eigen-values ∆ ˆΩ √λn.This shows explicitly that eigenvectors of the Fisher matrix in any basis corresponds to the Npair principal maps spanning the observable space, with eigenvalues related to λn quantifying their sensitivity. The num-ber of pixels or the number or SpH multipoles used in the analysis does not need to be equal to Npair . It can be significantly larger, depending on the structure of the Fisher matrix. What matters is that the chosen basis ad-equately captures all the observable information encoded in the Fisher matrix. Note that currently Mn( ˆΩp) are orthogonal but not unit norm vectors and can be easily normalized to 1. We redefine principal maps as 
+
+Mn( ˆΩ) ≡ Mn( ˆΩ) 
+
+qR d2 ˆΩ M 2
+
+> n
+
+( ˆΩ) 
+
+. (2.8) Injected Map                     
+
+> 01Dirty Map
+> -3.51608 37.9316 Pixel Basis; Nside = 32
+> -0.0116911 0.0496725 Pixel Basis; Nside = 4
+> -0.212705 0.587185 SpH Basis; rec max = 52
+> -0.0133212 0.0504686 SpH Basis; rec max = 22
+> -0.0426412 0.0443756 Principal Maps Basis; Nside = 32
+> -0.0102922 0.0470588 Principal Maps Basis; Nside = 4
+> -0.212705 0.587185
+
+FIG. 2. Power Pp sky maps for point source reconstruction without noise ( σab = 0 ). The top row shows the injected power and the corresponding dirty map in the pixel basis with Nside = 32 . The left panels in the next three rows dis-play reconstructions in the pixel, SpH and principal maps bases using eigenspace-converged setup and using a condition number threshold κ = 10 13 (vertical solid line in Fig. 1). The agreement across these bases demonstrates their equivalence. Although power spreads across neighboring pixels, integrat-ing regions with P > 0.5 Pmax recovers 0.86 of the injected power. The right panel show reconstructions obtained using parameters determined from the counting argument and us-ing κ = 10 5 (dot-dashed vertical line in Fig. 1) for pixel and principal maps bases and κ = 10 13 for SpH basis (dashed ver-tical line in Fig. 1). 
+
+III. SIMULATIONS 
+
+Here, we consider a PTA configuration of 34 pulsars distributed in a statistically uniform distribution. Their sky locations are indicated by circles in Fig. 2. This is the same array configuration studied in [12]. We consider two reconstruction setups for comparison: (i) Eigenspace-converged setup: we perform the recon-struction in both the pixel and SpH bases using the pa-rameters determined in [12] based on eigenspace conver-gence. Specifically, we adopt Nside = 32 and ℓrec max = 52 .The same choice Nside = 32 is also used for construct-ing principal maps via [8, 9] formalism. (ii) Counting-based setup: We instead choose parameters motivated 5Injected Map                     
+
+> 00.945098 Dirty Map
+> 4562.62 19974.2 Pixel Basis; Nside = 32
+> -0.186352 1.10447 Pixel Basis; Nside = 4
+> -52.8674 82.5038 SpH Basis; rec max = 52
+> -0.192839 1.1136 SpH Basis; rec max = 22
+> -1.29798 1.54686 Principal Maps Basis; Nside = 32
+> -0.187439 1.09587 Principal Maps Basis; Nside = 4
+> -52.8674 82.5038
+
+FIG. 3. Power sky maps for extended source reconstruction with deterministic anisotropy and without noise. The layout follows the same arrangement as Fig. 2. 
+
+by counting argument. For 34 pulsars, the number of in-dependent cross-correlation is Npair = 561 . We therefore select Nside = 4 , for which the number of pixel satisfies 
+
+12 N 2side ≤ 561 . Similarly, requiring (ℓrec max + 1) 2 ≤ 561 
+
+gives ℓrec max = 22 .We simulate the cross-correlations ρab by sampling from a Gaussian distribution according to the properties described in Table I. We then construct the correspond-ing dirty map and Fisher matrix. To obtain clean map, we employ the regularized reconstruction method de-scribed in Table I and [12], for a selected condition num-ber threshold. The results are depicted in Figs. 2, 3, 4, 5, and 6. We note that the simulations performed in Figs. 2, 3, 4, and 5 by setting σab = 0 are well defined, as explained in [12]. The reason is that the clean map estimator be-comes independent of σ2 once the same noise-level across pulsar pairs limit is imposed. In this limit, the estimator variance vanishes because the Fisher information matrix diverges. The angular power spectrum is obtained using stan-dard estimator defined as [12] 
+
+ˆCℓ = 12ℓ + 1 
+
+X
+
+m
+
+| ˆPℓm |2 . (3.1) Injected Map                        
+
+> -0.0526488 0.052579 Dirty Map
+> -31.189 71.6502 Pixel Basis; Nside = 32
+> -0.0332506 0.0209451 Pixel Basis; Nside = 4
+> -0.804351 0.848071 SpH Basis; rec max = 52
+> -0.0282288 0.0221104 SpH Basis; rec max = 22
+> -0.198124 0.226361 Principal Maps Basis; Nside = 32
+> -0.0290263 0.0215834 Principal Maps Basis; Nside = 4
+> -0.804351 0.848071 Low-pass Filtered Injected Map cut = 20
+> -0.0192548 0.0188437
+
+FIG. 4. Power sky maps for statistical isotropic source recon-struction without noise. Layout follows the same arrangement for top four rows as in Fig. 2. The last row displays a low-pass filtered version of the injected map ( ℓcut = 20 ). Recovered maps in the left panels closely match these large-scale fea-tures, while finer details appear mainly in regions with denser pulsar coverage. The corresponding angular power spectrum recovery is shown in Fig. 5. 
+
+We note that when eigenspace-based search param-eters are used, the reconstructed anisotropy is equiva-lent across considered bases. The primarily computa-tional cost arises from diagonalizing the Fisher matrix, whose dimension depends on the chosen basis: for the pixel, SpH and principal maps basis, it scales as, i.e., 
+
+Npix = 12 ,288 , (ℓrec max + 1) 2 = 2809 and Npair = 561 .Consequently, the principal map approach is the most computationally efficient. 6012                
+
+> Pixel Basis; Nside = 32
+> 012
+> SpH Basis; rec max = 52
+> 020 40 012
+> Principal Maps Basis;
+> Nside = 32 Multipole
+> C
+> Recovered Injected 024
+> Pixel Basis; Nside = 4
+> 050 100
+> SpH Basis; rec max = 22
+> 020 40 024
+> Principal Maps Basis;
+> Nside = 4 Multipole
+> C
+> Recovered Injected
+
+FIG. 5. Angular power spectrum reconstruction without noise. The injected GWB power has support up to scale 
+
+ℓgwb max = 52 , with the cosmic mean and 1 σ cosmic uncertainty from (100) simulated skies shown by orange dotted curve [12]. The layout follows the same arrangement as Fig. 2 (from the second row). Recovery is consistent across bases in the left panels, whereas counting argument based parameters leads to leakage-induced bias [12, 16], independent of basis. 
+
+IV. COMMENT ON MAPPING ANISOTROPY WITH GROUND-BASED DETECTORS 
+
+We note that this study of basis equivalence is relevant for mapping GWB anisotropy in the audio-frequency band probed by ground-based interferometers. In that context, anisotropy is mainly decomposed in the pixel [13] and spherical harmonic bases [14]. A similar analysis could be performed by replacing the PTR γ and corresponding Fisher matrices with those appropriate for ground-based detectors. Although no study has yet ex-plored a reconstruction of principal maps using a matrix analogous to Npair × Npair matrix for ground-based inter-ferometers, eigenmaps indirectly play a role when trun-cated SVD regularization is applied [14, 26, 27]. An analogy can be drawn from Sec. II. Unlike PTAs, the baseline response of ground-based interferometers to the GWB, characterized by overlap reduction function (ORF), depends upon signal frequency f , sidereal time 
+
+ts, and detector baseline I [13, 14, 28, 29]. In this case, Dirty Map           
+
+> -10.7987 35.3764 Pixel Basis; Nside = 32
+> -0.00101874 0.00378482 SpH Basis; rec max = 52
+> -0.00103368 0.00378062 Principal Maps Basis; Nside = 32
+> -0.00101874 0.00378482
+
+FIG. 6. Power sky maps for point source reconstruction with noise ( σab = 1 ). The top-left panel shows the dirty map in the pixel basis with Nside = 32 . The remaining panels show reconstructions using eigenspace-based parameters with 
+
+κ = 30 : the pixel (top-right), SpH (bottom-left) and principal maps (bottom-right) bases. Integrating regions with P >
+
+0.5 Pmax yields a recovered total power of ∼ 1.14 ± 0.21 . The choice κ = 30 corresponds to retaining modes up to 33rd eigenmode, selected to limit noise amplification. 
+
+the principal maps can be constructed as 
+
+Mn( ˆΩ) = X
+
+> If t s
+
+Mn;If t s
+
+γIf t s ( ˆΩ) 
+
+σIf t s
+
+(4.1) with the requirement that these maps are orthogonal and span the observable space of Fisher kernel: 
+
+Z
+
+d2 ˆΩ d 2 ˆΩ′ Mn( ˆΩ) F ( ˆΩ, ˆΩ′) M ∗ 
+
+> n′
+
+( ˆΩ′) = λn δnn ′ ,
+
+X
+
+> II ′
+
+X 
+
+> f f ′
+
+X
+
+> tst′
+> s
+
+Mn;If t s FIf t s,I ′f ′t′ 
+
+> s
+
+M ∗  
+
+> n′;I′f′t′
+> s
+
+= λn δnn ′ ,
+
+(4.2) where Fisher kernel is given by [29] 
+
+F ( ˆΩ, ˆΩ′) = X
+
+> If t s
+
+γ∗ 
+
+> If t s
+
+( ˆΩ) γIf t s ( ˆΩ′)
+
+σ2
+
+> If t s
+
+(4.3) and FIf t s,I ′f ′t′ 
+
+> s
+
+is given by 
+
+FIf t s,I ′f ′t′ 
+
+> s
+
+≡
+
+Z
+
+d2 ˆΩ d 2 ˆΩ′ γIf t s ( ˆΩ) 
+
+σIf t s
+
+γ∗  
+
+> I′f′t′
+> s
+
+( ˆΩ′)
+
+σI′f ′t′
+
+> s
+
+F ( ˆΩ, ˆΩ′) .
+
+(4.4) (Additionally, we will have to account for negative fre-quency contribution carefully.) Here, the size of ma-trix FIf t s,I ′f ′t′ 
+
+> s
+
+is much larger than the Fisher matrix in pixel and SpH basis. This is because there are typically 
+
+∼ 5×10 4 frequency bins and ∼ 10 3 time sidereal segments to analyze for a broadband directional search, while the number of baselines is comparatively small (e.g., 3 base-lines for the current LIGO-Hanford and LIGO-Livingston and Virgo network). Consequently, unlike the PTA case, 7obtaining principal maps by diagonalizing the Fisher ma-trix in the pixel ( Nside = 16 ; [13]) and SpH ( ℓrec max = 15 ;[14, 27]) bases is computationally much faster. However, using the principal map basis for Bayesian parameter es-timation of an anisotropic background [30]—where direct inference over full set of Pℓm or P ( ˆΩ) coefficients becomes challenging due to the large parameter space, will be an interesting direction to explore. On the other hand, the narrowband directional search—such as all-sky-all-frequency analyses [31, 32]— may benefit from constructing principal maps using the Fisher matrix in the ORF basis. In this case, given the angular resolution of the search increases with frequency, potentially requiring a larger number of pixels to decom-pose the sky than the number of available sidereal seg-ments for a given detector baseline. Exploring this regime and assessing the computational advantages of the prin-cipal map construction remains another interesting direc-tion for future work.  
+
+> V. CONCLUSIONS
+
+In this work, we have examined the relationship be-tween different approaches to mapping anisotropies in the GWB, focusing on pixel, SpH and principal map for-mulations. We have shown that these methods are fun-damentally equivalent, provided they retain the same in-formation content, i.e., span the same eigenspace of the Fisher matrix described by the PTA response and noise properties. Our results clarify that the apparent difference be-tween reconstruction methods do not arise from the choice of basis itself, but from how the underlying param-eter space is truncated. In particular, truncation schemes based solely on counting arguments may fail to capture the full set of informative modes leading to incomplete or based reconstructions. By contrast, constructions that ensure the convergence of the Fisher matrix eigenspec-trum recover consistent and basis-independent descrip-tion of observable anisotropy. These findings have practical implications for future PTA anisotropy searches. Extension of this framework to realistic PTA datasets, as well as to ground-based inter-ferometers, will be important directions for future work. In addition, beyond truncated SVD regularization, alter-native regularization strategies informed by the expected source anisotropy may be considered in future work. 
+
+> ACKNOWLEDGMENTS
+
+The author gratefully acknowledges Joe Romano for bringing the counting argument problem to attention, for insightful discussion on the role of basis, and for valuable comments on earlier drafts of this article. This work greatly benefitted from discussion with Yacine Ali-Haïmoud and Tristan L. Smith regarding the construc-tion of principal maps formalism discussed in [8, 9]. The author is grateful to Chiara Mingarelli for detailed com-ments on the manuscript, which significantly improved its clarity and readability. D.A. acknowledges financial support from NSF Physics Frontier Center Award PFC-2020265 and start-up funds from the University of Texas Rio Grande Valley. Some of the results in this article have been derived using the healpy and HEALPix packages.  
+
+> Appendix A 1. Relation between eigenspace of Fisher matrix in PTR and pixel bases
+
+Let us start with the discrete representation of Fisher kernel in PTR basis (4.2) given as 
+
+F PTR ≈ (ΓΓ T )( ΓΓ T )(∆ ˆΩ) 2 , (A1) where we have defined matrix Γ ≡ γab,p  
+
+> σab
+
+. The Fisher matrix in pixel basis can be written as (see Table I) 
+
+F pix = ΓT Γ . (A2) Then, nth eigenvalue and eigenvector of matrix 
+
+F PTR (4.2) 
+
+F PTR Mn = λn Mn
+
+(ΓΓ T )( ΓΓ T )(∆ ˆΩ) 2 Mn = λn Mn
+
+(ΓΓ T )Mn =
+
+√λn
+
+∆ ˆΩ Mn
+
+(ΓT Γ)( ΓT Mn) = 
+
+√λn
+
+∆ ˆΩ (ΓT Mn) .
+
+(A3) Then, F pix Mn = √λn 
+
+> ∆ ˆΩ
+
+Mn where Mn = ΓT vn. 
+
+> 2. Alternative way to characterize eigenspace of Fisher matrix in PTR basis
+
+Here we show that same principal maps can also be constructed using a matrix defined as 
+
+Gab,cd ≡
+
+Z
+
+d2 ˆΩ γab ( ˆΩ) γcd ( ˆΩ) 
+
+σab σcd 
+
+, (A4) which is related to the matrix F (2.3) 
+
+Fab,cd ≡
+
+Z
+
+d2 ˆΩ d2 ˆΩ′ F ( ˆΩ, ˆΩ′) γab ( ˆΩ) γcd ( ˆΩ′)
+
+σab σcd 
+
+, (A5) as (using Fisher kernel from Table I) 
+
+Fab,cd =
+
+Z
+
+d2 ˆΩ d2 ˆΩ′ X
+
+> ef
+
+γef ( ˆΩ) γef ( ˆΩ′)
+
+σ2
+
+> ef
+
+γab ( ˆΩ) γcd ( ˆΩ′)
+
+σab σcd 
+
+= X
+
+> ef
+
+Gab,ef Gef,cd 
+
+F = GG T .
+
+(A6) 8If we decompose G matrix in terms of its eigenvalues and eigenvectors 
+
+X
+
+> ef
+
+Gab,ef M ef n = Σ n M ab n
+
+GM = M Σ ,
+
+(A7) then, 
+
+F = M ΣM T M ΣM T
+
+= M Σ2M T . (A8) Hence, the eigenvalues of matrix F are the square of those of matrix G and the eigenvectors are the same. 
+
+[1] Daniel J. Reardon et al. Search for an Isotropic Gravitational-wave Background with the Parkes Pulsar Timing Array. Astrophys. J. Lett. , 951(1):L6, 2023. doi: 10.3847/2041-8213/acdd02. [2] J. Antoniadis et al. The second data release from the European Pulsar Timing Array - III. Search for gravita-tional wave signals. Astron. Astrophys. , 678:A50, 2023. doi:10.1051/0004-6361/202346844. [3] Matthew T. Miles et al. The MeerKAT Pulsar Timing Array: the first search for gravitational waves with the MeerKAT radio telescope. Mon. Not. Roy. Astron. Soc. ,536(2):1489–1500, 2024. doi:10.1093/mnras/stae2571. [4] Gabriella Agazie et al. The NANOGrav 15 yr Data Set: Evidence for a Gravitational-wave Background. As-trophys. J. Lett. , 951(1):L8, 2023. doi:10.3847/2041-8213/acdac6. [5] Heng Xu et al. Searching for the Nano-Hertz Stochastic Gravitational Wave Background with the Chinese Pulsar Timing Array Data Release I. Res. Astron. Astrophys. ,23(7):075024, 2023. doi:10.1088/1674-4527/acdfa5. [6] Thomas Konstandin, Anna-Malin Lemke, Andrea Mitri-date, and Enrico Perboni. Prospects and limitations of PTAs anisotropy searches — the frequentist case. JCAP ,02:084, 2026. doi:10.1088/1475-7516/2026/02/084. [7] C. M. F. Mingarelli et al. Pulsar timing arrays: the emerging gravitational-wave landscape. 3 2026. [8] Yacine Ali-Haïmoud, Tristan L. Smith, and Chiara M. F. Mingarelli. Fisher formalism for anisotropic gravitational-wave background searches with pulsar tim-ing arrays. Phys. Rev. D , 102:122005, Dec 2020. doi: 10.1103/PhysRevD.102.122005. URL https://link. aps.org/doi/10.1103/PhysRevD.102.122005 .[9] Yacine Ali-Haïmoud, Tristan L. Smith, and Chiara M. F. Mingarelli. Insights into searches for anisotropies in the nanohertz gravitational-wave background. Phys. Rev. D, 103:042009, Feb 2021. doi:10.1103/PhysRevD.103.042009. URL https: //link.aps.org/doi/10.1103/PhysRevD.103.042009 .[10] Nihan Pol, Stephen R. Taylor, and Joseph D. Ro-mano. Forecasting Pulsar Timing Array Sensitivity to Anisotropy in the Stochastic Gravitational Wave Background. Astrophys. J. , 940(2):173, 2022. doi: 10.3847/1538-4357/ac9836. [11] Chiara M. F. Mingarelli, Trevor Sidery, Ilya Man-del, and Alberto Vecchio. Characterizing gravitational wave stochastic background anisotropy with pulsar tim-ing arrays. Phys. Rev. D , 88(6):062005, 2013. doi: 10.1103/PhysRevD.88.062005. [12] Deepali Agarwal, Joseph D. Romano, Yacine Ali-Haïmoud, and Tristan L. Smith. Addressing leakage and mode suppression in angular power spectrum estimation for gravitational-wave backgrounds using pulsar timing arrays. 2 2026. [13] Sanjit Mitra, Sanjeev Dhurandhar, Tarun Souradeep, Al-bert Lazzarini, Vuk Mandic, Sukanta Bose, and Stefan Ballmer. Gravitational wave radiometry: Mapping a stochastic gravitational wave background. Phys. Rev. D ,77:042002, 2008. doi:10.1103/PhysRevD.77.042002. [14] Eric Thrane, Stefan Ballmer, Joseph D. Romano, San-jit Mitra, Dipongkar Talukder, Sukanta Bose, and Vuk Mandic. Probing the anisotropies of a stochas-tic gravitational-wave background using a network of ground-based laser interferometers. Phys. Rev. D , 80: 122002, 2009. doi:10.1103/PhysRevD.80.122002. [15] Neil J. Cornish and Rutger van Haasteren. Mapping the nano-Hertz gravitational wave sky. 6 2014. [16] Federico Semenzato, Nicola Bellomo, Alvise Raccanelli, and Chiara M. F. Mingarelli. Bias from small-scale leak-age in Pulsar Timing Array maps. 10 2025. [17] Valerie Domcke, Gabriele Franciolini, and Mauro Pieroni. Cosmic Variance in Anisotropy Searches at Pulsar Tim-ing Arrays. 8 2025. [18] Note1. http://healpix.sf.net. [19] K. M. Górski, E. Hivon, A. J. Banday, B. D. Wan-delt, F. K. Hansen, M. Reinecke, and M. Bartelmann. HEALPix: A Framework for High-Resolution Discretiza-tion and Fast Analysis of Data Distributed on the Sphere. Astrophys. J. , 622:759–771, April 2005. doi: 10.1086/427976. [20] Andrea Zonca, Leo Singer, Daniel Lenz, Martin Rei-necke, Cyrille Rosset, Eric Hivon, and Krzysztof Gorski. healpy: equal area pixelization and spherical harmonics transforms for data on the sphere in python. Journal of Open Source Software , 4(35):1298, March 2019. doi: 10.21105/joss.01298. URL https://doi.org/10.21105/ joss.01298 .[21] Joseph D. Romano and Neil J. Cornish. Detection meth-ods for stochastic gravitational-wave backgrounds: a uni-fied treatment. Living Rev. Rel. , 20(1):2, 2017. doi: 10.1007/s41114-017-0004-1. [22] Latham Boyle and Ue-Li Pen. Pulsar timing arrays as imaging gravitational wave telescopes: angular resolution and source (de)confusion. Phys. Rev. D , 86:124028, 2012. doi:10.1103/PhysRevD.86.124028. [23] Gabriella Agazie et al. The NANOGrav 15 yr Data Set: Search for Anisotropy in the Gravitational-wave 9
+
+Background. Astrophys. J. Lett. , 956(1):L3, 2023. doi: 10.3847/2041-8213/acf4fd. [24] Kathrin Grunthal, David J. Champion, Eric Thrane, Rowina S. Nathan, Michael Kramer, and Matthew T. Miles. Optimising gravitational-wave sky maps for pul-sar timing arrays. Astron. Astrophys. , 706:A352, 2026. doi:10.1051/0004-6361/202557896. [25] Kathrin Grunthal et al. The MeerKAT Pulsar Timing Array: Maps of the gravitational wave sky with the 4.5-yr data release. Mon. Not. Roy. Astron. Soc. , 536(2): 1501–1517, 2024. doi:10.1093/mnras/stae2573. [26] Deepali Agarwal, Jishnu Suresh, Sanjit Mitra, and Anirban Ain. Upper limits on persistent gravita-tional waves using folded data and the full covari-ance matrix from Advanced LIGO’s first two observ-ing runs. Phys. Rev. D , 104(12):123018, 2021. doi: 10.1103/PhysRevD.104.123018. [27] Erik Floden, Vuk Mandic, Andrew Matas, and Leo Tsukada. Angular resolution of the search for anisotropic stochastic gravitational-wave background with terres-trial gravitational-wave detectors. Phys. Rev. D , 106(2): 023010, 2022. doi:10.1103/PhysRevD.106.023010. [28] Eric Thrane, Sanjit Mitra, Nelson Christensen, Vuk Mandic, and Anirban Ain. All-sky, narrow-band, gravitational-wave radiometry with folded data. Phys. Rev. D, 91(12):124012, 2015. doi: 10.1103/PhysRevD.91.124012. [29] Anirban Ain, Prathamesh Dalvi, and Sanjit Mi-tra. Fast Gravitational Wave Radiometry using Data Folding. Phys. Rev. D, 92(2):022003, 2015. doi: 10.1103/PhysRevD.92.022003. [30] Leo Tsukada, Santiago Jaraba, Deepali Agarwal, and Erik Floden. Bayesian parameter estima-tion for targeted anisotropic gravitational-wave back-ground. Phys. Rev. D, 107(2):023024, 2023. doi: 10.1103/PhysRevD.107.023024. [31] R. Abbott et al. All-sky, all-frequency directional search for persistent gravitational waves from Advanced LIGO’s and Advanced Virgo’s first three observing runs. Phys. Rev. D, 105(12):122001, 2022. doi: 10.1103/PhysRevD.105.122001. [32] Deepali Agarwal, Jishnu Suresh, Sanjit Mitra, and Anir-ban Ain. Angular power spectra of anisotropic stochas-tic gravitational wave background: Developing statis-tical methods and analyzing data from ground-based detectors. Phys. Rev. D, 108(2):023011, 2023. doi: 10.1103/PhysRevD.108.023011.
