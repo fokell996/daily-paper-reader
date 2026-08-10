@@ -1,0 +1,611 @@
+Title: Parameter Estimation for Eccentric Supermassive Black Hole Binaries with Pulsar Timing Arrays
+
+URL Source: https://arxiv.org/pdf/2608.06944v1
+
+Published Time: Mon, 10 Aug 2026 00:47:09 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+# Parameter Estimation for Eccentric Supermassive Black Hole Binaries with Pulsar Timing Arrays 
+
+Sara Manzini 1, ∗ and Stanislav Babak 1, †
+
+> 1
+
+Université Paris Cité, CNRS, Astroparticule et Cosmologie, F-75013 Paris, France 
+
+(Dated: August 10, 2026) Pulsar timing array (PTA) experiments are searching for gravitational waves (GWs) in the nanohertz band. The primary GW sources targeted by PTAs include populations of inspiralling supermassive black hole binaries (SMBHBs) in the local Universe, some of which may emit detectable continuous gravitational-wave (CGW) signals. In this paper, we focus on the detection strategy for individual binaries on eccentric orbits. Using simulated datasets based on the EPTA DR2new configuration, we perform injection-recovery studies across the parameter space. We demonstrate that individual component masses can be measured when an eccentric SMBHB is detected at high GW frequencies. We further show a correlation between the CGW signal and the stochastic gravitational-wave background (SGWB) at low frequencies, which makes CGW identification challenging. Finally, the developed software is GPU-compatible, enabling efficient Bayesian inference. This work lays the groundwork for future applications to real PTA data. 
+
+I. INTRODUCTION 
+
+Gravitational wave (GW) astronomy entered the nanohertz regime with the recent evidence for an emerg-ing GW signal reported by several Pulsar Timing Ar-ray (PTA) collaborations, including the European PTA (EPTA) + the Indian PTA InPTA [1], NANOGrav [2] and the Parkes PTA (PPTA) [3], members of the International PTA (IPTA) consortium [4]. While the origin of this sig-nal remains under active investigation, supermassive black hole binaries (SMBHBs) at sub-parsec separations are considered its most probable source. The SMBHBs on the broad orbits emit continuous gravitational waves (CGWs) and their incoherent superposition forms a stochastic GW signal at low (below a few tens of nanoHz) frequencies. Some particularly close and massive binaries could be indi-vidually resolved – these CGW sources represent the next major scientific milestone for current and future PTAs. The prospects of their detection improve rapidly with the increase in the array size (the number of monitored pulsars) and the observational time span. The prospects of detecting CGWs from individual SMB-HBs with current and future PTAs have been explored ex-tensively through population-based forecasts [5–8]. These studies suggest that the next-generation of instruments such as the SKA will likely resolve individual sources above the background. Crucially, the detectability and parameter estimation accuracy of such sources depend sen-sitively on the assumptions about SMBHBs eccentricity and rely on accurate modelling of GW signals. SMBHBs are formed following galaxy mergers, during which the black hole binary hardens through dynamical friction and interactions with stars and gas. When these environmental effects dominate over GW-driven circu-larisation, binaries can retain substantial eccentricity as   
+
+> ∗manzini@apc.in2p3.fr
+> †stas@apc.in2p3.fr
+
+they enter the PTA band. Modelling GW emission from eccentric binaries was the main subject of our previous work reported in [9]. We demonstrated that eccentric binary waveforms introduce significant additional com-plexity compared to the circular case: (i) eccentric binaries evolve significantly faster than circular; (ii) gravitational radiation is distributed across multiple harmonics of the orbital frequencies (azimuthal and precession). Moreover, we argued that the use of the waveform for the circular binary (a very common assumption) will not be able to detect the eccentric signal even for mild eccentricity. The main focus of this paper is to estimate the accuracy with which we can measure the parameters of eccentric bi-naries. Note that we do not consider here the detectability of eccentric CGWs (eCGWs); this will be the subject of a separate publication. We select binaries with sufficiently high, and therefore potentially detectable, signal-to-noise ratios (SNRs) from several simulated astrophysical popu-lations [8]. The first investigation concerns the conjecture presented in [9]: that we can obtain unbiased estimates of the masses of the individual SMBHs in an eccentric binary. This becomes possible thanks to the inclusion of periapse precession and post-leading-order relativistic terms in binary evolution. For the second investigation, we simulate data similar to EPTA DR2 [1] and examine (i) the accuracy of parameter estimation in different regimes (high and low frequency and high and low eccentricity) and (ii) the correlation between noise components and the eCGW signal. eCGWs introduce additional parameters associated with eccentricity: the initial eccentricity, mass ratio, pre-cession frequency, and initial precession phase. Including the pulsar term requires numerical integration of the ODEs describing the binary evolution. All these factors significantly increase the computational cost of Bayesian parameter inference for eCGWs. To keep the computa-tions feasible, we use the Discovery package [10] to fit both the signal and noise parameters, as it natively sup-ports GPU computations. The likelihood is written in arXiv:2608.06944v1 [astro-ph.HE] 7 Aug 2026 2
+
+JAX , and we use the JAX-compatible parallel-tempering ensemble Markov Chain Monte Carlo (MCMC) sampler 
+
+jexplore [11]. Together, these tools allow us to exploit GPU hardware acceleration, reducing the computation time by approximately an order of magnitude while also lowering the carbon footprint compared to CPU-based computations. The paper is organised as follows. In Section II we give a brief overview of eCGW model. We describe the Bayesian framework adopted in the paper in Section III. In Section IV A, we demonstrate the importance of pulsar term and post-Newtonian corrections in recovering param-eters of eccentric SMBHBs. We investigate the correlation between noise components and eCGW in Section IV B. We summarize and discuss our findings in concluding Section V.  
+
+> II. ECCENTRIC BINARY MODEL
+
+We refer the reader to [9] for a detailed description of the model; here we provide only a summary of its key aspects for completeness. The timing residuals induced by eCGW for pulsar α
+
+are given as 
+
+rα(t) = F + 
+
+> α
+
+cos 2 ψ + F × 
+
+> α
+
+sin 2 ψ [r+(t) − r+(t − τα)] 
+
+− F + 
+
+> α
+
+sin 2 ψ − F × 
+
+> α
+
+cos 2 ψ [r×(t) − r×(t − τα)] ,
+
+(1) where ψ is the GW polarisation angle and the antenna pattern functions for the α-th pulsar are: 
+
+F + 
+
+> α
+
+= ( ˆ m · ˆpα)2 − (ˆ n · ˆpα)2
+
+2(1 + ˆΩGW · ˆpα) , (2a) 
+
+F × 
+
+> α
+
+= ( ˆ m · ˆpα)(ˆ n · ˆpα)1 + ˆΩGW · ˆpα
+
+. (2b) Here we introduced ˆpα as the unit vector toward the pulsar, ˆΩGW is the GW propagation direction, and 
+
+ˆm = ( − sin ϕGW , cos ϕGW , 0) , (3a) 
+
+ˆn = ( − cos θGW cos ϕGW , − cos θGW sin ϕGW , sin θGW ),
+
+(3b) 
+
+ˆΩGW = ( − sin θGW cos ϕGW , − sin θGW sin ϕGW , − cos θGW ).
+
+(3c) The two polarizations of the residuals r+,× are obtained from the time integral of the GW strain polarizations 
+
+h+,×:
+
+r+(t) = A(e, x )
+
+n
+
+(1 + cos 2 ι) [ a(e, ξ ) cos 2 γ + b(e, ξ ) sin 2 γ]+ sin 2 ι c (e, ξ )
+
+o
+
+, (4a) 
+
+r×(t) = 2 A(e, x ) cos ι [a(e, ξ ) sin 2 γ − b(e, ξ ) cos 2 γ] ,
+
+(4b) with 
+
+A(e, x ) = νM 2(1 − e2)3/2
+
+DL
+
+√x(1 − e2 − 3x)
+
+a(e, ξ ) = (e + 2 cos ξ) sin ξ
+
+1 + e cos ξb(e, ξ ) = cos 2 ξ + e cos ξ
+
+1 + e cos ξc(e, ξ ) = e sin ξ
+
+1 + e cos ξ
+
+(5) where ι is the inclination of the orbital angular momentum to the line of sight, DL is the luminosity distance and 
+
+ν = m1m2/M 2 is the symmetric mass ratio. The phases 
+
+ξ(t) (true anomaly) and γ(t) (periapsis advance) describe conservative orbital dynamics, while e(t) (eccentricity) and x(t) evolve adiabatically under radiation reaction. The variable x is defined in terms of the azimuthal orbital frequency as x = ( M ω ϕ)2/3.The two contributions are evaluated at Earth time (t) and at the retarded pulsar time ( t − τα), where the light-travel time from the pulsar to Earth is given by 
+
+τα = Lα
+
+
+
+1 + ˆΩGW · ˆpα
+
+
+
+. These will be referred to as the Earth term and pulsar term, respectively. In our previous paper [9], we explicitly presented the equations governing the binary evolution. In particular, we emphasize the importance of post-leading-order terms when evolving the orbit over the light-travel time between the Earth and pulsar terms. The dynamics are described by four time-dependent variables: ξ(t), γ(t), x(t), and 
+
+e(t). In total, the eCGW is described by 11 parame-ters: two initial phases, namely the true anomaly and the precession phase; the initial eccentricity, defined at the Earth time t = 0 ; the initial orbital frequency, associated with the azimuthal phase, ωϕ = 2 πF orb ; the total mass 
+
+M ; the symmetric mass ratio ν; the source sky position 
+
+(θGW , ϕ GW ); the orbital inclination ι; the luminosity dis-tance DL; and the polarization phase ψ. Including the pulsar term in the residuals introduces 2Npsr extra param-eters: one additional pulsar-term phase (true anomaly), and one pulsar distance for each pulsar in the array. The distances to the pulsars are generally poorly known, and we allow them to vary according to Gaussian priors with standard deviations equal to 20% of their nominal values, unless a different accuracy is explicitly specified.  
+
+> III. BAYESIAN FRAMEWORK
+
+The main aim of this paper is to demonstrate our ability to estimate the parameters of eccentric SMBHBs using PTA observations. We adopt a Bayesian framework in which the parameters are treated as random variables and their posterior distributions are inferred from simulated datasets. In the following subsections, we describe the PTA data model and the implementation of the Bayesian framework. 3 
+
+> A. PTA data model
+
+We begin by introducing the PTA data model. The TOAs of a single pulsar (indexed as α) can be written as [12]: 
+
+tarr α = tT M α + δt α (6) The deterministic term includes the timing model (TM) which accounts for inaccuracies in the pulsar’s sky loca-tion, proper-motion, spin evolution, the dispersion mea-sure (DM) and its first two derivatives [13]. We also account for the orbital motion of the pulsar if it is in a binary system. An initial fit for the TM parameters is performed using the least-squares ( χ2) method applied to the ToAs and provides the maximum likelihood pa-rameters β0. Those estimates do not take into account a possible GW signal or the time-correlated noise com-ponents described below. However, we assume that the initial fit is close enough to the true values so that the residual errors ϵ = β − β0 can be described by a linear model with the design matrix, M ϵ .The design matrix M is an (n × m) matrix, where n
+
+is the number of observed TOAs and m is the number of TM parameters ( β). Several noise components are usually present in the PTA observations. The white noise (WN) corresponds to the instrumental (and, in general, measurement) noise. The individual (pulsar-dependent) red noise (RN) is as-sociated with stochastic variation in the spin of the pul-sars. We also have the so-called "chromatic" red noise – dispersion measure variations (DMv) and scattering vari-ations (Sv) — which depend on the radio-frequency of observation and correspond to time-varying interactions of electromagnetic waves with interstellar plasma. The SGWB is present in the observations as a correlated com-mon red-noise process, with correlations depending on the angular separation between pulsars on the sky and described by the Hellings–Downs curve [14]. However, the correlated component of the noise is significantly weaker than the diagonal components of the cross-pulsar noise spectrum. In this work, we focus on the eCGW signal and there-fore simplify the simulated data model. First, we mimic the SGWB as a common uncorrelated red-noise process (CRN), effectively neglecting the correlated component of the SGWB in order to reduce computational cost (this allows us to factorize the likelihood over pulsars). The main conclusions of this paper are not affected by this approximation. Second, we neglect individual red-noise (RN) components and chromatic noise because (i) this saves substantial computational time and (ii) our primary goal is to study the correlation between the eCGW signal and the noise, for which CRN is sufficient. All in all, the data model used in this paper is described as 
+
+δt = M ϵ + seCGW + nWN + nCRN . (7) The first two components are deterministic and corre-spond to the linearised TM and eCGW signal. The white noise component is described by the power spectral density (PSD) SWN = 2 σ2∆t, where σ = σTOA 
+
+corresponds to TOA timing uncertainty and ∆t is the typical observation cadence. The corresponding covari-ance matrix in the time domain is diagonal: Nij = δij σ2 
+
+> i
+
+.The red noise is assumed to be diagonal in the frequency domain and is described by the power-law PSD: 
+
+S(f ) = A2crn 
+
+12 π2
+
+ ffyr 
+
+−γcrn 
+
+f −3 
+
+> yr
+
+, (8) where fyr = yr −1. Later in the paper, we fit the spectral content of the CRN in the frequency domain by applying the free-spectrum model [15]. The measurements ρi =
+
+ρ(fi) used in the free spectrum are related to the PSD by S(fi, ρ i) = ρ2 
+
+> i
+
+T . We choose frequencies fi = i/T ,corresponding to the Fourier bins, and restrict the analysis to the first 30 components, i ≤ 30 . The correponding covariance matrix in the time domain is obtained by applying the cosine transform (real Fourier Transform) of 
+
+S(f ) and approximated as [12]: 
+
+C(τij ) = 
+
+ A
+
+2√3π
+
+2 1yr 3−γ
+
+f γ−1
+
+> L
+
+(
+
+Γ(1 − γ) sin 
+
+ πγ 
+
+2
+
+
+
+(fLτij )γ−1
+
+−
+
+> ∞
+
+X
+
+> n=0
+
+(−1) n (flτij )2n
+
+(2 n)!(2 n + 1 − γ)
+
+)
+
+(9) where τij = 2 π|ti − tj |, flow is the cut-off frequency and we truncate the sum at n = 2 . Red noise dominates over white noise at low frequencies, implying that long-timescale correlations (large τij ) are important. Given two different regimes of the dominant noise, we also consider low and high-frequency eCGW separately. We stress, however, that eccentric binaries generate mul-tiple harmonics spanning a broad frequency range; there-fore, the classification into “low” and “high” frequency refers to the initial azimuthal orbital frequency of the system.  
+
+> B. Bayesian inference
+
+The likelihood assumes that the residuals of each pulsar are described as Gaussian noise after subtracting the TM and eCGW signal: 
+
+ln Lα = − 12 (δt α − sα − Mαϵα)⊤Σ−1 
+
+> α
+
+(δt α − sα − Mαϵα)
+
+− nα ln π − ln det {| Σα|} , (10) where nα is the number of observations, the noise covari-ance matrix is given by Σij = Nij + Cij , and sα = sα(Θ) 
+
+describes the eCGW signal. Since we neglect the corre-lations between pulsars, the total log-likelihood is given 4by 
+
+ln L =
+
+> Npsr
+
+X
+
+> α=1
+
+ln Lα. (11)  
+
+> 1. Frequency Domain Likelihood
+
+We can compute the likelihood more efficiently by ap-proximating the CRN as [16, 17]: 
+
+Σα = Nα + FαΦF Tα , (12) where Fα = {sin ωitα, cos ωitα} are the partial Fourier basis functions and Φij = S(fi)δij /T , assuming that the frequencies are uncorrelated. 1
+
+The inversion of this covariance matrix can be per-formed efficiently using the Woodbury matrix identity: 
+
+Σ−1 
+
+> α
+
+= N−1 
+
+> α
+
+−N−1 
+
+> α
+
+Fα(Φ−1 
+
+> α
+
++FTα N−1 
+
+> α
+
+Fα)−1FTα N−1 
+
+> α
+
+, (13) and its determinant is given by 
+
+ln |Σα| = ln |Nα| + ln |Φ| + ln |Φ−1 + FTα N−1 
+
+> α
+
+Fα|. (14) This form of the likelihood is implemented in JAX in the Discovery package [19] and is used in the most com-putationally demanding parts of our analysis.  
+
+> 2. Time-Domain Likelihood
+
+The likelihood can be evaluated in the time domain; however, this approach involves two computationally ex-pensive steps. The first is the computation of Cij (τ ) from Eq. (9) and the inversion of the full covariance matrix 
+
+Σ−1 
+
+> α
+
+, which constitutes the main computational bottle-neck. The second is the evaluation of the eCGW template over a large number of samples. Since PTA datasets typically have dimensionality NTOAs ∼ 10 3 − 10 4, one possible strategy for reducing the computational cost is to downsample the dataset, thereby making the time-domain likelihood more tractable. This could be a valid path to investigate the low-frequency content of PTA data. We test this possibility by retaining one residual out of every D consecutive TOAs. This reduces the dataset size by a factor of D and lowers the effective Nyquist frequency from fNyq to fNyq /D . A direct consequence of this operation is aliasing: signal components above the new Nyquist frequency, fNyq /D , are folded back into the retained frequency band, potentially distorting the  
+
+> 1It was shown in [18] that the frequency components are correlated and that this correlation should be taken into account in real data analyses. Here, we neglect these correlations since our focus is on the eCGW signal.
+
+reconstructed signal. To suppress this effect, we apply a low-pass Butterworth filter to both the residuals and the covariance matrix before downsampling, attenuating power above fNyq /D . This procedure is valid only when all dominant harmonics of the eCGW signal lie well below 
+
+fNyq /D , ensuring that downsampling does not degrade the total SNR. As a proof of principle, we analysed a simulated dataset consisting of a low-frequency eCGW with e0 = 0.5,
+
+log 10 Forb = 12 , nHz , and log 10 (M/M ⊙) = 9.56 , to-gether with WN characterised by σTOAs = 2 .5, μ s and 
+
+EFAC = 1 , as well as CRN with log 10 ACRN = −14 .5 and 
+
+γCRN = 4 .33 . The first inference was performed using the original evenly sampled dataset with a cadence of 
+
+∆torig = 15 days and a duration of 10 years. The data were then downsampled to a cadence of ∆tds = 90 days. In both cases, the SNR of the injected signal was 5.7, and the red-noise parameters were fixed to their injected values. The resulting posteriors for the eCGW parame-ters were statistically consistent, while the run time was reduced by a factor of 2 due to the smaller number of samples entering the computation of the signal-induced timing residuals and the likelihood inner products. A fur-ther speed-up, scaling approximately as (∆ tds /∆torig )3,is expected from the matrix inversion required in a joint analysis of the CRN/GWB and eCGW signals. Real PTA datasets are more complex. The TOAs are unevenly sampled in time, and the noise budget includes chromatic components, such as dispersion-measure varia-tions and scattering noise. As a result, combining TOAs from different frequency channels and applying a uniform downsampling scheme is non-trivial, and requires a more careful treatment.  
+
+> 3. Posteriors
+
+We infer the posterior distribution of the data-model parameters (eCGW and noise) within a Bayesian frame-work: 
+
+p(Θ , λ |δt, Ma) = L(δt |Θ, λ, Ma) π(Θ , λ |M a)
+
+p(δt |M a) . (15) Here, Ma denotes the assumed data model, where we separate the parameters describing the eCGW signal ( Θ)from those describing the noise ( λ). The prior distribution of these parameters is given by π(Θ , λ |M a), and p(δt |M a)
+
+is evidence for the model Ma.The evidence, 
+
+p(δt |M a) = 
+
+Z
+
+dΘ dλ L(δt |Θ, λ, Ma)π(Θ , λ |M a), (16) is used to quantify the relative support for different models through the odds ratio: 
+
+Oa,b = p(Ma|δt )
+
+p(Mb|δt ) = p(δt |M a)
+
+p(δt |M b)
+
+π(Ma)
+
+π(Mb) = BF a,b 
+
+π(Ma)
+
+π(Mb) ,
+
+(17) 5where BF a,b is the Bayes factor. For equal prior proba-bilities assigned to the models, the Bayes factor quanti-fies which model is better supported by the data. Note, however, that it does not determine whether a model is intrinsically good; rather, it provides a relative ranking between competing models. Inference of model parameters is typically performed numerically using Markov chain Monte Carlo (MCMC) methods [20]. Computing the evidence is challenging, particularly in high-dimensional parameter spaces such as the one considered here. The most common approach is nested sampling [21]. However, the Bayes factor can also be evaluated without explicitly computing the evidence using reversible-jump MCMC (RJMCMC) [22, 23] or the product-space approach [24, 25]. Alternatively, one can use normalizing flows to construct a neural density estimator based on posterior samples and estimate the evidence from the base distribution and Jacobians of the transformations [10]. We use a particular MCMC implementation: Jexplore 
+
+(https://jexplore-773e5b.pages.in2p3.fr/README. html ), an ensemble sampler with parallel tempering (using several walkers per temperature). The package is written in JAX and can be run on both CPU and GPU architectures. We vectorize the likelihood evaluation over all walkers and temperatures, which significantly improves the efficiency of the sampler. Additionally, 
+
+Jexplore can evaluate the Bayes factor using the product-space technique.  
+
+> IV. RESULTS
+
+This section is split into two parts. In the first part, we investigate the estimation of companion masses in the eccentric binary and the effect of high-order PN terms. We also emphasise the importance of pulsar terms in eCGW. The second part is dedicated to (almost) realistic PTA settings where we investigate inference (and partially detectability) of eCGWs in the presence of a CRN. In particular, we focus on the correlation between common red noise (mimicking the SGWB) and the GW signal from an individual eccentric MBHB.               
+
+> Data Model Figure
+> WN + eCGW (Forb = 15 nHz, e0= 0 .5)CGW 2a, 4, 6b (teal) CGW (leading order) 2a (pink) CGW (ET only) 6b (yellow) WN + eCGW (Forb = 5 nHz, e0= 0 .01 )CGW 6a (teal) CGW (ET only) 6a (yellow)
+
+TABLE I: Simulated datasets and models used in the inference.  
+
+> A. Estimating MBH masses in the eccentric binaries
+
+Here we employ a simple data model, which is sufficient to serve our purposes. The considered PTA consists of six pulsars used in [26, 27], selected to maximize the SNR while keeping the computational cost low. These are J0613-0200, J1012+5307, J1600-3053, J1713+0747, J1744-1134, and J1909-3744 all placed at 1kpc distance. The TOAs are evenly spaced with a two-week cadence over an observation time span of T = 20 yr . We assume that all pulsar observations contain only white noise with the same rms timing uncertainty, σTOA = 2 .5 μs. This is an idealized dataset aimed at demonstrating the importance of pulsar term and higher-order PN terms in estimating the individual black hole masses in the binary. In addition, we use these data to investigate the impact of uncertainties in pulsar distances in eCGW paramaters estimation. Restricting the noise to a white component allows us to study the impact of the full harmonic structure of the eCGW signal on the timing residuals. Using six pulsars demonstrates our ability to measure the individual masses even with a small array while keeping the computational cost low. We produce several datasets each containing an eCGW signal with parameters chosen from the simulated astro-physical population described in [8]. The datasets are summarised in Table I. We inject eCGW containing both Earth and pulsar terms at the highest PN order described in [9]. The SNR of the source against WN is 10.52. We in-ject a binary with chirp mass log 10 (M/M ⊙) = 9 .2, initial eccentricity e0 = 0 .5, orbital frequency Forb = 14 .85nHz ,and luminosity distance log 10 (d/ Mpc) = 1 .2. For the inference we are using several models: (i) eCGW model the same as injected, (ii) eCGW at leading order ap-proximation, neglecting all high (post-leading order) PN corrections, (iii) eCGW with the Earth term only. In all models we assume that WN level is known. In addition, we also study the impact of pulsar distance uncertainty on the parameter estimation, considering two Gaussian priors with σpdist = 20% (our feducial assumption) and 
+
+σpdist = 5% .The relatively high starting frequency Forb = 15 nHz 
+
+justifies using white noise only in the simulated data, as all Earth terms will lie in the white noise dominated fre-quency range. However, the pulsar terms appear between 1 and 10 nHz. The spectrum of the simulated eCGW signal is shown in the Fig. 1b. We also observe a small evolution of the orbital frequency over the observation span assumed to be 20yrs .One of our goals is to demonstrate the importance of high-order PN terms in computing the pulsar terms, since the binary is expected to evolve significantly over 
+
+τα. The difference between the residuals induced by an eCGW signal with and without high-order PN terms is visually apparent in Fig. 1a. However, this difference can be partially compensated by biases in the inferred parameters, as shown in the posterior distributions in Fig. 2a and Fig. 2b. In this test, we placed all pulsars 6             
+
+> (a) Time domain residuals including ET and PT for a binary with initial eccentricity e0= 0 .5and initial orbital frequency
+> Forb = 15nHz , considering ET only (yellow), post leading order corrections in dynamics (teal) and leading order dynamics (pink).
+> (b) Frequency domain power spectral density for one pulsar including ET (yellow) and PT (teal) for the same binary as in Figure 1a, considering post-leading-order corrections in dynamics. Different markers represent different sets of harmonics: kψ r+ 2 γare circles, kψ rsquares, and kψ r−2γ
+> triangles.
+
+FIG. 1: Residuals and spectral analysis for eccentric high-frequency and mild eccentricity binary. at a distance of 1 kpc and assumed that this distance is known with a relative uncertainty of 20% .The posteriors for the full (correct) eCGW model are given in teal in Fig. 2a. We see informative posteriors for all parameters, including the symmetric mass ratio ( ν). This confirms that we can constrain the individual masses of an SMBHB (see Fig. 2b). On the other hand, neglecting the PN terms in the binary evolution over τα leads to (i) a drop in the SNR to 10.14, (ii) broader posteriors (in pink), and (iii) larger biases in the recovered parameters. The biases partially compensate for the mismatch in the timing residuals, which is permitted by the large uncertainty in the pulsar distance. As a test, we repeated the analysis after reducing σpdist to a 5% relative error. The corresponding results are shown as dashed lines in Fig. 3. We clearly see that the leading-order model starts to fail in fitting the data, and the injected value of m2
+
+lies outside the 90% credible interval. Next, we explore the effect of the uncertainty in the        
+
+> (a) eCGW parameters posteriors
+> (b) Posterior distribution for m1, m 2obtained by combining the posteriors of log 10 Mand νfrom Fig. 2a.
+
+FIG. 2: Posterior distribution for eCGW parameters for the binary at Forb = 14 .85nHz and eccentricity e0 = 0 .5.The posterior in teal is obtained by fitting with the full ET + PT waveform with dynamics at post-leading order, while the pink posterior is obtained with leading order model. 7
+
+FIG. 3: Discrepancy (median and 90% credible interval) between recovered and true m1, m 2 for leading-order waveform (pink) and post-leading order (teal) with 
+
+σpd = 20% (circles and solid lines) and σpd = 5% 
+
+(squares and dashed lines). 
+
+FIG. 4: Posterior distribution for the model using a post-leading-order eCGW waveform and simulated residuals from six pulsars. The teal contours show the posteriors recovered using a pulsar-distance uncertainty of σpd = 20% , while the orange contours correspond to 
+
+σpd = 5% .pulsar distance on the parameter estimation of the eccen-tric binary. Since the pulsar distances are inferred as part of Bayesian fitting, we observe correlations across pulsars, which are unphysical and can also affect the correlation between the other eCGW parameters, most notably those constrained by their evolution over τα. We reduce the un-certainty in the pulsar distances to 5% while keeping the eCGW model the same as that used for the simulation. The resulting posteriors are presented in Fig. 4. The             
+
+> (a) Time-domain residuals for a binary with initial eccentricity e0= 0 .003 and initial orbital frequency
+> Forb = 4nHz . The full waveform with post-leading-order corrections in the dynamics is given by teal line. The ET-only contribution is shown as a yellow dashed line, and the leading-order dynamics waveform is in pink.
+> (b) Frequency-domain power spectral density for one pulsar, including ET (yellow) and PT (teal), for the same binary as in Figure 5a, using post-leading-order corrections in the dynamics. Different markers represent different sets of harmonics: kψ r+ 2 γare circles, kψ rsquares, and kψ r−2γ
+> triangles.
+
+FIG. 5: Residuals and spectral analysis for a low-frequency, low-eccentricity binary. teal posterior corresponds to our reference, and the orange contours represent the posteriors obtained with reduced uncertainty in the pulsar distances. As expected, the biggest impact is on the sky localisation of the GW source, while the improvement in the estimation of the other parameters is negligible; still, we observe a slight change in the correlation between total mass and symmetric mass ratio. Finally, we investigate the impact of the pulsar term: can we drop the pulsar term from the model? First, we consider an almost circular binary ( e = 0 .003 )with initial orbital frequency Forb = 4nHz and SNR = 8. The residuals and the spectrum of harmonics for this source are presented in Fig. 5. This binary does not evolve significantly over τα, for example, for pulsar J1744-1134, the eccentricity at the pulsar term is ep 
+
+> 0
+
+=0.004 , and the orbital frequency is F p 
+
+> orb
+
+= 3 .16nHz . As a 8result, neglecting the pulsar terms does not prevent us from detecting the source. The inferred posteriors with (teal) and without (yellow) the pulsar term in the model are given in Fig. 6a. The full signal model gives well-constrained posteriors, while the Earth-term-only model leads to (i) unconstrained posteriors for the mass and mass ratio (which is expected since we lack frequency evolution), (ii) biases, most notably in the frequency and the initial phase, and (iii) broader posteriors for all parameters. We observe a different picture for eCGWs at high fre-quency. The ET-only model is too simplistic to accurately reproduce the full harmonic structure of the eccentric sig-nal, and consequently, all the eCGW parameters remain unconstrained. This is demonstrated by the yellow pos-teriors in Fig. 6b, which show substantial degradation compared to our fiducial posterior obtained using the ET+PT model (teal). Dropping the pulsar term leads to a decrease in the overall optimal SNR of the sources similar for both the eccentric and circular binaries, it is reduced to SNR ET ∼ 5.One the other hand the matched filtering SNR (inner product between the signal and the maximum likelihood estimator) decreases from 8 to 7.6 for the circular binary and from 10.52 to 5.7 for the eccentric SMBHB. This has direct observational consequences: dropping the pulsar term in the eccentric model might fail to detect the signal altogether. The drop in SNR in yellow posteriors in Fig. 6b for eccentric binaries is a direct consequence of the multi-harmonic structure of eCGW. In contrast, for low-frequency and almost circular binaries, the groups of harmonics associated with the Earth and pulsar terms lie in the same frequency bins, since the binary evolution over τα is still negligible, and the ET-only model can still capture the overall signal at the expense of biases.                
+
+> B. Correlation of eCGW with the CRN Data Model Figure
+> CRN + CGW (Forb = 3 nHz, e0= 0 .75 )CRN + CGW 7, 10 (cyan) CRN (power law) 10 (purple) CRN (freespectrum) 11 (cyan violins) CRN + CGW (Forb = 15 nHz, e0= 0 .5)CRN + CGW 12, 13 (cyan) CRN (power law) 13 (purple) CRN (freespectrum) 14 (cyan violins)
+
+TABLE II: Summary of different data sets and modeling approaches for CRN, and CGW signals. All the runs include WN both in the data set and the model, with parameters fixed to per backend values contained in the noise dictionaries. The main focus of this subsection is to understand and assess the correlation between noise and the eCGW signal.           
+
+> (a) Posterior distribution obtained for a dataset with an injected source at initial eccentricity e0= 0 .003 and initial orbital frequency Forb = 4nHz .
+> (b) Posterior distribution obtained for a dataset with an injected source at initial eccentricity e0= 0 .5and initial orbital frequency Forb = 15nHz .
+
+FIG. 6: Comparison of posteriors obtained with a full model (both pulsar and Earth terms) (teal) and with the model with Earth term only (yellow). The simulated data contained the full eCGW signals including high PN corrections to the dynamics. 9
+
+FIG. 7: Posterior distribution for CGW parameters using model containing WN+CGW+CRN on the WN+CGW+CRN dataset. To answer this question, we need to use more realistic simulated data. The data simulated in this subsection closely resemble the EPTA DR2new dataset [9]. We use the actual epochs of observations and measurement errors for the TOAs of 25 pulsars, which implies non-uniformly sampled data. We add a CRN with log 10 (Acrn ) = −14 .5
+
+and γcrn = 4 .33 . We also inject an eCGW with a low orbital frequency Forb = 3 .15 nHz and high eccentricity 
+
+e0 = 0 .74 to study the correlation between the CRN and the eCGW signal. The simulated eCGW signal has 
+
+SNR eff = 8 .89 . We use a highly eccentric binary to have GW power spread across many harmonics in the frequency domain and potentially amplify the covariance between the noise and the signal. The summary of the simulated data sets and the models used in the inference is given in Table II. We infer the parameters of the eccentric SMBHB to-gether with the CRN parameters; both the simulated data and the model consist of CRN+WN+eCGW. The resulting posterior is given in Fig.7, and the corresponding distribution of the log-likelihood is presented in Fig. 8. The likelihood exhibits a bimodal structure. We split the posterior samples into low- and high-likelihood modes with Lth = 537255 .3 as the separator and replot the pos-terior using teal colour for the high-likelihood mode and orange for the low-likelihood mode in Fig. 9. The CRN posterior is shown in Fig. 10. We observe that the teal posterior corresponds to the actual data model and cor-rectly recovers the parameters of the eCGW and CRN, while the orange posterior points correspond to a model 
+
+FIG. 8: Log-likelihood distribution for parameter estimation on data: WN+CRN+CGW, using model: WN+CRN+CGW (teal). The black dashed line is the threshold for splitting the posteriors in eCGW constrained and absorbed by the CRN. 
+
+FIG. 9: Posterior distribution for CGW parameters using model containing WN+CGW+CRN on the WN+CGW+CRN dataset. Teal (orange) posterior are obtained selecting points with L > Lth (L < Lth )with CRN only, returning a non-informative posterior for the eCGW (upper bound). Moreover, the orange poste-rior points correspond to a CRN that is flatter in slope and higher in amplitude than the simulated CRN 2.We analysed the same data assuming a CRN+WN model only and overplot the CRN posterior in purple in Fig. 10 which overlaps closely with the orange contours. Therefore, the low-likelihood mode in the full posterior  
+
+> 2Interestingly, we recover similar spectrum for GWB in EPTA DR2new data set [28].
+
+10 corresponds to the partial absorption of the eCGW by the CRN. We also evaluate the free spectrum of our simulated data, presented in Fig. 10. We overplot it with the spec-trum corresponding to the injection (CRN+eCGW+WN) in teal, and with the purple line corresponding to the CRN only fit to the same data (the colors match posteriors in Fig. 10). These results are consistent with the low Bayes factor of BCRN+CGW CRN = 0 .7 evaluated using the product space approach (see [29] and references therein). This indicates no significant preference for the eCGW+CRN model over the CRN-only hypothesis. The MCMC loses track of the signal and explores regions of parameter space consistent with noise only, suggesting that the noise model provides a comparable (actually slightly worse) description of the data. This is likely a consequence of the large prior volume associated with the eCGW parameters — 63 parameters for the CGW+CRN model compared to the 2 parameters of the CRN-only model — which penalizes the evidence integral even in the presence of a strong likelihood peak of ∆ ln L = 16 .5. Hence, the CRN-only model cannot be ruled out because of its simplicity (only two parameters) and its similarity to the broadband eCGW spectrum. We now consider an eCGW signal from a binary with a higher orbital frequency ( Forb = 15 nHz ). The Earth terms fall completely on the WN-dominated part of the spectrum, while the pulsar terms still have some overlap with the CRN. The posteriors are presented in Fig. 12. The absorption of the high-frequency eCGW by the CRN is much less pronounced, since the two processes 
+
+FIG. 10: CRN parameters posterior distribution for different simulations. The posterior distribution in teal (orange) is obtained by fitting dataset with WN+CRN+CGW with model WN+CRN+CGW and selecting only points with L > Lth (L < Lth ). The purple posterior is obtaine fitting the same dataset with model WN+CRN. 
+
+FIG. 11: Teal violin plots represent the free spectrum fit on the dataset containing WN+CRN+eCGW at high frequency, the teal line is the sum of the PSD of the CGW and the CRN obtained when the two signals are properly disentangled. The purple line is the CRN PSD obtained from WN+CRN on the same dataset 
+
+FIG. 12: Corner plot for the high frequency source. Data and model consist of WN+CRN+eCGW. overlap only in a subset of the pulsar-term harmonics in the frequency domain. The intrinsic eCGW parameters, namely the orbital frequency Forb = 15 .10 nHz , the eccen-tricity e0 = 0 .55 , and the symmetric mass ratio ν = 0 .22 ,are well constrained. Nevertheless, we still observe a shallow tail associated with the correlation between the eCGW signal and the CRN. The recovered CRN posterior is shown in Fig.13. As in the low-frequency case, the teal contours correspond to the full CRN+eCGW inference, while the purple contours are obtained by analysing the same simulated data with the CRN-only model. The free spectrum of the simulated data is shown in Fig.14. 11 
+
+FIG. 13: Posterior distribution in teal resulting from fitting dataset with WN+CRN+eCGW at high frequency with model WN+CRN+eCGW compared with the purple posterior obtained from fitting the same dataset with the WN+CRN model. 
+
+FIG. 14: Teal violin plots represent the free spectrum fit on the dataset containing WN+CRN+eCGW at high frequency, the teal line is the sum of the PSD of the CGW and the CRN obtained when the two signals are properly disentangled. The purple line is the CRN PSD obtained from WN+CRN on the same dataset For comparison, we overplot the injected spectrum (teal) and the best-fitting CRN-only spectrum (purple), using the same colour scheme as in the left panel. We observe that the recovered CRN spectrum overlaps with the in-jected. The evaluated Bayes factor (noise only vs noise plus eCGW), which is of order unity, does not yet pro-vide strong evidence in favour of the CGW+CRN model over the CRN-only hypothesis. This is primarily due to the high dimensionality of the CGW+CRN parameter space, which penalizes the Bayesian evidence despite the improved likelihood. The evidence penalty associated with the "curse of dimensionality" can be mitigated when the prior volume is reduced, for example in targeted searches where some prior ranges are constrained by external information. It is therefore possible to obtain informative posteriors without a large Bayes factor. As an alternative diagnostic for an "emerging eCGW" signal, we evaluate the Hellinger [30] and Jensen-Shannon [31] marginalised per-parameter distances between the posteriors p(Θ i) and the priors 
+
+π(Θ i) for the full WN+CRN+eCGW runs at low and high frequency. We define these two metrics in the Appendix A. The per-parameter metrics for the eCGW parameters of both binaries considered in this study are presented in Fig. 15. The large prior–posterior Hellinger and Jensen-Shannon distances show that the data are informative about the CGW parameters, particularly for the high-frequency eCGW. The Hellinger and Jensen-Shannon diagnostics show similar qualitative trends, but probe the prior–posterior difference in complementary ways: the Hellinger distance measures geometric overlap, while the Jensen-Shannon divergence quantifies information gain. This highlights the limitation of Bayes factors in high-dimensional parameter-estimation problems and motivates parameter-level diagnostics as complementary measures of signal informativeness.  
+
+> V. DISCUSSION/CONCLUSION
+
+In this work, we use Bayesian approach to infer param-eters of eccentric supermassive black hole binaries in the simulated PTA data. We believe, this work is the most complete investigation of eCGW signal within PTA data. Here we briefly summarize the main conclusions of this paper. 
+
+a. Importance of post-Newtonian corrections and pul-sar term: Our results confirm the conjecture put forward in [9]: including higher-order post-Newtonian corrections in the binary evolution is essential for unbiased parameter recovery when the source is at high orbital frequency. In this regime, the binary evolves significantly over the Earth– pulsar light-travel time τα, and truncating the dynamics at leading order make posteriors broader and introduces biases. These biases propagate into the estimates of the individual companion masses. The pulsar term plays an equally critical role at high orbital frequencies. The Earth-term-only model is unable to reproduce the full harmonic structure of the eCGW signal and leads to unconstrained posteriors for most source parameters. This contrasts with the low-frequency, nearly circular case ( Forb = 5 , nHz , e0 = 0 .01 ), where the binary evolves only mildly over τα. In that case, the Earth-term-only model still recovers the frequency, eccentricity, and sky location with acceptable accuracy, although the total mass, distance, and mass ratio remain unconstrained, as expected from the absence of frequency-evolution information provided by the pulsar term. The ability to measure the individual companion masses 
+
+m1 and m2, rather than only the chirp mass, is a distinc-tive feature of the eccentric model. The symmetric mass ratio ν is constrained through the combination of periap-sis precession and the harmonic structure of the waveform, 12 crn   
+
+> log 10  Acrn
+> log 10  Forb
+> log 10  M
+> log 10  de0
+> 0
+> 0
+> cos
+> cos  gw
+> gw
+> 0.0 0.2 0.4 0.6 0.8 1.0 Hellinger distance  H
+> CRN CGW
+> Hellinger
+> e=0.55, 15.10 nHz e=0.74, 3.15 nHz
+> crn
+> log 10  Acrn
+> log 10  Forb
+> log 10  M
+> log 10  de0
+> 0
+> 0
+> cos
+> cos  gw
+> gw
+> 0.0 0.2 0.4 0.6 0.8 1.0 Jensen-Shannon distance  JSd
+> CRN CGW
+> Jensen-Shannon
+> e=0.55, 15.10 nHz e=0.74, 3.15 nHz
+
+FIG. 15: Hellinger distance (left) and Jensen-Shannon divergence (right) for two eccentric CGW signals: e0 = 0 .5,
+
+Forb = 15 nHz (teal) and e0 = 0 .75 , Forb = 3 nHz (red). both of which depend sensitively on ν. This measurement becomes possible only when both the pulsar term and high-PN corrections are included, since the individual mass estimates rely on the total mass and symmetric mass ratio inferred from the eccentricity and frequency evolution over τα.Reducing the pulsar distance uncertainty from 20% to 
+
+5% primarily improves the sky localisation of the source, while leaving the other binary parameters largely unaf-fected. This suggests that, at current levels of pulsar dis-tance knowledge, the dominant limitation on sky localisa-tion is the prior on dα rather than the signal itself. Future astrometric measurements, such as those expected from VLBI campaigns, could therefore meaningfully tighten the source-position constraints. 
+
+b. Correlation between eCGW and CRN: The sec-ond set of results addresses the interplay between the eCGW signal and the common red noise. At low or-bital frequencies ( Forb = 3 , 15nHz ), the eCGW harmonics overlap substantially with the CRN-dominated frequency band. The resulting degeneracy between the two pro-cesses appears as a bimodal likelihood distribution. In the high-likelihood mode, the eCGW signal is identified and the CRN is recovered consistently with the injection. In the second mode, part of the eCGW power is absorbed by the CRN, which leads to shifts toward a higher ampli-tude and a shallower spectral index in order to account for the excess power at intermediate frequencies. This behaviour has a clear physical interpretation: a highly eccentric binary distributes its GW power across many harmonics producing a broad-band spectrum that can resemble a smooth red process at the frequency resolution of current PTA datasets. For this injection, the Bayes factor is BCRN+CGW CRN ≈
+
+0.7, indicating no significant preference for the eCGW signal model over the CRN-only hypothesis. This result is driven by the large prior volume of the eCGW+CRN model. Although the likelihood exhibits a clear peak (∆ ln L = 16 .5), the 63-parameter eCGW+CRN model is strongly penalized by the evidence integral relative to the 2-parameter CRN model. Thus, the data are informative about parts of the signal parameter space, but not sufficiently so to overcome the Occam penalty associated with the full eCGW model. This illustrates an important limitation of Bayes factors in high-dimensional, low-SNR searches for individual PTA sources. At higher orbital frequencies ( Forb = 15 , 10nHz ), the situation improves considerably. Many of eCGW har-monics lie well above the CRN-dominated band, reduc-ing the spectral overlap and the degeneracy between the two processes. The misspecified WN+CRN fit to the WN+CGW+CRN dataset shows only a marginal bias in amplitude and spectral index, and the free-spectrum reconstruction closely tracks the true noise power law across all frequencies. The eCGW posteriors from the joint WN+CGW+CRN run recover the injected orbital frequency, eccentricity, and symmetric mass ratio with good accuracy, while the sky position, chirp mass, and luminosity distance remain broad but still informative. The Bayes factor, however, is of order unity in this case as well, again due to the dimensionality penalty. The prior–posterior Hellinger distances and Jensen-Shanon divergence shown in Fig. 15 provide a comple-mentary diagnostic. They show that the data can be informative about the eCGW parameters, especially for the high-frequency source, even when the global Bayes factor does not favour the more complex model. These results motivate the use of parameter-level diagnostics to-gether with global model-selection metrics when assessing candidates for individual sources in PTA data. 
+
+c. Limitations. Several simplifications adopted in this work should be kept in mind. First, we model the 13 SGWB as a common uncorrelated red-noise process and neglect the Hellings–Downs spatial correlations. This approximation is not expected to change our main con-clusions about eCGW parameter recovery. However, a fully spatially correlated background could, in principle, produce stronger degeneracies with highly eccentric, low-frequency eCGWs than the CRN model used here. Second, we did not include individual pulsar red noise or chromatic noise components. In an ideal dataset with suf-ficiently broad radio-frequency coverage, chromatic noise should decouple from achromatic red noise. This was not fully the case for EPTA DR2, but future data releases including LOFAR and NenuFAR observations should help address this limitation. Individual pulsar red-noise compo-nents are expected to have an effect qualitatively similar to that of the CRN. Third, although the simulated dataset follows realis-tic EPTA DR2new configurations, we fix the CRN and WN parameters. In reality, these parameters are drawn from the broad posterior distributions reported in EPTA studies [1, 28]. Finally, on the signal-modelling side, the numerical inte-gration of the binary evolution equations over τα remains the main computational bottleneck in the evaluation of the pulsar term. Faster approximations, for example, based on neural-network-generated waveforms, would sig-nificantly improve the efficiency and extend the reach of the current pipeline. 
+
+> ACKNOWLEDGMENTS
+
+This work was supported by the French National Research Agency (grant ANR-21-CE31-0026, project MBH_waves). We also acknowledge financial support from the Centre national d’études spatiales (CNES), France (ROR: https://ror.org/04h1h0y33), within the framework of the LISA space mission. We thank Irene Ferranti and Riccardo Jurgen Truant for their help during the preparation of this work. 
+
+> Appendix A: Appendix: Jensen-Shannon and Hellinger distances
+
+To quantify the level of agreement between posterior distributions obtained under different waveform models, we employ two complementary statistical distance mea-sures: the Jensen–Shannon (JS) distance and the Hellinger distance. Both are symmetric, bounded metrics that cap-ture the full shape of a distribution, including differences in width, skewness, and multimodality that may not be evident from percentile or credible-interval comparisons alone. The Hellinger distance is expressed as 
+
+H(p(Θ i), π (Θ i)) = 1
+
+√2
+
+vuut
+
+> Nsamples
+
+X
+
+> j=1
+
+q 
+
+p(Θ i,j ) −
+
+q
+
+π(Θ i,j )
+
+
+
+(A1) while the Jensen-Shannon divergence is given by: 
+
+JSD( p(Θ i)∥π(Θ i)) = 12 (KL( p(Θ i)∥m(Θ i)) + KL( π(Θ i)∥m(Θ i))) 
+
+(A2) where m(Θ i) is the average between per-parameter poste-rior and prior: 
+
+m(Θ i) = 12 (p(Θ i) + π(Θ i)) (A3) and KL is the Kullback-Leibler divergence 
+
+DKL (p∥q) = 
+
+> Nsamples
+
+X
+
+> j=1
+
+p(Θ i,j ) log p(Θ i,j )
+
+q(Θ i,j ) . (A4) The JS distance is defined as a root square of JS di-vergence; it behaves like a proper distance, including satisfying the triangle inequality. 
+
+> Appendix B: Appendix: Prior Distributions
+
+Table III summarizes the prior distributions adopted for all parameters in the parameter estimation analysis, including pulsar distances, true anomalies, common red noise parameters, and continuous-wave source parameters. 14 
+
+Parameter Distribution Property 1 Property 2 
+
+Pulsar Distance Parameters 
+
+J0030+0451 distance Normal μ = 0 .28 σ = 0 .10 
+
+J0613 −0200 distance Normal μ = 0 .90 σ = 0 .40 
+
+J1012+5307 distance Normal μ = 0 .70 σ = 0 .20 
+
+J1022+1001 distance Normal μ = 0 .52 σ = 0 .09 
+
+J1024 −0719 distance Normal μ = 0 .49 σ = 0 .12 
+
+J1455 −3330 distance Normal μ = 0 .74 σ = 0 .15 
+
+J1600 −3053 distance Normal μ = 2 .40 σ = 0 .90 
+
+J1640+2224 distance Normal μ = 1 .19 σ = 0 .238 
+
+J1713+0747 distance Normal μ = 1 .05 σ = 0 .06 
+
+J1730 −2304 distance Normal μ = 0 .51 σ = 0 .10 
+
+J1744 −1134 distance Normal μ = 0 .42 σ = 0 .02 
+
+J1857+0943 distance Normal μ = 0 .90 σ = 0 .20 
+
+J1909 −3744 distance Normal μ = 1 .26 σ = 0 .03 
+
+J1910+1256 distance Normal μ = 1 .95 σ = 0 .39 
+
+J1918 −0642 distance Normal μ = 1 .40 σ = 0 .28 
+
+J2124 −3358 distance Normal μ = 0 .30 σ = 0 .07 
+
+J0751+1807, J0900 −3144, J1738+0333, etc. Normal μ = 1 .00 σ = 0 .20 
+
+True Anomalies at Pulsars 
+
+ξ0,p Uniform min = −π max = π
+
+Common Red Noise Parameters 
+
+γCRN Uniform min = 0 max = 7 log 10 ACRN Uniform min = −18 max = −10 
+
+Continuous Wave (GW Source) Parameters 
+
+cos θGW Uniform min = −1 max = 1 cos ι Uniform min = −1 max = 1 
+
+e0 Uniform min = 0 .001 max = 0 .9
+
+γ0 Uniform min = 0 max = πϕGW Uniform min = 0 max = 2 π
+
+log 10 Forb Uniform min = −9.0 max = −7.7log 10 M Uniform min = 8 .0 max = 10 .2log 10 d Uniform min = −2 max = 4 
+
+ν Uniform min = 0 .01 max = 0 .25 
+
+ψ Uniform min = 0 max = πξ0 Uniform min = −π max = π
+
+TABLE III: Prior distributions for all parameters used in parameter estimation. 15 
+
+[1] J. Antoniadis et al. (EPTA, InPTA), Astron. Astrophys. 
+
+678 , A50 (2023), arXiv:2306.16214 [astro-ph.HE]. [2] G. Agazie et al. (NANOGrav), Astrophys. J. Lett. 951 ,L8 (2023), arXiv:2306.16213 [astro-ph.HE]. [3] D. J. Reardon et al., Astrophys. J. Lett. 951 , L6 (2023), arXiv:2306.16215 [astro-ph.HE]. [4] J. P. W. Verbiest et al., Mon. Not. Roy. Astron. Soc. 458 ,1267 (2016), arXiv:1602.03640 [astro-ph.IM]. [5] L. Z. Kelley, Z. Haiman, A. Sesana, and L. Hernquist, Mon. Not. Roy. Astron. Soc. 485 , 1579 (2019), arXiv:1809.02138 [astro-ph.HE]. [6] P. A. Rosado, A. Sesana, and J. Gair, Mon. Not. Roy. Astron. Soc. 451 , 2417 (2015), arXiv:1503.04803 [astro-ph.HE]. [7] R. J. Truant, D. Izquierdo-Villalba, A. Sesana, G. M. Shaifullah, and M. Bonetti, Astron. Astrophys. 694 , A282 (2025), arXiv:2407.12078 [astro-ph.GA]. [8] R. J. Truant, D. Izquierdo-Villalba, A. Sesana, G. M. Shaifullah, M. Bonetti, D. Spinoso, and S. Bonoli, Astron. Astrophys. 706 , A115 (2026), arXiv:2504.01074 [astro-ph.GA]. [9] S. Manzini and S. Babak, Phys. Rev. D 114 , 024036 (2026), arXiv:2511.19611 [gr-qc]. [10] M. Vallisneri, M. Crisostomi, A. D. Johnson, and P. M. Meyers, Phys. Rev. Lett. 135 , 071401 (2025), arXiv:2405.08857 [gr-qc]. [11] jexplore, jexplore .[12] R. van Haasteren and Y. Levin, Mon. Not. Roy. Astron. Soc. 428 , 1147 (2013), arXiv:1202.5932 [astro-ph.IM]. [13] A. Chalumeau et al. (EPTA), Mon. Not. Roy. Astron. Soc. 509 , 5538 (2021), arXiv:2111.05186 [astro-ph.HE]. [14] R. W. Hellings and G. S. Downs, Astrophys. J. Lett. 265 ,L39 (1983). [15] L. Lentati et al., Mon. Not. Roy. Astron. Soc. 458 , 2161 (2016), arXiv:1602.05570 [astro-ph.IM]. [16] L. Lentati, P. Alexander, M. P. Hobson, S. Taylor, J. Gair, S. T. Balan, and R. van Haasteren, Phys. Rev. D 87 ,104021 (2013), arXiv:1210.3578 [astro-ph.IM]. [17] R. van Haasteren and M. Vallisneri, Phys. Rev. D 90 ,104012 (2014), arXiv:1407.1838 [gr-qc]. [18] M. Crisostomi, R. van Haasteren, P. M. Meyers, and M. Vallisneri, Beyond diagonal approximations: improved covariance modeling for pulsar timing array data analysis (2025), arXiv:2506.13866 [astro-ph.IM]. [19] Discovery, Discovery: next-generation pulsar-timing-array data-analysis package, built for speed on a jax back-end that supports gpu execution and autodifferentiation, 
+
+https://github.com/nanograv/discovery (2025). [20] Ž. Ivezić, A. J. Connolly, J. T. VanderPlas, and A. Gray, Statistics, Data Mining, and Machine Learning in Astronomy (Princeton University Press, 2014). [21] J. Skilling, AIP Conf. Proc. 735 , 395 (2004). [22] T. B. Littenberg and N. J. Cornish, Phys. Rev. D 107 ,063004 (2023), arXiv:2301.03673 [gr-qc]. [23] N. Karnesis, M. L. Katz, N. Korsakova, J. R. Gair, and N. Stergioulas, Mon. Not. Roy. Astron. Soc. 526 , 4814 (2023), arXiv:2303.02164 [astro-ph.IM]. [24] S. Hee, W. Handley, M. P. Hobson, and A. N. Lasenby, Mon. Not. Roy. Astron. Soc. 455 , 2461 (2016), arXiv:1506.09024 [astro-ph.CO]. [25] F. Bartolucci, L. Scaccia, and A. Mira, Biometrika 93 , 41 (2006). [26] S. Chen et al. (EPTA), Mon. Not. Roy. Astron. Soc. 508 ,4970 (2021), arXiv:2110.13184 [astro-ph.HE]. [27] L. Speri, N. K. Porayko, M. Falxa, S. Chen, J. R. Gair, A. Sesana, and S. R. Taylor, Mon. Not. Roy. Astron. Soc. 
+
+518 , 1802 (2022), arXiv:2211.03201 [astro-ph.HE]. [28] J. Antoniadis et al. (EPTA), Astron. Astrophys. 678 , A48 (2023), arXiv:2306.16224 [astro-ph.HE]. [29] N. Korsakova, S. Babak, M. L. Katz, N. Karnesis, S. Khukhlaev, and J. R. Gair, Phys. Rev. D 110 , 104069 (2024), arXiv:2402.13701 [gr-qc]. [30] A. Bhattacharyya, Bull. Calcutta Math. Soc. 35 , 99 (1943). [31] J. Lin, IEEE Trans. Info. Theor. 37 , 145 (1991).
