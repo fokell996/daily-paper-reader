@@ -1,0 +1,2159 @@
+Title: A Gaussian Process framework for constraining the nuclear equation of state from microscopic calculations with correlated uncertainties
+
+URL Source: https://arxiv.org/pdf/2608.09678v1
+
+Published Time: Tue, 11 Aug 2026 02:26:59 GMT
+
+Number of Pages: 30
+
+Markdown Content:
+N3AS-26-017, INT-PUB-26-029 
+
+## A Gaussian Process framework for constraining the nuclear equation of state from microscopic calculations with correlated uncertainties 
+
+Y. G. Lee ,1, ∗ J. Kim ,2, 1, † T. Zhao ,3, 4, ‡ and C. Drischler 1, 5, §
+
+> 1
+
+Department of Physics and Astronomy, Ohio University, Athens, Ohio 45701, USA 
+
+> 2
+
+Physics Division, Argonne National Laboratory, Lemont, Illinois 60439, USA 
+
+> 3
+
+Institute for Nuclear Theory, University of Washington, Seattle, Washington 98195, USA 
+
+> 4
+
+Network for Neutrinos, Nuclear Astrophysics, and Symmetries (N3AS), University of California, Berkeley, California 94720, USA 
+
+> 5
+
+Facility for Rare Isotope Beams, Michigan State University, East Lansing, Michigan 48824, USA 
+
+(Dated: August 11, 2026) We present constraints on the nuclear equation of state (EOS) from microscopic asymmetric matter calculations at zero temperature based on chiral nucleon-nucleon and three-nucleon interactions. The constraints include the saturation point, the isospin dependence of the incompressibility, and the symmetry energy, as well as the crust-core transition density of neutron-star matter. To quantify and propagate correlated uncertainties from noisy many-body calculations to derived observables, we introduce GPDiff , an efficient JAX -based Python package for multivariate Gaussian process (GP) regression with automatic differentiation. After training, GPDiff enables joint predictions of the EOS and derivatives of arbitrary order with respect to the input variables, including mixed partial derivatives. In this initial application, we analyze recent high-order many-body perturbation theory calculations of asymmetric matter up to about twice saturation density and explore nonstationary change-surface kernels, a class of input-dependent kernels, for modeling the EOS. GPDiff is broadly applicable to microscopic nuclear EOS calculations at zero and finite temperature and provides a versatile package for GP-based uncertainty quantification and inference of the nuclear EOS. 
+
+I. INTRODUCTION 
+
+Infinite nuclear matter, an idealized system of interact-ing nucleons without Coulomb and surface effects, has been an important laboratory for benchmarking micro-scopic nuclear forces in medium [1–6]. Its equation of state (EOS) provides essential constraints on the proper-ties of strongly interacting matter and is thus essential for understanding atomic nuclei, heavy-ion collisions, and compact objects such as neutron stars [7–11]. Substantial advances in chiral effective field theory (EFT) for nuclear forces [12–15] and in many-body frame-works, including high-order many-body perturbation the-ory (MBPT) [3, 16], quantum Monte Carlo (QMC) meth-ods [17–20], and emulators for uncertainty quantifica-tion (UQ) [21–25], have provided increasingly stringent constraints on low-density nuclear matter. In particular, recent calculations of symmetric nuclear matter (SNM) and pure neutron matter (PNM) have provided insights into nuclear saturation properties and, when combined with empirical expansions in the isospin asymmetry, con-strain the EOS of neutron-rich matter with important implications for the structure of neutron stars [16, 26–34]. In parallel, explicit calculations of isospin asymmetric matter allow for direct tests of these expansions while further constraining the infinite matter EOS as a function     
+
+> ∗yl518521@ohio.edu
+> †jane.kim@anl.gov
+> ‡tianqi.zhao@berkeley.edu
+> §drischler@ohio.edu
+
+of the density and isospin asymmetry, both at zero and finite temperature [35–41]. Gaussian processes (GPs) [42–45] are a well-established nonparametric method for regression and classification in machine learning 1 and have become popular statistical tools for EOS modeling across a wide range of densities with quantified uncertainties. For example, GPs have been used to estimate truncation errors from finite-order EFT or many-body expansions [51–54]; interpolate many-body calculations to constrain derived quantities such as the speed of sound [41, 51, 52]; facilitate Bayesian model mixing to combine EOS constraints from different density regions into globally predictive composite models [55, 56]; and provide model-agnostic priors for EOS inference from multimessenger observations of neutron stars (e.g., Refs. [57–67]). Going forward, it will be important to explore more systematically how inferred EOS constraints depend on modeling choices, such as the GP kernel, which encodes prior information about the EOS function space, and how these choices can be informed by physics. While advanced kernel design is well established in machine learning [68], e.g., to incorporate information on data trends and pat-terns, it has only recently begun to see broader use in nuclear physics. Recent applications to neutron-star mat-ter include modified GPs designed to model nontrivial features in the speed of sound [69] and nonstationary changepoint kernels used in Bayesian model mixing of  
+
+> 1For connections between GPs and infinite-width neural networks, see Refs. [46–49]; for related work in nuclear physics, see Ref. [50]. arXiv:2608.09678v1 [nucl-th] 10 Aug 2026
+
+2chiral EFT and perturbative quantum chromodynamics (pQCD) calculations [55, 56]. Motivated by these considerations, we have developed a general-purpose Python package for multivariate GP regression, named GPDiff , which enables theoretical un-certainties in the EOS to be quantified and propagated to derived quantities for arbitrary differentiable kernels. 2
+
+For example, once trained on a set of many-body calcula-tions for the energy per particle based on various chiral interactions, GPDiff can efficiently evaluate derivatives to constrain derived observables, such as the pressure, with quantified correlated uncertainties. Built on Google’s 
+
+JAX [70], GPDiff leverages automatic differentiation and just-in-time compilation, among other high-performance computing optimizations. While addressing use cases sim-ilar to those of the earlier Python package gptools [71], which, to our knowledge, is no longer actively maintained, 
+
+GPDiff provides an independent, more flexible JAX -based implementation tailored to EOS UQ and inference. In this work, we demonstrate GPDiff ’s efficacy for an-alyzing microscopic calculations of asymmetric nuclear matter using a higher-dimensional generalization of the nonstationary change-point kernels recently studied for Bayesian model mixing in Ref. [56]. We present results for several low-density EOS parameters, including the incompressibility of SNM and the symmetry energy. In particular, we constrain the EOS parameter Kτ , which governs the isospin dependence of the incompressibility 
+
+K at leading order [72, 73]. Improving experimentally in-formed constraints on Kτ is currently the goal of the sched-uled FRIB experiment “The Isoscalar Giant Monopole Resonance in 132 Sn: Implications on the Nuclear Incom-pressibility” (PAC #21056). We also constrain properties of low-density neutron-star matter, such as the EOS and the crust-core transition density, below which matter is nonuniform. While our constraints are based on recent high-order MBPT calculations of asymmetric matter [16], 
+
+GPDiff is broadly applicable to many-body calculations of the nuclear EOS at zero and finite temperature. The remainder of this paper is organized as follows. Section II describes our statistical framework, including the developed Python library GPDiff and the proposed deviation model for noisy microscopic EOS calculations. Together with technical documentation and the EOS re-sults presented here, GPDiff will be made publicly avail-able on GitHub to allow the practitioner to apply and extend it in their research. In Sec. III, we apply GPDiff 
+
+to recent asymmetric matter calculations and present our main results for constraining the symmetry energy and other EOS parameters, as well as neutron-star matter properties, such as the EOS, composition, and crust-core transition density. Section IV concludes with a summary and outlook. Appendix A gives an overview of existing libraries for GP regression and classification; Appendix B   
+
+> 2Appendix A contains a listing of other GP-based software pack-ages, including packages using Google’s JAX .
+
+provides further details on the uncertainty propagation to neutron-star matter; and Appendix C contains additional results based on a different kernel choice that supplement Sec. III. We use natural units in which ℏ = c = 1 and typeset vectors and matrices in boldface.  
+
+> II. GP-BASED FRAMEWORK
+
+In this section, we describe our GP-based framework for modeling cold, low-density matter based on microscopic EOS calculations.   
+
+> A. GPs and their implementation in GPDiff
+
+To keep the article self-contained, we summarize the key features of GPs relevant to our EOS analysis, including kernels, mean functions, and differentiation, and discuss their implementation in GPDiff . For a comprehensive introduction to GPs and their applications, we refer the reader to Refs. [42–45]; for an introduction in the con-text of correlated EFT truncation errors specifically, see Section II.B of Ref. [74]. A GP is a collection of random variables, any finite number of which have joint Gaussian distributions [43]. A one-dimensional GP f (x), with multiple inputs collected in the d-dimensional vector x, is denoted by 
+
+f (x) ∼ GP (μ(x), k (x, x′)) , (1) and is fully determined by its mean function 
+
+μ (x) = E [f (x)] , (2) and kernel, also called the covariance function, 
+
+k (x, x′) = E [( f (x) − μ (x)) ( f (x′) − μ (x′))] . (3) In our zero-temperature EOS applications, we model the energy per particle as a GP, f (x) = E(x)/A , with d = 2 inputs, where x = ( δiso , n ) denotes the baryon density n
+
+and isospin asymmetry δiso , both continuous variables. In practice, however, the EOS is only evaluated at a finite set of N observation (or training) points, which we collect as xt = {xi}Ni=1 . For example, evaluating PNM ( δiso = 1) and SNM ( δiso = 0) at the saturation density n0 corresponds to N = 2. The associated function values, ft = {f (xi)}Ni=1 , are modeled as random variables following a multivariate normal distribution, 3
+
+ft | xt ∼ N (μt, Kt) , (4)    
+
+> 3We follow the standard statistical notation, denoting the co-variance matrix by K, which should not be confused with the incompressibility of SNM, K.
+
+3where the mean vector μt has the components μi = μ(xi)and the covariance (or kernel) matrix Kt has elements (Kt)ij = k(xi, xj ). By modeling the EOS as a GP with a specified mean function and kernel, we impose a prior probability dis-tribution over functions that, before calibration to data, can represent a wide range of behaviors consistent with our prior knowledge of the EOS’s smoothness and global trends, rather than restricting it to a single paramet-ric form. The chosen mean function encodes our prior expectation of the systematic trends in the data (i.e., microscopic EOS calculations), while the covariance struc-ture of the deviations from this expectation is specified by the kernel. Calibration to data then yields a poste-rior distribution over functions, as described in the next subsections.  
+
+> 1. Kernels
+
+A valid kernel must be symmetric and positive semi-definite, which ensures that the associated matrix K de-fines a proper covariance matrix. The parameters of a kernel, such as length scales, are called hyperparameters. We collect them in θ and calibrate their values to data. There are two broad classes of kernels [44, 68, 75]. Sta-tionary kernels are translation invariant, i.e., k(x, x′) = 
+
+k(x − x′), so the covariance between function values de-pends on their relative separation and not on their ab-solute location. 4 Examples include the constant, radial basis function (RBF), Mat´ ern, and rational quadratic (RQ) kernels. In contrast, nonstationary kernels allow the covariance to vary with the absolute position in input space. Examples include the polynomial and change-point (CP) kernels. The most widely used kernel is the stationary RBF kernel, also known as the squared-exponential (SE) kernel: 
+
+kRBF (x, x′; θ) = σ2 
+
+> f
+
+exp 
+
+
+
+− 12 (x − x′)⊺ Λ−1 
+
+> θ
+
+(x − x′)
+
+
+
+.
+
+(5) It is parameterized by the signal variance σ2 
+
+> f
+
+> 0 and a set of length scales for each input dimension, collected in the diagonal matrix Λθ = diag( λ21, λ 22, . . . , λ 2
+
+> d
+
+). Despite its popularity, the RBF kernel can be too restrictive for EOS modeling across a wide range of densities because it is in-finitely differentiable, implying global smooth, stationary behavior with a single length scale in each dimension. Individual kernels can also be combined through addi-tion, multiplication, or scaling to capture more complex structure in the output space. In this regard, nonsta-tionary change-surface (CS) kernels, which combine two or more kernels via input-dependent weight functions,       
+
+> 4If a stationary kernel is also isotropic, then it depends only on the distance between inputs, k(x,x′) = k(∥x−x′∥).
+
+allow the covariance structure to vary across regions of the input space and are therefore of particular interest for EOS inference [56]. Here, we consider the subclass of CS kernels [76, 77] with smooth Gaussian weight (or gating) functions, 
+
+kCS (x, x′) = X
+
+> i
+
+σi(x) ki(x, x′) σi(x′) , (6a) 
+
+σi(x) = ai
+
+Z exp −(x − ci)⊺B−1(x − ci) , (6b) where ci denotes the center of the ith weight function 
+
+σi(x), and Z is determined such that P 
+
+> i
+
+σi(x) = 1 for all x. For illustration, throughout this article we set all 
+
+ai to be equal (e.g., ai = 1), take a common diagonal smearing matrix B = diag( b21, b 22, . . . , b 2
+
+> d
+
+), and adjust only the widths bi > 0 and the centers ci.It is worth noting that, when combining only two ker-nels, Eq. (6) reduces to the multivariate version of the CP kernel studied in Ref. [56, see Eq. (29)] for Bayesian mixing of EOS models: 
+
+kCP (x, x′) = σ (x) k1 (x, x′) σ (x′)+ (1 − σ (x)) k2 (x, x′) (1 − σ (x′)) , (7a) 
+
+σ(x) = [1 + exp [ −w · (x − xc)]] −1 , (7b) where the mid-point xc and normal vector w,
+
+xc = c1 + c2
+
+2 , w = 2 B−1 (c1 − c2) , (8) define the sigmoidal weight function σ(x). 5 Its level sets (contours) are hyperplanes defined by w · x = constant, which are straight lines in two dimensions. The level set σ(x) = 0 .5 defines a hyperplane passing through xc,referred to as the change surface (or change point in one dimension), given by 
+
+w · x = w · xc ≡ c⊺ 
+
+> 1
+
+B−1c1 − c⊺ 
+
+> 2
+
+B−1c2 . (9) In the limit c2 → c1, Eq. (9) is trivially satisfied; i.e., both constituent kernels contribute equally for all x, and thus σ(x) ≡ 12 .For illustration, Fig. 1 shows the CS kernel (6) for two (panel a) and four (panel b) centers in the n–δiso 
+
+plane ( d = 2). The stars indicate the locations of the centers for the two illustrative choices of B shown in pan-els (a) and (b), respectively. As discussed, the change surface in panel (a) is a straight line (i.e., the black line). The remaining solid lines show contour levels at the an-notated values and are associated with centers of the corresponding color. Figure 1 illustrates that CS kernels of the form of Eq. (7) enable the construction of com-posite kernels designed to represent different features of          
+
+> 5Note that adoes not contribute to the weight function (7b), because setting a1=a2renders aa global prefactor that is absorbed into the overall normalization.
+
+40.00 0.05 0.10 0.15 0.20 0.25 0.30 
+
+n [fm −3]
+
+0.00.20.40.60.81.0
+
+> δiso  [—]
+
+## (a) 0.40 0.42 0.45 0.48 0.53 0.56 0.59 0.61 0.40 0.42 0.45 0.48 0.53 0.56 0.59 0.61 0.50 
+
+0.00 0.05 0.10 0.15 0.20 0.25 0.30 
+
+n [fm −3]
+
+0.00.20.40.60.81.0
+
+> δiso  [—]
+
+## (b) 
+
+> 0.15 0.25 0.35 0.45 0.15 0.25 0.35 0.45 0.15 0.25 0.35 0.45 0.15 0.25 0.35 0.45
+
+FIG. 1. Illustrations of two-dimensional change-surface kernels (e.g., the n–δiso plane) with two centers (panel a) and four centers (panel b), as indicated by the colored stars. For illustration, we assume that the weight functions in Eq. (6) have the form of normal distributions, with their means located at the colored stars and identity covariance matrices. The solid lines depict the contours (i.e., level sets) for which the weights of the corresponding kernels are as annotated. For example, in panel (a), the so-called change point would correspond to the point where the contour line corresponding to w = 0 .5 and the line connecting the two centers intersect. In panel (b), consider the green center and the associated region encompassed by, e.g., the w = 0 .45 contour line, which corresponds to low-density neutron-rich matter. This center separates characteristic EOS features in that region from those of neutron-rich matter at higher densities ( n ≳ n0) and from nearly SNM, where nuclear saturation emerges. 
+
+the EOS in its input space, e.g., ( δiso , n ). For example, consider the green center and its associated contour lines in Fig. 1(b). This center separates characteristic EOS features of neutron-rich matter at low densities ( n ≲ n0)from those of neutron-rich matter at higher densities (n ≳ n0) and from nearly SNM, where nuclear saturation emerges. In our implementation, the two degrees of free-dom are the centers ci, which determine the locations of these features, and the global smearing parameters b
+
+in each dimension, which control the smoothness of the transition between the kernels. For b → 0, these features are assumed isolated since σ(x) approaches the Heaviside step function centered at xc, resulting in a discontinuous transition. For b → ∞ , both kernels contribute equally across the entire input space. For intermediate values of 
+
+b, the transition between the kernels is more localized but still smooth. 
+
+2. Predictions and calibration 
+
+In practical applications, such as many-body EOS cal-culations, observations are subject to uncertainties. That means, instead of observing the latent function directly, one observes noisy realizations of it. Nevertheless, we can infer the latent function and predict its values at new input points, as described below. Let xt = {x1, . . . , xN } be the set of (observed) training inputs, with corresponding observations yt. These obser-vations are modeled here as yt = ft + ϵ with ϵ ∼ N (0, Ct), where ft ≡ f (xt) are the latent function values at xt,and Ct is the covariance matrix describing the observa-tional uncertainties. Sometimes only the diagonal compo-nents of Ct are considered, e.g., in the Python package 
+
+scikit-learn [78], but here we retain the full covariance matrix to account for correlated uncertainties in the input data. Our goal is then to predict the latent function at a set of N∗ evaluation points x∗ = {x∗1, x∗2, . . . , x∗N∗ },with corresponding values f∗ ≡ f (x∗). The joint distri-bution of the observations and the latent function at the evaluation points is given by: 
+
+yt
+
+f∗
+
+
+
+∼ N 
+
+ μt
+
+μ∗
+
+
+
+,
+
+Ktt + Ct Kt∗
+
+K∗t K∗∗ 
+
+ 
+
+, (10) where μt ≡ μ(xt) and μ∗ ≡ μ(x∗) are the mean functions evaluated at the training and test inputs, re-spectively, and the covariance matrices have elements [Ktt ]ij = k(xt,i , xt,j ; θ), [ Kt∗]ij = k(xt,i , x∗j ; θ), and [K∗∗ ]ij = k(x∗i, x∗j ; θ), generated by the kernel k with kernel hyperparameter θ. Hence, the kernel can be seen as a prior on the covariance structure, which is updated 5by conditioning on the observed data yt, with their un-certainties encoded in Ct.Conditioning on the training data ( xt, yt), one can show that the posterior distribution for the latent function values at the test points is the multivariate normal 
+
+f∗ | x∗, xt, yt, θ ∼ N  m∗| t, K∗∗| t
+
+ , (11) with the predictive mean and covariance: 
+
+m∗| t = μ∗ + K∗t [Ktt + Ct]−1 (yt − μt) , (12) 
+
+K∗∗| t = K∗∗ − K∗t [Ktt + Ct]−1 Kt∗ . (13) Comparing Eq. (4) with Eqs. (12) and (13) reveals that the data-agnostic GP prior (4) is updated by the data-informed second terms in the predictive mean (12) and covariance (13). For example, for the RBF kernel, evalu-ation points far from the data support (in terms of the kernel’s correlation length) cause K∗t to approach the zero matrix and thus the GP reverts to its prior mean and covariance structure in Eq. (4). In general, the hyperparameters θ are calibrated to the observed data. Given observations yt at inputs xt, the posterior for the hyperparameters is pr( θ | xt, yt) ∝ pr( yt | xt, θ) pr( θ) , (14) with the so-called log marginal likelihood, ln pr( yt | xt, θ) = − 12 ln |Ktt + Ct|− 12 ˜y⊺ 
+
+> t
+
+(Ktt + Ct)−1 ˜yt , (15) which is obtained by marginalizing out the typically unob-served latent function, ft. In Eq. (15), we have used the short-hand notation ˜ yt = yt − μt and dropped the addi-tive constant independent of θ. The hyperposterior (14) can be sampled using Monte Carlo (MC) methods, which allows one to explore a wide function space informed by the observed data, and predictions can then be made by marginalizing out the hyperparameters: pr( f∗ | xt, yt) = 
+
+Z
+
+pr( f∗ | xt, yt, θ) pr( θ | xt, yt) d θ . (16) This process, however, is computationally demanding. Hence, we follow here instead the usual maximum a pos-teriori (MAP) approach, in which only the maximum of Eq. (14), θMAP , is used as a point estimate, corresponding to δ-distribution pr( θ | xt, yt) = δ(θ − θMAP ) in Eq. (16). In GPDiff , this optimization is performed using stochastic gradient descent via the optax library [79].  
+
+> 3. GP differentiation
+
+One of the key features that makes GPs attractive for EOS inference (and thermodynamics in general) is that they are closed under linear operations, such as differentiation, integration, and linear combinations. That means any linear operation applied to a GP results in another GP. In this work, we are mainly interested in derivatives of the GPs trained on many-body calculations of the energy per particle to obtain derived quantities such as the pressure. For brevity, we assume in the following that a scalar-valued function of a one-dimensional input x is modeled as a GP. The generalization to vector inputs x can be found, e.g., in Ref. [80]. Since derivatives of GPs remain GPs, if they exist (see below), f (x) and its derivatives 
+
+f ′(x), f ′′ (x), . . . , f (n)(x) are jointly normally distributed. This property enables simultaneous prediction of the EOS and its relevant derivatives while consistently quantifying and propagating uncertainties in the input data. For illustration, let us only consider the joint distribution of the noisy observations and the n-th derivative at x∗,which is given by: 
+
+ yt
+
+f (n)
+
+> ∗
+
+
+
+∼ N 
+
+ μt
+
+μ(n)
+
+> ∗
+
+
+
+,
+
+"
+
+Ktt + Ct K(0 ,n )
+
+> t∗
+
+K(n, 0)  
+
+> ∗t
+
+K(n,n )
+
+> ∗∗
+
+#! 
+
+, (17) where μ(n) 
+
+> ∗
+
+≡ μ(n)(x∗) is the n-th derivative of the mean function evaluated at the test inputs, and the covariance matrices have elements [K(0 ,n ) 
+
+> t∗
+
+]ij =
+
+k(0 ,n )(xt,i , x∗j ; θ), [ K(n, 0)  
+
+> ∗t
+
+]ij = k(n, 0) (x∗i, xt,j ; θ), and [K(n,n ) 
+
+> ∗∗
+
+]ij = k(n,n )(x∗i, x∗j ; θ), generated by the differ-entiated kernel 
+
+k(a,b ) (x, x ′) = ∂a+b
+
+∂x a∂(x′)b k (x, x ′) . (18) Similar to the derivation of Eq. (11), it follows that, given the training data, the distribution of f (n) 
+
+> ∗
+
+at test locations 
+
+x∗ is: 
+
+f (n) 
+
+> ∗
+
+| x∗, xt, yt ∼ N 
+
+
+
+m(n) 
+
+> ∗| t
+
+, K(n,n )
+
+> ∗∗| t
+
+
+
+, (19) with the predictive mean and covariance, 
+
+m(n) 
+
+> ∗| t
+
+= μ(n) 
+
+> ∗
+
++ K(n, 0)  
+
+> ∗t
+
+[Ktt + Ct]−1 (yt − μt) , (20) 
+
+K(n,n ) 
+
+> ∗∗| t
+
+= K(n,n ) 
+
+> ∗∗
+
+− K(n, 0)  
+
+> ∗t
+
+[Ktt + Ct]−1 K(0 ,n ) 
+
+> t∗
+
+. (21) A few comments are in order. Note that in Eq. (20), the mean of the n-th derivative GP is given by the n-th derivative of the mean function plus corrections from the covariance structure. Similarly, the covariance is given by the differentiated kernel matrix plus corrections in Eq. (21). This property ensures that the global trend encoded in μ(x), together with its covariance structure, is consistently propagated to all derivatives. Hence, the existence of predictions for n-th order derivatives of the original GP depends on the differentiability of both the mean function and the kernel. Specifically, for the n-th derivative to exist, the μ(x) must be at least n-times differentiable, and k(x, x ′) must be at least n-times differ-entiable with respect to both arguments over the entire 6input domain of interest. For example, for the second-derivative GP to exist, the kernel must admit all partial derivatives with a, b ⩽ n = 2, as can be seen in Eq. (18). These conditions are not satisfied by all choices of mean functions and kernels. For example, the Mat´ ern kernel (with finite degree of freedom) is not smooth, which re-stricts the order of derivatives that can be computed. While the mean function and kernel derivatives can be derived and implemented manually, e.g., as in gptools ,
+
+GPDiff uses SymPy to evaluate the derivatives of the mean function symbolically, 6 and uses automatic differentiation built into Google’s JAX to implement the derivative of the kernel. This feature enables arbitrary (partial) deriva-tives of the EOS with respect to any input variable to be computed straightforwardly at machine precision for a wide range of mean functions and kernels. Moreover, 
+
+GPDiff enables joint random sampling of the original GP and its derivatives, with correlated uncertainties in the input data propagated. We see therein a significant ad-vantage over other methods, including finite differencing, especially for noisy data sets.  
+
+> B. Microscopic training data
+
+We examine microscopic calculations of the zero-temperature energy per particle E(δiso , n )/A as a function of the nucleon density n = nn + np and isospin asymme-try δiso = ( nn − np)/(nn + np), where np and nn are the proton and neutron densities, respectively. 7 We calibrate a GP to these calculations using GPDiff , while all other observables, such as the pressure, are derived from this GP. Section II C discusses the details of this calibration. Specifically, we consider the explicit MBPT calculations of asymmetric matter based on chiral nucleon-nucleon (NN) and three-nucleon (3N) interactions in Ref. [16] as the training set for EOS analysis, although this is merely a choice as our framework is more broadly applicable to microscopic many-body calculations. Reference [16] com-puted E(δiso , n )/A for n ⩽ 0.32 fm −3 ranging from PNM (δiso = 1) to SNM ( δiso = 0) in MBPT up to fourth order, including both NN and 3N interactions at the normal-ordered two-body level [7, 81]. These MBPT calculations were carried out for the six Hebeler et al. interactions, which are commonly used in nuclear structure and infi-nite matter calculations (see, e.g., Refs. [3, 36, 82–86]). They were obtained in Ref. [87] by softening the N 3LO NN potential EM 500 MeV using the similarity renormal-ization group (SRG) and then adding them at different SRG resolution scales λSRG to the unevolved N 2LO 3N forces. The two 3N LECs at this chiral order, cD and        
+
+> 6Automatic differentiation could also be used. The symbolic SymPy
+> implementation may be advantageous, e.g., when mean functions are expressed in terms of physics-informed basis expansions.
+> 7The proton fraction and asymmetry are related via δiso = 1 −2x.Hence, we use both variables interchangeably.
+
+cE , were adjusted to the 3H binding energy and the 4He charge radius for two 3N momentum cutoffs Λ 3N . These interactions are labeled as “( λSRG , Λ3N ).” The MBPT training data are provided on a regular density grid, n = 0 .01 , 0.02 , . . . , 0.32 fm −3, and a regu-lar isospin-asymmetry grid, δiso = 0 , 0.1, . . . , 1.0, yielding 32 × 11 = 352 data points for each interaction. Each training point comes with an uncorrelated estimate of the statistical uncertainty from the MC integrations of the MBPT diagrams performed in Ref. [16]. Exploiting the approximate symmetry of the EOS under neutron-proton exchange, E(δiso , n )/A ≈ E(−δiso , n )/A , we augment the dataset by reflecting the EOS about δiso = 0. The result-ing grid spans δiso = −1.0, −0.9, . . . , 0.9, 1.0 and contains 
+
+N = 32 × 21 = 672 training points. Using the expected (approximate) isospin symmetry of the EOS, this prepro-cessing step mitigates GP boundary effects by shifting the region around SNM from the edge of the training domain into the interpolation region. Figure 2 shows the results of these MBPT calculations (see also Figure 7 in Ref. [16]). Each panel depicts the en-ergy per particle as a function of the density n for a given isospin asymmetry δiso , as annotated. The black dots depict the sample mean values and the error bars depict twice the standard deviations across the EOS calculations based on these six interactions. We will discuss the blue bands when we revisit Fig. 2 in Sec. II C. In addition to the sample mean and standard deviation of the energy per nucleon on the ( δiso , n ) grid, we quantify the corre-lations between different grid points. These correlations are estimated from the MBPT calculations through the unbiased sample covariance matrix (see Sec. II C 3).  
+
+> C. Statistical model
+
+As discussed in Sec. II B, we consider an ensemble of microscopic EOS calculations {y(h)(xt)}Hh=1 at the com-mon training inputs xt obtained from the H = 6 Hebeler et al. interactions. Here, y(h) 
+
+> t
+
+≡ y(h)(xt) denotes the vector of computed energies per particle E(x)/A associ-ated with the interaction h, where each training input is xt,i = ( δiso ,i , n i). Because these EOS calculations are performed within the same theoretical framework, namely MBPT applied to a set of similar interactions based on the same calibration protocol [87], we model them as noisy realizations of a shared underlying mean EOS process, with interaction-specific deviations that are correlated in the input domain. 8 Accordingly, we assume a hierarchical model 9 for this EOS process ( h = 1 , 2, . . . ): 
+
+Y (h)(x) = η(x) + δ(h)(x) + ε(h)(x) , (22)       
+
+> 8We assess our model assumptions in Sec. III by comparing our results with those obtained from deterministic methods.
+> 9In this section, the interaction-dependent deviation term δ(x)should not be confused with the Dirac delta δx,x′or the isospin asymmetry δiso .
+
+7010 20 30 40 
+
+> E/A [MeV ]
+
+δiso = 1.0
+
+010 20 30 δiso = 0.9
+
+010 20 30 
+
+δiso = 0.8
+
+−50510 15 20 25 
+
+> E/A [MeV ]
+
+δiso = 0.7
+
+−10 
+
+−50510 15 20 
+
+δiso = 0.6
+
+−15 
+
+−10 
+
+−50510 15 
+
+δiso = 0.5
+
+−20 
+
+−10 010 
+
+> E/A [MeV ]
+
+δiso = 0.4
+
+−20 
+
+−15 
+
+−10 
+
+−50510 
+
+δiso = 0.3
+
+0.0 0.1 0.2 0.3
+
+n [fm −3]
+
+−20 
+
+−10 010 
+
+δiso = 0.2
+
+0.0 0.1 0.2 0.3
+
+n [fm −3]
+
+−20 
+
+−10 010 
+
+> E/A [MeV ]
+
+δiso = 0.1
+
+0.0 0.1 0.2 0.3
+
+n [fm −3]
+
+−20 
+
+−10 010 
+
+δiso = 0.0
+
+Data (2 σ) GP (2 σ)
+
+FIG. 2. Explicit asymmetric matter calculations used for training the GPs. In Ref. [16], the energy per particle as a function of the density n, sampled at 11 equidistant isospin asymmetries δiso between PNM ( δiso = 1) and SNM ( δiso = 0), was calculated for the six Hebeler et al. interactions using MBPT up to fourth order at the normal-ordered two-body level. The black dots depict the sample mean values and the error bars depict twice the standard deviations across these interactions. The blue uncertainty bands correspond to our GP-based EOS model at the 2 σ confidence level. See the main text for details. 8where δ(h)(x) represents the interaction-dependent devi-ation from the common mean and ε(h)(x) accounts for numerical noise in the microscopic EOS calculations. The spread among the six computed EOSs is therefore not treated as numerical noise in the GP inference, but rather represents a region of unobserved EOSs. We refer to 
+
+δ(h)(x) as a deviation rather than a model discrepancy, since it does not represent a bias with respect to the unob-served true EOS. Following standard statistical notation, we use uppercase Y (h)(x) to denote the EOS stochastic process and lowercase y(h)(x) for its observed realization. The central object in the hierarchical model (22) is the latent common mean EOS, η(x), which represents the systematic behavior shared across the ensemble. We place a GP prior on that common mean EOS, 
+
+η ∼ GP (μη , k η ) , (23) and model the interaction-dependent deviations as inde-pendent instances of a single underlying GP, 10 
+
+δ(h) i .i.d.
+
+∼ GP (0 , k δ ) , h = 1 , 2, . . . . (24) Equation (24) reflects the assumption that the interac-tions are constructed within the same theoretical frame-work and evaluated on the same grid, and are therefore treated as exchangeable (under the prior assumption) with respect to their deviation structure. The deviation GP is taken to have zero mean so that any systematic trend across interactions is absorbed by η(x). We further assume independent heteroscedastic white noise, 
+
+ε(h) i .i.d.
+
+∼ GP  0, σ 2 
+
+> ε
+
+(x)δx,x′
+
+ , (25) where σ2 
+
+> ε
+
+(x) denotes an input-dependent variance, captur-ing the heteroscedastic numerical noise across the input space, and δx,x′ is the Kronecker delta representing the white noise. The explicit forms of the mean function 
+
+μη and the kernels kη and kδ are specified in Secs. III (and II C 3). Our objective is not only to infer the common mean EOS, but to predict a noise-free EOS associated with a previously unobserved interaction drawn from the same population. We denote this prediction by 
+
+f (new) (x) = η(x) + δ(new) (x) , (26) where δ(new) is an independent draw from the deviation GP in Eq. (24) and is independent of both η and the deviations associated with the observed interactions. The process f (new) is noise-free, as it represents the latent EOS for a new interaction rather than the outcome of a noisy microscopic calculation.  
+
+> 10 In statistics, “i.i.d.” stands for independent and identically dis-tributed; i.e., while a collection of random variables shares the same probability distribution, they are mutually independent (and exchangeable).
+
+Constructing the posterior for f (new) requires both the covariance kδ of the interaction-dependent deviations and the covariance kη of the common mean EOS. We therefore calibrate the model in two stages. First, we infer kδ from the residuals of the individual EOSs about their sample mean. Second, holding kδ fixed, we infer kη from the ensemble mean while accounting for the finite number of interactions and the numerical noise. Finally, we com-bine the posterior uncertainty in the common mean EOS with the full interaction-dependent covariance to obtain predictions for a new noise-free EOS.  
+
+> 1. Covariance structure of the EOS ensemble
+
+The cross-covariance implied by Eqs. (22)–(24) is cov 
+
+
+
+Y (h)(x), Y (h′)(x′)
+
+
+
+= kη (x, x′)+ δh,h ′
+
+kδ (x, x′) + σ2 
+
+> ε
+
+(x)δx,x′
+
+ , (27) where δh,h ′ is the Kronecker delta in interaction space. Thus, the common mean process η(x) correlates all EOS processes, whereas δ(h)(x) and ε(h)(x) contribute only when h = h′. These EOS processes are conditionally inde-pendent given η, but they are correlated after marginaliz-ing over the shared mean process due to the uncertainty in the mean EOS. In practice, the latent mean process 
+
+η(x) is not directly observed, and inference is therefore based on its marginal effect on the EOS. Marginalizing over η yields that each EOS is itself a GP, 
+
+Y (h)(x) ∼ GP  μη (x), k η (x, x′) + kδ (x, x′) + σ2 
+
+> ε
+
+(x)δx,x′
+
+ .
+
+(28) To write the corresponding discretized model, let 
+
+{xi}Ni=1 denote the common set of N training points introduced in Sec. II B. For the interaction indexed by h,the E/A random variable is represented by the length-N
+
+vector 
+
+Y(h) = η + δ(h) + ε(h) . (29) Conditioned on the latent mean vector η, each discretized EOS then follows 
+
+Y(h) | η ∼ N (η, Kδ + ΣMC ) , (30) where Kδ is the covariance matrix generated by the ker-nel kδ on the training grid. The diagonal covariance ma-trix ΣMC = diag( σ2MC ) accounts for the input-dependent numerical noise in the MC momentum integrations in Ref. [16], where σMC contains the average of the reported standard deviations across the six interactions estimated by the MBPT calculations at the grid points. Since η is not directly observed in practice, we marginal-ize over its GP prior by carrying out the integral pr 
+
+
+
+Y(h)
+
+=
+
+Z
+
+pr 
+
+
+
+Y(h) | η
+
+
+
+pr ( η) d η . (31) 9The integral in Eq. (31) can be done analytically because both the conditional likelihood (30) and the prior (23) are Gaussian, resulting in a Gaussian marginal distribution: 
+
+Y(h) ∼ N (μη , Kη + Kδ + ΣMC ) . (32) Likewise, for arbitrary evaluation points x, each EOS realization follows the same GP as given in Eq. (28).  
+
+> 2. Distribution of the ensemble mean
+
+To determine how the common mean EOS is informed by the ensemble, we first derive the distribution of the ensemble average. Let us define the stochastic ensemble mean ¯Y (x) = 1
+
+H
+
+> H
+
+X
+
+> h=1
+
+Y (h)(x) . (33) Using the statistical model (22), the ensemble mean (33) can be written as ¯Y (x) = η(x) + ¯δ(x) + ¯ ε(x) , (34) where ¯δ(x) and ¯ ε(x) are the corresponding mean values over interactions, defined similarly to Eq. (33). Because the interaction-dependent deviations δ(h)(x) are assumed to be independent draws from a common zero-mean GP, their average is also a GP, ¯δ ∼ GP 
+
+
+
+0, 1
+
+H kδ
+
+
+
+, (35) and the mean numerical noise is also white, ¯ε ∼ GP 
+
+
+
+0, σ2 
+
+> ε
+
+(x)
+
+H δx,x′
+
+
+
+. (36) Therefore, conditional on the common mean process η(x), the ensemble mean (33) is then distributed as ¯Y (x) | η(x) ∼ GP 
+
+
+
+η(x), 1
+
+H kδ (x, x′) + σ2 
+
+> ε
+
+(x)
+
+H δx,x′
+
+
+
+.
+
+(37) Averaging over the H interactions thus reduces both the interaction-dependent uncertainty and the numerical noise by the usual factor of 1 /H , while leaving the common mean process η unchanged. This reduction is what allows the ensemble average to inform η without treating the interaction-to-interaction spread in the EOS as ordinary observational noise. Similar to Eq. (31), marginalizing over the GP prior for η, the ensemble mean is also a GP, ¯Y (x) ∼ GP 
+
+
+
+μη (x), k η (x, x′) + 1
+
+H kδ (x, x′) + σ2 
+
+> ε
+
+(x)
+
+H δx,x′
+
+
+
+.
+
+(38) Hence, the observed sample mean ¯ y(xt) = ¯ yt can be seen as a noisy observation of η(xt) at the training points, with associated prior covariance matrix 
+
+K¯y,tt = Kη,tt + 1
+
+H Kδ,tt + 1
+
+H ΣMC . (39) Equivalently, the kernel of the ensemble mean is 
+
+k¯y (x, x′) = kη (x, x′) + 1
+
+H kδ (x, x′) + 1
+
+H σ2 
+
+> ε
+
+(x)δx,x′ . (40) The numerical-noise term is needed only at the observed points, where σε(x) is known. As H → ∞ , the contribu-tions proportional to 1 /H vanish and K¯y,tt approaches 
+
+Kη,tt , provided this limit exists. The preceding result shows that the ensemble mean can be treated as an observation of η, but with an effective co-variance containing the contribution kδ /H . Consequently, the posterior of the common mean EOS cannot be con-structed until the covariance of the interaction-dependent deviations has been specified. We therefore turn next to the construction and calibration of kδ . 
+
+> 3. Construction and calibration of the deviation kernel
+
+The distribution derived above identifies kδ as a re-quired input for inference of the common mean EOS. The first calibration stage therefore determines the covariance of the interaction-dependent deviations. At the training points {xi}Ni=1 , we define the unbiased ensemble covari-ance matrix 11 corresponding to the ensemble mean (33): 
+
+eΣδ = 1
+
+H − 1
+
+> H
+
+X
+
+> h=1
+
+R(h) 
+
+> t
+
+R(h)⊺ 
+
+> t
+
+, (41a) 
+
+R(h) 
+
+> t
+
+= Y(h) 
+
+> t
+
+− ¯Yt . (41b) According to the statistical model (22), ηt cancels in the centered residuals Rt and thus they are Gaussian variables with zero mean and covariance matrix (( H −
+
+1) /H ) ( Kδ,tt + ΣMC ), resulting in (H − 1) eΣδ ∼ W N (Kδ,tt + ΣMC , H − 1) , (42) where WN denotes the N -dimensional Wishart distri-bution with H − 1 degrees of freedom. We treat the (observed) unbiased sample covariance matrix Σδ ob-tained from the MBPT calculations as a realization of the random variable eΣδ . However, with only H = 6 interac-tions, Σδ is necessarily singular and low-rank. Specifically, rank( Σδ ) ⩽ min( N, H − 1), so that Σδ has here rank of (at most) 5. Because of the significant rank deficiency        
+
+> 11 Note that the covariance matrix and the scatter matrix are related via Σδ=Sδ/(H−1).
+
+10 of the observed Σδ , we augment the deviation kernel by writing it as 
+
+kδ (x, x′; θδ ) = αemp k(emp)  
+
+> δ
+
+(x, x′)+ k(sm)  
+
+> δ
+
+(x, x′; θsm ), (43) with the scale parameter αemp ⩾ 0, and the joint set of hyperparameters θδ = {αemp , θsm }. The first term in Eq. (43) is a low-rank empirical kernel (“emp”) con-structed from the (dominant) eigenmodes of the centered sample covariance. The second term in Eq. (43) is as-sumed to be a smooth, stationary kernel (“sm”) that regularizes the covariance and stabilizes interpolation away from the training points. For the residual kernel in Eq. (43), we use an RBF kernel k(sm)  
+
+> δ
+
+(x, x′) with hy-perparameters θsm . It provides a full-rank background covariance that accounts for interaction-dependent varia-tion not fully captured by the small number of empirical eigenmodes. Because both kernels are valid kernels, so is their sum, and covariance matrices generated from this sum kernel are positive definite. The empirical kernel in Eq. (43) is obtained from the eigendecomposition, Σδ = UΛU ⊺, and the associated decomposition 
+
+k(emp)  
+
+> δ
+
+(x, x′) ≃
+
+> M
+
+X
+
+> m=1
+
+λm ϕm(x) ϕm(x′) , (44) with M ⩽ H − 1, the eigenvalues and interpolated eigen-functions, respectively corresponding to the eigenvalues and discrete eigenvectors of Σδ , λm and ϕm(x). Here, we consider the 3 dominant eigenmodes ( M = 3), so that Eq. (44) is a low-rank approximation of Σδ . These eigen-modes are interpolated with a GP via GPDiff to obtain continuous representations. We observe much higher nu-merical noise in the 2 remaining eigenvectors (associated with nonzero eigenvalues) and thus omit them, which is further justified by the amount of preserved variance 
+
+ηp.v. [88] being very close to unity, i.e., 1 − ηp.v. ≈ 10 −4.The kernel hyperparameters θδ are estimated by maxi-mizing the restricted log-likelihood constructed from the original ensemble data [89, 90]. For the present Gaus-sian model, formally integrating out the likelihood over the unknown mean vector under an improper flat prior results in the restricted likelihood [91]. Up to additive constants independent of θδ , the restricted log-likelihood reads [corresponding to Eq. (42)] 
+
+L(θδ ) = − H − 12 ln |Ktt | − H − 12 tr K−1 
+
+> tt
+
+Σδ
+
+ , (45) where Ktt = Kδ,tt + ΣMC and Kδ,tt is generated by the kernel (43). The trace term in Eq. (45) enforces agreement with Σδ , while the log term penalizes overly complex kernels. Note that the inverse of the rank-deficient Σδ
+
+does not enter the likelihood (45). To improve numerical stability, both terms are evaluated using the Cholesky decomposition. One can show [80] that at the maximum of the restricted log-likelihood (45) with respect to arbitrary kernel variations and full-rank Σδ is Ktt = Σδ , as required. However, in our case, Σδ does not have full rank and kδ
+
+is restricted to the chosen form in Eq. (43), so Ktt ≈ Σδ . 
+
+> 4. Posterior of the common mean EOS
+
+With the deviation kernel now calibrated, all compo-nents of the ensemble mean covariance are specified. We can therefore determine the common mean process by conditioning on the observed sample mean. At arbitrary evaluation points, 
+
+η | ¯yt, xt, x∗ ∼ N  mη, ∗| t, Kη, ∗∗| t
+
+ , (46) with posterior mean and posterior covariance matrix, re-spectively, given by 
+
+mη, ∗| t = μη, ∗ + Kη, ∗tK−1¯y,tt (¯ yt − μη,t ) , (47) 
+
+Kη, ∗∗| t = Kη, ∗∗ − Kη, ∗tK−1¯y,tt Kη,t ∗ , (48) where the cross-covariance is given by [Kη, ∗t]ij = cov( η(x∗i), ¯Y (xt,j )) = kη (x∗i, xt,j ) (49) because ¯δ(x) and ¯ ε(x) are independent of η(x). While the posterior mean (47) provides the best estimate of the common EOS shared across the ensemble, η, the posterior covariance (48) quantifies the remaining uncertainty in η
+
+after accounting for the finite sample size and remaining numerical noise of the ensemble average. To complete the specification of the statistical model, the kernels kη and kδ , along with their hyperparameters, must be defined and calibrated to the considered EOS ensemble. Because these kernels govern distinct aspects of the statistical model (22), we adopt a two-step calibra-tion procedure. First, the hyperparameters of kδ (θδ ) are calibrated to the observed (unbiased) ensemble covariance matrix Σ δ , which isolates the interaction-dependent devi-ation about the common mean (see Sec. II C 3 for details). Second, given kδ , the hyperparameters of kη (θη ), govern-ing the prior covariance structure of η(x), are calibrated to the sample mean ¯ yt with associated uncertainties encoded in Eq. (39). This construction ensures that the inference for kη explicitly accounts for the (reduced) interaction-dependent deviation (of the finite EOS sample size) and the reduced numerical noise already present in ¯ yt, thereby avoiding double counting of uncertainty between η and δ.We infer the hyperparameters θη by maximizing the Gaussian log-marginal likelihood, which reads up to addi-tive constants independent of θη :ln pr(¯ yt | xt, Kδ,tt , θη ) = − 12 ˜y⊺ 
+
+> t
+
+K−1¯y,tt ˜yt − 12 ln |K¯y,tt | ,
+
+(50) with ˜ yt = ¯ yt − μη,t . In this step, Kδ,tt is treated as fixed at its estimated value obtained in Sec. II C 3. 11  
+
+> 5. Predictive distribution for a new EOS
+
+We now return to the predictive target in Eq. (26). Before conditioning on the MBPT data for the EOS, 
+
+f (new) (x) is marginally distributed as 
+
+f (new) (x) ∼ GP (μη (x), k η (x, x′) + kδ (x, x′)) , (51) corresponding to Eq. (31) when also the numerical noise is marginalized over and with the kernels defined in Eqs. (40) and (43). Hence, at evaluation points x∗ one has the distribution: 
+
+f (new) (x∗) | ¯yt ∼ N  mf, ∗| t, Kf, ∗∗| t
+
+ , (52a) 
+
+mf, ∗| t = mη, ∗| t , (52b) 
+
+Kf, ∗∗| t = Kη, ∗∗| t + Kδ, ∗∗ . (52c) By construction, the predictive mean mf, ∗| t is equal to that of mη, ∗| t defined in Eq. (47), whereas the predic-tive covariance Kf, ∗∗| t obtains a contribution from the interaction-dependent deviation in addition to Kη, ∗∗| t de-fined in Eq. (48). Both can be calculated at arbitrary evaluation points. Equation (52) shows that, if H ≪ ∞ , the uncertainty bands for these EOS predictions are naturally wider than those of the latent mean EOS and the interaction-dependent deviation encoded in the sample covariance matrix, Σδ , individually. One can see this feature also in Fig. 2, where the blue bands depicting our GP model at the 2 σ confidence level are slightly larger than the black error bars on which it was trained. This larger uncer-tainty is because Σδ is defined in terms of the residuals 
+
+{y(h) 
+
+> t
+
+− ¯yt}Hh=1 [see Eq. (41)], causing the common mean 
+
+η(x) in our statistical model (22) to cancel. As a result, 
+
+Σδ captures only the interaction-dependent uncertainty about the ensemble mean, whereas the predictive covari-ance for a single noise-free EOS prediction, which we are mainly interested in, should also capture the uncertainty in the predicted mean. On the other hand, the numerical noise contributes only through the likelihood functions and is excluded from the final predictive distribution of the noise-free EOS. Figure 3 compares the predictions of GPs (shaded bands) trained on the same dataset (shown as error bars) using GPDiff and different model assumptions. For this illustration, we use the SNM data from Fig. 2, where the error bars represent the sample mean ¯ yt and covariance matrix Σδ evaluated at the training points, as discussed in Sec. II B. Panel (a) shows the predictions obtained when only the diagonal covariance matrix Ct = diag( Σδ +ΣMC )is treated as the numerical noise term for standard GP training (thereby ignoring all correlations in the uncer-tainty estimates), 12 while panel (b) corresponds to train-ing with the fully occupied Ct = Σδ + ΣMC . In both      
+
+> 12 The scenario in panel (a) could be straightforwardly realized in
+> scikit-learn by setting the GP regressor’s input parameter α
+> to diag( Σδ+ΣMC ).
+
+panels (a) and (b), the GP hyperparameters are opti-mized by maximizing the likelihood in Eq. (15). These two panels show the general feature of GPs that, in these cases, the predicted uncertainties are smaller than those of the data, which is not desired in our EOS analysis. In contrast to the behaviors observed in panels (a) and (b) of Fig. 3, for our EOS analysis, we aim to construct models that are statistically consistent with the empirical mean and covariance inferred from the many-body data, as shown in panel (c). This panel depicts the corresponding results obtained by modeling Σδ as the deviation ker-nel Kδ based on the framework described in Sec. II C 3, which is then used to train the mean EOS kernel Kη in Sec. II C 4 and to derive the EOS mean and uncertainty via Eq. (52). The GP regression in panel (c), based on our statistical model, achieves the desired consistency be-tween the MBPT data and the GP prediction, including uncertainties, and is therefore adopted in this work.  
+
+> III. RESULTS AND DISCUSSION
+
+In this section, we present our main results. We use 
+
+GPDiff together with the predictive distribution (52) for quantifying and propagating correlated EOS uncertainties to derived quantities. To explore CS kernels and probe the sensitivity of our constraints to our kernel choices (within a specific subclass), we examine two cases: a single RBF kernel and a CS kernel composed of three RBF kernels in the mean-EOS GP. For the latter kernel, the centers are placed at 
+
+δiso = 0 , ±1 and n = 0 .16 fm −3, allowing the kernel to distinguish different features in PNM and SNM. 13 Here, we choose fixed values ai = 1 and Bi = diag(0 .5, 0.5) for all i, in the respective units, to facilitate a smooth crossover between the kernels predominant in PNM and SNM, respectively. The density length scale is arbitrary in this case, because the kernels are aligned at a fixed density. In both cases, we use the zero-mean function. We obtain qualitatively similar results for both kernel choices, and therefore focus in this section on the results obtained with the CS kernel. Our results for the other kernel choice can be found in Appendix C. These findings suggest that a smooth RBF kernel with a single length scale in each dimension for the mean EOS is sufficiently flexible to capture the dominant features of low-density asymmetric matter. However, this conclusion should be revisited when modeling the EOS over a wider density range, e.g., for applications to neutron stars [56].     
+
+> 13 The two RBF kernels at δiso =±1 share the same hyperparam-eters to ensure charge symmetry, amounting to 6 free hyperpa-rameters in total.
+
+12 0.00 0.10 0.20 0.30 
+
+n [fm −3]
+
+-20 -16 -12 -8 -4 0
+
+> E/A [MeV ]
+
+## (a) 
+
+0.00 0.10 0.20 0.30 
+
+n [fm −3]
+
+-20 -16 -12 -8 -4 0
+
+## (b) 
+
+0.00 0.10 0.20 0.30 
+
+n [fm −3]
+
+-20 -16 -12 -8 -4 0
+
+## (c) 
+
+Data (1 σ) Uncorrelated Input GP (1 σ) Correlated Input GP (1 σ) This Work (1 σ)
+
+FIG. 3. Comparison of the one-dimensional GP regression based on different model assumptions (for illustration). Panels (a) and (b) show straightforward GP regressions with the diagonal Ct = diag( Σδ + ΣMC ) and fully occupied Ct = Σδ + ΣMC 
+
+treated as the numerical noise term for training, respectively. Panel (c) shows the GP regression with the proposed statistical model with the mean kernel and the deviation kernel. This illustration is based on the SNM data shown in Fig. 2. The black center dots and vertical bars in each panel depict the empirical mean and 1 σ credibility region of the MBPT calculations, and the colored dashed lines and bands depict the predicted mean and 1 σ uncertainty interval from the GP regressions, respectively. 
+
+A. Low-density EOS parameters 
+
+We constrain the following parameters that describe the low-density, asymmetric matter EOS. The SNM satu-ration density and energy are given by 
+
+n0 ≡ n0(δiso = 0) , (53a) 
+
+E0
+
+A ≡ EA (δiso , n ) n=n0
+
+> δiso =0
+
+. (53b) We define the saturation density n0(δiso ) as 
+
+∂∂n EA (δiso , n )
+
+> n=n0(δiso )
+
+= 0 . (54) The leading isospin-dependent EOS parameters are the nuclear symmetry energy and its slope parameter, 
+
+Sv ≡ 12
+
+∂2
+
+∂δ 2iso 
+
+EA (δiso , n ) n=n0
+
+> δiso =0
+
+, (55) 
+
+L ≡ 3n0
+
+2
+
+∂3
+
+∂n∂δ 2iso 
+
+EA (δiso , n ) n=n0
+
+> δiso =0
+
+. (56) We also consider the isospin-dependent incompressibility of asymmetric matter, 14 
+
+K(δiso ) = 9 n20(δiso ) ∂2
+
+∂n 2
+
+EA (δiso , n )
+
+> n=n0(δiso )
+
+. (57)  
+
+> 14 See also Refs. [72, 73] for detailed discussions of the incompress-ibility and related low-density EOS parameters.
+
+Expanding around SNM, one gets two leading coefficients of the series expansion of Eq. (57), 
+
+K(δiso ) = K + δ2iso Kτ + O(δ4iso ) , (58) which are the incompressibility in SNM, 
+
+K ≡ 9n20
+
+∂2
+
+∂n 2
+
+EA (δiso , n ) n=n0
+
+> δiso =0
+
+. (59) and the isospin-asymmetry term, 
+
+Kτ = Ksym − 6L − Q0
+
+K L , (60a) 
+
+Ksym = 9n20
+
+2
+
+∂4
+
+∂δ 2iso ∂n 2
+
+EA (δiso , n ) n=n0
+
+> δiso =0
+
+, (60b) 
+
+Q0 = 27 n30
+
+∂3
+
+∂n 3
+
+EA (δiso , n ) n=n0
+
+> δiso =0
+
+. (60c) To constrain these low-density EOS parameters, we jointly sample E(δiso , n )/A and the involved derivatives using GPDiff . The GP is sampled on a two-dimensional grid of n ∈ [0 .01 , 0.28] fm −3 (28 points) and δiso ∈ [0 , 0.7] (8 points). Since all quantities are drawn simultaneously from the same GP, the correlations between the EOS and its derivatives, and between different values of n and 
+
+δiso , are automatically included. Once n0 is determined by interpolating ∂(E/A )/∂n , the EOS parameters are evaluated at that density using Eqs. (53b), (55), (56), (59), and (60). For each jointly drawn sample of the GP posterior, local cubic splines are constructed separately for E/A and the correlated derivatives (in the GP sample), and then evaluated at n0. In the rare cases when a GP 13 n0 = 0 .169 +0.061 
+
+> −0.037
+> −21
+> −18
+> −15
+> −12
+> −9
+> E0/A
+
+E0/A = −15 .50 +3.00 
+
+> −4.63
+> 150 200 250 300 350
+> K
+
+K = 221 +114 
+
+> −67
+> 28 32 36 40
+> Sv
+
+Sv = 32 .6+7.7
+
+> −4.9
+> 40 50 60 70
+> L
+
+L = 49 .5+18 .5
+
+> −10 .9
+> 0.12 0.15 0.18 0.21 0.24
+
+## n0
+
+> −750
+> −600
+> −450
+> −300
+> −150
+> Kτ
+> −21
+> −18
+> −15
+> −12
+> −9
+
+## E0/A
+
+> 150 200 250 300 350
+
+## K
+
+> 28 32 36 40
+
+## Sv
+
+> 40 50 60 70
+
+## L
+
+> −750
+> −600
+> −450
+> −300
+> −150
+
+## KτKτ = −423 +263 
+
+> −374
+
+## Interaction (1.8/2.0) (2.0/2.0) (2.0/2.5) (2.2/2.0) (2.8/2.0) (2.0/2.0)* Interaction (1.8/2.0) (2.0/2.0) (2.0/2.5) (2.2/2.0) (2.8/2.0) (2.0/2.0)* Meta-model Smooth Spline 
+
+FIG. 4. Posterior distributions of the inferred low-density EOS parameters. The parameters include the saturation density n0,saturation energy E0/A , incompressibility K, symmetry energy Sv , slope parameter L, and isospin incompressibility parameter 
+
+Kτ , all evaluated at n0. All parameters are given in MeV, except for n0, which is in fm −3. Diagonal panels show marginalized posterior distributions, with titles reporting the medians and central 95% credibility intervals corresponding to the dashed lines. Contours correspond to the approximate 0 .5σ, 1 σ, 1 .5σ, and 2 σ confidence regions. Symbols indicate the corresponding values for the six Hebeler et al. interactions extracted using the “Meta-model” ( ×) and “Smooth Spline” method ( +), as described in the main text. The blue ellipse in the panel showing the n0–E0 correlations depicts the empirical saturation point at the 95% credibility level determined in Ref. [6]. 14 sample does not saturate or has more than one local minimum at any δiso , the entire sample is discarded. Figure 4 shows the resulting posterior distribution of the EOS parameters, based on 399,163 out of 400,000 sam-ples that went through the filtering process. The titles on the diagonal panels state the 95% confidence regions centered on the medians of the corresponding marginal distributions (dashed vertical lines). The contour lines, moving outward, enclose the 0 .5σ, 1 σ, 1 .5σ, and 2 σ confi-dence regions. All parameters in Fig. 4 are given in MeV, except for n0, which is in fm −3.We observe a strong Coester-band-like anticorrelation between ( n0, E 0/A ) [3, 36]. 15 In the normal approxima-tion, we obtain the corresponding mean vector and the covariance matrix 
+
+μ ≡
+
+ n0
+
+E0/A 
+
+
+
+≈
+
+ 0.172 
+
+−15 .7
+
+
+
+, Σ ≈
+
+ 0.025 2 −0.212 2
+
+−0.212 2 1.95 2
+
+
+
+,
+
+(61) with a Pearson correlation coefficient of ρ = −0.93. Con-sistent with previous studies [3, 16, 36], the predicted saturation point overlaps with the empirical saturation point, which is depicted by the light-blue ellipse at the 95% credibility level in Fig. 4, but shifted toward higher saturation densities and lower saturation energies. The constraints on the empirical saturation point were ob-tained in Ref. [6] based on Bayesian model mixing of various Skyrme and RMF constraints. Furthermore, we observe a still strong correlation between ( Sv , L ), with 
+
+ρ = 0 .76 and 
+
+μ ≡
+
+Sv
+
+L
+
+
+
+≈
+
+32 .950 .4
+
+
+
+, Σ ≈
+
+3.22 2 4.26 2
+
+4.26 2 7.41 2
+
+
+
+. (62) In addition, we find ( Sv , n 0) strongly correlated and, cor-respondingly, ( Sv , E 0/A ) strongly anticorrelated. Our constraints on the incompressibility parameters are less precise. At the 68% credibility level, we find 
+
+K = 221 +48  
+
+> −38
+
+MeV and Kτ = −423 +133  
+
+> −145
+
+MeV. Both results are, within their large uncertainties, consistent with empirical constraints inferred from isoscalar giant monopole resonance (ISGMR) measurements. In par-ticular, Ref. [92] reported K(emp) ≈ 240 ± 20 MeV as the phenomenological range based on several analyses of closed-shell nuclei. Moreover, ISGMR measurements of the even-A isotopes 112 −124 Sn and 106 −116 Cd extracted 
+
+K(emp)  
+
+> τ
+
+= −550 ± 100 MeV and K(emp)  
+
+> τ
+
+= −555 ± 75 MeV, respectively [93–95], and the comprehensive analysis in Ref. [96] based on even-even Sn and Cd isotopes obtained 250 < K (emp) < 315 MeV and Kτ = −(840 − 350) MeV. Hence, both the empirical and microscopic constraints have significant uncertainties, although ours are somewhat larger. We note, however, that comparisons with these empirical constraints should be made with caution, since  
+
+> 15 To quantify correlations and anticorrelations, we adopt the ter-minology of Ref. [6, see the discussion of Eq. (26)].
+
+they are inferred from finite-nucleus observables, whereas our calculations are directly performed in infinite nuclear matter [96–98]. Nevertheless, both our results and the empirical constraints indicate that Kτ < 0. To cross-check our GP-based constraints and the un-derlying model assumptions [see Sec. II C], we determine these EOS parameters for each of the six interactions independently using two GP-free methods. In the first method, we consider the parametric model [39] 
+
+EM
+
+A (δiso , n ) = A0(n) + A2(n)δ2iso 
+
++
+
+h
+
+A4(n) + A(log) 4 (n) ln |δiso |
+
+i
+
+δ4iso ,
+
+(63a) 
+
+Aμ(n) = X
+
+> ν=2 ,3,4,5,6
+
+Cμν 
+
+ nn⋆
+
+> 0
+
+ ν
+
+> 3
+
+, (63b) from which derivatives can then be computed symbolically, e.g., with SymPy . Here, n⋆ 
+
+> 0
+
+is the fiducial value for the saturation density, n⋆ 
+
+> 0
+
+= 0 .16 fm −3, and Cμν are the 20 model parameters determined by a least-squares fit to the EOS data, weighted by the inverse of the estimated MC errors. Note that the model (63) is based on the standard expansion of the energy per particle in δ2iso , truncated and supplemented by the logarithmic term at fourth order. This term, which does not contribute to the EOS in the limits of PNM and SNM, was identified in Ref. [99] and later confirmed numerically in Ref. [37]. The density de-pendence of the coefficients Aμ(n) is modeled following Ref. [36]; see also Ref. [16]. We construct the model (63) with the goal of obtaining precise reference constraints for our GP-based approach, rather than studying nonan-alytic terms in the isospin-asymmetry expansion. For a comprehensive analysis of such terms, we refer the reader to Ref. [39]. In the second method, we construct a smoothing bivari-ate spline as implemented in scipy ’s SmoothBivariate Spline [100]. The MC uncertainties are used as weights in the sum of squared deviations, with the smoothing parameter set to the dataset size, s = 672, and spline de-grees kn = 4 and kδiso = 3. This spline method produces a differentiable interpolant that suppresses numerical noise in the EOS calculations. The symbols in Fig. 4 depict the results for each of the six EOSs obtained using these methods: “Meta-model” ( ×) and “Smooth Spline” ( +). For each EOS, the two GP-free methods result in similar values, with noticeable deviations only in the constraints on Kτ and its correlations, shown in the bottom row of Fig. 4. However, the actual level of consistency is difficult to assess without uncertainty estimates. Furthermore, these results are con-sistent with those obtained from our GP-based approach, generally falling within the ≈ 2σ credible regions or bet-ter [e.g., see ( n0, E 0/A ) in Fig. 4]. This consistency gives us confidence in our statistical approach to constraining derived observables from the noisy microscopic EOS calcu-lations considered here and highlights the key advantage 15 of our GP-based method over the GP-free approaches: uncertainty estimates are naturally built in. Figure 5 shows the asymmetry dependence of the satu-ration density, n0(δiso ) [panel (a)], and incompressibility, 
+
+K(δiso ) [panel (b)]. The green markers and shaded bands denote the GP posterior median and the correspond-ing 68% and 95% credibility intervals, respectively. For comparison, the dashed and dotted lines depict our cor-responding results using the “Meta-model” (dotted line) and “Smooth Spline” method (dashed line). For clarity, Fig. 5 shows these results only for three representative interactions: the interaction with the lowest SRG resolu-tion scale, “(1 .8/2.0)”; the one with the larger 3N cutoff, “(2 .0/2.5)”; and the one with different πN coupling con-stants, “(2 .0/2.0) ∗” [87]. These results are consistent with our GP-based constraints at the 68% credibility level, except for n0(δiso ) obtained from the “(2 .0/2.0) ∗”interaction, which nevertheless remains within the 95% credibility band. Naively, one would expect roughly one third of the results obtained from individual EOS calcu-lations to lie outside the 68% credibility bands; however, the limited sample size and the correlations across δiso 
+
+make this expectation difficult to assess quantitatively. A few more comments on Fig. 5. Panel (a) shows that asymmetric matter exhibits nuclear saturation for 
+
+δiso ≲ 0.7, consistent with visual inspection of Fig. 2. At the largest shown δiso = 0 .7, the saturation density has decreased to n0(δiso ) ≈ 0.085 ± 0.019 fm −3. Panel (b) confirms that K(δiso ) exhibits an approximately quadratic dependence on δiso over the range relevant for medium-mass to heavy nuclei, as expected from the expansion in Eq. (58). Furthermore, the negative curvature observed in Fig. 5(b) implies Kτ < 0. To validate our constraint on Kτ summarized in Fig. 4, we extract Kτ by fitting parabolas to our samples for K(δiso ⩽ 0.3), resulting in Kτ = −410 +253  
+
+> −365
+
+MeV. This constraint is statistically consistent with the values obtained from Eq. (60). Both methods are subject to significant uncertainties.  
+
+> B. Neutron star EOS
+
+We constrain the EOS of neutron-star matter (NSM) at n ≲ 2n0, assuming only nucleon and electron degrees of freedom. At a given n, the isospin asymmetry associ-ated with charge-neutral, β-equilibrated matter, δβ (n), is determined by 
+
+fβ (n, δ iso ) = 0 =
+
+
+
+−2 ∂∂δ iso 
+
+EA + μe(δiso , n ) − ∆m
+
+ 
+
+> δiso =δβ(n)
+
+, (64) where μe(δiso , n ) = 3
+
+q 3π2 
+
+> 2
+
+(1 − δiso )n is the chemical po-tential of ultra-relativistic electrons and ∆ m = mn −mp ≈
+
+1.29 MeV is the nucleon mass difference. Since x and δiso 
+
+are directly related, we use them interchangeably and denote the corresponding proton fraction in β-equilibrium as xβ (n) = (1 − δβ (n)) /2. In addition to the NSM energy per particle, 
+
+E(δβ (n), n )/A , we constrain its pressure, chemical po-tential, and speed of sound squared by evaluating the following expressions, 
+
+p(n) = n2 ∂∂n EA (δiso , n ) δiso =δβ (n)
+
++ 14 μe (n, δ β ) xβ n , 
+
+(65) 
+
+μc(n) = 
+
+
+
+1 + n ∂∂n 
+
+ EA (δiso , n ) 
+
+> δiso =δβ(n)
+
++ m + ∆m
+
+2 δβ + μe(δβ , n )xβ , (66) 
+
+c2
+
+> s
+
+(n) = dp(n)dn [μc(n)] −1 , (67) with the average nucleon mass m = ( mn + mp)/2 ≈
+
+938 .9 MeV. However, E(δβ (n), n )/A is in general not a GP anymore, and thus constraining derived quantities in NSM requires sampling, as described in the follow-ing. Similar to Sec. III A, we jointly sample from the trained GP the energy per particle and the derivatives needed to evaluate these NSM observables. The samples are evaluated at n ∈ [0 .05 , 0.32] fm −3 (28 points) and 
+
+δiso ∈ [0 .8, 1.0] (21 points) to focus on neutron-rich mat-ter at densities relevant for the outer core. Specifically, at each density, we first determine δβ (n) by solving Eq. (64). We bracket the root using the nearest sign change on the asymmetry grid and construct a local cubic spline to de-termine the root more accurately. The derivatives, which are jointly sampled from the GP, are then interpolated using cubic splines, resulting in a data set comprised of the samples 
+
+n
+
+n, δ β , EA δiso =δβ (n) , ∂∂n EA δiso =δβ (n)
+
+o
+
+. This dataset is sufficient to determine the energy per par-ticle, pressure, and the composition of NSM. To also evaluate the sound speed squared (67), we furthermore calibrate GPs to the subsets {n, δ β },
+
+n
+
+n, EA δiso =δβ (n)
+
+o
+
+,and 
+
+n
+
+n, ∂∂n EA δiso =δβ (n)
+
+o
+
+, respectively, using the statisti-cal model described in Sec. II C. For the kernel matrix 
+
+Kδ,tt , we use the empirical kernel (44) with the M = 7 dominant eigenmodes obtained by diagonalizing the em-pirical covariance matrix of the samples (cf. Sec. II C 3). Combining these GPs with the propagated covariances derived in Appendix B, e.g., for μc, allows us to constrain 
+
+c2
+
+> s
+
+(n). Figure 6 shows the resulting energy per parti-cle E(δβ (n), n )/A [panel (a)], proton fraction xβ (n)[panel (b)], pressure p(n) [panel (c)], and sound speed squared c2
+
+> s
+
+(n) [panel (d)] as a function of the density in NSM (green bands) and PNM (blue bands) up to 
+
+n = 0 .30 fm −3. The uncertainty bands encompass the 1σ credibility regions. In addition to these GP-based bands, we show the corresponding NSM constraints from the “Meta-Model” (dotted lines) and the “Smooth Spline” method (dashed lines) in Fig. 6, shown again only for the three representative interactions for clarity. 16 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7
+
+δiso [—]
+
+0.00 0.05 0.10 0.15 0.20 0.25 
+
+> n0(δiso ) [ fm −3]
+
+## (a) 
+
+> Interaction
+> (1.8/2.0) (2.0/2.5) (2.0/2.0)* Meta-model Smooth Spline
+
+0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7
+
+δiso [—]
+
+050 100 150 200 250 300 350 400 
+
+> K(δiso ) [ MeV ]
+
+## (b) 
+
+## Median 68% C.I. 95% C.I. 
+
+FIG. 5. The predicted saturation density, n0(δiso ), and incompressibility, K(δiso ), as a function of the isospin asymmetry in panels (a) and (b), respectively. The green dots represent the median, and the dark (light) shading corresponds to the 68% (95%) credibility interval (C.I.). The other lines depict the results obtained from three representative individual EOS calculations using the “Meta-model” (dotted lines) and the “Smooth Spline” method (dashed lines). 
+
+As shown in Fig. 6(a), we obtain E/A = 10 .77 ±
+
+1.35 MeV at n = 0 .16 fm −3 and E/A = 23 .49 ± 3.70 MeV at n = 0 .30 fm −3, which is, within the 1 σ credibility re-gions, less than the PNM energy per particle (blue band) across the entire density. Consistent with the constraints derived in Ref. [16], we find that NSM does not exceed 
+
+xβ ≲ 0.055 up to ≈ 2n0 and decreases at n ≳ 1.5n0, as shown in panel (b). That is, we obtain xβ = 0 .045 ± 0.002 at n = 0 .16 fm −3 and xβ = 0 .046 ±0.006 at n = 0 .30 fm −3.In contrast to the energies per particle, the pressures in NSM and PNM are comparable in both their in-ferred mean values and uncertainties. Only small dif-ferences appear near n0, where the PNM EOS is some-what stiffer, and near 2 n0, where the NSM EOS is some-what stiffer. This behavior is qualitatively similar to the findings in Ref. [29, see Figure 1(b)]. For NSM, we obtain p = 2 .22 ± 0.34 MeV fm −3 at n = 0 .16 fm −3 and 
+
+p = 9 .38 ± 2.71 MeV fm −3 at n = 0 .30 fm −3. For PNM, the corresponding values are p = 2 .45 ± 0.29 MeV fm −3
+
+and 9 .23 ± 2.63 MeV fm −3, respectively. Finally, for the sound speed we obtain the constraints c2 
+
+> s
+
+= 0 .036 ± 0.007 at n = 0 .16 fm −3 and 0 .061 ± 0.030 at n = 0 .30 fm −3. We emphasize that, as described in Sec. II B, the uncertainty bands in Fig. 6 do not explicitly include EFT trunca-tion errors [51, 52]; incorporating these errors should be revisited in future work. Accordingly, the uncertainty bands should be interpreted as lower bounds on the total theoretical uncertainties, especially at n ≳ 1.5n0.As shown in Fig. 6, the “Meta-Model” and the “Smooth Spline” method are generally consistent with each other. Only the sound speed square at high densities [panel (d)] shows a noticeable sensitivity to the specific extraction method due to the numerical noise in the input data. For example, the two predictions for c2
+
+> s
+
+(n = 0 .30 fm −3)based on the “(2.0/2.5)” interaction (purple lines) differ slightly compared with the overall spread of the GP-free results, c2
+
+> s
+
+(n = 0 .30 fm −3) ≈ 0.05 − 0.12. Nonetheless, the results of both GP-free methods are within the ≈ 2σ
+
+confidence region of our GP-based constraint. The effects of numerical noise are also manifested in the GP-based constraints for c2
+
+> s
+
+, where the uncertainty bands exhibit some fluctuations at n ≳ n0. Overall, the agreement of these methods further supports the robustness of our constraints derived from our statistical model and the noisy input data. 
+
+C. Crust-core transition 
+
+We constrain the crust-core transition density, ncc , be-low which NSM is unstable against density and compo-sition fluctuations and transitions to an inhomogeneous clustered phase [101, 102]. 16 Its location, e.g., directly impacts the fractional moment of inertia of the crust, which is key to modeling pulsar glitches [107]. Here, we adopt a formulation equivalent to the thermodynamical method [108], but more concise since it directly tests  
+
+> 16 For a selection of work incorporating constraints from chiral EFT on the crust-core transition and the implications for neutron star properties, we refer the reader to Refs. [26, 54, 103–106].
+
+17 510 15 20 25 30 35 
+
+> E/A [MeV ]
+
+(a) 
+
+Meta-model Smooth Spline 0.02 0.03 0.04 0.05 0.06 
+
+> xβ [—]
+
+(b) 
+
+0.05 0.10 0.15 0.20 0.25 0.30 Density n [fm −3]
+
+0246810 12 
+
+> p [MeVfm −3]
+
+(c) 
+
+Interaction 
+
+(1.8/2.0) (2.0/2.5) (2.0/2.0)* 
+
+Interaction 
+
+(1.8/2.0) (2.0/2.5) (2.0/2.0)* 0.05 0.10 0.15 0.20 0.25 0.30 Density n [fm −3]
+
+0.00 0.02 0.04 0.06 0.08 0.10 0.12 
+
+> c2
+> s [—]
+
+(d) NSM (1 σ) PNM (1 σ)
+
+FIG. 6. Constraints on charge-neutral, β-equilibrated NSM ( δiso = δβ ; green bands), with PNM constraints ( δiso = 1; blue bands) serving only as a reference here. The four panels show the energy per particle E/A [panel (a)], proton fraction xβ [panel (b)], pressure p [panel (c)], and sound speed squared c2 
+
+> s
+
+[panel (d)] as a function of the nucleon density. The green solid lines and regions depict the predicted mean and 1 σ uncertainty interval from the GP analysis. For comparison, the corresponding results in NSM using the “Meta-model” and the “Smooth Spline” method are depicted by the dotted and dashed lines, respectively, for the three representative EOS calculations. 
+
+the local convexity of the energy in the x–n [or δiso –n]plane. It accounts for instabilities arising from arbitrary infinitesimal coupled perturbations ( δx, δn ). Specifically, following Refs. [109–111], we study the determinant of the Hessian matrix HE of the energy density nE (δiso , n )/A 
+
+with respect to ( nδ iso , n ): 17 
+
+det[ HE ] = 
+
+ 2
+
+n∂E ∂n + ∂2E∂n 2
+
+ ∂2E∂δ 2iso 
+
+−
+
+ ∂2E∂n∂δ iso 
+
+2
+
+, (68) where we omitted “( δiso , n )/A ” for brevity. Uniform nu-clear matter is stable when det[ HE ] ⩾ 0 and unstable when det[ HE ] < 0; det[ HE ] = 0 marks the crust-core  
+
+> 17 Note that det[ nE (δiso , n )/A ] with respect to ( nδ iso , n ) is propor-tional to det[ nE (np, n n)/A ] with respect to ( np, n n).
+
+transition. The electron energy can be neglected when evaluating the Hessian determinant (68), assuming the electrons remain in β-equilibrium with the nucleons during these perturbations [110]. The energy involving density-gradient and Coulomb terms may be included, as in the dynamical method [112–116]. These terms generally shift the instability toward lower densities, with the resulting transition density typically lower than the thermodynam-ical estimate, roughly at the 10% level [113, 114]. In this initial application of GPDiff , however, such finite-size contributions are not incorporated. Their impact is ex-pected to be subleading compared with the bulk EOS dependence, particularly the density dependence of the symmetry energy [115, 116]. Hence, we consider only the thermodynamic estimate here. We follow a sampling approach to trace the instabil-ity condition in the δiso –n plane and then to constrain the corresponding crust-core (cc) transition in NSM. Us-18 0.04 0.05 0.07 0.08 0.10 0.11 0.12 0.14 0.15         
+
+> n[fm −3]
+> 0.005 0.010 0.015 0.020 0.025 0.030 0.035 0.040 0.045 0.050 0.055 0.060
+> x [—]
+> Interaction
+> (1.8/2.0) (2.0/2.5) (2.0/2.0)*
+> Meta-model Smooth Spline
+> FIG. 7. Composition of NSM and instability boundary as a function of the density. The green solid line and uncer-tainty bands show the proton fraction in charge-neutral, β-equilibrated NSM ( xβ; determined from Eq. (64)), while the blue solid line and bands indicate our estimates of the in-stability condition ( ncc ; see Eq. (68)). Solid lines represent the median, and dark-shaded (light-shaded) bands depict the 68% (95%) confidence regions. The intersection of these two uncertainty bands determines the crust-core transition density
+> ncc and associated proton fraction xcc in NSM [see Fig. 8 for the results]. For comparison, the other lines indicate the corresponding results based on the three representative EOS calculations extracted using the “Meta-model” (dotted lines) and “Smooth Spline” method (dashed lines).
+
+ing GPDiff , we jointly sample the trained GP and all derivatives necessary to evaluate Eq. (68) on a suitable (δiso , n )-grid that covers the region in which we expect the crust-core transition to occur: n ∈ [0 .01 , 0.17] fm −3
+
+(17 points) and δiso ∈ [0 .8, 0.99] (11 points). For each joint GP sample, we use bivariate interpolation to locate the zero crossing of det[ HE ] on a dense grid and keep only those samples that exhibit a negative-to-positive zero crossing across the considered density range consistent with the physical boundary of the instability. At the same time, we determine δβ (n) by finding the zero crossing of 
+
+fβ [see Eq. (64)], as before in Sec. III B. Samples for which no zero crossing is found are discarded. The crust-core transition in NSM, ( ncc , δ cc ), is then determined by the intersection of the β-equilibrium region and the stability boundary [see Fig. 7]. Furthermore, to study correlations between ( ncc , δ cc ) and the EOS parameters discussed in Sec. III A [see Fig. 8], we extend this approach to include joint samples of the SNM EOS. These additional corre-lated samples are used to determine the saturation point and, subsequently, the associated EOS parameters. Figure 7 depicts the constraints on the instability boundary (blue bands) and the proton fraction of NSM (green bands) as a function of the density, resulting from this sampling procedure. The intersection of these two constraints determines the crust-core transition density 
+
+ncc and associated proton fraction xcc in NSM, which we will discuss below [see also Fig. 8]. Dark and light shaded bands indicate the 68% and 95% confidence regions, re-spectively. Figure 7 shows that the β-equilibrium region (green bands) forms a relatively narrow and smoothly increasing band in the x–n plane. In contrast, the stabil-ity boundary region (blue bands) exhibits a much larger spread, particularly in the density due to the stronger density dependence. As a consequence, the uncertainty in the crust-core transition density is mainly driven by the uncertainty in the stability boundary. This conclu-sion is also supported by the results obtained with the two GP-free methods (dashed and dotted lines), although their predictions for the stability boundary are somewhat sensitive to numerical noise in the input data. Figure 8 shows the inferred joint posterior distributions of the crust-core transition properties and EOS parame-ters studied in Sec. III A. Specifically, in addition to ncc 
+
+and xcc , the crust-core transition is characterized by the associated energy per particle E/A cc , pressure pcc , and sound speed squared c2
+
+> scc
+
+. As before, symbols indicate val-ues extracted using the “Meta-model” and the “Smooth Spline” method based on the six individual EOS calcula-tions. The diagonal panels show the marginalized distri-butions, and their titles report our constraints on these parameters at the 95% credibility level. In particular, we determine ncc = 0 .076 +0 .036  
+
+> −0.023
+
+fm −3, which is consistent with the range recently obtained from a chiral EFT trun-cation error analysis, ncc ∈ [0 .062 , 0.088] fm −3 [54] and from a Bayesian analysis of a compressible liquid-drop model (CLDM), ncc = 0 .072 ± 0.022 fm −3 (2 σ-level) [117]. The latter study also reported a compatible yet somewhat lower pcc = 0 .339 ± 0.230 MeV fm −3 [117] than we ob-tain, pcc = 0 .380 +0 .312  
+
+> −0.156
+
+MeV fm −3 (both at the 95% level). Furthermore, using a CLDM with additional constraints from the MBPT calculations in Ref. [36] for the chiral interactions “(2.0/2.0)” and “(2.0/2.5)” employed in this work, Ref. [103] found ncc = 0 .084 − 0.093 fm −3, which is also consistent with our estimate within the uncertainties. The results obtained with the GP-free methods are mostly within the 95% credibility regions of the inferred GP constraints, indicating that the GP-based uncertainty bands encompass the interaction-dependent variation in the extracted parameters within the estimated uncertain-ties. On the other hand, our nonparametric GP con-straints revealed a lack of flexibility of the parametric “Meta-model” in constraining the crust-core transition properties. Specifically, we found that the “Meta-model” without the fourth-order terms in Eq. (63), corresponding to the functional forms used in Refs. [3, 16], can precisely reproduce the results shown in Figs. 4, 5, and 6. How-ever, it leads to significant deviations from the GP and “Smooth Spline” approaches when the Hessian determi-19 ncc = 0 .076 +0.036 
+
+> −0.023
+> 0.025 0.030 0.035 0.040
+> xcc
+
+xcc = 0 .0303 +0.0094 
+
+> −0.0069
+> 5.66.06.46.87.2
+> E/Acc
+
+E/Acc = 6 .50 +0.69 
+
+> −0.65
+> 0.30 0.45 0.60 0.75
+> pcc
+
+pcc = 0 .380 +0.312 
+
+> −0.156
+> 0.0075 0.0100 0.0125 0.0150 0.0175
+> c2
+> s cc
+
+c2 
+
+> s cc
+
+= 0 .0108 +0.0040 
+
+> −0.0025
+> 28 32 36 40
+> Sv
+
+Sv = 32 .5+7.2
+
+> −4.9
+> 40 50 60 70
+> L
+
+L = 49 .5+17 .9
+
+> −10 .8
+> 0.06 0.08 0.10 0.12
+
+## ncc 
+
+> −750
+> −600
+> −450
+> −300
+> −150
+> Kτ
+> 0.025 0.030 0.035 0.040
+
+## xcc 
+
+> 5.66.06.46.87.2
+
+## E/Acc 
+
+> 0.30 0.45 0.60 0.75
+
+## pcc 
+
+> 0.0075 0.0100 0.0125 0.0150 0.0175
+
+## c2
+
+s cc 
+
+> 28 32 36 40
+
+## Sv
+
+> 40 50 60 70
+
+## L
+
+> −750
+> −600
+> −450
+> −300
+> −150
+
+## KτKτ = −423 +259 
+
+> −352
+
+## Interaction (1.8/2.0) (2.0/2.0) (2.0/2.5) (2.2/2.0) (2.8/2.0) (2.0/2.0)* Interaction (1.8/2.0) (2.0/2.0) (2.0/2.5) (2.2/2.0) (2.8/2.0) (2.0/2.0)* Meta-model Smooth Spline 
+
+FIG. 8. Posterior distributions of the crust-core transition properties and low-density EOS parameters. The crust-core transition is characterized by the transition density ncc [fm −3] and associated proton fraction xcc [—], energy per particle E/A cc [ MeV], pressure pcc [ MeV fm −3], and sound speed squared c2 
+
+> s cc
+
+[—]. The other EOS parameters are the symmetry energy Sv [ MeV], slope parameter L [ MeV], and isospin incompressibility parameter Kτ [ MeV] evaluated at the saturation density, corresponding to the results shown in Fig. 4 up to statistical fluctuations (because of the smaller sampling size). Diagonal panels show marginalized posterior distributions, with titles reporting the median and central 95% credibility interval. The dashed lines indicate the medians and the bounds of the 95% credibility intervals, and the contours correspond to the approximate 0 .5σ, 1 σ,1.5σ, and 2 σ confidence regions. Symbols indicate values extracted using the “Meta-model” ( ×) and the “Smooth Spline” ( +)method based on the six individual EOS calculations. 20 nant in Eq. (68) is evaluated to determine the crust-core transition properties. These systematic deviations are remedied by the inclusion of the fourth-order terms in Eq. (63), as shown in Fig. 8. These comparisons between different methods provide valuable consistency checks of the inferred constraints and underscore the importance of uncertainty estimates, as provided by GPDiff .Previous studies have found that ncc generally decreases with increasing L when individual nuclear models or re-stricted model families are considered [113]. However, more recent systematic investigations have shown that 
+
+ncc and pcc cannot be characterized by merely one EOS parameter such as L and Ksym (or the related Kτ ), but instead depend on correlations among several EOS param-eters [114, 118]. Because our GP framework quantifies and propagates the correlations in the underlying nuclear calculations, it enables us to determine how crust-core transition properties near n0/2 correlate with EOS pa-rameters evaluated at n0.Figure 8 provides insights into these correlations. For example, we find a strong correlation between ncc and 
+
+xcc because xβ (n) is a monotonically increasing function in the vicinity of the crust-core transition, as shown in Fig. 7, and both ncc and xcc are correlated with Sv and 
+
+L. Interestingly, the observed correlation between ncc 
+
+and L deviates from the anti-correlation often reported in phenomenological studies based on energy density func-tionals [113, 116], and ncc and Kτ are uncorrelated. We also observe strong correlations between pcc , ncc , c2
+
+> scc
+
+,and E/A cc since the neutron-rich matter EOS is well con-strained at these low densities, as can be seen in Fig. 2.  
+
+> IV. SUMMARY AND OUTLOOK
+
+We have presented microscopic constraints on the low-density nuclear EOS at zero temperature with quantified correlated uncertainties based on a novel GP framework, named GPDiff . Specifically, we have studied the satura-tion point ( n0, E 0/A ) in SNM, the incompressibility K
+
+and its leading isospin dependence Kτ , the symmetry energy Sv and its slope parameter L [see Sec. III A], as well as properties of charge-neutral, β-equilibrated NSM, including its EOS [see Sec. III B] and crust-core transi-tion density [see Sec. III C]. Table I summarizes the main results of our analysis at the 95% credibility level. In particular, we look forward to the forthcoming constraints on Kτ , which is only weakly determined in our analysis, obtained from the FRIB experiment “The Isoscalar Giant Monopole Resonance in 132 Sn: Implications on the Nu-clear Incompressibility” [119]. These results will provide valuable benchmarks for microscopic nuclear interactions. To this end, we have developed GPDiff , a JAX -based Python package for multivariate GP regression with auto-matic differentiation and support for user-defined kernels, including input-dependent kernels. Once trained on, e.g., microscopic calculations of the energy per particle, GPDiff 
+
+enables joint predictions of the EOS and derivatives of                                   
+
+> TABLE I. Summary of our constraints on the low-density EOS parameters. The table shows the 95% confidence intervals of the marginalized distribution functions. We emphasize that, as shown in Fig. 4, these parameters are correlated. The acronym “CCT” stands for crust-core transition. Symbol Parameter Constraint Unit
+> n0Saturation density 0.169 +0 .061
+> −0.037 fm −3
+> E0/A Saturation energy −15 .5+3 .0
+> −4.6MeV
+> KIncompressibility 221 +114
+> −67 MeV
+> SvSymmetry energy 32 .6+7 .7
+> −4.9MeV
+> LSlope parameter 49 .5+18 .5
+> −10 .9MeV
+> KτK’s isospin dependence −423 +263
+> −374 MeV
+> ncc CCT density 0.076 +0 .036
+> −0.023 fm −3
+> xcc CCT proton fraction 0.030 +0 .009
+> −0.007 —
+> E/A cc CCT energy per particle 6.5+0 .7
+> −0.7MeV
+> pcc CTT pressure 0.38 +0 .31
+> −0.16 MeV fm −3
+
+arbitrary order with respect to the input variables, in-cluding mixed partial derivatives; thereby propagating correlated uncertainties from these many-body calcula-tions, which may contain numerical noise in addition to other theoretical uncertainties, to derived observables, such as the pressure and speed of sound. In that regard, 
+
+GPDiff provides an improved, more flexible Python im-plementation of GP regression with arbitrary derivative predictions, particularly for EOS applications, than the earlier package gptools [71], which, to our knowledge, is no longer actively maintained. As a first application, we trained GPDiff on recent high-order MBPT calculations of asymmetric nuclear mat-ter [16] based on the six Hebeler et al. interactions [87]. To analyze the corresponding set of distinct EOS calcula-tions, we have developed a statistical model [see Sec. II C] that separates the common mean EOS shared by these six EOS from their interaction-dependent deviations and numerical noise in the MBPT calculations. This model allowed us to construct predictive uncertainty bands that account for correlations across density and isospin asym-metry, and uncertainties due to the limited sample size of only six individual EOS calculations. Future work may apply GPDiff in the opposite, data-rich limit by leveraging fast and accurate emulators for many-body calculations [4, 5, 21], including parametric matrix mod-els [24, 120–123], to propagate uncertainties in the low-energy couplings, together with EFT truncation errors, to the nuclear EOS. To model the mean EOS, we have explored input-dependent CS kernels, which generalize CP kernels [56] to higher-dimensional input spaces, here constructed from multiple RBF kernels. These kernels led to statistically consistent results compared to those obtained with a sin-21 gle RBF kernel. This finding suggests that smooth (i.e., infinitely differentiable) kernels with a single length scale in each input dimension can already capture the dom-inant features of the asymmetric matter EOS, at least at the mean level. However, when modeling the EOS over a wider density range (e.g., for neutron star applica-tions), the CS kernels may become more important for encoding nonstationarity, variations in smoothness, and related EOS features such as phase transitions. Interest-ing stationary kernel choices that could be combined into nonstationary CS kernels for these studies include the Mat´ ern, polynomial, and rational quadratic kernels [68]. We have compared the inferred GP-based constraints with two independent GP-free methods, a parametric meta-model and a smooth bivariate spline, calibrated sep-arately to the different EOS calculations. The observed agreement between these three approaches supports the robustness of the derived low-density EOS parameters and NSM properties in the presence of numerical noise in the many-body calculations, and provides a consis-tency check of the underlying GP modeling assumptions. This comparison also highlighted the importance of uncer-tainty estimates and nonparametric EOS modeling, both facilitated by GPDiff .Several extensions of our GP framework would be valu-able. GPDiff is independent of the idiosyncrasies of the EOS calculations, and so studying results obtained with different many-body frameworks and a wider range of chi-ral interactions [85, 124] would provide insights into many-body uncertainties. For example, order-by-order EOS studies based on LENPIC’s SMS potentials [125, 126] and delta-full potentials [127–129] comparing MBPT and non-perturbative calculations would be interesting [130, 131]. In this spirit, combining constraints from complemen-tary low-density EOS calculations, including recent QMC results for NSM in the nonuniform region [19], will be important for improving constraints on the crust-core tran-sition. Furthermore, because GPDiff already supports multidimensional inputs, its extension to microscopic EOS calculations at finite temperature [40, 41] should be straightforward. This extension would enable thermo-dynamic quantities relevant to supernovae, neutron-star mergers, and heavy-ion collisions to be modeled and ex-trapolated based on different kernel choices, aimed at assessing the sensitivity of the inferred results to the GP model assumptions encoded in the kernels. In these studies, EFT truncation errors, which we did not explicitly quantify, should also be incorporated rigor-ously using the BUQEYE truncation-error model [51, 52]. We expect GPDiff to be compatible with this error model [74]. The uncertainty bands presented here there-fore likely underestimate the full theoretical uncertainty at densities above ≈ 1.5n0. In this regard, marginalizing over the posterior distributions of the kernel hyperpa-rameters instead of simply using the corresponding MAP value would also be insightful, though computationally expensive, to account for these additional uncertainties, especially for predictions of EOS derivatives. Our GPDiff framework, together with the presented results, will be made publicly available on GitHub [132], enabling practitioners to use, adapt, and extend it in their own work. With comprehensive documentation and tutorials, we hope that GPDiff will become a useful and versatile tool for GP-based workflows aimed at constrain-ing the EOS in the multimessenger astronomy era, includ-ing Bayesian model mixing [55, 56] and nonparametric inference with GP-based priors [57–67]. 
+
+> ACKNOWLEDGMENTS
+
+We are grateful to R. J. Furnstahl, M. Grosskopf [133], M. L. Kumamoto, D. R. Phillips, and J. Piekarewicz for fruitful discussions. We also thank the N3AS collabora-tion [134] for its encouragement and support. Y. G. L. and C. D. are supported by the National Science Foundation (NSF) under award PHY-2339043. J. K. is supported by the U.S. Department of Energy, Office of Science, Office of Nuclear Physics, under contracts DE-AC02-06CH11357, by the DOE Early Career Research Program, and un-der the STREAMLINE 2 Collaboration Award. T. Z. is supported by N3AS’s NSF Award No. 2020275. This material is in part based upon work supported by the U.S. Department of Energy, Office of Science, Office of Nuclear Physics, under the FRIB Theory Alliance award DE-SC0013617. The following open-source libraries were used to generate the results in this work: corner [135], JAX [70], 
+
+Jupyter [136], matplotlib [137], PyNumDiff [138], 
+
+scipy [100], optax [79], and numpy [139]. 
+
+> DATA AVAILABILITY
+
+The data that support the findings of this article will be made openly available [132]. 
+
+> Appendix A: Existing GP libraries
+
+Table II provides a non-exhaustive list of existing GP software libraries, along with a brief description. Although 
+
+GPDiff could, in principle, be added to this listing as a general-purpose GP library, it was specifically designed for applications to EOS modeling, analysis, and inference. 
+
+> Appendix B: Uncertainties in the neutron star EOS
+
+This appendix explains the UQ of neutron star EOS using the trained GPs in Sec. III B. Using standard iden-tities for adding normal distributions, the uncertainties of chemical potential can be calculated by performing error 22 
+
+TABLE II. A selection of existing software packages for GP regression and related applications. For further details, we refer to the respective package documentation, which served as the source for the information given in the “Description” column. Package Engine Description 
+
+George [140] C++ & Python Fast and flexible GP regression library focused on efficient marginal-likelihood evaluation, kernel composition, and custom modeling 
+
+GPflow [141, 142] TensorFlow (Python) Implements modern GP inference with composable kernels and likelihoods, including exact, sparse, variational, and MCMC-based models 
+
+GPJax [143] JAX (Python) Supports GPU acceleration and just-in-time compilation; designed for flexible research prototyping 
+
+gptools [71] NumPy /SciPy (Python) Regression package with support for derivative observations and predic-tions, derivative variances, and arbitrary linearly transformed quantities; developed and tested using Python 2.7, which reached end-of-life in 2020; applied by the nuclear theory community, e.g., in Refs. [41, 51, 52] 
+
+GPy [144] NumPy & Cython (Python) Framework from SheffieldML with support for GP regression, classification, sparse GPs, multi-output models, latent-variable models, and a broad range of kernels 
+
+GPyTorch [145] PyTorch (Python) Scalable and modular GP library supporting exact and approximate infer-ence, GPU acceleration, and modern variational methods 
+
+hetGP [146] R Heteroskedastic GP regression package that models input-dependent noise and supports sequential design under replication 
+
+MuyGPyS [147] NumPy (Python) Toolkit for scalable approximate GP inference using nearest-neighbor sparsification; supports fast training and prediction on large datasets; engines other than NumPy are optional 
+
+scikit-learn [78] NumPy /SciPy (Python) Standard GP regression and classification implementation; straightforward to use, but non-sparse and somewhat limited in scalability 
+
+propagation as follows: 
+
+σ2 
+
+> μc
+
+(n) = σ2 
+
+> EA
+
+|δiso =δβ (n)
+
++ n2σ2∂∂n EA |δiso =δβ (n)
+
++ V 2 
+
+> δβ
+
+σ2
+
+> δβ
+
++ 2 n cov EA δiso =δβ (n)
+
+, ∂∂n EA δiso =δβ (n)
+
+!
+
++ 2 Vδβ
+
+"
+
+cov EA δiso =δβ (n)
+
+, δ β
+
+!
+
++ n cov ∂∂n EA δiso =δβ (n)
+
+, δ β
+
+!# 
+
+,
+
+(B1) where the coefficient is Vδβ = ∆m 
+
+> 2
+
+− 23 μe
+
+ ¯δβ , n . The un-certainties in the speed of sound squared can be calculated by performing error propagation as follows: 
+
+σ2 
+
+> c2
+> s
+
+(n) = ¯c2
+
+> s
+> 2
+
+ σ2 
+
+> dp (n)
+> dn
+> dp (n)
+> dn
+> 2
+
++ σ2 
+
+> μc
+
+(n)¯μ2 
+
+> c
+
+(n) − 2 cov( dp (n) 
+
+> dn
+
+, μ c) 
+
+> dp (n)
+> dn
+
+· ¯μc
+
+ ,
+
+(B2) 
+
+σ2
+
+> dp (n)
+> dn
+
+= 4 n2σ2∂∂n EA |δiso =δβ (n)
+
++ n4σ2ddn ∂∂n EA |δiso =δβ (n)
+
++ W 2 
+
+> δβ
+
+σ2 
+
+> δβ
+
++ W 2
+
+> dδ βdn
+
+σ2
+
+> dδ βdn
+
++ 4 n3cov ∂∂n EA δiso =δβ (n)
+
+, ddn ∂∂n EA δiso =δβ (n)
+
+!
+
++ 2 Wδβ W dδ βdn 
+
+cov 
+
+
+
+δβ , dδ β
+
+dn 
+
+
+
++ 4 nW δβ cov ∂∂n EA δiso =δβ (n)
+
+, δ β
+
+!
+
+, (B3) with the covariance term cov   dp (n)
+
+dn , μ c
+
+
+
+= 2 n cov EA δiso =δβ (n)
+
+, ∂∂n EA δiso =δβ (n)
+
+!
+
++ 2 n2 σ2∂∂n EA |δiso =δβ (n)
+
++ n3 cov ∂∂n EA δiso =δβ (n)
+
+, ddn ∂∂n EA δiso =δβ (n)
+
+!
+
++ Wδβ cov EA δiso =δβ (n)
+
+, δ β
+
+!
+
++ n  2Vδβ + Wδβ
+
+ cov ∂∂n EA δiso =δβ (n)
+
+, δ β
+
+!
+
++ Wδβ Vδβ σ2 
+
+> δβ
+
++ W dδ βdn 
+
+Vδβ cov 
+
+
+
+δβ , dδ β
+
+dn 
+
+
+
+.
+
+(B4) 23 The coefficients are given by 
+
+Wδβ = − 29 μe
+
+ ¯δβ , n  + 136 μe
+
+ ¯δβ , n  n
+
+¯xβ
+
+dδ β
+
+dn , (B5) 
+
+W dδ βdn 
+
+= − 16 μe
+
+ ¯δβ , n  n , (B6) where bars indicate mean values. Both, cov 
+
+ ∂∂n EA δiso =δβ (n) , ddn ∂∂n EA δiso =δβ (n)
+
+
+
+and cov 
+
+
+
+δβ , dδ β
+
+> dn
+
+
+
+are directly obtained from the derivatives of the GP models trained on 
+
+n
+
+n, ∂∂n EA δiso =δβ (n)
+
+o
+
+and 
+
+{n, δ β }, respectively. The three remaining covariance terms in Eq. (B1), which also appear in Eqs. (B3) and (B4) are evaluated at the same n and are extracted by train-ing standard GP interpolants (without deviation kernels since the uncertainties of the covariances themselves are not required), calibrated to the mean of the generated samples. Note that several cross-covariance terms involve higher-order derivatives across different physical quantities (e.g., between EA δiso =δβ and dδ β 
+
+> dn
+
+, or between δβ and   
+
+> ddn ∂∂n EAδiso =δβ
+
+) are not included in the equations above. This is a direct consequence of the model architecture: while covariances among the base variables (e.g., those directly sampled from the GP) and intra-variable deriva-tive covariances (e.g., between a variable and its own derivative) are strictly constrained by the trained GPs, the cross-derivative covariances between independently evaluated models are inaccessible and thus neglected. 
+
+> Appendix C: Additional results
+
+This appendix contains additional results obtained us-ing a single RBF kernel, supplementing the results pre-sented in Sec. III. In general, we find qualitatively similar results for these kernels, indicating that the two sets of results are consistent with one another within their un-certainties. Hence, the results in this appendix do not change the conclusions made in Sec. III. Figure 9 shows the inferred low-density EOS parame-ters at n0, similar to Fig. 4. Within their uncertainties reported in the titles along the diagonal panels, the in-ferred constraints on these parameters based on the two kernel choices match. The same applies to the agree-ment between the GP-free extraction methods and our GP-based constraints. We find, as expected, a strong Co-ester anti-correlation ( ρ = −0.93), with the approximate bivariate normal distribution: 
+
+μ ≈
+
+ 0.173 
+
+−15 .8
+
+
+
+, Σ ≈
+
+ 0.025 2 −0.215 2
+
+−0.215 2 1.98 2
+
+
+
+. (C1) Likewise, we find a strong correlation ( ρ = 0 .77) between 
+
+Sv and L, with the approximate bivariate normal distri-bution: 
+
+μ ≈
+
+33 .251 .9
+
+
+
+, Σ ≈
+
+3.32 2 4.40 2
+
+4.40 2 7.61 2
+
+
+
+. (C2) Figure 10 shows the isospin dependence of the satura-tion point [panel (a)] and the incompressibility [panel (b)], similar to Fig. 5. At the 95% credibility level, we ob-tain n0(δiso ) ≈ 0.0844 +0 .0420  
+
+> −0.0325
+
+fm −3 at the highest shown 
+
+δiso = 0.7, and Kτ = −418 +227  
+
+> −346
+
+MeV from fitting a parabola [cf. Eq. (58)] to the results in panel (b) for 
+
+δiso ⩽ 0.3. These constraints are consistent with our other extractions. Figure 11 shows the NSM EOS, similar to Fig. 6. Match-ing the results of our extraction in the main text, we find at the 68% credibility level at the highest density depicted, n = 0 .30 fm −3: E(n)/A = 23 .37 ± 3.72 MeV, 
+
+p(n) = 9 .38 ± 2.68 MeV fm −3, xβ (n) = 0 .046 ± 0.006, and 
+
+c2
+
+> s
+
+(n) = 0 .063 ± 0.030. Figure 12 shows the constraints on the crust-core tran-sition boundary (blue bands) and the NSM region (green bands) in the x–n plane, similar to Fig. 7, while Fig. 13 shows the corresponding inferred posterior, analogous to Fig. 8. Our results reported in the titles of the diagonal panels at the 95% credibility level are consistent within their uncertainties with those reported in Fig. 8. Finally, we also studied different configurations for mix-ing RBF kernels, including a very expressive CS kernel with 6 RBF kernels, whose centers were located at n0/2and 3 n0/2 with δiso = 0 , ±1. This CS kernel not only distinguishes the EOS features of PNM and SNM, but also separates their behavior at both low and high den-sities. The hyperparameters of the kernels at δiso = ±1were shared, amounting to 12 free hyperparameters in total. Within the estimated uncertainties, this kernel configuration led to consistent results compared to the ones presented in this appendix and the main text. This finding indicates that the CS kernel mixing only two RBF kernels, or even a single RBF kernel, is an adequate compromise between accuracy and model complexity.     
+
+> [1] A. Ekstr¨ om, G. R. Jansen, K. A. Wendt, G. Hagen, T. Papenbrock, B. D. Carlsson, C. Forss´ en, M. Hjorth-Jensen, P. Navr´ atil, and W. Nazarewicz, Phys. Rev. C
+> 91 , 051301(R) (2015), arXiv:1502.04682. [2] A. Ekstr¨ om, G. Hagen, T. D. Morris, T. Papenbrock, and P. D. Schwartz, Phys. Rev. C 97 , 024332 (2018), arXiv:1707.09028. [3] C. Drischler, K. Hebeler, and A. Schwenk, Phys. Rev. Lett. 122 , 042501 (2019), arXiv:1710.08220. [4] W. G. Jiang, C. Forss´ en, T. Dj¨ arv, and G. Hagen, Phys. Rev. C 109 , 064314 (2024), arXiv:2212.13216. [5] W. G. Jiang, C. Forss´ en, T. Dj¨ arv, and G. Hagen, Phys. Rev. C 109 , L061302 (2024), arXiv:2212.13203 [nucl-th].
+
+24 n0 = 0 .170 +0.062      
+
+> −0.038
+> −21
+> −18
+> −15
+> −12
+> −9
+> E0/A
+> E0/A=−15 .57 +3.04
+> −4.70
+> 150 200 250 300 350
+> K
+> K= 223 +116
+> −68
+> 28 32 36 40
+> Sv
+> Sv= 32 .8+7.9
+> −5.1
+> 40 50 60 70
+> L
+> L= 51 .0+18 .7
+> −11 .4
+> 0.12 0.15 0.18 0.21 0.24
+
+## n0
+
+> −750
+> −600
+> −450
+> −300
+> −150
+> Kτ
+> −21
+> −18
+> −15
+> −12
+> −9
+
+## E0/A
+
+> 150 200 250 300 350
+
+## K
+
+> 28 32 36 40
+
+## Sv
+
+> 40 50 60 70
+
+## L
+
+> −750
+> −600
+> −450
+> −300
+> −150
+
+## KτKτ = −432 +216 
+
+> −351
+
+## Interaction (1.8/2.0) (2.0/2.0) (2.0/2.5) (2.2/2.0) (2.8/2.0) (2.0/2.0)* Interaction (1.8/2.0) (2.0/2.0) (2.0/2.5) (2.2/2.0) (2.8/2.0) (2.0/2.0)* Meta-model Smooth Spline 
+
+FIG. 9. Same as Fig. 4 but for the single RBF kernel. 25 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7
+
+δiso [—]
+
+0.00 0.05 0.10 0.15 0.20 0.25 
+
+> n0(δiso ) [ fm −3]
+
+## (a) 
+
+> Interaction
+> (1.8/2.0) (2.0/2.5) (2.0/2.0)* Meta-model Smooth Spline
+
+0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7
+
+δiso [—]
+
+050 100 150 200 250 300 350 400 
+
+> K(δiso ) [ MeV ]
+
+## (b) 
+
+## Median 68% C.I. 95% C.I. 
+
+FIG. 10. Same as Fig. 5 but for the single RBF kernel. [6] C. Drischler, P. G. Giuliani, S. Bezoui, J. Piekarewicz, and F. Viens, Phys. Rev. C 110 , 044320 (2024), arXiv:2405.02748. [7] C. Drischler, J. W. Holt, and C. Wellenhofer, Annu. Rev. Nucl. Part. Sci. 71 , 403 (2021), arXiv:2101.01709. [8] A. Sorensen et al. , Prog. Part. Nucl. Phys. 134 , 104080 (2024), arXiv:2301.13253. [9] R. Kumar et al. (MUSES), Living Rev. Rel. 27 , 3 (2024), arXiv:2303.17021 [nucl-th]. [10] K. Chatziioannou, H. T. Cromartie, S. Gandolfi, I. Tews, D. Radice, A. W. Steiner, and A. L. Watts, Rev. Mod. Phys. 97 , 045007 (2025), arXiv:2407.11153. [11] K. Agarwal, J. Jahan, B. Kardan, P. T. H. Pang, T. Re-ichert, and A. C. Semposki, (2025), arXiv:2511.20378. [12] E. Epelbaum, H.-W. Hammer, and U.-G. Meißner, Rev. Mod. Phys. 81 , 1773 (2009), arXiv:0811.1338. [13] R. Machleidt and D. R. Entem, Phys. Rept. 503 , 1 (2011), arXiv:1105.2919. [14] H.-W. Hammer, S. K¨ onig, and U. van Kolck, Rev. Mod. Phys. 92 , 025004 (2020), arXiv:1906.12122. [15] E. Epelbaum, H. Krebs, and P. Reinert, Front. Phys. 8,98 (2020), arXiv:1911.11875. [16] C. Drischler, K. S. McElvain, and P. Arthuis, (2026), arXiv:2603.24532. [17] D. Lonardoni, I. Tews, S. Gandolfi, and J. Carlson, Phys. Rev. Res 2, 022033(R) (2020), arXiv:1912.09411. [18] P. Arthuis, C. Barbieri, F. Pederiva, and A. Roggero, Phys. Rev. C 107 , 044303 (2023), arXiv:2203.16167. [19] B. Fore, J. Kim, M. Hjorth-Jensen, and A. Lovato, Com-mun. Phys. 8, 108 (2025), arXiv:2407.21207 [nucl-th]. [20] A. Lovato, G. Carleo, B. Fore, M. Hjorth-Jensen, J. Kim, A. Rios, and N. Rocco, (2026), arXiv:2602.13826 [nucl-th]. [21] T. Duguet, A. Ekstr¨ om, R. J. Furnstahl, S. K¨ onig, and D. Lee, Rev. Mod. Phys. 96 , 031002 (2024), arXiv:2310.19419 [nucl-th]. [22] J. A. Melendez, C. Drischler, R. J. Furnstahl, A. J. Garcia, and X. Zhang, J. Phys. G 49 , 102001 (2022), arXiv:2203.05528 [nucl-th]. [23] C. Drischler, J. A. Melendez, R. J. Furnstahl, A. J. Garcia, and X. Zhang, Front. Phys. 10 , 92931 (2023), supplemental, interactive Python code can be found on the companion website https://github.com/buqeye/ frontiers-emulator-review , arXiv:2212.04912. [24] P. Cook, D. Jammooa, M. Hjorth-Jensen, D. D. Lee, and D. Lee, Nature Commun. 16 , 5929 (2025), arXiv:2401.11694 [cs.LG]. [25] D. Frame, R. He, I. Ipsen, D. Lee, D. Lee, and E. Rrapaj, Phys. Rev. Lett. 121 , 032501 (2018), arXiv:1711.07090. [26] K. Hebeler, J. M. Lattimer, C. J. Pethick, and A. Schwenk, Astrophys. J. 773 , 11 (2013), arXiv:1303.4662 [astro-ph.SR]. [27] J. E. Lynn, I. Tews, J. Carlson, S. Gandolfi, A. Gezerlis, K. E. Schmidt, and A. Schwenk, Phys. Rev. Lett. 116 ,062501 (2016), arXiv:1509.03470 [nucl-th]. [28] J. W. Holt and N. Kaiser, Phys. Rev. C 95 , 034326 (2017), arXiv:1612.04309. [29] C. Drischler, S. Han, J. M. Lattimer, M. Prakash, S. Reddy, and T. Zhao, Phys. Rev. C 103 , 045808 (2021), arXiv:2009.06441 [nucl-th]. [30] S. Huth, C. Wellenhofer, and A. Schwenk, Phys. Rev. C 
+
+103 , 025803 (2021), arXiv:2009.08885 [nucl-th]. [31] C. Drischler, S. Han, and S. Reddy, Phys. Rev. C 105 ,035808 (2022), arXiv:2110.14896 [nucl-th]. [32] S. Huth et al. , Nature 606 , 276 (2022), arXiv:2107.06229 [nucl-th]. [33] I. Tews, R. Somasundaram, D. Lonardoni, H. G¨ ottling, R. Seutin, J. Carlson, S. Gandolfi, K. Hebeler, and A. Schwenk, Phys. Rev. Res. 7, 033024 (2025), arXiv:2407.08979. [34] F. Alp, Y. Dietz, K. Hebeler, and A. Schwenk, Phys. Rev. C 112 , 055802 (2025), arXiv:2504.18259. 26 510 15 20 25 30 35 
+
+> E/A [MeV ]
+
+## (a) 
+
+Meta-model Smooth Spline 0.02 0.03 0.04 0.05 0.06 
+
+> xβ [—]
+
+## (b) 
+
+0.05 0.10 0.15 0.20 0.25 0.30 Density n [fm −3]
+
+0246810 12 
+
+> p [MeVfm −3]
+
+## (c) 
+
+Interaction 
+
+(1.8/2.0) (2.0/2.5) (2.0/2.0)* 
+
+Interaction 
+
+(1.8/2.0) (2.0/2.5) (2.0/2.0)* 0.05 0.10 0.15 0.20 0.25 0.30 Density n [fm −3]
+
+0.00 0.02 0.04 0.06 0.08 0.10 0.12 
+
+> c2
+> s [—]
+
+## (d) NSM (1 σ) PNM (1 σ)
+
+FIG. 11. Same as Fig. 6 but for the single RBF kernel. [35] C. Drischler, V. Som` a, and A. Schwenk, Phys. Rev. C 
+
+89 , 025806 (2014), arXiv:1310.5627. [36] C. Drischler, K. Hebeler, and A. Schwenk, Phys. Rev. C 
+
+93 , 054314 (2016), arXiv:1510.06728. [37] C. Wellenhofer, J. W. Holt, and N. Kaiser, Phys. Rev. C 93 , 055802 (2016), arXiv:1603.02935. [38] R. Somasundaram, C. Drischler, I. Tews, and J. Margueron, Phys. Rev. C 103 , 045803 (2021), arXiv:2009.04737. [39] P. Wen and J. W. Holt, Phys. Rev. C 103 , 064002 (2021), arXiv:2012.02163 [nucl-th]. [40] J. Keller, C. Wellenhofer, K. Hebeler, and A. Schwenk, Phys. Rev. C 103 , 055806 (2021), arXiv:2011.05855. [41] J. Keller, K. Hebeler, and A. Schwenk, Phys. Rev. Lett. 
+
+130 , 072701 (2023), arXiv:2204.14016 [nucl-th]. [42] D. J. C. MacKay, Information Theory, Inference, and Learning Algorithms (Cambridge University Press, Cam-bridge, UK, 2003). [43] C. E. Rasmussen and C. K. I. Williams, Gaussian Pro-cesses for Machine Learning , Adaptive computation and machine learning series (University Press Group Limited, Cambridge, MA, 2006). [44] K. P. Murphy, Machine Learning: A Probabilistic Per-spective (The MIT Press, 2012). [45] A. Gelman, J. Carlin, H. Stern, D. Dunson, A. Vehtari, and D. Rubin, Bayesian Data Analysis, Third Edition ,Chapman & Hall/CRC Texts in Statistical Science (Tay-lor & Francis, 2013). [46] R. M. Neal, Priors for infinite networks, in Bayesian Learning for Neural Networks (Springer New York, New York, NY, 1996) pp. 29–53. [47] C. K. I. Williams, in NIPS (1996). [48] J. Lee, Y. Bahri, R. Novak, S. S. Schoenholz, J. Pen-nington, and J. Sohl-Dickstein, Deep neural networks as gaussian processes (2018), arXiv:1711.00165 [stat.ML]. [49] A. G. de G. Matthews, M. Rowland, J. Hron, R. E. Turner, and Z. Ghahramani, Gaussian process behaviour in wide deep neural networks (2018), arXiv:1804.11271 [stat.ML]. [50] S. A. Sundberg and R. J. Furnstahl, J. Phys. G 52 ,115106 (2025), arXiv:2508.01001 [nucl-th]. [51] C. Drischler, R. J. Furnstahl, J. A. Melendez, and D. R. Phillips, Phys. Rev. Lett. 125 , 202702 (2020), arXiv:2004.07232 [nucl-th]. 27 0.04 0.05 0.07 0.08 0.10 0.11 0.12 0.14 0.15 
+
+n [fm −3]
+
+0.005 0.010 0.015 0.020 0.025 0.030 0.035 0.040 0.045 0.050 0.055 0.060 
+
+> x [—]
+
+Interaction 
+
+> (1.8/2.0) (2.0/2.5) (2.0/2.0)*
+> Meta-model Smooth Spline
+
+FIG. 12. Same as Fig. 7 but for the single RBF kernel. [52] C. Drischler, J. A. Melendez, R. J. Furnstahl, and D. R. Phillips, Phys. Rev. C 102 , 054315 (2020), arXiv:2004.07805 [nucl-th]. [53] I. Svensson, A. Tichai, K. Hebeler, and A. Schwenk, Phys. Rev. C 113 , 024303 (2026), arXiv:2507.09079 [nucl-th]. [54] H. G¨ ottling, L. Hoff, K. Hebeler, and A. Schwenk, Phys. Rev. C 113 , 055804 (2026), arXiv:2512.19593. [55] A. C. Semposki, C. Drischler, R. J. Furnstahl, J. A. Melendez, and D. R. Phillips, Phys. Rev. C 111 , 035804 (2025), arXiv:2404.06323 [nucl-th]. [56] A. C. Semposki, C. Drischler, R. J. Furnstahl, and D. R. Phillips, Phys. Rev. C 113 , 015808 (2026), arXiv:2505.18921 [nucl-th]. [57] T. Gorda, O. Komoltsev, A. Kurkela, and J. Schaffner-Bielich, (2026), arXiv:2606.23929. [58] I. Legred and N. Yunes, (2026), arXiv:2603.26973. [59] E. Finch, I. Legred, K. Chatziioannou, R. Essick, S. Han, and P. Landry, Phys. Rev. D 112 , 103023 (2025), arXiv:2505.13691. [60] T. Gorda, O. Komoltsev, A. Kurkela, and E. Sunde, Astrophys. J. 1002 , 40 (2026), arXiv:2512.18044 [astro-ph.HE]. [61] I. Legred, L. Brodie, A. Haber, R. Essick, and K. Chatzi-ioannou, (2025), arXiv:2505.07677. [62] S. Ng, I. Legred, L. Suleiman, P. Landry, L. Traylor, and J. Read, Class. Quant. Grav. 42 , 205008 (2025), arXiv:2507.03232. [63] J. Golomb, I. Legred, K. Chatziioannou, A. Abac, and T. Dietrich, Phys. Rev. D 110 , 063014 (2024), arXiv:2403.07697. [64] R. Essick, I. Legred, K. Chatziioannou, S. Han, and P. Landry, Phys. Rev. D 108 , 043013 (2023), arXiv:2305.07411. [65] I. Legred, B. O. Sy-Garcia, K. Chatziioannou, and R. Es-sick, Phys. Rev. D 109 , 023020 (2024), arXiv:2310.10854. [66] I. Legred, K. Chatziioannou, R. Essick, S. Han, and P. Landry, Phys. Rev. D 104 , 063003 (2021), arXiv:2106.05313. [67] P. Landry and R. Essick, Phys. Rev. D 99 , 084049 (2019), arXiv:1811.12529. [68] D. Duvenaud, Automatic model construction with Gaus-sian processes , Ph.D. thesis, Apollo - University of Cam-bridge Repository. [69] D. Mroczek, M. C. Miller, J. Noronha-Hostler, and N. Yunes, Phys. Rev. D 110 , 123009 (2024), arXiv:2309.02345 [astro-ph.HE]. [70] J. Bradbury, R. Frostig, P. Hawkins, M. J. Johnson, C. Leary, S. Kind, L. Martens, A. Passos, S. Gross, S. Saxena, V. Saladi, J. Lim, M. van den Bosch, J. Burnim, and A. Paszke, JAX: Composable transfor-mations of Python+NumPy programs (2018). [71] M. Chilenski, M. Greenwald, Y. Marzouk, N. Howard, A. White, J. Rice, and J. Walk, Nucl. Fusion 55 , 023012 (2015). [72] J. Piekarewicz and M. Centelles, Phys. Rev. C 79 , 054311 (2009), arXiv:0812.4499. [73] J. Piekarewicz, J. Phys. G 37 , 064038 (2010), arXiv:0912.5103. [74] J. A. Melendez, R. J. Furnstahl, D. R. Phillips, M. T. Pratola, and S. Wesolowski, Phys. Rev. C 100 , 044001 (2019), arXiv:1904.10581. [75] M. G. Genton, J. Mach. Learn. Res. 2, 299–312 (2002). [76] W. Herlands, A. Wilson, H. Nickisch, S. Flaxman, D. Neill, W. van Panhuis, and E. Xing, arXiv e-prints , arXiv:1511.04408 (2015), arXiv:1511.04408. [77] A. G. Wilson, D. A. Knowles, and Z. Ghahramani, arXiv:1110.4411 (2011). [78] F. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O. Grisel, M. Blondel, P. Prettenhofer, R. Weiss, V. Dubourg, J. Vanderplas, A. Passos, D. Cour-napeau, M. Brucher, M. Perrot, and E. Duchesnay, J. Mach. Learn. Res. 12 , 2825–2830 (2011). [79] DeepMind, I. Babuschkin, K. Baumli, A. Bell, S. Bhu-patiraju, J. Bruce, P. Buchlovsky, D. Budden, T. Cai, A. Clark, I. Danihelka, A. Dedieu, C. Fantacci, J. God-win, C. Jones, R. Hemsley, T. Hennigan, M. Hes-sel, S. Hou, S. Kapturowski, T. Keck, I. Kemaev, M. King, M. Kunesch, L. Martens, H. Merzic, V. Miku-lik, T. Norman, G. Papamakarios, J. Quan, R. Ring, F. Ruiz, A. Sanchez, L. Sartran, R. Schneider, E. Sezener, S. Spencer, S. Srinivasan, M. Stanojevi´ c, W. Stokowiec, L. Wang, G. Zhou, and F. Viola, The DeepMind JAX Ecosystem (2020). [80] Y. G. Lee, Quantifying Correlated Uncertainties in Mi-croscopic Nuclear Equation of State Calculations with Gaussian Processes , Ph.D. dissertation, Ohio University, Athens, OH, USA (2026), in prep. [81] K. Hebeler, Phys. Rept. 890 , 1 (2021), arXiv:2002.09548 [nucl-th]. [82] J. Simonis, S. R. Stroberg, K. Hebeler, J. D. Holt, and A. Schwenk, Phys. Rev. C 96 , 014303 (2017), arXiv:1704.02915. [83] S. Stroberg, J. Holt, A. Schwenk, and J. Simonis, Phys. Rev. Lett. 126 , 022501 (2021), arXiv:1905.10475 [nucl-th]. [84] T. Miyagi, S. R. Stroberg, P. Navr´ atil, K. Hebeler, and J. D. Holt, Phys. Rev. C 105 , 014302 (2022), arXiv:2104.04688. 28 ncc = 0 .080 +0.036 
+
+> −0.021
+> 0.025 0.030 0.035 0.040
+> xcc
+
+xcc = 0 .0313 +0.0093 
+
+> −0.0063
+> 5.66.06.46.87.2
+> E/Acc
+
+E/Acc = 6 .65 +0.66 
+
+> −0.57
+> 0.30 0.45 0.60 0.75
+> pcc
+
+pcc = 0 .418 +0.330 
+
+> −0.143
+> 0.0075 0.0100 0.0125 0.0150 0.0175
+> c2
+> s cc
+
+c2 
+
+> s cc
+
+= 0 .0116 +0.0039 
+
+> −0.0021
+> 28 32 36 40
+> Sv
+
+Sv = 32 .8+7.5
+
+> −5.1
+> 40 50 60 70
+> L
+
+L = 51 .0+18 .1
+
+> −11 .4
+> 0.06 0.08 0.10 0.12
+
+## ncc 
+
+> −750
+> −600
+> −450
+> −300
+> −150
+> Kτ
+> 0.025 0.030 0.035 0.040
+
+## xcc 
+
+> 5.66.06.46.87.2
+
+## E/Acc 
+
+> 0.30 0.45 0.60 0.75
+
+## pcc 
+
+> 0.0075 0.0100 0.0125 0.0150 0.0175
+
+## c2
+
+s cc 
+
+> 28 32 36 40
+
+## Sv
+
+> 40 50 60 70
+
+## L
+
+> −750
+> −600
+> −450
+> −300
+> −150
+
+## KτKτ = −432 +214 
+
+> −336
+
+## Interaction (1.8/2.0) (2.0/2.0) (2.0/2.5) (2.2/2.0) (2.8/2.0) (2.0/2.0)* Interaction (1.8/2.0) (2.0/2.0) (2.0/2.5) (2.2/2.0) (2.8/2.0) (2.0/2.0)* Meta-model Smooth Spline 
+
+FIG. 13. Same as Fig. 8 but for the single RBF kernel. 29 
+
+[85] P. Arthuis, K. Hebeler, and A. Schwenk, (2024), arXiv:2401.06675. [86] F. Bonaiti, G. Hagen, and T. Papenbrock, (2025), arXiv:2508.14217 [nucl-th]. [87] K. Hebeler, S. K. Bogner, R. J. Furnstahl, A. Nogga, and A. Schwenk, Phys. Rev. C 83 , 031301(R) (2011), arXiv:1012.3381. [88] J. M. Maldonado, C. Drischler, R. J. Furnstahl, and P. Mlinari´ c, Phys. Rev. C 112 , 024002 (2025), arXiv:2504.06092. [89] H. D. Patterson and R. Thompson, Biometrika 58 , 545 (1971). [90] D. A. Harville, Journal of the American Statistical As-sociation 72 , 320 (1977). [91] D. A. Harville, Biometrika 61 , 383 (1974). [92] X. Roca-Maza and N. Paar, Prog. Part. Nucl. Phys. 101 ,96 (2018), arXiv:1804.06256. [93] T. Li, U. Garg, Y. Liu, R. Marks, B. K. Nayak, P. V. M. Rao, M. Fujiwara, H. Hashimoto, K. Kawase, K. Nakan-ishi, S. Okumura, M. Yosoi, M. Itoh, M. Ichikawa, R. Matsuo, T. Terazono, M. Uchida, T. Kawabata, H. Akimune, Y. Iwao, T. Murakami, H. Sakaguchi, S. Terashima, Y. Yasuda, J. Zenihiro, and M. N. Harakeh, Phys. Rev. Lett. 99 , 162503 (2007), arXiv:0709.0567. [94] T. Li et al. , Phys. Rev. C 81 , 034309 (2010), arXiv:1002.0896. [95] D. Patel, U. Garg, M. Fujiwara, H. Akimune, G. Berg, M. Harakeh, M. Itoh, T. Kawabata, K. Kawase, B. Nayak, T. Ohta, H. Ouchi, J. Piekarewicz, M. Uchida, H. Yoshida, and M. Yosoi, Phys. Lett. B 718 , 447 (2012), arXiv:1209.0681. [96] J. R. Stone, N. J. Stone, and S. A. Moszkowski, Phys. Rev. C 89 , 044316 (2014), arXiv:1404.0744. [97] D. N. Basu, P. Roy Chowdhury, and C. Samanta, Phys. Rev. C 80 , 057304 (2009), arXiv:0907.5350. [98] F. Bonaiti, A. Porro, S. Bacca, A. Schwenk, and A. Tichai, Phys. Rev. C 113 , 024333 (2026), arXiv:2511.15836. [99] N. Kaiser, Phys. Rev. C 91 , 065201 (2015), arXiv:1504.00604. [100] P. Virtanen, R. Gommers, T. E. Oliphant, M. Haber-land, T. Reddy, D. Cournapeau, E. Burovski, P. Pe-terson, W. Weckesser, J. Bright, S. J. van der Walt, M. Brett, J. Wilson, K. J. Millman, N. Mayorov, A. R. J. Nelson, E. Jones, R. Kern, E. Larson, C. J. Carey, ˙I. Po-lat, Y. Feng, E. W. Moore, J. VanderPlas, D. Laxalde, J. Perktold, R. Cimrman, I. Henriksen, E. A. Quintero, C. R. Harris, A. M. Archibald, A. H. Ribeiro, F. Pe-dregosa, P. van Mulbregt, and SciPy 1.0 Contributors, Nature Methods 17 , 261 (2020). [101] D. Ravenhall, C. Pethick, and J. Wilson, Physical Review Letters 50 , 2066 (1983). [102] N. Chamel and P. Haensel, Living Reviews in relativity 
+
+11 , 1 (2008). [103] G. Grams, J. Margueron, R. Somasundaram, and S. Reddy, Few Body Syst. 62 , 116 (2021), arXiv:2109.11857. [104] T. Carreau, F. Gulminelli, and J. Margueron, Eur. Phys. J. A 55 , 188 (2019), arXiv:1902.07032. [105] Y. Lim and J. W. Holt, Phys. Rev. C 95 , 065805 (2017), arXiv:1702.02898. [106] I. Tews, Phys. Rev. C 95 , 015803 (2017), arXiv:1607.06998. [107] B. Link, R. I. Epstein, and J. M. Lattimer, Physical Review Letters 83 , 3362 (1999). [108] J. M. Lattimer and M. Prakash, Physics reports 442 ,109 (2007). [109] J. W. Gibbs, American Journal of Science s3-16 , 441 (1878). [110] S. Kubis, Physical Review C—Nuclear Physics 76 ,025801 (2007). [111] A. Kunjipurayil and J. Piekarewicz, (2026), arXiv:2606.10090. [112] C. Ducoin, P. Chomaz, and F. Gulminelli, Nuclear Physics A 789 , 403 (2007). [113] J. Xu, L.-W. Chen, B.-A. Li, and H.-R. Ma, Phys. Rev. C 79 , 035802 (2009), arXiv:0807.4477. [114] C. Ducoin, J. Margueron, C. Providˆ encia, and I. Vidana, Physical Review C—Nuclear Physics 83 , 045810 (2011). [115] J. Xu, L.-W. Chen, B.-A. Li, and H.-R. Ma, Astrophys. J. 697 , 1549 (2009), arXiv:0901.2309. [116] C. Ducoin, J. Margueron, and C. Providencia, EPL (Europhysics Letters) 91 , 32001 (2010). [117] T. Carreau, F. Gulminelli, and J. Margueron, The Euro-pean Physical Journal A 55 , 188 (2019). [118] B.-A. Li and M. Magno, Physical Review C 102 , 045807 (2020). [119] B. A. Brown et al. , J. Phys. G 52 , 050501 (2025), arXiv:2410.06144. [120] R. Somasundaram, C. L. Armstrong, P. Giuliani, K. God-bey, S. Gandolfi, and I. Tews, Phys. Lett. B 866 , 139558 (2025), arXiv:2404.11566 [nucl-th]. [121] C. L. Armstrong, P. Giuliani, K. Godbey, R. Somasun-daram, and I. Tews, Phys. Rev. Lett. 135 , 142501 (2025), arXiv:2502.03680 [nucl-th]. [122] R. Curry, K. Hebeler, S. Gandolfi, A. Gezerlis, A. Schwenk, R. Somasundaram, and I. Tews, (2025), arXiv:2510.15860. [123] P. Cook, K. Yu, C. Drischler, and S. K. Bogner, (2026), arXiv:2607.19773. [124] T. H¨ uther, K. Vobig, K. Hebeler, R. Machleidt, and R. Roth, Phys. Lett. B 808 , 135651 (2020), arXiv:1911.04955. [125] P. Reinert, H. Krebs, and E. Epelbaum, Eur. Phys. J. A 
+
+54 , 86 (2018), arXiv:1711.08821. [126] E. Epelbaum, H. Krebs, and P. Reinert, Semi-local Nu-clear Forces From Chiral EFT: State-of-the-Art and Challenges, in Handbook of Nuclear Physics , edited by I. Tanihata, H. Toki, and T. Kajino (Springer Singapore, 2022) pp. 1–25, arXiv:2206.07072 [nucl-th]. [127] M. Piarulli and I. Tews, Front. in Phys. 7, 245 (2020), arXiv:2002.00032 [nucl-th]. [128] W. G. Jiang, A. Ekstr¨ om, C. Forss´ en, G. Hagen, G. R. Jansen, and T. Papenbrock, Phys. Rev. C 102 , 054301 (2020), arXiv:2006.16774 [nucl-th]. [129] Y. Nosyk, D. R. Entem, and R. Machleidt, Phys. Rev. C 104 , 054001 (2021), arXiv:2107.06452 [nucl-th]. [130] C. Drischler, A. Carbone, K. Hebeler, and A. Schwenk, Phys. Rev. C 94 , 054307 (2016), arXiv:1608.05615. [131] F. Marino, W. Jiang, and S. J. Novario, Phys. Rev. C 
+
+110 , 054322 (2024), arXiv:2407.17098 [nucl-th]. [132] BUQEYE collaboration, (2022), https://buqeye. github.io/software/ .[133] Los Alamos National Laboratory (LANL), dfdjaxGP: JAX-based Gaussian Process tools for DFD applications, 
+
+https://github.com/lanl/dfdjaxGP (2023), GitHub repository, accessed: 2026-03-20. 30 
+
+[134] N3AS Collab. (2024) https://n3as.berkeley.edu/ .[135] D. Foreman-Mackey, The Journal of Open Source Soft-ware 1, 24 (2016). [136] T. Kluyver, B. Ragan-Kelley, F. P´ erez, B. Granger, M. Bussonnier, J. Frederic, K. Kelley, J. Hamrick, J. Grout, S. Corlay, P. Ivanov, D. Avila, S. Abdalla, C. Willing, and J. development team, in Positioning and Power in Academic Publishing: Players, Agents and Agendas , edited by F. Loizides and B. Scmidt (IOS Press, Netherlands, 2016) pp. 87–90. [137] J. D. Hunter, Computing in Science & Engineering 9,90 (2007). [138] F. van Breugel, Y. Liu, B. W. Brunton, and J. N. Kutz, PyNumDiff: A python package for numerical differentia-tion of noisy time-series data (2022), version 0.1.2.4. [139] C. R. Harris, K. J. Millman, S. J. van der Walt, R. Gom-mers, P. Virtanen, D. Cournapeau, E. Wieser, J. Taylor, S. Berg, N. J. Smith, R. Kern, M. Picus, S. Hoyer, M. H. van Kerkwijk, M. Brett, A. Haldane, J. F. del R´ ıo, M. Wiebe, P. Peterson, P. G´ erard-Marchant, K. Shep-pard, T. Reddy, W. Weckesser, H. Abbasi, C. Gohlke, and T. E. Oliphant, Nature 585 , 357 (2020). [140] S. Ambikasaran, D. Foreman-Mackey, L. Greengard, D. W. Hogg, and M. O’Neil, IEEE Transactions on Pat-tern Analysis and Machine Intelligence 38 , 252 (2015), arXiv:1403.6015. [141] A. G. d. G. Matthews, M. van der Wilk, T. Nickson, K. Fujii, A. Boukouvalas, P. Le´ on-Villagr´ a, Z. Ghahra-mani, and J. Hensman, Journal of Machine Learning Research 18 , 1 (2017). [142] M. van der Wilk, V. Dutordoir, S. John, A. Artemev, V. Adam, and J. Hensman, arXiv:2003.01115 (2020). [143] T. Pinder and D. Dodd, Journal of Open Source Software 
+
+7, 4455 (2022). [144] The GPy authors, GPy: A Gaussian process frame-work in Python, http://github.com/SheffieldML/GPy 
+
+(2012). [145] J. R. Gardner, G. Pleiss, D. Bindel, K. Q. Weinberger, and A. G. Wilson, arXiv:1809.11165 (2018). [146] M. Binois and R. B. Gramacy, Journal of Statistical Software 98 , 1–44 (2021). [147] A. Muyskens, B. Priest, I. Goumiri, and M. Schneider, arXiv:2104.14581 (2021).

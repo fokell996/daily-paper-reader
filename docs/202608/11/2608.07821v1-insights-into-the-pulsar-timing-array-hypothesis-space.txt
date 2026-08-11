@@ -1,0 +1,1102 @@
+Title: Insights into the Pulsar Timing Array hypothesis space
+
+URL Source: https://arxiv.org/pdf/2608.07821v1
+
+Published Time: Tue, 11 Aug 2026 00:25:12 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+Insights into the Pulsar Timing Array hypothesis space 
+
+El Mehdi Zahraoui 1 , Patricio Maturana-Russel 1,2 , Willem van Straten 3 , Renate Meyer 2 , and Sergei Gulyaev 1
+
+> 1
+
+Department of Mathematical Sciences, Auckland University of Technology, Private Bag 92006, Auckland 1142, New Zealand 
+
+> 2
+
+Department of Statistics, University of Auckland, 38 Princes St, Auckland, New Zealand and 
+
+> 3
+
+Manly Astrophysics, 15/41-42 East Esplanade, Manly, NSW 2095, Australia 
+
+(Dated: August 11, 2026) We present novel insights into the pulsar-noise model space in pulsar timing array (PTA) exper-iments. Through a comparative analysis of the same Parkes PTA second data release observations processed with the 2020 and 2023 pipelines, we show that data processing materially changes the distribution of posterior support across competing noise hypotheses and increases sensitivity to weak contributions such as the solar wind. A solar-wind component appears in the highest-posterior hy-pothesis for ten pulsars under the 2023 pipeline, against four under the 2020 pipeline, while the corresponding mean electron density estimates are consistent with PPTA DR3 results. Further-more, hypothesis-space analysis exposes model competition and degeneracies that are hidden by single-model summaries. Approximately 75% of the pulsars retain substantial posterior support for alternative noise descriptions. Therefore, understanding the nature of the pulsar noise hypothesis space is crucial for robust inference and nanohertz gravitational-wave background searches. 
+
+I. INTRODUCTION 
+
+Pulsar timing arrays (PTAs) were conceived as Galactic-scale detectors of gravitational waves (GWs) in the nanohertz frequency band [1, 2]. By monitoring the pulse times of arrival from an ensemble of exception-ally stable millisecond pulsars (MSPs), PTAs search for the characteristic quadrupolar angular correlations in-duced by an isotropic stochastic gravitational-wave back-ground (GWB) in the pulsar timing residuals [3]. Over the past several decades, major collaborations including the North American Nanohertz Observatory for Gravi-tational Waves [NANOGrav; 4], the Parkes Pulsar Tim-ing Array [PPTA; 5], the European Pulsar Timing Array [EPTA; 6], the Indian Pulsar Timing Array [InPTA; 7], the MeerKAT Pulsar Timing Array [MeerKAT PTA; 8], and the Chinese Pulsar Timing Array [CPTA; 9], have assembled increasingly longer and more precise pulsar-timing data sets. Through Bayesian analyses, recent data releases have provided strong evidence for a common red noise spec-trum process, with several analyses also reporting inter-pulsar spatial correlations consistent with those expected from a GWB [10–14]. However, the timing residuals en-tering these analyses are themselves products of calibra-tion, radio-frequency-interference excision, frequency av-eraging, pulse-profile template construction, and time-of-arrival estimation [13]. These processing choices are not statistically neutral: improved instrumental calibra-tion and template matching can reduce apparent white noise and alter the inferred properties of red noise [15], while inadequately modelled frequency-dependent profile evolution and shape variability can bias measured arrival times [16, 17]. Because the adopted single-pulsar noise models can affect the inferred properties of a common red-spectrum process [10], processing-induced changes in the timing residuals may propagate into PTA-wide gravitational-wave conclusions. Bayesian inference has become a central component of PTA data analysis [18–20]. It is widely used both to characterize stochastic processes affecting individual MSPs [11–13, 21, 22] and to perform joint searches for a common GWB signal [10, 11, 23]. A robust assessment of the evidence for a GWB requires careful treatment of the stochastic processes that can affect PTA sensitivity [24]. These include intrinsic pulsar spin noise, commonly re-ferred to as red noise (RN), variations in the interstellar dispersion measure (DM), and dispersive contributions from the solar wind (SW) [21, 24, 25]. Different combi-nations and parameterizations of these components give rise to a large discrete space of candidate noise models. Consequently, several studies have used Bayesian model comparison to identify preferred noise descriptions for in-dividual pulsars and PTA data sets [21, 26–28]. To navigate this large model space, PTA analy-ses have increasingly adopted model-index and trans-dimensional sampling methods. Product-space sampling, often referred to in PTA analyses as the hypermodel ap-proach, embeds a collection of candidate models within a common augmented parameter space and introduces a discrete model-index parameter that determines which model is active [29–31]. More recently, inference frame-works such as tPTAbilby have introduced binary indi-cator variables for candidate stochastic processes, allow-ing the number and combination of active noise compo-nents to be inferred directly from the data [32]. These approaches permit parameter estimation and Bayesian model selection to be performed simultaneously within a single sampling run, while naturally incorporating the Bayesian penalty for unnecessary model complexity. Pro-vided that the sampler mixes efficiently between models, posterior model probabilities can be estimated from their relative occupancy fractions, and Bayes factors can be obtained from ratios of these probabilities if the models are assumed apriori equally probable [31, 32]. Recent advances in PTA marginal-likelihood estima-tion, including generalized steppingstone sampling (GSS) [33] and MorphZ [34], have substantially improved the arXiv:2608.07821v1 [astro-ph.HE] 7 Aug 2026 2feasibility of estimating marginal likelihoods and, in turn, posterior model probabilities. Unlike product-space and trans-dimensional methods, which estimate model prob-abilities from the posterior occupancy of competing con-figurations [29, 32], these approaches evaluate the evi-dence for each model independently allowing a direct es-timation of posterior model probabilities and Bayes fac-tors [35]. This enables parallel computation and model-specific convergence checks, and allows evidences to be reused when the candidate set or model priors change. Moreover, their efficiency extends to high-dimensional PTA models, including searches for common processes [33, 34]. Here, we use MorphZ to compare a fixed set of pulsar-noise models across the original PPTA DR2 [36] and its 2023 DR3 reprocessing [37]. By examining the posterior model probabilities, we identify competing hypotheses, parameter degeneracies, and cases where the data can-not clearly distinguish between different combination of noise components. We then assess how changes in cali-bration, radio-frequency-interference mitigation, time-of-arrival estimation, and observing-system treatment af-fect inferred model preferences. This comparison reveals which noise-model conclusions are robust to reprocessing and which depend sensitively on the construction of the timing data set. This paper is organized as follows. Section II intro-duces the Bayesian model comparison framework and defines the posterior model probabilities used through-out the analysis. Section III describes the original and reprocessed PPTA DR2 data sets. Section IV presents the pulsar-noise models, prior choices, and marginal-likelihood calculations. Section V compares the resulting model spaces and examines the impact of data repro-cessing on noise-model preferences. Finally, Section VI summarizes the main findings and their implications for PTA gravitational-wave searches.  
+
+> II. BAYESIAN INFERENCE
+
+For a dataset D and a finite set of K competing hy-potheses H = {H1, . . . , H K }, the posterior probability of hypothesis Hi is given by 
+
+p(Hi | D, H) = p(D | Hi) p(Hi | H )
+
+> K
+
+X
+
+> j=1
+
+p(D | Hj ) p(Hj | H )
+
+, (1) where p(Hi | H ) is the prior probability assigned to Hi,and 
+
+Zi ≡ p(D | Hi) = 
+
+Z
+
+> Θ
+
+p(D | θi, H i) p(θi | Hi) d θi, (2) where θi ∈ Θi is the parameter vector for model Hi, is its marginal likelihood, or evidence. The denominator of TABLE I: Priors definition of the noise components used in the noise models for the PTA DR2 analysis.                             
+
+> Noise component Parameters Priors
+> WN EFAC U(0 .01 ,10) EQUAD log 10 U(10 −9,10 −5)ECORR log 10 U(10 −9,10 −2)RN ARN log 10 U(10 −20 ,10 −11 )
+> γRN U(0 ,7) DMv ADMv log 10 U(10 −20 ,10 −11 )
+> γDMv U(0 ,7) SW
+> nearth U(0 ,30)
+> ASW log 10 U(10 −11 ,10 1)
+> γSW U(−2,−1)
+
+Eq. (1), 
+
+p(D | H ) = 
+
+> K
+
+X
+
+> j=1
+
+Zj p(Hj | H ), (3) is the model space normalizing constant. Because each fixed-model evidence Zj is estimated separately, this nor-malizing constant is obtained without additional compu-tation, enabling the estimation of posterior model prob-abilities. The model priors p(Hi | H ) may represent different expectations about the occurrence of intrinsic red noise, dispersion-measure variations, solar-wind variations, or additional white-noise components. Uniform model pri-ors assign equal prior support to every candidate model, whereas informed priors can favor simpler models or in-crease the prior probability of physically motivated noise components. Posterior model probabilities may therefore be recomputed under different model-prior choices with-out extra sampling cost, provided that p(D | θi, H i) and 
+
+p(θi | Hi) remain unchanged.  
+
+> III. DATA
+
+In this study, we analyze two instances of the Parkes Pulsar Timing Array (PPTA) second data release to as-sess the sensitivity of single-pulsar noise models to data processing choices prerequisite to the Bayesian analysis phase. The first is the original PPTA-DR2 [38], as used in the timing analysis of [36]. The second is the repro-cessed version of the same observations, produced as part of the PPTA third data release [13]. Both datasets share a common set of 25 millisecond pulsars observed with the 64-m Parkes radio telescope. The original DR2 provides sub-banded arrival times derived from calibrated pulse profiles with 32 frequency channels per observation, dynamically sub-banded to maintain a minimum signal-to-noise ratio [38]. Times 30.0 0.2 0.4 0.6 0.8 1.0             
+
+> ptop (PPTA DR2 2020 pipeline)
+> J0613-0200 J0711-6830 J1017-7156 J1022+1001 J1024-0719 J1045-4509 J1125-6014 J1446-4701 J1600-3053 J1603-7202 J1643-1224 J1713+0747 J1730-2304 J1744-1134 J1824-2452A J1832-0836 J1857+0943 J1909-3744 J1939+2134 J2124-3358 J2129-5721 J2145-0750
+> RN RN+DMv RN RN+DMv+SW DMv EQ+RN DMv DMv DMv DMv RN+DMv RN+DMv DMv RN+DMv+SW RN+DMv EQ+DMv RN+DMv RN+DMv+SW EQ+RN+DMv EQ+RN+DMv EQ+DMv DMv+SW
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> ptop (PPTA DR2 2023 pipeline)
+> RN RN+DMv EQ+RN+DMv RN+DMv+SW DMv RN DMv DMv DMv+SW DMv RN+DMv+SW RN+DMv+SW DMv+SW RN+DMv+SW RN+DMv+SW EQ+DMv RN+DMv EQ+RN+DMv+SW EQ+RN+DMv RN+SW DMv RN+DMv+SW
+> Decisive ( ptop 0.7) Competitive (0.35 ptop < 0.7) Diffuse ( ptop < 0.35) Class transition
+
+FIG. 1: Summary of the model space for 22 pulsars noise analysis. For each pulsar, the model with the highest posterior probability ptop is shown for both the 2020 DR2 (left) and 2023 DR2 (right) pipelines. Bars are colour-coded by class: decisive ( ptop ≥ 0.7; cyan), competitive (0 .35 ≤ ptop < 0.7; light orange), and diffuse (ptop < 0.35; light grey). Abbreviated top models are annotated; EF and EC are present in every ptop model and omitted for clarity. Stars mark pulsars that change classes between datasets. of arrival (ToAs) were obtained by cross-correlating pro-files against band-specific analytic templates. The tim-ing models and noise characterization are described in [36] and [21], respectively. The data are referred to the TT(BIPM2018) timescale and the JPL DE436 solar sys-tem ephemeris. The reprocessed DR2 was produced to enable consis-tent combination with new ultra-wide-bandwidth (UWL) receiver observations [37]. The reprocessing involved sev-eral changes, including improved radio-frequency inter-ference excision using MeerGuard [39], reduction to four frequency channels per band, new ToA templates de-rived from UWL wide-band pulse portraits [40], Fourier-domain Monte Carlo ToA estimation via pat [41], up-dated dispersion measure values and timing ephemerides, and adoption of the TT(BIPM2020) reference timescale. Additional frequency-dependent (FD) parameters were also required to absorb residual profile-evolution system-atics introduced by the wide-band portrait templates. The full details of these changes are described in the DR3 release paper [13]. In this work, we restrict our analysis to the 22 pulsars common to both datasets, enabling a direct comparison of the inferred noise models. 
+
+IV. ANALYSIS 
+
+In the following, we refer to the different hypotheses as noise models. We construct the noise models using 
+
+Enterprise [30, 42] via Enterprise Warp 1. Posteri-ors are sampled with emcee [43] and cross-checked with 
+
+PocoMC [44, 45]; all marginal likelihoods are estimated with MorphZ [34]. The posterior model probabilities are computed directly using these marginal likelihood es-timates and a custom prior model probabilities. We adopt the following notation: EF for EFAC (error scale factor), EQ for EQUAD (error added in quadra-ture), and EC for ECORR (extra correlated noise) as the white-noise parameters; and RN, DM v, and SW for achromatic red noise, dispersion-measure variations, and solar-wind variations, respectively[21]. Each stochastic process (SP) is modeled as a power law with two free parameters: the log-amplitude log 10 ASP and a spectral index γSP . We use a SW model which includes an addi-tional parameter: nearth the mean free electron density  
+
+> 1
+
+Enterprise Warp : https://enterprise-warp.readthedocs. io/ 4at 1 AU [10, 25, 46]. Table I shows the prior distribution used for each noise component parameters. For each pulsar and dataset, we evaluate K=13 can-didate noise models after excluding white-noise only models. These excluded models have a zero pos-terior model probabilities for every pulsar in both datasets, due to a presence of excess noise in the dataset. These models span different combina-tions of EQ, EC, RN, and DMv. For the so-lar wind, we present only the four following models: EC+RN+SW, EC+DMv+SW, EC+RN+DMv+SW, and EQ+EC+RN+DMv+SW. These models are added to determine if the solar wind contribution is present in the dataset. For each pulsar, the thirteen models are shown in Figure 2 and in the appendix A ( Figure 5 and 6), where EF is included in all models and is omitted from abbreviated labels. Deterministic signals and chromatic noise are included as free components for each relevant pulsar, following the description in Goncharov et al. [21]. For each stochastic component, the number of Fourier harmonics is set to 30. Our approach differs from the sequential procedure of Ref. [21], where white-noise parameters are first fixed at their maximum-posterior values before red-noise com-ponents are selected iteratively. Such fixing influences the inference when white-noise and red-noise parameters are covariant [21]. In contrast, we evaluate 13 noise-component combinations simultaneously while keeping the white-noise parameters free, allowing the data rather than the procedure to determine the preferred model.  
+
+> V. RESULTS
+
+We compare the candidate models through their pos-terior model probabilities defined in Eq. (1), assuming uniform prior probabilities over the K = 13 models con-sidered for each pulsar. Throughout this section, the posterior probability of the highest-probability model is denoted by ptop . This quantity provides a compact de-scription of the concentration of the model posterior, but it does not contain all of the information in the model space. In particular, two pulsars with the same value of 
+
+ptop may differ substantially in how the remaining pos-terior probability is distributed among the other models. In the following, a pulsar is labeled decisive when 
+
+ptop ≥ 0.7, competitive when 0 .35 ≤ ptop < 0.7, and 
+
+diffuse when ptop < 0.35. We use this classification, as shown in Figure 1, only as a descriptive summary of the model spaces of these datasets. These arbitrary thresh-olds are not used to accept the highest-probability model or to discard the remaining models. Instead, they distin-guish model spaces dominated by one model from those in which the data retain substantial support for multiple noise descriptions. 
+
+> (a) PSR J1909 −3744
+> (b) PSR J1022+1001
+> (c) PSR J1730 −2304
+
+FIG. 2: Posterior model probabilities for one representative pulsar from each class under the 2020 DR2 (grey) and 2023 DR2 (cyan) pipelines. 
+
+(a) Decisive: one model dominates at ∼ 90%. 
+
+(b) Competitive: two SW-containing models each hold 
+
+∼ 40%. (c) Diffuse: the posterior fragments in 2020 but reorganizes around DMv+SW in 2023.  
+
+> A. Precision of the marginal-likelihood estimates
+
+First, we assess the precision of the marginal-likelihood estimates used to construct the posterior model proba-bilities. Table II summarizes the run-to-run variation 5TABLE II: Summary of the log marginal-likelihood estimates for the DR2 2020 and DR2 2023 datasets. The median and standard deviation of σlog( bz) the standard deviation of 5 × 286 independent evidence estimates. The averaged coefficient of variation CV log( bz)
+
+across these evidence estimates.                   
+
+> Dataset Nlog( bz)med σlog( bz)std σlog( bz)CV log( bz)
+> DR2 2020 1430 0.016 0.091 9.23 ·10 −5
+> DR2 2023 1430 0.013 0.058 1.78 ·10 −4
+
+across five independent calculations for all model–pulsar combinations. For each dataset, the summary contains 1430 log( z) estimates. The median standard deviation across repeated calculations is 0 .016 for the 2020 DR2 analysis and 0 .013 for the 2023 DR2 analysis. The corre-sponding coefficient of variation values are 9 .23 ·10 −5 and 1.78 ·10 −4, respectively, indicating a low variance between the independent runs. The close agreement between inde-pendent runs demonstrates that the marginal-likelihood estimates are numerically stable for both datasets. This stability is essential for the next stage of the analysis, be-cause it allows the uncertainty in the marginal-likelihood estimates to be propagated reliably into the posterior model probabilities shown in the figures. The model probabilities uncertainties (see Figure 2) were obtained by a first-order propagation of the log-evidence uncertainties through the normalized exponen-tial transformation. The log-evidence estimates are as-sumed to be independent, and model-prior probabilities were treated as fixed. Consequently, the uncertainty in each model probability includes contributions from the log-evidence uncertainties of all models entering the nor-malization, as described in Eq. 1. Consequently, the differences observed between competing models and be-tween processing pipelines are not dominated by numer-ical fluctuations in the evidence calculations, but instead reflect genuine changes in the support provided by the data.  
+
+> B. Summary of PPTA DR2 model space
+
+Figure 1 summarizes the model spaces of the 22 pul-sars through ptop and the composition of the highest-probability model. Under the 2020 pipeline, six pulsars are classified as decisive, nine as competitive, and seven as diffuse. Under the 2023 pipeline, the corresponding numbers are five, eight, and nine. Thus, neither dataset generally identifies a unique noise model. The competi-tive and diffuse classes contain the majority of the pulsars under both processing pipelines. Seven pulsars change classification between datasets. These transitions occur in both directions. PSRs J0711 −6830, J1125 −6014, J1857+0943, and J2129 −5721 move from the competitive class in 2020 to the diffuse class in 2023. For these pulsars, the reprocessed data distribute the posterior probability more broadly among the candidate models. PSR J1643 −1224 moves from de-cisive to competitive, because its previously dominant model loses posterior probability to the SW variant mod-els after reprocessing. Conversely, PSRs J1730 −2304 and J2124 −3358 move from diffuse to competitive, showing a concentration of posterior support for multiple SW mod-els in the 2023 analysis. The presence of transitions in both directions shows that improved reprocessing does not make every model posterior more concentrated. Rather, the changes in cal-ibration, interference mitigation, template construction, ToA estimation, and timing-model treatment alter the relative ability of the candidate stochastic processes to describe each pulsar. For some pulsars this resolves part of the model ambiguity, whereas for others it exposes ad-ditional competition that was less apparent in the origi-nal dataset. The most prominent change with the reprocessed data concerns the solar wind contribution. When models dif-fering only in their white-noise components are grouped into the same stochastic process family, the most common highest probability family changes from RN+DMv in the 2020 analysis to RN+DMv+SW in the 2023 analysis. A solar wind component occurs in the highest-probability model for four pulsars under the original pipeline and for ten pulsars under the reprocessed pipeline. The ten pul-sars are PSRs J1022+1001, J1600 −3053, J1643 −1224, J1713+0747, J1730 −2304, J1744 −1134, J1824 −2452A, J1909 −3744, J2124 −3358, and J2145 −0750. For these ten pulsars, Table III reports solar-wind-density esti-mates from the highest-posterior SW-containing model under the 2023 pipeline.  
+
+> C. Classification of PPTA DR2 model spaces
+
+The complete model-posterior distributions in Fig-ures 2, 5, and 6 show that the changes between pipelines take several distinct forms. For some pulsars, the same broad stochastic-process family remains preferred and the posterior concentration changes only moderately. In other cases, posterior support is redistributed among models that contain the same stochastic processes but differ in their white-noise components. A third group ex-hibits a qualitative change in the stochastic-process com-position, most commonly through increased support for models containing SW. Several model spaces remain broad under both pipelines. For example, the model posteriors of PSRs J1024 −0719, J1045 −4509, and J1446 −4701 remain dis-tributed among numerous models rather than becoming dominated by a single configuration. The absence of a decisive model in such cases is itself an inference from the data: several combinations of white noise, RN, and DMv remain plausible within the candidate set. 613.8                  
+
+> 13.7
+> 13.6
+> 13.5
+> log 10  ADMv
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+> 6.4
+> 6.0
+> 5.6
+> 5.2
+> log 10  ASW
+> 1.5 3.0 4.5 6.0 7.5
+> RN
+> 15.5
+> 15.0
+> 14.5
+> 14.0
+> log 10  ARN
+> 0.6 1.2 1.8 2.4 3.0
+> DMv
+> 612 18 24
+> nearth
+> 13.8
+> 13.7
+> 13.6
+> 13.5
+> log 10 ADMv
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+> 6.4
+> 6.0
+> 5.6
+> 5.2
+> log 10 ASW
+> 1.5 3.0 4.5 6.0 7.5
+> RN
+> 15.5
+> 15.0
+> 14.5
+> 14.0
+> log 10 ARN
+> 612 18 24
+> nearth
+> DMv = 1.59 +0.65 0.59
+> log 10 ADMv =13.67 +0.11 0.11
+> SW =1.09 +0.08 0.40
+> log 10 ASW =5.69 +0.28 0.28
+> RN = 3.07 +1.44 0.87
+> log 10 ARN =14.00 +0.24 0.53
+> nearth = 3.81 +0.50 0.51
+
+(a) PSR J1909 −3744 19.5                  
+
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+> log 10  ADMv
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+> 14
+> 12
+> 10
+> 8
+> 6
+> log 10  ASW
+> 2468
+> RN
+> 19.5
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+> log 10  ARN
+> 2468
+> DMv
+> 612 18 24
+> nearth
+> 19.5
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+> log 10 ADMv
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+> 14
+> 12
+> 10
+> 8
+> 6
+> log 10 ASW
+> 2468
+> RN
+> 19.5
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+> log 10 ARN
+> 612 18 24
+> nearth
+> DMv = 1.26 +1.11 0.74
+> log 10 ADMv =13.30 +0.16 0.35
+> SW =3.34 +2.08 1.52
+> log 10 ASW =9.48 +3.66 5.10
+> RN = 4.49 +4.78 3.86
+> log 10 ARN =15.71 +2.15 3.47
+> nearth = 9.71 +1.45 1.70
+
+(b) PSR J1022+1001 16.0 
+
+> 15.2
+> 14.4
+> 13.6
+> log 10  ADMv
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+> 14
+> 12
+> 10
+> 8
+> 6
+> log 10  ASW
+> 2468
+> DMv
+> 2.5 5.0 7.5 10.0
+> nearth
+> 16.0
+> 15.2
+> 14.4
+> 13.6
+
+log 10 ADMv 
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+> 14
+> 12
+> 10
+> 8
+> 6
+
+log 10 ASW 
+
+> 2.5 5.0 7.5 10.0
+
+nearth           
+
+> DMv = 3.17 +2.05 1.03
+> log 10 ADMv =13.74 +0.37 0.86
+> SW =3.10 +1.87 1.75
+> log 10 ASW =8.43 +2.72 5.70
+> nearth = 7.80 +1.59 2.02
+
+(c) PSR J1730 −2304 
+
+FIG. 3: Corner plots of the SP parameters of the highest-posterior 2023 noise model, evaluated using the 2020 DR2 (grey) and the 2023 DR2 (teal) pipelines: (a) PSR J1909 −3744, representing a decisive model space; (b) PSR J1022+1001, representing a competitive space; and (c) PSR J1730 −2304, which transitions from a diffuse to a competitive space. At the opposite extreme, pulsars such as J1713+0747, J1744 −1134, J1909 −3744, and J1939+2134 retain strongly concentrated model posteriors. Nevertheless, concentration of the model posterior does not necessarily imply complete stability under reprocessing. The iden-tity of the preferred white-noise variant or the inclusion of a solar-wind component can change even when ptop 
+
+remains in the decisive range. The three pulsars exam-ined below illustrate the different forms of stability, com-petition, and posterior reorganization visible in the full sample. 
+
+1. A decisive model space: PSR J1909 −3744 
+
+PSR J1909 −3744 provides an example in which the inferred stochastic-process composition is stable while the preferred white-noise description changes. As shown in Figure 2(a), an RN+DMv+SW model family dom-inates the model space under both pipelines. The EC+RN+DMv+SW model carries approximately 92% of the posterior probability in the 2020 analysis, whereas the corresponding model including EQ carries approxi-mately 91% in the 2023 analysis. The change in the highest-probability model is there-fore associated primarily with the additional white-noise component rather than with a change in the inferred set of stochastic processes. This example demonstrates why it is useful to distinguish between the complete noise-model label and the underlying stochastic-process family. At the level of the latter, the model selection is highly stable. The parameter posteriors in Figure 3(a) provide ad-ditional information that is not visible from the model probabilities alone. The RN and DMv parameters are constrained under both pipelines and remain mutually consistent. In contrast, the solar-wind parameters be-comes more informative. In the 2020 analysis, the solar-wind posterior is comparatively broad and largely prior dominated. After reprocessing, the posterior becomes localized, yielding nearth = 3 .81 +0 .50 
+
+−0.51 cm −3. Thus, even though the same stochastic-process family dominates both model spaces, the reprocessed observations provide substantially more information about the solar-wind con-tribution. 
+
+2. A competitive model space: PSR J1022+1001 
+
+PSR J1022+1001 illustrates a different form of model uncertainty. The model posterior is concentrated on four SW models in both datasets Figure 2(b). In the 2020 analysis, EC+RN+DMv+SW and EC+DMv+SW have posterior probabilities of approximately 0 .41 and 0.34, respectively. In the 2023 analysis, the two models become nearly degenerate, each carrying approximately 0.43 of the posterior probability. The remaining support is divided between the EQ+EC+RN+DMv+SW and 7EC+RN+SW models. Within the candidate model set and under the adopted uniform model priors, the solar-wind contribution is robustly supported even though the complete noise model remains uncertain. The unresolved question is whether an additional achromatic RN process is required. Model competition therefore occurs mainly between the RN-containing and RN-free models, rather than between models with and without a DM and SW contributions. This interpretation is consistent with Figure 3(b). The DMv parameters and nearth are well constrained by the reprocessed data, whereas the RN amplitude remains weakly constrained. Consequently, adding RN does not lead to a sufficiently distinct description for the data to select decisively between the two leading models. Con-ditional on the EC+RN+DMv+SW model, the inferred solar-wind density is nearth = 9 .71 +1 .45  
+
+> −1.70
+
+cm −3. This den-sity is consistent with the value obtained from the longer PPTA DR3 dataset [10]. PSR J1022+1001 therefore demonstrates that strong support for an individual phys-ical component can coexist with substantial uncertainty over the complete noise model. 
+
+3. Posterior reorganization: PSR J1730 −2304 
+
+PSR J1730 −2304 illustrates how reprocessing can re-organize a previously diffuse model posterior. Under the 2020 pipeline, the posterior probability is divided among several DMv-containing models, with no model reaching the competitive threshold. The hypothesis space there-fore does not provide a clear preference for a particular combination of DMv, RN, and white-noise components. In the 2023 analysis, the support becomes concen-trated on models containing both DMv and SW. The EC+DMv+SW model carries approximately 60% of the posterior probability, causing the pulsar to move from the diffuse to the competitive class. The posterior does not become fully decisive, because non-negligible probability remains assigned to alternative SW-containing configura-tions. Nevertheless, the reprocessed data identify a much more restricted region of the model space than the orig-inal pipeline. The parameter posterior in Figure 3(c) mirrors this model-level change. When both data sets are evalu-ated under the highest-posterior 2023 model, the solar-wind-density posterior is broad under the 2020 pipeline but becomes substantially more localized under the 2023 pipeline, with nearth = 7 .80 +1 .59  
+
+> −2.02
+
+cm −3. This is consistent with the PPTA DR3 [10] estimate of 7 .5±0.7 cm −3. The agreement indicates that the solar-wind information re-covered in the longer DR3 analysis is already present in the reprocessed DR2 observations. TABLE III: Solar-wind electron density at 1 au, nearth 
+
+(cm −3), nDR2 earth from the highest-posterior SW-containing model under the 2023 DR2 analysis and 
+
+nDR3 earth the PPTA DR3 analysis [10]. Posterior medians and central 68% credible intervals are shown; pulsars are sorted by absolute ecliptic latitude |βe| in degrees. 
+
+Pulsar |βe| nDR2 earth nDR3 earth 
+
+J1022+1001 0.06 9.71 +1 .4 
+
+> −1.7
+
+9.0+0 .6
+
+> −0.6
+
+J1730 −2304 0.19 7.80 +1 .5 
+
+> −2.1
+
+7.5+0 .7
+
+> −0.7
+
+J1824 −2452A 1.55 7.59 +1 .1 
+
+> −1.3
+
+7.9+0 .7
+
+> −0.7
+
+J2145 −0750 5.31 5.31 +2 .1 
+
+> −1.9
+
+5.8+0 .7
+
+> −0.7
+
+J1643 −1224 9.78 4.84 +2 .6 
+
+> −2.3
+
+4.5+1 .5
+
+> −1.5
+
+J1600 −3053 10 .07 4 .34 +1 .8 
+
+> −1.6
+
+3.4+0 .8
+
+> −0.8
+
+J1744 −1134 11 .81 5 .80 +1 .3 
+
+> −1.3
+
+5.1+0 .5
+
+> −0.5
+
+J1909 −3744 15 .16 3 .81 +0 .5 
+
+> −0.5
+
+4.1+0 .4
+
+> −0.4
+
+J2124 −3358 17 .82 8 .21 +4 .2 
+
+> −4.7
+
+6.0+2 .0
+
+> −2.0
+
+J1713+0747 30 .70 4 .55 +1 .7 
+
+> −1.9
+
+4.0+0 .9
+
+> −0.9
+
+D. Solar-wind emergence in PPTA DR2 
+
+Table III compares the 2023 DR2 estimates of nearth 
+
+with those obtained from the full PPTA DR3 dataset [10]. The table contains ten pulsars spanning absolute ecliptic latitudes from 0 .06 ◦ to 30 .70 ◦. For every pulsar, the nearth posterior median inferred from the reprocessed DR2 data is consistent with the corresponding DR3 esti-mate within the reported credible intervals. Figure 4 displays the solar wind agreement between datasets, despite the shorter observing baseline of the DR2 subset and the absence of the UWL observations included in DR3 [10]. The DR2 credible intervals are generally wider, as expected from the reduced data vol-ume, but they are centred on values compatible with the ones from the longer dataset. The comparison therefore shows that the increased support for SW models is not produced solely by the additional years of DR3 observa-tions. Instead, improved processing of the observations already contained in DR2 is sufficient to reveal the solar-wind contribution. The posterior distributions for the seven additional pulsars in Figure 7 support the same interpretation. To-gether with the three representative pulsars in Figure 3, they show that the 2023 analysis generally yields more localized solar-wind-density posteriors than the original pipeline. The improvement is not identical for every pul-sar, and the widths of the distributions continue to de-pend on the available information for each line of sight. Nevertheless, the agreement with the independently ob-tained DR3 values across all ten pulsars establishes the consistency of the recovered signal. 8J1022+1001                  
+
+> |βe| = 0.06 ∘
+> J1730−2304
+> |βe| = 0.19 ∘
+> J1824−2452A
+> |βe| = 1.55 ∘
+> J2145−0750
+> |βe| = 5.31 ∘
+> J1643−1224
+> |βe| = 9.78 ∘
+> J1600−3053
+> |βe| = 10.07 ∘
+> J1744−1134
+> |βe| = 11.81 ∘
+> J1909−3744
+> |βe| = 15.16 ∘
+> J2124−3358
+> |βe| = 17.82 ∘
+> J1713+0747
+> |βe| = 30.70 ∘
+> 0246810 12 14
+> nSW earth  (cm −3 )
+> PPTA DR2 (2023) PPTA DR3 Reference: nearth = 4 cm −3
+
+FIG. 4: Comparison of the inferred solar-wind electron density at Earth, nSW earth , for ten PPTA pulsars in the PPTA DR2 (2023) and PPTA DR3 analyses[10]. The violin profiles show the distributions of nSW earth posterior summaries from Table III, while the markers and vertical bars indicate the posterior medians and central 68% credible intervals. The horizontal dashed line marks the reference value nearth = 4 cm −3. Pulsars are arranged by increasing absolute ecliptic latitude, |βe|, which is reported below each pulsar. 
+
+VI. CONCLUSION 
+
+In this work, we have examined how the processing of a pulsar-timing dataset affects Bayesian noise-model in-ference by comparing the model spaces obtained from two processing versions of the PPTA second data re-lease. For each of 22 pulsars, we evaluated the same set of 13 candidate noise models and used independently estimated marginal likelihoods to construct the complete model posterior. The comparison demonstrates that pre-processing choices can materially alter both the concen-tration and the composition of the inferred noise-model posterior. Seven pulsars change between the decisive, competitive, and diffuse classes. These transitions occur in both directions: for some pulsars, reprocessing con-centrates support on a smaller set of models, whereas for others it distributes the support more broadly. Improved processing therefore does not merely increase the appar-ent decisiveness of model selection. Instead, it changes which distinctions between the candidate stochastic pro-cesses are supported by the observations. The clearest systematic change is the increased pos-terior support of SW-containing models. A solar-wind component appears in the highest-posterior model for ten pulsars in the 2023 analysis, compared with four under the original pipeline. The inferred values of the mean electron density at 1 AU are consistent with the values reported from the longer PPTA DR3 dataset for all ten pulsars [10]. Although the credible intervals from the shorter DR2 baseline are generally wider, their agreement with the DR3 measurements shows that the solar-wind signal is already present in the DR2 observations. The results also illustrate why support for a physical noise component should not be equated with decisive se-lection of a complete model. For J1022+1001, for exam-ple, nearly degenerate models provide strong and stable support for SW while differing over the inclusion of achro-matic RN. Conversely, for J1909 −3744, the stochastic-process family remains stable even though the preferred white-noise extension changes. The full model posterior separates these different forms of uncertainty, whereas a comparison based only on the highest-probability model would obscure them. Most pulsars in both analyses have competitive or dif-fuse hypothesis spaces. Averaging over the two pipelines, approximately 75% of the pulsars are not adequately summarized by a single overwhelmingly preferred noise model. Selecting only the highest-probability model for these pulsars would overstate confidence in a particular noise description and would fail to propagate the uncer-9tainty associated with alternative, data-supported mod-els. This issue is directly relevant to PTA searches for a common red-spectrum process and a gravitational-wave background. Noise components inferred for individual pulsars can be covariant with a common process, and a noise model selected in a preliminary analysis is usu-ally treated as fixed in the subsequent PTA-wide anal-ysis. Uncertainty that is removed at the single-pulsar stage is therefore not automatically recovered later. The single-pulsar noise analysis should instead produce a pos-terior distribution over plausible noise models that can be marginalized over, or otherwise propagated, in the common-process analysis. The numerical model probabilities reported here are conditional on the candidate model space and on the uni-form model priors adopted in this work. The decisive, competitive, and diffuse labels are similarly intended as descriptive categories rather than universal model-selection thresholds. Because the marginal likelihood of each model has been estimated independently, the model posterior can be recomputed under alternative model-prior choices without repeating the parameter-inference calculations. This provides a practical route for examin-ing the sensitivity of downstream conclusions to different physical expectations about the occurrence of RN, DMv, SW, and additional white-noise components. More broadly, this study shows that data processing is a component of the systematic uncertainty budget of Bayesian PTA inference. Hypothesis-space analysis pro-vides a direct means of exposing that uncertainty by re-taining the relative support for every candidate model, identifying degeneracies between noise components, and distinguishing robust component-level conclusions from uncertain complete-model assignments. As described in van Haasteren [47], propagating this information through Bayesian model averaging offers a more principled foun-dation for gravitational-wave inference than conditioning on a single selected noise model. 
+
+> ACKNOWLEDGMENTS
+
+EMZ, PMR, WS, and RM gratefully acknowledge sup-port by the Marsden Fund Council grant MFP-UOA2131 from New Zealand Government funding, managed by the Royal Society Te Ap¯ arangi. We thank the Parkes Pulsar Timing Array collaboration for making their data publicly accessible. This work uses the third data release of the Parkes Pulsar Timing Array [13], available on the CSIRO Data Access Portal [48]. We also thank Boris Goncharov for making the PPTA DR2 noise analysis publicly reproducible (https://github.com/ bvgoncharov/ppta_dr2_noise_analysis ). This work was performed on the OzSTAR national facility at Swin-burne University of Technology. The OzSTAR program receives funding in part from the Astronomy National Collaborative Research Infrastructure Strategy (NCRIS) allocation provided by the Australian Government, and from the Victorian Higher Education State Investment Fund (VHESIF) provided by the Victorian Government. 
+
+Software : ENTERPRISE [30, 42], 
+
+enterprise extension [31, 42, 49], Enterprise Warp , EMCEE [43], PocoMC [45], MorphZ [34], Jupyter [50], 
+
+matplotlib [51], numpy [52], scipy [53], and arviz [54]. 
+
+> Appendix A: Posterior model-probability comparisons
+
+Figures 5 and 6 show the posterior model-probability comparisons under the 2020 DR2 and 2023 DR2 pipelines for the 19 pulsars not displayed in the main text. The notation follows that of the main text. EF is present in every model and is therefore omitted from the abbreviated model labels. EQ, EC, RN, DMv, and SW denote EQUAD, ECORR, achromatic red noise, dispersion-measure variations, and solar-wind variations, respectively. 
+
+> Appendix B: Solar-wind posterior distributions
+
+Figure 7 shows the joint and marginalized posterior distributions for the preferred noise models of seven ad-ditional pulsars whose highest-posterior model under the 2023 pipeline contains a solar-wind component. 10         
+
+> PSR J0613 −0200 PSR J0711 −6830 PSR J1017 −7156
+> PSR J1024 −0719 PSR J1045 −4509 PSR J1125 −6014
+> PSR J1446 −4701 PSR J1600 −3053 PSR J1603 −7202
+> PSR J1643 −1224 PSR J1713+0747 PSR J1744 −1134
+
+FIG. 5: Posterior model probabilities obtained with the 2020 DR2 pipeline (grey) and the 2023 DR2 pipeline (teal) for pulsars not shown in the main text. This Figure shows the first 12 pulsars. 11     
+
+> PSR J1824 −2452A PSR J1832 −0836 PSR J1857+0943
+> PSR J1939+2134 PSR J2124 −3358 PSR J2129 −5721
+> PSR J2145 −0750
+
+FIG. 6: Posterior model probabilities obtained with the 2020 DR2 pipeline (grey) and the 2023 DR2 pipeline (teal) for the remaining seven pulsars not shown in the main text. 12 13.6 
+
+> 13.4
+> 13.2
+> 13.0
+> log 10  ADMv
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+> 14
+> 12
+> 10
+> 8
+> 6
+> log 10  ASW
+> 1.8 2.4 3.0 3.6 4.2
+
+DMv 
+
+> 2468
+> nearth
+> 13.6
+> 13.4
+> 13.2
+> 13.0
+
+log 10 ADMv 
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+
+SW 
+
+> 14
+> 12
+> 10
+> 8
+> 6
+
+log 10 ASW 
+
+> 2468
+
+nearth 
+
+DMv = 2.79 +0.62 0.46 
+
+log 10 ADMv = 13.29 +0.15 0.20 
+
+SW = 3.25 +2.00 1.58 
+
+log 10 ASW = 6.77 +1.31 7.23 
+
+nearth = 4.34 +1.85 1.61 
+
+PSR J1600 −3053 DMv = 1.58 +0.54 0.41 
+
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+> log 10  ADMv
+
+log 10 ADMv = 12.52 +0.08 0.09 
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+
+SW = 3.11 +1.89 1.66 
+
+> 14
+> 12
+> 10
+> 8
+> 6
+> log 10  ASW
+
+log 10 ASW = 10.16 +3.77 4.33 
+
+> 0.6 1.2 1.8 2.4 3.0
+> RN
+
+RN = 1.10 +0.65 0.61 
+
+> 13.0
+> 12.8
+> 12.6
+> 12.4
+> log 10  ARN
+
+log 10 ARN = 12.60 +0.11 0.11 
+
+> 2468
+
+DMv 
+
+> 2.5 5.0 7.5 10.0
+> nearth
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+
+log 10 ADMv 
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+
+SW 
+
+> 14
+> 12
+> 10
+> 8
+> 6
+
+log 10 ASW 
+
+> 0.6 1.2 1.8 2.4 3.0
+
+RN 
+
+> 13.0
+> 12.8
+> 12.6
+> 12.4
+
+log 10 ARN 
+
+> 2.5 5.0 7.5 10.0
+
+nearth 
+
+nearth = 4.84 +2.65 2.38 
+
+DMv = 1.58 +0.54 0.41 
+
+log 10 ADMv = 12.52 +0.08 0.09 
+
+SW = 3.11 +1.89 1.66 
+
+log 10 ASW = 10.16 +3.77 4.33 
+
+RN = 1.10 +0.65 0.61 
+
+log 10 ARN = 12.60 +0.11 0.11 
+
+nearth = 4.84 +2.65 2.38 PSR J1643 −1224 DMv = 1.27 +0.55 0.64 
+
+> 13.95
+> 13.80
+> 13.65
+> 13.50
+> log 10  ADMv
+
+log 10 ADMv = 13.68 +0.13 0.13 
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+
+SW = 2.91 +1.70 1.86 
+
+> 14
+> 12
+> 10
+> 8
+> 6
+> log 10  ASW
+
+log 10 ASW = 6.08 +0.48 7.95 
+
+> 2468
+> RN
+
+RN = 5.82 +3.29 2.55 
+
+> 17
+> 16
+> 15
+> 14
+> log 10  ARN
+
+log 10 ARN = 15.60 +1.29 1.59 
+
+> 0.8 1.6 2.4
+
+DMv 
+
+> 612 18 24
+> nearth
+> 13.95
+> 13.80
+> 13.65
+> 13.50
+
+log 10 ADMv 
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+
+SW 
+
+> 14
+> 12
+> 10
+> 8
+> 6
+
+log 10 ASW 
+
+> 2468
+
+RN 
+
+> 17
+> 16
+> 15
+> 14
+
+log 10 ARN 
+
+> 612 18 24
+
+nearth 
+
+nearth = 4.55 +1.76 1.89 
+
+DMv = 1.27 +0.55 0.64 
+
+log 10 ADMv = 13.68 +0.13 0.13 
+
+SW = 2.91 +1.70 1.86 
+
+log 10 ASW = 6.08 +0.48 7.95 
+
+RN = 5.82 +3.29 2.55 
+
+log 10 ARN = 15.60 +1.29 1.59 
+
+nearth = 4.55 +1.76 1.89 PSR J1713+0747 16.2 
+
+> 15.6
+> 15.0
+> 14.4
+> 13.8
+> log 10  ADMv
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+> 14
+> 12
+> 10
+> 8
+> 6
+> log 10  ASW
+> 2468
+> RN
+> 17
+> 16
+> 15
+> 14
+> log 10  ARN
+> 2468
+
+DMv 
+
+> 612 18 24
+> nearth
+> 16.2
+> 15.6
+> 15.0
+> 14.4
+> 13.8
+
+log 10 ADMv 
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+
+SW 
+
+> 14
+> 12
+> 10
+> 8
+> 6
+
+log 10 ASW 
+
+> 2468
+
+RN 
+
+> 17
+> 16
+> 15
+> 14
+
+log 10 ARN 
+
+> 612 18 24
+
+nearth 
+
+DMv = 2.34 +1.71 0.65 
+
+log 10 ADMv = 13.82 +0.21 0.59 
+
+SW = 2.59 +1.49 2.08 
+
+log 10 ASW = 6.16 +0.34 6.83 
+
+RN = 1.37 +2.24 0.75 
+
+log 10 ARN = 13.48 +0.18 0.85 
+
+nearth = 5.80 +1.35 1.30 
+
+PSR J1744 −1134 12.56 
+
+> 12.48
+> 12.40
+> 12.32
+> 12.24
+> log 10  ADMv
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+> 14
+> 12
+> 10
+> 8
+> 6
+> log 10  ASW
+> 4.5 6.0 7.5 9.0
+> RN
+> 15.0
+> 14.4
+> 13.8
+> 13.2
+> 12.6
+> log 10  ARN
+> 1.8 2.4 3.0 3.6 4.2
+
+DMv 
+
+> 2.5 5.0 7.5 10.0
+> nearth
+> 12.56
+> 12.48
+> 12.40
+> 12.32
+> 12.24
+
+log 10 ADMv 
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+
+SW 
+
+> 14
+> 12
+> 10
+> 8
+> 6
+
+log 10 ASW 
+
+> 4.5 6.0 7.5 9.0
+
+RN 
+
+> 15.0
+> 14.4
+> 13.8
+> 13.2
+> 12.6
+
+log 10 ARN 
+
+> 2.5 5.0 7.5 10.0
+
+nearth 
+
+DMv = 2.55 +0.44 0.41 
+
+log 10 ADMv = 12.39 +0.10 0.10 
+
+SW = 2.97 +1.81 1.83 
+
+log 10 ASW = 10.91 +4.26 3.66 
+
+RN = 5.91 +2.51 1.55 
+
+log 10 ARN = 13.62 +0.62 0.96 
+
+nearth = 7.59 +1.16 1.18 PSR J1824 −2452A 12.5 
+
+> 10.0
+> 7.5
+> 5.0
+> log 10  ASW
+> 2468
+> RN
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+> log 10  ARN
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+
+SW 
+
+> 4812 16
+> nearth
+> 12.5
+> 10.0
+> 7.5
+> 5.0
+
+log 10 ASW 
+
+> 2468
+
+RN 
+
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+
+log 10 ARN 
+
+> 4812 16
+
+nearth 
+
+SW = 3.05 +1.82 1.81 
+
+log 10 ASW = 8.69 +3.25 5.56 
+
+RN = 6.66 +2.99 3.94 
+
+log 10 ARN = 15.77 +2.07 1.90 
+
+nearth = 8.21 +4.19 4.77 PSR J2124 −3358 DMv = 2.70 +4.09 1.64 
+
+> 19.5
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+> log 10  ADMv
+
+log 10 ADMv = 14.01 +0.54 4.54 
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> SW
+
+SW = 3.64 +2.27 1.24 
+
+> 14
+> 12
+> 10
+> 8
+> 6
+> log 10  ASW
+
+log 10 ASW = 5.84 +0.28 0.30 
+
+> 2468
+> RN
+
+RN = 3.17 +3.49 1.94 
+
+> 19.5
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+> log 10  ARN
+
+log 10 ARN = 14.00 +0.79 3.82 
+
+> 2468
+
+DMv 
+
+> 612 18 24
+> nearth
+> 19.5
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+
+log 10 ADMv 
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+
+SW 
+
+> 14
+> 12
+> 10
+> 8
+> 6
+
+log 10 ASW 
+
+> 2468
+
+RN 
+
+> 19.5
+> 18.0
+> 16.5
+> 15.0
+> 13.5
+
+log 10 ARN 
+
+> 612 18 24
+
+nearth 
+
+nearth = 5.31 +2.18 1.94 
+
+DMv = 2.70 +4.09 1.64 
+
+log 10 ADMv = 14.01 +0.54 4.54 
+
+SW = 3.64 +2.27 1.24 
+
+log 10 ASW = 5.84 +0.28 0.30 
+
+RN = 3.17 +3.49 1.94 
+
+log 10 ARN = 14.00 +0.79 3.82 
+
+nearth = 5.31 +2.18 1.94 
+
+PSR J2145 −0750 
+
+FIG. 7: Joint and marginalized posterior distributions for the parameters of the preferred noise models of the seven additional pulsars showing statistically significant solar-wind variations. Results obtained with the 2020 PPTA DR2 pipeline are shown in grey, while those obtained with the 2023 PPTA DR2 pipeline are shown in teal. 13 
+
+[1] M. V. Sazhin, Soviet Ast. 22 , 36 (1978). [2] R. W. Hellings and G. S. Downs, Astrophysical Journal, Part 2-Letters to the Editor, vol. 265, Feb. 15, 1983, p. L39-L42. 265 , L39 (1983). [3] R. S. Foster and D. C. Backer, Astrophys. J. 361 , 300 (1990). [4] M. A. McLaughlin, Classical and Quantum Gravity 30 ,224008 (2013). [5] R. N. Manchester, G. Hobbs, M. Bailes, W. A. Coles, W. Van Straten, et al. , Publications of the Astronomical Society of Australia 30 , e017 (2013). [6] R. D. Ferdman, R. van Haasteren, C. G. Bassa, M. Bur-gay, I. Cognard, et al. , Classical and Quantum Gravity 
+
+27 , 084014 (2010). [7] B. C. Joshi, P. Arumugasamy, M. Bagchi, D. Bandy-opadhyay, A. Basu, et al. , Journal of Astrophysics and Astronomy 39 , 51 (2018). [8] M. T. Miles, R. M. Shannon, M. Bailes, D. J. Reardon, M. J. Keith, et al. , Monthly Notices of the Royal Astronomical Society 519 , 3976 (2022), https://academic.oup.com/mnras/article-pdf/519/3/3976/48617501/stac3644.pdf. [9] H. Xu, S. Chen, Y. Guo, J. Jiang, B. Wang, et al. , Re-search in Astronomy and Astrophysics 23 , 075024 (2023). [10] D. J. Reardon, A. Zic, R. M. Shannon, V. Di Marco, G. B. Hobbs, A. Kapur, M. E. Lower, R. Mandow, H. Mid-dleton, M. T. Miles, et al. , The Astrophysical Journal Letters 951 , L7 (2023). [11] G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzou-manian, P. T. Baker, et al. , The Astrophysical Journal Letters 951 , L8 (2023). [12] J. Antoniadis, P. Arumugam, S. Arumugam, S. Babak, M. Bagchi, et al. , Astronomy & Astrophysics 678 , A50 (2023). [13] A. Zic, D. J. Reardon, A. Kapur, G. Hobbs, R. Mandow, 
+
+et al. , Publications of the Astronomical Society of Aus-tralia 40 , e049 (2023). [14] M. T. Miles, R. M. Shannon, M. Bailes, D. J. Reardon, M. J. Keith, et al. , Monthly Notices of the Royal Astro-nomical Society 519 , 3976 (2023). [15] A. F. Rogers, W. van Straten, S. Gulyaev, A. Parthasarathy, G. Hobbs, Z.-C. Chen, Y. Feng, B. Goncharov, A. Kapur, X. Liu, et al. , The Astrophysi-cal Journal 973 , 94 (2024). [16] T. T. Pennucci, The Astrophysical Journal 871 , 34 (2019). [17] L. Lentati, M. Kerr, S. Dai, M. Hobson, R. M. Shan-non, G. Hobbs, M. Bailes, N. R. Bhat, S. Burke-Spolaor, W. Coles, et al. , Monthly Notices of the Royal Astronom-ical Society 466 , 3706 (2017). [18] R. Van Haasteren, Y. Levin, P. McDonald, and T. Lu, Monthly Notices of the Royal Astronomical Society 395 ,1005 (2009). [19] L. Lentati, P. Alexander, M. P. Hobson, S. Taylor, J. Gair, S. T. Balan, and R. van Haasteren, Phys. Rev. D 87 , 104021 (2013), arXiv:1210.3578 [astro-ph.IM]. [20] J. A. Ellis, Classical and Quantum Gravity 30 , 224004 (2013), arXiv:1305.0835 [astro-ph.IM]. [21] B. Goncharov, D. Reardon, R. Shannon, X.-J. Zhu, E. Thrane, M. Bailes, N. Bhat, S. Dai, G. Hobbs, M. Kerr, et al. , Monthly Notices of the Royal Astronom-ical Society 502 , 478 (2021). [22] S. Chen, H. Xu, Y. Guo, B. Wang, R. N. Caballero, J. Jiang, J. Xu, Z. Xue, K. Lee, J. Yuan, et al. , As-tronomy & Astrophysics 699 , A165 (2025). [23] E. collaboration, I. Collaboration, et al. , Astronomy and Astrophysics 690 , A118 (2024). [24] L. Lentati, R. M. Shannon, W. A. Coles, J. P. W. Ver-biest, R. van Haasteren, J. A. Ellis, R. N. Caballero, R. N. Manchester, Z. Arzoumanian, S. Babak, and et al., Mon. Not. Roy. Astron. Soc. 458 , 2161 (2016), arXiv:1602.05570 [astro-ph.IM]. [25] J. S. Hazboun, J. Simon, D. R. Madison, Z. Arzouma-nian, H. T. Cromartie, K. Crowter, M. E. DeCesar, P. B. Demorest, T. Dolch, J. A. Ellis, R. D. Ferdman, E. C. Ferrara, E. Fonseca, P. A. Gentile, G. Jones, M. L. Jones, M. T. Lam, L. Levin, D. R. Lorimer, R. S. Lynch, M. A. McLaughlin, C. Ng, D. J. Nice, T. T. Pennucci, S. M. Ransom, P. S. Ray, R. Spiewak, I. H. Stairs, K. Stovall, J. K. Swiggum, W. Zhu, and T. N. Collaboration, The Astrophysical Journal 929 , 39 (2022). [26] M. L. Jones, M. A. McLaughlin, M. T. Lam, J. M. Cordes, L. Levin, et al. , The Astrophysical Journal 841 ,125 (2017). [27] A. Chalumeau, S. Babak, A. Petiteau, S. Chen, A. Sama-jdar, R. N. Caballero, G. Theureau, L. Guillemot, G. Desvignes, A. Parthasarathy, and et al., Mon. Not. Roy. Astron. Soc. 509 , 5538 (2022), arXiv:2111.05186 [astro-ph.HE]. [28] J. Antoniadis, P. Arumugam, S. Arumugam, S. Babak, M. Bagchi, et al. , Astronomy & Astrophysics 678 , A49 (2023). [29] B. P. Carlin and S. Chib, Journal of the Royal Statistical Society Series B: Statistical Methodology 57 , 473 (1995). [30] J. A. Ellis, M. Vallisneri, S. R. Taylor, and P. T. Baker, Astrophysics Source Code Library , ascl (2019). [31] J. Ellis and R. van Haasteren, jel-lis18/PTMCMCSampler: Official Release (2017). [32] V. D. Marco, N. Guttman, M. T. Miles, A. Zic, R. M. Shannon, and E. Thrane, A transdimensional sampling framework for pulsar timing noise modelling (2026), arXiv:2603.23817 [astro-ph.IM]. [33] E. M. Zahraoui, P. Maturana-Russel, W. van Straten, R. Meyer, and S. Gulyaev, Monthly Notices of the Royal Astronomical Society 540 , 3818 (2025). [34] E. M. Zahraoui, P. Maturana-Russel, A. Vajpeyi, W. van Straten, R. Meyer, and S. Gulyaev, Phys. Rev. D 113 ,083014 (2026). [35] R. E. Kass and A. E. Raftery, Journal of the american statistical association 90 , 773 (1995). [36] D. J. Reardon, R. M. Shannon, A. D. Cameron, B. Gon-charov, G. B. Hobbs, H. Middleton, M. Shamohammadi, N. Thyagarajan, M. Bailes, N. D. R. Bhat, and et al., Monthly Notices of the Royal Astronomical Society 507 ,2137 (2021), arXiv:2107.04609 [astro-ph.HE]. [37] A. Zic, D. J. Reardon, A. Kapur, G. Hobbs, R. Mandow, M. Curylo, R. M. Shannon, J. Askew, M. Bailes, N. D. R. Bhat, and et al., Publications of the Astronomical Soci-ety of Australia 40 , e049 (2023), arXiv:2306.16230 [astro-ph.HE]. [38] M. Kerr, D. J. Reardon, G. Hobbs, R. M. Shannon, R. N. Manchester, S. Dai, C. J. Russell, L. Toomey, 14 
+
+B. Goncharov, H. Middleton, et al. , Publications of the Astronomical Society of Australia 37 , e020 (2020), arXiv:2003.09780 [astro-ph.HE]. [39] P. Lazarus, R. Karuppusamy, E. Graikou, R. N. Ca-ballero, D. J. Champion, K. J. Lee, J. P. W. Verbiest, and M. Kramer, Monthly Notices of the Royal Astronomical Society 458 , 868 (2016), arXiv:1601.06194 [astro-ph.IM]. [40] M. Curylo, T. T. Pennucci, M. Bailes, N. D. R. Bhat, A. D. Cameron, W. A. Coles, P. B. Demorest, G. Hobbs, A. Kapur, M. J. Keith, et al. , Monthly No-tices of the Royal Astronomical Society 528 , 3304 (2024), arXiv:2309.07862 [astro-ph.HE]. [41] A. W. Hotan, W. van Straten, and R. N. Manchester, Publications of the Astronomical Society of Australia 21 ,302 (2004), arXiv:astro-ph/0404549. [42] S. R. Taylor, P. T. Baker, J. S. Hazboun, J. Simon, and S. J. Vigeland, enterprise extensions (2021), v2.4.3. [43] D. Foreman-Mackey, D. W. Hogg, D. Lang, and J. Good-man, PASP 125 , 306 (2013), 1202.3665. [44] M. Karamanis, F. Beutler, J. A. Peacock, D. Nabergoj, and U. Seljak, Monthly Notices of the Royal Astronomi-cal Society 516 , 1644 (2022). [45] M. Karamanis, D. Nabergoj, F. Beutler, J. A. Peacock, and U. Seljak, arXiv preprint arXiv:2207.05660 (2022). [46] F. Iraci, A. Chalumeau, C. Tiburzi, J. Verbiest, A. Pos-senti, S. Susarla, M. Krishnakumar, G. Shaifullah, J. An-toniadis, M. Bagchi, et al. , Astronomy & Astrophysics 
+
+704 , A109 (2025). [47] R. van Haasteren, Monthly Notices of the Royal Astronomical Society: Letters 537 , L1 (2025), https://academic.oup.com/mnrasl/article-pdf/537/1/L1/61215365/slae108.pdf. [48] A. Zic, D. J. Reardon, A. Kapur, G. Hobbs, R. Mandow, M. Curylo, R. M. Shannon, J. Askew, M. Bailes, N. D. R. Bhat, A. Cameron, Z.-C. Chen, S. Dai, V. Di Marco, Y. Feng, M. Kerr, A. Kulkarni, M. Lower, R. Luo, R. N. Manchester, M. Miles, R. Nathan, S. Oslowski, A. Rogers, C. Russell, M. Shamohammadi, R. Spiewak, N. Thyagarajan, L. Toomey, S. Wang, L. Zhang, S. Zhang, and X. Zhu, Parkes pulsar timing array third data release (part 2 of 2) (2023), dataset. [49] L. Dalc´ ın, R. Paz, and M. Storti, Journal of Parallel and Distributed Computing 65 , 1108 (2005). [50] T. Kluyver, B. Ragan-Kelley, F. P´ erez, B. Granger, M. Bussonnier, et al. , in Positioning and power in aca-demic publishing: Players, agents and agendas (IOS press, 2016) pp. 87–90. [51] J. D. Hunter, Computing in Science & Engineering 9, 90 (2007). [52] C. R. Harris, K. J. Millman, S. J. Van Der Walt, R. Gom-mers, P. Virtanen, et al. , Nature 585 , 357 (2020). [53] P. Virtanen, R. Gommers, E. Burovski, T. E. Oliphant, W. Weckesser, et al. , scipy/scipy: SciPy 1.6.0 (2020). [54] R. Kumar, C. Carroll, A. Hartikainen, and O. Martin, Journal of Open Source Software 4, 1143 (2019).

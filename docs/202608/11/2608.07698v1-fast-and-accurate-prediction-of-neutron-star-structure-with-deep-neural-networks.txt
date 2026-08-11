@@ -1,0 +1,497 @@
+Title: Fast and Accurate Prediction of Neutron Star Structure with Deep Neural Networks
+
+URL Source: https://arxiv.org/pdf/2608.07698v1
+
+Published Time: Tue, 11 Aug 2026 00:10:02 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+# Fast and Accurate Prediction of Neutron Star Structure with Deep Neural Networks 
+
+Kaushikk V N 1, Bhaskar Biswas 1,2, Stephan Rosswog 1,3
+
+> 1
+
+Hamburger Sternwarte, Gojenbergsweg 112, D-21029 Hamburg, Germany, 
+
+> 2
+
+Department of Physics, School of Natural Sciences, Shiv Nadar Institution of Eminence, NH-91, Tehsil Dadri, Gautam Buddha Nagar, Uttar Pradesh-201314, India, 
+
+> 3
+
+The Oskar Klein Centre, Department of Astronomy, Stockholm University, AlbaNova, SE-10691 Stockholm, Sweden 
+
+Solving the Tolman–Oppenheimer–Volkoff (TOV) equations, together with the tidal perturbation equations, for large numbers of equation-of-state (EOS) samples is a major computational bottleneck in Bayesian inference of the dense-matter EOS, and this will become increasingly limiting as next-generation observatories deliver far larger and more precise datasets. We develop neural-network surrogates for the forward TOV mapping that predict neutron star mass, radius, and tidal deforma-bility simultaneously and directly from the EOS parameters and central density. We train and compare two architectures: a conventional feedforward network and a residual network, the latter of which, to our knowledge, has not previously been explored for TOV surrogate modeling. Trained on a piecewise polytropic EOS parameter space, both networks reproduce the numerical solutions to high accuracy, with the coefficient of determination exceeding 0.999 for all three observables, while accelerating the evaluation of stellar observables by roughly two orders of magnitude relative to direct numerical integration. We find that both architectures achieve excellent predictive accuracy at the network sizes considered here, with the residual network providing a modest improvement in accuracy over the feedforward network at the expense of slightly longer inference times. The overall performance differences remain small, indicating that a feedforward network already has sufficient capacity for this mapping while residual connections offer only incremental gains. Nevertheless, the residual architecture provides a robust baseline for future extensions to richer EOS parameteriza-tions or higher-dimensional regression tasks. The resulting surrogates are well-suited to large-scale Bayesian EOS inference and population studies, where repeated TOV evaluations would otherwise dominate the computational cost. 
+
+I. INTRODUCTION 
+
+The nuclear equation of state (EOS), which relates pressure and energy density, remains one of the central open problems in relativistic and nuclear astrophysics [1–3]. Its behavior is experimentally constrained pri-marily near the nuclear saturation density, ρ0 ≡ 2.7 ×
+
+10 14 g cm −3 (equivalently, n0 ≡ 0.16 fm −3). Measure-ments of neutron-skin thickness in atomic nuclei con-strain the symmetry energy at ρ0 [4, 5], while heavy-ion collisions probe isospin-symmetric matter above ρ0 [6– 8]. Nuclear theory extends these constraints to roughly 
+
+2 n0 [9–13]. Matter at the most extreme densities, 6–8 n0,but essentially zero temperature, is realized only inside neutron stars (NSs), making them the sole natural lab-oratory for the high-density EOS [3, 14]. The remnant oscillations in the aftermath of a neutron star merger, will additionally allow to probe the properties of hot nuclear matter [15–17]. The macroscopic structure of a NS, its mass and ra-dius, is determined by the Tolman–Oppenheimer–Volkoff (TOV) equations [18, 19] which require the EOS as in-put. The tidal deformability, which characterizes the response of a NS to an external tidal field, is obtained by simultaneously solving the TOV equations alongside the differential equations governing perturbations of the metric [20–22]. Inverting this relationship, i.e., infer-ring the EOS from observed NS properties, is the cen-tral inference problem of NS astrophysics [23]. Sev-eral observational channels now contribute to this ef-fort. Precise radio timing of binary pulsars yields NS masses [24, 25]. Joint mass–radius measurements are obtained from pulse-profile modeling of X-ray emis-sions from millisecond pulsars, most notably through the NICER mission [26–31]. Gravitational wave (GW) ob-servations of binary neutron star (BNS) mergers provide tidal deformability constraints; GW170817, the first ob-served BNS merger [32, 33], placed the first GW-derived radius estimates [34]. Together, these multimessenger data are routinely combined in Bayesian inference frame-works to constrain the EOS [31, 35–45]. Direct EOS parameter inference, however, requires solving the TOV equations coupled with the tidal per-turbation equations for every proposed sample, typi-cally O(10 5–10 6) times per analysis. This computa-tional cost is already a bottleneck in current pipelines and will become prohibitive with next-generation instru-ments. Upcoming X-ray telescopes such as eXTP [46] and STROBE-X [47] and next-generation GW obser-vatories (the Einstein Telescope [48] and Cosmic Ex-plorer [49]) are projected to detect O(10 5) BNS mergers annually and measure NS radii to sub-100-meter preci-sion [50, 51]. Meeting this demand requires inference methods that are both accurate and computationally ef-ficient. A widely explored strategy is to replace the TOV solver with a machine-learning surrogate. Prior work has em-ployed regression methods [52, 53], feedforward neural networks [54–60], support vector machines [54], Gaus-sian processes and reduced basis methods [57], and dy-namic mode decomposition [61] to emulate the forward arXiv:2608.07698v1 [astro-ph.HE] 7 Aug 2026 2TOV mapping, including in modified gravity scenarios where the structure equations themselves are altered [60]. A complementary class of methods bypasses traditional sampling entirely, using neural networks [62–77], nor-malizing flows [78–80], and transformers [81] to recover the EOS directly from NS observables. Alternatively, rather than parameterizing the EOS directly, one can parameterize the macroscopic M -R and M -Λ relations and infer NS properties from multimessenger data within a Bayesian framework [82]. Despite their speed advan-tages, surrogate-based methods share a structural limi-tation: models must be retrained whenever the EOS pa-rameterization or prior assumptions change, and training can require hours to weeks depending on model complex-ity [80, 83]. An alternative that avoids this bottleneck en-tirely is to leverage differentiable programming and GPU acceleration to solve the TOV equations on the fly dur-ing inference [84], eliminating the need for pre-trained emulators at the cost of restricting flexibility to gradient-compatible samplers. In this work, we develop and benchmark neural-network surrogates for the forward TOV mapping, in-cluding the tidal deformability. We consider two ar-chitectures: a conventional feedforward network (FFN), which has been used successfully in previous TOV emu-lation studies [54–57], and a residual network (ResNet), which to our knowledge has not previously been applied to TOV surrogate modeling. Residual architectures have achieved considerable success in other domains by en-abling the stable training of deeper networks through shortcut connections [85], and the strongly nonlinear de-pendence of neutron star observables on the EOS makes them a natural candidate to investigate for this task. Us-ing a large dataset of neutron star models generated from a piecewise polytropic EOS parameterization [86], we train both surrogates to predict mass, radius, and tidal deformability simultaneously, and assess their accuracy, training behavior, and computational efficiency against direct numerical integration of the TOV equations. The resulting surrogate models provide orders-of-magnitude reductions in evaluation time, making them attractive for computationally intensive applications such as Bayesian inference, parameter estimation, and population studies that require repeated TOV evaluations. The remainder of this paper is organized as follows. Section II summarizes the Tolman–Oppenheimer–Volkoff equations and presents the EOS model used to relate pressure and energy density. Section III provides an overview of artificial neural networks, with a focus on FFNs and ResNets in the context of this work. Section IV details the proposed network architectures, including dataset generation, training procedures, and evaluation methodology. Section V presents the results, assessing model accuracy and benchmarking performance against a traditional TOV solver. Finally, Section VI summa-rizes the key findings and outlines directions for future research.   
+
+> II. NEUTRON STAR OBSERVABLES A. Structure and Tidal Deformability
+
+The macroscopic structure of a non-rotating, spheri-cally symmetric neutron star is governed by the TOV equations [18, 19], derived from the Einstein field equa-tions under the assumption of hydrostatic equilibrium. In natural units ( G = c = 1 ), these take the form: 
+
+dp dr = − [ϵ(r) + p(r)] m(r) + 4 πr 3p(r)
+
+r [r − 2m(r)] , (1) 
+
+dm dr = 4 πr 2ϵ(r) , (2) where p(r), ϵ(r), and m(r) are the pressure, energy den-sity, and enclosed gravitational mass at radial coordinate 
+
+r, respectively. Given a central pressure pc, these equa-tions are integrated outward from the center with bound-ary conditions m(0) = 0 and p(0) = pc, using an EOS to close the system by relating p and ϵ. Integration pro-ceeds until the pressure vanishes at r = R, which defines the stellar radius R and gravitational mass M ≡ m(R).The tidal deformability Λ characterizes the quadrupo-lar deformation of a neutron star induced by an external gravitational field, and is defined as [20, 22, 87]: 
+
+Λ = 23 k2
+
+ RM
+
+5
+
+, (3) where k2 is the second tidal Love number. This quantity is obtained by solving a first-order differential equation for y(r) together with the TOV equations, 
+
+dy dr = − y(r)2
+
+r − y(r)
+
+r
+
+1 + 4 πr 2 (p(r) − ϵ(r)) 
+
+−
+
+r
+
+
+
+5ϵ(r) + 9 p(r) + ϵ(r) + p(r)
+
+∂p/∂ϵ − 64πr 2
+
+
+
+r − 2m(r)+ 4 m(r) + 4 πr 3p(r)2
+
+r2 [r − 2m(r)] 2 ,
+
+(4) subject to the boundary condition y(0) = 2 . The surface value yR ≡ y(R) then determines k2 via: 
+
+k2 = 8C5
+
+5 (1 − 2C)2 [2 + 2 C(yR − 1) − yR]
+
+×
+
+n
+
+2C [6 − 3yR + 3 C(5 yR − 8)] +4 C3 13 − 11 yR + C(3 yR − 2) + 2 C2(1 + yR)
+
++3(1 − 2C)2 [2 − yR + 2 C(yR − 1)] ln(1 − 2C)
+
+o−1
+
+,
+
+(5) where C ≡ M/R is the compactness. Together, R, M ,and k2 fully determine the tidal deformability Λ for a given EOS and central pressure. 3
+
+B. Piecewise Polytropic EOS 
+
+We model the neutron star interior using a piecewise polytropic EOS (PPEOS) parameterization [88], in which the EOS is divided into density segments each described by: 
+
+p(ρ) = KiρΓi , ϵ(ρ) = Ki
+
+Γi − 1 ρΓi + (1 + ai)ρ , (6) where the constants Ki and ai are fixed by enforcing the continuity of pressure and energy density across segment boundaries. The high-density core is described by four free parameters, log p1, Γ1, Γ2, and Γ3, where p1 is the pressure at the first transition density, and the Γi are the polytropic indices in three successive density intervals separated at 1.8 ρ0 and 3.6 ρ0.
+
+III. NEURAL NETWORK ARCHITECTURES Γ3  
+
+> Γ2
+> Γ1
+> Λ
+> R
+> M
+> Input layer
+> 𝐚 (0)
+> Output layer
+> 𝐲
+> 0,0 1.0
+> Activation
+> value
+> a(0) 1
+> y1
+> y2
+> y3
+> a(0) 2
+> a(0) 3
+> a(0) 4
+> 𝐚 (1)
+> a(0) 5
+> 𝐖 (2)
+> 𝐛 (1) 𝐛 (2)
+> 𝐛 (3)
+> 𝐖 (1)
+> Hidden layers
+> 𝐖 (0)
+> logp 1
+> 𝐚 (2)
+> logρ 𝑐
+
+Figure 1. Schematic of a fully-connected feedforward network mapping EOS parameters (Γ 1, Γ2, Γ3, log p1) along with log central density (log ρc) inputs to neutron star observables M ,
+
+R, and Λ. The output vector is given by y=(M, R, Λ) T , where 
+
+M , R, and Λ denote the predicted gravitational mass, radius, and tidal deformability, respectively. 
+
+This section describes the architecture and working of FFNs in the context of neutron star parameter regression. We then introduce ResNets and motivate their use as an alternative architecture for the present task. 
+
+A. Fully-Connected Feedforward Networks 
+
+A fully-connected FFN maps inputs to outputs through a sequence of weighted nonlinear transforma-tions. As illustrated in Fig. 1, the network consists of an input layer, two hidden layers, and an output layer. Information propagates through the network by applying an affine transformation followed by a nonlinear activa-tion function at each hidden layer. For a generic layer 
+
+(l + 1) , the activation is given by 
+
+y(l+1) = f
+
+
+
+W(l)a(l) + b(l+1) 
+
+, (7) where a(l) denotes the activations from layer (l), W(l) is the weight matrix connecting layer (l) to layer (l + 1) ,
+
+b(l+1) is the corresponding bias vector, and f repre-sents the nonlinear activation function. Common choices include the “rectified linear unit” (ReLU) [89] and the “Gaussian error linear unit” (GELU) [90], which intro-duce the nonlinear representational capacity required to model complex mappings. The specific choice of activa-tion function influences the learning behavior of the net-work by affecting gradient propagation, numerical stabil-ity, and the ability of the model to approximate highly nonlinear relationships. For the input layer, a(0) corresponds to the in-put features (Γ 1, Γ2, Γ3, log p1, log ρc), while the output layer produces the predicted neutron-star observables 
+
+(M, R, Λ) , as shown in Fig. 1. During training, the cost function C is evaluated after each forward pass to quan-tify the difference between the predicted and target out-puts. The gradients of the cost function, −∇ C, are then propagated backwards through the network to update the weights and biases, iteratively improving the model pre-dictions. This process, known as backpropagation, con-stitutes the training procedure of the neural network [91– 93]. Tasks involving complex nonlinear mappings often require networks with multiple hidden layers, forming Deep Neural Networks (DNNs), which provide increased representational capacity for learning intricate relation-ships [94–96]. A schematic of the fully-connected FFN architecture is shown in Fig. 1. 
+
+B. Residual Networks 
+
+The task considered here, namely simultaneously pre-dicting (M, R, Λ) from five EOS and stellar input pa-rameters across O(10 5) training samples, requires a neu-ral network with sufficient capacity to represent highly nonlinear relationships. Increasing network depth is one natural way of enhancing representational power. How-ever, deeper architectures do not necessarily yield im-proved performance. Previous studies have shown that standard feed-forward networks can become increasingly difficult to optimize as depth increases, with training er-ror sometimes saturating or degrading despite the ad-ditional model capacity [97–99] a phenomenon distinct from overfitting. Such behaviour has often been asso-ciated with optimization challenges including vanishing gradients [100, 101]: gradients backpropagated through successive nonlinear transformations diminish and be-come uninformative, causing early layers to learn inef-fectively. Although modern training techniques such as improved weight initialization [101–104] and normalization layers 4[105] can substantially alleviate these issues, residual ar-chitectures remain an attractive alternative for deep re-gression problems. Residual Networks (ResNets) 𝑥 
+
+> Linear weighted layer
+> Activation function
+
+## +𝑥              
+
+> Linear weighted layer
+> Activation
+> function
+> 𝐹(𝑥)
+> Residual: 𝐹 𝑥 + 𝑥
+> 𝐹 𝑥 + 𝑥
+> Input
+> Figure 2. Residual block with identity skip connection. The input xbypasses the nonlinear transformation F(x)and is added directly to the block output, forming the residual map-ping F(x) + x.
+
+provide an alternative mechanism for information and gradient propagation through the network by introduc-ing skip connections [106–108], that add the block input directly to its output, as illustrated in Fig. 2: 
+
+y = F (x) + x , (8) where F (x) represents the transformation learned by the stacked layers and x is passed through unchanged via the identity shortcut. Rather than learning the full tar-get mapping H(x) directly, the network learns only the residual F (x) := H(x) − x that has demonstrated strong performance across a variety of machine-learning appli-cations [97]. The skip connection provides an unobstructed gradi-ent pathway during backpropagation, ensuring that early layers receive meaningful updates regardless of network depth [91, 97]. Furthermore, if the optimal mapping is close to the identity, the network can represent it by driv-ing F (x) → 0, substantially reducing the optimization difficulty. These properties make ResNets particularly well-suited for the high-dimensional nonlinear regression task of simultaneously predicting neutron star mass, ra-dius, and tidal deformability from EOS parameters. In the present work, the motivation for investigating ResNets is not that the feed-forward architecture exhibits optimization difficulties, but the motivation is rather to assess whether residual learning offers any advantage for the EOS-to-observable mapping. Given the nonlinear de-pendence of neutron-star observables on the underlying EOS, it is reasonable to explore whether the enhanced feature-learning capabilities of residual architectures can improve predictive accuracy, training behaviour, or com-putational efficiency relative to a conventional FFN.  
+
+> IV. NEURAL NETWORK MODELS
+
+This section describes the proposed model architec-tures, the construction of the training dataset, the train-ing methodology, and the procedure used to evaluate the models on previously unseen data.  
+
+> A. Model Architecture
+
+The proposed architectures, shown in Figs. 3 and 4, map five input features to three neutron star observ-ables. The inputs comprise the four PPEOS parame-ters defining the high-density core ( log p1, Γ1, Γ2, Γ3; see Sec. II) together with the logarithmic central density 
+
+log ρc, which selects a configuration along the result-ing stellar sequence. The three outputs are the gravi-tational mass M (in M⊙), the radius R (in km), and the tidal deformability expressed as log 10 Λ which compresses its large dynamic range and becomes comparable to the other parameters. For the feed forward network in Fig. 3 the five inputs are mapped onto a 512-dimensional latent representation by a linear input layer, which subsequently flows through four hidden layers with GELU activation before connect-ing to the output layer comprised of 256 neurons which eventually feed into the three outputs. In the case of the ResNet, Fig. 4 the five inputs are first mapped to a 512-dimensional latent representation as well by a linear input layer, which feeds into a sequence of four residual blocks. Each block applies a linear trans-formation followed by a GELU activation, and adds the result to its input through an identity skip connection: 
+
+h(l+1) = h(l) + GELU 
+
+
+
+W(l)h(l) + b(l)
+
+, (9) where the hidden dimension is held fixed at 512 through-out, so that the skip connection is a direct element-wise addition. The final output layer maps the 512-dimensional representation to 256 neurons through a lin-ear layer with GELU activation, and then projects to the three output quantities; unlike the residual blocks, it does not employ a skip connection.  
+
+> B. Dataset Creation
+
+The training dataset was generated by solving the TOV and tidal perturbation equations (Sec. II) for a large set of piecewise polytropic equations of state. The four EOS parameters and the central density were sam-pled uniformly over the ranges Γ1,2,3 ∈ [1 .4, 5.0] , log p1 ∈
+
+[33 .5, 34 .8] , and log ρc ∈ [14 .5, 15 .4] , where p1 is in 
+
+dyn cm −2 and ρc in g cm −3.For each sampled configuration, the stellar structure and tidal perturbation equations were solved in Fortran using a vectorized, parallelized fourth-order Runge-Kutta (RK4) solver with a spatially adaptive step size while simultaneously computing the tidal deformability. The solver was interfaced with the Python data-generation pipeline through an F2PY [109] wrapper. The integra-tion was initialized with a step size of h = 10 −4 km , which 5𝑥  Loss 
+
+# 𝑦 
+
+# Target 
+
+# Output 
+
+# 3n 
+
+# Input layer  Output layer 
+
+# Input 
+
+# 5n 
+
+> Hidden
+> layer 2
+> (512n)
+> Hidden
+> layer 3
+> (512n)
+> Linear layer
+> (256n)
+> Linear layer (512n)
+> Activation layer (GELU)  Hidden
+> layer 4
+> (512n)
+> Hidden
+> layer 1
+> (512n)
+> Linear layer
+> (512n)
+> Activation layer (GELU)
+
+Figure 3. Architecture of the proposed feed forward neural network. Five input features are encoded into a 512-dimensional representation, processed by four hidden layers, and projected onto the three neutron star observables (M, R, log 10 Λ) .𝑥  Loss 
+
+# 𝑦 
+
+# Target 
+
+# ++ 
+
+> 3. Add residuals: 𝐹(𝑥) + 𝑥
+> 512 + 512 n
+
+# Output 
+
+# 3n 
+
+> ResNet BLOCK 2
+> 512n
+
+# +
+
+> ResNet
+> BLOCK 1
+> 512n
+
+# Input 
+
+# layer 
+
+> 1. Linear layer (512n)
+> 2. Activation
+> layer (GELU)
+> 𝐹(𝑥)
+
+# Output layer 
+
+> Linear layer
+> (512n)  𝑥
+> 𝑥
+
+# Input 
+
+# 5n 
+
+> ResNet BLOCK 3
+> 512n
+> ResNet BLOCK 4
+> 512n
+
+# +
+
+> Activation
+> layer (GELU)
+> Linear layer
+> (256n)
+
+Figure 4. Architecture of the proposed residual network. Five input features are encoded into a 512-dimensional representa-tion, processed by four residual blocks with identity skip connections, and projected onto the three neutron star observables 
+
+(M, R, log 10 Λ) .
+
+is subsequently adjusted according to the local difference between the fractional radial gradients of the enclosed mass and pressure, 
+
+1
+
+mdm dr − 1
+
+pdp dr . (10) This heuristic criterion decreases the step size in regions where the solution varies rapidly and increases it where the solution evolves more smoothly, providing an efficient balance between computational cost and numerical accu-racy. For each configuration, the solver returns the gravi-tational mass, radius, and tidal deformability. Physical consistency was enforced by requiring a monotonically increasing pressure profile and causality throughout the star, while the unstable branch beyond the maximum-mass configuration was discarded. Configurations yield-ing unphysical observables, for example due to extremely stiff equations of state, were removed by restricting the outputs to M ∈ [0 .15 , 3.5] M⊙, R ∈ [6 , 25] km , and 
+
+Λ ∈ [0 , 10 6]. This procedure yielded 4.2 × 10 5 valid sam-ples used for training and validation. The dataset was partitioned into training and valida-tion sets using an 80–20 split. The five input features were standardized via Z-score normalization [110]. The outputs were rescaled to comparable dynamic ranges: mass and radius by constant factors, and the tidal de-formability through the transformation Λ → log 10 Λ.This preprocessing places all quantities on similar scales, improving numerical conditioning and convergence dur-ing training [91]. 6 
+
+> C. Training
+
+The models were trained by minimizing the Huber loss [111] between predicted and target observables, us-ing the AdamW [112] optimizer with a cosine-annealing learning-rate [113]. The Huber loss was chosen for its robustness to the occasional large residual relative to the mean squared error. The full set of training hyperparam-eters is listed in Table I. Training was configured for a maximum of 1000 epochs, with early stopping employed to prevent overfitting [114]. Convergence was reached at epoch 364, with a best val-idation loss of 7.45 × 10 −7, in approximately 37 minutes of wall-clock time in the case of the FFN whereas the ResNet training was stopped early at epoch 685 using the same criterion as before and reached a validation loss of 3.12 ×10 −7, in approximately 70 minutes. The training was performed on a single compute node of a HPC clus-ter equipped with an AMD Ryzen 9 7950X3D Processor (16 physical cores, 32 logical cores with hyper-threading enabled) and 62 GB of RAM. The training and valida-tion loss curves for the FFN is shown in Fig. 5 and the same for the ResNet is shown in Appendix A (Fig. 9). 0 50 100 150 200 250 300 350          
+
+> Epoch
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> Huber Loss
+> Training Loss Validation Loss
+> Figure 5. Training and validation loss as a function of epoch for the FFN. The close agreement between the two curves indicates the absence of significant overfitting. Table I. Training hyperparameters of the models. Batch size 256 Learning rate 5×10 −4
+> Optimizer AdamW Loss function Huber loss Activation function GELU Maximum epochs 1000 Early-stopping patience 100 epochs
+> D. Testing
+
+The trained models were evaluated on EOSs not seen during training. Test configurations were drawn by selecting combinations of (Γ 1, Γ2, Γ3, log p1) within the training ranges, since predictions outside these ranges would require extrapolation beyond the regime the mod-els were trained on. For each set of EOS parameters, a sequence of stellar models was generated by varying the central density log ρc.For every configuration, the mass, radius, and tidal deformability were computed directly from the TOV and tidal equations to provide ground-truth reference values, and were also predicted by the trained networks. Refer-ence configurations were retained only where the numer-ical solution returned a physically valid, stable star; pre-dictions were excluded only when numerically non-finite, and were not filtered on their physical values, so that the reported accuracy reflects the model’s performance without bias. Agreement between predicted and refer-ence values was assessed through the mass–radius and tidal deformability–mass relations, and quantified using the mean absolute error (MAE), root-mean-square error (RMSE), combined normalized RMSE, and the coeffi-cient of determination ( R2). In addition, the wall-clock times of the network and the numerical solver were com-pared to quantify the computational speedup, as detailed in Sec. V.   
+
+> V. MODEL PERFORMANCE A. Accuracy
+
+The accuracy of the trained models was assessed on EOSs not seen during training, using the MAE, RMSE, combined normalized RMSE, and R2 metrics introduced in Sec. IV D. These metrics are summarized in Table II, for a test set of 100 distinct EOSs, with each EOS sam-pled at 100 central densities. Additional tests performed on 1000 distinct EOSs produced nearly identical results and are therefore omitted in the table, serving instead as a reproducibility check of the reported performance. The combined normalized RMSE across all three ob-servables for 100 EOSs, with each EOS being sampled at 100 central densities is 2.106 ×10 −3 in the case of the FFN and 0.449 ×10 −3 in the case of the ResNet. In all cases the coefficient of determination exceeds 0.999 , indicating that the network reproduces the numerical TOV solutions to high accuracy across the full parameter range. The close agreement between the results obtained using 100 and 1000 EOSs further demonstrates the robustness and re-producibility of the model’s predictive performance. Figure 6 compares the mass–radius relation computed by the numerical solver (solid) with the FFN prediction (dashed) for 10 unseen equations of state, each evalu-ated at 100 central densities. The predicted sequences track the reference curves closely across the entire mass 710 11 12 13 14 15 
+
+Radius (km)       
+
+> 0.5 1.0 1.5 2.0 2.5 3.0
+> Mass  (M⊙ )
+> 12345678910 TOV FFN
+
+Figure 6. Mass–radius relation for 10 unseen equations of state, each evaluated at 100 central densities. The numerical TOV solution (solid) and the FFN prediction (dashed) are shown for comparison. 0.5 1.0 1.5 2.0 2.5 3.0 
+
+Mass (M⊙ ) 
+
+> 0123456
+> log 10  Λ
+> 12 3 45 6 7 8910
+> TOV FFN
+
+Figure 7. Tidal deformability as a function of mass for the same 10 unseen equations of state. The numerical TOV so-lution (solid) and the FFN prediction (dashed) are shown for comparison. 
+
+range, including the vicinity of the maximum mass. The corresponding PPEOS parameter values for the selected test cases are provided in Appendix C. Figure 7 shows the corresponding tidal-deformability–mass relation for the same equations of state, where the predictions again closely follow the reference values. Figures 10 and 11 shown in Appendix B represent the same predictive power in the case of the ResNet model, while the EOS parameters used for these cases are also listed in Ap-pendix C. To quantify the predictive performance across the full stable branch, the relative prediction error was evalu-14.5 14.6 14.7 14.8 14.9 15.0 0.00 0.05 0.10 0.15 0.20 0.25            
+
+> Percentage Error (%) Mass Percentage Error
+> FFN ResNet
+> 14.5 14.6 14.7 14.8 14.9 15.0 0.00 0.05 0.10 0.15
+> Percentage Error (%) Radius Percentage Error
+> 14.5 14.6 14.7 14.8 14.9 15.0
+> log 10 (ρc)
+> 0.0 0.2 0.4 0.6 0.8
+> Percentage Error (%) Tidal Deformability Percentage Error
+
+Figure 8. Aggregate percentage errors for Mass, Radius and Tidal Deformability vs logarithmic central density for 10 un-seen equations of state, each evaluated at 100 central densi-ties. 
+
+ated as a function of logarithmic central density. Figure 8 presents the aggregate percentage error between pre-dicted and reference values: the mass, radius and tidal-deformability values against the logarithmic central den-sity. Since the maximum stable central density differs be-tween EOSs, all stellar sequences were first interpolated onto a common logarithmic central-density grid spanning from log 10 (ρc) = 14 .5 to the smallest maximum stable density among the sampled EOSs. This common grid ensures that errors from different EOSs are compared at identical central densities while avoiding extrapolation beyond the stable branch. For each EOS, the pointwise relative error was com-puted as: 
+
+ϵ(ρc) = |Xpred − Xtrue |
+
+Xtrue 
+
+, (11) where X denotes the stellar mass, radius or tidal de-formability. The interpolated errors from all EOSs were then combined to calculate the mean prediction error and the corresponding one-standard-deviation uncertainty at each central density. This provides an aggregate measure of the emulator’s performance across the entire ensemble of sampled equations of state. The resulting profiles reveal how the emulator accuracy varies across the stable branch, from lower-mass stars at smaller central densities to configurations approaching 8                       
+
+> Table II. Model metrics for 100 EOSs each with 100 stars when predicting mass, radius, and tidal deformability. MAE and RMSE values are in units of 10 −3.
+> Model type Metric Mass Radius Tidal Def.
+> FFN MAE 2.351 11 .827 1.234
+> RMSE 5.720 23 .901 1.984
+> R20.999936 0.999622 0.999998
+> ResNet MAE 0.769 3.151 0.366
+> RMSE 1.012 5.199 0.555
+> R20.999998 0.999983 0.999999
+
+the maximum stable mass. Regions where the mean er-ror increases indicate areas of greater predictive difficulty, while the width of the one-standard-deviation band re-flects the sensitivity of the predictions to variations in the underlying equation of state. The percentage errors remain small and unbiased across the sampled central-density range for both models, with no significant dif-ference in their predictive performance. It should also be noted that the vertical axis spans a narrow range of percentage errors, which visually exaggerates the appar-ent width of the uncertainty bands. Overall, the figure demonstrates that both NN architectures maintain con-sistently high predictive accuracy across the full range of physically stable NS configurations.  
+
+> B. Benchmarks
+
+The computational performance of the networks was benchmarked against the numerical TOV solver used to generate the training data. The solver performs direct fourth-order Runge–Kutta integration of the TOV and tidal equations for each requested stellar configuration. Benchmarks were run for 100, 1000, and 10,000 equa-tions of state, each evaluated over 100 central densities. All timing measurements were obtained on the same com-pute node used for training, with the numerical solver ex-ecuted on the CPU and the neural networks performing inference on the same hardware. To ensure a like-for-like comparison, the networks were evaluated only on the stable stellar configurations identi-fied by the TOV solver. Consequently, the TOV runtime includes the computational cost of identifying and val-idating the stable branch, whereas the neural network performs inference directly on this validated set of stellar models. To reduce initialization bias, the first execution of both methods was treated as a warm-up and discarded. Each configuration was then repeated ten times and the median runtime recorded, the median being more ro-bust than the mean against transient fluctuations from                         
+
+> Table III. Runtime comparison between the numerical TOV solver and the networks for predicting mass, radius, and tidal deformability.
+> Network type No. of EoS Median TOV time (ms) Median model time (ms) Speedup factor
+> FFN 100 824.358 3.506 235 .3× ± 2.5×
+> 1000 830.470 3.527 235 .5× ± 1.3×
+> 10000 830.645 3.481 238 .6× ± 0.4×
+> ResNet 100 760.101 3.627 209 .6× ± 2.5×
+> 1000 762.516 3.503 217 .7× ± 0.7×
+> 10000 764.513 3.475 220 .0× ± 0.4×
+
+operating-system scheduling and background activity. The standard deviation across runs was retained as a measure of timing stability. The speedup factor is de-fined as 
+
+S = tTOV 
+
+tmodel 
+
+, (12) the ratio of solver to network runtimes. The results, listed in Table III, show that the inference time of both surrogate models remains approximately constant at ∼ 3.5 ms across all benchmark sets (each EOS sampled at 100 central densities). In contrast, di-rect numerical integration of the TOV equations requires 
+
+∼ 0.8 s per evaluation. Both architectures therefore achieve speedups exceeding 200 , with the FFN reaching maximum median accelerations by factors of 238 .6 and 220 for the ResNet; the slightly lower ResNet speedup reflects the additional computation associated with the residual connections. The run-to-run standard deviations remain below about 1% of the measured speedup, and decrease with increasing EOS count, confirming that the timings are reproducible and largely free of background interference. Overall, the networks deliver a substantial and stable acceleration over direct numerical integration, making them well-suited to large-scale Bayesian inference and population studies in which repeated TOV evalua-tions would otherwise dominate the computational cost.  
+
+> VI. CONCLUSION
+
+In this work, we developed and evaluated feed-forward and deep residual neural networks as surrogate models for the forward TOV mapping, predicting neutron-star mass, radius, and tidal deformability directly from the equation-of-state parameters and central density. To our knowledge, this is the first study to investigate residual learning for TOV surrogate modeling. Both architectures reproduce the numerical TOV solutions with high accu-9racy across the full parameter range, achieving R2 values exceeding 0.999 for all three observables. The surrogate models accelerate the evaluation of neutron-star observables by approximately two orders of magnitude relative to direct numerical integration, with measured speedups ranging from approximately 209 × to 
+
+238 ×, depending on the network architecture and sam-pling density. We note that a direct comparison with previously re-ported emulators is complicated by differences in the nu-merical solver, hardware, and the set of predicted observ-ables. For instance, Deep TOV [56] reported an approx-imate 8× acceleration over the Python interface to the TOV solver provided by the RePrimAnd package [115] for predicting mass and radius on a single CPU core. In the present work, the benchmark is performed against a vectorized, parallelized RK4 solver and additionally predicts the tidal deformability. Consequently, the re-ported speedups are not directly comparable, but they demonstrate that neural-network surrogates can provide substantial acceleration even when compared against an optimized numerical baseline. Residual Networks were investigated as an alterna-tive to conventional Feed-Forward Networks because of their demonstrated success in training deeper architec-tures and modeling highly nonlinear relationships. Given the complex dependence of neutron-star observables on the underlying equation of state through the TOV equa-tions, residual learning was expected to potentially im-prove predictive performance or training behaviour. The ResNet architecture achieved marginally higher predic-tive accuracy than the FFN across all predicted observ-ables, demonstrating that residual learning can provide a modest improvement in regression performance. How-ever, this increase in accuracy came at the cost of slightly longer inference times, resulting in a somewhat smaller computational speedup relative to the TOV solver. The performance differences between the two archi-tectures nevertheless remained small, indicating that the FFN already possesses sufficient representational capac-ity for the present EOS-to-observable mapping and that the additional complexity introduced by residual connec-tions yields only incremental gains. This comparative study demonstrates that the surrogate’s predictive capa-bility is robust with respect to architectural choice while establishing a performance baseline for future investi-gations involving more complex EOS parameterizations or higher-dimensional regression tasks, where the advan-tages of residual learning may become more pronounced. This level of acceleration is particularly relevant for multimessenger applications such as gravitational-wave parameter estimation and Bayesian EOS inference, where the TOV equations must be solved for large numbers of samples. The framework generalizes naturally across the piecewise-polytropic parameter space and provides a flexible foundation for future extensions to alternative EOS parameterizations and more sophisticated neutron-star models.        
+
+> Appendix A: ResNet Training Curves 0100 200 300 400 500 600 700
+> Epoch
+> 10 −7
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> Huber Loss
+> Training Loss Validation Loss
+> Figure 9. Training and validation loss as a function of epoch for the ResNet model.
+
+This appendix presents the training history of the ResNet model. Figure 9 shows the evolution of the train-ing and validation Huber loss throughout the optimiza-tion process. The training and validation loss curves re-main closely aligned throughout training. Toward the end of the optimization, the validation loss increases slightly above the training loss, indicating the onset of mild overfitting. However, the learning rate scheduler and early stopping terminate training before this di-vergence becomes significant, resulting in a model that maintains good generalization to unseen data. 
+
+> Appendix B: ResNet Testing
+
+This appendix presents the corresponding testing re-sults for the ResNet model. The mass-radius and tidal deformability-mass diagrams, shows in figures 10 and 11, compare the network predictions with the solutions generated by the TOV solver for the test EOS. Together with the quantitative evaluation discussed in the main text, these figures provide a visual assessment of the ResNet model’s ability to reproduce the underlying phys-ical relationships between NN observables across the full range of the test dataset. 
+
+> Appendix C: Equation of State Parameters for Representative Test Cases
+
+This appendix lists the PPEOS parameters for the rep-resentative test cases used in the mass-radius ( M − R)and tidal deformability-mass ( Λ − M ) comparisons pre-sented in Sec. V A and Appendix B. Table IV gives the EOS parameter values for the curves shown for the FFN, while Table V provides the corresponding values for 10 11.0 11.5 12.0 12.5 13.0 13.5 14.0 14.5 15.0       
+
+> Radius (km)
+> 0.5 1.0 1.5 2.0 2.5 3.0
+> Mass  (M⊙ )
+> 12345678910 TOV ResNet
+
+Figure 10. Mass–radius relation for 10 unseen equations of state, each evaluated at 100 central densities. The numerical TOV solution (solid) and the ResNet prediction (dashed) are shown for comparison. 0.5 1.0 1.5 2.0 2.5 3.0    
+
+> Mass (M⊙)
+> 0123456
+> log 10  Λ
+> 1234 5 6789 10
+> TOV ResNet
+
+Figure 11. Tidal deformability as a function of mass for the same 10 unseen equations of state. The numerical TOV so-lution (solid) and the ResNet prediction (dashed) are shown for comparison. 
+
+the ResNet. The tabulated parameters, Γ1, Γ2, Γ3, and 
+
+log p1, fully specify the piecewise polytropic EOS used to generate the reference TOV solutions and are included to facilitate reproducibility. 
+
+ACKNOWLEDGEMENTS 
+
+BB and SR acknowledge the support from the Knut and Alice Wallenberg Foundation under grant Dnr. KAW 2019.0112, the Deutsche Forschungsgemein-schaft (DFG, German Research Foundation) under Ger-
+
+Table IV. PPEOS parameters for the representative test cases shown in the mass–radius and tidal deformability–mass curves for the FFN. 
+
+EOS log p1 Γ1 Γ2 Γ3
+
+1 34.2 2.2 4.2 4.4 2 34.6 3.2 3.2 4.8 3 34.6 4.0 3.4 4.8 4 34.6 4.0 3.6 4.0 5 34.4 2.8 4.4 3.8 6 34.6 4.0 3.8 4.6 7 34.8 4.2 3.4 4.2 8 34.6 3.0 4.4 3.2 9 34.6 2.8 4.4 4.8 10 34.8 4.8 3.8 3.0 Table V. PPEOS parameters for the representative test cases shown in the mass–radius and tidal deformability–mass curves for the ResNet. 
+
+EOS log p1 Γ1 Γ2 Γ3
+
+1 34.8 3.4 2.6 3.0 2 34.6 2.8 3.4 3.0 3 34.8 3.2 2.8 2.4 4 34.6 3.4 3.4 4.2 5 34.4 2.6 4.4 3.6 6 34.8 3.6 3.4 2.8 7 34.6 2.8 4.2 4.0 8 34.6 3.8 4.4 1.6 9 34.8 4.2 4.0 3.4 10 34.8 3.4 4.4 4.6 
+
+many’s Excellence Strategy – EXC 2121 “Quantum Uni-verse” – 390833306. BB was further supported by the Alexander von Humboldt Foundation through a Hum-boldt Research Fellowship for Postdoctoral Researchers. SR has additionally been supported by the Swedish Re-search Council (VR) under grant number 2020-05044 and by the European Research Council (ERC) Advanced Grant INSPIRATION under the European Union’s Hori-zon 2020 research and innovation programme (Grant agreement No. 101053985). 
+
+[1] J. M. Lattimer and M. Prakash, Physics Reports 621 ,127–164 (2016). [2] M. Oertel, M. Hempel, T. Klähn, and S. Typel, Reviews of Modern Physics 89 , 10.1103/revmodphys.89.015007 (2017). 11 
+
+[3] G. Baym, T. Hatsuda, T. Kojo, P. D. Powell, Y. Song, and T. Takatsuka, Reports on Progress in Physics 81 ,056902 (2018). [4] D. Adhikari et al. (PREX), Phys. Rev. Lett. 126 ,172502 (2021), arXiv:2102.10767 [nucl-ex]. [5] D. Adhikari et al. (CREX), Phys. Rev. Lett. 129 ,042501 (2022), arXiv:2205.11593 [nucl-ex]. [6] P. Danielewicz, R. Lacey, and W. G. Lynch, Science 
+
+298 , 1592 (2002), arXiv:nucl-th/0208016. [7] B.-A. Li, L.-W. Chen, and C. M. Ko, Phys. Rept. 464 ,113 (2008), arXiv:0804.3580 [nucl-th]. [8] A. Sorensen et al. , Prog. Part. Nucl. Phys. 134 , 104080 (2024), arXiv:2301.13253 [nucl-th]. [9] E. Epelbaum, H.-W. Hammer, and U.-G. Meissner, Rev. Mod. Phys. 81 , 1773 (2009), arXiv:0811.1338 [nucl-th]. [10] R. Machleidt and D. R. Entem, Phys. Rept. 503 , 1 (2011), arXiv:1105.2919 [nucl-th]. [11] H.-W. Hammer, A. Nogga, and A. Schwenk, Rev. Mod. Phys. 85 , 197 (2013), arXiv:1210.4273 [nucl-th]. [12] K. Hebeler, Phys. Rept. 890 , 1 (2021), arXiv:2002.09548 [nucl-th]. [13] C. Drischler, J. W. Holt, and C. Wellenhofer, Ann. Rev. Nucl. Part. Sci. 71 , 403 (2021), arXiv:2101.01709 [nucl-th]. [14] J. M. Lattimer and M. Prakash, Phys. Rev. Lett. 94 ,111101 (2005), arXiv:astro-ph/0411280. [15] L. Baiotti, Prog. Part. Nucl. Phys. 109 , 103714 (2019), arXiv:1907.08534 [astro-ph.HE]. [16] A. Abac et al. (ET), JCAP 03 , 081, arXiv:2503.12263 [gr-qc]. [17] B. Biswas, S. Rosswog, P. Diener, and L. Schnabel, Binary neutron star mergers with SPHINCS_BSSN: temperature-dependent equations of state and damping of constraint violations (2026), arXiv:2601.01402 [astro-ph.HE]. [18] J. R. Oppenheimer and G. M. Volkoff, Physical Review 
+
+55 , 374 (1939). [19] R. C. Tolman, Physical Review 55 , 364 (1939). [20] T. Hinderer, Astrophys. J. 677 , 1216 (2008), arXiv:0711.2420 [astro-ph]. [21] E. E. Flanagan and T. Hinderer, Phys. Rev. D 77 ,021502 (2008), arXiv:0709.1915 [astro-ph]. [22] T. Damour and A. Nagar, Phys. Rev. D 80 , 084035 (2009), arXiv:0906.0096 [gr-qc]. [23] L. Lindblom, Astrophys. J. 398 , 569 (1992). [24] P. Demorest, T. Pennucci, S. Ransom, M. Roberts, and J. Hessels, Nature 467 , 1081 (2010), arXiv:1010.5788 [astro-ph.HE]. [25] H. T. Cromartie et al. , Nature Astron. 4, 72 (2019), arXiv:1904.06759 [astro-ph.HE]. [26] K. C. Gendreau, Z. Arzoumanian, P. W. Adkins, C. L. Albert, J. F. Anders, A. T. Aylward, C. L. Baker, E. R. Balsamo, W. A. Bamford, S. S. Benegalrao, D. L. Berry, S. Bhalwani, J. K. Black, C. Blaurock, G. M. Bronke, G. L. Brown, J. G. Budinoff, J. D. Cantwell, T. Cazeau, P. T. Chen, T. G. Clement, A. T. Colangelo, J. S. Cole-man, J. D. Coopersmith, W. E. Dehaven, J. P. Doty, M. D. Egan, T. Enoto, T. W. Fan, D. M. Ferro, R. Fos-ter, N. M. Galassi, L. D. Gallo, C. M. Green, D. Grosh, K. Q. Ha, M. A. Hasouneh, K. B. Heefner, P. Hestnes, L. J. Hoge, T. M. Jacobs, J. L. Jørgensen, M. A. Kaiser, J. W. Kellogg, S. J. Kenyon, R. G. Koenecke, R. P. Kozon, B. LaMarr, M. D. Lambertson, A. M. Larson, S. Lentine, J. H. Lewis, M. G. Lilly, K. A. Liu, A. Mal-onis, S. S. Manthripragada, C. B. Markwardt, B. D. Matonak, I. E. Mcginnis, R. L. Miller, A. L. Mitchell, J. W. Mitchell, J. S. Mohammed, C. A. Monroe, K. M. Montt de Garcia, P. D. Mulé, L. T. Nagao, S. N. Ngo, E. D. Norris, D. A. Norwood, J. Novotka, T. Okajima, L. G. Olsen, C. O. Onyeachu, H. Y. Orosco, J. R. Pe-terson, K. N. Pevear, K. K. Pham, S. E. Pollard, J. S. Pope, D. F. Powers, C. E. Powers, S. R. Price, G. Y. Prigozhin, J. B. Ramirez, W. J. Reid, R. A. Remil-lard, E. M. Rogstad, G. P. Rosecrans, J. N. Rowe, J. A. Sager, C. A. Sanders, B. Savadkin, M. R. Saylor, A. F. Schaeffer, N. S. Schweiss, S. R. Semper, P. J. Serlemit-sos, L. V. Shackelford, Y. Soong, J. Struebel, M. L. Vezie, J. S. Villasenor, L. B. Winternitz, G. I. Wofford, M. R. Wright, M. Y. Yang, and W. H. Yu, in Space Tele-scopes and Instrumentation 2016: Ultraviolet to Gamma Ray , Society of Photo-Optical Instrumentation Engi-neers (SPIE) Conference Series, Vol. 9905, edited by J.-W. A. den Herder, T. Takahashi, and M. Bautz (2016) p. 99051H. [27] S. Bogdanov et al. , Astrophys. J. Lett. 887 , L25 (2019), arXiv:1912.05706 [astro-ph.HE]. [28] T. E. Riley et al. , Astrophys. J. Lett. 887 , L21 (2019), arXiv:1912.05702 [astro-ph.HE]. [29] M. C. Miller et al. , Astrophys. J. Lett. 887 , L24 (2019), arXiv:1912.05705 [astro-ph.HE]. [30] T. E. Riley et al. , Astrophys. J. Lett. 918 , L27 (2021), arXiv:2105.06980 [astro-ph.HE]. [31] M. C. Miller et al. , Astrophys. J. Lett. 918 , L28 (2021), arXiv:2105.06979 [astro-ph.HE]. [32] B. P. Abbott et al. (LIGO Scientific, Virgo, Fermi GBM, INTEGRAL, IceCube, AstroSat Cadmium Zinc Telluride Imager Team, IPN, Insight-Hxmt, ANTARES, Swift, AGILE Team, 1M2H Team, Dark Energy Camera GW-EM, DES, DLT40, GRAWITA, Fermi-LAT, ATCA, ASKAP, Las Cumbres Observa-tory Group, OzGrav, DWF (Deeper Wider Faster Program), AST3, CAASTRO, VINROUGE, MAS-TER, J-GEM, GROWTH, JAGWAR, CaltechNRAO, TTU-NRAO, NuSTAR, Pan-STARRS, MAXI Team, TZAC Consortium, KU, Nordic Optical Telescope, ePESSTO, GROND, Texas Tech University, SALT Group, TOROS, BOOTES, MWA, CALET, IKI-GW Follow-up, H.E.S.S., LOFAR, LWA, HAWC, Pierre Auger, ALMA, Euro VLBI Team, Pi of Sky, Chan-dra Team at McGill University, DFN, ATLAS Tele-scopes, High Time Resolution Universe Survey, RIMAS, RATIR, SKA South Africa/MeerKAT), Astrophys. J. Lett. 848 , L12 (2017), arXiv:1710.05833 [astro-ph.HE]. [33] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. X 9, 011001 (2019), arXiv:1805.11579 [gr-qc]. [34] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 121 , 161101 (2018), arXiv:1805.11581 [gr-qc]. [35] G. Raaijmakers et al. , Astrophys. J. Lett. 893 , L21 (2020), arXiv:1912.11031 [astro-ph.HE]. [36] S. Traversi, P. Char, and G. Pagliara, Astrophys. J. 897 ,165 (2020), arXiv:2002.08951 [astro-ph.HE]. [37] W.-J. Xie and B.-A. Li, Astrophys. J. 883 , 174 (2019), arXiv:1907.10741 [astro-ph.HE]. [38] B. Biswas, P. Char, R. Nandi, and S. Bose, Phys. Rev. D 103 , 103015 (2021), arXiv:2008.01582 [astro-ph.HE]. [39] M. Al-Mamun, A. W. Steiner, J. Nättilä, J. Lange, R. O’Shaughnessy, I. Tews, S. Gandolfi, C. Heinke, and S. Han, Phys. Rev. Lett. 126 , 061101 (2021), 12 
+
+arXiv:2008.12817 [astro-ph.HE]. [40] T. Dietrich, M. W. Coughlin, P. T. H. Pang, M. Bulla, J. Heinzel, L. Issa, I. Tews, and S. Antier, Science 370 ,1450 (2020), arXiv:2002.11355 [astro-ph.HE]. [41] P. Landry, R. Essick, and K. Chatziioannou, Phys. Rev. D 101 , 123007 (2020), arXiv:2003.04880 [astro-ph.HE]. [42] B. Biswas, Astrophys. J. 921 , 63 (2021), arXiv:2105.02886 [astro-ph.HE]. [43] B. Biswas and S. Rosswog, Phys. Rev. D 112 , 023045 (2025), arXiv:2408.15192 [astro-ph.HE]. [44] B. Biswas and P. Char, Phys. Rev. D 112 , 063049 (2025), arXiv:2507.12540 [astro-ph.HE]. [45] B. Biswas, Phys. Rev. D 113 , 123032 (2026), arXiv:2509.06145 [astro-ph.HE]. [46] S.-N. Zhang et al. (eXTP), Sci. China Phys. Mech. As-tron. 62 , 29502 (2019), arXiv:1812.04020 [astro-ph.IM]. [47] P. S. Ray et al. (STROBE-X Science Working Group), STROBE-X: X-ray Timing and Spectroscopy on Dy-namical Timescales from Microseconds to Years (2019), arXiv:1903.03035 [astro-ph.IM]. [48] M. Maggiore et al. , JCAP 03 , 050, arXiv:1912.02622 [astro-ph.CO]. [49] D. Reitze et al. , Bull. Am. Astron. Soc. 51 , 035 (2019), arXiv:1907.04833 [astro-ph.IM]. [50] K. Chatziioannou, Phys. Rev. D 105 , 084021 (2022), arXiv:2108.12368 [gr-qc]. [51] K. Walker, R. Smith, E. Thrane, and D. J. Reardon, Phys. Rev. D 110 , 043013 (2024), arXiv:2401.02604 [astro-ph.HE]. [52] J. Richter and B.-A. Li, Phys. Rev. C 108 , 055803 (2023), arXiv:2307.05848 [nucl-th]. [53] S. M. A. Imam, A. Mukherjee, B. K. Agrawal, and G. Banerjee, Phys. Rev. C 109 , 025804 (2024), arXiv:2305.11007 [nucl-th]. [54] M. á. Ferreira and C. Providência, JCAP 07 , 011, arXiv:1910.05554 [nucl-th]. [55] A. Thete, K. Banerjee, and T. Malik, Phys. Rev. D 108 ,063028 (2023), arXiv:2208.13163 [nucl-th]. [56] P. Tiwari and A. Pai, Deep TOV to characterize Neu-tron Stars (2024), arXiv:2405.08163 [astro-ph.HE]. [57] B. T. Reed, R. Somasundaram, S. De, C. L. Armstrong, P. Giuliani, C. Capano, D. A. Brown, and I. Tews, As-trophys. J. 974 , 285 (2024), arXiv:2405.20558 [astro-ph.HE]. [58] S. J. Magnall, S. R. Goode, N. Sarin, and P. D. Lasky, Directly inferring cosmology and the neutron-star equa-tion of state from gravitational-wave mergers (2024), arXiv:2410.07754 [gr-qc]. [59] F. Di Clemente, M. Scialpi, and M. Bejger, Mach. Learn. Sci. Tech. 6, 025044 (2025), arXiv:2501.15222 [physics.comp-ph]. [60] I. Liodis, E. Smyrniotis, and N. Stergioulas, Physical Review D 109 , 104008 (2024). [61] S. Lalit, A. C. Semposki, and J. M. Maldonado, Phys. Rev. Res. 7, 043037 (2025), arXiv:2411.10556 [astro-ph.HE]. [62] Y. Fujimoto, K. Fukushima, and K. Murase, Phys. Rev. D 98 , 023019 (2018), arXiv:1711.06748 [nucl-th]. [63] Y. Fujimoto, K. Fukushima, and K. Murase, Phys. Rev. D 101 , 054016 (2020), arXiv:1903.03400 [nucl-th]. [64] F. Morawski and M. Bejger, Astron. Astrophys. 642 ,A78 (2020), arXiv:2006.07194 [astro-ph.HE]. [65] S. Traversi and P. Char, Astrophys. J. 905 , 9 (2020), arXiv:2007.10239 [nucl-th]. [66] P. G. Krastev, Galaxies 10 , 16 (2022), arXiv:2112.04089 [nucl-th]. [67] Y. Fujimoto, K. Fukushima, and K. Murase, JHEP 03 ,273, arXiv:2101.08156 [nucl-th]. [68] S. Soma, L. Wang, S. Shi, H. Stöcker, and K. Zhou, JCAP 08 , 071, arXiv:2201.01756 [hep-ph]. [69] S. Soma, L. Wang, S. Shi, H. Stöcker, and K. Zhou, Phys. Rev. D 107 , 083028 (2023), arXiv:2209.08883 [astro-ph.HE]. [70] D. Farrell, P. Baldi, J. Ott, A. Ghosh, A. W. Steiner, A. Kavitkar, L. Lindblom, D. Whiteson, and F. Weber, JCAP 02 , 016, arXiv:2209.02817 [astro-ph.HE]. [71] M.-Z. Han, S.-P. Tang, and Y.-Z. Fan, Astrophys. J. 
+
+950 , 77 (2023), arXiv:2205.03855 [astro-ph.HE]. [72] M. Ferreira, V. Carvalho, and C. Providência, Phys. Rev. D 106 , 103023 (2022), arXiv:2209.09085 [nucl-th]. [73] V. Carvalho, M. Ferreira, T. Malik, and C. Providên-cia, Phys. Rev. D 108 , 043031 (2023), arXiv:2306.06929 [nucl-th]. [74] P. G. Krastev, Symmetry 15 , 1123 (2023), arXiv:2303.17146 [nucl-th]. [75] Z. Wu and D. Wen, Chin. Phys. C 48 , 024101 (2024), arXiv:2312.15629 [nucl-th]. [76] S. Chatterjee, H. Sudhakaran, and R. Mallick, Eur. Phys. J. C 84 , 1291 (2024), arXiv:2302.13648 [astro-ph.HE]. [77] G. Ventagli and I. D. Saltas, JCAP 01 , 073, arXiv:2405.17908 [astro-ph.HE]. [78] F. Morawski and M. Bejger, Phys. Rev. C 106 , 065802 (2022), arXiv:2212.05480 [astro-ph.HE]. [79] L. Brandes, C. Modi, A. Ghosh, D. Farrell, L. Lindblom, L. Heinrich, A. W. Steiner, F. Weber, and D. Whiteson, JCAP 09 , 009, arXiv:2403.00287 [astro-ph.HE]. [80] Q. Hu, J. Irwin, Q. Sun, C. Messenger, L. Suleiman, I. S. Heng, and J. Veitch, Astrophys. J. Lett. 987 , L17 (2025), arXiv:2412.03454 [gr-qc]. [81] G. Gonçalves, M. Ferreira, J. Aveiro, A. Onofre, F. F. Freitas, C. Providência, and J. A. Font, JCAP 12 , 001, arXiv:2210.08382 [astro-ph.IM]. [82] B. Biswas and S. Datta, Phys. Rev. D 106 , 043012 (2022), arXiv:2112.10824 [astro-ph.HE]. [83] J. McGinn, A. Mukherjee, J. Irwin, C. Messenger, M. J. Williams, and I. S. Heng, Rapid neutron star equa-tion of state inference with Normalising Flows (2024), arXiv:2403.17462 [gr-qc]. [84] T. Wouters, P. T. H. Pang, H. Koehn, H. Rose, R. Soma-sundaram, I. Tews, T. Dietrich, and C. Van Den Broeck, Phys. Rev. D 112 , 043037 (2025), arXiv:2504.15893 [astro-ph.HE]. [85] K. He, X. Zhang, S. Ren, and J. Sun, Deep residual learning for image recognition (2015), arXiv:1512.03385 [cs.CV]. [86] J. S. Read, B. D. Lackey, B. J. Owen, and J. L. Fried-man, Physical Review D 79 , 124032 (2009). [87] T. Binnington and E. Poisson, Phys. Rev. D 80 , 084018 (2009), arXiv:0906.1366 [gr-qc]. [88] J. S. Read, B. D. Lackey, B. J. Owen, and J. L. Fried-man, Phys. Rev. D79 , 124032 (2009), arXiv:0812.2163 [astro-ph]. [89] V. Nair and G. E. Hinton, in Proceedings of the 27th international conference on machine learning (ICML-10) (2010) pp. 807–814. [90] D. Hendrycks and K. Gimpel, arXiv e-prints ,arXiv:1606.08415 (2016), arXiv:1606.08415 [cs.LG]. 13 
+
+[91] I. Goodfellow, Y. Bengio, A. Courville, and Y. Bengio, 
+
+Deep learning , Vol. 1 (MIT press Cambridge, 2016). [92] H. Abdi, D. Valentin, and B. Edelman, Neural Networks 
+
+(SAGE, 1999) google-Books-ID: ZEID3w9STOUC. [93] H. Abdi, D. Valentin, and B. Edelman, Neural Net-works , Neural Networks No. no. 124 (SAGE Publica-tions, 1999). [94] A. Thete, K. Banerjee, and T. Malik, Physical Review D 108 , 063028 (2023), arXiv:2208.13163 [nucl-th]. [95] M. H. Farrell, T. Liang, and S. Misra, Econometrica 89 , 181 (2021), _eprint: https://onlinelibrary.wiley.com/doi/pdf/10.3982/ECTA16901. [96] C. Szegedy, A. Toshev, and D. Erhan, in Advances in Neural Information Processing Systems , Vol. 26 (Curran Associates, Inc., 2013). [97] K. He, X. Zhang, S. Ren, and J. Sun, Deep Residual Learning for Image Recognition (2015), arXiv:1512.03385 [cs]. [98] K. He and J. Sun (IEEE, 2015) p. 580, aDS Bibcode: 2015cvpr.conf..580H. [99] R. K. Srivastava, K. Greff, and J. Schmidhuber, High-way Networks (2015), arXiv:1505.00387 [cs]. [100] Y. Bengio, P. Simard, and P. Frasconi, IEEE transac-tions on neural networks 5, 157 (1994). [101] X. Glorot and Y. Bengio, in Proceedings of the thir-teenth international conference on artificial intelligence and statistics (JMLR Workshop and Conference Pro-ceedings, 2010) pp. 249–256. [102] K. He, X. Zhang, S. Ren, and J. Sun, in Proceedings of the IEEE international conference on computer vision 
+
+(2015) pp. 1026–1034. [103] Y. LeCun, L. Bottou, G. B. Orr, and K.-R. Müller, in 
+
+Neural networks: Tricks of the trade (Springer, 2002) pp. 9–50. [104] A. M. Saxe, J. L. McClelland, and S. Ganguli, arXiv preprint arXiv:1312.6120 (2013). [105] Y. LeCun, B. Boser, J. S. Denker, D. Henderson, R. E. Howard, W. Hubbard, and L. D. Jackel, Neural compu-tation 1, 541 (1989). [106] C. M. Bishop, Neural networks for pattern recognition 
+
+(Oxford university press, 1995). [107] B. D. Ripley, Pattern recognition and neural networks 
+
+(Cambridge university press, 2007). [108] W. N. Venables and B. D. Ripley, Modern applied statis-tics with S (Springer Science & Business Media, 2013). [109] P. Peterson, International Journal of Computational Science and Engineering 4, 296 (2009). [110] F. Sohil, M. U. Sohali, and J. Shabbir, An introduc-tion to statistical learning with applications in r: By gareth james, daniela witten, trevor hastie, and robert tibshirani, new york, springer science and business me-dia, 2013, $41.98, eisbn: 978-1-4614-7137-7 (2022). [111] P. J. Huber, The Annals of Mathematical Statistics 35 ,73 (1964). [112] I. Loshchilov and F. Hutter, arXiv e-prints ,arXiv:1711.05101 (2017), arXiv:1711.05101 [cs.LG]. [113] I. Loshchilov and F. Hutter, Sgdr: Stochastic gradi-ent descent with warm restarts (2017), arXiv:1608.03983 [cs.LG]. [114] X. Ying, Journal of Physics: Conference Series 1168 ,022022 (2019). [115] W. Kastaun, J. V. Kalinani, and R. Ciolfi, Phys. Rev. D 103 , 023018 (2021), arXiv:2005.01821 [gr-qc].
