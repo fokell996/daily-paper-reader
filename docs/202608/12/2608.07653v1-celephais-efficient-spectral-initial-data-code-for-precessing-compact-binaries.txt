@@ -1,0 +1,946 @@
+Title: Celephais: efficient spectral initial data code for precessing compact binaries
+
+URL Source: https://arxiv.org/pdf/2608.07653v1
+
+Published Time: Tue, 11 Aug 2026 00:07:13 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# Celephaïs : e ffi cient spectral initial data code for precessing compact binaries 
+
+Hao-Jui Kuan 1, 2, ∗
+
+> 1
+
+Department of Physics and Illinois Center for Advanced Studies of the Universe, University of Illinois Urbana-Champaign, Urbana, Illinois 61801, USA 
+
+> 2
+
+Max Planck Institute for Gravitational Physics (Albert Einstein Institute), D-14476 Potsdam, Germany 
+
+(Dated: August 11, 2026) Large numerical-relativity surveys require compact-binary initial data that are both spectrally accurate and in-expensive to construct, including for systems with unequal masses and misaligned spins. We present Celephaïs ,a compact-object initial-data code built on the Kadath spectral library, that constructs binary-neutron-star and black-hole–neutron-star initial data without imposing equatorial symmetry. The method exploits the sparse structure of the globally coupled multi-domain Jacobian and the approximate parity separation of fields. The assembled matrix is factored with MUMPS and reused as a refreshed right preconditioner in a Jacobian-free Newton–Krylov iteration, thereby avoiding dense storage. An adaptive hp –refinement scheme then concentrates resolution where the spectral tails are not yet resolved. For a mass-ratio-20 black-hole–neutron-star benchmark, the adaptive schemes recover the uniform-grid constraint accuracy with about three times fewer unknowns. We also extend the post-Newtonian force-balance estimate to arbitrary spin orientations and use it to initialise eccentricity reduction. Validation comprises binding-energy comparisons with post-Newtonian sequences, a precessing binary-neutron-star eccentricity-reduction test, and a full evolution whose waveform-reconstructed precession axis follows a post-Newtonian simple-precession model. These results establish an e ffi cient route to spectrally resolved binary-neutron-star and black-hole–neutron-star initial data with arbitrary spin orientations. 
+
+I. INTRODUCTION 
+
+Gravitational-wave observations now probe compact-binary mergers throughout the strong-field regime. As the observation catalogue grows, higher-signal-to-noise events and systems in less explored regions of parameter space are expected [1, 2]. Accurate waveform models will require suites of numerical-relativity (NR) simulations spanning unequal masses, large and misaligned spins, eccentricity, and matter e ff ects. Each NR simulation begins with a solution of the Einstein constraint equations. Residual constraint violations and orbital artefacts in these initial data propagate into the evolution and can limit waveform accuracy. Multi-domain spectral methods are attractive because smooth solutions converge exponentially with spectral order [3–5]. The LORENE family established this approach for binary-neutron-star (BNS) and black-hole– neutron-star (BHNS) quasiequilibria [6–8]. The Kadath li-brary subsequently provided a general spectral elliptic infras-tructure [5, 9], on which FUKA built public solvers for unequal-mass, aligned-spin compact binaries [10]. Other spectral im-plementations that extend the physical or numerical scope include SGRID and Elliptica , which support generic spins and large mass ratios [11–13], while the SpEC /Spells frame-work uses a distinct multidomain infrastructure [4, 14, 15]. Hyperbolic relaxation in NRPyElliptic [16] and the task-based discontinuous-Galerkin solver in SpECTRE [17] provide alternative routes to scalable elliptic solves. Broad parameter surveys expose a tension between the ro-bustness of a globally coupled spectral solve and the cost of resolving every domain uniformly. A Newton step for a multi-domain spectral discretisation couples the elliptic equations and the multi-domain interface conditions through a global Ja-cobian. Direct factorisation would requires O(N2 
+
+> u
+
+) storage for  
+
+> ∗hjkuan@illinois.edu
+
+Nu unknowns, even when their Newton Jacobians are mostly structurally zero, whereas matrix-free Newton–Krylov meth-ods require an e ff ective preconditioner [4, 17, 18]. Rather than relying on a prescribed preconditioner, Celephaïs explicitly constructs the Jacobian for its strong-form elliptic system while assembling only the nonzero entries. Like FUKA , it is a separate application code built on Kadath , but it extends the framework to arbitrary spin orientations and fully leverages the sparsity of the Jacobian and the parity properties of the fields. Combined with adaptive hp –refinement, Celephaïs enables e ffi cient con-struction of BNS and BHNS with substantially lower memory demand. The resulting sparse matrix is factorised by MUMPS 
+
+library, whose LU factors are then reused as a right precon-ditioner in the following Jacobian-free Newton–Krylov solve. This way, we have the full Jacobian of the first Newton step as preconditioner to capture accurately the complicated couplings, and have the memory e ffi ciency of a Jacobian-free solve for the subsequent steps. In the event that the preconditioner becomes stale, the Jacobian is reassembled and refactored. For a rep-resentative precessing BNS at production resolution, the first Jacobian assembly takes under 10 minutes and the complete job uses under 17 GB on a MacBook Pro with an Apple M4 Max processor. Effi cient linear algebra addresses only one part of the com-putational cost. When underresolved spectral structure is con-fined to particular domains or coordinate directions, uniform refinement introduces unnecessary unknowns elsewhere. In a high-mass-ratio binary, for example, the markedly unequal sizes of the two objects produce a broad region that is underre-solved only in the radial direction. Increasing a single uniform resolution parameter then adds coe ffi cients to every domain and coordinate direction, including those whose spectral tails are already well resolved. We implement an anisotropic hp –refinement algorithm that independently assesses the spectral tails of each domain and coordinate direction. The adaptive mesh refinement (AMR) scheme especially helps to reach a arXiv:2608.07653v1 [gr-qc] 7 Aug 2026 2target constraint accuracy with fewer unknowns for high-mass ratio binaries. The remainder of the paper is organised as follows. Sec-tion II fixes notation by reviewing the extended conformal thin-sandwich (XCTS) formalism. We then develop the depen-dency filter and batched Jacobian assembler in Section III A. Sections III B and III C describe the parity-separated, refreshed-preconditioner Newton–Krylov solve and provide a benchmark of its performance. Section IV introduces the hp –refinement scheme. We assess the implementation through a handful of examinations with increasing complexity in Section V. Sec-tion VI summarises the results and outstanding limitations. Unless stated otherwise, we set c = G = M⊙ = 1.  
+
+> II. FIELD EQUATIONS IN THE XCTS FORMALISM
+
+To fix the notation used throughout the paper, we briefly recap the XCTS formalism, following closely the presentation of FUKA [10]. We use the standard 3 +1 decomposition [19], ds2 = gμν dxμdxν = −α2dt2 + γi j 
+
+dxi + βidt  dx j + β jdt ,
+
+(1) where α is the lapse, βi the shift, and γi j the spatial metric on slices Σt with future-pointing unit normal nμ. Initial data satisfy the Hamiltonian and momentum constraints, 
+
+R + K2 − Ki j Ki j = 16 πE, (2) 
+
+D j K ji − Di K = 8πJi, (3) where Ki j is the extrinsic curvature, K = γi j Ki j , and Di is the covariant derivative compatible with γi j . The matter sources are defined as E := nμnνTμν and Ji := −nμγνiT μν .The four constraints do not fix all twelve components of γi j , Ki j 
+
+. The XCTS decomposition [20, 21] therefore sep-arates freely specifiable data from variables determined by elliptic equations. We write the conformal metric and trace-free curvature as ˜γi j = Ψ −4γi j , (4) ˆAi j = Ψ 2 Ki j − 13 Kγi j 
+
+ . (5) XCTS closes the four constraints by using the conformal trace-free metric evolution equation to relate ˆAi j algebraically to the lapse, shift, and freely specified conformal-metric velocity ˜ui j := ∂t ˜γi j . Specifying ∂t K turns the evolution equation for 
+
+K into a fifth elliptic equation for the lapse. Thus, the system determines Ψ, α Ψ, β i from ˜γi j , ˜ui j , K, ∂ t K and the matter sources. For quasiequilibrium data, we set ˜ ui j = ∂t K = 0, assuming that these freely specified fields are instantaneously station-ary in the corotating frame associated with the approximate helical symmetry introduced below [22, 23]. We additionally adopt conformal flatness, ˜ γi j = fi j with fi j the flat metric, and maximal slicing, K = 0. Under these assumptions, the XCTS system reduces to the Isenberg–Wilson–Mathews form [24–26], ˜D2Ψ = − 18 Ψ−7 ˆAi j ˆAi j − 2πΨ5 E, (6) ˜D2(αΨ) = 78 αΨ−7 ˆAi j ˆAi j + 2πα Ψ5(E + 2S ), (7) ˜D2βi = − 13 ˜Di ˜D jβ j + 2 ˆ Ai j ˜D j(αΨ−6) + 16 πα Ψ4 Ji, (8) where ˜ Di is the covariant derivative compatible with ˜ γi j (= fi j )and ˜ D2 := ˜Di ˜Di. The trace-free curvature follows from the shift through the conformal longitudinal operator ˜ L,ˆAi j = Ψ6
+
+2α ( ˜ Lβ)i j , (9) ( ˜ Lv)i j := ˜Div j + ˜D jvi − 23 ˜γi j ˜Dkvk, (10) and S := γi j S i j is the trace of the spatial stress. When the orbital separation changes on a timescale much longer than one orbit, the data may be constructed with an approximate helical Killing vector ξμ, timelike inside the light cylinder [27, 28]. In coordinates adapted to the symmetry, the time-evolution vector can be written as [29, 30] 
+
+ξμ = αnμ + βμ , (11) where the shift is split into an inertial piece βi 
+
+> 0
+
+and an analytic comoving background shift [10, 31], 
+
+βi := βi 
+
+> 0
+
++ βi 
+
+> co
+
+with βi 
+
+> co
+
+= Ω ∂i 
+
+> φ
+
+(xc) + ˙aa
+
+xi − xic
+
+ + vz ˆzi .
+
+(12) Here Ω is the orbital angular velocity, ∂i
+
+> φ
+
+(xc) is the flat-space rotational vector about the binary centre xc, and a is the coor-dinate separation. Together, Ω and the radial approach speed ˙a = da/dt control the orbital eccentricity [32, 33]. The con-stant boost vz ˆzi controls the ADM linear momentum normal to the orbital plane [31], as described in Section II D. For the conformally flat construction used here, the analytic shift in Eq. (12) keeps the compact objects stationary on the grid without changing the gravitational elliptic operators. To see the latter aspect, the rotation and boost are flat-space Killing fields, while the radial term is a homothetic dilation. These affi ne fields contribute neither to the shift Laplacian nor to the trace-free flat longitudinal operator: ( ˜ Lβco )i j = 0. We therefore solve Eq. (8) for βi
+
+> 0
+
+, reconstruct βi = βi 
+
+> 0
+
++ βi
+
+> co
+
+, and impose asymptotic flatness only on the regular variables, lim  
+
+> r→∞
+
+α = 1 , lim  
+
+> r→∞
+
+Ψ = 1 , lim  
+
+> r→∞
+
+βi 
+
+> 0
+
+= 0 . (13) The analytic comoving terms instead encode the chosen orbital frame and need not decay at infinity.  
+
+> A. Matter sources and hydrostatic equilibrium
+
+We model neutron-star matter as a perfect fluid, T μν =
+
+ρh u μuν + pg μν , with specific enthalpy h, rest-mass density 3
+
+ρ, specific internal energy ϵ, pressure p, and four-velocity uμ.The sources entering (6)–(8) are 
+
+E = ρhW 2 − p, (14) 
+
+S = 3p + (E + p)U2, (15) 
+
+Ji = ρhW 2Ui, (16) where Ui is the fluid velocity relative to the normal observer, 
+
+U2 := γi j UiU j, and the Lorentz factor is W2 = (1 − U2)−1.Because ρ decreases steeply at the stellar surface, its direct spectral representation can develop Gibbs oscillations. Fol-lowing [10, 11, 13, 32, 34–36], we multiply the gravitational residuals by p/ρ . This rescaling replaces explicit factors of ρ
+
+in the source terms by smooth equation-of-state functions of h
+
+and improves the surface representation. Hydrostatic equilibrium further requires ∇μT μν = 0 and rest-mass conservation ∇μ(ρuμ) = 0. On each spatial slice, we define the projected enthalpy current ˆ ui := hγiμuμ = hWU i and the fluid velocity in the corotating frame Vi := αUi − ξi. For an isentropic fluid, the relativistic Euler equation can be written under helical symmetry as 
+
+Di
+
+hα
+
+W + ˆu jV j
+
+!
+
++ V jD j ˆui − Di ˆu j
+
+ = 0. (17) For corotation, Vi = 0 and the second term vanishes. For irrotational flow, we introduce a velocity potential ϕ through ˆui = Diϕ [37–39]. The corotating velocity then becomes 
+
+Vi = αUi − ξi = α
+
+Ψ4hW f i j ˜D jϕ − ξi (18) and the antisymmetrised derivative of ˆ ui vanishes. Thus, Eq. (17) admits an exact first integral for both corotation and irrotation. Defining H := ln h, rest-mass conservation can be expressed as 
+
+Ψ6WV i ˜Di H + dH
+
+d ln ρ ˜Di(Ψ6WV i) = 0 , (19) which gives an elliptic equation for ϕ through ˜ DiVi and avoids explicit dependence on the rest-mass density. To prescribe neutron-star spin, we use the constant-rotational-velocity construction developed and applied in [11, 13–15, 35, 36, 40–45] and add a rotational component to the enthalpy current, ˆui = Diϕ + Ψ 4 fi j s j, si = ω ξ i
+
+> NS
+
+, (20) where ω parametrises the magnitude of the uniform rotation. We allow ξi 
+
+> NS
+
+to have arbitrary orientation and, within the helical-symmetry approximation, treat the spin contribution as constant along the neutron-star centre worldline [11, 35, 36]. Neglecting its spin-curl terms in Eq. (17) gives the approximate 
+
+Bernoulli relation 
+
+hα
+
+W + Diϕ Vi ≃ CB , (21) where CB is constant on each star. The elliptic field and matter equations do not determine the orbital angular velocity Ω or the position xc of the rotation axis in Eq. (12). For a BNS force-balance solve, two stellar-centre conditions determine Ω
+
+and the component of xc along the line of centres [7, 10, 11]. For a BHNS, the single stellar condition determines Ω, while the ADM-momentum conditions determine xc [10]. In either case, local force balance is imposed by requiring the enthalpy to be extremal along the line of centres at each neutron-star centre xNS ,
+
+∂x H|xNS = 0 . (22) Evaluating the x derivative of Eq. (21) at each extremum bal-ances the gravitational, orbital, and internal-flow terms along the line of centres. The thermodynamic variables are closed separately by an equation of state (EOS) relating ρ, p, and h. 
+
+> B. Axisymmetric isolated-star XCTS system
+
+The binary Newton solve requires an initial guess for each neutron star with the targeted EOS and spin. We obtain this guess from an auxiliary isolated-star problem and use the re-sulting fields in the superposed binary data. Because the iso-lated configuration is axisymmetric, the problem reduces to two dimensions. With ˜ β = βr sin θ, the corresponding XCTS equations are [46–48] 
+
+△2(αΨ) = 2π (E + 2S ) αΨ5 + 7A2
+
+4 αΨ5 , (23) 
+
+△2Ψ = −2πEΨ5 − A2
+
+4 Ψ5 , (24) ˜△3 ˜β = 16 πα Jφ
+
+r sin θ + r sin θ (∂β ) [ ∂(ln α − 6 ln Ψ)] , (25) where △2 is the scalar flat-space Laplacian in axisymmetry and ˜△3 is the φ–component of the vector Laplacian, 
+
+△2 := (∂r)2 + 2
+
+r ∂r + 1
+
+r2 (∂θ)2 + 1
+
+r2 tan θ ∂θ , (26) ˜△3 := △2 − 1
+
+r2 sin 2 θ . (27) Here 
+
+A2 := 12 Ki j Ki j = r2 sin 2 θ
+
+4α2 (∂β )2 , (28) and we use the notation 
+
+∂α ∂β = ∂α ∂r
+
+∂β ∂r + 1
+
+r2
+
+∂α ∂θ ∂β ∂θ and (∂α )2 = ∂α ∂α . (29)  
+
+> C. Boundary conditions at compact-object surfaces
+
+For black holes, we excise a coordinate 2-sphere S BH and impose quasiequilibrium inner boundary conditions [49–52]. We require S BH to be a marginally outer trapped surface, i.e. 4a surface of vanishing outgoing null expansion. In the confor-mally flat XCTS variables, this requirement gives the Robin condition ˜si ˜DiΨ S BH 
+
+= − Ψ
+
+4 ˜Di ˜si − 14 Ψ−3 ˆAi j ˜si ˜s j , (30) where ˜ si is the conformal unit normal to S BH . Keeping the excision surface at a fixed coordinate location imposes 
+
+βi 
+
+> SBH
+
+= αΨ−2 ˜si + Ω BH ξi 
+
+> BH
+
+. (31) Here ξi 
+
+> BH
+
+is tangent to the horizon and ΩBH sets its rotation, while the first term fixes the normal component of the shift. On the spherical horizon, we choose the homogeneous Neumann gauge condition ˜si ˜Di(αΨ) S BH 
+
+= 0 . (32) On the other hand, neutron stars require no excision. Their surfaces are defined by H = 0 and, at each surface, Eq. (19) reduces regularly to 
+
+Vi ˜Di H = 0 . (33)  
+
+> D. Global and quasi-local diagnostics
+
+We use global charges as indicators of quasiequilibrium and momentum balance, and quasi-local charges to fix the compact-object parameters. Under conformal flatness, the ADM and Komar masses at spatial infinity are [53–56] 
+
+MADM = − 12π
+
+I 
+
+> S∞
+
+˜DiΨ dS i, (34) 
+
+MK = 14π
+
+I 
+
+> S∞
+
+˜Diα dS i. (35) where d S i is the outward conformal surface element. Ap-proximate helical symmetry requires MADM = MK, and the dimensionless discrepancy 
+
+ϵvir = |MK − MADM |
+
+MK + MADM 
+
+, (36) is monitored as a virial error. The total angular and ADM linear momenta are [57–59] 
+
+Jtot = 18π
+
+I 
+
+> S∞
+
+ˆAi j ξi dS j, (37) 
+
+Pi 
+
+> ADM
+
+= 18π
+
+I 
+
+> S∞
+
+ˆAi j dS j. (38) The binding energy is Eb = MADM − M∞, where M∞ is the sum of the individual masses at infinite separation. We achieve Px = Py = 0 by adjusting the centre-of-mass position in the rigid co-orbital velocity. Because rotation about ˆz generates no velocity along that axis, this adjustment cannot control Pz in generic tilted-spin configurations. We therefore solve for a uniform boost vz ˆzi and impose the corresponding momentum constraint at infinity, which is the out-of-plane part of the boost-based centre-of-mass control of [31]. The remaining compact-object parameters in Eqs. (6) to (8) are fixed by quasi-local mass and spin constraints. For each object, an approximate rotational vector ξi 
+
+> (NS ,BH)
+
+is centred on the object and aligned with the requested spin axis; in the aligned case, it reduces to ∂i
+
+> φ
+
+(xc). For a black hole, the spin and irreducible mass on the excision surface S BH are 
+
+S = 18π
+
+I 
+
+> SBH
+
+ˆAi j ξi 
+
+> BH
+
+dS j, (39) 
+
+M2irr = 116 π
+
+I 
+
+> SBH
+
+Ψ4 dS , (40) where d S j = ˜s jdS and d S is the conformal area element, giving the Christodoulou mass and dimensionless spin 
+
+M2CH = M2irr + S2
+
+4M2irr 
+
+, χ = S
+
+M2CH 
+
+. (41) For a neutron star, the same spin integral (39), evaluated on a coordinate sphere S NS enclosing all matter, gives the quasi-local spin SQL [12, 15]. A spinning BNS solve imposes χNS =
+
+SQL /M2ADM ,NS for each star. The baryonic mass is the volume integral 
+
+Mb =
+
+Z
+
+> VNS
+
+Wρ Ψ6 dV, (42) where d V is the conformal volume element.  
+
+> III. SPARSE JACOBIAN CONSTRUCTION AND MUMPS-PRECONDITIONED NEWTON–KRYLOV SOLVE
+
+KADATH discretises the XCTS system on the multi-domain space shown in Fig. 1, using surface-adapted coordinates to track neutron-star boundaries [7, 60, 61]. At Newton step k,the state uk contains the spectral fields, stellar-surface shapes, and scalar parameters, while the residual rk collects the vol-ume equations, boundary and matching conditions, and global constraints. With the code’s internal sign convention, the cor-rection satisfies 
+
+Jk δuk = rk , uk+1 = uk − δuk . (43) This correction is globally coupled, but its Jacobian is struc-turally sparse. We exploit this structure by estalishing an eco-nomical equation-to-Jacobian machienry through a dependency graph identifying potentially nonzero derivatives, batched au-tomatic di ff erentiation evaluating them, separating the factori-sation into invariant sectors under a y–reflection parity con-sideration, and a periodically refreshed sparse factorisation preconditions the matrix-free Newton–Krylov solve.  
+
+> A. Operator dependency graph and structural filtering
+
+We assemble the sparse Jacobian by columns and deter-mine its structural zeros before di ff erentiating. This is possible 5
+
+12345
+
+R⋆
+
+Rbisph compactified domain → spatial infinity       
+
+> h-move: insert shell p-move: add points exterior shell (hor pin r)non-conforming interface conforming interface neutron star surface-fitted, one ( nθ ,nϕ)five bispheric domains
+> ϕ-block, shared grid
+
+FIG. 1. Binary multi-domain decomposition and admissible refinement moves (schematic, not to scale). Two surface-fitted stars are connected by bispheric domains and surrounded by one spherical shell and a compactified outer domain. The field–domain blocks are the dependency units used in Section III A; the arrows indicate the admissible h and p refinements discussed in Section IV. Thin internal curves delimit the five bispheric domains, numbered in the upper half of the schematic. On the smaller object, R⋆ extends from its centre to the object surface and Rbisph 
+
+from the same centre to the surrounding dashed boundary. The large dash-dotted circle marks the non-conforming interface; solid circles denote conforming interfaces. An interactive 3D version is available at https://hao-jui.github.io/Celephais/SpaceDecomposition.html .
+
+because KADATH represents each residual Ei as a symbolic ex-pression. The scan illustrated in Fig. 2 follows the expression through its intermediate definitions Qλ to the unknown field– domain pairs on which it can depend. The resulting acyclic dependency graph defines supports V(Qλ) and V(Ei). When a coe ffi cient of q j(d j) is varied, only definitions and residual rows whose supports contain that field–domain pair are evaluated, and a structural zero is thusly excluded. Forward-mode automatic di ff erentiation evaluates the derivatives pass-ing the dependency filter. For a discrete residual r = F(u), the 
+
+j–th Jacobian column is the directional derivative of F(u + εe j)at ε = 0, restricted to the residual rows that may contribute. Be-cause the first variation is linear in its seed, strip-mined forward mode [62] propagates several compatible columns in one traver-sal, ˙ R = J ˙U =  Je j1 , . . . , Je jNlane 
+
+ for ˙U =  e j1 , . . . , e jNlane 
+
+,so the primal operations are shared while each lane carries one Jacobian column. Figure 3 illustrates the resulting spar-
+
+recursive scan of leaves   
+
+> Ei
+> Q2∂a
+> Q1
+> qA(d1)const.
+> qB(d2)
+
+support bucket            
+
+> V(Q1)={qA(d1)}V(Q2)={qA(d1)}V(Ei)={qA(d1),qB(d2)}
+> for varied qj(dj), evaluate Eionly if
+> qj(dj)∈ V (Ei)
+
+FIG. 2. Dependency filter for a residual operator Ei. The symbolic expression is traversed through intermediate definitions to its unknown field–domain leaves, producing the support V(Ei). When qj(dj) is varied, Ei is evaluated only if qj(dj) ∈ V (Ei). 6 
+
+> FIG. 3. Sparse Jacobian for a low-resolution equal-mass BNS with one spinning star. Only 2 .1% of the matrix entries are nonzero, and colours identify columns grouped by the batched automatic-di ff erentiation assembler. Batching reduces the number of residual traversals from 18 355 scalar sweeps to 2980 grouped sweeps.
+
+sity and reduction in residual traversals, using a representative low-resolution BNS as example. Several strides of non-zero entries are visible, which are the representation of one equation is a domain. We only batch the columns when they share the same field–domain support to reconcile with the structural-zero filter.  
+
+> B. Reflection parity and sector-separated preconditioning
+
+Before factorisation, the sparse preconditioner can be sep-arated into two sectors when the binary admits a reflection symmetry. We place the binary axis along x, take the orbital angular momentum along z, and restrict the spin axes to the 
+
+x–z plane. For ( xc)y = 0 and vanishing radial-infall param-eter ˙ a = 0, the residual map is equivariant under reflection 
+
+y → − y combined with reversal of velocity-type quantities; we denote this transformation by Py. The symmetry applies independently of the mass ratio, spin magnitudes, and spin tilts within the x–z plane. Each spectral degree of freedom is assigned the product of its field parity and the parity of its azimuthal basis function under Py. The same combined parity is assigned to the residual rows, thereby partitioning both unknowns and equations into even and odd sectors. Denoting F(u) as the discrete residual map, equivariance means F(Pyu) = Py F(u). At an invariant state Pyu = u, di ff erentiating this relation gives a Jacobian that commutes with the parity operation. When the unknowns and rows are ordered by this combined parity, [J, Py] = 0, J = J+ 00 J−
+
+!
+
+. (44) Here J+ and J− act on the even and odd sectors. On the first sparse assembly, we check that cross-sector entries are con-sistent with roundo ff and then remove them before factorising both sectors; neither sector is discarded. The radial approach ˙ a , 0 used in eccentricity reduction (Section V B) weakly breaks this symmetry. In that case, the sector mask is used only for the quasi-Newton preconditioner, while the matrix-free action of Jk retains the physical cross-sector coupling. This approximation did not prevent conver-gence for the weakly noncircular configurations considered here. It is worth cautioning that the mixed-parity components of solutions are retained, and are only truncated at the Jacobian level. If the measured coupling is appreciable or the parity assignment is inconsistent, the unmodified preconditioner of Section III C is used.  
+
+> C. MUMPS-preconditioned Newton–Krylov solve
+
+We solve the Newton correction with unrestarted gener-alised minimal residual iteration (GMRES). High-order spec-tral derivatives, boundary and matching conditions, and global integral rows have di ff erent numerical scales, which motivates preconditioning the matrix-free Krylov solve. The measure-ments below assess only the preconditioned implementation and do not provide an unpreconditioned robustness compari-son. At a refresh step k f , the filtered and batched assembler of Section III A constructs the sparse Jacobian Jk f . When the parity mask is active, MUMPS factors the two sectors introduced above separately; otherwise it factors the full matrix, using a METIS ordering in either case [63]. We denote the matrix represented by these factors by Mk f := Jk f ; applying M−1  
+
+> kf
+
+re-quires sparse triangular solves, not an explicit inverse. Between refreshes, the factors are reused in the right-preconditioned sys-tem 
+
+δuk = M−1  
+
+> kf
+
+yk , Jk M−1  
+
+> kf
+
+yk = rk . (45) Here M−1  
+
+> kf
+
+uses the latest stored factors, whereas Jk is always evaluated matrix-free at the current Newton state, i.e., every Newton step uses the current Jacobian and the cached infor-mation is only the preconditioner. Reusing the factorisation therefore changes the Krylov convergence rate but not the Newton equation being solved. The Krylov tolerance is tied to the nonlinear residual through the Eisenstat–Walker choice-2 forcing term [64, 65]. In the production configuration used here, GMRES stops when 
+
+rk − Jk M−1  
+
+> kf
+
+y(m)  
+
+> k2
+
+≤ ηk ∥rk∥2 , m ≤ 48 , (46) without restart before the cap. The forcing term is bounded between 10 −8 and 10 −3 and tightens as the nonlinear residual contracts, avoiding oversolving early Newton steps. Failure to meet the criterion is reported, and the resulting step is not counted as a converged linear solve. The first Jacobian is al-ways factored; thereafter, the factors are reused while nonlinear convergence remains rapid and are refreshed periodically or when the residual grows sharply. 7                                                        
+
+> Strong scaling at fixed resolution N =11
+> npJacob. (s) Wall time (s) RSS (GB) speedup effi ciency 147.77 61.35 4.442 1.00 ×100.0% 226.81 38.76 4.213 1.78 ×89.1% 414.90 27.66 3.960 3.21 ×80.2% 88.85 24.03 3.489 5.40 ×67.5%
+> Resolution sweep at fixed rank count n p=2Res NDOF Jacob. (s) MUMPS (s) RSS (GB) OOC (s) 941 612 9.09 2.14 1.397 2.12 11 81 035 26.81 11.68 4.213 11.69 13 120 168 69.15 43.40 13.873 47.20 15 191 200 163.53 ——150.08
+
+TABLE I. Sparse-Jacobian construction and MUMPS analysis plus fac-torisation for an equal-mass 1 .35 + 1.35 M⊙ precessing BNS with the DD2 EOS and coordinate separation 35 M⊙. One star is nonspinning; the other has χ = 0.3 inclined by 81 ◦ to the orbital angular momentum. Values are medians of three runs on a MacBook Pro with an Apple M4 Max processor. The strong-scaling block varies the MPI rank count at N = 11, where speedup and e ffi ciency are computed from Jacobian assembly. The resolution block uses two ranks, where “—” indicates that the factorisation was infeasible within the claimable memory (RAM). However, the use of out-of-core (OOC) memory enables the N = 15 factorisation to complete. 
+
+Table I reports the cost of constructing the first sparse pre-conditioner for a representative precessing BNS before AMR. Increasing the MPI rank count accelerates Jacobian assembly but not as much for the sparse factorisation. Actually, using many ranks for MUMPS can be rather ine ffi cient, because the factorisation is a competition between computation and com-munication where the latter dominates at high rank counts. Therefore, we intented to use one fourth of np, rounded up to the least integer, for MUMPS. At N = 15, the factorisation is infeasible within the memory budget, and we need to use the out-of-core functionality of MUMPS . The out-of-core action writes the partial factors to disk while factorising other factors and reads them back when needed for the triangular solves. In general, the factorisation time will be slowed by the disk I/O than the in-core factorisation. This headroom is negligible for Macbook Pro used here, but this is not a portable conclu-sion and depends on the I /O bandwidth of the machine. The rapid growth in the number of unknowns with uniform order motivates the adaptive refinement introduced in Section IV. 
+
+IV. ADAPTIVE HP-REFINEMENT 
+
+Sparse linear algebra reduces the cost at a fixed grid, but uni-form resolution can allocate DOF ine ffi ciently. The required order depends on the binary parameters, and is not known apriori . We therefore use domain-local spectral tails to refine only unresolved domains and coordinate directions. Following [66], a p move adds collocation points along one coordinate direction, an h move subdivides a radial shell, and their combi-nation is hp refinement (Fig. 4). The domain decomposition 
+
+p-move 
+
+h-move FIG. 4. The two admissible radial refinement moves on one domain (schematic). A p move raises the order in place, whereas an h move inserts a radial interface. The polar and azimuthal directions admit only p moves.                               
+
+> domain group rθϕcoupling rule nucleus +adapted pair pppone ( nθ,nϕ) for the stellar core stellar-side shells h+pppshellable band before the bispheric match bispheric ( ×5) ——prefine as a block, ϕonly exterior shells h+pppinterfaces matched by the tau method compactified pppoutermost cell, reaches ∞
+
+TABLE II. AMR moves allowed by the binary domain decomposition; “—” denotes a direction that cannot be refined. 
+
+constrains the admissible refinement moves, as summarised in Table II. The layout in Fig. 1 contains two surface-fitted stars and their surrounding shells, five connecting bispheric domains [9, 67], exterior shells, and a compactified outer domain. A 
+
+p move raises the order of an existing domain, whereas an h
+
+move subdivides only the shellable stellar-side and exterior bands that do not include the bispheric domains. Refinement must also preserve the tau-method interface conditions [5, 9]. Equal angular orders are matched mode by mode. When neighbouring orders di ff er, the fields are instead interpolated to common boundary points before their di ff erence is projected into the tau rows. These interfaces enforce that all domains belonging to one stellar core retain a common angular resolution, and that the five bispheric domains refine together and only in ϕ. The former preserves the single angular representation of the deformable stellar surface, while the latter preserves conformity within the bispheric block. An h move helps when su ffi cient radial space remains be-tween the compact object, at radius R⋆, and the bispheric matching surface, at Rbisph . After inserting nshell interfaces, this interval is divided into nshell + 1 equal-width shells, preserving the domain geometry over the configurations considered here. 
+
+A. Refinement indicators and marking strategy 
+
+For a su ffi ciently regular resolved field, spectral coe ffi cients decay rapidly, so the highest retained modes provide a local estimate of truncation error [66]. Let cα denote the coe ffi cients on one domain, with multi-index α = (αr, α θ, α ϕ). Along coordinate direction ℓ, we define the tail from the highest 
+
+w = 2 modes, 
+
+Tℓ = { α : αℓ ≥ nℓ − w }, ℓ ∈ { r, θ, ϕ }. (47) 823434         
+
+> hp
+> p{only
+> N= 7 baseline
+> N= 9
+> N= 11
+> N= 13
+> N= 15
+> 50k 100k 150k 200k 250k
+
+DOF (cost)   
+
+> 10 !8
+> 10 !7
+> Hamiltonian  kHk 2
+> uniform ladder
+> h{move
+> p{move
+> 926{27k 0:65 1:5
+> kHk 2 (10 !7) 112
+> 2:4#
+
+FIG. 5. Cost–accuracy relation for a mass-ratio-20 BHNS with the DD2 EOS and coordinate separation 240 M⊙. The Hamiltonian-constraint norm ∥H∥ 2 is shown against the number of unknowns for uniform, p-only, and hp refinement from a common N = 7 baseline. A radial imbalance triggers one h move, which inserts three shells at fixed order and reduces ∥H∥ 2 by about a factor of 8, to approximately 1/2.4 of that obtained by the equal-cost first p move. Subsequent p
+
+moves reach the finest uniform-grid accuracy with about three times fewer unknowns. 
+
+For each nonzero spectrum, the L2 and L∞ tail ratios are [68] 
+
+η2,ℓ =
+
+  P α∈T ℓ |cα|21/2
+
+  P α |cα|21/2 , η∞,ℓ = max α∈T ℓ |cα|
+
+max α |cα| . (48) For tensor fields, both norms include all components. The default tolerances are τ2 = 10 −8 and τ∞ = 10 −7 in every direction. For solved field q, domain d, and direction ℓ, the normalised demand is 
+
+Dd,ℓ := max  
+
+> q
+
+max 
+
+
+
+η(q)2,d,ℓ 
+
+τ2
+
+, η(q)
+
+> ∞,d,ℓ
+
+τ∞
+
+ . (49) Pairs with Dd,ℓ > 1 are marked for refinement, while the largest demand provides a global convergence diagnostic. For the azimuthal Fourier basis, cosine and sine coe ffi cients are combined into the physical amplitude of each mode before the tail is evaluated. 
+
+B. Execution policy 
+
+An h move inserts one radial shell into each marked shellable band, whereas a p move adds two points to a marked domain– direction pair. To select between them, let Rk be the largest radial demand among the h–eligible domains at AMR cycle 
+
+k, and let Ak be the largest polar or azimuthal demand over all domains. When a shell budget remains and Ak < dARk,the policy uses an h move; otherwise it uses anisotropic p
+
+refinement. We set the angular-dominance threshold to dA = 1. An accepted h move must reduce the radial demand in every aff ected band by at least a factor of two before further subdi-vision is allowed. If this test fails, the h gate is closed and the 0 2 4 6 8 10 
+
+mode index ,                      
+
+> 10 !8
+> 10 !6
+> 10 !4
+> 10 !2
+> coe /cient energy  jc,j
+> ?,n?= 8
+> ?,n?= 10
+> @(locked, base)
+> 2(locked, base) N= 9
+> N= 11
+> N= 13
+> N= 15
+> N= 17
+> 50k 100k 150k 200k 250k 300k
+> DOF (cost)
+> 10 !9
+> 10 !8
+> 10 !7
+> Hamiltonian  kHk 2
+> uniform ladder 9!17 p{AMR 13 !15 p{AMR
+
+FIG. 6. Local and global e ff ects of p refinement. Left : directional spectral coe ffi cients on a bispheric domain for the precessing BNS of Table I. The limiting azimuthal tail triggers nϕ = 8 → 10, reducing the tail by about one order of magnitude while leaving the resolved modes unchanged. Right : Hamiltonian-constraint norm against unknown count for a nonspinning mass-ratio-10 BHNS with a 1 .5 M⊙ neutron star, the DD2 EOS, and coordinate separation 200 M⊙. Anisotropic p
+
+refinement reaches the uniform N = 15 accuracy with about 1 .6 times fewer unknowns. 
+
+next cycle uses a restricted p fallback, avoiding a broad order increase immediately after the radial layout changes. For either 
+
+p branch, candidates are considered from largest to smallest demand, as in a capped analogue of Dörfler marking [69]. The estimated coe ffi cient-count growth is limited to a factor Γp = 2for an ordinary p move and Γp,h = 1.1 after an h move, with a per-axis order cap nmax = 15. The cycles end when no pair remains marked or no admissible candidate fits these limits. We illustrate how radial subdivision improves e ffi ciency when the domain layout is imbalanced, using a BHNS with a mass ratio of 20 in Fig. 5. Comparing with the uniform resolu-tion sequence, both pure p and hp refinements help to reach the same level of accuracy, represented by the Hamiltonian-9constraint residual, with less cost. Noticeably, the first h move yields an order of magnitude reduction in ∥H∥ 2, the L2 norm of the disagreement between the left- and right-hand sides of Equation (2). On the other hand, Fig. 6 demonstrates the benefit of p move both locally and globally. In the top panel, we zoom in to one of the bispheric domain for a precessing BNS, where we see the coe ffi cient tail of ϕ–direction is improved by more than an order of magnitude by locally increasing the ϕ resolution. The improvement in the global solution is exemplified by a BHNS with a mildly high mass ratio of 10. We compare the uniform ladder from N = 9 to 17. Alongside, the p–refined solutions from the N = 9 baseline always cost considerably less while keeping the same level of accuracy. We also include a solution obtained by applying a single p refinement to an 
+
+N = 13 baseline. It indicates that the resulting accuracy is largely independent of the refinement path once the fields reach N = 15 in the domain and spectral direction that limit convergence. 
+
+V. NUMERICAL ASSESSMENT OF QUASIEQUILIBRIUM QUALITY 
+
+Spectral convergence of the elliptic solve is necessary but does not by itself establish quasiequilibrium quality. The previ-ous section tested spectral convergence for BHNS systems with 
+
+q := m2/m1 = 20 and q = 10. We now apply four increasingly dynamical checks: compatibility with FUKA data, PN binding-energy consistency, eccentricity reduction in a short evolution (Section V B), and a full evolution from which we extract the waveform (Section V C) and reconstruct the precession axis (Section V D). 
+
+A. FUKA compatibility and binding-energy consistency 
+
+As a compatibility test, we initialise Celephaïs with the 
+
+FUKA BNS data used in [70, 71] and show that they are still solutions to the new code. This check is available only for the aligned-spin configurations FUKA supports [10]. The pre-cessing and tilted-spin data that motivate this work lie outside that overlap and admit no FUKA reference solution. For those data, assessment instead relies on the eccentricity-reduction, evolution, and waveform-based consistency tests below (Sec-tions V B to V D). Figure 7 then compares quasicircular Celephaïs binding-energy sequences with their PN estimates before any evolution-based eccentricity correction. For the most demanding configu-rations tested, agreement requires either a uniform N = 13 grid or an N = 11 baseline followed by one AMR cycle. We there-fore use this as the minimum production-resolution criterion for the configurations considered here; its adequacy outside the tested set must be checked with the same diagnostics. M1+       
+
+> 00.01 0.02 0.03 0.04 0.05 -8 -6 -4 -2 0
+> Eb=M 1
+> #10 !3
+> Series 4PN estimate 4PN + SO + SS + SIQ Numerical ( 'virial err.) Model BNS ( q=2, nonspinning) BHNS ( q=10, nonspinning) BHNS ( q=7, @BH =0 :5)
+
+FIG. 7. Binding energy Eb/M∞ against orbital frequency M∞Ω for three N = 13 quasicircular sequences: a nonspinning BNS with q = 2and M∞ = 3; a nonspinning BHNS with q = 10 and M∞ = 16 .5; and a BHNS with q = 7, M∞ = 12, and black-hole spin χBH = 0.5. All neutron stars use the DD2 EOS. Symbols show the numerical binding energies, and the vertical bars show the virial discrepancy of Eq. (36) as a scale diagnostic rather than a statistical uncertainty. Solid curves show the nonspinning 4PN estimate [72]. For the spinning BHNS, the dashed curve also includes the spin–orbit, spin–spin, and spin-induced-quadrupole terms [10, 73, 74]. The numerical sequences follow the corresponding PN trends over the sampled frequencies. 
+
+B. Eccentricity reduction 
+
+Low-eccentricity data generally require iteration rather than a single quasicircular elliptic solve. For binary black holes, one evolves trial data for several orbits, fits the residual oscillation in separation or orbital frequency, and updates the orbital fre-quency and radial approach rate [75]. Precession complicates the fit because spin-driven modulations occur near twice the orbital frequency, whereas eccentricity appears near the or-bital frequency [33]. Orbital- and waveform-based estimators reduce, but do not remove, this gauge dependence [76–78]. Nonetheless, the fitting formula used in [10] is adopted here. For BNS and BHNS data, the analogous procedure varies the orbital angular velocity and an approach velocity within the hydrostationary problem, then calibrates them with short evolutions [32, 79, 80]. In the Kadath /FUKA construction, Ω
+
+and ˙ a therefore serve as eccentricity-control parameters: PN es-timates provide the initial values, but dynamical measurements determine the final correction [10]. A spin-dependent initial estimate is particularly useful for precessing BNS because each calibration evolution is expensive. 
+
+Celephaïs evaluates algebraic PN estimates for Ω and ˙ a at the requested coordinate separation a = |x| := |x1 − x2|, where 
+
+x1,2 are the compact-object centres and ˆ r := x/a. The approach speed enters Eq. (12) through the homothetic rate ˙ a/a. For aligned or antialigned spins, symmetry supplies the nonradial circularity conditions. Instantaneous radial balance combines the nonspinning circular baseline with the leading spin–orbit and spin–spin accelerations from Kidder’s PN equations of 10 motion [73], 0 = −aΩ20(a) + ar
+
+> SO
+
+(a, Ω, S1, S2) + ar
+
+> SS
+
+(a, S1, S2) + aΩ2 .
+
+(50) Here Ω0(a) is the nonspinning 3PN value [10, 81]; ar 
+
+> SO
+
+and 
+
+ar 
+
+> SS
+
+are the radial spin–orbit and spin–spin projections; and 
+
+SA := m2
+
+> A
+
+χA is the angular momentum of object A, with mass 
+
+mA and dimensionless spin χA = χA ˆsA. The positive root of Eq. (50) gives the initial estimate of Ω.The comoving shift also requires ˙ a. At the same separation, we begin with the nonspinning value ˙ a0(a) and apply Kidder’s leading aligned-spin circular-inspiral correction [73], ˙a(a, χ1, χ2) = ˙a0(a)
+
+"
+
+1 − C SO 
+
+ ma
+
+3/2#
+
+, (51) with ˙a0(a) = − 64 5
+
+m3η
+
+a3
+
+"
+
+1 + ma − 1751 336 − 74 η
+
+!# 
+
+, (52) 
+
+CSO = 712 
+
+> 2
+
+X
+
+> A=1
+
+χA
+
+ ˆLN · ˆsA
+
+ 19 m2
+
+> A
+
+m2 + 15 η
+
+ , (53) where m = m1 + m2, η = m1m2/m2, and ˆ LN is the orbital-angular-momentum direction. For precessing configurations, the spin accelerations must be evaluated as vectors before taking the radial projection. With 
+
+arel := d2 x/dt2, the conservative relative acceleration at a trial angular velocity is 
+
+arel = −aΩ20(a) ˆ r + aSO (a, Ω, ˆr, S1, S2) + aSS (a, ˆr, S1, S2) ,
+
+(54) where aSO and aSS are the leading spin–orbit and spin–spin vectors from the same PN equations [73]. We then solve only the instantaneous radial balance condition for Ω; the nonradial spin acceleration describes the precessional dynamics and is not set to zero. For ˙ a, the present implementation still uses Eq. (51) with each spin projected onto ˆ LN . This aligned-spin approximation is a principal limitation of the precessing initial estimate. An evolution-based iteration handles the final calibration. We use the procedure of [10], fitting the separation oscilla-tion near the orbital frequency and correcting Ω and ˙ a. Fig-ure 8 shows the same precessing BNS as in Table I. The PN-initialised data give a measured eccentricity below 10 −2, and one evolution-based correction removes most of the visible orbital-frequency oscillation. This single example demon-strates a useful starting estimate, not a guarantee that one iteration su ffi ces throughout precessing parameter space.  
+
+> C. Dynamical evolution and waveform extraction
+
+A full dynamical evolution provides the most direct check that the data are usable. We evolve the same precessing BNS as in Table I with the graphics-processor-accelerated SACRAK t [ms]               
+
+> 0510 15 20 25 30
+> coordinate separation [ M-]
+> 0510 15 20 25 30 35 PN Iter1
+> -20 020 -20 -10 010 20
+> FIG. 8. Eccentricity reduction for the same precessing BNS as in Table I. The coordinate separation a(t) is shown for data initialised directly by the PN estimates of Ωand ˙ a[Eqs. (50) and (51)] and after one evolution-based correction (Iter1). The correction fits the component of a(t) near the orbital frequency and updates both control parameters. The inset shows the projected trajectory of the spinning neutron star, which completes more than seven orbits before merger.
+
+code [82], developed from the SACRA [83], SACRA-MPI [84– 86], and NANASI [87]. The data support a stable inspiral through to merger, and supply the waveform multipoles that Section V D uses to reconstruct the precession axis. For the simulations reported here, we adopt the resolution with a finest spacing of ∆x = 0.125 M⊙ ≃ 180 m. The waveform is derived from the Weyl scalar ψ4, ex-tracted at finite radius and decomposed into spin-weighted spherical-harmonic modes. The leading perturbative correc-tion of Nakano [88] approximates each mode at future null infinity, 
+
+rψℓm  
+
+> 4r=∞
+
+= 1 − 2M∞
+
+r
+
+!
+
+×
+
+"
+
+rψℓm 
+
+> 4
+
+(t, r) − (ℓ − 1)( ℓ + 2) 2r
+
+Z
+
+dt r ψℓm 
+
+> 4
+
+(t, r)
+
+#
+
+,
+
+(55) where r is the areal radius, M∞ is the background mass, and we omit the contribution of background spin here. The strain modes follow from ψℓm 
+
+> 4
+
+= ¨hℓm by fixed-frequency double in-tegration [89]. The low-frequency cuto ff is set as 0 .8|m|Ωini orb 
+
+to suppress secular drift, where Ωini orb is initial orbital angular frequency. For a precessing binary, we express the waveform in a quadrupole-aligned (QA) frame. If hQA  
+
+> ℓm
+
+denotes a co-precessing mode and the instantaneous radiation-axis proxy is described by ( θL, φ L), the inertial strain along a fixed line of sight can be written as [90, 91] 
+
+h(t) =
+
+X
+
+> ℓ, m
+
+e−2iφL(t)−2Yℓm
+
+−θL(t), −ψL(t) hQA  
+
+> ℓm
+
+(t),ψL(t) = −
+
+Z t
+
+˙φL(t′) cos θL(t′) d t′, (56) where the third Euler angle ψL enforces minimal rotation. This 11 convention separates precession of the radiation axis from an arbitrary rotation about it. Modes are referred to retarded time tret = t − r∗, where 
+
+r∗ = r + 2M∞ ln( r/2M∞ − 1) is the Schwarzschild tortoise coordinate of the extraction sphere. Fixed-frequency integra-tion uses a Tukey window that vanishes for tret < tcut and reaches unity after an interval ∆t, suppressing the initial-data transient and the window turn-on. We begin the analysis at 
+
+tstart = tcut + ∆ t, align the phase by imposing ϕ(tstart ) = 0, and take tcut = 0 and ∆t = 200 M∞ ≃ 2.8 ms. All quantities below use tret ≥ tstart . 
+
+> D. Waveform reconstruction of the precession axis
+
+The QA projection in Eq. (56) requires the radiation-axis direction ( θL, φ L) and a rotation ψL about that axis. We re-construct these angles from the waveform modes using the principal radiation axis [90], denoted ˆ L as a waveform-based proxy for the orbital axis. Acting on the strain multipoles with angular-momentum operators La in the |ℓm⟩ basis gives the real symmetric matrix 
+
+Λab (t) =
+
+> ℓax
+
+X
+
+> ℓ=2
+> ℓ
+
+X
+
+> m,m′=−ℓ
+
+h∗
+
+> ℓm
+
+(t)
+
+
+
+ℓm La Lb + Lb La
+
+2 ℓm′
+
+
+
+hℓm′ (t),
+
+(57) with a, b ∈ { x, y, z} and ℓax = 4. Normalisation by the total mode power is unnecessary because it does not change the eigenvectors. We identify ˆ L(t) with the eigenvector of the largest eigenvalue, fix its sign by continuity from +ˆz, and obtain 
+
+θL = arccos ˆ Lz, φL = arg  ˆLx + i ˆLy
+
+ − π
+
+2 . (58) We unwrap φL in time; the −π/ 2 shift sets φL = 0 for an axis in the yz plane. The minimal-rotation condition in Eq. (56), with ψL(tstart ) = 0, supplies the third angle. Figure 9 illustrates these conventions. For quadrupole-dominated quasicircular inspiral, the principal radiation axis approximately follows the instantaneous orbital angular momentum [90]. The reconstruction is well conditioned only when the largest eigenvalue is separated from the next. Writing λ1 ≥ λ2 ≥ λ3,we therefore monitor ( λ1 − λ2)/λ 1. Near and after merger, 
+
+λ1 and λ2 approach degeneracy, so both the axis and the co-precessing decomposition lose precision. As a closure check, rotating the inertial modes into the QA frame and back recovers the input to near machine precision over the analysis window. The resulting axis provides a waveform-based test of the spin-induced misalignment prescribed in the initial data; it should not be interpreted as an independent coordinate measure of the orbital plane near merger. To test the reconstructed axis during inspiral, we compare it with the single-spin simple-precession model [92] in the conventions of Fig. 9. The spinning star has S 1 = m21χ1 at tilt 
+
+ι from the orbital axis. The model assumes that ˆ L precesses about the nearly conserved J = L + S1 while radiation reac-tion adiabatically decreases L. It is therefore restricted to a                            
+
+> FIG. 9. Angle conventions for the single-spin precessing frame. At the reference time the stars lie on the ˆ xaxis, L∥ˆz, and S1has spin– orbit tilt ι. In the simple-precession model, L(t) and S1(t) rotate at fixed mutual tilt about the nearly conserved J=L+S1. The radiation-axis proxy ˆ L(t) traces a cone with half-angle θLJ and phase Φp. Its direction is ( θL, φ L), with φL=arg( ˆ Lx+iˆLy)−π/ 2 measured from
+> +ˆy;ψLcompletes the minimally rotating co-precessing frame. Angles and vector lengths are exaggerated.
+
+quasicircular binary in the PN slow-motion regime, with well-separated orbital, precession, and radiation-reaction timescales [74, 92]. The approximation becomes progressively less con-trolled during the strong-field late inspiral. The nonspinning orbital angular momentum is given by 
+
+L(v) = ηm2
+
+v
+
+
+
+1 +  32 + η
+
+> 6
+
+ v2 +
+
+ 27 8 − 19 η 
+
+> 8
+
++ η2
+
+> 24
+
+
+
+v4
+
+
+
+, (59) where η = m1m2/m2 and v = (mΩorb )1/3 with Ωorb = ω22 /2from the co-precessing (2 , 2) frequency. Because ω22 is mea-sured from the numerical waveform rather than evolved by the PN model, the resulting angles test the precession dynamics conditional on the measured frequency; they do not indepen-dently predict the frequency evolution. The vector relation 
+
+J = L + S1 then fixes the cone half-angle, 
+
+θLJ (v) = arctan S 1 sin ι
+
+L(v) + S 1 cos ι , (60) and total angular momentum, 
+
+J(v) =
+
+q
+
+L2 + 2LS 1 cos ι + S 21 , (61) respectively. The spin-precession phase is Φp(t) = R t 
+
+> 0
+
+Ωp dt ′,where the precession frequency through 3.5PN order is [74] 
+
+Ωp(v) = J(v)
+
+L(v) Ω1(v) , (62) 12 3L [deg]              
+
+> 0246810
+> 'L [deg]
+> 050 100 150 200
+> orbital-axis direction (O'Shaughnessy hLaLbi)
+> 3L
+> 3Lanalytic
+> 'L
+> 'Lanalytic
+> AL [deg]
+> -150 -100 -50 0
+> AL(minimal rotation) ALanalytic
+> tret [ms]
+> 510 15 20 25
+> 3SL  [deg]
+> 20 40 60 80
+> cone-inferred spin{orbit tilt ( @1=0.30)
+> 3SL input 4
+
+FIG. 10. Radiation-axis precession reconstructed from the waveform of the same precessing BNS as in Table I and compared with the single-spin simple-precession model using a 3.5PN spin–orbit rate [dashed, Eqs. (59) to (65)]. Top: the polar tilt θL and precession angle φL of ˆ L(t). Middle: the minimal-rotation angle ψL. The PN angles track the reconstruction through most of the inspiral and depart near merger ( tret ≳ 25 ms), where the two leading eigenvalues of Λab 
+
+approach degeneracy. Bottom: the inversion from Eq. (66), with a pointwise envelope obtained by propagating the combined statistical and subwindow-drift uncertainty in θLJ . A horizontal reference line marks the initial tilt. 
+
+and the precession frequency of S1 about ˆ L is 
+
+Ω1(v) = v5
+
+m
+
+A0 + A1v2 + A2v4 . (63) In above, the coe ffi cients are 
+
+A0 = 34 + η 
+
+> 2
+
+− 34 δ, A1 = 916 + 54 η − η2 
+
+> 24
+
++ δ− 916 + 58 η ,
+
+A2 = 27 32 + 316 η − 105 32 η2 − η3 
+
+> 48
+
++ δ− 27 32 + 39 8 η − 532 η2 , (64) with δ = (m1 − m2)/m. At leading order, this yields Ωp =
+
+(2 + 3m2/2m1)Jv 6/m3. The predicted orbital axis therefore follows the cone as ˆL(t) = cos θLJ ˆJ + sin θLJ 
+
+cos Φp ˆe1 + sin Φp ˆe2
+
+ , (65) where ˆ e1 ∝ ˆz − ( ˆ J · ˆz) ˆ J and ˆ e2 = ˆJ × ˆe1 are fixed so that ˆL ∥ ˆz at t = 0. Substituting ˆ L(t) into Eq. (58) gives θL(t)and φL(t), and integrating the minimal-rotation condition in Eq. (56) determines ψL(t). These three predicted angles are shown by the dashed curves in Fig. 10. It is however not easy to test the initial spin–orbit tilt ι from the waveform. Within the simple-precession approximation, the angle between S1 and L (θSL ) remains constant and equals the initial tilt ι =: θSL (t = 0). Rearranging the cone relation sin( θSL − θLJ ) = (L/S 1) sin θLJ gives 
+
+θSL = θLJ + arcsin[( L/S 1) sin θLJ ]. (66) This inversion is ill conditioned for a nearly in-plane spin. The forward map tan θLJ = S 1 sin θSL /(L + S 1 cos θSL ) reaches 
+
+θmax LJ = arcsin( S 1/L) at θ∗ 
+
+> SL
+
+= arccos( −S 1/L), where d θLJ /dθSL 
+
+vanishes. For the present configuration L/S 1 ≈ 13 .8, giving 
+
+θmax LJ ≈ 4.2◦ at θ∗ 
+
+> SL
+
+≈ 94 ◦. Here d θSL /dθLJ ≈ 26, so small errors in the cone angle are strongly amplified. The ill-conditioned inversion for this nearly in-plane spin gives about 60 ◦, below the input 81 ◦. A complementary estimate follows from the initial single-spin balance cos θSL = Jz,0 − L0
+
+S 1
+
+, (67) where Jz,0 is the initial ADM angular momentum along the orbital axis and L0 is the PN orbital contribution at the same reference time. The angular-momentum-balance estimate from Eq. (67) gives about 82 ◦, which is more consistent with the tilt of initial data. 
+
+VI. CONCLUSION 
+
+Celephaïs provides spectrally resolved compact-binary initial data without restricting the spins to align or antialign with the orbital axis. Its central numerical result relies on an equation-to-Jacobian machinery that exploits sparsity, and the fact that an intermittently refreshed direct preconditioner is enough to guarantee convergence. In particular, the operator-tree filter removes structural zeros, batched forward-mode au-tomatic di ff erentiation evaluates compatible columns together, and MUMPS factors the assembled matrix for use in a Jacobian-free Newton–Krylov solve. Together, the benchmarks show that the precessing BNS can be solved on a laptop in a matter of minutes (Table I). In addition, we implement an AMR algorithm aiming to ease the resource demand to solve for high-mass ratio BHNS. For the mass-ratio-20 BHNS, adaptive refinement reproduces the highest uniform-grid constraint accuracy with about three times fewer unknowns (Fig. 5), while p refinement reaches the uniform N = 15 accuracy for the mass-ratio-10 BHNS with about 1 .6 times fewer unknowns (Fig. 6). These gains arise because computational e ff ort is concentrated on the couplings, domains, and spectral directions that limit convergence. We first validate Celephaïs by importing solutions gener-ated with FUKA and confirming that each remains a solution of the corresponding system in Celephaïs . We then selectively build some BNS and BHNS sequences to examine the consis-tency with post-Newtonian theory, where the comparatively small spin-dependent e ff ects can also be well captured (Fig. 7). This agreement motivates the use of post-Newtonian predic-tions for the orbital frequency and infall velocity to construct low-eccentricity configurations, following the approach of [10] but including spin contributions here. This scheme allows for 13 constructing quasi-circular precessing BNS by running only one round of evolution-based correction (Fig. 8). The precess-ing BNS is then evolved stably through inspiral and merger to verify that the initial data produce a reliable gravitational wave-form. In particular, the radiation axis reconstructed from the waveform closely follows the 3.5PN simple-precession model throughout most of the inspiral (Fig. 10). Taken together, these tests link the spin geometry prescribed in the initial data to the expected orbital dynamics and waveform evolution. The evolution presented here demonstrates usability and provides the multipoles needed for radiation-axis reconstruc-tion, but it does not establish waveform-phase convergence. Such a study requires multiple resolutions, careful estimator selection [70, 71, 87, 93, 94], and the self-similar scaling test of phase errors [95, 96]. Precession adds further di ffi culty be-cause meaningful phase comparisons require a time-dependent co-precessing frame. We therefore defer the detailed wave-form analysis to future work. In addition, the black-hole is treated with an excision horizon with. A puncture formulation is planned to allow for initial data matching with the moving-puncture gauge commonly used in NR simulations. Extensions to Damour–Esposito-Farèse scalar–tensor (as an upgrade of [97]) and scalar Gauss–Bonnet gravity are also planned. 
+
+ACKNOWLEDGEMENTS 
+
+The author acknowledges support from the Simons Foun-dation through Award No. 896696, Simons Foundation Inter-national through Award No. SFI-MPS-BH-00012593-01, and the NSF through Grant No. PHY-25-12423. The author thanks Kenta Kiuchi for encouraging the development of an initial-data solver. Yong Gao, Mingzhe Han, and Alan Tsz-Lok Lam assisted with the numerical evolutions. Computations were per-formed in part on the BinAC2 cluster, supported by the High Performance and Cloud Computing Group at the Zentrum für Datenverarbeitung of the University of Tübingen, and, during the early stages of the project, on the Sakura cluster at the Max Planck Computing and Data Facility. Claude was used extensively to assist the analysis of numerical bottlenecks and optimisation strategies. 
+
+CODE AVAILABILITY 
+
+Celephaïs will be released under the GNU General Public License upon article acceptance. The release will include the parameters needed to reproduce the configurations and figures, together with the M atlab analysis scripts. 
+
+[1] R. Abbott et al. (KAGRA, VIRGO, LIGO Scientific), GWTC-3: Compact Binary Coalescences Observed by LIGO and Virgo during the Second Part of the Third Observing Run, Phys. Rev. X 13 , 041039 (2023), arXiv:2111.03606 [gr-qc]. [2] R. W. Kiendrebeogo et al. , Updated Observing Scenarios and Multimessenger Implications for the International Gravitational-wave Networks O4 and O5, Astrophys. J. 958 , 158 (2023), arXiv:2306.09234 [astro-ph.HE]. [3] S. Bonazzola, E. Gourgoulhon, and J. A. Marck, Spectral meth-ods in general relativistic astrophysics, J. Comput. Appl. Math. 
+
+109 , 433 (1999), arXiv:gr-qc /9811089. [4] H. P. Pfei ff er, L. E. Kidder, M. A. Scheel, and S. A. Teukolsky, A Multidomain spectral method for solving elliptic equations, Comput. Phys. Commun. 152 , 253 (2003), arXiv:gr-qc /0202096. [5] P. Grandclement and J. Novak, Spectral methods for numerical relativity, Living Rev. Rel. 12 , 1 (2009), arXiv:0706.2286 [gr-qc]. [6] LORENE website: Langage Objet pour la RElativité Numériqué, 
+
+https://gitlab.in2p3.fr/lorene/Lorene .[7] E. Gourgoulhon, P. Grandclement, K. Taniguchi, J.-A. Marck, and S. Bonazzola, Quasiequilibrium sequences of synchronized and irrotational binary neutron stars in general relativity: 1. Method and tests, Phys. Rev. D 63 , 064029 (2001), arXiv:gr-qc /0007028. [8] P. Grandclement, E. Gourgoulhon, and S. Bonazzola, Binary black holes in circular orbits. 2. Numerical methods and first results, Phys. Rev. D 65 , 044021 (2002), arXiv:gr-qc /0106016. [9] P. Grandclement, Kadath: A Spectral solver for theoretical physics, J. Comput. Phys. 229 , 3334 (2010), arXiv:0909.1228 [gr-qc]. [10] L. J. Papenfort, S. D. Tootle, P. Grandclément, E. R. Most, and L. Rezzolla, New public code for initial data of unequal-mass, spinning compact-object binaries, Phys. Rev. D 104 , 024057 (2021), arXiv:2103.09911 [gr-qc]. [11] T. Dietrich, N. Moldenhauer, N. K. Johnson-McDaniel, S. Bernuzzi, C. M. Markakis, B. Brügmann, and W. Tichy, Binary Neutron Stars with Generic Spin, Eccentricity, Mass ratio, and Compactness - Quasi-equilibrium Sequences and First Evolutions, Phys. Rev. D 92 , 124007 (2015), arXiv:1507.07100 [gr-qc]. [12] W. Tichy, A. Rashti, T. Dietrich, R. Dudi, and B. Brügmann, Constructing binary neutron star initial data with high spins, high compactnesses, and high mass ratios, Phys. Rev. D 100 ,124046 (2019), arXiv:1910.09690 [gr-qc]. [13] A. Rashti, F. M. Fabbri, B. Brügmann, S. V. Chaurasia, T. Diet-rich, M. Ujevic, and W. Tichy, New pseudospectral code for the construction of initial data, Phys. Rev. D 105 , 104027 (2022), arXiv:2109.14511 [gr-qc]. [14] F. Foucart, L. E. Kidder, H. P. Pfei ff er, and S. A. Teukolsky, Initial data for black hole-neutron star binaries: A Flexible, high-accuracy spectral method, Phys. Rev. D 77 , 124051 (2008), arXiv:0804.3787 [gr-qc]. [15] N. Tacik et al. , Binary Neutron Stars with Arbitrary Spins in Numerical Relativity, Phys. Rev. D 92 , 124012 (2015), [Erratum: Phys.Rev.D 94, 049903 (2016)], arXiv:1508.06986 [gr-qc]. 14 
+
+[16] T. Assumpcao, L. R. Werneck, T. P. Jacques, and Z. B. Etienne, Fast hyperbolic relaxation elliptic solver for numerical relativity: Conformally flat, binary puncture initial data, Phys. Rev. D 105 ,104037 (2022), arXiv:2111.02424 [gr-qc]. [17] N. L. Vu et al. , A scalable elliptic solver with task-based paral-lelism for the SpECTRE numerical relativity code, Phys. Rev. D 
+
+105 , 084027 (2022), arXiv:2111.06767 [gr-qc]. [18] T. Vincent, H. P. Pfei ff er, and N. L. Fischer, hp-adaptive dis-continuous Galerkin solver for elliptic equations in numerical relativity, Phys. Rev. D 100 , 084052 (2019), arXiv:1907.01572 [physics.comp-ph]. [19] E. Gourgoulhon, 3 +1 formalism and bases of numerical relativity (2007), arXiv:gr-qc /0703035. [20] J. W. York, Jr., Conformal ’thin sandwich’ data for the initial-value problem, Phys. Rev. Lett. 82 , 1350 (1999), arXiv:gr-qc /9810051. [21] H. P. Pfei ff er and J. W. York, Jr., Extrinsic curvature and the Einstein constraints, Phys. Rev. D 67 , 044022 (2003), arXiv:gr-qc /0207095. [22] G. B. Cook, Corotating and irrotational binary black holes in quasicircular orbits, Phys. Rev. D 65 , 084003 (2002), arXiv:gr-qc /0108076. [23] S. Bonazzola, E. Gourgoulhon, P. Grandclement, and J. Novak, A Constrained scheme for Einstein equations based on Dirac gauge and spherical coordinates, Phys. Rev. D 70 , 104007 (2004), arXiv:gr-qc /0307082. [24] J. A. Isenberg, Waveless approximation theories of gravity, Int. J. Mod. Phys. D 17 , 265 (2008), arXiv:gr-qc /0702113. [25] J. R. Wilson and G. J. Mathews, Instabilities in Close Neutron Star Binaries, Phys. Rev. Lett. 75 , 4161 (1995). [26] J. R. Wilson, G. J. Mathews, and P. Marronetti, Relativistic numerical model for close neutron star binaries, Phys. Rev. D 
+
+54 , 1317 (1996), arXiv:gr-qc /9601017. [27] M. Shibata, K. Uryu, and J. L. Friedman, Deriving formula-tions for numerical computation of binary neutron stars in qua-sicircular orbits, Phys. Rev. D 70 , 044044 (2004), [Erratum: Phys.Rev.D 70, 129901 (2004)], arXiv:gr-qc /0407036. [28] K. Uryu, F. Limousin, J. L. Friedman, E. Gourgoulhon, and M. Shibata, Binary neutron stars in a waveless approximation, Phys. Rev. Lett. 97 , 171101 (2006), arXiv:gr-qc /0511136. [29] S. Bonazzola, E. Gourgoulhon, and J.-A. Marck, A Relativis-tic formalism to compute quasiequilibrium configurations of nonsynchronized neutron star binaries, Phys. Rev. D 56 , 7740 (1997), arXiv:gr-qc /9710031. [30] W. Tichy, B. Bruegmann, and P. Laguna, Gauge conditions for binary black hole puncture data based on an approximate helical Killing vector, Phys. Rev. D 68 , 064008 (2003), arXiv:gr-qc /0306020. [31] S. Ossokine, F. Foucart, H. P. Pfei ff er, M. Boyle, and B. Szilágyi, Improvements to the construction of binary black hole initial data, Class. Quant. Grav. 32 , 245010 (2015), arXiv:1506.01689 [gr-qc]. [32] N. Moldenhauer, C. M. Markakis, N. K. Johnson-McDaniel, W. Tichy, and B. Brügmann, Initial data for binary neutron stars with adjustable eccentricity, Phys. Rev. D 90 , 084043 (2014), arXiv:1408.4136 [gr-qc]. [33] A. Buonanno, L. E. Kidder, A. H. Mroue, H. P. Pfei ff er, and A. Taracchini, Reducing orbital eccentricity of precessing black-hole binaries, Phys. Rev. D 83 , 104034 (2011), arXiv:1012.1549 [gr-qc]. [34] W. Tichy, A New numerical method to construct binary neu-tron star initial data, Class. Quant. Grav. 26 , 175018 (2009), arXiv:0908.0620 [gr-qc]. [35] W. Tichy, Initial data for binary neutron stars with arbitrary spins, Phys. Rev. D 84 , 024041 (2011), arXiv:1107.1440 [gr-qc]. [36] W. Tichy, Constructing quasi-equilibrium initial data for binary neutron stars with arbitrary spins, Phys. Rev. D 86 , 064024 (2012), arXiv:1209.5336 [gr-qc]. [37] M. Shibata, A Relativistic formalism for computation of irrota-tional binary stars in quasiequilibrium states, Phys. Rev. D 58 ,024012 (1998), arXiv:gr-qc /9803085. [38] E. Gourgoulhon, Relations between three formalisms for irrota-tional binary neutron stars in general relativity (1998), arXiv:gr-qc /9804054. [39] S. Bonazzola, E. Gourgoulhon, and J.-A. Marck, Numerical models of irrotational binary neutron stars in general relativity, Phys. Rev. Lett. 82 , 892 (1999), arXiv:gr-qc /9810072. [40] F. Foucart, M. D. Duez, L. E. Kidder, and S. A. Teukolsky, Black hole-neutron star mergers: e ff ects of the orientation of the black hole spin, Phys. Rev. D 83 , 024005 (2011), arXiv:1007.4203 [astro-ph.HE]. [41] F. Foucart, M. B. Deaton, M. D. Duez, L. E. Kidder, I. Mac-Donald, C. D. Ott, H. P. Pfei ff er, M. A. Scheel, B. Szilagyi, and S. A. Teukolsky, Black hole-neutron star mergers at realistic mass ratios: Equation of state and spin orientation e ff ects, Phys. Rev. D 87 , 084006 (2013), arXiv:1212.4810 [gr-qc]. [42] P. Tsatsin and P. Marronetti, Initial data for neutron star bi-naries with arbitrary spins, Phys. Rev. D 88 , 064060 (2013), arXiv:1303.6692 [gr-qc]. [43] K. Kawaguchi, K. Kyutoku, H. Nakano, H. Okawa, M. Shibata, and K. Taniguchi, Black hole-neutron star binary merger: Depen-dence on black hole spin orientation and equation of state, Phys. Rev. D 92 , 024014 (2015), arXiv:1506.05473 [astro-ph.HE]. [44] T. Dietrich, S. Bernuzzi, B. Brügmann, M. Ujevic, and W. Tichy, Numerical Relativity Simulations of Precessing Bi-nary Neutron Star Mergers, Phys. Rev. D 97 , 064002 (2018), arXiv:1712.02992 [gr-qc]. [45] K. Kyutoku, S. Fujibayashi, K. Hayashi, K. Kawaguchi, K. Kiuchi, M. Shibata, and M. Tanaka, On the Possibility of GW190425 Being a Black Hole–Neutron Star Binary Merger, Astrophys. J. Lett. 890 , L4 (2020), arXiv:2001.04474 [astro-ph.HE]. [46] S. Bonazzola, E. Gourgoulhon, M. Salgado, and J. A. Marck, Axisymmetric rotating relativistic bodies: A new numerical ap-proach for ’exact’ solutions, Astron. Astrophys. 278 , 421 (1993). [47] M. Shibata, Rotating black hole surrounded by self-gravitating torus in the puncture framework, Phys. Rev. D 76 , 064035 (2007). [48] E. Gourgoulhon, An Introduction to the theory of rotating rel-ativistic stars, in CompStar 2010: School and Workshop on Computational Tools for Compact Star Astrophysics (2010) arXiv:1003.5015 [gr-qc]. [49] E. Gourgoulhon, P. Grandclement, and S. Bonazzola, Binary black holes in circular orbits. 1. A Global space-time approach, Phys. Rev. D 65 , 044020 (2002), arXiv:gr-qc /0106015. [50] G. B. Cook and H. P. Pfei ff er, Excision boundary conditions for black hole initial data, Phys. Rev. D 70 , 104016 (2004), arXiv:gr-qc /0407078. [51] J. L. Jaramillo, E. Gourgoulhon, and G. A. Mena Marugan, Inner boundary conditions for black hole initial data derived from isolated horizons, Phys. Rev. D 70 , 124036 (2004), arXiv:gr-qc /0407063. [52] P. Grandclément and J. Nicoules, Boundary conditions for sta-tionary black holes: Application to Kerr, Martínez-Troncoso-Zanelli, and hairy black holes, Phys. Rev. D 105 , 104011 (2022), arXiv:2203.09341 [gr-qc]. 15 
+
+[53] R. Arnowitt, S. Deser, and C. W. Misner, Energy and the Criteria for Radiation in General Relativity, Phys. Rev. 118 , 1100 (1960). [54] B. S. DeWitt, Quantum Theory of Gravity. 1. The Canonical Theory, Phys. Rev. 160 , 1113 (1967). [55] N. O Murchadha and J. W. York, Gravitational energy, Phys. Rev. D 10 , 2345 (1974). [56] J. W. York, Jr., Kinematics and Dynamics of General Relativity, in Workshop on Sources of Gravitational Radiation (1978) pp. 83–126. [57] R. L. Arnowitt, S. Deser, and C. W. Misner, The Dynamics of general relativity, Gen. Rel. Grav. 40 , 1997 (2008), arXiv:gr-qc /0405109. [58] T. Regge and C. Teitelboim, Role of Surface Integrals in the Hamiltonian Formulation of General Relativity, Annals Phys. 
+
+88 , 286 (1974). [59] E. Gourgoulhon, 3+1 Formalism in General Relativity , Lecture Notes in Physics (Springer, 2012). [60] K. Uryu and Y. Eriguchi, A New numerical method for con-structing quasiequilibrium sequences of irrotational binary neu-tron stars in general relativity, Phys. Rev. D 61 , 124023 (2000), arXiv:gr-qc /9908059. [61] M. Ansorg, A. Kleinwachter, and R. Meinel, Highly accurate calculation of rotating neutron stars: detailed description of the numerical methods, Astron. Astrophys. 405 , 711 (2003), arXiv:astro-ph /0301173. [62] A. Griewank and A. Walther, Evaluating Derivatives: Principles and Techniques of Algorithmic Di ff erentiation , 2nd ed. (Society for Industrial and Applied Mathematics, Philadelphia, 2008). [63] G. Karypis and V. Kumar, A Fast and High Quality Multilevel Scheme for Partitioning Irregular Graphs, SIAM Journal on Scientific Computing 20 , 359 (1998). [64] R. S. Dembo, S. C. Eisenstat, and T. Steihaug, Inexact newton methods, SIAM Journal on Numerical Analysis 19 , 400 (1982), https: // doi.org /10.1137 /0719025. [65] S. C. Eisenstat and H. F. Walker, Choosing the forcing terms in an inexact newton method, SIAM Journal on Scientific Comput-ing 17 , 16 (1996), https: // doi.org /10.1137 /0917003. [66] S. Renkho ff , D. Cors, D. Hilditch, and B. Brügmann, Adaptive hp refinement for spectral elements in numerical relativity, Phys. Rev. D 107 , 104043 (2023), arXiv:2302.00575 [gr-qc]. [67] M. Ansorg, A Double-domain spectral method for black hole excision data, Phys. Rev. D 72 , 024018 (2005), arXiv:gr-qc /0505059. [68] P.-O. Persson and J. Peraire, Sub-cell shock capturing for dis-continuous galerkin methods, in 44th AIAA Aerospace Sciences Meeting and Exhibit (American Institute of Aeronautics and Astronautics, 2006) p. 112. [69] W. Dörfler, A convergent adaptive algorithm for poisson’s equa-tion, SIAM Journal on Numerical Analysis 33 , 1106 (1996), https: // doi.org /10.1137 /0733054. [70] H.-J. Kuan, K. Kiuchi, and M. Shibata, Tidal Resonance in Binary Neutron Star Inspirals: A High-Precision Study in Numerical Relativity, Phys. Rev. Lett. 135 , 141403 (2025), arXiv:2411.16850 [hep-ph]. [71] H.-J. Kuan, I. Markin, M. Ujevic, T. Dietrich, K. Kiuchi, M. Shi-bata, and W. Tichy, The error budget of binary neutron star merger simulations for configurations with high spin (2025), arXiv:2506.02115 [gr-qc]. [72] L. Blanchet, Post-Newtonian Theory for Gravitational Waves, Living Rev. Rel. 17 , 2 (2014), arXiv:1310.1528 [gr-qc]. [73] L. E. Kidder, Coalescing binary systems of compact objects to postNewtonian 5 /2 order. 5. Spin e ff ects, Phys. Rev. D 52 , 821 (1995), arXiv:gr-qc /9506022. [74] A. Bohe, S. Marsat, G. Faye, and L. Blanchet, Next-to-next-to-leading order spin-orbit e ff ects in the near-zone metric and precession equations of compact binaries, Class. Quant. Grav. 
+
+30 , 075017 (2013), arXiv:1212.5520 [gr-qc]. [75] H. P. Pfei ff er, D. A. Brown, L. E. Kidder, L. Lindblom, G. Lovelace, and M. A. Scheel, Reducing orbital eccentricity in binary black hole simulations, Class. Quant. Grav. 24 , S59 (2007), arXiv:gr-qc /0702106. [76] M. Purrer, S. Husa, and M. Hannam, An E ffi cient iterative method to reduce eccentricity in numerical-relativity simula-tions of compact binary inspiral, Phys. Rev. D 85 , 124051 (2012), arXiv:1203.4258 [gr-qc]. [77] A. Ramos-Buades, S. Husa, and G. Pratten, Simple procedures to reduce eccentricity of binary black hole simulations, Phys. Rev. D 99 , 023003 (2019), arXiv:1810.00036 [gr-qc]. [78] S. Habib, M. A. Scheel, and S. A. Teukolsky, Eccentricity re-duction for quasicircular binary evolutions, Phys. Rev. D 111 ,084059 (2025), arXiv:2410.05531 [gr-qc]. [79] K. Kyutoku, M. Shibata, and K. Taniguchi, Reducing orbital eccentricity in initial data of binary neutron stars, Phys. Rev. D 
+
+90 , 064006 (2014), arXiv:1405.6207 [gr-qc]. [80] K. Kyutoku, K. Kawaguchi, K. Kiuchi, M. Shibata, and K. Taniguchi, Reducing orbital eccentricity in initial data of black hole–neutron star binaries in the puncture framework, Phys. Rev. D 103 , 023002 (2021), arXiv:2009.03896 [gr-qc]. [81] L. Blanchet, Innermost circular orbit of binary black holes at the third postNewtonian approximation, Phys. Rev. D 65 , 124009 (2002), arXiv:gr-qc /0112056. [82] M.-Z. Han, K. Kiuchi, and M. Shibata, SACRA-K: APerformance-Portable Numerical Relativity Code with Kokkos (2026), arXiv:2607.08743 [astro-ph.HE]. [83] T. Yamamoto, M. Shibata, and K. Taniguchi, Simulating coa-lescing compact binaries by a new code SACRA, Phys. Rev. D 
+
+78 , 064054 (2008), arXiv:0806.4007 [gr-qc]. [84] K. Kiuchi, K. Kawaguchi, K. Kyutoku, Y. Sekiguchi, M. Shibata, and K. Taniguchi, Sub-radian-accuracy gravitational waveforms of coalescing binary neutron stars in numerical relativity, Phys. Rev. D 96 , 084060 (2017), arXiv:1708.08926 [astro-ph.HE]. [85] K. Kiuchi, K. Kawaguchi, K. Kyutoku, Y. Sekiguchi, and M. Shi-bata, Sub-radian-accuracy gravitational waves from coalescing binary neutron stars in numerical relativity. II. Systematic study on the equation of state, binary mass, and mass ratio, Phys. Rev. D 101 , 084006 (2020), arXiv:1907.03790 [astro-ph.HE]. [86] K. Kiuchi, L. E. Held, Y. Sekiguchi, and M. Shibata, Imple-mentation of advanced Riemann solvers in a neutrino-radiation magnetohydrodynamics code in numerical relativity and its ap-plication to a binary neutron star merger, Phys. Rev. D 106 ,124041 (2022), arXiv:2205.04487 [astro-ph.HE]. [87] K. Kiuchi, Toward high-precision inspiral gravitational wave-forms from binary neutron star mergers in numerical relativity, Phys. Rev. D 112 , 084008 (2025), arXiv:2508.10981 [astro-ph.HE]. [88] H. Nakano, J. Healy, C. O. Lousto, and Y. Zlochower, Perturbative extraction of gravitational waveforms generated with Numerical Relativity, Phys. Rev. D 91 , 104022 (2015), arXiv:1503.00718 [gr-qc]. [89] C. Reisswig and D. Pollney, Notes on the integration of numeri-cal relativity waveforms, Class. Quant. Grav. 28 , 195015 (2011), arXiv:1006.1632 [gr-qc]. [90] R. O’Shaughnessy, B. Vaishnav, J. Healy, Z. Meeks, and D. Shoe-maker, E ffi cient asymptotic frame selection for binary black hole spacetimes using asymptotic radiation, Phys. Rev. D 84 , 124002 (2011), arXiv:1109.5224 [gr-qc]. 16 
+
+[91] K. Kawaguchi, K. Kyutoku, H. Nakano, and M. Shibata, Extract-ing the orbital axis from gravitational waves of precessing binary systems, Phys. Rev. D 97 , 024017 (2018), arXiv:1705.07459 [gr-qc]. [92] T. A. Apostolatos, C. Cutler, G. J. Sussman, and K. S. Thorne, Spin induced orbital precession and its modulation of the grav-itational wave forms from merging binaries, Phys. Rev. D 49 ,6274 (1994). [93] L. Eça and M. Hoekstra, A procedure for the estimation of the numerical uncertainty of CFD calculations based on grid refinement studies, Journal of Computational Physics 262 , 104 (2014). [94] T. A. Oliver, N. Malaya, R. Ulerich, and R. D. Moser, Estimating uncertainties in statistics computed from direct numerical simu-lation, Physics of Fluids 26 , 035101 (2014), arXiv:1311.0828 [physics.flu-dyn]. [95] T. Dietrich, A. Samajdar, S. Khan, N. K. Johnson-McDaniel, R. Dudi, and W. Tichy, Improving the NRTidal model for bi-nary neutron star systems, Phys. Rev. D 100 , 044003 (2019), arXiv:1905.06011 [gr-qc]. [96] K. Hotokezaka, K. Kyutoku, H. Okawa, and M. Shibata, Explor-ing tidal e ff ects of coalescing binary neutron stars in numerical relativity. II. Long-term simulations, Phys. Rev. D 91 , 064060 (2015), arXiv:1502.03457 [gr-qc]. [97] H.-J. Kuan, K. Van Aelst, A. T.-L. Lam, and M. Shibata, Binary neutron star mergers in massive scalar-tensor theory: Quasiequi-librium states and dynamical enhancement of the scalarization, Phys. Rev. D 108 , 064057 (2023), arXiv:2309.01709 [gr-qc].
