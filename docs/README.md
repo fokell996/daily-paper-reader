@@ -6,32 +6,35 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-13
-- 运行时间：2026-08-13 20:59:49 UTC
+- 最新运行日期：2026-08-14
+- 运行时间：2026-08-14 21:16:31 UTC
 - 运行状态：成功
-- 本次总论文数：4
+- 本次总论文数：5
 - 精读区：2
-- 速读区：2
+- 速读区：3
 
 ### 今日简报（AI）
-今日聚焦射电瞬变与宇宙重子探测：精读两篇高分研究，涵盖27个新旋转射电瞬变源发现及FRB与星系互相关分析。最值得关注：MeerTRAP新发现的瞬变源样本（9.0分）及FRB联合运动学SZ效应追踪宇宙重子分布（8.0分）。普通读者不妨留意，快速射电暴正成为定位“失踪重子”的关键探针。
-- 详情：[/202608/13/README](/202608/13/README)
+今日围绕中子星主题精读2篇、速读3篇，重点锁定双中子星并合抛射物演化与中子星半径对物态方程的约束。最值得关注的是：并合残余的秒级动力学与元素分布直接影响光变曲线，而半径测量可揭示致密物质中的强子-夸克相变。建议从这两篇9分精读入手，先建立中子星“极端密度探针”的整体图像。
+- 详情：[/202608/14/README](/202608/14/README)
 
 ### 精读区论文标签
-1. [Discovery of 27 new Rotating Radio Transients by MeerTRAP](/202608/13/2608.11968v1-discovery-of-27-new-rotating-radio-transients-by-meertrap)  
+1. [3D Binary Neutron Star Merger Ejecta Evolution up to Seconds Timescale: Dynamics, Element Distribution, and Light Curves](/202608/14/2608.10100v1-3d-binary-neutron-star-merger-ejecta-evolution-up-to-seconds-timescale-dynamics-element-distribution-and-light-curves)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：发现27个新的旋转射电瞬变源，直接扩充了射电脉冲星种群样本。
-2. [A new measurement of the FRB DM-galaxy cross correlation and a first joint analysis with the kinematic SZ effect](/202608/13/2608.11296v1-a-new-measurement-of-the-frb-dm-galaxy-cross-correlation-and-a-first-joint-analysis-with-the-kinematic-sz-effect)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：利用130个局域化快速射电暴测量色散-星系互相关，约束重子反馈
+   evidence：对双中子星并合喷出物进行包含核物态方程的模拟并计算光变曲线，提供可约束中子星物态方程的观测预测
+2. [How Neutron Star Radii Encode the Dense-Matter Equation of State and Hadron-Quark Transition](/202608/14/2608.12632v1-how-neutron-star-radii-encode-the-dense-matter-equation-of-state-and-hadron-quark-transition)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：研究高精度中子星半径测量如何编码致密物质物态方程与强子-夸克相变信息。
 
 ### 速读区论文标签
-1. [Locating the missing baryons in the warm-hot intergalactic medium with fast radio bursts and the Sunyaev-Zel'dovich effect](/202608/13/2608.09014v1-locating-the-missing-baryons-in-the-warm-hot-intergalactic-medium-with-fast-radio-bursts-and-the-sunyaev-zeldovich-effect)  
+1. [Locating the missing baryons in the warm-hot intergalactic medium with fast radio bursts and the Sunyaev-Zel'dovich effect](/202608/14/2608.09014v1-locating-the-missing-baryons-in-the-warm-hot-intergalactic-medium-with-fast-radio-bursts-and-the-sunyaev-zeldovich-effect)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：利用快速射电暴色散量与SZ效应探测缺失重子，属于FRB主题核心
-2. [3D Binary Neutron Star Merger Ejecta Evolution up to Seconds Timescale: Dynamics, Element Distribution, and Light Curves](/202608/13/2608.10100v1-3d-binary-neutron-star-merger-ejecta-evolution-up-to-seconds-timescale-dynamics-element-distribution-and-light-curves)  
+   evidence：利用快速射电暴色散测量探测缺失重子，属于快速射电暴的前沿应用。
+2. [Monsters and neutron stars](/202608/14/2608.10904v1-monsters-and-neutron-stars)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：双中子星并合抛射物模拟，涉及状态方程与核合成
+   evidence：与中子星连续的超重亚稳态核，涉及中子星内部与状态方程
+3. [Transport properties in binary neutron star mergers: Effect of magnetic field](/202608/14/2608.12091v1-transport-properties-in-binary-neutron-star-mergers-effect-of-magnetic-field)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：磁化中子星并合核心的中微子输运，与中子星内部物理及状态方程约束相关
 
 
 <div class="dpr-home-promo-card">
