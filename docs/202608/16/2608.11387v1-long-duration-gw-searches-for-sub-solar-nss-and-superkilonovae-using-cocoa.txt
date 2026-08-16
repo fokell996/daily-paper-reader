@@ -1,0 +1,603 @@
+Title: Long-duration GW Searches for Sub-solar NSs and Superkilonovae using CoCoA
+
+URL Source: https://arxiv.org/pdf/2608.11387v1
+
+Published Time: Thu, 13 Aug 2026 00:15:00 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+# Long-duration GW Searches for Sub-solar NSs and Superkilonovae using CoCoA 
+
+Abby Tejera ,1 Divyajyoti ,2 Alessandra Corsi ,1 Yossef Zenati ,3, 1 Robert Coyne ,4 and Logan Cote 4
+
+> 1
+
+William H. Miller III Department of Physics and Astronomy, Johns Hopkins University, Baltimore, MD 21218, USA 
+
+> 2
+
+Gravity Exploration Institute, School of Physics and Astronomy, Cardiff University, Cardiff, CF24 3AA, United Kingdom 
+
+> 3
+
+Astrophysics Research Center of the Open University (ARCO), Department of Natural Sciences, Ra’anana 4353701, Israel 
+
+> 4
+
+Department of Physics, University of Rhode Island, Kingston, Rhode Island 02881 (USA) 
+
+(compiled August 13, 2026) On 2025 August 18, the LIGO–Virgo–KAGRA collaboration reported a sub-threshold gravitational-wave (GW) candidate, S250818k, consistent with a binary neutron star (NS) merger potentially involving a sub-solar-mass compact object. Follow-up electromagnetic (EM) observations identified a Type IIb supernova, SN 2025ulz within the broad localization area of the GW signal. This potential link between a sub-solar GW event candidate and a Type IIb SN, while not confirmed given the low statistical significance of S250818k, has nonetheless sparked renewed interest in the “superkilonova” scenario, where sub-solar-mass NSs form through processes like the fragmentation of an accretion disk or core fission in a collapsing star. In this picture, the in-spiral and merger of a sub-solar NS–NS binary is followed by the merger of the NS-NS remnant with the central black hole (BH), producing chirp-like GW signals. For sub-solar NSs with masses in the (0 .1–1) M ⊙ range and BH masses in the so-called lower mass gap range of ≈ (3–5) M ⊙, these signals can persist in the 20 - 1024 Hz frequency band of ground-based GW detectors for O(10 2–10 3) s, potentially offering an opportunity to probe the superkilonova scenario, as well as the lower mass gap between NSs and stellar-mass BHs. However, the complexity of the underlying astrophysics may yield waveforms that deviate from standard templates, limiting the use of matched filtering in real GW searches. We therefore explore the detectability of such signals using the Cross-Correlation Algorithm ( CoCoA ), a more robust though less sensitive cross-correlation method. We discuss general strategies for imple-menting CoCoA superkilonova searches via either targeted follow-up of candidate chirps identified in matched-filter searches, or EM-triggered searches of stripped-envelope core-collapse SNe. 
+
+I. INTRODUCTION 
+
+The fourth observing run (O4) of the LIGO [63], Virgo [17], and KAGRA [19] detectors has provided new in-sights into the diversity of compact binary mergers [7, 99]. While O4 did not yield a GW170817-like [97, 100, 101] high-significance binary neutron star (NS) merger with a confirmed electromagnetic (EM) counterpart, it en-abled the identification of a particularly intriguing event. In August 2025, the sub-threshold compact binary can-didate S250818k was reported in data from the LIGO detectors [68, 69]. Low-latency parameter estimation placed this candidate in the sub-solar mass regime, with a chirp mass of ≃ 0.87 M⊙, implying at least one compo-nent with a mass below 1 M⊙ [51, 57]. Extensive EM follow-up observations covered a large fraction of the localization region and led to the identification by the Zwicky Transient Facility (ZTF) of ZTF25abjmnps [94] as the only candidate exhibiting both a red color (rem-iniscent of a kilonova-like emission) and a photometric redshift consistent with the GW distance, motivating ex-pectations of a possible gamma-ray burst (GRB) asso-ciation. Subsequent observations established the tran-sient as a stripped-envelope Type IIb supernova (SN) at 
+
+z = 0 .0848 [21–23, 27, 49, 58, 78, 105]. While early-time X-ray and radio observations did not yield detections [47, 50, 75], late-time radio observations showed emis-sion consistent with a Type IIb SN, though the presence of a faint off-axis GRB jet remains compatible with the data [76]. While the association between S250818k and SN2025ulz remains uncertain and highly debated, it may nonetheless represent a qualitatively novel target motivating further studies in both the observational and theoretical domains. Indeed, given the potential link between S250818k and a sub-solar-mass NS event, several authors have interpreted this system within a “superkilonova” scenario, in which sub-solar NSs form through core fission or accretion-disk fragmentation within a core-collapse SN (CCSN). More broadly, the superkilonova class has been proposed to include CCSNe exhibiting embedded kilonova-like r-process nucleosynthesis signatures [34, 73, 82]. Recent theoretical work offers important insight into how sub-solar-mass compact objects may form in core collapses. Zenati et al. 2025 [106] demonstrated that mass transfer in eccentric BH–NS mergers can alter or-bital evolution and significantly reduce the NS mass when the transfer rate exceeds ≥ 10 −2M⊙ per orbit, forming an accretion disk around the BH before merger with mass similar to post-merger debris ( ∼ 0.1M ⊙). This mecha-nism enables the creation of subsolar-mass compact ob-jects. Complementing this, Wu et al. 2026 [104] ex-amined the GW signatures of hierarchical subsolar-mass mergers resulting from fragmentation within collapsar accretion disks. Through numerical relativity simula-tions, it was demonstrated that repeated capture and the merger dynamics can impart substantial orbital ec-centricity ( e0 ≃ 0.6) to the final merger. Overall. these and other studies [34, 73, 82] offer a theoretical base sup-porting the superkilonova scenario and highlight the need arXiv:2608.11387v1 [astro-ph.HE] 11 Aug 2026 2for specialized GW search strategies. In the superkilonova framework, the in-spiral and merger of a sub-solar NS-NS binary formed within the SN disk would be followed by the in-spiral and merger of the remnant with the central black hole (for alter-native formation channels and BH–NS scenarios, see [29, 30, 39, 73, 82, 93, 106]), producing long-duration, chirp-like GW signals. For NS masses in the (0 .1–1) M ⊙
+
+range and BH masses in the (3–5) M ⊙ range, these sig-nals can persist in the most sensitive frequency range of ground-based GW detectors for O(10 2–10 3 s), thereby also probing the lower mass gap between NSs and stellar-mass BHs. While ground-based GW detectors may be sensitive to such superkilonova signals, existing de-tectability estimates typically assume optimal matched-filtering techniques [34]. However, the complexity of the underlying astrophysics may produce waveforms that de-viate significantly from standard templates, thereby re-ducing the effectiveness of matched-filter searches and/or potentially producing sub-threshold triggers [4, 35]. Motivated by the above considerations, here we esti-mate the detectability of GW signals from compact bi-nary coalescences involving sub-solar objects using the Cross-Correlation Algorithm ( CoCoA ) [38], a more robust method optimized for long-duration GW signals such as those predicted in this scenario. Our paper is or-ganized as follows. In Section II we discuss potential bounds on the rates of superkilonovae, which directly impact what can be defined as an astrophysically in-teresting distance horizon for any GW search. In Sec-tion III we describe the approximate waveforms that we use to assess the GW detectability. In Section IV we describe the methods we use to assess GW detectability in stochastic searches, addressing both targeted follow-up of low-significance (potentially affected by waveform mismatch) candidate chirps identified in matched-filter searches, and EM-triggered searches of stripped-envelope CCSNe [51, 57]. In Section V we discuss the detector net-works and sensitivity curves used in this study, followed by Section VI where we present our results. Finally, in Section VII, summarize and conclude.  
+
+> II. RATES
+
+The superkilonova scenario posits that sub-solar-mass NSs can form within collapsar accretion disks via frag-mentation or core fission, and subsequently merge with each other and then with the central BH [34, 73, 82]. Furthermore, Wu et al. (2026) [104] find that fragmen-tation within an accretion disk can generate smaller NS fragments capable of hierarchical merging, which may re-sult in observable eccentricities in their orbital trajecto-ries. The rate of such events is highly uncertain, as it depends on the fraction of collapsars with sufficient disk mass and angular momentum to fragment, on the prob-ability that fragmentation produces bound sub-solar NS binaries, which in turn is impacted by the timescale for in-disk merger relative to disk dispersal. Hereafter, we es-tablish a reasonable upper bound on the intrinsic rate of superkilonovae one might expect in the local universe, so as to understand what horizon distances may be relevant for potentially probing these events via GW observations. First, in a superkilonova scenario, the collapsar disk must become gravitationally unstable and satisfy the cooling conditions required for fragmentation; we denote the fraction of collapsars satisfying these conditions by (ff rag ). Among the fragmenting disks, only a fraction (f≥2NS |frag ) may produce at least two surviving subsolar-mass NSs. These NSs must subsequently form a bound binary, a condition that we described by ( fpair |≥ 2NS ). This pair then needs to merge before the cooling disk or infall into the central BH occur ( fmerge |pair ). Putting it all together we can write: 
+
+fSKN |coll = ffrag × f≥2NS |frag × fpair |≥ 2NS × fmerge |pair .
+
+(2.1) The branching fraction fSKN |coll is presently uncon-strained. The simulations of Chen & Metzger [34] demon-strate that sufficiently massive, rapidly cooling collapsar disks can fragment into sub-solar-mass NSs, while Wu et al. [104] show that subsequent hierarchical mergers can produce distinctive eccentric GW signals. However, neither calculation determines the population-averaged fraction of collapsars that fragment, form at least two surviving NSs, produce a bound binary, and undergo a merger before the disk disperses. This unknown branch-ing fraction therefore dominates the uncertainty in the predicted superkilonova rate, which we can thus write as: 
+
+R0,SKNe = fSKN |coll × Rtrue 0,coll . (2.2) The tentative association between S250818k and AT2025ulz does not presently provide a calibration of this branching fraction [51, 57, 58]. Hence, optimisti-cally, hereafter we assume that superkilonovae occur in 
+
+fSKN |coll = 10 −2 as a fiducial benchmark rather than an empirically measured rate. In the local universe, the comoving event-rate den-sity of CCSNe is well-established at R0,CCSN ≈ 7 ×
+
+10 4 Gpc −3 yr −1 [87]. This rate provides the baseline from which all compact-object formation channels emerge. Within the CCSN population, the observed on-axis rate of long-duration GRBs (LGRBs) associated with collap-sars is Robs 0,LGRB ≃ 1.3+0 .6 
+
+> −0.7
+
+Gpc −3 yr −1 [71, 95, 103]. Low-luminosity GRBs (LL-GRBs), which may represent a distinct collapsar mode or viewing-angle effects, oc-cur at higher rates of Robs 0,LLGRB ∼ few ×10 2 Gpc −3 yr −1
+
+[31, 41, 61, 79, 88]. However, their intrinsic rate is bounded by the rate of broad-lined Type Ic SNe, which are estimated to represent ≈ 4.4% of CCSN with rates of ∼ 3 × 10 4 Gpc −3 yr −1 [56, 80]. Recent radio stud-ies of broad-lined Type Ic SNe have searched for rel-ativistic ejecta indicative of engine-powered explosions [36, 37, 72, 77]. These observations have constrained 3the fraction of engine-powered events similar to the broad-lined Type Ic SN 1998bw, associated with the LL-GRB 980425, to < 16% [77], implying that successful LL collapsar jets constitute ≲ 1% of all core collapses [36, 37, 77], or Rtrue 0,LLGRB ≲ 7 × 10 2 Gpc −3 yr −1. This, in turn, implies that the true rate Rtrue 0,LLGRB cannot be much larger than Robs 0,LLGRB .The above constraints, combined with the assumption that at most 1% of collapsars can power superkilonova (or fSKN |coll ∼ 10 −2, see Equation 2.2), imply: 
+
+R0,SKNe ≲ 7 Gpc −3 yr −1. (2.3) For comparison, the most recent constraint from the LIGO-Virgo-KAGRA’s (LVK) O4 run places the local NS-NS merger rate at R0,BNS = 5 .1–154 .7 Gpc −3 yr −1
+
+[3, 7, 16], and that of subsolar-mass compact object coa-lescences at R0,Sub −BNS < 86 Gpc −3 yr −1 [5, 10, 12, 98]. With the upper bound on the intrinsic rate of superk-ilonovae provided by Equation 2.3, it is evident that GW searches for potentially associated GW signals need to reach horizon distances of ≳ 470 Mpc ( ≳ 218 Mpc) to en-sure a 95% probability of at least one GW detection in a 1-year (10-year)-long GW run.  
+
+> III. GW SIGNAL MODELING
+
+To obtain order-of-magnitude estimates of the basic properties of GW signals from sub-solar NS compo-nents (their duration in a given frequency range, time-frequency evolution, and amplitude) we use the approx-imate waveforms described below. Such signals could be targeted by long-duration GW searches like CoCoA . An-alytical waveform approximations are computationally cheaper to evaluate than numerical ones, making them well suited for large template banks and for search meth-ods robust enough not to require more accurate numeri-cal waveforms. As we show in what follows, the approxi-mants considered here can be used interchangeably for a 
+
+CoCoA analysis.  
+
+> A. Analytical in-spiral waveforms
+
+We reproduce the approximate analytical waveforms derived in Appendix B of Chen & Metzger [34] for the hierarchical merger system consisting of a sub-solar NS– NS inner binary embedded within a collapsar accretion disk, whose merged remnant subsequently inspirals into the central black hole (BH; outer binary). For a quasi-circular binary with chirp mass M =(m1m2)3/5/(m1 + m2)1/5, the instantaneous GW fre-quency for 0 ≤ t < τ m is: 
+
+f (t) = 18π
+
+ 5
+
+τm − t
+
+3/8  c3
+
+GM
+
+5/8
+
+, (3.1) where the GW-driven merger time for a circular binary with semi-major axis a0 is [81] 
+
+τm = 5256 
+
+c5 a40
+
+G3 m1 m2 (m1 + m2) ≈ 5256 
+
+c5 a40
+
+G3 m21 m2
+
+, (3.2) where in the last approximation we have assumed 
+
+m1 ≫ m2 1.In the bottom panels of Figure 1 we evaluate Eq. (3.1) for the outer NS–BH in-spiral with chirp mass 
+
+Mout = M(Mrem , M •), and using Equation 3.2 with 
+
+m2 = Mrem = 2 MNS for the mass of the inner NS–NS merger remnant and m1 = M• for the BH mass. The BH mass is taken as M• ∈ { 3, 4, 5}M⊙ and the mass of the NS taken in the range MNS ∈ [0 .1, 0.5] M⊙. The outer NS–BH binary is taken to originate at a separa-tion a0,out = r0 = 200 Rg (Rg ≡ GM •/c 2), motivated by the characteristic outer radius of the gravitationally unstable region in the Chen & Metzger [34] disk simu-lations. For our mass grid this separation corresponds to a GW frequency of a few Hz, below the 20 Hz low-frequency cutoff of ground-based detectors; we therefore begin tracking and plotting the waveform (Figure 1) from the later point at which the inspiral reaches f = 20 Hz. We note that the maximum possible initial separation for the inner NS–NS binary is set by the Hill radius of the remnant within the disk, 
+
+RH = r0
+
+ Mrem 
+
+3M•
+
+1/3
+
+, (3.3) which is the stability boundary beyond which the binary would be tidally disrupted by the central BH [see Eq. B3 in 34]. Assuming a0,in = RH /10 ensures that the NS– NS merger occurs before the outer inspiral completes, consistent with the hierarchical superkilonova picture [6, 24, 26, 74, 85]. Although before the inner NS-NS merger the total GW strain is the superposition of the two inspiral compo-nents, with each component having plus and cross po-larization signals of the form: 
+
+h+(t) ∝ h0(t) cos 
+
+
+
+2π
+
+Z t
+
+> 0
+
+f (t′) dt ′
+
+
+
+, (3.4) 
+
+h×(t) ∝ h0(t) sin 
+
+
+
+2π
+
+Z t
+
+> 0
+
+f (t′) dt ′
+
+
+
+, (3.5) the GW amplitude h0(t) of the inner NS-NS merger is ex-pected to be much smaller than that of the BH-NS rem-nant merger for BH masses in the range 3–5 M ⊙ merging with sub-solar NSs (see Eq. B9 in [34]). The amplitude (see Eq. B5 in [34]): 
+
+h0(t) = 4 ( GM)5/3
+
+c4 D
+
+ πf (t)2/3, (3.6)  
+
+> 1This post-Newtonian (PN) result is accurate for the inspiral phase but breaks down in the final stages of merger where full general relativistic effects become important.
+
+410 −24 
+
+> 10 −23
+> 10 −22
+> Amplitude  h0(t)
+
+M• = 3 M M• = 4 M M• = 5 M                             
+
+> 0200 400 600 800 1000
+> Time since 20 Hz [s]
+> 10 2
+> 10 3
+> f (t) [Hz]
+> 0200 400 600 800
+> Time since 20 Hz [s]
+> 0200 400 600 800
+> Time since 20 Hz [s]
+> Mrem = 0 .1MMrem = 0 .2MMrem = 0 .3MMrem = 0 .4MMrem = 0 .5MIMRPhenomD Analytical
+
+FIG. 1: TOP: GW strain amplitude as a function of in-band time (where we take t = 0 at 20 Hz) for NS-BH binaries at a luminosity distance of dL = 112Mpc. BOTTOM: Instantaneous frequency of GW binaries as a function of in-band time. The mass of primary is fixed to (3, 4, 5) M⊙ for left, center, and right columns respectively. The mass of the secondary is taken in the range [0.1, 0.5] M⊙ and shown with different colours. We have used the LAL waveform IMRPhenomD [67] to generate the waveforms shown here as solid lines. Analytical waveforms derived from Chen & Metzger [34] (dots) are over-plotted for comparison. describes the instantaneous amplitude of the GW signal, and it is plotted in the top panel of Figure 1 for a system placed at a distance of dL = 112 Mpc. We note that the effects of tidal deformability can sig-nificantly modify the waveform, increasing its detectabil-ity for a binary with masses m1 = 1 .2M⊙ and m2 =1.0M⊙ [34]. Hereafter, we neglect tidal deformability, so our detectability estimates can be regarded as conserva-tive. 
+
+B. LAL waveforms 
+
+For direct comparison with the analytical estimates presented in the previous Section, we generate 15 gravi-tational waveforms for NS-BH binaries with the mass of the BH taken as M• ∈ { 3, 4, 5}M⊙ and the mass of the NS taken in the range MNS ∈ [0 .1, 0.5] M⊙, placed at a distance of dL = 112 Mpc. We use the LAL waveform model IMRPhenomD [53, 59, 67] to get the time-domain strain. Let h+(t) and h×(t) be the plus and cross polar-isations of the GW strain. Then, 
+
+h(t) = h+(t) − ih ×(t) = A(t)e−iϕ (t), (3.7) where A(t) is the amplitude of the waveform and ϕ(t) de-notes the phase. Hence, the instantaneous GW frequency can be written as: 
+
+f GW inst (t) = 12π
+
+dϕ(t)dt . (3.8) In Figure 1, we show the GW amplitude and (instanta-neous) frequency evolution, of the NS-BH systems con-sidered here, as a function of time in the top and bot-tom panels respectively. The mass of the primary is kept constant at 3 M⊙, 4M⊙, and 5 M⊙ for the left, center, and right columns respectively while the mass of the sec-ondary is varied between [0.1, 0.5] M⊙. We consider t = 0 at 20 Hz which is typically taken as start frequency for observation of signals in the current generation GW de-tectors. It can be seen in Figure 1 that the lighter systems spend hundreds of seconds in the detector band. We then calculate the approximate waveform duration for these 5
+
+FIG. 2: Approximate GW waveform durations for sub-solar NS-BH systems. Stars show the approximate durations (Eq. 3.9) at flow =20 Hz for the 15 LAL analytical waveforms considered in this study; triangles show the time the corresponding waveforms (Section III A) spend between 20 and 1024 Hz. Tracks in shades of blue, green, and red show approximate LAL durations for a population of NS-BH systems with mass ratios of 1/10 and 1/20, assuming flow = 5 , 10, and 20 Hz. systems using just the 0PN term for chirp time [20] given by: 
+
+Tchirp = 5256 ηGM c3
+
+ GM c3 πf low 
+
+−8/3
+
+, (3.9) where M is the total mass of the binary in solar mass, 
+
+η = m1m2/M 2 is the symmetric mass ratio, and flow is the lower cut-off frequency from where the chirp time is calculated. In order to include the possible ringdown, we have multiplied Tchirp by a fudge factor of 1.1 to get the approximate waveform duration. In Figure 2 we show with star symbols the approximate waveform durations calculated using Eq. (3.9) and flow = 20 Hz. For compar-ison, we plot with triangles the time the analytical wave-forms described in Section III A spend between 20 Hz and 1024 Hz. Next, we simulate a population of NS-BH systems with mass ratios 1/10 and 1/20. For each mass ratio, we sam-ple uniformly in chirp mass such that the primary mass lies between m1 ∈ [3 , 5] M⊙ and the secondary mass lies between m2 ∈ [0 .2, 1] M⊙. In Figure 2 we show the ap-proximate waveform durations for this LAL population (shades of blue, green, and red tracks) when assuming 
+
+flow = 5 , 10 , 20 Hz so as to show the impact of the in-creased low-frequency sensitivity on long-duration GW searches with next-generation ground-based GW detec-tors (Section V).   
+
+> IV. GW SEARCH METHODS A. CoCoA in brief
+
+CoCoA [38] is a GW search algorithm that adapts the cross-correlation technique originally developed for the detection of stochastic and continuous GW signals [14, 40] to the search for GW transients of intermediate duration [38, 60, 90], i.e., much shorter than continuous GWs (e.g.,[11, 15]) but longer than typical so-called GW burst searches (e.g., [62, 70, 96]). 
+
+CoCoA searches are triggered GW searches aimed at discovering GW signals of intermediate duration from sources of known sky position occurring at a well-known trigger time (ideally with an uncertainty ≲ 1 s; [90]). Searches also assume quasi-periodic GW signals i.e., sig-nals that can be considered monochromatic over small time intervals, and whose time-frequency evolution can be modeled with sufficient physical accuracy over a time interval Tcoh , less than or equal to the total observa-tion time Tobs over which the signal is expected to last. Since the signal is quasi-periodic, one can define a base-line ∆ TSFT ≤ Tcoh such that, when performing a short Fourier Transform (SFT) of the signal within TI −∆TSFT 
+
+to TI + ∆ TSFT , all of the signal power at time TI is con-centrated in a single SFT bin around a frequency f (TI ), so the GW signal can be approximated as: 
+
+h(t) ≈ h0(TI )A+F+ cos( ϕ(TI ) + 2 πf (TI )( t − TI )) +h0(TI )A×F× sin( ϕ(TI ) + 2 πf (TI )( t − TI )) , (4.1) where F+ and F× are the antenna factors that quantify the detector’s sensitivity to each GW polarization state, and where A+ and A× are amplitude factors dependent on the physical system’s inclination angle ι:
+
+A+ = 1 + cos 2 ι
+
+2 (4.2) 
+
+A× = cos ι. (4.3) Hereafter, we assume that F+ and F× are constant with time, given the duration of the signals we are interested in (see also [38]). For each waveform, assuming a source located at a cer-tain distance dL, we can compute the root mean square (rms) amplitude at the detector as (see Equation 4.24 of [38]): 
+
+hrms =
+
+s P 
+
+> I
+
+h20(TI )
+
+NSFT 
+
+, (4.4) where I is the SFT index; NSFT = Tobs /∆TSFT ; and 
+
+h0(t) is proportional to the inverse of the distance to the source. With CoCoA , a cross-correlation statistic is calculated from SFTs of detector’s data along the model time fre-quency tracks that form the search template bank. In the so-called stochastic limit of CoCoA , only SFT pairs 6from different detectors at the same time (after correcting for the time-of-flight in case of non co-located detectors) are correlated. This choice minimizes computational cost and maximizes robustness against signal uncertainties, at the expense of sensitivity. In the matched-filter limit of 
+
+CoCoA , all possible SFT pairs (including self-pairs) are considered. This limit maximizes sensitivity at the ex-pense of robustness and computing time. Finally, in the semi-coherent regime of CoCoA , a CoCoA matched-filter search is performed in each of Ncoh = Tobs /T coh coherent segments, and the results for each coherent time segment are then combined incoherently. Hence, the CoCoA semi-coherent approach can be regarded as the incoherent sum of Ncoh matched-filter searches carried out over Ncoh time segments each of duration Tcoh .Hereafter, we focus on the CoCoA stochastic limit. In this limit, the detection cross-correlation statistic is a Gaussian variable with mean ( μρ) and standard deviation (σρ) defined as follows (see Equations 4.17 and 4.18 of [38]): 
+
+μρ = ( A2+F 2+,H + A2
+
+> ×
+
+F 2 
+
+> ×,H
+
+)( A2+F 2+,L + A2
+
+> ×
+
+F 2
+
+> ×,L
+
+) ∆T 2
+
+> SF T
+
+2
+
+> NSF T
+
+X
+
+> I
+
+h20(TI )
+
+SHn [fk,I ]SLn [fk,I ] , (4.5) 
+
+σ2 
+
+> ρ
+
+= ( A2+F 2+,H + A2
+
+> ×
+
+F 2 
+
+> ×,H
+
+)( A2+F 2+,L + A2
+
+> ×
+
+F 2
+
+> ×,L
+
+) ∆T 2
+
+> SF T
+
+2
+
+> NSF T
+
+X
+
+> I
+
+1
+
+SHn [fk,I ]SLn [fk,I ] , (4.6) where Sn is the single-sided Power Spectral Density (PSD) of the noise; the H and L subscripts denote quan-tities calculated for two different detectors, i.e., in this example, LIGO Hanford and LIGO Livingston, respec-tively. Assuming white Gaussian noise (so that Sn is independent of frequency), the detection condition can be expressed as hrms (1 /d ) ≳ hstoch with (see Equation 4.23 in [38]): 
+
+hstoch =
+
+√2S1/2∆T −1/2 
+
+> SF T
+
+N −1/4 
+
+> SF T
+
+(SHn SLn )1/4
+
+[( A2+F 2+,H + A2
+
+> ×
+
+F 2 
+
+> ×,H
+
+)( A2+F 2+,L + A2
+
+> ×
+
+F 2
+
+> ×,L
+
+)] 1/4 ,
+
+(4.7) where S is defined as: 
+
+S = erfc −1(2 α) − erfc −1(2 γ), (4.8) where α is the False Alarm Probability (FAP), 1 − γ
+
+is the False Dismissal Probability (FDP), erfc( x) is the complementary error function of x, and erfc −1(x) is its inverse. The complementary error function is related to the error function by the relation erfc( x) = 1 − erf( x), where the erf( x) is the probability that a random variable that is normally distributed with mean zero and standard deviation 1 /√2 falls in the range [ −x, x ]. Hence, the complementary error function represents the area under the two tails of a zero-mean Gaussian probability density function with standard deviation 1 /√2.  
+
+> B. EM- vs GW-triggered search strategies
+
+Based on the tentative association between S250818k and SN 2025ulz, we envisage two types of CoCoA GW search strategy for sub-solar NSs in the context of the superkilonova scenario, described in what follows. The first is inspired directly by the S250818k/SN 2025ulz potential association: a low-significance matched-filter GW trigger provides an initial sky localization area, within which an EM cam-paign searches for counterparts, ideally yielding a much more accurate sky position through the identification of a SN or other EM counterpart [18, 57]. A more robust 
+
+CoCoA search is then carried out using the GW-provided merger time and the EM-provided sky position. We stress, however, that the GW sky localization is likely to be large when derived from a low-threshold matched-filter trigger, so our ability to conduct a CoCoA search would rely on identifying an EM counterpart within that area. The second type of search is independent of the GW localization capabilities and is usually referred to as an EM-triggered search (e.g., [2, 9, 13, 96]). Here one would use CoCoA to search for GWs within an on-source time window and sky localization area both provided by in-dependent EM observations (see e.g., [25, 36, 77]). In-deed superkilonovae, if they exist, are potentially iden-tifiable through spectroscopic follow-up of long GRBs or engine-driven stripped-envelope SNe (such as Type IIb or broad-lined Type Ic; 28, 89, and Section II). They are generally expected to be even redder than kilonovae ow-710 1 10 2 10 3 
+
+> f(Hz)
+> 10 −25
+> 10 −23
+> 10 −21
+> 10 −19
+> 10 −17
+> Strain noise (Hz −1/2)
+> AdvVirgo O4c O5c A# CE20 ET15 CE40
+
+FIG. 3: Amplitude spectral density (ASD) curves for all the GW detectors used in this study (Section V). While for our localization results shown in Figure 5 we use the respective L1 and H1 ASDs for O4c as given in Ref. [64], since they are very similar, we only show O4c for LIGO-H here for clarity. ing to line blanketing by the r-process elements produced. The near- and mid-infrared are of particular interest, as this is the regime where neutron-capture ( r-process) lines can be identified. Alternatively, superkilonovae could be identified using the wide-field capabilities of the upcom-ing Roman [91] and/or Rubin LSST [54, 102] observato-ries. Their light curves and spectra are distinguishable from those of ordinary Type I and II SNe, and theory predicts that they should be detectable out to z ≈ 1with Roman NIR observations reaching a depth of 26-27 mag in F158, F184, and F62 filters [86, 89]. An EM-triggered GW search for sub-solar NS-BH mergers with 
+
+CoCoA would benefit from a very small sky localization error, but its sensitivity is likely to be limited by how well the merger time of the sub-solar NS-BH system can be reconstructed from the EM observations alone, since the larger the timing uncertainty, the less sensitive GW searches become (e.g., [90, 96]).  
+
+> V. DETECTOR SENSITIVITY AND NETWORKS
+
+We assess the detection and localization capabilities of current- and next-generation (XG) GW detectors in dif-ferent network configurations. The noise curves (noise amplitude spectral density; ASD) used for the distance range estimates described in Section VI are shown in Figure 3. Specifically, to provide the range of distance horizons for a single-trial one- or two-detector searches (Section VI A), we consider the LIGO Hanford detector (H) at O4c sensitivity [32, 64] and a 40 km Cosmic Ex-plorer (CE40) at default sensitivity [33, 43] plus a 15 km TABLE I: Detector locations and networks included in this study.                                     
+
+> Label Latitude Longitude Azimuth Network L30 .56 ◦−90 .77 ◦197 .7◦O4, O5, A# H46 .46 ◦−119 .4◦126 ◦O4, O5, A# V43 .63 ◦10 .50 ◦19 .43 ◦O4/O5 I19 .61 ◦77 .03 ◦117 .62 ◦A# CE40 34 .17 ◦−118 .13 ◦90 ◦XG CE20 29 ◦−94 ◦−200 ◦XG ET-L1 40 .52 ◦9.42 ◦0◦XG ET-L2 50 .72 ◦5.92 ◦45 ◦XG
+
+TABLE II: Antenna pattern values used for the GW sensitivity (horizon distance) estimates. We assume a face-on optimally-oriented system for the LIGO Hanford (LIGO-H) detector with (R.A., Dec., ψ) = (-0.2572, 0.8108, 0) rad, ι = 0 rad, and tGPS = 0 s. Columns from left to right are: Detector symbols, F+, and F×.                  
+
+> Detector F+F×
+> L0.2744 -0.8476 H-0.3090 0.9510 V0.2079 0.0517 I0.5641 -0.1570 CE40 -0.9768 0.0284 CE20 -0.8877 -0.1308 ET-L1 0.0649 -0.2384 ET-L2 0.2992 0.4381
+
+Einstein Telescope in L–configuration [ET-L1; 1, 42, 84]. We stress that all the sensitivity curves used in this study are taken from published and publicly available ASDs. In addition, we consider GW localization capabilities for the following detector networks: 1. O4 network: LIGO Livingston (L), H, and Virgo (V) detectors with LIGO detectors taken at O4c sensitivity [8, 32, 64] and Virgo at Advanced Virgo design sensitivity [17]. 2. O5 network: L, H, and V detectors with LIGO detectors taken at O5c/A+ sensitivity [8, 65] and Virgo at Advanced Virgo design sensitivity [17]. 3. A# network: L, H, and LIGO-India [55] (I) detec-tors, all at A# sensitivity [8, 66]. 4. XG network: CE40 at default sensitivity in [33], a 20 km Cosmic Explorer (CE20) at default sen-sitivity for CE20 in [33], and two 15 km Einstein Telescopes (ET-L1, ET-L2) in L–configuration at ET15 sensitivity [42] used in the CoBA study [1]. The locations of all the detectors considered in these networks are given in Table I. 8  
+
+> VI. RESULTS A. GW distance horizons
+
+Here, we estimate the distance horizons for sub-solar NS-BH single-trial one-detector matched-filter searches and single-trial two-detector CoCoA stochastic searches. In each case we assume the minimum number of detec-tors required to implement the search. Real searches typically rely on networks of two or more detectors, im-proving sensitivity and potentially providing GW local-ization, and use large template banks, resulting in a correspondingly large number of trials (e.g., O(10 6) tri-als were estimated for a two-parameter-waveform CoCoA 
+
+EM-triggered search by Sowell et al. [90]). Our aim here, however, is to characterize the distance reach of the most sensitive technique (matched filtering) and of a more ro-bust one (the CoCoA stochastic search) under these mini-mal assumptions. The resulting distances provide a use-ful reference, as they can be rescaled to obtain order-of-magnitude sensitivity estimates for more complex and realistic searches. For all distance estimates, we consider an optimally-oriented source with respect to LIGO Han-ford (see Table II). For the 15 LAL waveforms described in Section III B, we report in Table III the optimal SNR ( ρopt ) at 112 Mpc, and the optimal horizon distance estimated as the dis-tance at which ρopt ≈ 8 (i.e., single-trial False-Alarm-Probability of FAP ≈ 1.3 × 10 −14 ) in a single-detector matched-filter search with a LIGO H-like detector or a 40-km CE detector with ideal Gaussian noise. The op-timal horizons should be seen as the most optimistic es-timates of the reach of single-detector searches for sub-solar NS-BH systems. We have verified that these hori-zon distance estimates are fully consistent with what one would derive using the analytical waveforms described in Section III A. Next, using the formulation described in Section IV A, we estimate the CoCoA stochastic horizon distance for a single-trial FAP ≈ 1.3 × 10 −14 and FDP ≈ 50%, assuming a two-detector LIGO-H plus LIGO-L search with O4c-like ASD and Gaussian noise. For the CoCoA search we set ∆ TSFT = 9 ms to satisfy the quarter-cycle approx-imation. Finally, we repeat the CoCoA estimates for a two-detector stochastic search with CE40 and one ET 15 km (ET-L1). We note that the CoCoA horizon dis-tances of an actual search may be degraded to up to a factor of ≈ √2 in distance reach compared to what one would estimate purely analytically (Equation 4.7), due to spectral leakage effects [38]. Because spectral leakage is equivalent to a systematic error, it will manifest itself more prominently in XG detectors. For this reason, the estimates reported in Table III are obtained applying a Hanning window to the signal (in a zero-noise approxima-tion) and then performing actual SFTs on the signal to calculate the expectation value (see the numerator in the sum of Equation 4.5). The detector ASD is then used to weigh the signal power in each SFT and frequency bin, as in Equation 4.5, and to calculate the standard deviation of the detection statistic as in Equation 4.6. As evident from Table III and Figure 4, CoCoA stochas-tic searches in current-generation GW detectors data may start setting interesting constraints on sub-solar NS mergers in the superkilonova scenario via EM-triggered strategies. Indeed, the distance horizons in Table III are at least comparable to the distances of the closest short (GRB170817/GW170817) and long (SN 1998bw/GRB980425) GRBs we know of, both lo-cated at dL ≈ 40 Mpc [48, 52]. While these events are very rare (order of one per decade or less), they have occurred. Further sensitivity improvements in current-generation GW detectors of a factor of ≈ 1.5 compared to the O4 sensitivity, such as the planned A#, would be very helpful especially for ensuring that the horizon distances of stochastic searches with CoCoA get closer to 
+
+≈ 150 Mpc: this is the distance at which optical surveys of the transient sky are currently detecting and spec-troscopically classifying a few Ic-BL SNe per year (e.g., [77, 92]). In order for CoCoA searches to reach distances comparable to that of SN 2025ulz, which was located at 
+
+≈ 401 Mpc (e.g., [49, 57]), next-generation GW detec-tors such as CE and ET are going to be critical. Using the superkilonova rate upper-limit discussed in Section II (see Eq. 2.3), we estimate ≲ 85% probability of detect-ing at least one superkilonova at ≲ 400 Mpc over a 1-yr period. As we show in the next Section, these detectors are also expected to provide much improved localizations for GW-triggered searches with CoCoA . 
+
+> B. GW localization for GW-triggered searches
+
+To evaluate the feasibility of GW-triggered searches for sub-solar NS-BH systems (see Section IV B), we gen-erate a population of non-spinning sub-solar NS-BH sys-tems similar to that described in Section III B and esti-mate the localization capabilities of various GW detector networks. Specifically, we sample 500 points uniformly in chirp mass such that the primary mass lies between 
+
+m1 ∈ [3 , 5] M⊙ and the secondary mass lies between 
+
+m2 ∈ [0 .2, 1] M⊙. We then distribute the simulated sys-tems in the sky, adopting a uniform R.A. distribution in the [0 , 2π] range, and a uniform-Cosine distribution for the Dec in the range [ −1, 1]. We also adopt a uniform distribution in polarization angle ( ψ) in the range [0 , π ]. We place all the binaries at a distance of dL = 112 Mpc in face-on configuration ( ι = 0). We have chosen a GW phase equal to zero at tgps = 0. For these sources, we generate signals using the wave-form model IMRPhenomXPHM [67, 83] 2 and calcu-late the optimal SNR and sky localization area using                    
+
+> 2Here, we use amore advanced waveform model (IMRPhenomXPHM ), which includes higher-modes, com-pared to IMRPhenomD (used in previous sections) because
+
+9
+
+FIG. 4: Subsolar waveform GW horizons across the search strategies analyzed in this work. See Section VI A for discussion. TABLE III: Sub-solar waveform detectability estimates (see Section VI A for details) for the 15 LAL waveforms described in Section III B. The first six columns, from left to right are: central BH mass; NS merger-remnant mass; in-band duration (time to span 20–1024 Hz); optimal SNR at 112 Mpc; optimal horizon distance (SNR ≈ 8, FAP ≈ 1.3 × 10 −14 ) for a single-detector matched-filter search with a LIGO H-like detector, Gaussian noise, and an O4c-like ASD; and CoCoA stochastic horizon distance (single-trial FAP ≈ 1.3 × 10 −14 , FDP ≈ 50%) for a 2-detector LIGO HL search with O4c-like ASD and Gaussian noise. The last three columns are similar estimates but for CE40 km and ET-L1. For the CoCoA horizons we set ∆ TSFT = 9 ms so as to satisfy the quarter-cycle approximation. 
+
+MBH MNSrem T20 −1024 Hz ρopt ,O4c H,112 Mpc dopt ,O4c H,1−trial dCoCoA −S,O4c HL ,1−trial ρopt ,XG CE40 ,112 Mpc dopt ,XG CE40 ,1−trial dCoCoA −S,XG CE40 −ETL1 ,1−trial 
+
+(M⊙) (M⊙) (s) (Mpc) (Mpc) (Gpc) (Mpc) 3.0 0.1 1078 9.23 129 32.2 301 4.21 231 3.0 0.2 545 13.0 182 53.7 423 5.92 387 3.0 0.3 368 15.9 223 72.6 516 7.22 522 3.0 0.4 279 18.2 255 88.5 593 8.30 648 3.0 0.5 225 20.3 284 104 661 9.25 759 4.0 0.1 887 10.0 140 36.4 329 4.61 266 4.0 0.2 447 14.1 197 61.2 464 6.50 445 4.0 0.3 301 17.3 242 82.0 566 7.92 604 4.0 0.4 227 19.9 279 102 651 9.11 740 4.0 0.5 183 22.2 311 119 726 10.2 872 5.0 0.1 762 10.6 148 40.5 352 4.93 292 5.0 0.2 384 15.0 210 64.8 496 6.94 489 5.0 0.3 258 18.3 256 91.4 607 8.50 659 5.0 0.4 195 21.1 295 113 699 9.79 823 5.0 0.5 157 23.6 330 132 779 10.9 973 10 
+
+FIG. 5: 90% Localization area (deg 2) as a function of network SNR for various detector networks (see Section V for details). Networks of three current generation detectors at their O4 (orange), O5/A+ (blue), and A# (magenta) sensitivity are compared with a network of XG detectors (green). All binaries are placed at 
+
+dL = 112 Mpc. The upper axis shows, for each network, the distance that would yield a network SNR of 8. For reference, the 90% GW sky localization area of S250818k was ≈ 949 deg 2 [69]. the timing-based triangulation method [44–46] (see Ap-pendix B.2. of Fairhurst et al. [45] for details) for O4, O5, A#, and XG networks listed in Table I. In Figure 5 we show the 90% GW sky localization area for binaries with SNR > 5 in each detector and a network SNR > 8when placed at dL = 112 Mpc. While the estimates performed here should be taken with caution as they represent the best possible localizations achievable by a given detector network as they assume perfect waveform match, it can be seen that the XG network performs bet-ter by at least two orders of magnitude compared to the current-generation detector networks at O4 sensitivity. Hence, with next-generation detectors, the search for EM counterparts to sub-solar NS-BH systems, and the corre-sponding GW-triggered searches for long-duration GWs, will be greatly facilitated.  
+
+> VII. SUMMARY AND CONCLUSION
+
+Prompted by the tentative association between the sub-threshold candidate S250818k and the Type IIb su-pernova SN 2025ulz, in this work we have addressed the question of whether it is possible to detect long-lived, non-standard GW chirps potentially associated with them using existing and planned GW instruments. Because the astrophysics of sub-solar NS formation and the subsequent merger with lower-mass-gap BHs can push the waveforms away from reliable templates, we considered detection techniques beyond matched filter-ing, focusing on the more robust but less sensitive cross-correlation algorithm CoCoA , applied either as follow-up of candidate chirps or as EM-triggered searches of stripped-envelope CCSNe. This is the first analysis where 
+
+CoCoA has been applied to a class of waveforms substan-tially different from the bar-mode instability waveforms for which CoCoA was originally proposed [38, 90]. The central conclusion of our work is that EM-triggered stochastic searches for sub-solar chirps are worthwhile in current-generation GW detector data for nearby events: the expected reach covers the distances at which the nearest GW/GRB-associated explosions have historically occurred, though the expected rate of such events is low. The value of an A# upgrade on current-generation detectors is clear, as it moves the accessible volume up to where transient surveys routinely classify the relevant SN population, turning opportunistic follow-up into more of a systematic program. Reaching the population as a whole, however, is fundamentally in the realm of next-generation GW detectors: only CE and ET extend the horizon to the distances of events like SN 2025ulz, and could deliver the localizations that make GW-triggered searches practical alongside EM-triggered ones. Our rate-based estimate reinforces this conclu-sion, indicating that a confident yearly detection is plau-sible only once sensitivities approach several hundred Mpc. This conclusion is affected by a big uncertainty, namely, the current lack of a robust rate measurement for superkilonovae. The last will require a large sam-ple of confident subsolar-mass GW detections with well-characterized GRB or SN counterparts, together with global simulations of the full disk evolution. We stress that the superkilonova scenario itself remains unconfirmed; S250818k is sub-threshold, and the link to SN 2025ulz is suggestive rather than established. Our re-sults should thus be read as a detectability roadmap for a hypothesis worth testing, not as evidence for it. More-over, CoCoA ’s robustness comes at a sensitivity cost, so the horizons quoted here are conservative compared to a matched-filter search (Table III) and driven by the as-trophysical uncertainties. Any future narrowing of the theoretical scenarios invoking superkilonovae, and of the related GW signal models, would therefore help extend GW searches to larger distances. In fact, in both the matched filter and CoCoA cases we have considered only the single-trial horizons. These are useful for projecting sensitivities in a variety of scenarios that could include different search strategies (Section IV B) and/or GW net-works (Section V). However, a real search would need to account for the number of trials namely, the size of the template bank, that is likely to be dominated by the un-certainties on the expected GW signals (e.g., on the com-ponent masses) and, in an EM-triggered framework, by the uncertainties on the merger time [90]. The number of trials also impacts the computing cost, which would need to be carefully evaluated in a search where computing re-sources may be limited [60] and/or computing speed is 11 of essence (e.g., low-latency searches). 
+
+ACKNOWLEDGMENTS 
+
+A.C. acknowledges support from the National Science Foundation (NSF) via the grant # AST-2431072. DJ ac-knowledges the Science and Technology Facilities Coun-cil (STFC) for support through grants ST/V005618/1 and ST/Y004272/1. YZ acknowledges support from MAOF grant 12641898 and visitor support from the Observatories of the Carnegie Institution for Science, Pasadena CA, where much of this work was completed. RC acknowledges support from the NSF via grant # PHY-2512922. [1] Abac, A., et al. 2026, J. Cosmology Astropart. Phys., 2026, 081, doi: 10.1088/1475-7516/2026/03/081 
+
+[2] Abac, A. G., Abbott, R., Abouelfettouh, I., et al. 2025, ApJ, 985, 183, doi: 10.3847/1538-4357/adc681 
+
+[3] Abac, A. G., Abe, A., Abouelfettouh, I., et al. 2026, arXiv e-prints, arXiv:2605.27226, doi: 10.48550/arXiv. 2605.27226 
+
+[4] Abac, A. G., Abouelfettouh, I., Acernese, F., et al. 2026, arXiv e-prints, arXiv:2605.05444, doi: 10.48550/arXiv. 2605.05444 
+
+[5] —. 2026, arXiv e-prints, arXiv:2605.05444, doi: 10. 48550/arXiv.2605.05444 
+
+[6] Abac, A. G., Abouelfettouh, I., Acernese, F., et al. 2026, Phys. Rev. D, 113, 082004, doi: 10.1103/83j3-pgk1 
+
+[7] Abac, A. G., Abouelfettouh, I., Acernese, F., et al. 2025, arXiv e-prints, arXiv:2508.18082, doi: 10.48550/arXiv. 2508.18082 
+
+[8] Abbott, B. P., Abbott, R., Abbott, T. D., et al. 2018, Living Reviews in Relativity, 21, 3, doi: 10.1007/ s41114-018-0012-9 
+
+[9] Abbott, B. P., Abbott, R., Abbott, T. D., et al. 2020, Phys. Rev. D, 101, 084002, doi: 10.1103/PhysRevD. 101.084002 
+
+[10] —. 2019, Phys. Rev. Lett., 123, 161102, doi: 10.1103/ PhysRevLett.123.161102 
+
+[11] Abbott, B. P., Abbott, R., Abbott, T. D., et al. 2019, ApJ, 875, 160, doi: 10.3847/1538-4357/ab0f3d 
+
+[12] Abbott, R., Abbott, T. D., Acernese, F., et al. 2022, Phys. Rev. Lett., 129, 061104, doi: 10.1103/ PhysRevLett.129.061104 
+
+[13] Abbott, R., Abbott, T. D., Acernese, F., et al. 2022, ApJ, 928, 186, doi: 10.3847/1538-4357/ac532b 
+
+[14] Abbott, R., Abe, H., Acernese, F., et al. 2022, The Astrophysical Journal Letters, 941, L30, doi: 10.3847/ 2041-8213/aca1b0 
+
+[15] —. 2022, Phys. Rev. D, 106, 102008, doi: 10.1103/ PhysRevD.106.102008 
+
+[16] Abbott, R., Abbott, T. D., Acernese, F., et al. 2023, Physical Review X, 13, 011048, doi: 10.1103/PhysRevX. 13.011048 
+
+[17] Acernese, F., Agathos, M., Agatsuma, K., et al. 2015, Classical and Quantum Gravity, 32, 024001, doi: 10. 1088/0264-9381/32/2/024001 
+
+[18] Ackley, K., Botticella, M. T., Boye, A., et al. 2026, arXiv e-prints, arXiv:2605.02639, doi: 10.48550/arXiv. 2605.02639 
+
+[19] Akutsu, T., Ando, M., Arai, K., et al. 2021, Progress of Theoretical and Experimental Physics, 2021, 05A101, doi: 10.1093/ptep/ptaa125 
+
+[20] Allen, B., Anderson, W. G., Brady, P. R., Brown, D. A., & Creighton, J. D. E. 2012, Phys. Rev. D, 85, 122006, doi: 10.1103/PhysRevD.85.122006 
+
+[21] An, J., Liu, X., Zhu, Z. P., et al. 2025, GRB Coordinates Network, 41503, 1 [22] Angulo, C., Watson, A. M., Dornic, D., et al. 2025, GRB Coordinates Network, 41518, 1 [23] Antier, S., Pillas, M., Akl, D., et al. 2025, GRB Coor-dinates Network, 41519, 1 [24] Antognini, J. M., Shappee, B. J., Thompson, T. A., & Amaro-Seoane, P. 2014, MNRAS, 439, 1079, doi: 10. 1093/mnras/stu039 
+
+[25] Ayala, B., Anderson, J. P., Pignata, G., et al. 2025, A&A, 701, A128, doi: 10.1051/0004-6361/202554370 
+
+[26] Baiotti, L., & Rezzolla, L. 2017, Reports on Progress in Physics, 80, 096901, doi: 10.1088/1361-6633/aa67bb 
+
+[27] Banerjee, S., Botticella, M.-T., Brennan, S. J., et al. 2025, GRB Coordinates Network, 41532, 1 [28] Barnes, J., & Metzger, B. D. 2022, ApJ, 939, L29, doi: 10.3847/2041-8213/ac9b41 
+
+[29] Belczynski, K., Kalogera, V., & Bulik, T. 2002, ApJ, 572, 407, doi: 10.1086/340304 
+
+[30] Belczynski, K., Repetto, S., Holz, D. E., et al. 2016, ApJ, 819, 108, doi: 10.3847/0004-637X/819/2/108 
+
+[31] Camisasca, A. E., Guidorzi, C., Amati, L., et al. 2023, A&A, 671, A112, doi: 10.1051/0004-6361/202245657 
+
+[32] Capote, E., Jia, W., Aritomi, N., et al. 2025, Phys. Rev. D, 111, 062002, doi: 10.1103/PhysRevD.111.062002 
+
+[33] CE Consortium. 2024, Cosmic Explorer Strain Sensitivity. https://dcc.cosmicexplorer.org/ CE-T2000017-v8/public 
+
+[34] Chen, Y.-X., & Metzger, B. D. 2025, ApJ, 991, L22, doi: 10.3847/2041-8213/ae045d 
+
+[35] Cornish, N. C. N., K¨ uhnel, F., Sakellariadou, M., & Guanga, A. S. V. 2026. https://arxiv.org/abs/2607. 23119 
+
+[36] Corsi, A., Gal-Yam, A., Kulkarni, S. R., et al. 2016, ApJ, 830, 42, doi: 10.3847/0004-637X/830/1/42 
+
+[37] Corsi, A., Ho, A. Y. Q., Cenko, S. B., et al. 2023, ApJ, 953, 179, doi: 10.3847/1538-4357/acd3f2 
+
+[38] Coyne, R., Corsi, A., & Owen, B. J. 2016, Phys. Rev. D, 93, 104059, doi: 10.1103/PhysRevD.93.104059 
+
+[39] Davies, M. B., Levan, A. J., & King, A. R. 2005, MN-RAS, 356, 54, doi: 10.1111/j.1365-2966.2004.08423. x
+
+[40] Dhurandhar, S., Krishnan, B., Mukhopadhyay, H., & Whelan, J. T. 2008, Phys. Rev. D, 77, 082001, doi: 10. 1103/PhysRevD.77.082001 
+
+[41] Dong, X. F., Zhang, Z. B., Li, Q. M., Huang, Y. F., & Bian, K. 2023, ApJ, 958, 37, doi: 10.3847/1538-4357/ acf852 
+
+[42] ET Collaboration. 2023, ET sensitivity curves used for CoBA Science Study. https://apps.et-gw.eu/tds/ ?r=18213 
+
+[43] Evans, M., Adhikari, R. X., Afle, C., et al. 2021, arXiv 12 
+
+e-prints, arXiv:2109.09882, doi: 10.48550/arXiv.2109. 09882 
+
+[44] Fairhurst, S. 2009, New J. Phys., 11, 123006, doi: 10. 1088/1367-2630/11/12/123006 
+
+[45] —. 2018, Class. Quant. Grav., 35, 105002, doi: 10.1088/ 1361-6382/aab675 
+
+[46] Fairhurst, S., Hoy, C., Green, R., Mills, C., & Usman, S. A. 2023, Phys. Rev. D, 108, 082006, doi: 10.1103/ PhysRevD.108.082006 
+
+[47] Franz, N., Subrayan, B., Kilpatrick, C. D., et al. 2025, ApJ, 994, L45, doi: 10.3847/2041-8213/ae17a8 
+
+[48] Galama, T. J., Vreeswijk, P. M., van Paradijs, J., et al. 1998, Nature, 395, 670, doi: 10.1038/27150 
+
+[49] Gillanders, J. H., Huber, M. E., Nicholl, M., et al. 2025, ApJ, 995, L27, doi: 10.3847/2041-8213/ae2125 
+
+[50] Hall, X. J., Stein, R., O’Connor, B., & Palmese, A. 2025, GRB Coordinates Network, 41453, 1 [51] Hall, X. J., Busmann, M., Koehn, H., et al. 2025, arXiv e-prints, arXiv:2510.24620, doi: 10.48550/arXiv.2510. 24620 
+
+[52] Hjorth, J., Levan, A. J., Tanvir, N. R., et al. 2017, ApJ, 848, L31, doi: 10.3847/2041-8213/aa9110 
+
+[53] Husa, S., Khan, S., Hannam, M., et al. 2016, Phys. Rev. D, 93, 044006, doi: 10.1103/PhysRevD.93.044006 
+
+[54] Ivezi´ c, ˇZ., Kahn, S. M., Tyson, J. A., et al. 2019, ApJ, 873, 111, doi: 10.3847/1538-4357/ab042c 
+
+[55] Iyer, B., Souradeep, T., Unnikrishnan, C. S., et al. 2011, LIGO-India, Proposal of the Consortium for In-dian Initiative in Gravitational-wave Observations (In-dIGO), Tech. Rep. LIGO-M1100296-v2, LIGO. https: //dcc.ligo.org/LIGO-M1100296/public 
+
+[56] Japelj, J., Vergani, S. D., Salvaterra, R., et al. 2018, A&A, 617, A105, doi: 10.1051/0004-6361/201833209 
+
+[57] Kasliwal, M. M., Ahumada, T., Stein, R., et al. 2025, arXiv e-prints, arXiv:2510.23732, doi: 10.48550/arXiv. 2510.23732 
+
+[58] Kasliwal, M. M., Karambelkar, V., Fremling, C., et al. 2025, GRB Coordinates Network, 41538, 1 [59] Khan, S., Husa, S., Hannam, M., et al. 2016, Phys. Rev. D, 93, 044007, doi: 10.1103/PhysRevD.93.044007 
+
+[60] Khanam, T., Corsi, A., Coyne, R., & Pierre, M. S. 2026, Phys. Rev. D, 113, 103034, doi: 10.1103/yc6h-g481 
+
+[61] Liang, E., Zhang, B., Virgili, F., & Dai, Z. G. 2007, ApJ, 662, 1111, doi: 10.1086/517959 
+
+[62] LIGO Scientific Collaboration. 2005, Phys. Rev. D, 72, 042002, doi: 10.1103/PhysRevD.72.042002 
+
+[63] —. 2015, Classical and Quantum Gravity, 32, 074001, doi: 10.1088/0264-9381/32/7/074001 
+
+[64] LIGO Scientific Collaboration. 2025, O4c Reference Sensitivity. https://dcc.ligo.org/LIGO-T2500364 
+
+[65] —. 2025, A+/O5 strain curve projections. https:// dcc.ligo.org/LIGO-T2500310/public 
+
+[66] —. 2026, A# Strain Sensitivity. https://dcc.ligo. org/LIGO-T2300041/public 
+
+[67] LIGO Scientific Collaboration, Virgo Collaboration, & KAGRA Collaboration. 2018, LVK Algorithm Li-brary - LALSuite, Free software (GPL), doi: 10.7935/ GT1W-FZ16 
+
+[68] Ligo Scientific Collaboration, VIRGO Collaboration, & Kagra Collaboration. 2025, GRB Coordinates Network, 41437, 1 [69] —. 2025, GRB Coordinates Network, 41440, 1 [70] —. 2025, Phys. Rev. D, 112, 102005, doi: 10.1103/ wjdz-jdby 
+
+[71] Lloyd-Ronning, N. M., Aykutalp, A., & Johnson, J. L. 2019, MNRAS, 488, 5823, doi: 10.1093/mnras/stz2155 
+
+[72] Margutti, R., Milisavljevic, D., Soderberg, A. M., et al. 2014, ApJ, 797, 107, doi: 10.1088/0004-637X/797/2/ 107 
+
+[73] Metzger, B. D., Hui, L., & Cantiello, M. 2024, ApJ, 971, L34, doi: 10.3847/2041-8213/ad6990 
+
+[74] Naoz, S. 2016, ARA&A, 54, 441, doi: 10.1146/ annurev-astro-081915-023315 
+
+[75] O’Connor, B., Ricci, R., Troja, E., et al. 2025, ApJ, 995, L47, doi: 10.3847/2041-8213/ae16a6 
+
+[76] O’Dwyer, T., Corsi, A., Yadav, D., et al. 2026, arXiv e-prints, arXiv:2604.05128, doi: 10.48550/arXiv.2604. 05128 
+
+[77] O’Dwyer, T., Corsi, A., Yang, S., et al. 2026, ApJ, 1002, 194, doi: 10.3847/1538-4357/ae522d 
+
+[78] Passaleva, N., Durbak, J., Guiffreda, O., et al. 2025, GRB Coordinates Network, 41504, 1 [79] Pescalli, A., Ghirlanda, G., Salvaterra, R., et al. 2016, A&A, 587, A40, doi: 10.1051/0004-6361/201526760 
+
+[80] Pessi, T., Desai, D. D., Prieto, J. L., et al. 2025, A&A, 703, A34, doi: 10.1051/0004-6361/202556799 
+
+[81] Peters, P. C. 1964, Physical Review, 136, 1224, doi: 10. 1103/PhysRev.136.B1224 
+
+[82] Piro, A. L., & Pfahl, E. 2007, ApJ, 658, 1173, doi: 10. 1086/511672 
+
+[83] Pratten, G., et al. 2021, Phys. Rev. D, 103, 104056, doi: 10.1103/PhysRevD.103.104056 
+
+[84] Punturo, M., Abernathy, M., Acernese, F., et al. 2010, Classical and Quantum Gravity, 27, 084007, doi: 10. 1088/0264-9381/27/8/084007 
+
+[85] Rodriguez, C. L., Amaro-Seoane, P., Chatterjee, S., et al. 2018, Phys. Rev. D, 98, 123005, doi: 10.1103/ PhysRevD.98.123005 
+
+[86] Rose, B. M., Baltay, C., Hounsell, R., et al. 2021, arXiv e-prints, doi: 10.48550/arXiv.2111.03081 
+
+[87] Rozwadowska, K., Vissani, F., & Cappellaro, E. 2021, New A, 83, 101498, doi: 10.1016/j.newast.2020. 101498 
+
+[88] Ruffini, R., Rodriguez, J., Muccino, M., et al. 2018, ApJ, 859, 30, doi: 10.3847/1538-4357/aabee4 
+
+[89] Siegel, D. M., Agarwal, A., Barnes, J., et al. 2021, arXiv e-prints, arXiv:2111.03094. https://arxiv.org/abs/ 2111.03094 
+
+[90] Sowell, E., Corsi, A., & Coyne, R. 2019, Phys. Rev. D, 100, 124041, doi: 10.1103/PhysRevD.100.124041 
+
+[91] Spergel, D., Gehrels, N., Baltay, C., et al. 2015, arXiv e-prints, arXiv:1503.03757. https://arxiv.org/abs/ 1503.03757 
+
+[92] Srinivasaragavan, G. P., Yang, S., Anand, S., et al. 2024, ApJ, 976, 71, doi: 10.3847/1538-4357/ad7fde 
+
+[93] Stegmann, J., & Klencki, J. 2025, ApJ, 991, L54, doi: 10.3847/2041-8213/ae055b 
+
+[94] Stein, R., Ahumada, T., Kasliwal, M., et al. 2025, GRB Coordinates Network, 41414, 1 [95] Sun, H., Zhang, B., & Li, Z. 2015, ApJ, 812, 33, doi: 10. 1088/0004-637X/812/1/33 
+
+[96] Szczepa´ nczyk, M. J., Zheng, Y., Antelis, J. M., et al. 2024, Phys. Rev. D, 110, 042007, doi: 10.1103/ PhysRevD.110.042007 
+
+[97] The LIGO Scientific Collaboration, & the Virgo Collab-oration. 2017, Phys. Rev. Lett., 119, 161101, doi: 10. 1103/PhysRevLett.119.161101 
+
+[98] The LIGO Scientific Collaboration, the Virgo Collab-13 
+
+oration, & the KAGRA Collaboration. 2023, Monthly Notices of the Royal Astronomical Society, 524, 5984, doi: 10.1093/mnras/stad588 
+
+[99] —. 2025, arXiv e-prints, arXiv:2508.18083, doi: 10. 48550/arXiv.2508.18083 
+
+[100] The LIGO Scientific Collaboration, the Virgo Collab-oration, et al. 2017, ApJ, 848, L13, doi: 10.3847/ 2041-8213/aa920c 
+
+[101] —. 2017, ApJ, 848, L12, doi: 10.3847/2041-8213/ aa91c9 
+
+[102] Tyson, J. A. 2002, in Survey and Other Telescope Tech-nologies and Discoveries, ed. J. A. Tyson & S. Wolff, Vol. 4836, International Society for Optics and Photon-ics (SPIE), 10 – 20, doi: 10.1117/12.456772 
+
+[103] Wanderman, D., & Piran, T. 2010, MNRAS, 406, 1944, doi: 10.1111/j.1365-2966.2010.16787.x 
+
+[104] Wu, J., Most, E. R., Vu, N. L., et al. 2026, arXiv e-prints, arXiv:2604.26912, doi: 10.48550/arXiv.2604. 26912 
+
+[105] Yang, Y.-H., Troja, E., Risti´ c, M., et al. 2026, ApJ, 996, L24, doi: 10.3847/2041-8213/ae2dea 
+
+[106] Zenati, Y., Rozner, M., Krolik, J. H., & Most, E. R. 2025, ApJ, 978, 126, doi: 10.3847/1538-4357/ad9b87
