@@ -6,32 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-16
-- 运行时间：2026-08-16 19:15:18 UTC
+- 最新运行日期：2026-08-17
+- 运行时间：2026-08-17 19:53:41 UTC
 - 运行状态：成功
-- 本次总论文数：4
+- 本次总论文数：3
 - 精读区：1
-- 速读区：3
+- 速读区：2
 
 ### 今日简报（AI）
-今日聚焦4篇天体物理论文，精读1篇关于暗物质致密星坍缩为黑洞的时标研究。最值得关注的是暗物质诱导恒星坍缩机制，以及亚太阳中子星与超千新星的引力波搜索。建议普通读者从精读的暗物质致密星方向入手，理解暗物质对恒星演化的极端影响。
-- 详情：[/202608/16/README](/202608/16/README)
+今日精读1篇、速读2篇，聚焦脉冲星计时加速与引力波背景搜索。最值得关注的是用归一化流与并行化将脉冲星计时计算提速（9.0/10），另外速读涉及引力波互相关估计器均值以外的新视角和中子星爆发振荡探测。建议普通读者优先了解精读论文中的加速方法，可快速入门计算效率提升的关键思路。
+- 详情：[/202608/17/README](/202608/17/README)
 
 ### 精读区论文标签
-1. [Transmutation Timescales for Dark Matter Induced Collapse of Compact Stars into Black Holes](/202608/16/2608.10594v1-transmutation-timescales-for-dark-matter-induced-collapse-of-compact-stars-into-black-holes)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：利用年老毫秒脉冲星持续存在约束暗物质诱发的坍缩，属于脉冲星观测的应用
+1. [On the Acceleration of Pulsar Timing computations using Normalising Flows and Parallelisation](/202608/17/2608.13991v1-on-the-acceleration-of-pulsar-timing-computations-using-normalising-flows-and-parallelisation)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：直接针对脉冲星计时计算加速及PTA数据集分析
 
 ### 速读区论文标签
-1. [Long-duration GW Searches for Sub-solar NSs and Superkilonovae using CoCoA](/202608/16/2608.11387v1-long-duration-gw-searches-for-sub-solar-nss-and-superkilonovae-using-cocoa)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：对亚太阳质量中子星并合与超级千新星的长时标引力波搜索，处于中子星天体物理核心
-2. [Hyperaccreting Magnetised Neutron Stars inside Rotating Massive Envelopes: Low-Power Jets and Precursor Flares](/202608/16/2608.09395v1-hyperaccreting-magnetised-neutron-stars-inside-rotating-massive-envelopes-low-power-jets-and-precursor-flares)  
+1. [All You Need is not $Ω_\mathrm{gw}$: Beyond the Mean of the Cross-Correlation Estimator when Searching for an Astrophysical Gravitational-Wave Background](/202608/17/2608.11119v1-all-you-need-is-not-mathrmgw-beyond-the-mean-of-the-cross-correlation-estimator-when-searching-for-an-astrophysical-gravitational-wave-background)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：对共包层演化中超吸积磁化中子星的GRMHD模拟，研究中子星存活、喷流与前兆耀发
-3. [Real-time observations of the transition to the quiescent state in an accreting magnetised neutron star: No propeller required?](/202608/16/2608.10733v1-real-time-observations-of-the-transition-to-the-quiescent-state-in-an-accreting-magnetised-neutron-star-no-propeller-required)  
+   evidence：引力波背景交叉相关估计量的统计分解方法可迁移至脉冲星计时阵列数据分析
+2. [Detection of possible burst oscillation in the neutron star low-mass X-ray binary 4U 1323-62](/202608/17/2608.14010v1-detection-of-possible-burst-oscillation-in-the-neutron-star-low-mass-x-ray-binary-4u-1323-62)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：对吸积磁化中子星向静默态转变的实时观测，涉及盘-磁层相互作用与磁场探测
+   evidence：中子星X射线计时分析，暴发振荡探测自旋频率
 
 
 <div class="dpr-home-promo-card">
