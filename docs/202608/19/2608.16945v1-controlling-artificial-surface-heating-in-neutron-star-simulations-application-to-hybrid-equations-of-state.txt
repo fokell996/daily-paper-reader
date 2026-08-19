@@ -1,0 +1,237 @@
+Title: Controlling artificial surface heating in neutron star simulations: Application to hybrid equations of state
+
+URL Source: https://arxiv.org/pdf/2608.16945v1
+
+Published Time: Wed, 19 Aug 2026 00:03:30 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+## Controlling artificial surface heating in neutron star simulations: Application to hybrid equations of state 
+
+Georgios Doulis 
+
+Institut f¨ ur Theoretische Physik, Goethe-Universit¨ at Frankfurt, 60438 Frankfurt am Main 
+
+(Dated: August 19, 2026) The treatment of the stellar surface in binary neutron star simulations is crucial for the accuracy of the numerical evolution and the physical reliability of the predicted observables. Numerical arti-facts associated with the treatment of steep gradients near the stellar surface can produce spurious heating during the inspiral, leading to an artificial increase of the internal energy and an unphysical expansion of the neutron star. In this work, we investigate the effectiveness of the entropy-based flux-limiting (EFL) scheme in mitigating these numerical effects within the finite-difference code BAM. We perform simulations of both isolated neutron stars and binary neutron star inspirals em-ploying a representative set of hybrid equations of state. We show that the EFL scheme significantly reduces artificial surface heating. This reduction is observed consistently across all stellar models and binary configurations considered, demonstrating that the reduction of numerical heating is a robust feature of the EFL method. 
+
+I. INTRODUCTION 
+
+Neutron stars constitute a unique astrophysical lab-oratory for exploring matter under extreme conditions. Their macroscopic properties and long-term evolution en-code valuable information about the equation of state (EoS) of dense matter and the underlying microphysical processes governing neutron star (NS) transport proper-ties, composition and radiative behaviour [1, 2]. As many of these regimes are inaccessible to analytic treatment, numerical simulations have become an essential tool for studying NS structure, dynamics and evolution [3]. Despite significant advances in numerical relativity [4– 7], accurate modelling of neutron stars remains challeng-ing, particularly in the vicinity of the stellar surface. The surface region is characterized by sharp gradients in the hydrodynamical variables, marking the transition from dense stellar matter to a tenuous exterior. In binary sys-tems, the stellar surface is advected across the grid and undergoes continuous tidal deformations, thereby exacer-bating the challenges faced by the high-resolution shock-capturing (HRSC) schemes [8] used in the evolution of the fluid. These effects lead to an inaccurate represen-tation of the stellar boundary, with consequences for the simulation as a whole [9, 10]. One direct consequence of the inaccurate numerical treatment of the NS surface is the appearance of artificial surface heating, i.e. a spurious increase of the thermal energy that is not associated with any physical heating mechanism. Although the heating originates at the sur-face, the temperature increase rapidly spreads into the stellar interior as the simulation progresses [10]. Such ar-tificially elevated temperatures can bias comparison be-tween simulations and observations, impact inferred con-straints on NS microphysics and contaminate parameter estimation. This calls for the development of numeri-cal strategies that mitigate artificial surface heating and maintain physically consistent NS temperatures during the inspiral phase. In [10] it was convincingly demonstrated that artificial heating alters the structure and the tidal properties of NSs in BNS merger simulations. Although the analysis presented there focused on finite-temperature EoSs, sim-ilar effects (not to the extent presented in [10]) should also be expected in simulations employing hybrid EoSs [11] as the underlying numerical mechanisms responsi-ble for artificial heating are not specific to a particular thermodynamic treatment. In the present work we investigate the performance of the fast-converging entropy-based flux-limiting scheme developed in [9] in controlling artificial heating in simula-tions employing hybrid EoSs. This choice of EoSs is dic-tated by the fact that, to our knowledge, the EFL method has so far been implemented only in the finite-difference code BAM [12, 13]. Since BAM does not evolve the tem-perature explicitly, and the finite-temperature extension of the code does not employ the EFL scheme [14, 15], hy-brid EoSs are employed to model thermal effects in NS matter while using the EFL formulation. In this setup, thermal effects (and in particular artificial heating) are encoded in the evolution of the specific internal energy, which we adopt as the primary diagnostic tool to monitor artificial heating throughout this work. Although artificial surface heating is expected to be less pronounced in simulations employing hybrid EoSs than in those using fully finite-temperature treatment, the resulting temperature increase should be detectable in both isolated and binary neutron star simulations. Identifying and quantifying this effect in the hybrid case should provide a controlled testing ground for assessing the ability of numerical strategies to mitigate artificial heating. In particular, evidence that the EFL scheme can effectively control surface heating in simulations with hy-brid EoSs would strongly suggest that similar behaviour may be expected in finite-temperature simulations once the method is implemented in codes that evolve the tem-perature explicitly. The article is organised as follows. Sec. II introduces the numerical methods and the EFL scheme, together with the hybrid EoSs and the setup used for the simula-arXiv:2608.16945v1 [astro-ph.HE] 14 Aug 2026 2tions. In Sec. III, we investigate artificial heating in iso-lated NS configurations and assess the performance of the EFL scheme using a set of TOV models. In Sec. IV, we extend the analysis to BNS inspirals and examine the im-pact of artificial heating in fully dynamical simulations. Finally, in Sec. V, we summarize our main findings and discuss possible directions for future work. Throughout this work we use geometric units. We set 
+
+c = G = 1 and express masses in units of solar masses 
+
+M⊙. 
+
+> II. NUMERICAL SETUP
+
+As demonstrated in previous studies [9, 16, 17], the EFL scheme is applicable to any system of partial dif-ferential equations that can be expressed in conservative form, 
+
+∂tQ + ∂iFi(Q) = S, (1) where the index i runs over the spatial dimensions, Q de-notes the vector of conserved variables, Fi are the physi-cal fluxes along the spatial directions and S is the vector of the sources. Within the EFL framework, the numeri-cal fluxes obtained from the spatial discretization of (1) are formulated as a superposition of a high-order (HO) flux f HO , which may become unstable in non-smooth re-gions, and a low-order (LO) flux f LO that provides the required robustness. The entropy production of the sys-tem is used to regulate the transition between the two fluxes through a continuous function θ ∈ [0 , 1] entering the flux-limiter: 
+
+fi±1/2 = θi±1/2 f HO  
+
+> i±1/2
+
++ (1 − θi±1/2) f LO 
+
+> i±1/2
+
+, (2) where all quantities are evaluated at the cell interfaces. The flux f HO is constructed using the Rusanov (local Lax–Friedrichs) flux-splitting approach with reconstruc-tion performed on the characteristic fields [18, 19]. Afifth-order unfiltered central stencil (CS5) is always used for reconstruction. The flux f LO is computed using the local Lax-Friedrichs (LLF) central scheme with recon-struction performed directly on the primitive variables [20]. Primitive variable reconstruction is performed with the fifth-order weighted-essentially-non-oscillatory finite difference scheme WENOZ [21]. The weighting function θ is evaluated dynamically from the local entropy production [9, 16, 17]. For the piecewise-polytropic equations of state employed in this work, the specific entropy is given by 
+
+s = ln 
+
+ pρΓ
+
+
+
+, (3) where ρ denotes the rest-mass density, p the pressure and Γ the adiabatic index. In the present work, we consider a number of hybrid EoSs, namely APR [22], ALF2 [23], SLy [24], H4 [25] and MPA1 [26]. These models provide a broad sampling of NS matter properties commonly used in numerical rel-ativity simulations. In the hybrid formulation [11], the pressure is decomposed into a cold component, obtained from a piecewise-polytropic approximation to one of the zero-temperature EoSs listed above, and an additional thermal contribution that accounts for shock heating and other non-isentropic processes. The thermal pressure is modelled using a Γ-law EoS with Γ = 1 .75. In simulations employing hybrid EoSs, artificial heat-ing manifests itself as an unphysical growth of the ther-mal component of the internal energy. Since the cold contribution depends only on the local density, such ef-fects are also reflected in the evolution of the total spe-cific internal energy ϵ, which we therefore adopt as the primary diagnostic of numerical heating. All simulations presented here are evolved with the general relativistic hydrodynamics code BAM [13, 19, 20, 27]. The EFL method has been fully integrated into BAM and implemented as part of its core numerical in-frastructure [9]. BAM does not evolve the temperature or composition explicitly, but instead advances the specific internal en-ergy as part of the primitive variable set. As a conse-quence, fully finite-temperature EoSs, which require the evolution or inversion of the temperature and composi-tion, are not currently supported. Instead, thermal ef-fects are modelled using hybrid EoSs, which provide a numerically robust approximation suitable for this frame-work. Recent developments have extended BAM to allow the use of finite-temperature, microphysical EoSs [14, 15]. However, even in this extended framework, the tempera-ture is not evolved as an independent dynamical variable. Instead, thermal effects are incorporated by reconstruct-ing the temperature from the evolved rest-mass density, internal energy and electron fraction through tabulated EoS inversions. While this approach enables the inclusion of temperature-dependent microphysics, it differs from a fully self-consistent temperature evolution. Moreover, the numerical fluxes employed in these simulations do not make use of the EFL technique. As a result, the finite-temperature extension of BAM cannot presently be used to assess the impact of the EFL method on artificial surface heating. Consequently, the use of hybrid EoSs currently provides the only viable framework to include thermal effects in the investigations carried out in this work. Vacuum regions are treated by introducing a static, low-density, cold atmosphere surrounding the NS [20]. The atmosphere density is prescribed as 
+
+ρatm = fatm max ρ(t = 0) , (4) where max ρ(t = 0) denotes the initial maximum rest-mass density. During the evolution, grid cells with rest-mass density falling below the threshold ρthr = fthr ρatm 
+
+are reset automatically to ρatm .3In the following, the results obtained with the EFL scheme are compared with the “hybrid” HO-LLF al-gorithm [19]. The latter employs the high-order HO-WENOZ scheme [19] above a density threshold ρhyb , this is the high-order scheme that we use to approximate the HO flux f HO in (2), but with WENOZ instead of CS5. Below ρhyb , the method switches to the standard second-order LLF-WENOZ scheme, which uses LLF for the nu-merical fluxes and WENOZ for the reconstruction of the primitive variables [20]. 
+
+III. ISOLATED NEUTRON STARS 
+
+Tolman-Oppenheimer-Volkoff (TOV) initial data are constructed for a set of cold, spherically symmetric, non-rotating NSs in hydrostatic equilibrium described by the hybrid EoSs of TABLE I. For each EoS, the central rest-mass density is specified and the TOV equations are solved to obtain equilibrium configurations with gravita-tional masses in the range M ≃ 1.1 − 1.5M⊙, as summa-rized in TABLE I. The corresponding baryonic masses and stellar radii are determined self-consistently from the TOV solutions. These models span a representative range of NS masses, radii and compactness. 
+
+TABLE I. Initial single neutron star configurations. Columns: EoS, gravitational mass M , baryonic mass Mb, radius R, cen-tral rest-mass density ρc and compactness C.EoS M [M⊙] Mb [M⊙] R [km] ρc [×10 −3] C
+
+H4 1.288 1.396 13.548 0.850 0.140 APR4 1.074 1.166 10.983 1.250 0.144 SLy 1.123 1.220 11.456 1.200 0.145 ALF2 1.409 1.560 12.389 1.080 0.168 MPA1 1.459 1.625 12.166 1.120 0.177 
+
+The computational domain consists of three fixed re-finement levels, l = (0 , 1, 2), arranged in a nested-box configuration. Simulations are performed with 160 grid points per direction leading to grid spacings h =(0 .45 , 0.225 , 0.1125) for successive refinement levels. It is ensured that the NS is entirely covered by the finest box throughout the evolution. Each TOV configuration is evolved for approximately 25ms. This duration is suf-ficient to capture secular numerical effects such as artifi-cial heating. Radiative (absorbing) boundary conditions are used in all single star simulations. The spacetime is dynamically evolved using the BSSNOK formulation. Octant symmetry is employed to reduce computational costs. FIG. 1 shows the temporal evolution of the relative variation of the L2-norm of the specific internal energy for simulations employing the hybrid EoSs of TABLE I. Re-sults obtained using the HO-LLF method are compared against those obtained with the EFL scheme. Across all EoSs, the HO-LLF scheme exhibits a systematic and 0 5 10 15 20 25                          
+
+> 024
+> H4
+> EFL HO-LLF
+> 0510 15 20 25
+> 0.0 2.5 5.0 7.5 APR4
+> 0510 15 20 25
+> 0.0 2.5 5.0 7.5 SLy
+> 0510 15 20 25
+> 0510 ALF2
+> 0510 15 20 25
+> Time [ms]
+> 0510 MPA1
+> ²norm (t)/² norm (0)  − 1 (%)
+
+FIG. 1. Time evolution of the L2-norm of the specific internal energy for isolated NS simulations employing different hybrid EoSs. Results obtained with the HO-LLF scheme are com-pared to those obtained using the EFL method. 
+
+monotonic increase of the internal energy norm, reaching deviations of up to several percent over a 25 ms evolution, indicating a persistent artificial surface heating pattern. In contrast, simulations performed with the EFL method show a markedly improved behaviour, with the relative variation of the internal energy remaining close to zero and typically bounded within sub-percent levels through-out the evolution. This trend is observed consistently across all stellar models, despite differences in mass, ra-dius and compactness, demonstrating that the mitigation of spurious heating achieved by the EFL scheme is robust with respect to the underlying EoS. The small negative relative variations observed in sev-eral EFL evolutions should not be interpreted as physi-cal cooling, but rather as a consequence of the numeri-cal relaxation of the discretized initial data towards the equilibrium supported by the numerical scheme. Dis-cretization and interpolation errors can cause the initial configuration to deviate slightly from the corresponding discrete equilibrium, resulting in a small reduction of the 
+
+L2-norm during the evolution. These variations remain 40 2 4 6 8 10 12 14  
+
+> r[km]
+> 0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5
+> log 10  (²HO  − LLF
+> ²EFL  )
+> ALF2 t=0 EFL HO-LLF
+
+FIG. 2. Radial profile of the ratio ϵHO −LLF /ϵ EFL for the ALF2 TOV model at time 25 ms. The horizontal axis shows the isotropic coordinate radius used by BAM. The black dotted line marks the initial stellar surface, while the red dashed and green dash-dotted lines indicate the stellar surface at 25ms for the HO-LLF and EFL schemes, respectively. The stellar surface is defined as the location where the rest-mass density falls to the atmosphere floor. 
+
+small and bounded, in contrast to the systematic secular increase observed with the HO-LLF scheme. 0 5 10 15 20 25 
+
+> Time [ms]
+> 0510 15 20 25 30 35 40
+> Maximum of  ∆²/² max (t = 0)  (%)  H4 APR4 SLy ALF2 MPA1
+
+FIG. 3. Time evolution of the maximum value of the differ-ence ∆ ϵ = ϵHO −LLF − ϵEFL between the HO-LLF and EFL schemes for all considered EoSs. 
+
+FIG. 2 illustrates the radial profile of the logarithmic ratio of the specific internal energy for the HO–LLF and EFL schemes, i.e. log 10 (ϵHO −LLF /ϵ EFL ), for the ALF2 TOV model 1 at t = 25 ms. Throughout most of the stel-lar interior, the difference between the two schemes re-mains small, indicating good agreement in regions where the flow is smooth. In contrast, a pronounced and spa-tially localized peak develops near the stellar surface. This behaviour indicates that the excess internal energy produced by the HO-LLF scheme is generated primarily  
+
+> 1
+
+A qualitatively similar behaviour is observed for the other TOV models of TABLE I. 0 5 10 15 20 25 5                         
+
+> 0510
+> H4
+> 0510 15 20 25 10
+> 010 APR4
+> 0510 15 20 25 10
+> 5
+> 0510 SLy
+> 0510 15 20 25 10
+> 010 ALF2
+> 0510 15 20 25
+> Time [ms]
+> 10
+> 010 MPA1
+> (R HO  − LLF (t) − REFL (t)) /R(0)  (%)
+> Linear Fit Raw Data
+
+FIG. 4. Time evolution of the difference in the stellar radius between HO-LLF and EFL simulations for the TOV models considered in this work. Solid blue lines show the raw data, while dashed red lines denote linear least-squares fits high-lighting the secular trend. 
+
+at the stellar boundary. In particular, this strong surface-localized enhancement provides a clear explanation for the secular growth of the L2-norm of the specific inter-nal energy observed in FIG. 1 when the numerical fluxes are computed with the HO-LLF scheme. As the sim-ulation proceeds, this surface-generated excess internal energy is advected away from the surface into the stellar interior and redistributed throughout the star, leading to the monotonic increase of the global energy norm. The enhanced heating at the stellar surface leads to an out-ward displacement of the stellar surface during the evo-lution. As indicated by the positions of the vertical lines in FIG. 2, this displacement is significantly smaller for the EFL than for the HO-LLF scheme. This observation is consistent with the results presented in FIG. 5. Following the spatial analysis of the ratio 
+
+ϵHO −LLF /ϵ EFL in FIG. 2, we now study the temporal evolution of the global maximum of ∆ ϵ = ϵHO −LLF −ϵEFL 
+
+for all considered EoSs in FIG. 3. For each model, we track the most extreme local deviation between the 5HO-LLF and EFL schemes by plotting the maximum value of ∆ ϵ over the spatial domain at each time step. Across all EoSs, the maximum difference exhibits arapid initial growth during the early transient phase, followed by a sustained increase over the duration of the simulation. When interpreted together with the radial profiles shown in FIG. 2, this behaviour indicates that the growing extrema are associated with the persistent surface-localized excess internal energy generated by the HO-LLF scheme. The continued growth of the maximum of ∆ ϵ demonstrates that the surface-generated numerical heating persists and intensifies over time. 0 5 10 15 20 25   
+
+> Time [ms]
+> 0.0 2.5 5.0 7.5 10.0 12.5 15.0 17.5
+> R( t)/R(0)  − 1 (%)
+> ALF2
+> EFL (Raw) HO-LLF (Raw) EFL (Linear Fit)
+
+FIG. 5. Time evolution of the stellar radius for the ALF2 TOV model. The radius is shown for simulations performed with the HO-LLF (solid blue line) and EFL (solid green line) numerical flux schemes. Raw data are plotted with solid lines, while a linear least-squares fit to the EFL data is shown with a dashed red line. 
+
+In FIG. 4, we show the temporal evolution of the differ-ence in the stellar radius between simulations performed with the HO-LLF and EFL schemes for each considered EoS. A linear least-squares fit (dashed red line) is applied to the raw data (solid blue line) to highlight the long-term trend. For all EoSs considered, the radius difference dis-plays a systematic positive drift over time, indicating a progressively larger stellar radius in the HO-LLF evolu-tions. Despite short-time fluctuations, the late-time dis-crepancy reaches values of order ∼10%. The origin of this trend can be traced back to FIG. 5, where the temporal evolution of the stellar radius obtained with both HO-LLF and EFL schemes is presented for the ALF2 EoS. 2
+
+It is apparent that the HO-LLF scheme leads to a con-tinuous, step-like growth of the NS radius, whereas the EFL evolution, after an initial rapid adjustment, gradu-ally stabilizes and maintains the stellar radius at approx-imately 7.5% above its initial value. This behaviour is consistent with the excess internal energy generated by the HO-LLF scheme, as shown in FIG. 1–FIG. 3. The spurious increase in internal energy provides additional pressure support in the outer layers of the star, leading to the observed artificial expansion of the stellar radius.  
+
+> 2A qualitatively similar behaviour is observed for the other EoSs.
+
+In all cases the EFL method exhibits a systematically smaller increase of the stellar radius throughout the evo-lution, indicating a significant reduction of artificial sur-face heating compared to the standard HO-LLF scheme. 
+
+IV. BINARY NEUTRON STARS 
+
+Building on the results obtained in the single star case, we now extend the analysis to BNS simulations. While the single star setup provides a controlled environment to isolate numerical heating effects, the binary case al-lows us to assess their impact in a fully dynamical and strongly interacting spacetime. This enables us to inves-tigate whether the behaviour observed in isolated stars persists in more realistic astrophysical scenarios. In the following, we analyse a representative set of binaries to inspect whether the use of the EFL scheme mitigates ar-tificial surface heating during dynamical inspirals. The BNS configurations [28, 29] considered in this work are summarized in TABLE II. The selected dataset spans a representative range of binary configurations employ-ing the ALF2, H4, MPA1 and SLy EoSs, thereby cover-ing NS matter models with different stiffness, compact-ness and tidal deformability properties. All binaries are equal mass, irrotational systems with total gravitational masses close to M ≃ 2.7, M ⊙. The sample includes con-figurations with different initial orbital separations and gravitational wave frequencies, corresponding to binaries undergoing approximately 3–11 orbits prior to merger. In particular, BAM:100 starts from a significantly higher initial frequency and therefore undergoes fewer inspiral cycles than the other models. All configurations are constructed using LORENE initial data [30], except for 
+
+BAM:95 , which employs the SGRID solver [31], allowing us to assess the robustness of the results with respect to differences in the initial data construction. Overall, this set of simulations provides a diverse set of inspiral condi-tions for investigating the impact of the EFL scheme on artificial heating effects in BNS simulations. 
+
+TABLE II. Initial BNS configurations. Columns: simula-tion name, EoS, number of orbits Norb , total gravitational mass M [M⊙], total baryonic mass Mb [M⊙], ADM mass 
+
+MADM [M⊙], ADM angular momentum JADM [M 2
+
+> ⊙
+
+] and grav-itational wave frequency M ω 22 . All configurations are equal mass and irrotational. Name EoS Norb M Mb MADM JADM M ω 22 
+
+BAM:4 [27] ALF2 6 2.702 2.978 2.675 7.148 0.052 
+
+BAM:36 [27] H4 5 2.701 2.939 2.674 7.133 0.052 
+
+BAM:58 [32] MPA1 10 2.700 2.979 2.678 7.659 0.038 
+
+BAM:95 [33] SLy 11 2.700 2.989 2.678 7.686 0.038 
+
+BAM:97 [32] SLy 11 2.700 2.989 2.678 7.658 0.038 
+
+BAM:100 [19] SLy 3 2.700 2.989 2.671 6.872 0.060     
+
+> Note: BAM:95 and BAM:97 employ different initial data solvers, namely SGRID and LORENE, respectively.
+
+60 2 4 6 8 10 12                                    
+
+> 020 40 BAM:4
+> 0246810
+> 010 20 30
+> BAM:36
+> 0510 15 20 25 30
+> 010 20 30 40 50
+> BAM:58
+> 0510 15 20 25 30 35
+> 020 40 BAM:95
+> 0510 15 20 25 30 35
+> 020 40 BAM:97
+> 02468
+> 020 40 BAM:100
+> Time [ms]
+> ²norm (t)/² norm (0)  − 1 (%)
+> EFL HO-LLF
+> FIG. 6. Time evolution of the L2-norm of the specific internal energy for the BNS simulations of TABLE II. Results obtained with the HO-LLF (blue solid line) scheme are compared to those obtained using the EFL (red solid line) method. Each panel corresponds to a different binary configuration. The vertical rise at the end of each evolution marks the onset of merger.
+
+The computational domain is the same for all BNS simulations and consists of seven fixed refinement levels, 
+
+l = (0 , . . . , 6), arranged in a nested-box configuration. Simulations are performed with 128 grid points per di-rection, resulting in a coarsest grid spacing of h0 = 7 .296, with the resolution increasing by a factor of two between successive refinement levels, i.e. h = (7 .296 , . . . , 0.114). The metric is evolved with the Z4c scheme. Bitant sym-metry and standard radiative boundary conditions are employed for all BNS simulations. The time evolution of the relative variation of the L2-norm of the specific internal energy for the BNS config-urations listed in TABLE II is presented in FIG. 6. As in the isolated NS evolutions, see Sec. III, the results ob-tained with the HO-LLF scheme are compared with those obtained using the EFL method. For all binary config-urations considered, the HO-LLF simulations exhibit a substantially larger increase of the internal energy norm throughout the inspiral than the corresponding EFL evo-lutions. After an initial transient, the HO-LLF curves re-main systematically above the EFL ones, indicating the continuous accumulation of excess internal energy dur-ing the binary evolution. Although the dynamical in-teraction between the stars introduces larger temporal fluctuations than in the single-star case, the qualitative behaviour remains unchanged: the EFL scheme consis-tently suppresses the secular growth of the internal en-ergy associated with artificial surface heating. Shortly before merger, all models display a rapid increase in the internal energy norm as strong hydrodynamical interac-tions and tidal deformation become dominant. Neverthe-less, the EFL simulations maintain significantly lower val-ues than the corresponding HO-LLF runs, demonstrating that the reduction of spurious heating observed in the TOV tests carries over to fully dynamical BNS inspirals. Notice that the small initial decrease observed for the EFL evolution of BAM:4 is consistent with the relaxation of the discretized initial data towards the equilibrium of the numerical scheme and remains bounded throughout the inspiral. In contrast, the HO-LLF scheme rapidly develops a positive secular increase, indicating that the natural relaxation is dominated by artificial surface heat-ing. Following the global diagnostics presented in FIG. 6, FIG. 7 illustrates the 2-dimensional spatial distribution of the logarithmic ratio log 10 (ϵHO −LLF /ϵ EFL ) for all BNS configurations of TABLE II at representative times dur-ing the late inspiral. Consistent with the isolated NS re-sults presented in Sec. III, the largest differences between the two schemes are localized at the NS surfaces, while the stellar interiors remain largely unaffected. The en-hanced specific internal energy produced by the HO-LLF scheme therefore originates primarily in the low-density surface layers, where steep gradients and the artificial at-mosphere make the numerical evolution particularly chal-lenging. As the inspiral proceeds, this surface-generated excess energy is continuously replenished as the stars or-bit and deform under tidal interactions, explaining the persistent secular increase of the global L2-norm shown in FIG. 6. The remarkably similar spatial pattern ob-served for all considered EoSs indicates that the suppres-sion of the numerical heating at (and near) the stellar surface is a robust feature of the EFL scheme rather than a consequence of a particular stellar model or binary con-figuration. The consequences of the excess surface heating on the stellar structure are illustrated in FIG. 8, which shows the temporal evolution of the relative stellar radius for 7    
+
+> FIG. 7. 2-dimensional spatial distribution of the ratio ϵHO −LLF /ϵ EFL for the BNS configurations listed in TABLE II at representative times during the late inspiral. The ratio highlights the regions where the HO-LLF scheme produces larger specific internal energy than the EFL scheme. Each panel corresponds to a different binary configuration.
+
+all BNS configurations of TABLE II evolved with the HO-LLF and EFL schemes. For each snapshot, the stel-lar surface is identified by the contour ρ = ρsurf , where 
+
+ρsurf = 10 −4ρmax and ρmax is the maximum density of the star at that time. The radius is then estimated as the mean distance from the stellar center, defined by the density maximum, to the corresponding isodensity con-tour. Consistent with the behaviour observed for iso-lated NSs (see Sec. III), the stellar radius remains sys-tematically larger in the HO-LLF simulations through-out the inspiral. After a short initial relaxation phase, both schemes exhibit a gradual radius increase. How-ever, the HO-LLF evolutions consistently show a greater expansion than the corresponding EFL runs, with dif-ferences of several percent persisting until shortly before merger. This behaviour is observed for all binary config-urations considered, irrespective of the underlying EoS or initial orbital separation. The systematic radius increase is naturally explained by the artificial surface heating produced by the HO-LLF scheme. The excess specific internal energy generated near the stellar surface pro-vides additional pressure support in the outer layers of the stars, leading to an artificial expansion that is largely suppressed when the EFL method is employed. The con-sistent reduction of the stellar radius obtained with EFL therefore provides further evidence that the mitigation of numerical heating translates into a measurable improve-ment in the global dynamics of BNS inspirals.  
+
+> V. CONCLUSIONS
+
+In this work, we have investigated the origin and evo-lution of artificial surface heating in NS simulations em-ploying hybrid EoSs within the BAM code. Particular emphasis was placed on assessing the performance of the EFL scheme in reducing the spurious increase of the spe-cific internal energy associated with the numerical treat-ment of the stellar surface. The analysis was carried out for both isolated NSs and BNS inspirals, allowing the ro-bustness of the method to be evaluated in both controlled equilibrium configurations and fully dynamical systems. For isolated NSs, see Sec. III, we demonstrated that the secular increase of the specific internal energy ob-served with the HO-LLF scheme originates primarily from the stellar surface. This artificial heating accumu-lates throughout the evolution, leading to a continuous increase of the global internal energy norm and producing an artificial expansion of the stellar radius. In contrast, the EFL scheme effectively suppresses this behaviour for all hybrid EoSs considered, maintaining the internal en-ergy close to its initial value while substantially reducing the unphysical growth of the stellar radius. The EFL scheme reduces the accumulated increase in the internal 80 2 4 6 8 10 010 20 30 40                           
+
+> BAM4
+> 0246
+> BAM36
+> 0510 15 20 25 30
+> BAM58
+> 0510 15 20 25 30 010 20 30 40
+> BAM95
+> 0510 15 20 25 30
+> BAM97
+> 012345
+> BAM100
+
+Time [ms] R(t)/R(0)  1 (%)  
+
+> EFL HO-LLF
+> FIG. 8. Time evolution of the stellar radius for the BNS simulations of TABLE II evolved with the HO-LLF (blue solid line) and EFL (red solid line) schemes.
+
+energy by 4-12%, depending on the EoS, and the associ-ated radius expansion by approximately 10%. The same qualitative behaviour persists in BNS inspi-rals, see Sec. IV. Despite the additional complexity in-troduced by orbital motion, tidal interactions and strong-field dynamics, the excess internal energy generated by the HO-LLF scheme remains localized near the NS sur-face and continuously accumulates during the inspiral. Simulations employing the EFL method consistently ex-hibit significantly lower internal energy, reduced surface heating and smaller stellar radii across all binary configu-rations considered, demonstrating that the improvement is robust with respect to the underlying EoS, initial or-bital separation and initial data construction. The reduc-tion in the internal energy growth and stellar expansion persists throughout the inspiral, with the EFL scheme re-ducing the internal energy growth by 8-20%, depending on the EoS, and the stellar expansion by approximately 5%. These results confirm and extend the findings of [10], showing that artificial surface heating is primarily a nu-merical effect associated with the treatment of steep gra-dients at the NS surface rather than an intrinsic feature of the physical evolution. Our results further demonstrate that this effect is not restricted to finite-temperature EoSs, but is also clearly present in simulations employing hybrid EoSs. The EFL method provides a simple and ef-fective strategy for mitigating this numerical heating in NS simulations and represents a promising ingredient for future high-accuracy numerical relativity calculations. The present work has focused on hybrid EoSs, for which the specific internal energy serves as an effective diagnostic of artificial heating. An important next step is to investigate the impact of the EFL method in simula-tions employing finite-temperature microphysical EoSs. To this end, the EFL method is currently being imple-mented in the GRMHD codes FIL (Frankfurt Illinois) and GRACE (General Relativistic Astrophysics Code for Exascale) [34], both of which evolve the temperature as a primitive variable. Extending the EFL method to finite-temperature evolutions within the finite-temperature ex-tension of BAM [14, 15] is left for future work. We expect that these developments will allow the impact of the EFL scheme to be assessed directly in simulations with real-istic temperature-dependent microphysics and may pro-vide a further step towards more accurate and physically reliable NS merger simulations. 
+
+> ACKNOWLEDGMENTS
+
+We would like to thank Khalil Pierre for carefully proofreading the manuscript and for providing valuable comments and suggestions. GD acknowledges fund-ing from the European High Performance Computing Joint Undertaking (JU) and Belgium, Czech Republic, France, Germany, Greece, Italy, Norway, and Spain un-der grant agreement No 101093441 (SPACE). We ac-knowledge the EuroHPC JU for awarding us access to MareNostrum5 at BSC, Spain, through the Regular Ac-cess programme under project ID EHPC-REG-2025R02-175 and to Leonardo at CINECA, Italy, through the Development Access programme. The majority of the computations for this work were performed on these Eu-9roHPC machines. Additional computations were per- formed on the CALEA and GOETHE clusters of Goethe University Frankfurt. 
+
+[1] J. M. Lattimer and M. Prakash, The physics of neutron stars, Science 304 , 536 (2004), arXiv:astro-ph/0405262. [2] P. Haensel, A. Y. Potekhin, and D. G. Yakovlev, Neutron stars 1: Equation of state and structure (Springer, New York, USA, 2007). [3] L. Baiotti and L. Rezzolla, Binary neutron star merg-ers: a review of Einstein’s richest laboratory, Rept. Prog. Phys. 80 , 096901 (2017), arXiv:1607.03540 [gr-qc]. [4] J. S. Read, L. Baiotti, J. D. E. Creighton, J. L. Friedman, B. Giacomazzo, K. Kyutoku, C. Markakis, L. Rezzolla, M. Shibata, and K. Taniguchi, Matter effects on binary neutron star waveforms, Phys. Rev. D 88 , 044042 (2013), arXiv:1306.4065 [gr-qc]. [5] D. Radice, L. Rezzolla, and F. Galeazzi, Beyond second-order convergence in simulations of binary neutron stars in full general-relativity, Mon.Not.Roy.Astron.Soc. 437 ,L46 (2014), arXiv:1306.6052 [gr-qc]. [6] R. Haas et al. , Simulations of inspiraling and merging double neutron stars using the Spectral Einstein Code, Phys. Rev. D93 , 124062 (2016), arXiv:1604.00782 [gr-qc]. [7] E. R. Most, L. J. Papenfort, and L. Rezzolla, Be-yond second-order convergence in simulations of mag-netized binary neutron stars with realistic micro-physics, Mon. Not. Roy. Astron. Soc. 490 , 3588 (2019), arXiv:1907.10328 [astro-ph.HE]. [8] E. F. Toro, Riemann Solvers and Numerical Methods for Fluid Dynamics , 2nd ed. (Springer-Verlag, 1999). [9] G. Doulis, F. Atteneder, S. Bernuzzi, and B. Br¨ ugmann, Entropy-limited higher-order central scheme for neu-tron star merger simulations, Phys. Rev. D 106 , 024001 (2022), arXiv:2202.08839 [gr-qc]. [10] F. Gittins, R. Matur, N. Andersson, and I. Hawke, Prob-lematic systematics in neutron-star merger simulations, Phys. Rev. D 111 , 023049 (2025), arXiv:2409.13468 [gr-qc]. [11] M. Shibata, K. Taniguchi, and K. Uryu, Merger of bi-nary neutron stars with realistic equations of state in full general relativity, Phys. Rev. D71 , 084021 (2005), arXiv:gr-qc/0503119. [12] B. Br¨ ugmann, W. Tichy, and N. Jansen, Numerical simu-lation of orbiting black holes, Phys. Rev. Lett. 92 , 211101 (2004), arXiv:gr-qc/0312112. [13] B. Bruegmann, J. A. Gonzalez, M. Hannam, S. Husa, U. Sperhake, and W. Tichy, Calibration of Moving Puncture Simulations, Phys. Rev. D 77 , 024027 (2008), arXiv:gr-qc/0610128. [14] H. Gieg, F. Schianchi, T. Dietrich, and M. Ujevic, In-corporating a Radiative Hydrodynamics Scheme in the Numerical-Relativity Code BAM, Universe 8, 370 (2022), arXiv:2206.01337 [gr-qc]. [15] F. Schianchi, H. Gieg, V. Nedora, A. Neuweiler, M. Uje-vic, M. Bulla, and T. Dietrich, M1 neutrino transport within the numerical-relativistic code BAM with appli-cation to low mass binary neutron star mergers, Phys. Rev. D 109 , 044012 (2024), arXiv:2307.04572 [gr-qc]. [16] G. Doulis, S. Bernuzzi, and W. Tichy, Entropy based flux limiting scheme for conservation laws, (2024), arXiv:2401.04770 [gr-qc]. [17] G. Doulis, S. Bernuzzi, and W. Tichy, Eccentricity reduc-tion of binary neutron star initial data with the entropy based flux limiting scheme, Phys. Rev. D 111 , 063041 (2025), arXiv:2412.17863 [gr-qc]. [18] A. Mignone, P. Tzeferacos, and G. Bodo, High-order conservative finite difference GLM-MHD schemes for cell-centered MHD, J.Comput.Phys. 229 , 5896 (2010), arXiv:1001.2832 [astro-ph.HE]. [19] S. Bernuzzi and T. Dietrich, Gravitational wave-forms from binary neutron star mergers with high-order weighted-essentially-nonoscillatory schemes in nu-merical relativity, Phys. Rev. D94 , 064062 (2016), arXiv:1604.07999 [gr-qc]. [20] M. Thierfelder, S. Bernuzzi, and B. Br¨ ugmann, Nu-merical relativity simulations of binary neutron stars, Phys.Rev. D84 , 044012 (2011), arXiv:1104.4751 [gr-qc]. [21] R. Borges, M. Carmona, B. Costa, and W. S. Don, An improved weighted essentially non-oscillatory scheme for hyperbolic conservation laws, Journal of Computational Physics 227 , 3191 (2008). [22] A. Akmal, V. R. Pandharipande, and D. G. Ravenhall, The equation of state for nucleon matter and neutron star structure, Phys. Rev. C58 , 1804 (1998), arXiv:nucl-th/9804027. [23] M. Alford, M. Braby, M. W. Paris, and S. Reddy, Hybrid stars that masquerade as neutron stars, Astrophys. J. 
+
+629 , 969 (2005), arXiv:nucl-th/0411016. [24] F. Douchin and P. Haensel, A unified equation of state of dense matter and neutron star structure, Astron. As-trophys. 380 , 151 (2001), astro-ph/0111092. [25] N. K. Glendenning and S. A. Moszkowski, Reconcilia-tion of neutron star masses and binding of the lambda in hypernuclei, Phys. Rev. Lett. 67 , 2414 (1991). [26] H. M¨ uther, M. Prakash, and T. L. Ainsworth, The nu-clear symmetry energy in relativistic Brueckner-Hartree-Fock calculations, Phys. Lett. B 199 , 469 (1987). [27] T. Dietrich, S. Bernuzzi, M. Ujevic, and B. Br¨ ugmann, Numerical relativity simulations of neutron star merger remnants using conservative mesh refinement, Phys. Rev. 
+
+D91 , 124041 (2015), arXiv:1504.01266 [gr-qc]. [28] T. Dietrich, D. Radice, S. Bernuzzi, F. Zappa, A. Perego, B. Br¨ ugmann, S. V. Chaurasia, R. Dudi, W. Tichy, and M. Ujevic, CoRe database of binary neutron star merger waveforms, Class. Quant. Grav. 35 , 24LT01 (2018), arXiv:1806.01625 [gr-qc]. [29] A. Gonzalez et al. , Second release of the CoRe database of binary neutron star merger waveforms, Class. Quant. Grav. 40 , 085011 (2023), arXiv:2210.16366 [gr-qc]. [30] E. Gourgoulhon, P. Grandclement, K. Taniguchi, J.-A. Marck, and S. Bonazzola, Quasiequilibrium sequences of synchronized and irrotational binary neutron stars in general relativity: 1. Method and tests, Phys.Rev. D63 ,064029 (2001), arXiv:gr-qc/0007028 [gr-qc]. [31] W. Tichy, Constructing quasi-equilibrium initial data for binary neutron stars with arbitrary spins, Phys. Rev. D 10 
+
+86 , 064024 (2012), arXiv:1209.5336 [gr-qc]. [32] S. Bernuzzi, A. Nagar, S. Balmelli, T. Dietrich, and M. Ujevic, Quasi-universal properties of neu-tron star mergers, Phys.Rev.Lett. 112 , 201101 (2014), arXiv:1402.6244 [gr-qc]. [33] T. Dietrich, S. Bernuzzi, and W. Tichy, Closed-form tidal approximants for binary neutron star gravitational waveforms constructed from high-resolution numerical relativity simulations, Phys. Rev. D96 , 121501 (2017), arXiv:1706.02969 [gr-qc]. [34] C. Musolino, C. Ecker, K. Topolski, M. Cassing, K. Miler, H. H.-Y. Ng, K. Pierre, E. R. Most, and L. Rezzolla, GRACE: An Open-Source Frame-work for GPU-Accelerated Numerical Relativity, (2026), arXiv:2607.09854 [gr-qc].

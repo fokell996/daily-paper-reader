@@ -1,0 +1,2209 @@
+Title: Generative artificial intelligence for reconstructing neutron-star matter
+
+URL Source: https://arxiv.org/pdf/2608.17457v1
+
+Published Time: Wed, 19 Aug 2026 00:42:04 GMT
+
+Number of Pages: 69
+
+Markdown Content:
+# Generative artificial intelligence for reconstructing neutron-star matter 
+
+Julia Yu. Panteleeva 1, Herzallah Alharazin 1, Evgeny Epelbaum 11Institut f¨ ur Theoretische Physik II, Ruhr-Universit¨ at Bochum, D-44780 Bochum, Germany. 
+
+Neutron-star cores hold the only known matter in the universe that is simultaneously cold and strongly interacting, compressed beyond nuclear density into a state of unknown com-position. The equation of state links stellar masses, radii and tidal deformabilities to this regime 1, 2 , but recovering this key quantity from sparse observations is an ill-posed inverse problem. Existing analyses bury a prior in a fixed functional form, unevenly weighting ad-missible solutions and biasing the result. We reconstruct the equation of state with a denois-ing diffusion model 3, 4 that keeps prior, physics and data separate: it learns an inspectable, physically motivated prior anchored to first-principles nuclear theory 5, while perturbative-QCD 6, 7 and astrophysical 8–11 constraints are imposed exactly. Future measurements there-fore will update the posterior by reweighting alone, without retraining or resampling. The inferred radius of 12 .6 km and tidal deformability of 469 at 1.4 solar masses reproduce Gaussian-process 12–14 and heavy-ion-informed 15 inferences despite a far broader prior. We find near-conformal but still stiff matter in the heaviest stars, consistent with a gradual hadron–quark crossover and disfavouring a strong first-order phase transition. More broadly, coupling a learned prior to exactly enforced physics establishes a template for ill-posed in-verse problems where theory and data constrain different regions 16 .
+
+1arXiv:2608.17457v1 [nucl-th] 18 Aug 2026 Neutron stars concentrate more mass than the Sun into a sphere some twenty kilometres across, compressing their cores to several times the density of atomic nuclei. They are the only known objects in which cold, strongly interacting matter exists in bulk, and thus the only window into a regime of quantum chromodynamics (QCD) beyond the reach of both laboratory experi-ments and first-principles computation. What this matter is made of — nucleons, hyperons, meson condensates or deconfined quarks — remains a central open problem of the strong interaction. Mul-timessenger astronomy has made the question quantitative: X-ray pulse-profile modelling, gravi-tational waves from merging neutron stars and radio timing of the heaviest pulsars now measure their masses, radii and tidal deformabilities precisely enough to constrain the interior composition. A single function connects those observables to the microphysics. The pressure of strongly interacting matter depends on density, temperature and composition, but in a mature neutron star the last two are fixed: the matter is effectively cold, its keV-scale thermal energies being negligible compared with Fermi energies of tens to hundreds of MeV, and weak reactions have long since driven it to charge-neutral β-equilibrium at every density. What survives is a single relation be-tween pressure P and energy density ε, the equation of state (EOS), and whatever the constituents, gravity feels them only through this curve. The general-relativistic equations of stellar structure 1, 2 
+
+take the EOS as their sole microphysical input to yield masses, radii and tidal deformabilities, so measuring these can, in principle, determine the thermodynamics of dense matter. On the theory side, only limited information about the EOS is available. At low densities 
+
+n ≲ (1 .5–2) n0 (n0 ≈ 0.16 fm −3 is the nuclear saturation density), chiral effective field theory 2(χEFT) gives controlled predictions with quantified truncation uncertainties 5. At asymptotically high densities n ≳ 40 n0, perturbative QCD (pQCD) 6, 17 determines the EOS, and thermodynamic consistency propagates this constraint down to neutron-star densities 7, 18 . Between these anchors lie the cores of all observed stars, where no controlled calculation exists and model predictions for the pressure already differ by an order of magnitude at n = 2 n0. Across this gap, multimes-senger astronomy provides the only empirical information on cold matter, sparse and heteroge-neous: mass–radius measurements from X-ray pulse-profile modelling with NICER 8–10 , the tidal deformability of the merger GW170817 11 and lower bounds on the maximum mass from two-solar-mass pulsars 19, 20 . What changes across the gap is the shape of P (ε) itself, read off from its slope, the squared speed of sound c2 
+
+> s
+
+= d P/ dε, and above all from how this compares with the conformal value c2 
+
+> s
+
+= 1 /3 approached from below by deconfined quark matter in the pQCD limit. Whether the speed of sound exceeds its conformal value, whether the heaviest stars’ cores ap-proach the deconfined-like behaviour of quark matter, and whether the two regimes join smoothly or through a first-order transition can be settled only by combining these constraints 14, 21, 22 .Bridging the gap requires solving an ill-posed inverse problem: reconstructing an unknown function from sparse, noisy and heterogeneous data. The standard remedy imposes a functional form with a few adjustable parameters, from flexible phenomenological parametrizations to forms tied to specific microphysical scenarios 6, 17, 23–31 . No ansatz is innocent: each restricts the acces-sible shapes and weights them unevenly, biasing the posterior 27 . Non-parametric methods relax this but do not remove it. Gaussian-process priors 12, 13, 32 admit a broad range of shapes, yet their support is set by the kernel and hyperpriors, often calibrated on tabulated-EOS catalogues, and 3their smoothness suits gradual behaviour better than the sharp kinks and plateaus of a strong first-order transition. Machine-learning maps from observables to the EOS 33–36 are highly expressive but learn stellar-structure physics and prior assumptions jointly, entangling them in the network weights so that neither can be investigated separately nor updated as new data arrive without re-training. Deliberately agnostic analyses 15, 37 sample the sound speed on a density grid with no global form, but the segmentation, interpolation, bounds and node measure are still hand-chosen and shape the posterior wherever the data run out. No reconstruction is prior-free; what is desir-able is a prior that is explicit, physically interpretable, broad enough that no single parametrization drives the conclusions, and informed by ab initio theory. Generative machine learning meets these demands: rather than fitting a fixed ansatz, it learns a prior over an entire space of admissible functions and reconstructs by conditional generation. De-noising diffusion models 3, 4 , trained to invert a gradual noising process, are particularly well suited because generation can be steered by inpainting 38 : theory constraints are imposed exactly where they are trustworthy and the model fills in the rest, a strategy recently used to infer hadronic grav-itational form factors from limited lattice-QCD input 16 . Here we apply it to the dense-matter EOS. A single diffusion model, trained on 10 6 synthetic speed-of-sound profiles spanning various physically motivated functional classes and their combinations (Sec. Training ensemble of speed-of-sound profiles), furnishes a prior that encompasses sound-speed peaks, first-order-transition plateaus and near-conformal tails without committing to any of them, and is shown to be suffi-ciently general (Sec. Robustness of the prior). The χEFT constraints are imposed during genera-tion as an inpainting anchor, while the pQCD and astrophysical likelihoods are applied afterwards 4by importance reweighting (Secs. Theory conditioning by inpainting and Data conditioning by im-portance reweighting). This keeps prior and likelihood cleanly separated, so future measurements will update the posterior by reweighting alone, without retraining. The result is a posterior for the squared speed of sound c2 
+
+> s
+
+(nB ) between 0.5 and 8 n0, with quantified uncertainties and no assumed functional form. Propagated through the equations of stellar structure, it yields mass–radius and tidal-deformability relations, constrains the slope of the nuclear symmetry energy, and informs the inner-core composition of neutron stars. 
+
+Reconstruction and constraining power 
+
+We draw 10 5 speed-of-sound profiles from the χEFT-inpainted diffusion prior, of which 89 ,513 
+
+satisfy causality and thermodynamic stability, 0 ≤ c2 
+
+> s
+
+(nB ) ≤ 1, at every point of the density grid. Each surviving profile is integrated to the pressure and energy density and solved for stellar structure, then reweighted by the marginalized pQCD likelihood 7, three NICER mass–radius pos-teriors 8–10 , the GW170817 tidal measurement 11 and the heavy-pulsar maximum-mass bound 39 ,(see Secs. Data conditioning by importance reweighting and Stellar structure and the data like-lihood). The reweighted posterior retains an effective sample size (ESS), see Eq. 31, of Neff =4,187 . All quantities below are posterior medians with 68% credible intervals unless stated other-wise. Reweighting the same inpainted samples with each likelihood separately isolates its con-straining power (Fig. 1). With only the χEFT anchors imposed, the speed of sound above roughly 5Figure 1: Data ablation of the speed-of-sound posterior. The common χEFT-inpainted prior is reweighted by the pQCD and astrophysical data likelihoods as explained in the legend. Red points mark the χEFT anchors. Bands are pointwise equal-tailed 68% credible intervals. 
+
+2n0 is weakly determined. The pQCD likelihood acts almost exclusively above nB ≈ 3n0: it ex-cludes equations of state too soft to connect to the perturbative limit, lifting the high-density band towards c2 
+
+> s
+
+≈ 0.4 and narrowing it at modest statistical cost ( Neff = 24 ,501 ). The astrophysical likelihoods instead constrain the density range probed by the observed stars, pushing the band to-wards the stiffer behaviour demanded by two-solar-mass pulsars and reweighting far more strongly (Neff = 3 ,876 ). In the full posterior, the two are complementary: the astrophysical data fix the canonical-mass region, while pQCD trims the residual stiff tail back towards the conformal value 
+
+c2 
+
+> s
+
+= 1 /3 at the highest densities. 6Sound speed and conformality 
+
+We now examine the reconstructed sound speed and its conformality diagnostics. We use the two publicly released posteriors of Annala et al. 14 , namely the Gaussian-process ensemble (GP) and the four-segment sound-speed interpolation (C4), as external benchmarks. Both rest on broad classes of constraints similar to the present work and, therefore, offer the closest available compar-ison. Figure 2 overlays the three posteriors for the speed of sound and its conformality diagnos-tics. All share the low-density χEFT anchoring but separate above nB ≈ 2 n0, where the astro-physical likelihood stiffens the diffusion band relative to its own prior. The GP and C4 posteriors develop a sharp, well-localized peak in c2 
+
+> s
+
+(nB ); ours does not: where individual diffusion samples do peak, they peak lower and at higher density, and in much of the posterior c2 
+
+> s
+
+is still rising at the stellar centre (see Extended Data Table S1), so these features wash out on averaging and the weighted median rises smoothly to a plateau. Because all three analyses employ comparable χEFT, astrophysical and perturbative-QCD constraints, this difference primarily reflects the prior: the dif-fusion prior spans a broader family of physically motivated equations of state (Sec. Training en-semble of speed-of-sound profiles) than a stationary Gaussian-process kernel or a four-segment parametrization, containing such peaks without imposing them. The derived diagnostics approach conformality: the polytropic index falls through the quark-matter criterion γ < 1.75 21 near 4.5 n0, the trace anomaly ∆ = 1 /3 − P/ε 22 decreases to a median consistent with zero at μTOV , and the median conformal distance dc 14 drops below the 7near-conformality threshold 0.2 above nB ≈ 5 n0. The speed of sound, by contrast, stays well above its conformal value, c2 
+
+> s
+
+≈ 0.47 at the centre of the maximum-mass star and at 8 n0. Dense matter thus approaches conformality in its bulk thermodynamics while remaining stiff: ∆ tracks the ratio P/ε and c2 
+
+> s
+
+its slope, so the two need not conformalize together. Where the GP and interpolation reconstructions have the speed of sound decline after its peak, in step with the ther-modynamics, we find that current data do not require that decline. Indeed, for 45% of the posterior weight c2 
+
+> s
+
+has not attained its maximum by the centre of the maximum-mass star (Extended Data Table S1). A turnover must occur, since c2 
+
+> s
+
+exceeds 1/3 at nTOV and must approach its conformal value asymptotically; what the data do not fix is whether it lies inside a star. A fixed functional form places it there by construction. Brandes et al. 40 reach a parallel conclusion from the trace anomaly, finding that conformality is approached beyond the densities realized in neutron-star cores. 
+
+Neutron-star structure 
+
+Propagating each posterior sample through the stellar-structure and tidal equations (Sec. Stellar structure and the data likelihood) yields the mass–radius relation in Fig. 3a; the full set of fiducial quantities is collected in Extended Data Table S1. The three NICER measurements used as conditioning data pull in opposite directions and the posterior settles between them (Fig. 3a): PSR J0030 +0451 8 and PSR J0740 +6620 9 favour larger radii, the tightly constrained PSR J0437 −4715 10 a smaller one, and all three agree with our band within 1.2σ. Of the three NICER posteriors withheld from the fit, two land on the credible 8Figure 2: Speed of sound and conformality diagnostics of the reconstructed equation of state. a, Squared speed of sound c2 
+
+> s
+
+versus baryon density. b, Polytropic index γ. c, Trace anomaly 
+
+∆ versus baryon chemical potential. d, Conformal distance dc. Dotted lines mark the conformal values c2 
+
+> s
+
+= 1 /3 (a), γ = 1 (b) and ∆ = 0 (c). All results are compared with Gaussian-process (GP) and interpolation (C4) ensembles of Annala et al. 14 . Shaded bands are pointwise equal-tailed 
+
+68% credible intervals and curves their medians. The χEFT anchors 5 are those imposed during generation; the independent determination of ∆ at the maximum-mass point by Marczenko et al . 41 
+
+is overlaid in c.band without ever having informed it 42, 43 , while PSR J0614 −3329 44 prefers a markedly smaller radius. An alternative analysis of PSR J0437 −4715 45 shifts R(1 .4 M⊙) by 0.24 km (Extended Data Table S2), so the inferred radius scale does not hinge on a single X-ray analysis (Sec. Robustness to the χEFT anchoring and the astrophysical data). 9Figure 3: Stellar structure and effective degrees of freedom. a , Mass-radius posterior alongside the GP and C4 ensembles of Annala et al. 14 . Filled circles are the three NICER measurements used as conditioning data 8–10 ; open diamonds are further NICER posteriors withheld from the inference and retained as independent cross-checks 42–44 . The horizontal dotted line is the radio heavy-pulsar mass bound 39 . b, Pressure normalized to that of a free gas of massless quarks, P free =
+
+μ4 
+
+> B
+
+/(108 π2(ℏc)3), versus baryon chemical potential; the grey band reproduces the value at μTOV 
+
+quoted by Annala et al. 14 . Bands and error bars are equal-tailed 68% credible intervals; curves are medians. Our reconstruction agrees with previous work at the canonical mass and departs from it at high mass (Fig. 4): R(1 .4 M⊙) and Λ(1 .4 M⊙) lie within the range of Legred et al. 13 , Koehn et al. 46 , Pang et al. 37 , Rutherford et al. 47 and the Gaussian-process (GP) reconstruction of Annala et al. 14 , whereas the values at 2.08 M⊙ and the maximum mass fall below all of them. The mass– radius relation is thus tilted rather than uniformly shifted, most strongly in the tidal sector, while 
+
+˜Λ(GW170817) remains consistent with the LIGO low-spin constraint 11 .The heaviest stable star also probes deconfinement in its core, at the central baryon density 
+
+nTOV = 6 .38 +0 .47  
+
+> −0.45
+
+n0, where three separately proposed diagnostics agree: the trace anomaly is 10 Figure 4: Fiducial neutron-star quantities compared with the literature. a –c, Radius at the fixed masses 1.4 M⊙ and 2.08 M⊙, and at the maximum-mass (TOV) configuration — the former (a, b) evaluated at a mass shared by all equations of state, the latter ( c) at each equation of state’s 
+
+own maximum mass. d, Tidal deformability at 1.4 M⊙. e, Mass-weighted binary tidal deformabil-ity of GW170817. f, Maximum mass MTOV . Filled symbols denote ensemble of the present work and the Annala 2023 GP ensemble 14 . Open symbols are values as published by Legred et al. 13 ,Pang et al. 37 , Koehn et al. 46 and Rutherford et al. 47 , together with the LIGO low-spin posterior 11 
+
+in e and the direct NICER radius posterior for PSR J0740 +6620 9 in b. Error bars are 68% cred-ible intervals; literature values reported at 90% or 95% credibility have been rescaled assuming approximately Gaussian marginals. consistent with the conformal limit, ∆(TOV) = −0.01 +0 .04  
+
+> −0.09 22
+
+; the polytropic index falls entirely below the quark-matter criterion, γ(TOV) = 1 .39 +0 .20  
+
+> −0.10
+
+< 1.75 21 ; and the conformal distance sits below the near-conformality threshold, dc(TOV) = 0 .13 +0 .14  
+
+> −0.03
+
+against dc < 0.2 14 , with only its upper tail lying above. Because each indicator is sensitive to a different combination of c2 
+
+> s
+
+, P and 11 ε, their agreement at the same time is stronger than any criterion alone. Our median coincides with ∆TOV = −0.01 ± 0.03 of Marczenko et al. 41 (Fig. 2c), on a negatively skewed interval that still admits the conjectured bound ∆ ≥ 0 22 while leaning towards the ∆ < 0 strongly favoured by the NICER-updated Brandes et al. analysis 40 , leaving the sign of the trace anomaly unresolved. A complementary deconfinement measure is the pressure normalized to that of a free gas of massless quarks (Fig. 3b). At the TOV-central chemical potential μTOV = 1 .68 +0 .16  
+
+> −0.09
+
+GeV we find 
+
+P/P free = 0 .45 +0 .03 
+
+> −0.04
+
+, consistent with the headline value 0.40 ± 0.03 of Annala et al. 14 ; the offset can follow from their heavier maximum-mass star and correspondingly higher μTOV (Sec. Confor-mality and deconfinement diagnostics). 
+
+Phase transition and symmetry energy 
+
+The smooth approach to conformality raises the complementary question of whether the data in-stead support a strong first-order phase transition. We test for its necessary, but not sufficient signa-ture 48 : the probability PPT that c2 
+
+> s
+
+drops below 0.1 at a density above its in-window peak, evaluated in nB ∈ [1 .5, 6] n0 (Sec. Conformality and deconfinement diagnostics). Comparing the posterior with the prior value on the same χEFT-anchored, causality-filtered ensemble isolates the infor-mation added by the astrophysical and pQCD likelihoods: PPT falls from 0.088 to 0.014 , and the 12 posterior-to-prior odds ratio, with the signature in the numerator, yields 
+
+BF(PT vs. no -PT) = Ppost PT /(1 − P post PT )
+
+Pprior PT /(1 − P prior PT ) = 0 .14 , (1) i.e. odds of about 7 : 1 against the signature – substantial, but far from decisive. The data disfavour a strong transition without excluding it. The ratio is not fixed by how often such shapes appear in the prior: ensembles with almost identical prior frequencies return Bayes factors differing by a factor of two, and the ensemble with the highest frequency of threshold crossings returns the lowest Bayes factor of all (Sec. Conformality and deconfinement diagnostics). An independent multimessenger and heavy-ion analysis 15 , built on a different prior and transition criterion, likewise finds a value below unity ( ≈ 0.42 ), so the conclusion does not rest on our prior’s shape content. Beyond these high-density questions, the same reconstruction reaches back to a nuclear em-pirical parameter measurable in the laboratory. For each posterior sample we extract the symmetry-energy slope L from the β-equilibrium EOS (Sec. Symmetry-energy slope). The importance-weighted result 
+
+L = 60 .5+7 .5 
+
+> −7.6
+
+(stat) ± 3.0 (sys) MeV (2) is consistent with the inference L = 48 +11  
+
+> −13
+
+MeV of Koehn et al. 46 and lower than the experiment-driven L = 83 .6+19 .2 
+
+> −16 .8
+
+MeV of Tsang et al. 49 , sitting between the two. The extraction is stable: the prior ensemble gives L = 57 .7 ± 8.3 MeV and the χEFT anchoring band L = 59 .8 ± 4.1 MeV 5,and the astrophysical and pQCD data shift the median only marginally above the χEFT central value. 13 Discussion 
+
+We have reconstructed the neutron-star-matter EOS with a generative prior, conditioned on χEFT by inpainting and on the astrophysical and pQCD data by importance reweighting. Because no functional form is imposed, the absence of a sharp sound-speed peak at intermediate density and the persistence of a stiff high-density tail reflect the data rather than an ansatz; and because reweighting acts on raw samples, multimodality survives conditioning, enabling shape-level tests such as the phase-transition Bayes factor. With the diffusion network the only learned component, prior and likelihood stay explicitly separated, so the credible intervals are free of emulator bias and carry a quantifiable sampling error. The posterior presented here is not an endpoint but an instru-ment. Every future pulse-profile measurement, tidal signal or sharpened pQCD bound refines it by reweighting alone – without retraining, without resampling. The structural conclusions are robust to the composition of the prior ensemble: training en-sembles pushed to the boundary of the prior’s support leave the fiducial observables intact (Ex-tended Data Tables S4 and S5). What responds is the sound-speed peak, whose height rises from 
+
+0.55 to at most 0.64 , and the phase-transition Bayes factor, which varies between 0.04 and 0.24 
+
+but never approaches unity — so neither the absence of a sharp intermediate-density peak nor the case against a strong transition is an artefact of our baseline shape content (Secs. Robustness of the prior and Robustness to the χEFT anchoring and the astrophysical data). The picture that emerges is coherent: an equation of state softer than previous reconstruc-tions where they peak and stiffer where they decline, whose heaviest stable stars harbour near-14 conformal matter by three separate diagnostics, yet whose sound speed stays well above the con-formal limit. Such a stiff-yet-conformal combination is the hallmark of a gradual hadron–quark crossover — quarks emerging and coexisting with hadrons through percolation — rather than a sharp first-order transition, for which the combined data offer little support. This reading is con-sistent with our purely thermodynamic diagnostics but cannot be established by them alone. The peak is not absent but displaced: for 45% of the posterior weight c2 
+
+> s
+
+has not attained its maxi-mum by the centre of the maximum-mass star, so no mass, radius or tidal deformability can locate it. Post-merger gravitational-wave signals, which probe transiently higher densities, are the nearest observational handle. The most substantial extension is in scope. The EOS inferred here is cold, charge-neutral and β-equilibrated – a one-dimensional slice of a far richer thermodynamic surface. Generalizing the prior to temperature- and composition-dependent equations of state, P (nB , T, Y p), would carry the same machinery into neutron-star mergers, proto-neutron-star cooling and core-collapse super-novae, where finite-temperature physics dominates and theory-anchored priors remain scarce. It can also be confronted with microscopic models of hadronic and quark matter through the diag-nostics extracted here, though locating it relative to the deconfined regime requires composition-resolved input. More broadly, a learned, theory-anchored prior bridging sparse data and firm asymptotic limits addresses a class of inverse problems recurring throughout nuclear and hadronic physics 16 .1. R. C. Tolman, Phys. Rev. 55 (1939), 364-373 doi:10.1103/PhysRev.55.364 15 2. J. R. Oppenheimer and G. M. Volkoff, Phys. Rev. 55 (1939), 374-381 doi:10.1103/PhysRev.55.374 3. J. Sohl-Dickstein, E. A. Weiss, N. Maheswaranathan, and S. Ganguli, in Proc. 32nd Int. Conf. Machine Learning , 37 , 2256 (2015). arXiv:1503.03585 [cs.LG] 4. J. Ho, A. Jain, P. Abbeel, in Adv. Neural Inf. Process. Syst. 33 , 6840 (2020), arXiv:2006.11239 [cs.LG]. 5. C. Drischler, R. J. Furnstahl, J. A. Melendez and D. R. Phillips, Phys. Rev. Lett. 125 (2020) no.20, 202702 doi:10.1103/PhysRevLett.125.202702 [arXiv:2004.07232 [nucl-th]]. 6. T. Gorda, A. Kurkela, R. Paatelainen, S. S¨ appi and A. Vuorinen, Phys. Rev. Lett. 127 (2021) no.16, 162003 doi:10.1103/PhysRevLett.127.162003 [arXiv:2103.05658 [hep-ph]]. 7. O. Komoltsev, R. Somasundaram, T. Gorda, A. Kurkela, J. Margueron and I. Tews, Phys. Rev. D 109 (2024) no.9, 094030 doi:10.1103/PhysRevD.109.094030 [arXiv:2312.14127 [nucl-th]]. 8. M. C. Miller, F. K. Lamb, A. J. Dittmann, S. Bogdanov, Z. Arzoumanian, K. C. Gendreau, S. Guillot, A. K. Harding, W. C. G. Ho and J. M. Lattimer, et al. Astrophys. J. Lett. 887 
+
+(2019) no.1, L24 doi:10.3847/2041-8213/ab50c5 [arXiv:1912.05705 [astro-ph.HE]]. 9. T. Salmi, D. Choudhury, Y. Kini, T. E. Riley, S. Vinciguerra, A. L. Watts, M. T. Wolff, Z. Arzoumanian, S. Bogdanov and D. Chakrabarty, et al. Astrophys. J. 974 (2024) no.2, 294 doi:10.3847/1538-4357/ad5f1f [arXiv:2406.14466 [astro-ph.HE]]. 16 10. D. Choudhury, T. Salmi, S. Vinciguerra, T. E. Riley, Y. Kini, A. L. Watts, B. Dorsman, S. Bogdanov, S. Guillot and P. S. Ray, et al. Astrophys. J. Lett. 971 (2024) no.1, L20 doi:10.3847/2041-8213/ad5a6f [arXiv:2407.06789 [astro-ph.HE]]. 11. B. P. Abbott et al. [LIGO Scientific and Virgo], Phys. Rev. X 9 (2019) no.1, 011001 doi:10.1103/PhysRevX.9.011001 [arXiv:1805.11579 [gr-qc]]. 12. R. Essick, P. Landry and D. E. Holz, Phys. Rev. D 101 (2020) no.6, 063007 doi:10.1103/PhysRevD.101.063007 [arXiv:1910.09740 [astro-ph.HE]]. 13. I. Legred, K. Chatziioannou, R. Essick, S. Han and P. Landry, Phys. Rev. D 104 (2021) no.6, 063003 doi:10.1103/PhysRevD.104.063003 [arXiv:2106.05313 [astro-ph.HE]]. 14. E. Annala, T. Gorda, J. Hirvonen, O. Komoltsev, A. Kurkela, J. N¨ attil¨ a and A. Vuorinen, Nature Commun. 14 (2023) no.1, 8451 doi:10.1038/s41467-023-44051-y [arXiv:2303.11356 [astro-ph.HE]]. 15. S. Huth, P. T. H. Pang, I. Tews, T. Dietrich, A. L. F` evre, A. Schwenk, W. Trautmann, K. Agar-wal, M. Bulla and M. W. Coughlin, et al. Nature 606 (2022), 276-280 doi:10.1038/s41586-022-04750-w [arXiv:2107.06229 [nucl-th]]. 16. H. Alharazin and J. Y. Panteleeva, Phys. Rev. D 113 (2026) no.11, 116007 doi:10.1103/g1j2-2ww2 [arXiv:2602.19267 [hep-ph]]. 17. A. Kurkela, P. Romatschke and A. Vuorinen, Phys. Rev. D 81 (2010), 105021 doi:10.1103/PhysRevD.81.105021 [arXiv:0912.1856 [hep-ph]]. 17 18. O. Komoltsev and A. Kurkela, Phys. Rev. Lett. 128 (2022) no.20, 202701 doi:10.1103/PhysRevLett.128.202701 [arXiv:2111.05350 [nucl-th]]. 19. P. Demorest, T. Pennucci, S. Ransom, M. Roberts and J. Hessels, Nature 467 (2010), 1081-1083 doi:10.1038/nature09466 [arXiv:1010.5788 [astro-ph.HE]]. 20. H. T. Cromartie et al. [NANOGrav], Nature Astron. 4 (2019) no.1, 72-76 doi:10.1038/s41550-019-0880-2 [arXiv:1904.06759 [astro-ph.HE]]. 21. E. Annala, T. Gorda, A. Kurkela, J. N¨ attil¨ a and A. Vuorinen, Nature Phys. 16 (2020) no.9, 907-910 doi:10.1038/s41567-020-0914-9 [arXiv:1903.09121 [astro-ph.HE]]. 22. Y. Fujimoto, K. Fukushima, L. D. McLerran and M. Praszalowicz, Phys. Rev. Lett. 129 (2022) no.25, 252702 doi:10.1103/PhysRevLett.129.252702 [arXiv:2207.06753 [nucl-th]]. 23. J. S. Read, B. D. Lackey, B. J. Owen and J. L. Friedman, Phys. Rev. D 79 (2009), 124032 doi:10.1103/PhysRevD.79.124032 [arXiv:0812.2163 [astro-ph]]. 24. K. Hebeler, J. M. Lattimer, C. J. Pethick and A. Schwenk, Astrophys. J. 773 (2013), 11 doi:10.1088/0004-637X/773/1/11 [arXiv:1303.4662 [astro-ph.SR]]. 25. L. Lindblom, Phys. Rev. D 82 (2010), 103011 doi:10.1103/PhysRevD.82.103011 [arXiv:1009.0738 [astro-ph.HE]]. 26. I. Tews, J. Carlson, S. Gandolfi and S. Reddy, Astrophys. J. 860 (2018) no.2, 149 doi:10.3847/1538-4357/aac267 [arXiv:1801.01923 [nucl-th]]. 18 27. S. K. Greif, G. Raaijmakers, K. Hebeler, A. Schwenk and A. L. Watts, Mon. Not. Roy. As-tron. Soc. 485 (2019) no.4, 5363-5376 doi:10.1093/mnras/stz654 [arXiv:1812.08188 [astro-ph.HE]]. 28. H. Mueller and B. D. Serot, Nucl. Phys. A 606 (1996), 508-537 doi:10.1016/0375-9474(96)00187-X [arXiv:nucl-th/9603037 [nucl-th]]. 29. Y. Nambu and G. Jona-Lasinio, Phys. Rev. 122 (1961), 345-358 doi:10.1103/PhysRev.122.345 30. L. McLerran and S. Reddy, Phys. Rev. Lett. 122 (2019) no.12, 122701 doi:10.1103/PhysRevLett.122.122701 [arXiv:1811.12503 [nucl-th]]. 31. M. G. Alford, S. Han and M. Prakash, Phys. Rev. D 88 (2013) no.8, 083013 doi:10.1103/PhysRevD.88.083013 [arXiv:1302.4732 [astro-ph.SR]]. 32. P. Landry and R. Essick, Phys. Rev. D 99 (2019) no.8, 084049 doi:10.1103/PhysRevD.99.084049 [arXiv:1811.12529 [gr-qc]]. 33. Y. Fujimoto, K. Fukushima and K. Murase, Phys. Rev. D 98 (2018) no.2, 023019 doi:10.1103/PhysRevD.98.023019 [arXiv:1711.06748 [nucl-th]]. 34. F. Morawski and M. Bejger, Astron. Astrophys. 642 (2020), A78 doi:10.1051/0004-6361/202038130 [arXiv:2006.07194 [astro-ph.HE]]. 35. S. Soma, L. Wang, S. Shi, H. St¨ ocker and K. Zhou, Phys. Rev. D 107 (2023) no.8, 083028 doi:10.1103/PhysRevD.107.083028 [arXiv:2209.08883 [astro-ph.HE]]. 19 36. G. Ventagli and I. D. Saltas, JCAP 01 (2025), 073 doi:10.1088/1475-7516/2025/01/073 [arXiv:2405.17908 [astro-ph.HE]]. 37. P. T. H. Pang, T. Dietrich, M. W. Coughlin, M. Bulla, I. Tews, M. Almualla, T. Barna, R. W. Kiendrebeogo, N. Kunert and G. Mansingh, et al. Nature Commun. 14 (2023) no.1, 8352 doi:10.1038/s41467-023-43932-6 [arXiv:2205.08513 [astro-ph.HE]]. 38. A. Lugmayr, M. Danelljan, A. Romero, F. Yu, R. Timofte, L. Van Gool, in Proceedings of the IEEE/CVF Conference on CVPR , 11461 (2022), arXiv:2201.09865 [cs.CV]. 39. Z. Arzoumanian et al. [NANOGrav], Astrophys. J. Suppl. 235 (2018) no.2, 37 doi:10.3847/1538-4365/aab5b0 [arXiv:1801.01837 [astro-ph.HE]]. 40. L. Brandes and W. Weise, Phys. Rev. D 111 (2025) no.3, 034005 doi:10.1103/PhysRevD.111.034005 [arXiv:2412.05923 [nucl-th]]. 41. M. Marczenko, L. McLerran, K. Redlich and C. Sasaki, Phys. Rev. C 107 (2023) no.2, 025802 doi:10.1103/PhysRevC.107.025802 [arXiv:2207.13059 [nucl-th]]. 42. Y. Kini, L. Mauviard, T. Salmi, A. L. Watts, S. Guillot, B. Dorsman, D. Choudhury, D. Gonz´ alez-Caniulef, M. Hoogkamer and D. Huppenkothen, et al. [arXiv:2602.23743 [astro-ph.HE]]. 43. T. Salmi, J. S. Deneva, P. S. Ray, A. L. Watts, D. Choudhury, Y. Kini, S. Vinciguerra, H. T. Cromartie, M. T. Wolff and Z. Arzoumanian, et al. Astrophys. J. 976 (2024) no.1, 58 doi:10.3847/1538-4357/ad81d2 [arXiv:2409.14923 [astro-ph.HE]]. 20 44. L. Mauviard, S. Guillot, T. Salmi, D. Choudhury, B. Dorsman, D. Gonzalez-Caniulef, M. Hoogkamer, D. Huppenkothen, C. Kazantsev and Y. Kini, et al. Astrophys. J. 995 (2025) no.1, 60 doi:10.3847/1538-4357/ae145d [arXiv:2506.14883 [astro-ph.HE]]. 45. M. C. Miller, A. J. Dittmann, I. M. Holt, F. K. Lamb, C. Chirenti, Z. Arzoumanian, J. Berteaud, S. Bogdanov, K. C. Gendreau and W. C. G. Ho, et al. Astrophys. J. Lett. 1000 (2026) no.2, L48 doi:10.3847/2041-8213/ae5057 [arXiv:2512.08790 [astro-ph.HE]]. 46. H. Koehn, H. Rose, P. T. H. Pang, R. Somasundaram, B. T. Reed, I. Tews, A. Abac, O. Komoltsev, N. Kunert and A. Kurkela, et al. Phys. Rev. X 15 (2025) no.2, 021014 doi:10.1103/PhysRevX.15.021014 [arXiv:2402.04172 [astro-ph.HE]]. 47. N. Rutherford, M. Mendes, I. Svensson, A. Schwenk, A. L. Watts, K. Hebeler, J. Keller, C. Prescod-Weinstein, D. Choudhury and G. Raaijmakers, et al. Astrophys. J. Lett. 971 (2024) no.1, L19 doi:10.3847/2041-8213/ad5f02 [arXiv:2407.06790 [astro-ph.HE]]. 48. L. Brandes, W. Weise and N. Kaiser, Phys. Rev. D 108 (2023) no.9, 094014 doi:10.1103/PhysRevD.108.094014 [arXiv:2306.06218 [nucl-th]]. 49. C. Y. Tsang, M. B. Tsang, W. G. Lynch, R. Kumar and C. J. Horowitz, Nature Astron. 8 (2024) no.3, 328-336 doi:10.1038/s41550-023-02161-z [arXiv:2310.11588 [nucl-th]]. 21 Methods Overview of the inference framework 
+
+We reconstruct the squared speed of sound c2 
+
+> s
+
+(nB ) of cold, charge-neutral, β-equilibrated matter on a uniform grid of L = 200 points in baryon density nB /n 0 ∈ [0 .5, 8] , with n0 = 0 .16 fm −3. A de-noising diffusion probabilistic model 3, 4 , trained on a large synthetic ensemble of physically moti-vated profiles (Sec. Training ensemble of speed-of-sound profiles), serves as a non-parametric prior over c2 
+
+> s
+
+(nB ). Conditioning enters in two cleanly separated stages. The chiral-effective-field-theory (χEFT) constraints at low density are imposed during generation, as inpainting anchors 38 on the density grid (Sec. Theory conditioning by inpainting). The perturbative-QCD (pQCD) and multi-messenger astrophysical constraints are imposed after generation, as a self-normalized importance-reweighting pass over the raw solutions of the stellar-structure and tidal equations (Secs. Stellar structure and the data likelihood and Data conditioning by importance reweighting). The diffu-sion network is the only learned component; it acts purely as a prior, so that the reported credible intervals carry only quantifiable sampling error. 
+
+Training ensemble of speed-of-sound profiles 
+
+We train the diffusion model on 10 6 synthetic speed-of-sound profiles, sampled on the density grid defined above, that span the manifold of physically plausible EOS. The training curves are drawn from ten classes of functional forms: eight rooted in distinct theoretical or phenomeno-logical approaches to the dense-matter EOS, and two built from convex combinations. The eight base functional forms are summarized below. The piecewise polytrope (3a) is a widely used EOS 22 parametrization 23, 24, 50–53 ; we use it to specify the stiffness structure of the EOS by decomposing the density range into Nseg ∈ { 3, · · · , 9} polytropic segments. The spectral class (3b) expands the adiabatic index as a polynomial of truncation order K ∈ { 2, · · · , 9} in ln( P/P 0), with P0 the reference pressure at 0.5 n0 and expansion coefficients γk; this representation, introduced in ref. 25 ,accurately reproduces a range of realistic neutron-star EOSs. The logistic + Gaussian model (3c) follows the speed-of-sound parametrization of Greif et al. 27 , combining a logistic baseline matched to the low-density χEFT regime with a Gaussian peak that lifts c2 
+
+> s
+
+above the conformal value 1/3.It generalizes the earlier ansatz of Tews et al. 26 , replacing their exponential approach to 1/3 by a logistic. The RMF class (3d) computes ε and P from the Walecka model with nonlinear scalar and vector self couplings 28, 54, 55 , fixed by nuclear saturation properties 56 , including a density-dependent variant centred on a CompOSE-catalogued parametrization 57–60 .The CSS (constant-sound-speed) class (3e) models a first-order hadron–quark transition 31, 61–63 : a density-dependent hadronic speed of sound c2
+
+> s, H
+
+(nB ), inherited from a parent class (1–4), is joined at a transition density ntrans through a Maxwell construction to a quark phase of constant speed of sound c2
+
+> s, QM
+
+; the Seidov criterion 64 is deliberately not enforced, so that both connected and disconnected (twin-star) branch topologies are represented. The quarkyonic class (3f) implements the McLerran–Reddy model 30, 65 : above a transition density nt, a quark momentum shell below the baryonic Fermi surface drives a rapid rise of c2 
+
+> s
+
+above 1/3 followed by a gradual recovery toward the conformal value. The NJL crossover (3g) realizes the “three-window” structure of NJL/quark– meson models 29, 66–68 , a stiff chiral crossover with c2 
+
+> s
+
+> 1/3 required to support ∼ 2 M⊙ stars 69 ,as a conformal baseline plus a Gaussian peak. Finally, the pQCD-motivated class (3h) enforces 23 the asymptotic approach c2 
+
+> s
+
+→ 1/3 − δ∞ 6, 17 , complementing the quarkyonic and NJL forms in approaching the conformal limit from below. Polytrope: c2 
+
+> s
+
+= Γ i
+
+Pε + P , Γi = const. on segment i , (3a) Spectral: c2 
+
+> s
+
+= Γ( P ) Pε + P , ln Γ( P ) = 
+
+> K
+
+X
+
+> k=0
+
+γk
+
+ln( P/P 0)k , (3b) Logistic + Gauss: c2 
+
+> s
+
+(ε) = a1
+
+1 + e−a2(ε/ε 0−a3) + a4 exp 
+
+
+
+−(ε/ε 0 − a5)2
+
+2 a26
+
+
+
+, (3c) RMF: c2 
+
+> s
+
+= dP/dn B
+
+dε/dn B
+
+, {ε, P } from the σ–ω–ρ mean-field model , (3d) CSS: c2 
+
+> s
+
+(nB ) = 
+
+
+
+c2
+
+> s, H
+
+(nB ) , nB < n trans ,
+
+0 , ntrans ≤ nB ≤ nQ 
+
+> B
+
+,c2 
+
+> s, QM
+
+, nB > n Q 
+
+> B
+
+,
+
+(3e) Quarkyonic: c2 
+
+> s
+
+= nB
+
+μB
+
+dμ B
+
+dn B
+
+, μB = dε dn B
+
+, ε(nB ) from McLerran–Reddy , (3f) NJL: c2 
+
+> s
+
+(x) = 13
+
+xγ1
+
+1 + xγ1 + A exp 
+
+
+
+−(x − ¯nχ)2
+
+2 σ2
+
+> χ
+
+ xγ2
+
+1 + xγ2 , (3g) pQCD: c2 
+
+> s
+
+(x) = 
+
+13 + A exp 
+
+
+
+−(x − ¯np)2
+
+2 σ2
+
+> p
+
+
+
+− δ∞
+
+1 + (¯ nδ/x )α
+
+ xγ
+
+1 + xγ . (3h) Here x ≡ nB /n 0 is the reduced baryon density; ε0 ≡ n0 mN is the nucleon rest-mass energy density at saturation, with mN the average nucleon mass; and P , ε and μB are the pressure, energy density and baryon chemical potential. The final two classes are convex combinations of the eight base forms: Class 9 draws pairwise mixtures and Class 10 Dirichlet-weighted mixtures of three to 24 five parents, excluding physically inconsistent quark-onset pairings (Supplementary Information Sec. S3. Construction and sampling of the functional classes). For each class, the free parameters are sampled using multiple randomized strategies to en-sure broad coverage of the accessible shape space. All generated curves satisfy the acceptance criteria ( 0 ≤ c2 
+
+> s
+
+≤ 1), ensuring causality and mechanical stability, are free of numerical singu-larities, and fulfil a minimum-variation requirement ( std( c2 
+
+> s
+
+) > 0.01 ) that excludes effectively constant profiles. The low-density reference point for training data is taken from the SLy4 analyti-cal EOS 53 at nref  
+
+> B
+
+= 0 .5 n0. The complete thermodynamic relations, defining equations, parameter ranges and sampling procedures for every class are given in Supplementary Information Secs. S1. Master thermodynamic relations and sampling conventions and S3. Construction and sampling of the functional classes. 
+
+Denoising diffusion probabilistic model 
+
+We employ a DDPM with v-prediction 70 . Let x0 ∈ RL denote a c2 
+
+> s
+
+profile on the density grid. The forward (noising) process maps it, at diffusion step τ ∈ { 1, . . . , T } with T = 1000 , to 
+
+xτ = √¯ατ x0 + √1 − ¯ατ ϵ, ϵ ∼ N (0, I), (4) with ¯ατ = τQ
+
+> s=1
+
+αs and αs = 1 − βs 3, 4 . The variance schedule is the cosine form of ref. 71 ,
+
+¯ατ = f (τ )
+
+f (0) , f (τ ) = cos 2
+
+τ /T + s
+
+1 + sπ
+
+2
+
+
+
+, s = 0 .008 . (5) The network is trained to predict the velocity 
+
+vτ = √¯ατ ϵ − √1 − ¯ατ x0. (6) 25 Given the network output ˆvτ , the linear relations (4) and (6) invert to 
+
+ˆx0 = √¯ατ xτ − √1 − ¯ατ ˆvτ , (7) 
+
+ˆϵ = √1 − ¯ατ xτ + √¯ατ ˆvτ . (8) In addition to the noisy input xτ and diffusion time τ , the denoiser receives a binary mask m ∈{0, 1}L, which is unity at the known (anchor) indices, and a conditioning channel c ∈ RL contain-ing the corresponding anchor values (and zero elsewhere). The training objective is 
+
+L(θ) = Ex0,ϵ,τ, m
+
+h
+
+fθ(xτ , τ, m, c) − vτ
+
+> 2
+
+i
+
+. (9) The denoiser fθ is the one-dimensional ResNet–attention hybrid of ref. 16 , operating at fixed reso-lution L = 200 ; architecture and training hyperparameters are given in Supplementary Information Sec. S4. Diffusion-model architecture and training. Sampling starts from xT ∼ N (0, I) and iter-ates the ancestral reverse step 4
+
+xτ −1 = ˜ μτ +
+
+q
+
+˜βτ z, z ∼ N (0, I) (τ > 1) , (10) with the mean and variance of the Gaussian posterior q(xτ −1 | xτ , ˆx0),
+
+˜μτ =
+
+√¯ατ −1 βτ
+
+1 − ¯ατ
+
+ˆx0 +
+
+√ατ (1 − ¯ατ −1)1 − ¯ατ
+
+xτ , (11) 
+
+˜βτ = βτ (1 − ¯ατ −1)1 − ¯ατ
+
+, (12) and ˆx0 from Eq. (7); the final step τ = 1 is taken deterministically, x0 = ˜ μ1.1     
+
+> 1For numerical stability ˆx0is clipped to [−5,5] in standardized units at every step, a safeguard that leaves typical profiles unaffected.
+
+26 Extraction of χEFT anchors with correlated uncertainties 
+
+The anchors are the Monte-Carlo moments of an ensemble of N = 2 × 10 4 realizations of the low-density equation of state, 
+
+c2 
+
+> s
+
+(k) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+ c2
+
+> s
+
+(i)(nk), Ckl = 1
+
+N − 1
+
+> N
+
+X
+
+> i=1
+
+(c2 
+
+> s
+
+)(i)(nk) − c2 
+
+> s
+
+(k) (c2 
+
+> s
+
+)(i)(nl) − c2 
+
+> s
+
+(l), (13) evaluated at nk/n 0 ∈ { 0.500 , 0.764 , 0.990 , 1.254 , 1.518 }, where Ckl is the covariance matrix 2. Each realization is a charge-neutral npeμ equation of state in β equilibrium at T = 0 , for which the squared sound speed is 
+
+ c2
+
+> s
+
+(i) = dP (i)
+
+dε (i) = nB
+
+μ(i)
+
+> B
+
+dμ (i)
+
+> B
+
+dn B
+
+, μ(i) 
+
+> B
+
+= e(i) 
+
+> N
+
++ nB
+
+∂e (i)
+
+> N
+
+∂n B xp
+
++ μ(i) 
+
+> e
+
+x(i) 
+
+> p
+
+, (14) the composition derivative dropping out of μ(i) 
+
+> B
+
+because ∂e N /∂x p + μe vanishes at weak equi-librium. The full npeμ closure is given in Supplementary Information Sec. S2. Charge-neutral 
+
+β-equilibrium matter, where μB reduces to the PNM and SNM energies E(i) 
+
+> N
+
+and E(i) 
+
+> S
+
+alone: these two curves are the only stochastic objects in the construction, and every other quantity is a deter-ministic functional of them. All density derivatives, including dμ (i) 
+
+> B
+
+/dn B , are centred differences taken within a single realization, so that their correlation with E(i) 
+
+> S
+
+and E(i)sym is preserved exactly; each realization is propagated on a grid containing the anchor densities exactly, so that no interpo-lation enters the anchors and the discretisation error in c2 
+
+> s
+
+stays below 0.2% , more than an order of magnitude smaller than √Ckk .Both curves carry the N 3LO truncation error, modelled by the Gaussian process of ref. 72 
+
+with the published analysis code 73, 74 (interpolation and truncation covariance, Λb = 600 MeV,   
+
+> 2The full covariance is propagated: neighbouring anchors are correlated at ρ= 0 .95 –0.98 .
+
+27 chiral cutoff Λ = 500 MeV). Because Eq. (S8) mixes EN and ES , their cross-covariance must be retained; it is recovered from three published blocks by the polarization identity 
+
+Cov( EN , E S ) = 12
+
+ΣN N + Σ SS − ΣEsym Esym 
+
+ . (15) Realizations are drawn as θ(i) = ¯ μ + Lz(i), z(i) ∼ N (0, 1), with LL ⊤ the assembled joint covari-ance (symmetrised, its negative eigenvalue rim of O(10 −4) MeV 2 clipped); each draw fixes both curves at all densities simultaneously, so that the derivatives inherit the correct joint distribution and the same realizations supply the integration constants (εref , P ref ) of Eq. (18). In PNM-only mode the pipeline reproduces the published BUQEYE neutron-matter sound speed 5, 73 to 1.0% in the mean and 3.5% in the width (Extended Data Figure S1 and Table S6). 
+
+Theory conditioning by inpainting 
+
+The χEFT input enters as fixed values of c2 
+
+> s
+
+at K = 5 low-density grid points. The anchors are the charge-neutral β-equilibrium ( npeμ ) sound-speed values of the previous section. Conditioning is the inpainting rule of ref. 38 , applied at every reverse step: the masked entries are overwritten by a forward-noised copy of c at the current noise level, 
+
+xτ −1 ← m ⊙
+
+√¯ατ −1 c + p1 − ¯ατ −1 ϵ′
+
+
+
++ ( 1 − m) ⊙ xτ −1, ϵ′ ∼ N (0, I), (16) with ⊙ the elementwise product and ϵ′ drawn independently at each step; at τ = 1 the masked entries are set to the clean values, x0 ← m ⊙ c + ( 1 − m) ⊙ x0. The χEFT truncation uncertainty is propagated by giving each sample an independent realization r of the anchor values, held fixed 
+
+along its reverse trajectory, 
+
+c2
+
+> sr
+
+(nk) = c2 
+
+> s
+
+(nk) + δ(k) 
+
+> r
+
+, δn ∼ N (0, C ), (17) 28 where C is the covariance of the sound-speed anchors discussed in the previous section. 
+
+From the speed of sound to the equation of state 
+
+Because the post-generation constraints act on quantities other than the χEFT-conditioned c2 
+
+> s
+
+(nB )
+
+— the astrophysical likelihoods on masses, radii and tidal deformabilities, which require P (ε),and the pQCD likelihood on the termination point (nT 
+
+> B
+
+, μ T, P T) — each sampled c2 
+
+> s
+
+(nB ) profile is converted back to the full equation of state before reweighting. Given c2 
+
+> s
+
+(nB ), the pressure is reconstructed by integrating 
+
+P (nB ) = Pref +
+
+> nB
+
+Z
+
+> nref
+> B
+
+dn ′ c2 
+
+> s
+
+(n′) ε(n′) + P (n′)
+
+n′ , (18) jointly with the first law of thermodynamics, upward from a reference point (nref  
+
+> B
+
+, P ref , ε ref ) at 
+
+nref  
+
+> B
+
+= 0 .5 n0; the baryon chemical potential entering the pQCD likelihood then follows from the Euler relation. The reference constants are evaluated on the same joint pure-neutron- and symmetric-matter samples of the BUQEYE N 3LO analysis 5, 72–74 from which the sound-speed anchors are constructed, rendering them thermodynamically and statistically consistent with the anchors. 
+
+Stellar structure and the data likelihood 
+
+The reconstructed equation of state P (nB ), ε (nB ) is fed to the Tolman–Oppenheimer–Volkoff equa-tions 1, 2 (G = c = 1 ), 
+
+dP dr = −(ε + P ) ( m + 4 πr 3P )
+
+r (r − 2m) , dm dr = 4 πr 2ε, (19) 29 integrated outward from P (0) = Pc to the surface P (R) = 0 over a grid of central pressures Pc,yielding M , R and the tidal deformability Λ as functions of Pc. Stability requires dM/dP c ≥ 0,and Mmax ≡ max Pc M (Pc) is the maximum mass along the stable branch. Below nref  
+
+> B
+
+the equation of state is matched to the SLy crust in the analytic representation of Haensel & Potekhin 53 , rescaled so that ε(P ) is continuous at the junction. Profiles whose stable branch has not terminated at the upper edge of the density grid admit only a lower bound on Mmax and are discarded rather than scored ( 59 ,547 of the 89 ,513 causal samples, 66 .5% ); under the full likelihood these samples would carry 5.3% of the posterior weight, so all reported posteriors are conditioned on nTOV ≤ 8 n0. The dimensionless tidal deformability is 
+
+Λ = 23 k2 C−5, C ≡ M/R, (20) with k2 the quadrupole tidal Love number 75 . The surface value y ≡ y(R) of the metric-perturbation variable obeys 
+
+r y ′ + y2 + y F + r2Q = 0 , (21) 
+
+F = 1 − 4πr 2(ε − P )1 − 2m/r , Q =4π
+
+
+
+5ε + 9 P + ε + Pc2
+
+> s
+
+
+
+1 − 2m/r − 6
+
+r2(1 − 2m/r ) −
+
+2( m + 4 πr 3P )
+
+r(r − 2m)
+
+2
+
+.
+
+The stable evaluation of k2 follows ref. 76 . The thermodynamic, stellar-structure and tidal chain was cross-validated against an independent implementation. The NICER mass–radius measurements, the GW170817 tidal deformability, the heavy-pulsar maximum-mass bound and the pQCD constraint contribute additive log-likelihoods. Each NICER pulsar marginalizes its measured mass–radius density fp over the stable branch under a flat prior 30 on the stellar mass, normalized on [Mmin , M max ] with Mmin = 1 M⊙,
+
+log LNICER = X
+
+> p
+
+log 
+
+ 1
+
+Mmax − Mmin 
+
+> Mmax
+
+Z
+
+> Mmin
+
+fp
+
+ M, R (M ) dM 
+
+ , (22) where fp is a product of Gaussians in M and R for pulsars given by summary moments and, for J0740 and J0437, 
+
+fp(M, R ) = KDE p(M, R ) Lradio  
+
+> p
+
+(M )
+
+πM,p (M ) πR,p (R | M ) , (23) the released two-dimensional posterior with the priors of the underlying analysis divided out and the radio mass re-added once as an independent Gaussian. Here πM,p is the radio-timing mass prior 77, 78 and πR,p the X-PSI radius prior, uniform on [4 .4, 16] km and restricted by the com-pactness condition of the pulse-profile model 9, 10 . Because Lradio  
+
+> p
+
+and πM,p are the same Gaus-sian, the mass factors cancel and only the radius-prior normalization survives. The NICER infor-mation is incorporated at two stages. First, all three pulsars (J0030+0451 8, J0740+6620 9 and J0437 −4715 10 ) enter as separable Gaussians in (M, R ), taken from the moments of the released samples for J0740 and J0437 and from the upper half-widths of the published asymmetric credi-ble interval for J0030. Secondly, J0740 and J0437 are upgraded to kernel-density likelihoods on the full released posteriors 79, 80 , with the radio-timing masses of refs. 77, 78 . Three further NICER posteriors 42–44 are withheld from the fit and used only as consistency checks (Fig. 3). For each equation of state, the tidal deformabilities Λ1 and Λ2 of the two neutron stars in GW170817 are read from the computed mass–deformability relation at the component masses 
+
+(m1, m 2) = (1 .48 , 1.26) M⊙. The mass-weighted binary tidal deformability is then 81, 82 
+
+˜Λ = 16 13 (m1 + 12 m2)m41Λ1 + ( m2 + 12 m1)m42Λ2
+
+(m1 + m2)5 , (24) 31 which GW170817 constrains to ˆ˜Λ = 300 +420  
+
+> −230
+
+at the 90% highest-posterior-density level under the low-spin prior 11 . We impose this as an asymmetric Gaussian, 
+
+log LGW = −12
+
+ ˜Λ − ˆ˜Λ
+
+σ±
+
+2
+
+, σ± =
+
+
+
+σ+, ˜Λ > ˆ˜Λ,σ−, ˜Λ ≤ ˆ˜Λ,
+
+(25) with σ+ ≈ 255 and σ− ≈ 140 the upper and lower 90% half-widths rescaled to 1σ.Independently, the EOS must support a maximum mass at least as large as the heaviest well-measured pulsar. We impose this as a one-sided Gaussian on the configuration maximum mass 
+
+Mmax = max Pc M (Pc),
+
+log LMmax = −12
+
+min( Mmax − Mlow , 0) 
+
+σ
+
+2
+
+, (26) with the threshold set by the radio-timing mass of PSR J1614 −2230, Mlow = 1 .908 M⊙ and σ =0.016 M⊙ 19, 39 . PSR J1614 −2230 only supplies the threshold and is not a NICER source, avoiding double counting with the J0740 likelihood, whose stable branch already drives Mmax ≳ 2 M⊙. The sensitivity of the inference to this threshold is examined in Sec. Robustness to the χEFT anchoring and the astrophysical data, where it is replaced by the considerably higher mass inferred for the black-widow pulsar PSR J0952 −0607 83 .Finally, at the termination density nT 
+
+> B
+
+= nTOV  
+
+> B
+
+the reconstructed (εT, P T) give the chemical potential μT = ( εT + P T)/n T 
+
+> B
+
+, and the termination point is scored by the marginalized pQCD likelihood of Komoltsev et al. 7, 84 ,
+
+log LpQCD = log Lmarg  nT 
+
+> B
+
+, μ T, P T, (27) 32 which grades how readily a causal, stable, thermodynamically consistent extension connects it to the pQCD anchor at μH 
+
+> B
+
+= 2 .6 GeV, returning −∞ when none exists. 
+
+Data conditioning by importance reweighting 
+
+Let {x(n)}Nn=1 be the conditioned profiles passing the pointwise causality and stability filter 0 ≤
+
+c2 
+
+> s
+
+(nB ) ≤ 1. For each, the equation of state is reconstructed and solved, and the total log-likelihood factorizes over the independent data 
+
+log L(x(n)) = log LNICER + log LGW + log LMmax + log LpQCD . (28) Treating the χEFT-conditioned prior pθ as the proposal, the posterior π(x) ∝ pθ(x) L(x) is repre-sented by the self-normalized importance weights wn 32, 85 
+
+wn = exp  log L(x(n))PNm=1 exp  log L(x(m)), Eπ[g] ≃ X
+
+> n
+
+wn g(x(n)), (29) where g is any function of x and Eπ[g] its posterior expectation. The weights are normalized throughout with the log-sum-exp identity. Posterior summaries are the weighted moments and quantiles obtained from Eq. (29). The pointwise mean and variance are 
+
+¯xj = X
+
+> n
+
+wn x(n) 
+
+> j
+
+, σ2 
+
+> j
+
+= X
+
+> n
+
+wn
+
+ x(n) 
+
+> j
+
+− ¯xj
+
+2. (30) The contraction of the prior under the data is monitored by Kish’s effective sample size 86 
+
+Neff =
+
+  P  
+
+> n
+
+wn
+
+2
+
+P 
+
+> n
+
+w2
+
+> n
+
+=
+
+ X 
+
+> n
+
+w2
+
+> n
+
+−1
+
+, (31) the last equality holding for normalized weights. Applying Eqs. (29)–(31) to each likelihood term in isolation yields a per-term Neff , identifying the constraint that contracts the prior most strongly. 33 Conformality and deconfinement diagnostics 
+
+From each reconstructed EOS we compute the polytropic index γ, the trace anomaly ∆ 22 , and the conformal distance dc 14 . The normalized pressure uses the free three-flavour, three-colour massless-quark reference P free (μB ). Quantities plotted against μB are interpolated onto a com-mon chemical-potential grid. Per-sample peak diagnostics ( c2 
+
+> s, max
+
+and its location npeak ) are the maximum of c2 
+
+> s
+
+and its argument over the density grid. As a necessary but not sufficient signature of a strong first-order transition 48 , we evaluate the probability PPT that c2 
+
+> s
+
+drops below 0.1 at some density above its in-window peak, with the peak and the search restricted to nB ∈ [1 .5, 6] n0. The associated Bayes factor is the posterior-to-prior odds ratio of Eq. (1), evaluated on the same χEFT-anchored, causality-filtered ensemble so that it isolates the information added by the astrophysical and pQCD likelihoods. Although the full posterior retains Neff ≈ 4187 , the flagged feature is carried by only ≈ 33 effective draws; tightening the threshold to c2 
+
+> s
+
+< 0.05 strengthens it ( BF = 0 .092 , odds of 11 : 1 ). Because the Bayes factor is a posterior-to-prior odds ratio, the overall frequency of transition-like shapes in the prior does not determine it and only a qualitatively different distribution of such shapes could shift it. The augmented-family variants illustrate this (Table S4): Class 13 ( MIII ), whose causal continuation is monotone by construction (Sec. S3. Construction and sampling of the functional classes) and adds no genuine first-order-like drops, registers the highest prior frequency of thresh-old crossings yet the lowest Bayes factor, the shallow crossings produced by it being the most strongly disfavoured by the data. 34 As external benchmarks we use the two publicly released posteriors of Annala et al. 14 : the GP and the four-segment sound-speed interpolation (C4) 87, 88 . Each is reduced to the quantities we report using our own diagnostic and stellar-structure code wherever the release does not already provide them; the two releases expose different products, so the P –ε normalization is shared with our posterior for C4 but native to Annala for GP (Supplementary Information Sec. S5. Repro-cessing of the external ensembles). 
+
+Symmetry-energy slope 
+
+From every posterior sample we extract the symmetry-energy slope L ≡ 3n0 (∂E sym /∂n B )|n0 by the β-equilibrium reconstruction of ref. 89 , modified to use a χEFT symmetric-matter baseline, to retain muons, and to read L from a weighted parabolic fit. Using the charge-neutral npeμ closure of Supplementary Information Sec. S2. Charge-neutral β-equilibrium matter, we subtract the symmetric-matter baseline E0 ≡ ES — taken from BUQEYE N 3LO samples ( Λ = 500 MeV) 5, 72 
+
+held at their posterior mean — and the equilibrium lepton contribution to isolate Esym (nB ), which we fit to 
+
+Esym (nB ) = J + L χ + 12 Ksym χ2, χ = nB − n0
+
+3n0
+
+, (32) by inverse-variance-weighted least squares. The value of the slope in Eq. 2 and its (stat) interval are the median and 68% credible interval of L over the importance-weighted posterior, with the symmetric-matter baseline E0 held at its N 3LO mean. The (sys) term is the χEFT truncation uncertainty of the symmetry energy at n0, propagated from the correlated BUQEYE PNM and SNM samples with the PNM–SNM 35 correlation retained. The regulator-cutoff dependence is assessed separately in Sec. Robustness to the χEFT anchoring and the astrophysical data and is not folded into this systematic. 
+
+Robustness to the χEFT anchoring and the astrophysical data 
+
+The checks in this section probe two sensitivities: to the χEFT anchoring applied to the prior at low density, and to the astrophysical data. All comparisons are made at matched sample size, so differences reflect these choices rather than Monte-Carlo noise. To test the anchoring, we repeated the full inference with the χEFT anchors rebuilt at Λ = 450 instead of 500 MeV. Under this change the canonical-mass observables agree within their 68% 
+
+credible intervals, and the high-density sound speed varies by a small fraction of its interval (see Tables S4 and S5). The symmetry-energy slope is the most cutoff-sensitive quantity, shifting from 
+
+60 .5 to 66 .8 MeV; this regulator dependence exceeds the ±3.0 MeV truncation systematic quoted in Eq. (2) and is reported separately rather than folded into it. To test the data, we replaced the PSR J0437 −4715 likelihood of Choudhury et al. 10 with the independent analysis of Miller et al. 45, 90 , which reports a larger, bimodal radius, and whose own priors – flat in the inverse compactness c2R/ (GM ) rather than in the radius – are divided out in its place. This shifts R(1 .4 M⊙) upward by 0.24 km and Λ(1 .4 M⊙) by 66 , both within their credible intervals, and leaves the maximum-mass configuration and its conformality diagnos-tics unchanged; the symmetry-energy slope moves by 4.2 MeV, comparable to its quoted system-atic. Adding to the maximum-mass bound from PSR J1614 −2230 ( MTOV ≳ 1.908 ± 0.016 M⊙)the far higher value inferred for PSR J0952 −0607 ( 2.35 ± 0.17 M⊙) 83 shifts MTOV upward by less 36 than its credible interval ( 2.06 →2.13 M⊙) and raises the peak sound speed ( c2 
+
+> s, max
+
+= 0 .55 → 0.66 ), leaving the radii, tidal deformabilities and conformality diagnostics unchanged. These quantities move little because a one-sided maximum-mass bound acts on the low-MTOV tail rather than on the bulk of the posterior. All variations remain within the quoted 68% credible intervals (see Tables S2 and S3). 
+
+Robustness of the prior 
+
+A remaining concern is whether the reconstruction is driven by the network itself rather than by the data and prior. We therefore assess the generality of the prior directly. We verified that the baseline model M0 is neither under- nor over-parametrized (Supplementary Information Sec. S4. Diffusion-model architecture and training). Around the convergence plateau (Fig. S2), the model sits at the small end of the sufficient-capacity range: reducing the network – fewer self-attention layers and ResNet blocks – increases the loss and degrades sample quality, whereas adding capacity leaves both the loss and the downstream c2 
+
+> s
+
+posterior essentially unchanged. Systematically varying the training strategies, the parameter ranges of the eight baseline classes and the number of training curves left the posterior within the same region, confirming that the results are controlled by the data and prior, not by the network architecture, parameter ranges, or training-set size. Furthermore, we probed the prior itself from two complementary directions: from outside the physically motivated space, by adding two free-form families that are not physically motivated a priori – causal and thermodynamically stable by construction, but encoding no underlying physical description of dense matter – namely a Gaussian-process sound speed (class 11) and a piecewise-37 linear interpolation with random nodes (class 12), to test whether the reconstruction is destabilized when the training distribution is broadened beyond physically motivated shapes; and from within 
+
+that space, by adding a further physically motivated family, built on the nuclear empirical param-eters (class 13), to test whether the ten classes already span it. The free-form classes are stress tests, not candidate priors. We trained three further models alongside the baseline M0 – MI (base-line classes + class 11), MII (baseline classes + class 12) and MIII (baseline classes + class 13) (Supplementary Information Sec. S3. Construction and sampling of the functional classes) – and repeated the entire analysis with each. The radii, tidal deformabilities, MTOV , the peak sound speed and all three conformality diagnostics at the maximum-mass central density agree within their 68% credible intervals, and no variant supports a strong first-order transition. The two tests carry different messages. The free-form classes (classes 11 and 12) populate causal shapes that the baseline model almost never generates. Yet even trained on this space of not physically motivated curves, the inference is not misled by the added freedom (Tables S4 and S5). The residual sensitivity lies in the sound-speed peak, lowest for the baseline and rising under the stress tests — still below the Gaussian-process ensemble and of the four-segment interpolation. The absence of a sharp intermediate-density peak therefore survives the broadening of the training distribution. We adopt the baseline as fiducial: each of its ten families is physically motivated a priori, and the class-13 test confirms that they span this space without further additions. Classes 11 and 12, though not excluded by current data, remain stress tests rather than candidate priors: by construc-tion, the baseline concentrates its probability mass on sound-speed shapes with a physical real-38 ization rather than on all causal functions, and the stress tests quantify the cost of relaxing that choice. Taken together with the checks of Sec. Robustness to the χEFT anchoring and the astro-physical data, these results establish robustness to the choice of prior and to bounded changes in the data; they do not imply that the data alone determine the result. That the reconstruction re-mains prior-dependent is shown by the effective sample size ( Neff ≈ 4187 , 4.2% of draws), which indicates the likelihood does not overwhelm the prior, and by the R(1 .4 M⊙) predictive median, which rises from 12 .0 to 12 .6 km after conditioning: the data pull towards stiffer matter, but only by half a kilometre, and the radius scale inherited from the prior survives. The reconstructed radius is therefore a joint consequence of the χEFT-anchored prior and the observations. 50. C. Vuille and J. Ipser, in General Relativity and Relativistic Astrophysics, edited by C. P. Burgess and R. C. Myers (American Institute of Physics, College Park MD, 1999), vol. 493, p. 60. 51. J. L. Zdunik, M. Bejger, P. Haensel and E. Gourgoulhon, Astron. Astrophys. 450 (2006), 747-758 doi:10.1051/0004-6361:20054260 [arXiv:astro-ph/0509806 [astro-ph]]. 52. M. Bejger, P. Haensel and J. L. Zdunik, Mon. Not. Roy. Astron. Soc. 359 (2005), 699-706 doi:10.1111/j.1365-2966.2005.08933.x [arXiv:astro-ph/0502348 [astro-ph]]. 53. P. Haensel and A. Y. Potekhin, Astron. Astrophys. 428 (2004), 191-197 doi:10.1051/0004-6361:20041722 [arXiv:astro-ph/0408324 [astro-ph]]. 39 54. J. Boguta and A. R. Bodmer, Nucl. Phys. A 292 (1977), 413-428 doi:10.1016/0375-9474(77)90626-1 55. F. J. Fattoyev, C. J. Horowitz, J. Piekarewicz and G. Shen, Phys. Rev. C 82 (2010), 055803 doi:10.1103/PhysRevC.82.055803 [arXiv:1008.3030 [nucl-th]]. 56. J. Margueron, R. Hoffmann Casali and F. Gulminelli, Phys. Rev. C 97 (2018) no.2, 025805 doi:10.1103/PhysRevC.97.025805 [arXiv:1708.06894 [nucl-th]]. 57. S. Typel and H. H. Wolter, Nucl. Phys. A 656 (1999), 331-364 doi:10.1016/S0375-9474(99)00310-3 58. S. Typel, M. Oertel and T. Kl¨ ahn, Phys. Part. Nucl. 46 (2015) no.4, 633-664 doi:10.1134/S1063779615040061 [arXiv:1307.5715 [astro-ph.SR]]. 59. S. Typel et al. [CompOSE Core Team], Eur. Phys. J. A 58 (2022) no.11, 221 doi:10.1140/epja/s10050-022-00847-y [arXiv:2203.03209 [astro-ph.HE]]. 60. C. Huang, T. Malik, J. Cartaxo, S. Sourav, W. Yuan, T. Zhou, X. Liu, J. Groger, X. Dong and N. Osborn, et al. [arXiv:2411.14615 [astro-ph.HE]]. 61. M. G. Alford and S. Han, Eur. Phys. J. A 52 (2016) no.3, 62 doi:10.1140/epja/i2016-16062-9 [arXiv:1508.01261 [nucl-th]]. 62. S. Han, M. A. A. Mamun, S. Lalit, C. Constantinou and M. Prakash, Phys. Rev. D 100 (2019) no.10, 103022 doi:10.1103/PhysRevD.100.103022 [arXiv:1906.04095 [astro-ph.HE]]. 40 63. J. E. Christian, A. Zacchi and J. Schaffner-Bielich, Eur. Phys. J. A 54 (2018) no.2, 28 doi:10.1140/epja/i2018-12472-y [arXiv:1707.07524 [astro-ph.HE]]. 64. Z. F. Seidov, Sov. Astron. 15 (1971) 347. 65. T. Zhao and J. M. Lattimer, Phys. Rev. D 102 (2020) no.2, 023021 doi:10.1103/PhysRevD.102.023021 [arXiv:2004.08293 [astro-ph.HE]]. 66. S. P. Klevansky, Rev. Mod. Phys. 64 (1992), 649-708 doi:10.1103/RevModPhys.64.649 67. K. Fukushima, T. Kojo and W. Weise, Phys. Rev. D 102 (2020) no.9, 096017 doi:10.1103/PhysRevD.102.096017 [arXiv:2008.08436 [hep-ph]]. 68. T. Kojo, AAPPS Bull. 31 (2021) no.1, 11 doi:10.1007/s43673-021-00011-6 [arXiv:2011.10940 [nucl-th]]. 69. P. Bedaque and A. W. Steiner, Phys. Rev. Lett. 114 (2015) no.3, 031103 doi:10.1103/PhysRevLett.114.031103 [arXiv:1408.5116 [nucl-th]]. 70. T. Salimans and J. Ho, ICLR 2022, arXiv:2202.00512 [cs.LG]. 71. A. Q. Nichol and P. Dhariwal, in Proc. 38th Int. Conf. on Machine Learning , 8162 (2021), arXiv:2102.09672 [cs.LG]. 72. C. Drischler, J. A. Melendez, R. J. Furnstahl and D. R. Phillips, Phys. Rev. C 102 (2020) no.5, 054315 doi:10.1103/PhysRevC.102.054315 [arXiv:2004.07805 [nucl-th]]. 73. BUQEYE Collaboration, nuclear-matter-convergence , https://github. com/buqeye/nuclear-matter-convergence (2020). 41 74. BUQEYE Collaboration, gsum , https://github.com/buqeye/gsum (2019). 75. T. Hinderer, Astrophys. J. 677 (2008), 1216-1220 [erratum: Astrophys. J. 697 (2009) no.1, 964] doi:10.1086/533487 [arXiv:0711.2420 [astro-ph]]. 76. S. Postnikov, M. Prakash and J. M. Lattimer, Phys. Rev. D 82 (2010), 024016 doi:10.1103/PhysRevD.82.024016 [arXiv:1004.5098 [astro-ph.SR]]. 77. E. Fonseca, H. T. Cromartie, T. T. Pennucci, P. S. Ray, A. Y. Kirichenko, S. M. Ransom, P. B. Demorest, I. H. Stairs, Z. Arzoumanian and L. Guillemot, et al. Astrophys. J. Lett. 915 
+
+(2021) no.1, L12 doi:10.3847/2041-8213/ac03b8 [arXiv:2104.00880 [astro-ph.HE]]. 78. D. J. Reardon, M. Bailes, R. M. Shannon, C. Flynn, J. Askew, N. D. R. Bhat, Z. C. Chen, M. Curyło, Y. Feng and G. B. Hobbs, et al. Astrophys. J. Lett. 971 (2024) no.1, L18 doi:10.3847/2041-8213/ad614a [arXiv:2407.07132 [astro-ph.HE]]. 79. T. Salmi et al. , Zenodo (2024), doi:10.5281/zenodo.10519473. 80. D. Choudhury et al. , Zenodo (2024), doi:10.5281/zenodo.13766753. 81. M. Favata, Phys. Rev. Lett. 112 (2014), 101101 doi:10.1103/PhysRevLett.112.101101 [arXiv:1310.8288 [gr-qc]]. 82. L. Wade, J. D. E. Creighton, E. Ochsner, B. D. Lackey, B. F. Farr, T. B. Littenberg and V. Raymond, Phys. Rev. D 89 (2014) no.10, 103012 doi:10.1103/PhysRevD.89.103012 [arXiv:1402.5156 [gr-qc]]. 42 83. R. W. Romani, D. Kandel, A. V. Filippenko, T. G. Brink and W. Zheng, Astrophys. J. Lett. 
+
+934 (2022) no.2, L17 doi:10.3847/2041-8213/ac8007 [arXiv:2207.05124 [astro-ph.HE]]. 84. O. Komoltsev, T. Gorda, and A. Kurkela, Zenodo (2024), doi:10.5281/zenodo.15407795. 85. D. Mroczek, M. C. Miller, J. Noronha-Hostler and N. Yunes, J. Phys. Conf. Ser. 2536 (2023) no.1, 012006 doi:10.1088/1742-6596/2536/1/012006 [arXiv:2302.07978 [astro-ph.HE]]. 86. L. Kish, Survey Sampling (Wiley, New York, 1965). 87. O. Komoltsev, A. Kurkela, and T. Gorda, Zenodo (2023), doi:10.5281/zenodo.10101447. 88. J. Hirvonen, J. N¨ attil¨ a, and E. Annala, Zenodo (2023), doi:10.5281/zenodo.10102436. 89. R. Essick, P. Landry, A. Schwenk and I. Tews, Phys. Rev. C 104 (2021) no.6, 065804 doi:10.1103/PhysRevC.104.065804 [arXiv:2107.05528 [nucl-th]]. 90. M. C. Miller, A. J. Dittmann, I. M. Holt, F. K. Lamb, C. Chirenti, Z. Arzoumanian, J. Berteaud, S. Bogdanov, K. Gendreau, W. C. G. Ho, S. M. Morsinik, P. S. Ray, R. A. Remillard, Z. Wa-diasingh and M. Wolff, Zenodo (2026), doi:10.5281/zenodo.17833896. 91. J. Yu. Panteleeva GitHub (2026), https://github.com/JuliaYu24/Neutron_ Star_Matter_Diffusion .
+
+Data availability 
+
+All datasets generated and/or analyzed during this study are available from the corresponding au-thor on reasonable request. 43 Code availability 
+
+The trained diffusion models and all codes required to generate the training data, train the model, reproduce the sampling procedure, and perform the analysis presented in this work are publicly available at ref. 91 .
+
+Acknowledgements We are grateful to Jambul Gegelia, Davide Laudicina and Bao-Dong Sun for helpful discussions about the manuscript. We acknowledge the funding from the European Union’s Horizon 2020 research and innovation programme under Grant Agreement No. 885150 (ERC AdG NuclearTheory) and from the Federal Ministry of Research, Technology and Space of Germany (BMFTR) through the ErUM-Data project DEMOS. Parts of the calculations of this work were performed on the HPC cluster Elysium of the Ruhr University Bochum, subsidised by the DFG (INST 213/1055-1). 
+
+Competing Interests The authors declare that they have no competing financial interests. 
+
+Author contributions H.A. constructed the training ensemble, designed, implemented and trained the diffusion model. E.E. participated in the analysis and interpretation of the results, validated the findings, and guided the methodological development of the study. J.Yu.P. developed the training strategies, the con-ditioning and importance-reweighting pipeline and participated in the analysis of the results. All authors jointly conceived the study, discussed every stage of the analysis, and contributed to the writing of the manuscript. The project was managed by E.E. 
+
+Correspondence Correspondence and requests for materials should be addressed to J. Yu. Panteleeva (email: panteleevajuly@gmail.com). 
+
+44 Supplementary Information 
+
+Generative artificial intelligence for reconstructing neutron-star matter 
+
+S1. Master thermodynamic relations and sampling conventions 
+
+The fundamental quantity modelled by the diffusion network is the squared speed of sound, 
+
+c2 
+
+> s
+
+(nB ) ≡ dP dε , (S1) which connects the pressure P to the energy density ε. Both are related to the energy per parti-cle E/A by 
+
+P (nB ) = n2
+
+> B
+
+d(E/A )
+
+dn B
+
+, (S2) 
+
+ε(nB ) = nB
+
+mN + E/A (nB ) , (S3) where mN = 938 .9 MeV is the average nucleon mass. Given a speed-of-sound profile c2 
+
+> s
+
+(nB ), the pressure is reconstructed by integrating Eq. (18) from a reference point (nref  
+
+> B
+
+, P ref ) in the known low-density regime. The first law of thermodynamics at T = 0 gives 
+
+dε dn B
+
+= ε + PnB
+
+, (S4) whose inverse is used by classes that parametrize c2 
+
+> s
+
+as a function of ε rather than nB . The adiabatic index 
+
+Γ( P ) = ε + PPdP dε = ε + PP c2 
+
+> s
+
+, (S5) 45 enters the spectral representation and relates the baryon density to the pressure via 
+
+dn B
+
+dP = nB
+
+P Γ( P ) . (S6) For segments described by a polytropic EOS, with pressure and energy density enforced to be continuous across segment boundaries, the pressure and energy density in the interval ρ ∈ [ρi−1, ρ i]
+
+satisfy 
+
+P (ρ) = Ki ρΓi , d
+
+ ερ
+
+
+
+= −P d 
+
+ 1
+
+ρ
+
+
+
+, (S7) where ρ = mB nB .
+
+S2. Charge-neutral β-equilibrium matter 
+
+For cold, charge-neutral npeμ matter in β equilibrium, the nucleonic energy per baryon is approx-imated by the quadratic isospin expansion 
+
+eN (nB , x p) = (1 − xp)mn + xpmp + ES (nB ) + Esym (nB ) f 2, f ≡ 1 − 2xp, (S8) with ES and EN = ES + Esym the energy per particle of symmetric nuclear matter (SNM) and pure neutron matter (PNM) excluding rest masses, Esym ≡ EN − ES the symmetry energy, and beyond-quadratic terms neglected 92 . The proton fraction follows from weak equilibrium, μe =
+
+−∂e N /∂x p, and charge neutrality with leptons as free relativistic Fermi gases, 
+
+μe = ∆ m + 4 Esym f, xp nB = X
+
+> ℓ=e,μ
+
+μ2 
+
+> e
+
+− m2
+
+> ℓ
+
+3/2
+
+3π2(ℏc)3 Θ μe − mℓ
+
+, (S9) with ∆m ≡ mn − mp and μμ = μe; the first relation is linear in xp, and substituting it into the second leaves a single scalar equation for μe, giving xp ≃ 2.5–6.2% over the anchor range with 46 muons appearing at nB ≈ 0.141 fm −3. The baryon chemical potential then closes on ES and Esym 
+
+alone, 
+
+μB = mn + ES + nB
+
+dE S
+
+dn B
+
++ Esym f (2 − f ) + nB f 2 dE sym 
+
+dn B
+
+, (S10) from which P = nB μB − ε and c2 
+
+> s
+
+= ( nB /μ B ) dμ B /dn B follow at T = 0 . This closure underlies both the χEFT anchors (Methods, Sec. Extraction of χEFT anchors with correlated uncertainties) and the symmetry-energy slope (Methods, Sec. Symmetry-energy slope). 
+
+S3. Construction and sampling of the functional classes 
+
+In what follows we give the prior ranges and sampling algorithms for each class introduced in Methods (Sec. Training ensemble of speed-of-sound profiles). At the end of each sampling process we apply the acceptance criteria 0 ≤ c2 
+
+> s
+
+≤ 1 and std( c2 
+
+> s
+
+) > 0.01 . To also represent profiles with more than one local maximum, we let about a third of the draws in the two peak-based classes (Classes 3 and 7) carry a second Gaussian peak. Furthermore, classes 1 and 3 are generated under an additional quota requiring at least 30% of their accepted curves to show a transition-like drop (c2 
+
+> s
+
+< 0.05 at a density above the in-window maximum in nB ∈ [1 .5, 6] n0), so that the network sees such shapes often enough to learn them; without the quota these rates are 6.8% and 14 .3% .
+
+* Class 1: Piecewise polytropes Following Read et al. 23 , the density range is decomposed into Nseg ∈ { 3, · · · , 9} polytropic segments. In each segment ρ ∈ [ρi−1, ρ i], the EOS takes the polytropic form (S7), with the energy 47 density 3
+
+ε(ρ) = (1 + ai) ρ + Ki
+
+Γi − 1 ρΓi . (S11) Continuity of pressure and energy density at the dividing densities requires 
+
+Ki+1 = Ki ρ Γi−Γi+1  
+
+> i
+
+, ai = ε(ρi−1)
+
+ρi−1
+
+− Ki
+
+Γi − 1 ρ Γi−1 
+
+> i−1
+
+− 1 . (S12) The speed of sound in each segment is 
+
+c2 
+
+> s
+
+= Γi Pε + P , (S13) evaluated directly on the baryon-density grid. Sampling procedure: (1) Pick Nseg ∈ { 3, · · · , 9}. (2) Sam-ple Γi ∈ [0 .5, 8] for each segment. (3) Sample Nseg − 1 dividing densities in (0 .6, 7.5) n0. (4) Fix 
+
+K1 = P (ρ0)/ρ Γ1 
+
+> 0
+
+from the crust EOS at ρ0. (5) Propagate Ki+1 and continuity constants ai. (6) Eval-uate c2 
+
+> s
+
+at each grid point. 
+
+* Class 2: Spectral representation The energy and baryon densities in the spectral representation are obtained from Eqs. (S6) and (S5). The adiabatic index is expanded as in Eq. (3b) and the speed of sound is c2 
+
+> s
+
+(P ) = Γ( P ) P/ [ε(P )+ P ]. Sampling procedure: (1) Pick K ∈ { 2, · · · , 9}. (2) Sample {γ0, . . . , γ K } from order-dependent prior ranges (narrower with increasing k). (3) Set P0 = Pref from the crust EOS at 0.5 n0. (4) Integrate the ODE (S6) upward in P until nB = 8 n0; discard if not reached. (5) In-terpolate c2 
+
+> s
+
+onto the nB grid.     
+
+> 3To derive Eq. (S11) we applied the first law of thermodynamics with lim ρ→0ε/ρ = 1 after integrating over the energy in Eq. (S7).
+
+48 * Class 3: Speed-of-sound model (logistic + Gaussian) The six free parameters defining the speed-of-sound parametrization in Eq. (3c) are sampled from 
+
+a1 ∈ 13 , 1, a2 ∈ [0 .05 , 2.0] , a3 ∈ [1 .5, 37] , a4 ∈ [0 .1, 1.5] , a5 ∈ [1 .5, 12] , a6/a 5 ∈ [0 .05 , 2] ,
+
+(S14) motivated by ref. 27 . Sampling procedure: (1) Sample (a1, . . . , a 6) from the prior ranges (S14). (2) In-tegrate dP/dε = c2 
+
+> s
+
+(ε) and then dn B /dε = nB /(ε + P ) upward from the reference point; discard if nB = 8 n0 is not reached. (3) Interpolate c2 
+
+> s
+
+onto the nB grid. 
+
+* Class 4: Relativistic mean-field models The energy density and pressure in the RMF are given explicitly by Eqs. (42) and (43) of ref. 28 . For cold, β-equilibrated npeμ matter we solve the meson field equations on the den-sity grid and take c2 
+
+> s
+
+= ( dP/dn B )/(dε/dn B ) by centred finite differences. Prior ranges: K0 ∈
+
+[200 , 300] MeV, m∗/m N |n0 ∈ [0 .55 , 0.80] , J ∈ [28 , 36] MeV, mσ ∈ [400 , 600] MeV, ζ ∈ [0 , 0.06] ,
+
+Λω ∈ [0 , 0.05] . Sampling: the six parameters above are sampled, and the couplings (gσ, g ω, g ρ, b, c )
+
+are fixed by the five saturation conditions ( Esat , P = 0 , K0, m∗, J) at n0 28, 56 , discarding draws with no solution or L / ∈ [30 , 90] MeV; the EOS is then evaluated on the grid and kept if it satis-fies the causality and stability criteria. Density-dependent variant 57 : the meson–nucleon couplings 
+
+gi(nB ) are smooth functions of density, drawn from priors centred on the DD-ME2 parametriza-tion 93 with ±30% widths; the nonlinear self-couplings are switched off and a density-dependent 49 rearrangement self-energy maintains thermodynamic consistency. 
+
+* Class 5: CSS with phase transition The hadronic phase below ntrans is taken from a parent class C ∈ { 1, 2, 3, 4}, supplying 
+
+c2
+
+> s, H
+
+(nB ); above the transition a Maxwell construction ( c2 
+
+> s
+
+= 0 ) joins it to a quark phase of con-stant speed of sound c2
+
+> s, QM
+
+, giving the composite profile of Eq. (3e). Continuity of the pressure and of the baryon chemical potential across the transition fixes the quark-matter onset density 
+
+nQ 
+
+> B
+
+= ntrans (εtrans + ∆ ε + Ptrans )/(εtrans + Ptrans ), where εtrans and Ptrans are the parent values at ntrans and ∆ε is the latent-heat jump. The Seidov criterion 64 , ∆εcrit /ε trans = 12 + 32 Ptrans /ε trans ,is not enforced, so that both connected and disconnected/twin-star branch topologies are repre-sented. Prior ranges: ntrans /n 0 ∈ [1 .5, 7.0] , ∆ε/ε trans ∈ [0 .01 , 1.5] , c2 
+
+> s, QM
+
+∈ [0 .05 , 1.0] . Sampling procedure: (1) Draw a parent class C with probability 1/4 each and draw a c2
+
+> s, H
+
+(nB ) from its gen-erator. (2) Reconstruct ε(nB ) and P (nB ) from the parent c2 
+
+> s
+
+via Eqs. (S4) and (18). (3) Draw the three CSS parameters from the ranges above and compute nQ 
+
+> B
+
+; discard if nQ 
+
+> B
+
+> 8 n0. (4) Construct the composite c2 
+
+> s
+
+(nB ) via Eq. (3e). 
+
+* Class 6: Quarkyonic matter (McLerran–Reddy model) We adopt the chargeless two-flavour (pure-neutron) quarkyonic construction of McLerran and Reddy 30 (see also Zhao and Lattimer 65 ). Above the transition density nt, neutrons occupy a momentum shell of width ∆( kF n ) = Λ 3/k 2 
+
+> F n
+
++ κ Λ/N 2 
+
+> c
+
+[Eq. (5) of ref. 30 ], with lower edge k0n =
+
+kF n − ∆; the quark Fermi momenta follow from colour matching and charge neutrality, kF d =
+
+50 k0n/N c and kF u = kF d /21/3. The onset condition k0n(nt) = 0 fixes κ = N 2 
+
+> c
+
+(ktn /Λ − Λ2/k 2
+
+> tn
+
+) with 
+
+ktn = (3 π2nt)1/3 [Eq. (4) of ref. 65 ], which requires ktn > Λ. The total baryon density nB (kF n )
+
+[Eq. (8) of ref. 30 ] is inverted numerically for kF n at each grid point (below nt: k0n = kF d = kF u =0). The energy density, relativistic neutron and quark Fermi integrals, with constituent quark mass 
+
+MQ = MN /N c, plus the interaction term nnVn(nn) with neutron shell density nn = ( k3 
+
+> F n
+
+−
+
+k30n)/(3 π2), is evaluated analytically (Eqs. (6) and (7) of ref. 65 ). We generalize the McLerran– Reddy neutron potential to free exponents, 
+
+Vn(nn) = a
+
+nn
+
+n0
+
+α
+
++ b
+
+nn
+
+n0
+
+β
+
+, (S15) and obtain μB = dε/dn B , P = nB μB −ε, and c2 
+
+> s
+
+= ( nB /μ B ) dμ B /dn B by centred finite differences on the grid (the last form via the T = 0 Gibbs–Duhem relation). Prior ranges: 
+
+Λ ∈ [150 , 600] MeV , n t/n 0 ∈ [1 .0, 5.0] , a ∈ [−40 , 20] MeV , α ∈ [0 .3, 1.5] ,b ∈ [0 , 30] MeV , β ∈ [1 .5, 3.5] . (S16) 
+
+Sampling procedure: (1) Sample the six parameters from (S16); reject if ktn ≤ Λ. (2) On the 200-point grid, invert nB (kF n ) for kF n and evaluate ε(nB ). (3) Obtain μB , P and c2 
+
+> s
+
+by centred finite differences. 
+
+* Class 7: NJL/quark–meson-inspired crossover model The speed of sound is parametrized as in (3g) and the corresponding parameters are sampled from the following Prior ranges: 
+
+A ∈ [0 .05 , 0.60] , nχ/n 0 ∈ [1 .5, 5.0] , σχ ∈ [0 .3, 3.0] , γ1 ∈ [3 , 10] , γ2 ∈ [2 , 8] . (S17) 51 Sampling procedure: (1) Sample the five parameters from the prior ranges (S17). (2) Evaluate 
+
+c2 
+
+> s
+
+(nB ) from Eq. (3g) at each grid point. 
+
+* Class 8: pQCD-motivated high-density profiles The parameters of the speed of sound parametrized as in (3h) are sampled from the following 
+
+Prior ranges: 
+
+A ∈ [0 .0, 0.60] , np/n 0 ∈ [2 .0, 5.0] , σp ∈ [0 .3, 3.0] , δ∞ ∈ [0 .02 , 0.25] , nδ/n 0 ∈ [1 .5, 4.0] ,α ∈ [1 , 6] , γ ∈ [2 , 8] . (S18) 
+
+Sampling procedure: (1) Sample the seven parameters from the prior ranges (S18). (2) Evaluate 
+
+c2 
+
+> s
+
+(¯ n) from Eq. (3h) at each grid point. 
+
+* Classes 9–10: Convex combinations The two mixture families that fill the gaps in shape space between the eight base classes are defined in Methods (Sec. Training ensemble of speed-of-sound profiles). Class 9 draws pair-wise mixtures c2 
+
+> s
+
+= λ c 2 ( A) 
+
+> s
+
++ (1 − λ) c2 ( B) 
+
+> s
+
+with λ ∼ U (0 , 1) , excluding the pairs {5, 6}, {5, 7}
+
+and {6, 7} because Classes 5–7 encode mutually exclusive quark-onset mechanisms in the same density window, whose superposition is unphysical. Class 10 forms Dirichlet-weighted mixtures 
+
+c2 
+
+> s
+
+= PMm=1 λm c2 ( m) 
+
+> s
+
+of M ∈ { 3, 4, 5} parents, with weights (λ1, . . . , λ M ) ∼ Dir( α, . . . , α ), con-centration α ∼ LogU(0 .1, 10) , and at most one of {5, 6, 7} per draw. In both, the parent profiles are drawn afresh from the generators of Classes 1–8, the mixture is formed pointwise on the grid, and the causality and minimum-variation criteria are applied to the result. 52 * Construction of the additional classes 11–13 Class 11 is a Gaussian-process family defined on the logit of the squared sound speed, 
+
+φ ∼ GP (m, k ) , c2 
+
+> s
+
+(x) = 11 + e−φ(x) , x = nB /n 0, (S19) so that c2 
+
+> s
+
+∈ (0 , 1) is causal by construction 32, 94 . Each curve draws one of twelve equally weighted strategies, which fix the covariance to be either squared-exponential or Mat´ ern-3/2, 
+
+kSE (x, x ′) = η2 exp 
+
+
+
+−(x − x′)2
+
+2ℓ2
+
+
+
+, k3/2(x, x ′) = η2 1 + 
+
+√3 |x − x′|
+
+ℓ
+
+!
+
+exp 
+
+"
+
+−√3 |x − x′|
+
+ℓ
+
+#
+
+,
+
+(S20) and the mean to be either constant, m = ln[¯ c2/(1 − ¯c2)] , or linear in x between logit endpoints 
+
+ln[ c2lo /(1 − c2lo )] and ln[ c2hi /(1 − c2hi )] , so that the mean stiffens with density. The per-curve hyper-parameters are drawn from broad hyperpriors spanning η ∈ [0 .15 , 3] , ℓ ∈ [0 .2, 6] (in units of n0)and ¯c2 ∈ [0 .02 , 0.70] , under uniform, log-uniform or beta-shaped draws depending on the strat-egy; one strategy fixes the mean to the conformal value ¯c2 = 1 /3, and one conditions the process on a soft χEFT-like anchor c2 
+
+> s
+
+(0 .5 n0) ∈ [0 .03 , 0.15] at the lowest grid point. Class 12 is a non-parametric piecewise-linear family, 
+
+c2 
+
+> s
+
+(x) = vi + ( vi+1 − vi) x − xi
+
+xi+1 − xi
+
+, x ∈ [xi, x i+1 ], (S21) in the baryon density x = nB /n 0, with two fixed endpoints at x0 = 0 .5 and xM +1 = 8 and 
+
+M random interior nodes 0.6 ≤ x1 < · · · < x M ≤ 7.5, M ∈ { 1, . . . , 8}; all M + 2 node values vi (endpoints included) lie in the full causal interval [0 , 1] set by thermodynamic stability and causality, and c2 
+
+> s
+
+is obtained by linear interpolation across the whole grid. As with class 11, 53 each curve draws one of twelve equally weighted strategies, which fix the number of nodes, their placement (uniform or log-uniform in x), and the node-value draw: uniform or beta-shaped across all of [0 , 1] , uniform on a stiff or soft sub-range, sorted ascending, or with one interior node pushed high or low, or one endpoint pinned to a soft χEFT-like or near-conformal value. The piecewise-linear sound-speed representation with causal sampling follows Annala et al. 21 ; here it is applied directly in number density, like in the density-space sound-speed ansatz of Tews et al. 26 .Class 13 is built on the nuclear empirical parameters of ref. 56 , expanding the energy per nucleon around saturation in x = ( n − nsat )/(3 nsat ) and the isospin asymmetry δ,
+
+e(n, δ ) = esat (n) + δ2 esym (n),esat (n) = Esat + 12 Ksat x2 + 16 Qsat x3 + 124 Zsat x4,esym (n) = Esym + Lsym x + 12 Ksym x2 + 16 Qsym x3 + 124 Zsym x4.
+
+(S22) This is the expansion that defines those parameters, rather than the metamodel built on it, which additionally separates an effective-mass-corrected Fermi-gas kinetic term and multiplies each order by a low-density correction factor. Closure is by β-equilibrium and charge neutrality with electrons and muons 95 ; ε(n) and P (n), and hence c2 
+
+> s
+
+= d P/ dε, follow, with the empirical parameters 
+
+(nsat , E sat , K sat , Q sat , Z sat , E sym , L sym , K sym , Q sym , Z sym ) drawn from broad ranges bracketing the empirical averages and uncertainties of ref. 56 . Because the order-4 expansion converges only up to ∼ 4 nsat 56 and becomes acausal or thermodynamically unstable for the overwhelming majority of parameter draws when continued naively to 8 n0, we use the metamodel only below a matching density nm = t n sat with t ∼ U (2 , 4) , and impose a causal continuation of c2 
+
+> s
+
+above it, drawn among (i) a constant c2 
+
+> s
+
+(n) = c2 
+
+> s
+
+(nm), (ii) a linear ramp in n from c2 
+
+> s
+
+(nm) to an endpoint cend ∼ U (0 , 1) ,54 and (iii) a linear ramp toward the near-conformal band cend ∼ U (0 .20 , 0.45) ; each continuation is a convex interpolation of values in [0 , 1] and is therefore causal and stable by construction. 
+
+S4. Diffusion-model architecture and training 
+
+The denoiser fθ is the one-dimensional ResNet–attention hybrid of ref. 16 , operated at the fixed resolution L = 200 of the density grid with no down- or up-sampling: all grid points carry com-parable physical significance, and pooling would discard information. The network receives three input channels – the noisy curve xτ , the binary anchor mask m ∈ { 0, 1}L, and the condition vector c ∈ RL holding the normalized anchor values at the masked positions and zero elsewhere (Methods) – which is mapped by an initial convolution (kernel size 7) to a constant width of 256 channels. The core consists of twelve residual blocks arranged in three groups of four, each group followed by a multi-head self-attention layer (four heads) 96 . Each residual block applies a GroupNorm–SiLU–convolution sequence twice (kernel size 7, dropout 0.1), with the diffusion timestep injected after the first convolution by feature-wise linear modulation (FiLM) 97 : a sinu-soidal embedding of τ is passed through a two-layer MLP of width 4 × 256 and projected to per-channel scale and shift parameters. The self-attention layers provide a global receptive field across the full grid – essential for the long-range correlations imposed by thermodynamic consis-tency and by the interplay of low- and high-density constraints – at negligible cost for L = 200 
+
+(200 × 200 attention matrices). The second convolution of every residual block and the output projection of every attention layer are zero-initialized, so that each block acts as the identity map at the start of training and gradients propagate unimpeded through the deep residual stack. A fi-55 nal GroupNorm–SiLU–convolution projects back to a single channel. The resulting network has 
+
+≈ 1.94 × 10 7 trainable parameters. To impose the χEFT anchors at inference, the network must complete a full sound-speed profile from the few low-density values held fixed – and it must equally be able to generate a profile from nothing. We therefore train a single network to condition on an arbitrary subset of known grid points, by randomizing sample-by-sample which points are revealed to it (the mask ). Conditioning is learned through a random-mask curriculum: for 50% of the training samples the mask exposes 5–30 clean values at uniformly random grid positions; for 30% it exposes 5–15 
+
+values clustered in the lowest 30% of the grid, mimicking the low-density χEFT anchoring applied at inference; and for the remaining 20% the mask is empty, which trains the same network to act as an unconditional prior sampler. The training set comprises the ten families of Methods with 10 5 accepted curves per class (10 6 curves in total), generated with fixed per-class seeds; an independently generated validation set of 3×10 3 curves per class ( 3×10 4 in total), drawn with disjoint seeds, is held out to evaluate the loss during training. Each grid point is standardized to zero mean and unit variance using statistics of the training split only; the statistics are stored with the model and inverted after sampling to recover physical c2 
+
+> s
+
+values. Optimization uses AdamW 98 with learning rate 10 −4, weight decay 10 −4, and batch size 
+
+120 , with a linear warm-up over the first two epochs followed by a per-step cosine annealing of the learning rate (100-epoch horizon), gradient-norm clipping at 1.0; the random seed is fixed for 56 reproducibility. With 10 6 training curves each epoch comprises ≈ 8.3×10 3 optimizer steps. An ex-ponential moving average (EMA) of the network weights (decay 0.9999 ) is maintained throughout; validation and all sampling use the EMA weights. The training loss decreases steadily throughout the full 100 -epoch schedule, from ≈ 0.052 at epoch 20 to ≈ 0.047 at epoch 100 , while the valida-tion loss follows the same slow downward trend, from ≈ 0.050 to ≈ 0.046 , with a non-monotonic epoch-to-epoch scatter at the few-percent level that is typical for diffusion-model training. Be-yond the initial ≈15 warm-up epochs, the EMA-evaluated validation loss lies at or slightly below the training loss (consistent with no overfitting), and the EMA weights with the lowest validation loss ( 0.0439 , epoch 83 ) define the baseline model M0. The augmented-family models MI–MIII 
+
+are trained with identical architecture, hyperparameters and schedule; their loss curves follow the same pattern (Extended Data Figure S3), and the EMA weights at their lowest validation losses define the instances used in Extended Data Tables S4 and S5. 
+
+S5. Reprocessing of the external ensembles 
+
+The GP and C4 posteriors of Annala et al. 14, 87, 88 are ingested from their public releases and reduced to the quantities of Table S1, with each release handled according to what it provides. For the GP ensemble the released per-sample (c2 
+
+> s
+
+, ε, P ) curves and (M, R, Λ, M max ) arrays are used directly, converted to consistent units and interpolated onto our density grid, and the combined weight is formed from the published likelihood columns; the conformality diagnostics (γ, ∆, d c)
+
+are computed with our code, the GP release carrying no diagnostic arrays. For the C4 ensemble only c2 
+
+> s
+
+(nB ) is released in re-griddable form, so ε and P are reconstructed by integrating c2 
+
+> s
+
+from 57 the same χEFT curve used for our own samples, evaluated at 1.03 n0 (Sec. From the speed of sound to the equation of state), while the released (γ, ∆, d c) and (M, R ) arrays are used where available. Consequently the mass–radius and tidal quantities of the two ensembles are derived from each published stellar-structure solution, whereas in the P –ε and P/P free plane the C4 band and our posterior share the same χEFT normalization, applied at 1.03 n0 for C4 and at 0.5 n0 for our samples, while the GP band carries Annala’s own low-density normalization. Because that anchoring is itself χEFT-based, the resulting offset near 0.5 n0 is small but not removed. 
+
+S6. Why per-class evidences are not reported * On per-class evidence One might expect the relative support for each family to be quantifiable as a model-selection statistic – a Bayes factor between classes. A Bayes factor is a ratio of marginal likelihoods, Bij =
+
+p(D | M i)/p (D | M j ), comparing two generative models Mi and Mj , each equipped with a likelihood for the data D and a prior over its own parameters 99 . Our pipeline does not admit this construction. We train a single diffusion model on the union of the ten families, so the “classes” are labels on training curves rather than competing generative models: no per-class likelihood exists, and hence no per-class marginal from which a ratio could be formed. Retraining ten separate per-class diffusion models would not repair this. The joint training is precisely what defines the broad prior on which the entire analysis rests; ten independently trained models would each carry its own, much narrower prior, and the resulting ratios would compare ten different priors rather than 58 ten physical hypotheses under a common one. Capacity is a secondary but real concern: each per-class model would be trained on an order of magnitude less data, forcing a different architecture and breaking the like-for-like comparison. 
+
+* Distributional similarity Distributional similarity is not a substitute for the missing evidences. It is tempting to replace the marginal-likelihood ratio by a distributional similarity between the reconstruction and each training family. Let D denote the reconstructed ensemble of c2 
+
+> s
+
+curves under χEFT + astro + pQCD conditioning and Ck the training curves of family k = 1 , . . . , 10 . Each 200-point curve is re-duced to a low-dimensional feature vector – with components such as the height and location of the c2 
+
+> s
+
+maximum above 2n0, its value at 8n0, its minimum over [1 .5, 6] n0, and the conformality measure at 8n0 – and the feature densities gD and gk are estimated by Gaussian kernel density estimation. Resemblance to family k can then be quantified by 
+
+KL( gD ∥ gk) = 
+
+Z
+
+gD(u) ln gD(u)
+
+gk(u) du. (S23) Read as a statement of class importance, however, any such ranking is structurally misleading, because a single-number comparison between a broad ensemble and an individual family conflates 
+
+location with breadth . The reconstruction is, by construction, a mixture of many admissible be-haviours, and a family may contribute substantially to that mixture and yet – being concentrated on its characteristic shapes – differ markedly from the ensemble as a whole distribution .
+
+S7. Supplementary tables and figures 
+
+59 Extended Data Table S1: Posterior fiducial quantities . The diffusion reconstruction, compared with the Annala 2023 GP and C4 posteriors (see Sec. S5. Reprocessing of the external ensem-bles). Medians with 68% credible intervals. Radii in km, L in MeV, MTOV in M⊙. Pprior PT and Ppost PT 
+
+are the prior and posterior frequencies of the necessary phase-transition signature, and BF is their odds ratio. A dash indicates a quantity not extractable from the corresponding public release. c2
+
+> s, max
+
+and npeak /n 0 are the height and density of each equation of state’s own c2 
+
+> s
+
+(nB ) peak over the full density grid; P(npeak > n TOV ) is the posterior weight for which the peak lies above the central density of the maximum-mass star. 
+
+Quantity This work Annala GP Annala C4 
+
+R(1 .4 M⊙) 12 .56 +0 .36  
+
+> −0.45
+
+12 .24 +0 .18  
+
+> −0.22
+
+12 .24 +0 .20 
+
+> −0.20
+
+R(1 .6 M⊙) 12 .45 +0 .36  
+
+> −0.44
+
+12 .29 +0 .19  
+
+> −0.23
+
+12 .27 +0 .19 
+
+> −0.21
+
+R(2 .08 M⊙) 11 .76 +0 .47  
+
+> −0.51
+
+12 .20 +0 .27  
+
+> −0.37
+
+12 .16 +0 .30 
+
+> −0.40
+
+Λ(1 .4 M⊙) 469 +97  
+
+> −100
+
+465 +42  
+
+> −68
+
+–
+
+Λ(1 .6 M⊙) 193 +42  
+
+> −42
+
+205 +28  
+
+> −31
+
+–
+
+Λ(2 .08 M⊙) 18 .9+8 .2 
+
+> −6.2
+
+30 .4+7 .4 
+
+> −7.9
+
+–
+
+MTOV 2.06 +0 .10  
+
+> −0.08
+
+2.23 +0 .14  
+
+> −0.11
+
+–
+
+c2 
+
+> s, max
+
+0.55 +0 .23  
+
+> −0.12
+
+0.66 +0 .13  
+
+> −0.10
+
+0.80 +0 .12 
+
+> −0.16
+
+npeak /n 0 6.12 +1 .81  
+
+> −1.96
+
+3.48 +2 .86  
+
+> −0.57
+
+3.18 +0 .75 
+
+> −0.53
+
+Quantity This work 
+
+nTOV /n 0 6.38 +0 .47 
+
+> −0.45
+
+c2 
+
+> s
+
+(TOV) 0.47 +0 .21 
+
+> −0.08
+
+∆(TOV) −0.01 +0 .04 
+
+> −0.09
+
+γ(TOV) 1.39 +0 .20 
+
+> −0.10
+
+dc(TOV) 0.13 +0 .14 
+
+> −0.03
+
+L 60 .5+7 .5
+
+> −7.6
+
+Ppost  
+
+> PT
+
+0.014 
+
+Pprior  
+
+> PT
+
+0.088 BF 0.14 +0 .02 
+
+> −0.02
+
+P(npeak > n TOV ) 0.451 
+
+60 Extended Data Table S2: Effect of alternative data selections on the canonical-star and phase-transition quantities. Entries are medians with 68% credible intervals evaluated at 10 5 posterior draws. Radii in km, tidal deformabilities dimensionless, MTOV in M⊙. Baseline is the stan-dard analysis; the two data variants swap the PSR J0437 −4715 mass–radius posterior for the Miller et al. analysis 45 and add the maximum-mass threshold of PSR J0952 −0607 83 to that of PSR J1614 −2230. Pprior PT and Ppost PT are the prior and posterior frequencies of the necessary phase-transition signature, and BF their odds ratio. 
+
+Quantity Baseline J0437 (Miller) Mmax (J0952) 
+
+R(1 .4 M⊙) 12 .56 +0 .36  
+
+> −0.45
+
+12 .80 +0 .30  
+
+> −0.38
+
+12 .51 +0 .41 
+
+> −0.46
+
+R(1 .6 M⊙) 12 .45 +0 .36  
+
+> −0.44
+
+12 .69 +0 .32  
+
+> −0.37
+
+12 .44 +0 .40 
+
+> −0.45
+
+R(2 .08 M⊙) 11 .76 +0 .47  
+
+> −0.51
+
+11 .98 +0 .44  
+
+> −0.49
+
+11 .85 +0 .48 
+
+> −0.50
+
+Λ(1 .4 M⊙) 469 +97  
+
+> −100
+
+535 +78  
+
+> −94
+
+462 +107 
+
+> −97
+
+Λ(1 .6 M⊙) 193 +42  
+
+> −42
+
+218 +41  
+
+> −39
+
+196 +45 
+
+> −44
+
+Λ(2 .08 M⊙) 18 .9+8 .2 
+
+> −6.2
+
+21 .5+8 .3 
+
+> −6.7
+
+20 .9+8 .9
+
+> −7.0
+
+MTOV 2.06 +0 .10  
+
+> −0.08
+
+2.06 +0 .09  
+
+> −0.07
+
+2.13 +0 .10 
+
+> −0.09
+
+Ppost PT 0.014 0.012 0.014 
+
+Pprior PT 0.088 0.088 0.088 BF 0.14 +0 .02  
+
+> −0.02
+
+0.13 +0 .02  
+
+> −0.02
+
+0.14 +0 .03 
+
+> −0.03
+
+61 Extended Data Table S3: Effect of alternative data selections on the maximum-mass-configuration and peak quantities. Columns as in Table S2. Quantities labelled TOV are eval-uated at the central density of the maximum-mass star; L in MeV, densities in n0. c2 
+
+> s, max
+
+and 
+
+npeak /n 0 are the height and density of each equation of state’s own c2 
+
+> s
+
+(nB ) peak over the full den-sity grid; P(npeak > n TOV ) is defined as in Table S1. 
+
+Quantity Baseline J0437 (Miller) Mmax (J0952) 
+
+nTOV /n 0 6.38 +0 .47  
+
+> −0.45
+
+6.22 +0 .44  
+
+> −0.40
+
+6.23 +0 .49 
+
+> −0.48
+
+c2 
+
+> s
+
+(TOV) 0.47 +0 .21  
+
+> −0.08
+
+0.45 +0 .18  
+
+> −0.06
+
+0.52 +0 .20 
+
+> −0.11
+
+∆(TOV) −0.01 +0 .04  
+
+> −0.09
+
+0.01 +0 .03  
+
+> −0.08
+
+−0.04 +0 .06 
+
+> −0.08
+
+γ(TOV) 1.39 +0 .20  
+
+> −0.10
+
+1.38 +0 .18  
+
+> −0.06
+
+1.40 +0 .20 
+
+> −0.14
+
+dc(TOV) 0.13 +0 .14  
+
+> −0.03
+
+0.13 +0 .11  
+
+> −0.02
+
+0.16 +0 .13 
+
+> −0.05
+
+L 60 .5+7 .5 
+
+> −7.6
+
+64 .7+7 .4 
+
+> −7.4
+
+59 .4+7 .8
+
+> −7.9
+
+c2 
+
+> s, max
+
+0.55 +0 .23  
+
+> −0.12
+
+0.48 +0 .25  
+
+> −0.07
+
+0.66 +0 .20 
+
+> −0.19
+
+npeak /n 0 6.12 +1 .81  
+
+> −1.96
+
+6.08 +1 .85  
+
+> −1.39
+
+5.74 +2 .22 
+
+> −2.04
+
+P(npeak > n TOV ) 0.451 0.462 0.417 
+
+Neff 4187 .3 5790 .3 2113 .9
+
+62 Extended Data Table S4: Robustness of the canonical-star and phase-transition quantities. 
+
+Each column repeats the full inference at a matched sample size of 10 5 draws; entries are medians with 68% credible intervals. Radii in km, tidal deformabilities dimensionless. Columns MI, MII 
+
+and MIII add three parametrized families to the training ensemble; Λ = 450 rebuilds the χEFT anchors at the lower cutoff. Pprior PT and Ppost PT are the prior and posterior frequencies of the necessary phase-transition signature, and BF their odds ratio. 
+
+Quantity Baseline MI MII MIII Λ = 450 
+
+R(1 .4 M⊙) 12 .56 +0 .36  
+
+> −0.45
+
+12 .58 +0 .35  
+
+> −0.45
+
+12 .50 +0 .39  
+
+> −0.46
+
+12 .54 +0 .37  
+
+> −0.45
+
+12 .43 +0 .42 
+
+> −0.46
+
+R(1 .6 M⊙) 12 .45 +0 .36  
+
+> −0.44
+
+12 .45 +0 .36  
+
+> −0.44
+
+12 .38 +0 .39  
+
+> −0.43
+
+12 .44 +0 .36  
+
+> −0.43
+
+12 .32 +0 .40 
+
+> −0.44
+
+R(2 .08 M⊙) 11 .76 +0 .47  
+
+> −0.51
+
+11 .75 +0 .45  
+
+> −0.48
+
+11 .71 +0 .47  
+
+> −0.48
+
+11 .84 +0 .51  
+
+> −0.52
+
+11 .69 +0 .56 
+
+> −0.49
+
+Λ(1 .4 M⊙) 469 +97  
+
+> −100
+
+469 +97  
+
+> −98
+
+454 +103  
+
+> −95
+
+463 +99  
+
+> −99
+
+425 +99 
+
+> −95
+
+Λ(1 .6 M⊙) 193 +42  
+
+> −42
+
+193 +43  
+
+> −42
+
+186 +44  
+
+> −40
+
+191 +42  
+
+> −41
+
+175 +44 
+
+> −41
+
+Λ(2 .08 M⊙) 18 .9+8 .2 
+
+> −6.2
+
+18 .5+8 .1 
+
+> −5.8
+
+18 .4+8 .4 
+
+> −5.9
+
+20 .1+9 .7 
+
+> −6.6
+
+18 .1+9 .2
+
+> −6.0
+
+MTOV 2.06 +0 .10  
+
+> −0.08
+
+2.06 +0 .09  
+
+> −0.08
+
+2.06 +0 .11  
+
+> −0.08
+
+2.07 +0 .10  
+
+> −0.08
+
+2.07 +0 .10 
+
+> −0.08
+
+Ppost PT 0.014 0.014 0.015 0.005 0.007 
+
+Pprior PT 0.088 0.081 0.060 0.111 0.086 BF 0.14 +0 .02  
+
+> −0.02
+
+0.16 +0 .03  
+
+> −0.03
+
+0.24 +0 .04  
+
+> −0.04
+
+0.04 +0 .01  
+
+> −0.01
+
+0.08 +0 .03 
+
+> −0.02
+
+63 Extended Data Table S5: Robustness of the maximum-mass-configuration and peak quanti-ties. Columns as in Table S4. Quantities labelled TOV are evaluated at the central density of the maximum-mass star; L in MeV, densities in n0. c2 
+
+> s, max
+
+and npeak /n 0 are the height and density of each equation of state’s own c2 
+
+> s
+
+(nB ) peak over the full density grid; P(npeak > n TOV ) is defined as in Table S1. Matched sample size is 10 5 draws. 
+
+Quantity Baseline MI MII MIII Λ = 450 
+
+nTOV /n 0 6.38 +0 .47  
+
+> −0.45
+
+6.41 +0 .49  
+
+> −0.45
+
+6.40 +0 .50  
+
+> −0.46
+
+6.28 +0 .48  
+
+> −0.50
+
+6.42 +0 .48 
+
+> −0.52
+
+c2 
+
+> s
+
+(TOV) 0.47 +0 .21  
+
+> −0.08
+
+0.48 +0 .22  
+
+> −0.10
+
+0.50 +0 .21  
+
+> −0.11
+
+0.45 +0 .20  
+
+> −0.09
+
+0.49 +0 .19 
+
+> −0.11
+
+∆(TOV) −0.01 +0 .04  
+
+> −0.09
+
+−0.02 +0 .05  
+
+> −0.09
+
+−0.02 +0 .06  
+
+> −0.09
+
+−0.00 +0 .04  
+
+> −0.08
+
+−0.02 +0 .06 
+
+> −0.08
+
+γ(TOV) 1.39 +0 .20  
+
+> −0.10
+
+1.40 +0 .21  
+
+> −0.13
+
+1.41 +0 .22  
+
+> −0.12
+
+1.36 +0 .22  
+
+> −0.19
+
+1.39 +0 .20 
+
+> −0.17
+
+dc(TOV) 0.13 +0 .14  
+
+> −0.03
+
+0.14 +0 .14  
+
+> −0.04
+
+0.15 +0 .14  
+
+> −0.05
+
+0.12 +0 .13  
+
+> −0.04
+
+0.14 +0 .13 
+
+> −0.05
+
+L 60 .5+7 .5 
+
+> −7.6
+
+61 .3+7 .3 
+
+> −7.8
+
+60 .5+7 .5 
+
+> −8.2
+
+61 .5+7 .3 
+
+> −8.3
+
+66 .8+7 .5
+
+> −7.8
+
+c2 
+
+> s, max
+
+0.55 +0 .23  
+
+> −0.12
+
+0.58 +0 .20  
+
+> −0.15
+
+0.63 +0 .19  
+
+> −0.20
+
+0.64 +0 .18  
+
+> −0.20
+
+0.64 +0 .18 
+
+> −0.18
+
+npeak /n 0 6.12 +1 .81  
+
+> −1.96
+
+6.34 +1 .62  
+
+> −2.15
+
+6.53 +1 .43  
+
+> −2.49
+
+5.40 +2 .53  
+
+> −2.15
+
+5.70 +2 .26 
+
+> −2.30
+
+P(npeak > n TOV ) 0.451 0.498 0.527 0.377 0.401 
+
+Neff 4187 .3 4212 .2 4349 .2 3387 .0 1714 .7
+
+64 Extended Data Table S6: β-equilibrium sound-speed anchors. Monte-Carlo means and 1σ un-certainties from the joint PNM–SNM draw at N 3LO ( Λb = 600 MeV , 2 × 10 4 samples), at the five densities used for conditioning. The two rows correspond to the chiral-interaction regulator cutoffs 
+
+Λ = 500 and 450 MeV. 
+
+nB /n 0 0.50 0.76 0.99 1.25 1.52 10 2 c2 
+
+> s
+
+(Λ = 500 MeV) 1.11 ± 0.16 2.81 ± 0.45 4.88 ± 0.85 7.68 ± 1.55 10 .29 ± 2.54 10 2 c2 
+
+> s
+
+(Λ = 450 MeV) 1.30 ± 0.14 3.08 ± 0.40 4.96 ± 0.75 7.52 ± 1.38 9.61 ± 2.28 
+
+65 Extended Data Figure S1: PNM-mode validation of the sampling pipeline. Squared sound speed of pure neutron matter at N 3LO ( Λ = 500 MeV, Λb = 600 MeV). Orange: mean and ±1σ band of the 1,000 Monte-Carlo samples published by the BUQEYE Collaboration 5, 73 ; blue dashed and dotted curves: mean and ±1σ from this work, run in PNM-only mode. Black circles mark the five anchor densities. At the anchor densities the means agree to 1% and the widths to 3.5% , consistent with the ≈2% finite-sample precision of the published sample set; the visible deviation of the lower band edge lies beyond the anchor region. 66 Extended Data Figure S2: Training dynamics of the equation-of-state diffusion model. a, Mean squared error (MSE) loss on the training (blue) and validation (orange) sets over 100 epochs, on a logarithmic scale. The shaded band spans the 10th–90th percentiles of the validation loss over the final 40 epochs; the star marks the lowest validation loss attained by the exponential moving average (EMA) of the weights, 0.0439 at epoch 83. Inset, the first 15 epochs at full vertical scale. b,Learning-rate schedule: linear warm-up over two epochs to a peak of 1 × 10 −4, followed by cosine decay to zero. The model ( 19 .4 × 10 6 parameters) was trained on 10 6 equation-of-state curves sampled from ten model classes, with 3 × 10 4 curves held out for validation. 67 Extended Data Figure S3: Training dynamics of the augmented-family diffusion models. Vali-dation MSE loss over the 100-epoch schedule for MI (baseline classes + class 11), MII (+ class 12) and MIII (+ class 13); thin curves are the corresponding training losses. Stars mark the lowest EMA-evaluated validation losses, whose weights define the models used in Extended Data Ta-bles S4 and S5. Inset, the first 15 epochs at full vertical scale. 68 92. R. Somasundaram, C. Drischler, I. Tews and J. Margueron, Phys. Rev. C 103 (2021) no.4, 045803 doi:10.1103/PhysRevC.103.045803 [arXiv:2009.04737 [nucl-th]]. 93. G. A. Lalazissis, T. Niksic, D. Vretenar and P. Ring, Phys. Rev. C 71 (2005), 024312 doi:10.1103/PhysRevC.71.024312 94. T. Gorda, O. Komoltsev and A. Kurkela, Astrophys. J. 950 (2023) no.2, 107 doi:10.3847/1538-4357/acce3a [arXiv:2204.11877 [nucl-th]]. 95. J. Margueron, R. Hoffmann Casali and F. Gulminelli, Phys. Rev. C 97 (2018) no.2, 025806 doi:10.1103/PhysRevC.97.025806 [arXiv:1708.06895 [nucl-th]]. 96. A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, L. Kaiser and I. Polosukhin, in Adv. Neural Inf. Process. Syst. 30 , 5998 (2017), arXiv:1706.03762 [cs.CL]. 97. E. Perez, F. Strub, H. de Vries, V. Dumoulin and A. Courville, in Proc. 32nd AAAI Conf. on Artificial Intelligence , 3942 (2018), arXiv:1709.07871 [cs.CV]. 98. I. Loshchilov and F. Hutter, ICLR 2019, arXiv:1711.05101 [cs.LG]. 99. R. E. Kass and A. E. Raftery, J. Am. Statist. Assoc. 90 (1995) no.430, 773-795 doi:10.1080/01621459.1995.10476572. 69

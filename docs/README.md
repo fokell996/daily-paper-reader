@@ -6,44 +6,43 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-18
-- 运行时间：2026-08-18 20:11:51 UTC
+- 最新运行日期：2026-08-19
+- 运行时间：2026-08-19 20:37:46 UTC
 - 运行状态：成功
-- 本次总论文数：8
-- 精读区：3
-- 速读区：5
+- 本次总论文数：7
+- 精读区：4
+- 速读区：3
 
 ### 今日简报（AI）
-今日精读8篇论文，聚焦中子星物理：相对论星二阶矩普适性与双中子星合并中的奇异数输运。最值得关注的是极限情况下的普适性结论，以及合并中奇异数输运对电子丰度的影响。建议普通读者从速读中的X射线双星观测入手，更直观理解中子星极端环境。
-- 详情：[/202608/18/README](/202608/18/README)
+1) 今日精读聚焦AI重建中子星物质与非线性贝叶斯脉冲星计时，另涉中子星热模拟、快速射电暴色散与重双中子星形成。  
+2) 最值得关注：生成式AI为致密物质状态方程提供新路径，通用脉冲星计时框架显著提升参数估计能力。  
+3) 建议普通读者优先了解AI如何从观测中反推中子星内部结构，这是近期高热度实用方向。
+- 详情：[/202608/19/README](/202608/19/README)
 
 ### 精读区论文标签
-1. [Limiting cases of second-order moments of relativistic stars and their universality](/202608/18/2608.16376v1-limiting-cases-of-second-order-moments-of-relativistic-stars-and-their-universality)  
+1. [Generative artificial intelligence for reconstructing neutron-star matter](/202608/19/2608.17457v1-generative-artificial-intelligence-for-reconstructing-neutron-star-matter)  
+   标签：评分：10.0/10、query:pulsar-frb
+   evidence：使用生成式AI从观测重建中子星状态方程
+2. [Generalized Non-linear Bayesian Pulsar Timing with Enterprise](/202608/19/2608.18047v1-generalized-non-linear-bayesian-pulsar-timing-with-enterprise)  
+   标签：评分：10.0/10、query:pulsar-frb
+   evidence：使用Enterprise进行广义非线性贝叶斯脉冲星计时，约束脉冲星质量
+3. [Density-induced dark-baryon conversion in $Δ-$admixed hypernuclear neutron stars](/202608/19/2608.17409v1-density-induced-dark-baryon-conversion-in--admixed-hypernuclear-neutron-stars)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：讨论相对论恒星转动惯量、潮汐形变等二阶矩的极限情况，与中子星状态方程约束直接相关。
-2. [Strangeness Transport in Binary Neutron Star Mergers](/202608/18/2608.15527v1-strangeness-transport-in-binary-neutron-star-mergers)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：构建含奇异数依赖手征平均场状态方程的反应网络，直接关联中子星状态方程与内部物理。
-3. [Nuclear Drip Line and the Composition of Supernova Matter](/202608/18/2608.16778v1-nuclear-drip-line-and-the-composition-of-supernova-matter)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：研究中子星壳层与超新星物质中核滴线对成分的影响，为状态方程和组成提供关键理论输入
+   evidence：研究含超子和Delta共振态的中子星物质中暗重子转化，构建状态方程
+4. [Confining density functional approach to the QCD phase diagram at low temperatures and thermal twin stars](/202608/19/2608.18038v1-confining-density-functional-approach-to-the-qcd-phase-diagram-at-low-temperatures-and-thermal-twin-stars)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：面向中子星合并与热双星的含夸克退禁闭状态方程，直接相关中子星状态方程约束
 
 ### 速读区论文标签
-1. [Hyperaccreting Magnetised Neutron Stars inside Rotating Massive Envelopes: Low-Power Jets and Precursor Flares](/202608/18/2608.09395v1-hyperaccreting-magnetised-neutron-stars-inside-rotating-massive-envelopes-low-power-jets-and-precursor-flares)  
+1. [Controlling artificial surface heating in neutron star simulations: Application to hybrid equations of state](/202608/19/2608.16945v1-controlling-artificial-surface-heating-in-neutron-star-simulations-application-to-hybrid-equations-of-state)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：中子星超吸积模拟，与中子星物理相关。
-2. [Multipolar Neutrino Radiation in Binary Neutron Star Mergers: Angular Structure, Rotational Variability, and Implications for Electron Fraction](/202608/18/2608.16275v1-multipolar-neutrino-radiation-in-binary-neutron-star-mergers-angular-structure-rotational-variability-and-implications-for-electron-fraction)  
+   evidence：混合状态方程的中子星模拟
+2. [A stochastic forward model for the intergalactic dispersion-measure distribution of Fast Radio Bursts](/202608/19/2608.17658v1-a-stochastic-forward-model-for-the-intergalactic-dispersion-measure-distribution-of-fast-radio-bursts)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：在不同状态方程下模拟双中子星并合，对与EOS相关的中微子观测有启示
-3. [The first comprehensive spectral and timing study of the ultra-compact X-ray binary 4U 1812-12 with NICER and NuSTAR](/202608/18/2608.16841v1-the-first-comprehensive-spectral-and-timing-study-of-the-ultra-compact-x-ray-binary-4u-1812-12-with-nicer-and-nustar)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：对含中子星的超紧凑X射线双星进行光谱与时序分析，用relxill拟合反射谱，可为中子星状态方程提供约束
-4. [Evolution of Neutron Star Environment in the Galactic Halo : Implications for Dark Matter Accretion](/202608/18/2608.10781v1-evolution-of-neutron-star-environment-in-the-galactic-halo--implications-for-dark-matter-accretion)  
+   evidence：FRB星系际色散量分布的随机正演模型
+3. [Formation of heavy double neutron stars II: the role of heavy first-born neutron stars and low metallicity](/202608/19/2608.17430v1-formation-of-heavy-double-neutron-stars-ii-the-role-of-heavy-first-born-neutron-stars-and-low-metallicity)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：研究暗物质混合中子星的状态方程与吸积过程，与中子星状态方程的解释密切相关
-5. [SNIFFLES I: Intended Emission, Unwanted Emission, and Unintended Radiation from Low-Earth Orbiting Satellites Impacting Radio Astronomy from 1-26 GHz](/202608/18/2608.12999v1-sniffles-i-intended-emission-unwanted-emission-and-unintended-radiation-from-low-earth-orbiting-satellites-impacting-radio-astronomy-from-1-26-ghz)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：刻画影响射电天文频段（脉冲星计时所用）的卫星射频干扰。
+   evidence：重双中子星系统的双星演化建模，关联中子星/脉冲星种群演化与形成通道
 
 
 <div class="dpr-home-promo-card">
