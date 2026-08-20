@@ -1,0 +1,398 @@
+Title: Real-Time RFI Mitigation in SPOTLIGHT: A Two-Stage Approach for Transient Searches
+
+URL Source: https://arxiv.org/pdf/2608.19102v1
+
+Published Time: Thu, 20 Aug 2026 01:08:08 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+> Draft version August 20, 2026
+> Typeset using L ATEX twocolumn style in AASTeX7.0.1
+
+Real-Time RFI Mitigation in SPOTLIGHT: A Two-Stage Approach for Transient Searches 
+
+Raghav Wani ,1, 2 Jayanta Roy ,1 Harshavardhan Reddy ,1 Sanjay Kudale ,1 Ujjwal Panda ,1
+
+Karel Adamek ,3 Wesley Armour ,4 Kshitij Bane ,1 Kaushal Buch ,1 Jayaram Chengalur ,1
+
+Jyotirmoy Das ,1 Sridhar Gajendran ,1 and SPOTLIGHT Collaboration 1
+
+> 1National Centre for Radio Astrophysics (NCRA), Pune-411007, Maharashtra, India
+> 2Indian Institute of Science Education and Research (IISER), Pune-411008, Maharashtra, India
+> 3Department of Physics, Silesian University in Opava, Opava, 74601, Czech Republic
+> 4Oxford e-Research Centre (OeRC), University of Oxford, Oxford-OX13PJ, United Kingdom
+
+ABSTRACT Radio Frequency Interference (RFI) remains one of the primary challenges limiting the sensitivity and reliability of modern radio transient surveys, particularly for real-time searches of fast radio tran-sients. The SPOTLIGHT system is a commensal real-time transient search backend operating at the upgraded Giant Metrewave Radio Telescope (uGMRT), where robust and computationally efficient RFI mitigation is essential for sustained operations. We present the real-time two-stage RFI mit-igation framework developed for SPOTLIGHT, comprising an antenna-level voltage-filtering module (VOLT ) operating prior to correlation beamforming and the SPOTLIGHT Time-domain RFI Processing Engine ( STRIPE ), a statistical RFI-filtering framework applied to beamformed data. Together, these complementary techniques mitigate a broad spectrum of RFI, ranging from broadband impulsive in-terference mitigated by VOLT to narrowband spectrally confined spurious signals mitigated by STRIPE ,while remaining computationally efficient enough to satisfy the stringent requirements of real-time processing. The framework is evaluated using routine commensal GMRT observations, controlled 76 pulsar observations, and benchmarking against PRESTO’s rfifind . The deployed system reduced the false detection rate by 98%. The recovered astrophysical pulses exhibit a 2.7 × improvement in S/N after the two-stage filtering compared with the unfiltered data. These improvements enhance SPOTLIGHT’s detection efficiency, sensitivity, and operational reliability, strengthening its capability to discover radio transients with the uGMRT. 
+
+1. INTRODUCTION Radio telescopes are, inadvertently, affected by human-made sources of interference. As industries, power grids, telecommunication systems, and digital in-frastructure have expanded, the amount of human-made radio frequency interference (RFI) has increased drasti-cally, including the emergence of entirely new sources of RFI (for instance, wind turbines (M. A. Brentjens 2016; B. Winkel & A. Jessner 2019), lightning (M. Sokolowski et al. 2015), and satellite constellations (F. D. Vruno et al. 2023; C. G. Bassa et al. 2024)). Thus, there has been a continuous investment for the development of more and better RFI mitigation methodologies, result-ing in a wide range of algorithms (A. Leshem et al. 2000; J. Raza et al. 2002; P. A. Fridman & W. A. Baan 2001; M. Bentum & A.-J. Boonstra 2016; A. R. Offringa et al. 
+
+> Corresponding author: Raghav Wani raghav.wani@gmail.com, wani.raghav@students.iiserpune.ac.in
+
+2010; W. A. Baan 2019; G. Cucho-Padin et al. 2019; J. Akeret et al. 2017; E. E. Vos et al. 2019). A major-ity of these algorithms are offline; that is, they operate on data stored on disk. This offers an advantage, since the full-range of the data in frequency and time can be accessed, and the data can be accessed multiple times, and multiple passes can be made through the data, if necessary. This has allowed the development of sophis-ticated algorithms for offline data (A. R. Offringa et al. 2010; Y. Maan et al. 2021), including machine learn-ing (ML) and deep learning (DL) based approaches (J. Akeret et al. 2017; E. E. Vos et al. 2019; M. Mesarcik et al. 2020). However, developing algorithms that can operate on data streams in real-time is tough, due to several factors: firstly, such algorithms can only access the data once, and the amount of data being accessed at any given instance is small. Thus, such algorithms need to successfully determine and mitigate the pres-ence of RFI from a limited instance of data in a single pass. Such algorithms have been developed, often with arXiv:2608.19102v1 [astro-ph.IM] 19 Aug 2026 2 The SPOTLIGHT Collaboration 
+
+the help of robust statistical estimators, such as skew-ness and kurtosis (G. M. Nita et al. 2007; D. E. Gary et al. 2010; G. M. Nita & D. E. Gary 2010; G. M. Nita et al. 2016), median absolute deviation (MAD) (K. D. Buch et al. 2019a), the autocorrelation function (ACF) (V. Morello et al. 2021), and others (R. van Nieuwpoort et al. 2018; A. Sclocco et al. 2019). These implemen-tations also need to be computationally efficient, in or-der to keep with real-time requirements; this has led to the development of algorithms that specifically meet this requirement (Z. Gong et al. 2026), as well as re-implementation of preexisting algorithms on hardware accelerators such as FPGAs (W. Baan et al. 2004; K. D. Buch et al. 2019a) and GPUs (R. V. van Nieuwpoort 2016; R. van Nieuwpoort et al. 2018; A. Sclocco et al. 2019) for faster performance. In this work, we present exactly such a real-time RFI mitigation framework, developed for the SPOTLIGHT project 5 (J. Roy et al. 2024), a commensal survey for radio transients being undertaken at the upgraded Gi-ant Metrewave Radio Telescope (uGMRT; (Y. Gupta et al. 2017)). This survey is carried out using a ded-icated high-performance cluster (HPC) comprising 60 Rudra servers and 90 NVIDIA A100 GPUs. 640 post-correlation (PC) phased array beams (J. Roy et al. 2018) are formed by SPOTLIGHT’s correlator/beamformer (Reddy et al. (in prep.)), optimally tiled across the field-of-view; alongside, a single incoherent array (IA) beam is formed as well. Both the PC beams and the IA beam are searched for transients in real-time using a highly-optimised search pipeline (U. Panda et al. 2026); 160 out of 640 beams are recorded to disk, and are put through an offline pulsar search pipeline (J. Das et al. 2026). The correlator/beamformer and the transient search system each use 32 GPUs, while the pulsar search pipeline uses 10 GPUs; the remaining GPUs are used by other SPOTLIGHT modules currently in development. Thus, it became necessary to develop a RFI mitigation framework that would meet the required computational requirements, without relying on GPUs. This frame-work was developed in two stages: the first stage oper-ates on Nyquist-sampled voltage time series from indi-vidual antennas, while the second stage performs RFI mitigation on the beamformed data products. A de-tailed description of this two-stage strategy can be found in §2. Then, results from our benchmarks using real observational datasets obtained with the SPOTLIGHT system are discussed in §3. Finally, our plans for future  
+
+> 5https://spotlight.ncra.tifr.res.in TELRing FRBRing
+> Real-time Transient Search
+> Ares STRIPE : RFI mitigation on beamformed data Correlato �Beamformer
+> VOLT : RFI mitigation on voltage data
+> GMRT Antennas
+
+Figure 1. Signal-processing flow of the SPOTLIGHT back-end, showing the locations of the two-stage RFI mitigation framework. VOLT operates on antenna voltages prior to cor-relation and beamforming, while STRIPE mitigates residual RFI in the beamformed data during transfer from TELRing 
+
+to FRBRing , before real-time transient searching. 
+
+improvements are detailed in §4, and our conclusions are summarised in §5. 
+
+2. SPOTLIGHT’S RFI FILTERING STRATEGY SPOTLIGHT employs a two-stage real-time RFI mit-igation framework that suppresses interference both be-fore and after beamforming, enabling efficient removal of complementary classes of RFI while satisfying the stringent latency requirements of commensal transient searches. Broadband impulsive interference is first mit-igated at the antenna-voltage level at Nyquist resolu-tion prior to correlation, whereas residual broadband contamination, persistent narrowband interference, and slowly varying baseline fluctuations are removed from the beamformed data before transient searching. In the first stage, digitised antenna voltages are pro-cessed by the voltage-level RFI filter, referred to here-after as VOLT , adapted from the real-time broadband RFI excision framework developed for the GMRT Wide-band Backend (GWB, S. H. Reddy et al. (2017)) in K. D. Buch et al. (2019a) and K. D. Buch et al. (2023). VOLT is a multi-CPU implementation of the orig-inal FPGA-based excision module developed for GWB (K. D. Buch et al. 2019a). Since VOLT operates directly on Nyquist-sampled voltages before cross-correlation, it efficiently suppresses strong impulsive broadband in-terference that would otherwise propagate coherently through the beamformer. The filtered antenna voltages are subsequently correlated within the SPOTLIGHT correlator and beamformer to generate interferometric visibilities, which are then used to form 640 simultane-ous high-sensitivity post-correlation tied-array beams. The beamformed data are then processed by the SPOT-LIGHT Time-domain RFI Processing Engine ( STRIPE )The SPOTLIGHT’s Real-time RFI Mitigation Framework 3prior to transient searching. Unlike VOLT , STRIPE op-erates on beamformed dynamic spectra and employs statistical techniques to identify and suppress residual broadband and narrowband interference that remains after beamforming. Figure 1 illustrates the position of VOLT and STRIPE 
+
+within the SPOTLIGHT system. The shared-memory architecture of SPOTLIGHT has been described in detail by U. Panda et al. (2026) and is summarised here only briefly. Following first-stage antenna voltage RFI filtering by VOLT , correlation and beamformation, the beamformed data are initially written to a smaller shared-memory ring buffer, referred to as TELRing , from where they are transferred by the program Ares 6 into a larger shared-memory buffer, FRBRing . During this transfer, each block of beamformed data is sequen-tially scaled and processed by STRIPE , along with other observation-specific operations as outlined in U. Panda et al. (2026), and finally written into FRBRing . The real-time transient search pipeline subsequently operates ex-clusively on the RFI-mitigated data stored in this larger buffer (U. Panda et al. 2026). 
+
+TELRing consists of eight buffer blocks that temporar-ily store 8.388608 seconds of beamformed data. In con-trast, FRBRing stores twelve larger blocks, with each block equivalent to four complete TELRing buffers, and thus stores 8.388608 × 12 × 4 = 402.653184 seconds of observations. Such a large buffer accommodates the la-tency for downstream transient detection, candidate val-idation, and simultaneous dumping of beamformed data, visibilities, and baseband voltages once a candidate has been identified. This architecture enables continuous real-time processing without interrupting the incoming data stream while accommodating the latency associ-ated with downstream transient search and validation. The complementary operations of VOLT and STRIPE 
+
+provide a real-time RFI mitigation framework for SPOTLIGHT, improving data quality while preserv-ing the computational efficiency required for continuous commensal observations. Detailed descriptions of the two modules are presented in the following subsections. 2.1. VOLT : RFI filtering on voltage data 
+
+In order to improve robustness against long-duration RFI, VOLT employs the Median-of-MAD (MoM) estima-tor proposed in K. D. Buch et al. (2019b) and in K. D. Buch et al. (2023), wherein the thresholds for mitigation are determined from the median of median absolute de-viation (MAD) estimates obtained from successive data windows, rather than from a single window. It has been  
+
+> 6https://github.com/nsmspotlight/Ares
+
+shown in K. D. Buch et al. (2019b) that this estimator remains robust even when ≈ 50% of the data is contam-inated by RFI. For an input block of digitised voltage samples, x, the median M (x) and the MAD, D(x) are estimated. Then, the upper and lower thresholds are computed as: 
+
+τU = M (x) + n × 1.4826 D(x),τL = M (x) − n × 1.4826 D(x),
+
+where n represents a user-defined threshold multiplier. The MAD D(x) is scaled by a factor of 1.4826 to yield the equivalent standard deviation, assuming that the data follows a normal distribution. Under the same as-sumption, the median M (x) ≈ 0, and hence its calcula-tion can be avoided entirely. Then, the MoM estimator, 
+
+MD , is calculated across k successive windows, as: 
+
+MD = M (D1, D 2, . . . , D k)where D1, D 2, . . . , D k are the MAD values for each of the k windows. In the SPOTLIGHT system, for a bandwidth of 200 MHz and a corresponding Nyquist resolution of 2.5 nanoseconds, the MoM estimator is calculated over 20,480 MAD values, and each MAD value is calculated over 20,480 voltage samples. For 100 MHz, the number of MAD values used remains the same, but the number of samples used to calculate each MAD value becomes 10,240. In both cases, the total amount of data used to estimate the thresholds becomes 20 , 480 × 20 , 480 × 2.5 ns = 20 , 480 × 10 , 240 × 5 ns = 1.048576 s, which is exactly equal to the duration of one block of the TELRing buffer. Synchronising the process-ing of voltage data with the beamformer’s block bound-aries simplifies the data flow through the system and enables continuous low-latency operation throughout. The current implementation of VOLT is only appli-cable when SPOTLIGHT observes in its 100 or 200 MHz modes. When operating at a bandwidth of 400 MHz, VOLT is bypassed entirely. This limitation is pri-marily computational: for 400 MHz, one must process 40,960 samples in a single pass, while meeting the same real-time requirements. Another restriction arises from memory availability: in order to fit 400 MHz voltage samples in memory, they are packed as 4-bit integers. However, these samples need to be unpacked into 8-bit integers during RFI excision and repacked into the 4-bit representation before being sent downstream to the cor-relator/beamformer. In GWB, these issues are avoided by falling back to the RFI excision algorithm’s original FPGA implementation K. D. Buch et al. (2019b), which has none of these restrictions. Work on optimising VOLT 
+
+is currently underway. 4 The SPOTLIGHT Collaboration 0 2 4 6 8 10 12 
+
+Real-time Factor      
+
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> Number of Counts
+> Real-time  Factor  = 1
+> Mean = 3.38
+> Figure 2. Distribution of the real-time speed-up factor of
+> STRIPE for 640 post-correlation beams over 35.8 hours of commensal GTAC observations. Each measurement corre-sponds to a 1.048576 s TELRing block
+
+In its present implementation, VOLT processes dual-polarisation complex voltage streams from 32 antennas (30 real antennas + 2 dummy antennas), for a total of 64 baseband inputs. These are uniformly distributed across 16 nodes. On each node, 4 OpenMP CPU threads are employed per input. The RFI-mitigated voltages are then supplied to SPOTLIGHT’s correlator/beamformer, which turns them into channelised, beamformed data. 2.2. STRIPE : RFI filtering on beamformed data 
+
+The SPOTLIGHT Time-domain RFI Processing En-gine ( STRIPE )7 is a lightweight statistical RFI mitigation framework, developed specifically for SPOTLIGHT’s beamformed data. STRIPE is adapted from PulsarX ’s 
+
+filtool utility (Y. Men et al. 2023), modifying its implementation as per SPOTLIGHT’s shared-memory-based ring buffer architecture, as well as its real-time constraints. It is deployed as a sub-module of the Ares 
+
+utility, which transfers data from the smaller TELRing to the larger FRBRing , the buffer read by SPOTLIGHT’s real-time transient search system; more details can be found in U. Panda et al. (2026). As a part of Ares ,in each iteration STRIPE processes a single block of 
+
+TELRing consisting of 800 samples, across 16 nodes. On each node, data from 40 PC beams is processed across 16 CPU cores; thus, a single block of data from 40 ×16 = 640 PC beams is processed across 16 ×16 = 256 CPU cores. STRIPE processes each TELRing block 3.4 times faster than real time on average, as seen in in Fig-ure 2, which shows the distribution of real-time speed-up factors per block. The real-time speed-up factor for  
+
+> 7https://github.com/RaghavWani/STRIPE
+
+each run is calculated as the ratio of the duration of each block by the time taken to process each block. Although the buffer occasionally approaches exhaus-tion (that is, the filter performance drops below 1), the 
+
+TELRing buffer stores 8.388608 seconds of data, so the filter can catch up, and no data is lost. STRIPE ’s com-putational efficiency leaves sufficient resources available for SPOTLIGHT’s transient search system downstream. For the IA beam, a single node and 16 CPU cores are used to process each block. Unlike VOLT , STRIPE works for all SPOTLIGHT configurations. Currently, STRIPE adapts filtool ’s patch, skewness-kurtosis, and baseline filters. The patch filter identifies time samples exhibiting zero variance across the entire band, indicating that these samples are contaminated by impulsive, broadband RFI, since their power is uniform across the band. The identified samples, along with their immediate neighbours, are then replaced with Gaussian noise generated according to each channel’s mean and variance, estimated from unflagged samples. This helps preserve the statistical properties of the data. The effect of the patch filter can be seen in Figure 3b. The data is then passed to the skewness-kurtosis (SK) filter. The SK filter follows the implementation in filtool .The filter identifies narrowband RFI by calculating the spectral skewness, the spectral excess kurtosis, and the spectral autocorrelation function with a 1-sample de-lay (hereafter referred to as ACF1). All of these statis-tics measure deviation from ideal, uncorrelated Gaus-sian noise. A large value of skewness and kurtosis in-dicates that the distribution of the data is highly non-Gaussian; similarly, a non-zero value of the autocorre-lation function indicates that there are correlations in the data, which should be ideally be absent (indeed, for uncorrelated Gaussian noise, ACF = 0, regardless of time lag). Thus, the SK filter calculates these statistics for each frequency-time block and identifies outliers in all three using Tukey’s fences (J. Tukey 1977). This is a robust non-parametric method for outlier detection, and is based on the interquartile range (IQR). For any arbitrary metric M , channel j is considered to be un-contaminated if: 
+
+Q1(M ) − κ × IQR(M) ≤ Mj ≤ Q3(M ) + κ × IQR(M) ,
+
+where Q1 and Q3 are the first and third quartiles, re-spectively, and IQR = Q3 − Q1. The parameter κ is a user-defined threshold that controls the aggressiveness of the outlier rejection and is the only tunable parameter in the SK filter. A sample is only flagged if all three statis-tical measures satisfy the above criterion. The flagged sample is then replaced with zero-mean, unit-variance Gaussian noise, while all other samples are normalised The SPOTLIGHT’s Real-time RFI Mitigation Framework 565.0 67.5 70.0                                   
+
+> (a) No Filter
+> 65 70 75 300 325 350 375 400 425 450 475 500
+> 0.0 0.5 1.0 1.5 2.0
+> Time (s)
+> 300 325 350 375 400 425 450 475 500
+> Frequency (MHz)
+> 64.0 64.2
+> (b) Patch
+> 65 70 75 0.0 0.5 1.0 1.5 2.0
+> Time (s)
+> 64.0 64.5
+> (c) Patch +SKF
+> 63.7564.0064.25 0.0 0.5 1.0 1.5 2.0
+> Time (s)
+> 63.99 64.00 64.01
+> (d) Patch +SKF +Baseline
+> 63.8 64.0 64.2 0.0 0.5 1.0 1.5 2.0
+> Time (s)
+> 60 62 64 66 68 70 72 74
+> Power (arb. units)
+
+Figure 3. Step-by-step RFI mitigation in representative Band 3 (300–500 MHz) beamformed data using the three STRIPE 
+
+filtering stages. Each panel shows the dynamic spectrum together with the corresponding time- and frequency-collapsed profiles. The successive stages progressively suppress RFI while preserving the underlying dispersed pulsar signal. 
+
+to zero mean and unity variance, as per the spectral mean and variance obtained from the data. This en-sures that, for each frequency-time block, the bandpass is normalised and the data statistics are preserved. The effect of the SK filter is shown in Figure 3c. The data is then passed to the baseline filter. The baseline filter removes slow-varying fluctuations in time that are introduced by instrumental or other ef-fects. It does so by first estimating the baseline using a running median filter. For each frequency-time block, 
+
+D(ν, t ), a one-dimensional time series, s(t), is obtained by averaging across all frequency channels. This helps suppress any channel-specific fluctuations that will af-fect the baseline estimate. Then, a running median filter with width ω is run over this time series, and a robust estimate of the baseline, ˜ s(t), is obtained. Note that it can be ensured that the running median filter is insensi-tive to short-duration impulsive events, by keeping the width large enough with respect to the typical duration of such events. Then, the baseline for each channel is modelled independently using the linear relation: 
+
+Bν (t) = αν ˜s(t) + βν ,
+
+where the coefficients αν and βν are determined through a simple linear least squares fit for each channel. The baseline is then subtracted from each frequency-time block as follows: 
+
+D′(ν, t ) = D(ν, t ) − Bν (t)The only free parameter for the baseline filter is the width, ω, used by the running median filter. The effect of the baseline filter is shown in Figure 3d. In §3.1, we present the optimisation of two tunable parameter of 
+
+STRIPE .
+
+3. RESULTS AND BENCHMARKING In this section, we present the results from SPOT-LIGHT’s two-stage RFI filters. Using a large sample of pulsar data, we optimise the STRIPE parameters in §3.1 and, using the best parameter, compare STRIPE with PRESTO’s ((S. Ransom 2011)) RFI mitigation tool in 
+
+§3.2. In §3.3, we present the results of RFI filtering for single-pulse recovery, and lastly in § 3.4 we discuss the effect of RFI filters on the real-time trigger rate within the SPOTLIGHT system. 3.1. Optimisation of STRIPE Parameters 
+
+The performance of STRIPE was optimised using a representative sample of 70 beamformed pulsar obser-vations commensally recorded by the SPOTLIGHT sys-tem over approximately one year (April 2025 to April 2026). The dataset spans all three SPOTLIGHT ob-serving bands (300–1460 MHz) and samples a wide range of observing conditions encountered during routine tele-scope operations. All observations were recorded in the PC beamforming mode, using the standard SPOT-LIGHT configuration with 4096 frequency channels and a sampling time of 1.31072 ms. Table 1 presents the physical properties of these pulsars, spanning a wide va-riety of periods, flux densities, dispersion measures, and duty cycles, making the dataset representative of the diverse observing conditions under which SPOTLIGHT routinely operates. The effectiveness of STRIPE was quantified using the folded signal-to-noise ratio (S/N), as single pulses are not consistently detectable for many 6 The SPOTLIGHT Collaboration 
+
+pulsars. By combining information from all pulses in an observation, folded S/N provides a robust measure of the cumulative impact of RFI mitigation on pulsar detectability. Since the voltage-level RFI filter ( VOLT ) was directly adopted from the GMRT Wideband Backend (GWB), the primary optimisation effort focused on the two tun-able parameters within STRIPE : the interquartile range (IQR) threshold ( κ) used by the SK filter and the base-line subtraction window size ( ω), as described in §2.2. For each pulsar observation, STRIPE was executed over a combination of values of κ and ω. The IQR threshold, 
+
+κ, was varied over 25 values between 0 and 30, with finer sampling at low thresholds (0 .0−7) and coarser sampling at higher thresholds (8 − 30). The window size, ω, was varied from 0.1 to 0.9 in steps of 0.1, resulting in a total of 225 independent parameter combinations per obser-vation. Each realisation was subsequently folded using PRESTO, and the relative change in folded S/N with respect to the original unmitigated data was computed. The parameter combination that yielded the maximum relative change was selected as the optimal configuration for that observation. Repeating this procedure for all 70 observations resulted in 15750 (225 × 70) independent realisations, providing a statistically meaningful basis for parameter optimisation. The mean of the optimal IQR threshold and width were 3.986 and 0.513, respec-tively. Based on this, we adopted ensemble mean values (κ = 4 .0) and ( ω = 0 .5) as the default operating param-eters for STRIPE within the SPOTLIGHT pipeline. Although these values are not necessarily optimal for every individual observation, they consistently yield near-optimal performance across the entire dataset with-out requiring dynamic parameter selection. It is im-portant to note that these parameters have been op-timised specifically for SPOTLIGHT’s observing con-figuration, frequency coverage, and RFI environment, and should not be regarded as universally optimal for other telescopes or transient-search pipelines. The opti-mised parameter set is used throughout the remainder of this work, including benchmarking against PRESTO’s 
+
+rfifind , as presented in §3.2. 3.2. STRIPE vs rfifind 
+
+We benchmarked STRIPE against PRESTO’s 
+
+rfifind , one of the most widely used offline RFI miti-gation tools in pulsar astronomy. Although rfifind is primarily intended for offline processing, it provides a useful reference for evaluating the effectiveness of RFI mitigation. The comparison was performed using the same pulsar dataset described in §3.1, ensuring that both parameter optimisation and performance evalua-1 2 3 4 5
+
+Relative S/N improvement (rfifind)           
+
+> 12345
+> Relative S/N improvement (STRIPE)
+> STRIPE superior rfifind superior
+> Observation Count = 55 STRIPE better: 42 (76.4%) rfifind better: 13 (23.6%)
+> Band Band 3 Band 4 Band 5
+> Figure 4. Relative folded S/N improvement with STRIPE
+> versus rfifind for 55 pulsar observations. Points are colour– coded by observing band and scaled by pulsar duty cycle; the dashed y=xline denotes equal performance, with points above (below) the line favouring STRIPE (rfifind ).
+
+tion were based on a common observational sample. We excluded ∼21% of the observations in which rfifind 
+
+corrupted the original input data. The effectiveness of both methods was evaluated using the folded S/N obtained from PRESTO. Both STRIPE and rfifind 
+
+were executed with a block size of 1526 samples ( ∼2seconds), using 8 CPU cores for RFI mitigation and 16 CPU cores for folding. STRIPE was run with the default operating parameters adopted for SPOTLIGHT (κ = 4 .0 and ω = 0 .5), while rfifind was executed using its standard configuration, including 10 σ time-domain and 4 σ frequency-domain rejection thresholds, and 6 σ time-domain clipping. Figure 4 compares the relative S/N improvement pro-duced by STRIPE and rfifind . The majority of obser-vations ( ∼76%) lie above the unity-slope line, indicating greater S/N improvement with STRIPE . In the remain-ing cases, the difference is generally small, with the mea-surements clustered close to the equality line. Using the median relative folded S/N improvement as the compar-ison metric, STRIPE achieved an enhancement that was 17.6% larger than that obtained with rfifind . Overall, these results indicate that STRIPE provides RFI mitiga-tion performance comparable to rfifind , while yielding greater folded-S/N improvement in a majority of the ob-servations considered here. The SPOTLIGHT’s Real-time RFI Mitigation Framework 73.3. Single pulse candidate recovery 
+
+While the improvement in folded pulsar S/N demon-strates the functional benefit of RFI mitigation, an equally important requirement is that the two-stage fil-tering preserves, and ideally improves, the detectability of genuine astrophysical transients. To evaluate this, we conducted dedicated observations of six pulsars span-ning all three SPOTLIGHT observing bands and com-pared the recovery of individual pulses under different RFI-mitigation configurations. Figure 5a and 5b illus-trate the effect of VOLT and STRIPE on a representative unfiltered beamformed dataset. Simultaneous observations were carried out using both the GWB and the SPOTLIGHT backend. Since both systems receive the same digitised antenna voltages from the GMRT receiver chain, differences in the recovered pulse populations can be attributed primarily to differ-ences in the RFI-mitigation configurations, while intrin-sic source variability and observing conditions are com-mon to the simultaneous observations. To isolate the contribution of each filtering stage, three processing con-figurations were analysed: (i) GWB data without real-time RFI mitigation, (ii) SPOTLIGHT data processed with VOLT only, and (iii) SPOTLIGHT data processed with both VOLT and STRIPE , with STRIPE applied offline to the recorded beamformed data while preserving the real-time observing configuration. Beamformed data from each configuration were dedis-persed using PRESTO over a narrow dispersion-measure range centred on the catalogue DM of each pulsar 8 (DM 
+
+±1 pc cm −3, with a step size of 0.1 pc cm −3), yielding 20 trial DMs. Single-pulse candidates were subsequently identified using PRESTO’s single pulse search.py .To reduce contamination from residual RFI, only can-didates with detection significance above 5 σ and widths below 50 ms (or 100 ms for pulsars with intrinsically broader pulses) were retained. Multiple detections cor-responding to the same astrophysical pulse were consoli-dated by requiring successive candidates to be separated by at least one pulsar rotation period. The remain-ing candidates were then visually inspected using their dedispersed dynamic spectra and DM transforms. Gen-uine pulses were required to exhibit a characteristic dis-persed track across frequency, along with the expected bow-tie signature in DM space, thereby enabling reliable rejection of residual RFI events. The analysis was per-         
+
+> 8Pulsar parameters were obtained from the ATNF Pulsar Catalogue: https://www.atnf.csiro.au/research/pulsar/ psrcat/
+
+formed independently for both PC and IA beam obser-vations across all three SPOTLIGHT observing bands. The resulting single-pulse populations provide a di-rect measure of the effect of RFI mitigation on burst recovery. Figure 6 shows the S/N of individual pulses as a function of pulse index for a representative Band 3 IA observation. Following the application of VOLT , and subsequently VOLT +STRIPE , additional genuine pulses are recovered, accompanied by an increase in the me-dian single-pulse S/N. The recovered pulses exhibit a 2.7 × improvement in median S/N after the two-stage filtering compared with the unfiltered data. We sum-marise this behaviour across the complete pulsar sam-ple in Figure 7, which shows the relative change in the number of genuine pulses recovered for the VOLT -only and VOLT +STRIPE configurations for PC and IA obser-vations in Bands 3 and 5. Across the six pulsar obser-vations, the number of genuine pulses increased relative to the unfiltered reference after applying VOLT , with in-creases of 4% and 52% for Band 3 and Band 5 PC beams, respectively, and 123% and 32% for the corresponding IA beams. Applying VOLT +STRIPE produced further in-creases of 9% and 86% for Band 3 and Band 5 PC beams, respectively, and 456% and 122% for the corresponding IA beams. The increase in the recovered pulse popula-tion across different observing configurations indicates that RFI mitigation can recover genuine single pulses not identified in the unfiltered data. For the representa-tive observation shown in Figure 6, the recovered pulses also show an increase in median S/N following RFI mit-igation, illustrating the corresponding improvement in single-pulse detectability. 3.4. Trigger Rate Reduction 
+
+The two-stage RFI mitigation framework was inte-grated into SPOTLIGHT towards the end of uGMRT observing Cycle 49 (April 2026) and has been in routine operation since the beginning of Cycle 50. The SPOT-LIGHT real-time transient detection pipeline is designed to accommodate approximately one trigger every 10 min (Reddy et al. in prep), a limit imposed by the compu-tational and storage resources required for downstream validation, imaging, and archival. For every transient candidate, SPOTLIGHT records high-resolution beam-formed data, interferometric raw visibilities, and base-band voltages over the burst duration, together with additional pre- and post-event buffers. For the most de-manding observing configuration (Band 3, correspond-ing to the maximum searched dispersion delay of ∼30 s at DM = 1000 pc/cm 3), a single trigger results in a maximum data dump of approximately 644 GB, with the baseband (425 GB) and visibility products (219 GB) 8 The SPOTLIGHT Collaboration 64.2 64.4                               
+
+> Mean power  No Filter
+> 01234
+> Time (s)
+> 300 325 350 375 400 425 450 475 500
+> Frequency (MHz)
+> 64.0 64.2
+> VOLT
+> 01234
+> Time (s)
+> 63.75 64.00
+> VOLT +STRIPE
+> 01234
+> Time (s)
+> 60 62 64 66 68
+> Power (arb. units)
+> 58 60 62 64 66 68 70 72
+> Power (arb. units)
+> 55 60 65 70 75
+> Power (arb. units)
+
+(a) Band 3 (300–500 MHz), PC beam mode, J2113+4644 13 14                                     
+
+> Mean power  No Filter
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+> Time (s)
+> 300 325 350 375 400 425 450 475 500
+> Frequency (MHz)
+> 77.0 77.5
+> VOLT
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+> Time (s)
+> 64 66
+> VOLT +STRIPE
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2
+> Time (s)
+> 010 20 30 40
+> Power (arb. units)
+> 65 70 75 80 85 90 95 100
+> Power (arb. units)
+> 55 60 65 70 75
+> Power (arb. units)
+
+(b) Band 3 (300–500 MHz), IA beam mode, J0820-1350 
+
+Figure 5. Comparison of SPOTLIGHT beamformed data processed with no RFI filtering, VOLT , and VOLT+STRIPE . The dynamic spectra, together with the corresponding time-series profiles, show the effect of successive RFI mitigation stages on the beamformed data. 
+
+dominating the storage requirements. At the nominal operating rate of one trigger every 10 min, the available 1 PB storage will be exhausted in only 11.3 days. The derivation of these extreme estimates is provided in Ap-pendix B. Furthermore, the real-time imaging pipeline (Pal et al. in prep) makes sustained operation at sub-stantially higher trigger rates computationally impracti-cal. Consequently, suppressing false triggers is essential for maintaining uninterrupted commensal observations. To quantify the operational impact of the proposed RFI mitigation framework, we estimated the trigger rate across all commensally recorded non-pulsar GTAC (GMRT Time Allocation Committee) observations (in total 250 observations spanning more than 713 hours of GTAC time) acquired between the beginning of Cycle 49 (October 2025) and the middle of Cycle 50 (June 2026). Since SPOTLIGHT performs a transient search continuously throughout every observation, irrespective of the primary science target, the trigger rate was com-puted by normalising the total number of triggers by the full observation duration. Figure 8 presents the monthly median trigger rate per 10 minutes, along with the min-imum and maximum trigger rates across observations obtained within each month. The temporal evolution of the trigger rate closely fol-lows the successive deployment of RFI mitigation strate-gies in SPOTLIGHT. During October and November 2025, when no real-time RFI mitigation was available, the median trigger rate was approximately 5 triggers per 10 min, which, in an extreme scenario, would com-pletely utilise the available 1 PB of storage in only 2.26 days, well below the timescale required for downstream inspection and data management. In December, a tem-porary mitigation strategy was introduced by flagging The SPOTLIGHT’s Real-time RFI Mitigation Framework 90 100 200 300 400 500 600 700 800     
+
+> Arrival Time (s)
+> 20 40 60 80 100
+> Signal-to-Noise Ratio (S/N)
+> GWB NF S/N = 10.6
+> SPLT VOLT S/N = 14.1
+> SPLT VOLT+STRIPE S/N = 28.5
+> Detection Threshold = 5 σ
+> 10 010 1
+> Count
+
+Figure 6. Single-pulse S/N distribution and temporal distribution of detected pulses from J0820 −1350 in Band 3 (300–500 MHz) for the unfiltered, VOLT -filtered, and 
+
+VOLT +STRIPE -filtered data. Each point is scaled with de-tected width, and the horizontal lines in the S/N–arrival-time panel indicate the median S/N for each configuration, while the solid red line marks the 5 σ detection threshold. Band 3 Band 5 020 40 60 80  
+
+> Change in genuine bursts (%)
+> PC beam
+> +4% +9% +52% +86%
+> Band 3 Band 5 0100 200 300 400 500
+> IA beam
+> +123% +456% +32% +122%
+> VOLT VOLT + STRIPE
+
+Figure 7. Relative change in the number of genuine single pulses detected after RFI mitigation, with respect to the unfiltered GWB data, for IA and PC beams across Bands 3 and 5. 
+
+known, persistently RFI-contaminated frequency chan-nels in the beamformed data, resulting in a moderate reduction in trigger rates. Beginning in February, the antenna-level voltage filter ( VOLT ) was deployed while the bad-channel masking strategy remained in place. Following the deployment of STRIPE in April, the tem-porary masking strategy was discontinued, and the com-plete two-stage RFI mitigation framework, comprising 
+
+VOLT and STRIPE , became operational from the start of Cycle 50. As April 2026 was largely occupied by GMRT maintenance and the transition from cycle 49 to 50, the 0100   
+
+> Hrs
+> 20.53 116.83 117.55 85.12 117.49 89.81 7.7 117.63 40.73
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> Trigger rate (triggers / 10 min)
+> SPOTLIGHT design limit Median Min Max
+> October November December January February March April May June
+> Filters
+> No Filter Bad channel Flagging VOLT STRIPE
+
+Figure 8. Monthly temporal evolution of the SPOTLIGHT trigger rate from October 2025 to June 2026, expressed as the number of triggers per 10 min. The median, minimum, and maximum trigger rates across observations in each month are shown by separate markers, while the horizontal dashed line indicates the nominal SPOTLIGHT processing limit of one trigger per 10 min. The total observing time contributing to each monthly estimate is shown by the bars in the upper panel; the limited April coverage results in closely clustered statistics. 
+
+number of commensal non-pulsar observations was only 2, so the statistics are heavily biased due to the limited sample size. The deployment of the complete framework reduced the median trigger rate from 5 to approximately 0.09 triggers per 10 min, extending the continuous operating lifetime of the available storage from 2.3 days to 125.5 days, comfortably exceeding the design requirement of one trigger every 10 min. This reduction restores SPOT-LIGHT to its intended operating regime while sub-stantially decreasing the burden of false-positive can-didates on the transient validation and real-time imag-ing pipelines. The close correspondence between the de-ployment timeline and the observed reduction in trigger rate demonstrates that a large fraction of triggers gener-ated during routine commensal observations originated from terrestrial radio-frequency interference. More im-portantly, the proposed two-stage mitigation framework transforms SPOTLIGHT from a storage-limited sys-tem into one capable of sustained, real-time transient searches without compromising its ability to detect gen-uine astrophysical transients. 
+
+4. FUTURE WORK Several extensions are planned to further improve the efficiency and adaptability of the framework. In par-10 The SPOTLIGHT Collaboration 
+
+ticular, STRIPE can be extended to exploit the spatial information available from the multiple simultaneous beams. Genuine astronomical sources are expected to produce spatially localised signals, whereas terrestrial interference may appear simultaneously across multiple beams. The shared-memory architecture, which pro-vides access to multiple beamformed data streams on each compute node, could therefore be used to construct common RFI masks and reduce redundant channel-level computations across beams. Such spatial information could complement the existing spectro-temporal filter-ing and multi-beam candidate-selection strategies. Afurther optimisation is to investigate whether RFI masks derived from the IA beam, which generally experiences a higher RFI burden and requires substantially less com-putation because only a single beam is processed, can be used to pre-identify persistently contaminated fre-quency channels in the PC beams. These approaches could reduce the computational cost of STRIPE and pro-vide additional headroom for increasing the number of beams processed in real-time. Future development will also explore adaptive and machine-learning-assisted ap-proaches to improve the robustness of RFI identification under changing interference environments while preserv-ing astrophysical signals.  
+
+> 5.
+
+SUMMARY We have presented a two-stage real-time RFI mit-igation framework developed for the SPOTLIGHT transient-search pipeline, comprising the antenna-level voltage filter ( VOLT ) and the beamformed-data filtering framework ( STRIPE ). The two filters operate at comple-mentary stages of the signal chain, mitigating impul-sive interference before correlation and residual spectro-temporal interference after beamforming. Following their deployment, SPOTLIGHT has experienced a sub-stantial reduction in the trigger rate during routine com-mensal observations, bringing the system within its in-tended operational capacity for sustained real-time tran-sient searches. Tests using pulsar observations demonstrate that the two-stage filtering improves the recovery of genuine sin-gle pulses. Comparison with PRESTO’s rfifind shows that STRIPE provides comparable or greater improve-ment in folded S/N for the pulsar sample analysed. To-gether, these results demonstrate the practical utility of lightweight, real-time RFI mitigation for maintain-ing the sensitivity and computational efficiency required by high-throughput transient surveys. By mitigating the impact of terrestrial radio-frequency interference, the framework enhances SPOTLIGHT’s sensitivity to weaker radio transients, potentially improving the de-tectability of faint pulsars and FRBs. ACKNOWLEDGMENTS We acknowledge constructive discussions with Yunpeng Men and Emma Carli, which helped us better under-stand the RFI mitigation algorithm. We acknowledge the invaluable contribution of colleagues from the Ox-ford e-Research Centre (OeRC), NVIDIA, and the Cen-tre for the Development of Advanced Computing (C-DAC). We thank our colleagues at the Centre for De-velopment of Advanced Computing (C-DAC) for their support in setting up the Param Brahmand data centre at the GMRT. We acknowledge funding for the SPOT-LIGHT backend (called Param Brahmand) under the National Supercomputing Mission (NSM) Phase 3, as well as support from the Department of Atomic En-ergy (DAE), Government of India, under project no. 12 − R&D − TFR5 .02 − 0700, for the contributions to-wards the overhead cost. The uGMRT is operated by the National Centre for Radio Astrophysics of the Tata Institute of Fundamental Research, India. We also ac-knowledge the DAE for the fund under the project titled Next Generation Instrumentation for Radio Astronomy (project UID number being RTI4017). We gratefully acknowledge support from the “Building Indo–UK Collaborations Towards the Square Kilometre Array”, funded under the DAE–STFC Technology and Skills Programme, which facilitated the development of SPOTLIGHT’s highly efficient, real-time transient search pipelines. We sincerely thank the uGMRT engi-neers involved in the SPOTLIGHT survey for their re-lentless efforts in commissioning and stabilising SPOT-LIGHT’s correlator and beamformer systems, ensuring high-quality data flow for all of SPOTLIGHT’s real-time and offline systems. We also thank the uGMRT oper-ators for their coordinated efforts in successfully con-ducting the SPOTLIGHT survey and test observations. This research was supported in part by the International Centre for Theoretical Sciences (ICTS) for the FTSky: A program in the field of Fast Radio Transients (code: ICTS/FTSky2025/10). The PI gratefully acknowledges the financial support provided by Premji Invest’s gener-ous donation to TIFR to pursue the application of AI to accelerate scientific discovery in astrophysics. This funding helped support a Research Assistant position at NCRA–TIFR and enabled this research. The SPOTLIGHT’s Real-time RFI Mitigation Framework 11                                                                                                                                
+
+> Table 1. Physical properties of the pulsars used throughout this paper to evaluate the performance of the RFI mitigation algorithms. Dispersion measures, periods, pulse widths, duty cycles, and flux densities (at 1400 MHz) are taken from the ATNF Pulsar Catalogue (R. N. Manchester et al. 2005). Pulsar DM (pc cm −3)Period (s) W50 (ms) Duty Cycle (%) Flux Density (mJy) J0139+5814 73.81 0.27 5.20 1.90 4.60 J0452 −1759 39.90 0.55 27.00 4.91 17.00 J0534+2200 56.77 0.03 2.00 6.00 14.00 J0543+2329 77.70 0.25 4.70 1.90 10.70 J0630 −2834 34.42 1.24 63.00 5.06 32.00 J0659+1414 13.95 0.39 14.80 3.80 2.70 J0729 −1448 91.93 0.25 7.60 3.00 0.83 J0729 −1836 61.22 0.51 14.00 2.70 1.90 J0742 −2822 73.76 0.17 4.40 2.60 26.00 J0820 −1350 40.94 1.24 23.00 1.86 6.00 J0835 −4510 67.77 0.09 1.70 1.90 1050.00 J1644 −4559 478.66 0.46 8.00 1.76 300.00 J1705 −3423 146.15 0.26 12.00 4.70 5.30 J1709 −4429 75.58 0.10 6.00 5.90 12.10 J1731 −4744 123.06 0.83 18.00 2.20 27.00 J1740 −3015 151.90 0.61 3.00 0.50 8.90 J1751 −3323 295.54 0.55 7.50 1.40 1.67 J1752 −2806 50.323 0.56 6.60 1.17 48.00 J1803 −2137 234.04 0.13 13.00 9.70 9.60 J1825 −0935 19.38 0.77 11.00 1.40 10.00 J1847 −0402 141.98 0.60 20.00 3.30 4.90 J1932+1059 3.18 0.23 5.60 2.50 29.00 J1935+1616 158.64 0.36 6.50 1.81 58.00 J2113+4644 141.26 1.01 60.50 5.96 19.00
+
+APPENDIX  
+
+> A.
+
+PULSAR DATA Table 1 presents the physical properties of pulsars used in the optimisation, comparison of STRIPE and rfifind , as well as single pulse recovery. The dataset spans a wide range of periods, flux densities, dispersion measures, and duty cycles, making it representative of the diverse observing conditions under which SPOTLIGHT routinely operates.  
+
+> B.
+
+ESTIMATION OF MAXIMUM TRIGGER DATA VOLUME The maximum data volume generated by a single SPOTLIGHT trigger is determined by the longest possible disper-sive delay searched by the real-time transient pipeline. This appendix derives the trigger size quoted in §3.4, which is subsequently used to estimate the operational storage lifetime of the SPOTLIGHT system. Throughout routine observations, SPOTLIGHT records three independent data products for every detected transient candidate: (i) beamformed data, (ii) high-time-resolution interferometric visibilities, and (iii) raw baseband voltages. The amount of data recorded depends on the burst duration, the searched dispersion measure (DM), and the buffering strategy adopted by the pipeline. The largest data volume occurs for the lowest observing frequency and the highest searched dispersion measure, since these produce the maximum dispersive delay across the observing band. For the standard Band 3 transient search, SPOTLIGHT searches up to a maximum dispersion measure of ( DM max )of 1000 pc/cm 3, which corresponds to a maximum dispersive delay (∆ tDM ) of 29.50 seconds (S. R. Kulkarni (2020)). 12 The SPOTLIGHT Collaboration 
+
+The following estimates assume a negligible intrinsic burst width so that the data volume is dominated by the dispersion delay. B.1. Beamformed Data 
+
+The dumped beamformed data consists of the complete dispersed burst together with equal pre- and post-event margins. Consequently, the number of beamformed samples written to disk is 
+
+Nbeam = 2 × Ndelay + Nburst ≈ 2Ndelay 
+
+where Ndelay = 45017 samples for the maximum dispersion delay at the default sampling interval of tsamp = 1 .31072ms. This corresponds to a beamformed data volume of Sbeam ≈ 175 .8 MB. Since beamformed data are total-intensity products, they contribute only a small fraction of the total trigger volume. B.2. Visibility Data 
+
+The real-time imaging pipeline requires high-time-resolution interferometric visibilities surrounding each transient candidate. To accommodate pipeline latency, the visibility dump can include at most one complete buffer before and after the dispersed burst and an additional 10% timing margin on either side of the dispersion delay. For the current SPOTLIGHT correlator, 
+
+Nvis = 2 ×
+
+32 2
+
+
+
++ 64 = 1056 visibility products are recorded, comprising all cross-correlations for two polarisations together with the autocorrelation products from 32 antennas. Each complex visibility is stored as a half-precision floating-point number (2 bytes per component). The resulting visibility dump occupies Svis ≈ 219 .1 GB. B.3. Baseband Data 
+
+The largest contribution to the trigger volume arises from the raw baseband voltages. Similar to the visibility dump, the baseband recording includes the complete dispersed burst, along with at most one buffer before and after the event, and an additional 10% timing margin. The SPOTLIGHT correlator records voltages from 32 antennas × 2 polarisations = 64 independent baseband streams. For the standard 200 MHz observing mode, the voltages are represented using 4-bit samples. Each baseband buffer contains 400 MB, corresponding to 1.048576 seconds of data. Accounting for the complete dispersed burst and the required buffering yields a total baseband data volume of Sbaseband ≈ 425 GB. B.4. Total Trigger Size 
+
+The maximum data volume associated with a single transient trigger is therefore 
+
+Strigger = Sbeam + Svis + Sbaseband 
+
+= 175 .8 MB + 219 .1 GB + 425 GB 
+
+≈ 644 .3 GB The beamformed data contribute less than 0.1% of the total trigger size, while the visibility and baseband products dominate the storage requirements. Assuming an effective storage capacity of approximately 1 PB, the maximum number of triggers that can be retained simultaneously is 
+
+Ntrigger = 1 PB 644 .3 GB ≈ 1627 triggers At the nominal design rate of one trigger every 10 min, the available storage would therefore be exhausted after 1627 ×10 min = 11.3 days. In contrast, as described in §3.4, the median trigger rate observed prior to the deployment of the real-time RFI mitigation framework was approximately 5 triggers per 10 min, reducing the effective storage lifetime to only 2.3 days. Following the deployment of VOLT and STRIPE , the median trigger rate decreased to 0.09 triggers per 10 min, extending the storage lifetime to approximately 125.5 days. This increase in operational lifetime illustrates the practical importance of real-time RFI mitigation in enabling sustained commensal observations with SPOTLIGHT. The SPOTLIGHT’s Real-time RFI Mitigation Framework 13 REFERENCES 
+
+Akeret, J., Chang, C., Lucchi, A., & Refregier, A. 2017, Astronomy and Computing, 18, 35, doi: 10.1016/j.ascom.2017.01.002 
+
+Baan, W., Fridman, P., & Millenaar, R. 2004, in 2004 12th European Signal Processing Conference, 765–768. https: //ieeexplore.ieee.org/abstract/document/7079673 
+
+Baan, W. A. 2019, Journal of Astronomical Instrumentation, 08, 1940010, doi: 10.1142/S2251171719400105 
+
+Bassa, C. G., Vruno, F. D., Winkel, B., et al. 2024, Astronomy & Astrophysics, 689, L10, doi: 10.1051/0004-6361/202451856 
+
+Bentum, M., & Boonstra, A.-J. 2016, in 2016 Radio Frequency Interference (RFI), 1–6, doi: 10.1109/RFINT.2016.7833521 
+
+Brentjens, M. A. 2016, in 2016 Radio Frequency Interference (RFI), 7–10, doi: 10.1109/RFINT.2016.7833522 
+
+Buch, K. D., Kale, R., Muley, M., Kudale, S., & Ajithkumar, B. 2023, Journal of Astrophysics and Astronomy, 44, 37, doi: 10.1007/s12036-023-09919-x 
+
+Buch, K. D., Naik, K., Nalawade, S., et al. 2019a, Journal of Astronomical Instrumentation, 8, 1940006 Buch, K. D., Naik, K., Nalawade, S., et al. 2019b, IETE Technical Review, 36, 225, doi: 10.1080/02564602.2018.1450650 
+
+Cucho-Padin, G., Wang, Y., Li, E., et al. 2019, Radio Science, 54, 986, doi: 10.1029/2019RS006902 
+
+Das, J., Roy, J., Deo, N. P., et al. 2026, The SPOTLIGHT Pulsar Search Pipeline: A GPU-Accelerated FFT Approach, arXiv, doi: 10.48550/arXiv.2607.08854 
+
+Fridman, P. A., & Baan, W. A. 2001, Astronomy & Astrophysics, 378, 327, doi: 10.1051/0004-6361:20011166 
+
+Gary, D. E., Liu, Z., & Nita, G. M. 2010, Publications of the Astronomical Society of the Pacific, 122, 560, doi: 10.1086/652410 
+
+Gong, Z., White, J., Roy, J., & Armour, W. 2026, MARS: A Lightweight Morphology-Aware RFI Segmentation Network for Mask-Guided Mitigation in Radio Astronomy, arXiv, doi: 10.48550/arXiv.2608.05546 
+
+Gupta, Y., Ajithkumar, B., Kale, H. S., et al. 2017, Current Science, 113, 707, doi: 10.18520/cs/v113/i04/707-714 
+
+Kulkarni, S. R. 2020, Dispersion measure: Confusion, Constants & Clarity, arXiv, doi: 10.48550/arXiv.2007.02886 
+
+Leshem, A., Veen, A.-J. v. d., & Boonstra, A.-J. 2000, The Astrophysical Journal Supplement Series, 131, 355, doi: 10.1086/317360 
+
+Maan, Y., van Leeuwen, J., & Vohl, D. 2021, Astronomy & Astrophysics, 650, A80, doi: 10.1051/0004-6361/202040164 
+
+Manchester, R. N., Hobbs, G. B., Teoh, A., & Hobbs, M. 2005, The Astronomical Journal, 129, 1993, doi: 10.1086/428488 
+
+Men, Y., Barr, E., Clark, C. J., Carli, E., & Desvignes, G. 2023, Astronomy & Astrophysics, 679, A20, doi: 10.1051/0004-6361/202347356 
+
+Mesarcik, M., Boonstra, A.-J., Meijer, C., et al. 2020, Monthly Notices of the Royal Astronomical Society, 496, 1517, doi: 10.1093/mnras/staa1412 
+
+Morello, V., Rajwade, K. M., & Stappers, B. W. 2021, Monthly Notices of the Royal Astronomical Society, 510, 1393, doi: 10.1093/mnras/stab3493 
+
+Nita, G. M., & Gary, D. E. 2010, Monthly Notices of the Royal Astronomical Society: Letters, 406, L60, doi: 10.1111/j.1745-3933.2010.00882.x 
+
+Nita, G. M., Gary, D. E., & Hellbourg, G. 2016, in 2016 Radio Frequency Interference (RFI), 75–80, doi: 10.1109/RFINT.2016.7833535 
+
+Nita, G. M., Gary, D. E., Liu, Z., Hurford, G. J., & White, S. M. 2007, Publications of the Astronomical Society of the Pacific, 119, 805, doi: 10.1086/520938 
+
+Offringa, A. R., de Bruyn, A. G., Biehl, M., et al. 2010, Monthly Notices of the Royal Astronomical Society, 405, 155, doi: 10.1111/j.1365-2966.2010.16471.x 
+
+Panda, U., Roy, J., Bane, K., et al. 2026, The SPOTLIGHT Multibeam Real-Time Transient Detection System, arXiv, doi: 10.48550/arXiv.2606.27262 
+
+Ransom, S. 2011, Astrophysics Source Code Library, ascl:1107.017. https: //ui.adsabs.harvard.edu/abs/2011ascl.soft07017R 
+
+Raza, J., Boonstra, A.-J., & van der Veen, A. 2002, IEEE Signal Processing Letters, 9, 64, doi: 10.1109/97.991140 
+
+Reddy, S. H., Kudale, S., Gokhale, U., et al. 2017, Journal of Astronomical Instrumentation, 06, 1641011, doi: 10.1142/S2251171716410117 
+
+Roy, J., Chengalur, J. N., & Pen, U.-L. 2018, The Astrophysical Journal, 864, 160, doi: 10.3847/1538-4357/aad815 
+
+Roy, J., Chengalur, J. N., Adamek, K., et al. 2024, in 2024 URSI Regional Conference on Radio Science (URSI-RCRS) (IEEE), 1–3 Sclocco, A., Vohl, D., & van Nieuwpoort, R. V. 2019, in 2019 RFI Workshop - Coexisting with Radio Frequency Interference (RFI), 1–8, doi: 10.23919/RFI48793.2019.9111826 14 The SPOTLIGHT Collaboration 
+
+Sokolowski, M., Wayth, R. B., & Lewis, M. 2015, in 2015 IEEE Global Electromagnetic Compatibility Conference (GEMCCON), 1–6, doi: 10.1109/GEMCCON.2015.7386856 
+
+Tukey, J. 1977, Exploratory Data Analysis (Addison-Wesley, Reading, MA) van Nieuwpoort, R., van Leeuwen, J., Sclocco, A., Spreeuw, H., & Williams, C. 2018, in 2018 2nd URSI Atlantic Radio Science Meeting (AT- RASC), 1–1, doi: 10.23919/URSI-AT-RASC.2018.8471446 
+
+van Nieuwpoort, R. V. 2016, in 2016 Radio Frequency Interference (RFI), 69–74, doi: 10.1109/RFINT.2016.7833534 
+
+Vos, E. E., Luus, P. S. F., Finlay, C. J., & Bassett, B. A. 2019, in (IEEE Computer Society), doi: 10.1109/MLSP.2019.8918820 
+
+Vruno, F. D., Winkel, B., Bassa, C. G., et al. 2023, Astronomy & Astrophysics, 676, A75, doi: 10.1051/0004-6361/202346374 
+
+Winkel, B., & Jessner, A. 2019, Journal of Astronomical Instrumentation, 08, 1940002, doi: 10.1142/S2251171719400026

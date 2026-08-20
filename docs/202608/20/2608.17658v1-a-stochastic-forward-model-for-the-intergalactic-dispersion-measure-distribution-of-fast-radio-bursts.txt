@@ -1,0 +1,1109 @@
+Title: A stochastic forward model for the intergalactic dispersion-measure distribution of Fast Radio Bursts
+
+URL Source: https://arxiv.org/pdf/2608.17658v1
+
+Published Time: Wed, 19 Aug 2026 00:51:51 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+MNRAS 000 , 1–16 (2026) Compiled using MNRAS L ATEX style file v3.2 
+
+# A stochastic forward model for the intergalactic dispersion-measure distribution of Fast Radio Bursts 
+
+# Jéferson A. S. Fortunato ,1,2,3★ Valerio Marra ,4,5,6,8†
+
+# Wiliam S. Hipólito-Ricaldi ,7,8‡ and Amanda Weltman ,1,2,3§
+
+> 1
+
+High Energy Physics, Cosmology & Astrophysics Theory Group, Department of Mathematics and Applied Mathematics, University of Cape Town, Cape Town 7700, South Africa 
+
+> 2
+
+African Institute for Mathematical Sciences, 6 Melrose Road, Muizenberg, Cape Town 7945, South Africa 
+
+> 3
+
+National Institute for Theoretical and Computational Sciences (NITheCS), Potchefstroom, South Africa 
+
+> 4
+
+Departamento de Física, Universidade Federal de Ouro Preto, 35400-000, Ouro Preto, MG, Brazil 
+
+> 5
+
+INAF – Osservatorio Astronomico di Trieste, via Tiepolo 11, 34131 Trieste, Italy 
+
+> 6
+
+IFPU – Institute for Fundamental Physics of the Universe, via Beirut 2, 34151, Trieste, Italy  
+
+> 7
+
+Grupo de Física Teórica e Computacional, Departamento de Ciências Naturais, CEUNES, Universidade Federal do Espírito Santo, Rodovia BR 101 Norte, km 60, CEP 29.932-540, São Mateus, ES, Brazil 
+
+> 8
+
+Núcleo Cosmo-UFES, CCE, Universidade Federal do Espírito Santo, Av. Fernando Ferrari, 540, CEP 29.075-910, Vitória, ES, Brazil 
+
+ABSTRACT 
+
+Fast Radio Bursts probe ionised baryons through their observed dispersion measures. We present turboFRB , a semi-analytic stochastic forward model for the intergalactic dispersion-measure distribution, 𝑃 (DM IGM | 𝑧 ), that resolves the diffuse IGM, halo, and filament contributions as explicit physical channels, with the halo and filament encounter rates coupled by a latent line-of-sight environmental variable. Only four effective parameters are calibrated against hydrodynamical ray-traced IllustrisTNG benchmark. The model matches the benchmark mean DM to the percent level and yields a per-redshift Jensen–Shannon divergence of at most 5 × 10 −3 across 𝑧 = 0.5–2 .5. The per-sightline channel decomposition makes explicit what closed-form parametric descriptions cannot show: the diffuse IGM sets the body of the distribution, while halos and filaments populate the high-DM tail. Applied to representative localised FRBs, the forward likelihood quantifies host-excess events independently of their astrophysical signatures and recovers the injected 𝐻 0 within 1 𝜎 in a closed-loop consistency test. The turboFRB package is available at github.com/jefersonfortunato/turbofrb. 
+
+Key words: fast radio bursts – intergalactic medium – cosmology: observations – methods: statistical – large-scale structure of Universe 
+
+1 INTRODUCTION 
+
+Fast Radio Bursts (FRBs) are millisecond radio transients that propagate across cosmological distances before reaching the ob-server (Lorimer et al. 2007; Petroff et al. 2019). Because radio waves travel through ionised plasma with a frequency-dependent group ve-locity, every burst accumulates a dispersion delay proportional to the integrated free-electron column density along the line of sight. The corresponding observable is the dispersion measure (DM), and for a localised FRB it can be written as DM obs = DM MW + DM IGM + DM host 
+
+1 + 𝑧 host 
+
+, (1) where DM MW contains the Milky Way disk and halo free electron density contributions, DM IGM is the intergalactic contribution, and DM host is the source-host contribution evaluated in the host rest  
+
+> ★
+
+jeferson.fortunato@uct.ac.za 
+
+† valerio.marra@me.com 
+
+‡ wiliam.ricaldi@ufes.br 
+
+§ amanda.weltman@uct.ac.za 
+
+frame. In a homogeneous Universe one recovers the familiar Mac-quart relation ⟨DM IGM (𝑧 )⟩ ∝ 𝑧 at low redshift (Ioka 2003; Inoue 2004), generalised in realistic cosmology by integrating the free-electron density along the light cone. This mean relation has already been used to infer baryon fractions, expansion histories, and tests of fundamental physics from localised FRBs (Macquart et al. 2020; James et al. 2022b; Hagstotz et al. 2022; Fortunato et al. 2025, 2026). The mean relation is not sufficient for individual FRB sightlines. At fixed redshift, different lines of sight sample different environ-ments: some pass mostly through diffuse intergalactic gas, while others intersect halo outskirts, groups, clusters, or cosmic filaments. The relevant observable is therefore the full conditional distribution 
+
+𝑃 (DM IGM | 𝑧 ), (2) which is broad, skewed, and non-Gaussian (Bhandari & Flynn 2021). Its body is set mainly by the diffuse IGM component, while halos and filaments populate the shoulder and high-DM tail. This distinction matters for likelihood analyses because Gaussian approximations or misestimated tails assign incorrect probabilities to high-DM events. As localised FRB samples grow in number, resolving the physical channels that shape 𝑃 (DM IGM | 𝑧 ) becomes increasingly important. 
+
+© 2026 The Authors arXiv:2608.17658v1 [astro-ph.CO] 18 Aug 2026 2 Fortunato et al. 
+
+This motivation goes back to McQuinn (2014), who showed that the shape of the DM distribution is sensitive to whether baryons reside inside halos or in more extended diffuse structures. A widely used phenomenological description compresses the problem into a small number of effective parameters. In the Macquart-style picture, the normalised variable 
+
+Δ ≡ DM IGM 
+
+⟨DM IGM (𝑧 )⟩ (3) is described by a skewed one-parameter family with a redshift-dependent width usually written as 
+
+𝜎 diff (𝑧 ) = 𝐹 
+
+√𝑧 , (4) with 𝐹 calibrated from localised FRBs (Macquart et al. 2020). The corresponding fitting function for the PDF is written as (McQuinn 2014; Prochaska & Zheng 2019; James et al. 2022a): 
+
+𝑃 diff (Δ) ∝ Δ−𝛽 exp 
+
+"
+
+− (Δ− 𝛼 − 𝐶 0)2
+
+2𝛼 2𝜎 2diff 
+
+#
+
+, (5) with 𝛼 , 𝛽 , 𝐶 0 (𝑧 ) and 𝜎 diff (𝑧 ) fitted to the IllustrisTNG simulation in Zhang et al. (2021). This type of approximation is useful because it converts the full distribution into a small set of summary functions. It is also, however, known to have limitations. At low redshift the 
+
+𝐹 /√𝑧 scaling formally diverges, the fitted PDF family becomes less well behaved, and the identification of 𝜎 diff with the true normalised scatter 𝜎 Δ is no longer exact, as studied by Zhuge et al. (2026). They also provided a complementary analytic viewpoint parametrized by halo-channel arguments, 
+
+𝜎 2 
+
+> Δ
+
+(𝑧 ) ∼ 𝜎 2halo 𝐷 𝑐 (𝑧 )⟨DM IGM (𝑧 )⟩ 2 𝑙 , (6) where 𝜎 halo is the halo-induced scatter per encounter, 𝑙 is an effective spacing scale that absorbs cross-section and mass-function weight-ing, and 𝐷 𝑐 is the comoving distance. This approach is physically suggestive, but it also leaves the key ingredients — the scatter per encounter and the effective spacing — to be supplied externally, and assumes implicitly that halo encounters dominate the variance budget at all redshifts. Much of the recent FRB cosmology literature has relied on the TNG-calibrated analytic fit of Zhang et al. (2021) as a reference description of 𝑃 (DM IGM | 𝑧 ). Konietzka et al. (2025), however, re-measured the TNG distribution using continuous mesh ray-tracing through Voronoi cells and showed that the original Zhang-based path integration suffers from a sparse-snapshot artefact that biases the width and higher moments of the distribution by tens of per-cent. In parallel, Torkamani et al. (2026) constructed an analytic baryonification model for 𝑃 (DM IGM | 𝑧 ), while Mo et al. (2025) provided direct observational evidence that filament crossings can imprint measurable DM excesses. Andrew et al. (2026) have addi-tionally argued that, on linear scales, the FRB dispersion measure is an effectively unbiased tracer of the matter distribution, with bias parameter 𝑏 DM ≃ 1. Taken together, these developments motivate a modelling framework that does not assume a closed-form PDF from the outset, but instead resolves the main physical channels that generate the distribution. Here we present turboFRB , a semi-analytic stochastic generator for 𝑃 (DM IGM | 𝑧 ) that builds each sightline as the sum of three physically motivated baryonic channels: a mean-preserving lognor-mal diffuse component, Poisson-sampled halo encounters integrated through NFW gas profiles (Navarro et al. 1997), and Poisson-sampled filament encounters with finite-cylinder geometry, coupled by a latent environmental variable that correlates the structural channels. This explicit channel decomposition is the conceptual core of the model, distinguishing turboFRB from both closed-form parametric descrip-tions and pure hydrodynamical ray-tracing: rather than assuming a PDF shape, the model resolves the physical mechanisms that gen-erate it. The output is a per-sightline DM trace, from which PDFs, moments, quantiles, tail probabilities, and channel decompositions can be measured directly. Only four effective parameters are cali-brated against the corrected TNG benchmark; the remaining inputs are fixed by external information, engine defaults, or budget closure. This makes turboFRB a natural tool for Bayesian inference of cos-mological parameters and for diagnosing individual FRB sightlines within a physically transparent framework. The stochastic sampling architecture is inspired by the gravitational-lensing framework of Kainulainen & Marra (2009, 2011), which demonstrated that line-of-sight PDFs can be built efficiently by Poisson-sampling halo encounters along cosmolog-ical sightlines and embedding them in large-scale structure. The FRB dispersion-measure problem shares this mathematical struc-ture, since DM IGM is likewise a line-of-sight integral of a positive-definite quantity that accumulates discrete contributions from over-dense structures. The physical kernels, gas profiles, environmental modulation, and calibration strategy are, however, all specific to the dispersion-measure observable: weak-lensing convergence weights projected mass through a geometric lensing kernel, whereas DM weights free-electron column density with a cosmological (1 + 𝑧 )−1
+
+dilution factor, requiring a complete reformulation of the encounter kernels and normalisation scheme. Throughout, we assume a flat ΛCDM cosmology with 𝐻 0 =
+
+67 .74 km s −1 Mpc −1, Ω𝑚 = 0.3089, Ω𝑏 = 0.0486, ΩΛ = 0.6911, and the canonical Macquart partition 𝑓 IGM ,0 = 0.84. This is the cosmology adopted by the corrected ray-traced catalogue of Koni-etzka et al. (2025) which serves as our calibration target. Matching the simulation cosmology ensures that the calibrated effective pa-rameters capture genuine differences in the conditional distribution shape rather than absorbing a residual cosmological-parameter offset between the model and the benchmark. The paper is organised as follows. Section 2 defines the stochas-tic engine and calibration strategy. Section 3 validates the calibrated distributions against corrected TNG ray tracing. Section 4 analyses the halo encounter statistics, Section 5 applies the forward likelihood to representative FRBs, and Section 6 gives a closed-loop 𝐻 0 con-sistency test. Sections 7 and 8 discuss the interpretation, limitations, and conclusions. 
+
+2 THE turboFRB STOCHASTIC ENGINE 
+
+The forward model assembles the line-of-sight DM contribution as the sum of three physically motivated channels: DM IGM (𝑧, LoS ) = DM smooth (𝑧 ) + DM halo (𝑧, 𝐸 ) + DM fil (𝑧, 𝐸 ), (7) where the smooth-IGM (diffuse), halo, and filament terms are defined below. The latent variable 𝐸 captures the line-of-sight environmental overdensity and couples the two structural channels through their encounter rates; the diffuse channel is drawn independently of 𝐸 .
+
+2.1 Analytic mean dispersion measure 
+
+Before describing the stochastic channels, we specify the determin-istic mean relation that all of them are anchored to. The analytic  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Stochastic FRB DM model 3
+
+ensemble-mean intergalactic dispersion measure as a function of source redshift is 
+
+⟨DM IGM (𝑧 )⟩ =
+
+∫ 𝑧 
+
+> 0
+
+𝑐 𝑛 𝑏, 0 𝑓 𝑒 (𝑧 ′) ( 1 + 𝑧 ′)
+
+𝐻 (𝑧 ′) 𝑑𝑧 ′, (8) where 𝑐 is the speed of light, 𝐻 (𝑧 ) = 𝐻 0√︁ Ω𝑚 (1 + 𝑧 )3 + ΩΛ is the Hubble parameter, and 
+
+𝑛 𝑏, 0 = 𝜌 𝑏, 0
+
+𝑚 𝑝 
+
+= 3𝐻 20 Ω𝑏 
+
+8𝜋𝐺 𝑚 𝑝 
+
+(9) is the comoving baryon number density today. The dimensionless prefactor 𝑓 𝑒 (𝑧 ) is the fraction of cosmic baryons present as dispersing free electrons at redshift 𝑧 , and is the quantity that encodes both the diffuse-IGM baryon partition and the time-dependent ionisation state of the plasma. In the standard Macquart-style treatment (Macquart et al. 2020; Deng & Zhang 2014), 𝑓 𝑒 is taken as approximately redshift-independent and factorised as 𝑓 Macq  
+
+> 𝑒
+
+≃ 𝑓 IGM ,0 𝜒 𝑒 , with 𝑓 IGM ,0 = 0.84 the fraction of cosmic baryons in the diffuse IGM and 𝜒 𝑒 =
+
+1 − 𝑌 He /2 ≃ 0.88 the electron-per-baryon ratio of a fully ionised primordial plasma, giving 𝑓 𝑒 ≃ 0.74. Konietzka et al. (2025) have recently measured the corresponding ratio directly in IllustrisTNG, defining 𝑓 𝑒𝑏 (𝑧 ) as the fraction of dispersing electrons to total baryons in the simulation volume. They show that 𝑓 𝑒𝑏 (𝑧 ) is well approximated by a linear function, 
+
+𝑓 𝑒𝑏 (𝑧 ) ≈ 𝑓 𝑒𝑏, 0 + 𝑓 𝑒𝑏, 1 𝑧, 𝑓 𝑒𝑏, 0 ≈ 0.83 , 𝑓 𝑒𝑏, 1 ≈ 0.006 , (10) obtained from the TNG free-electron field; the mild positive evolution with redshift encapsulates the residual effects of stellar and AGN feedback together with the late stages of cosmic reionisation. Because Konietzka et al. (2025) provides the benchmark used throughout this study, all reported results use the linear fit (10) in Eq. (8). A Macquart-style option with constant 𝑓 𝑒 = 𝜒 𝑒 𝑓 IGM ,0 ≈ 0.74 is retained as an internally selectable alternative in the engine; this choice affects the mean relation but not the stochastic channel structure. 
+
+2.2 Diffuse channel 
+
+The diffuse component DM smooth represents the smooth ionised inter-galactic medium between halos and filaments. It accounts for the vari-ance in DM accumulated across the smooth low-density regions that constitute most of the comoving volume; while individual smooth-medium fluctuations are small, their integral over a ∼Gpc-scale path length contributes significantly to the broadening of 𝑃 (DM IGM | 𝑧 ).We sample DM smooth from a lognormal distribution with redshift-dependent log-scatter, DM smooth (𝑧 ) = 𝜇 sm (𝑧 ) · exp 𝜎 sm (𝑧 ) 𝑋 − 12 𝜎 2sm (𝑧 ) , (11) where 𝑋 ∼ N ( 0, 1) and 
+
+𝜎 sm (𝑧 ) = 𝜎 0 (1 + 𝑧 )𝛾 𝑠 . (12) The mean-preservation factor − 12 𝜎 2sm ensures ⟨DM smooth (𝑧 )⟩ =
+
+𝜇 sm (𝑧 ) exactly, so the diffuse channel preserves its assigned bud-get share by construction and does not introduce an independent shift in the ensemble mean. The two free parameters of this channel are the amplitude 𝜎 0 and the redshift exponent 𝛾 𝑠 ; both are treated as nuisance parameters and calibrated as described in Section 2.7. The lognormal form is adopted phenomenologically and is not the Macquart-style family of Eq. (5): it reflects the fact that the diffuse-medium DM is the integral of a positive-definite quantity (electron density times path length) with multiplicative fluctuations, while admitting an exact mean-preserving prescription. It is not a derivation: the underlying density field of the smooth IGM is closer to a Gaussian random field on large scales, and the integrated DM is approximately lognormal only in the limit where the integrand variance is dominated by the largest-scale modes. We retain the lognormal form because it is well-behaved at the low-DM tail and admits an exact mean-preserving prescription. 
+
+2.3 Halo channel: Poisson encounters with NFW gas profiles 
+
+Halos along the LoS are drawn as a Poisson process with comoving differential rate 1
+
+𝑑 Λℎ
+
+𝑑𝑧 = 𝑛 hbg (1 + 𝑧 ) 𝜂 𝑛 ℎ ⟨𝜎 cross ⟩𝑀 
+
+𝑐 𝐻 (𝑧 ) , (13) where 𝑛 hbg is the effective calibrated comoving background halo number density, 𝜂 𝑛 ℎ = −0.20 controls its redshift evolution, and 
+
+⟨𝜎 cross ⟩𝑀 is the cross-section weighted average over the encounter mass function defined below; we use 𝜎 cross (𝑀 ) = 𝜋 (𝑥 max 𝑅 200 (𝑀 )) 2
+
+with 𝑥 max = 0.85. The cumulative halo rate from the observer to source redshift 𝑧 𝑠 is 
+
+Λℎ (𝑧 𝑠 ) =
+
+∫ 𝑧 𝑠 
+
+> 0
+
+𝑑 Λℎ
+
+𝑑𝑧 𝑑𝑧, (14) and is precomputed at construction time on the same redshift grid used for the analytic mean. Eq. (13) is an effective comoving parametrisation of the encounter rate: 𝑅 200 (𝑀 ) is held fixed in red-shift, so the cross-section carries no explicit (1 + 𝑧 ) scaling, and the proper-path and abundance-evolution factors that a fully physical rate would contain are absorbed into the calibrated 𝑛 hbg together with the fixed exponent 𝜂 𝑛 ℎ .The individual halo masses along each LoS are drawn from a log-normal pool truncated to 𝑀 ∈ [ 10 12 , 10 14 .8] 𝑀 ⊙ with log 10 𝑀 mean =
+
+12 .65 and log 10 𝑀 𝜎 = 0.35; for each encounter, a single halo is selected from a pre-drawn pool of 25 000 candidates with proba-bility proportional to its geometric cross-section ∝ 𝑅 2200 ∝ 𝑀 2/3,which is the standard reweighting for unbiased Poisson sampling of a heterogeneous rate. The lower mass cut excludes sub-galactic halos that contribute negligibly to the DM, while the upper cut excludes the rarest cluster-mass halos which would otherwise be sampled too coarsely by the Poisson process. The virial radius scales with mass as 𝑅 200 (𝑀 ) = 𝑅 ref 200 (𝑀 /𝑀 ref )1/3 with 𝑅 ref 200 = 0.30 Mpc at the pivot mass 𝑀 ref = 10 13 𝑀 ⊙ .The encounter redshift of each halo along the LoS is drawn by inverse-CDF sampling against Λℎ (𝑧 ), ensuring that the distribution of encounter redshifts reproduces 𝑑 Λℎ/𝑑𝑧 exactly without rejection. For each halo encounter, the impact parameter 𝑏 is sampled uniformly within the cross-section disk, 𝑏 = 𝑥 max 𝑅 200 
+
+√𝑢 with 
+
+𝑢 ∼ U ( 0, 1). The halo gas is assumed to trace the dark-matter density with a Navarro–Frenk–White (Navarro et al. 1997) profile, regularised by a small core at the centre. Writing 𝑢 ≡ 𝑟 /𝑅 200 and 
+
+𝑢 𝑠 ≡ 𝑟 𝑠 /𝑅 200 = 1/𝑐 200 , the dimensionless gas shape function used by the engine is 
+
+𝑆 (𝑢 ) = 1
+
+𝑥 (𝑢 ) [ 1 + 𝑥 (𝑢 )] 2 , 𝑥 (𝑢 ) = 𝑢 + 𝜖 𝑢 𝑠 
+
+𝑢 𝑠 
+
+= 𝑐 200 𝑢 + 𝜖,                         
+
+> 1Throughout the paper we write redshift-evolution factors as (1+𝑧 )𝜂 for compactness. The engine internally implements these factors as ( ( 1+𝑧 )/( 1+
+> 𝑧 piv ) ) 𝜂 with 𝑧 piv =1.0. A different pivot rescales the amplitude parameters (𝑛 hbg ,𝜆 0
+> 𝑓 ,𝑓 ℎ0,𝑓 𝑓 0) and not the exponents; accordingly, all amplitudes quoted in this paper are defined at 𝑧 piv =1. We keep the compact notation in the text and note this convention in the public code release. MNRAS 000 , 1–16 (2026)
+
+# 4 Fortunato et al. 
+
+(15) where 𝑐 200 = 5.0 is the adopted halo concentration (Duffy et al. 2008) and 𝜖 = 0.15 is a small dimensionless core-regularisation parameter (in units of 𝑟 𝑠 ) inserted to keep the central column finite. The volume integral of 𝑆 (𝑢 ),
+
+𝐽 mass ≡
+
+∫ 10
+
+4𝜋 𝑢 2 𝑆 (𝑢 ) 𝑑𝑢, (16) sets the normalisation 𝜌 0 through the requirement that the total en-closed gas mass within 𝑅 200 equal 𝑀 gas = 𝑓 gas ,h 𝑀 , with an effective halo gas fraction 𝑓 gas ,h = 0.10 that we treat as a fixed physical input. This value is consistent with the circumgalactic-medium constraints on 𝐿 ★ halos at 𝑧 ∼ 0 from Prochaska & Zheng (2019), based on high-velocity clouds, O vii absorption, and the Large Magellanic Cloud sightline. To allow for halo-to-halo variation in gas content, the gas mass of each individual encounter is multiplied by a lognor-mal scatter factor with log-amplitude 0 .12, sampled independently per encounter. The projected line-of-sight kernel at dimensionless impact param-eter 𝑥 𝑏 ≡ 𝑏 /𝑅 200 is 
+
+𝐽 col (𝑥 𝑏 ) ≡ 2
+
+∫√︃ 1−𝑥 2
+
+> 𝑏
+> 0
+
+𝑆 
+
+√︃ 
+
+𝑥 2 
+
+> 𝑏
+
++ 𝑡 2
+
+
+
+𝑑𝑡, (17) and is precomputed on a grid of 𝑥 𝑏 ∈ [ 0, 𝑥 max ] with 500 points, so a forward realisation only interpolates and does not re-evaluate the projection integral. The DM contribution of a single halo encounter at host redshift 𝑧 enc , impact parameter 𝑏 , and mass 𝑀 is then DM (1) 
+
+> halo
+
+(𝑀, 𝑏, 𝑧 enc ) = 𝜒 𝑒 𝑛 halo  
+
+> 𝑏, 0
+
+(𝑀 ) 𝑅 200 (𝑀 ) 𝐽 col (𝑥 𝑏 )
+
+1 + 𝑧 enc 
+
+, (18) where 𝜒 𝑒 = 0.88 is the electron-per-baryon ratio adopted for fully ionised primordial gas, 𝑛 halo  
+
+> 𝑏, 0
+
+is the central baryon number density fixed by the gas-mass closure described above, and the factor (1 +
+
+𝑧 enc )−1 is the cosmological dilution from the encounter rest frame to the observer. The total halo channel along the line of sight is the sum over all Poisson-sampled encounters, DM halo (𝑧 𝑠 , LoS ) =
+
+> 𝑁 ℎ
+
+∑︁ 
+
+> 𝑖 =1
+
+DM (1) 
+
+> halo
+
+(𝑀 𝑖 , 𝑏 𝑖 , 𝑧 enc  
+
+> 𝑖
+
+), (19) where 𝑁 ℎ is drawn from a Poisson distribution whose effective rate includes the line-of-sight environmental modulation described in Section 2.5: 𝑁 ℎ ∼ Poisson Λℎ (𝑧 𝑠 ) 𝜉 ℎ (𝐸 ), with Λℎ (𝑧 𝑠 ) from Eq. (14) and 𝜉 ℎ (𝐸 ) the halo environmental factor defined below. The parameter 𝑛 hbg absorbs the small offsets in mass-function shape, halo-gas content, and cross-section weighting between the engine’s anchored prescription and the corrected TNG benchmark; it is the single degree of freedom in the halo channel that is calibrated rather than fixed by physical input. The remaining halo-channel parameters ( 𝑓 ℎ0, 𝜂 ℎ, 𝜂 𝑛 ℎ , the cross-section weighting, the concentration 𝑐 200 ,and the effective gas fraction 𝑓 gas ,h) are all fixed by physical input at the values described above. 
+
+2.4 Filament channel: finite-cylinder encounters 
+
+Filament encounters are sampled with comoving differential rate 
+
+𝑑 Λ 𝑓 
+
+𝑑𝑧 = 𝜆 0 
+
+> 𝑓
+
+(1 + 𝑧 ) 𝜂 𝜆 𝑓 𝑐 𝐻 (𝑧 )
+
+110 3 Mpc /Gpc , (20) with 𝜆 0 
+
+> 𝑓
+
+= 0.45 Gpc −1 the comoving filament background rate at the pivot redshift, 𝜂 𝜆 𝑓 = 0.10 its redshift exponent, and the factor of 10 −3 converting from a per-Gpc rate to the per-Mpc convention used by the engine’s path-length integration. The values of 𝜆 0 
+
+> 𝑓
+
+and 𝜂 𝜆 𝑓 are informed by the DESI/DisPerSE filament catalogue analyses of Mo et al. (2025) and Connor et al. (2024). The cumulative filament rate 
+
+Λ 𝑓 (𝑧 𝑠 ) = ∫ 𝑧 𝑠  
+
+> 0
+
+𝑑 Λ 𝑓 /𝑑𝑧 𝑑𝑧 is precomputed on the same redshift grid as the halo rate. Each filament is treated as a finite cylinder with radius and length that scale with its mass as 
+
+𝑅 𝑓 (𝑀 ) = 𝑅 ref  
+
+> 𝑓
+
+(𝑀 /𝑀 ref )0.20 , 𝐿 𝑓 (𝑀 ) = 𝐿 ref  
+
+> 𝑓
+
+(𝑀 /𝑀 ref )0.15 ,
+
+(21) with 𝑅 ref  
+
+> 𝑓
+
+= 0.65 Mpc, 𝐿 ref  
+
+> 𝑓
+
+= 6.0 Mpc and 𝑀 ref = 10 13 𝑀 ⊙ ,drawn from the empirical fits in the catalogue. The filament masses are drawn from a log-normal distribution truncated to 𝑀 ∈[10 11 .8, 10 14 .2] 𝑀 ⊙ with log 10 𝑀 mean = 12 .55 and log 10 𝑀 𝜎 = 0.22. The impact parameter 𝑏 is sampled uniformly within the cylinder cross-section disk ( 𝑏 = 𝑅 𝑓 
+
+√𝑢 with 𝑢 ∼ U ( 0, 1)), and the cylinder orientation is sampled uniformly in cos 𝜃 , where 𝜃 is the inclination of the cylinder long-axis relative to the line of sight. The radial baryon density inside the filament follows an isothermal 
+
+𝛽 -model with 𝛽 = 2/3, 
+
+𝑛 𝑏 (𝑏 ) = 𝑛 fil 
+
+> 𝑏, 0
+
+1 +  𝑏 /𝑟 𝑐 
+
+2 , (22) with core radius 𝑟 𝑐 = 0.18 𝑅 𝑓 . The central density 𝑛 fil  
+
+> 𝑏, 0
+
+is fixed by requiring that the integral of the gas profile over the filament volume reproduce a gas mass 𝑀 gas = 𝑓 gas ,f 𝑀 , with an effective filament gas fraction 𝑓 gas ,f = 0.28. The absolute normalisation of the filament channel is not set by this value directly but is fixed by the budget-enforcement step (Section 2.6); we adopt the isothermal 𝛽 -model functional form ( 𝛽 = 2/3) motivated by the DESI/DisPerSE filament analysis of Mo et al. (2025), while the core geometry (𝑟 𝑐 = 0.18 𝑅 𝑓 ) is an engine choice. As with the halo channel, an independent lognormal scatter (log-amplitude 0 .10) is applied to the gas fraction of each individual filament encounter to capture filament-to-filament variation. For an encounter at host redshift 𝑧 enc and impact parameter 𝑏 , the projected DM contribution is then DM (1) 
+
+> fil
+
+(𝑀, 𝑏, 𝑧 enc ) = 𝜒 𝑒 𝑛 𝑏 (𝑏 ) ℓ(𝑏 )
+
+1 + 𝑧 enc 
+
+, (23) where 
+
+ℓ(𝑏 ) = min 
+
+
+
+2√︃ 𝑅 2 
+
+> 𝑓
+
+− 𝑏 2
+
+sin 𝜃 , 𝐿 𝑓 
+
+
+
+(24) is the chord length through the cylinder, clipped by the cylinder length when the inclination is small. Eq. (23) is an effective col-umn kernel rather than an exact integration: the density is evalu-ated at the point of closest approach and multiplied by the chord length, instead of integrating 𝑛 𝑏 [𝑟 (𝑠 )] along the oblique path, which would lower the column for inclined crossings. Because the bud-get step of Section 2.6 fixes the ensemble mean of the channel, this approximation acts on the shape of the per-encounter distribu-tion — and hence mildly on the high-DM tail — rather than on the channel normalisation. The total filament-channel contribution along the line of sight is the sum over all Poisson-sampled fila-ment encounters, DM fil (𝑧 𝑠 , LoS ) = Í𝑁 𝑓  
+
+> 𝑗 =1
+
+DM (1) 
+
+> fil
+
+(𝑀 𝑗 , 𝑏 𝑗 , 𝑧 enc  
+
+> 𝑗
+
+), with 
+
+𝑁 𝑓 ∼ Poisson Λ 𝑓 (𝑧 𝑠 ) 𝜉 𝑓 (𝐸 ), again with the environmental factor defined in Section 2.5.  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Stochastic FRB DM model 5
+
+2.5 Environmental modulation 
+
+The latent environmental variable 𝐸 is drawn once per line of sight from a Gaussian distribution 
+
+𝐸 ∼ N ( 0, 𝜎 2 
+
+> 𝐸
+
+), (25) and modulates the Poisson rates of the halo and filament channels through a mean-preserving exponential factor, 
+
+𝜉 𝑋 (𝐸 ) = exp  𝑎 𝑋 𝐸 − 12 (𝑎 𝑋 𝜎 𝐸 )2  , 𝑋 ∈ { ℎ, 𝑓 }. (26) The free parameter 𝜎 𝐸 controls the LoS-to-LoS amplitude of the modulation and is one of the four calibrated parameters. The two coupling exponents 𝑎 ℎ and 𝑎 𝑓 control how strongly the halo and fila-ment rates respond to the latent overdensity; we fix them at 𝑎 ℎ = 0.60 and 𝑎 𝑓 = 0.45 as engine defaults, encoding the qualitative observa-tion, drawn from cosmic-web simulations, that the halo abundance responds more sharply to the local overdensity than the filament population does. The functional form (26) is chosen so that the modulation is exactly mean-preserving, 
+
+⟨𝜉 𝑋 (𝐸 )⟩ 𝐸 ∼N ( 0, 𝜎 2  
+
+> 𝐸 )
+
+= 1, (27) which follows directly from the moment-generating function of a Gaussian. The − 12 (𝑎 𝑋 𝜎 𝐸 )2 correction term therefore plays the same role for the environmental modulation as the analogous correction in the diffuse lognormal (11): it ensures that the modulation reshapes the LoS-to-LoS scatter without introducing a drift in the ensemble mean encounter rate. Operationally, a single scalar 𝐸 is drawn per LoS and shared between the halo and filament channels. The effective Poisson rates that enter the per-LoS sampling are then 
+
+Λeff  
+
+> ℎ
+
+(𝑧 𝑠 , 𝐸 ) = Λ ℎ (𝑧 𝑠 ) 𝜉 ℎ (𝐸 ), Λeff  
+
+> 𝑓
+
+(𝑧 𝑠 , 𝐸 ) = Λ 𝑓 (𝑧 𝑠 ) 𝜉 𝑓 (𝐸 ),
+
+(28) and the encounter counts are drawn as 
+
+𝑁 ℎ ∼ Poisson Λeff  
+
+> ℎ
+
+(𝑧 𝑠 , 𝐸 ), 𝑁 𝑓 ∼ Poisson Λeff  
+
+> 𝑓
+
+(𝑧 𝑠 , 𝐸 ) . (29) Because 𝜉 𝑋 is mean-preserving in 𝐸 , the ensemble-averaged rates over all sightlines satisfy Λeff  
+
+> 𝑋
+
+= Λ 𝑋 (𝑧 𝑠 ), so the budget rescaling described in Section 2.6 is well-defined and the environmental chan-nel adds only LoS-to-LoS variance to the marginal 𝑃 (DM IGM | 𝑧 ).This is the mechanism by which the engine couples the halo and filament channels: along an overdense LoS ( 𝐸 > 0), both 𝜉 ℎ (𝐸 ) and 
+
+𝜉 𝑓 (𝐸 ) are simultaneously larger than unity, so more halos and more filaments are intersected; along a void-like LoS ( 𝐸 < 0), both factors are smaller than unity and the LoS samples a sparser population of structures. The asymmetry between 𝑎 ℎ and 𝑎 𝑓 ensures that the halo rate responds more sharply to the latent overdensity than the filament rate does. We acknowledge that the environmental modulation as imple-mented here is a simplification of the full cosmic-web structure: the latent 𝐸 is drawn independently per line of sight, with no explicit angular correlation, while in nature the environmental overdensity field has substantial coherence on Mpc scales. 
+
+2.6 Budget enforcement 
+
+Given the channel weights 𝑓 ℎ0 and 𝑓 𝑓 0, the smooth-channel weight is fixed by budget closure, 𝑓 𝑠 0 = 1 − 𝑓 ℎ0 − 𝑓 𝑓 0. The channel weights evolve mildly with redshift through prescribed factors of the form 
+
+𝑓 𝑋 (𝑧 ) = 𝑓 𝑋 0 (1 + 𝑧 ) 𝜂 𝑋 , with the same compact-notation conven-tion used elsewhere in the paper (see footnote in Section 2.3). The structural weights are additionally clipped to physical ranges ( 𝑓 ℎ ∈ [ 0.03 , 0.22 ], 𝑓 𝑓 ∈ [ 0.01 , 0.18 ], 𝑓 ℎ + 𝑓 𝑓 ≤ 0.90) to prevent any unphysical excursion that could arise from an extreme combination of 
+
+𝜂 exponents; in practice, these clips are inactive at the calibrated con-figuration and across the calibration window. The smooth-channel mean is then 
+
+𝜇 sm (𝑧 ) = 𝑓 𝑠 (𝑧 ) ⟨ DM IGM (𝑧 )⟩ , (30) while the halo and filament channels are sampled stochastically ac-cording to their Poisson rates and gas profiles, and then rescaled 
+
+by a redshift-dependent multiplicative factor so that their ensemble means match the target budget shares, 
+
+⟨DM halo (𝑧 )⟩ = 𝑓 ℎ (𝑧 ) ⟨ DM IGM (𝑧 )⟩ ,
+
+⟨DM fil (𝑧 )⟩ = 𝑓 𝑓 (𝑧 ) ⟨ DM IGM (𝑧 )⟩ . (31) Operationally, the engine precomputes the raw ensemble mean of each stochastic channel, 
+
+⟨DM halo ⟩raw (𝑧 𝑠 ) =
+
+∫ 𝑧 𝑠 
+
+> 0
+
+𝑑 Λℎ
+
+𝑑𝑧 
+
+D
+
+DM (1)
+
+> halo
+
+E 
+
+> 𝑀,𝑏
+
+(𝑧 ) 𝑑𝑧, (32) and similarly for the filaments, with the encounter-averaged DM con-tributions 
+
+D
+
+DM (1)
+
+> halo
+
+E 
+
+> 𝑀,𝑏
+
+(𝑧 ) estimated by Monte Carlo at five redshift anchors and linearly interpolated. The scale factors then read 
+
+𝑠 ℎ (𝑧 𝑠 ) = 𝑓 ℎ (𝑧 𝑠 ) ⟨ DM IGM (𝑧 𝑠 )⟩ ⟨DM halo ⟩raw (𝑧 𝑠 ) ,𝑠 𝑓 (𝑧 𝑠 ) = 𝑓 𝑓 (𝑧 𝑠 ) ⟨ DM IGM (𝑧 𝑠 )⟩ ⟨DM fil ⟩raw (𝑧 𝑠 ) ,
+
+(33) and the realised per-LoS halo and filament contributions are mul-tiplied by 𝑠 ℎ and 𝑠 𝑓 respectively before being summed. This step normalises the channels without distorting their conditional shape: the relative weights of common and rare encounters, of low-mass and high-mass halos, and of central and off-centre filament crossings are unchanged by the rescaling. This distinction is important conceptually. The forward realisa-tion for an individual LoS is still the stochastic sum of the smooth, halo, and filament contributions. What is constrained by the budget is the ensemble-average contribution of each channel at fixed redshift, rather than the addition of a fourth corrective term to every realisa-tion. The generator is therefore anchored to the analytic mean relation through the rescaling of the smooth, halo, and filament components, rather than through a post-hoc shift to each LoS. The full forward sampler is summarised in Fig. 1. For each source redshift 𝑧 𝑠 , the engine reads the analytic mean ⟨DM IGM (𝑧 𝑠 )⟩ , par-titions it into the three channel budgets, draws the latent environ-mental state 𝐸 , samples each channel stochastically with its physical prescription, applies the budget rescaling described in this section, and returns the sum. Repeating the procedure yields the conditional distribution 𝑃 (DM IGM | 𝑧 𝑠 ).
+
+2.7 Parameter classification and calibration 
+
+The sampling configuration exposes 15 scalar parameters, which are the quantities a user varies at run time; four of these are calibrated and the remaining hyperparameters — mass pools and their dispersions, gas fractions and their scatters, 𝑥 max , 𝑐 200 , core and cylinder geometry — are held fixed and catalogued in Appendix A. Following the principle that a forward generator should keep the calibrated subset to the minimum required to reproduce the target distribution, we classify them into three categories, summarised in Table 1. The calibrated subset is therefore restricted to the four parameters  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 6 Fortunato et al. Source redshift zs
+
+⟨DM IGM (zs)⟩
+
+analytic mean Budget shares 
+
+fs, f h, f f
+
+Smooth IGM 
+
+δs ∼ LogN (− 12 σ2 
+
+> s
+
+, σ 2
+
+> s
+
+)
+
+DM s = fs ⟨DM ⟩ δs
+
+Halos (NFW) 
+
+Nh ∼ Poisson (Λh(zs) ξh(E))
+
+DM h =
+
+> Nh
+
+∑
+
+> i=1
+
+DM (i) 
+
+> h
+
+(Mi, b i, z i)
+
+Filaments ( β-cyl.) 
+
+Nf ∼ Poisson (Λf (zs) ξf (E))
+
+DM f =
+
+> Nf
+
+∑
+
+> j=1
+
+DM (j) 
+
+> f
+
+(Mj , b j , z j )
+
+LoS environment 
+
+E ∼ N (0 , σ 2 
+
+> E
+
+)
+
+ξX (E) = e aX E− 12 (aX σE )2
+
+Rescale: DM h → sh DM h, DM f → sf DM f
+
+DM IGM (zs, LoS) = fs⟨DM ⟩δs + sh
+
+∑Nh 
+
+> i=1
+
+DM (i) 
+
+> h
+
++ sf
+
+∑Nf 
+
+> j=1
+
+DM (j)      
+
+> f
+> repeat Ntimes
+> ⇒P(DM IGM |zs)
+
+Figure 1. Schematic of the turboFRB forward sampler. For a source redshift 𝑧 𝑠 , the analytic mean ⟨DM IGM (𝑧 𝑠 ) ⟩ is split into three channel budgets ( 𝑓 𝑠 , 𝑓 ℎ , 𝑓 𝑓 ).The smooth channel (§2.2) draws a mean-preserving lognormal multiplier; the halo channel (§2.3) Poisson-samples 𝑁 ℎ encounters at effective rate Λℎ (𝑧 𝑠 ) 𝜉 ℎ (𝐸 )
+
+and integrates NFW gas profiles along each chord; the filament channel (§2.4) Poisson-samples 𝑁 𝑓 encounters at effective rate Λ 𝑓 (𝑧 𝑠 ) 𝜉 𝑓 (𝐸 ) and integrates 
+
+𝛽 -model gas profiles through finite-cylinder geometry. A latent LoS environmental variable 𝐸 (§2.5) couples the two structural channels through their Poisson rates. After sampling, the halo and filament sums are rescaled by 𝑠 ℎ , 𝑠 𝑓 (§2.6) so that their ensemble means match the assigned budget shares without altering the conditional shape of each channel. The three contributions are summed to give one realisation of DM IGM (𝑧 𝑠 , LoS ); repeating the procedure yields 
+
+𝑃 (DM IGM | 𝑧 𝑠 ).
+
+Table 1. Classification of the 15 scalar parameters exposed by the sampling configuration. P: fixed at the literature value or engine default. D: derived through budget closure. N: effective parameter calibrated by a single-shot grid search against the corrected ray-traced TNG benchmark of Konietzka et al. (2025) in 
+
+Δ-space, at matched (TNG) cosmology. The calibrated values reported in the rightmost column are the frozen four-parameter solution used throughout this paper. Parameter Class Value Description / source 
+
+𝜎 0 N 0.375 Diffuse log-scatter amplitude 
+
+𝛾 𝑠 N −1.460 Diffuse scatter redshift exponent 
+
+𝜎 𝐸 N 0.450 Environmental log-scatter 
+
+𝑛 hbg N 2.60 × 10 −3 Mpc −3 Effective halo background density 
+
+𝑓 ℎ0 P 0.10 Halo-channel weight at the pivot 𝑧 = 1
+
+𝑓 𝑓 0 P 0.05 Filament-channel weight at the pivot 𝑧 = 1
+
+𝜆 0 
+
+> 𝑓
+
+P 0.45 Gpc −1 Filament background rate from Mo et al. 
+
+𝜂 ℎ P +0.10 Halo-rate redshift exponent (engine default) 
+
+𝜂 𝑓 P −0.10 Filament budget-weight redshift exponent (engine default) 
+
+𝜂 𝑛 ℎ P −0.20 Halo-density redshift exponent 
+
+𝜂 𝜆 𝑓 P +0.10 Filament-rate redshift exponent 
+
+𝑎 ℎ P 0.60 Halo–environment coupling exponent 
+
+𝑎 𝑓 P 0.45 Filament–environment coupling exponent spine concentration P 1.0 Filament spine concentration factor 
+
+𝑓 𝑠 0 D 1 − 𝑓 ℎ0 − 𝑓 𝑓 0 Smooth-channel weight by budget closure 
+
+{𝜎 0, 𝛾 𝑠 , 𝜎 𝐸 , 𝑛 hbg }. The fixed parameters encode the adopted physical priors of the engine, while the derived weight 𝑓 𝑠 0 closes the budget once 𝑓 ℎ0 and 𝑓 𝑓 0 are chosen. This classification limits the freedom of the calibration and keeps the model tied to its channel-level pre-scription. turboFRB cannot freely fit an arbitrary benchmark: the stochastic channels remain tied to fixed physical inputs and engine defaults, and only four effective nuisance parameters are tuned. A model with enough free parameters could mimic almost any target distribution, whereas a model with four effective parameters and a fixed set of anchored physical inputs remains constrained by the en-counter physics of the cosmic web. The provenance and physical role of the fixed engine inputs and modelling choices are summarised in Appendix A. Before describing the calibration procedure, we explain the choice of comparison space. The two natural variables are the absolute DM and the normalised Δ = DM IGM /⟨ DM IGM ⟩. Calibrating directly in DM-space conflates two distinct sources of disagreement: a global normalisation difference in the mean DM budget and a genuine mis-match in the distribution shape. By calibrating in Δ-space, where each distribution is normalised by its own sample mean, we isolate the second effect from the first. This is the conservative choice: it prevents the calibrator from absorbing a convention-level or budget-level offset that has nothing to do with the accuracy of the distri-bution shape itself. It also complements our decision to match the benchmark cosmology: with the cosmology fixed to the TNG values, the residual mean-DM offset is already at the percent level, so the 
+
+MNRAS 000 , 1–16 (2026) Stochastic FRB DM model 7
+
+Δ-space normalisation removes only a very small residual and the calibration is genuinely shape-driven. The four-parameter calibration is obtained with a two-stage grid search: 
+
+• Target : the Konietzka et al. (2025) continuous ray-traced TNG catalogue, comprising 1 .2 × 10 5 sightlines at each redshift bin, in the TNG cosmology. 
+
+• Comparison space : Δ-space, with each distribution normalised by its own sample mean. 
+
+• Metric : the sum over 𝑧 ∈ { 0.5, 1.0, 1.5, 2.0, 2.5} of the Jensen– Shannon divergence (Lin 1991) computed from smoothed log-Δ ker-nel densities, with a bandwidth of 0 .18 in log space. 
+
+• Search : a coarse grid scan over 𝜎 0 ∈ [0.15 , 0.40 ], 𝛾 𝑠 ∈[− 1.30 , −0.50 ], 𝜎 𝐸 ∈ [ 0.20 , 0.45 ], and 𝑛 hbg ∈ [ 1.0 × 10 −3, 5.0 ×
+
+10 −3] Mpc −3, followed by a local refinement of five points per axis spanning ±one coarse step around the coarse optimum. Because the coarse optimum for 𝛾 𝑠 falls on the lower edge of the coarse box, this refinement extends the search by one coarse step (of width 0 .16) be-low −1.30, which is how the reported value 𝛾 𝑠 = −1.460 is reached. 
+
+• Reported solution : 𝜎 0 = 0.375, 𝛾 𝑠 = −1.460, 𝜎 𝐸 = 0.450, 𝑛 hbg =
+
+2.60 × 10 −3 Mpc −3, with a per-redshift Δ-space JSD at or below 
+
+≃ 5 × 10 −3 across the five-redshift calibration window (see Table 2). Two of the four calibrated parameters — 𝛾 𝑠 ≃ − 1.46 and 𝜎 𝐸 ≃
+
+0.45 — lie at the boundary of the searched region. Physically this reflects a steep redshift evolution of the diffuse log-scatter together with a sizeable LoS-to-LoS environmental amplitude, both needed to reproduce the simultaneous narrowing of the body at high redshift and the persistent extended tail. The two are not on the same footing, however. For 𝜎 𝐸 the refinement does probe beyond the coarse upper edge, and 𝜎 𝐸 = 0.50 returns a worse objective, so the adopted value is a genuine local optimum. For 𝛾 𝑠 the refinement returns the lowest value it explores ( 𝛾 𝑠 = −1.46, against −1.38 one step above), and smaller values were not scanned; we therefore do not claim a converged minimum in 𝛾 𝑠 . Since 𝛾 𝑠 is a nuisance parameter of the diffuse channel entering only through the calibrated distribution shape, we adopt the four values as a frozen effective configuration rather than as a converged optimisation, and quote them without uncertainties throughout. We therefore freeze the values quoted above as the calibrated configuration for the remainder of the paper. 
+
+3 VALIDATION AGAINST RAY-TRACED TNG 
+
+The central prediction of the forward engine is the full conditional distribution 𝑃 (DM IGM | 𝑧 ) at fixed redshift. The first question, there-fore, is not whether the model reproduces a single summary statistic, but whether it reproduces the shape of the corrected TNG distri-bution in the regime most relevant for localised FRBs. Figure 2 presents the DM-space comparison at five representative redshifts, 
+
+𝑧 ∈ { 0.5, 1.0, 1.5, 2.0, 2.5}. The turboFRB ensemble at each red-shift consists of 10 4 forward realisations generated with the frozen 4-parameter calibration. The Konietzka comparison sample is the full corrected TNG catalogue at the corresponding redshift, comprising 1.2 × 10 5 ray-traced sightlines from the public continuous catalogue. Both distributions are smoothed with a fixed log-DM kernel of band-width 0 .18, which is wide enough to suppress the per-bin noise of the estimator while preserving the shape features that distinguish the two prescriptions. Several qualitative features are visible immediately. First, the two prescriptions agree on the broad morphology of the distribution: the peak is narrow and high at low redshift, the body broadens as the comoving distance grows, and a long positive-DM tail remains present at all redshifts. Second, the DM-space mean is aligned at the percent level. The mean ratio ⟨DM IGM ⟩Turbo /⟨ DM IGM ⟩Kon stays in the range 0 .982–0 .990 across 𝑧 = 0.5–2 .5, so the residual differences are mainly shape differences rather than global shifts; turboFRB sits marginally below Konietzka in mean DM at every redshift, by no more than ≃ 2%. Third, the remaining discrepancy is most visible toward the lowest redshifts shown, where the turboFRB distribution carries a slightly heavier high-DM tail than the benchmark. To quantify these visual impressions we compute, at each redshift, the two-sample Kolmogorov–Smirnov (KS) statistic on the raw sam-ples and the Jensen–Shannon divergence (Lin 1991) on smoothed kernel-density estimates in both DM-space and Δ-space. The KS statistic is sensitive to the largest cumulative distance between the empirical CDFs and is therefore a robust non-parametric measure of overall agreement; the JSD is sensitive to local density differences and to the body of the distribution where most of the probability mass resides. Reporting both gives a more complete picture than either alone. The values are summarised in Table 2: the Δ-space JSD stays at or below ≃ 5 × 10 −3 at every redshift, with KS statistics of a few percent, and is smallest at 𝑧 ≃ 1.5 where the two distributions are nearly indistinguishable within the smoothing kernel. These five redshifts are the ones used in the calibration, so Table 2 quantifies in-sample goodness of fit rather than out-of-sample performance; the intermediate redshifts of Fig. 5 ( 𝑧 = 0.3, 0.7, 1.3, 1.8, 2.3) were not used in the calibration and provide a complementary out-of-sample comparison of the normalised scatter. We also note that the percent-level agreement in mean DM is a mean-anchor check rather than an independent validation, since the analytic mean relation adopts the 
+
+𝑓 𝑒𝑏 (𝑧 ) fit measured in the same simulation. We have verified that these distribution-level statistics are converged at the fiducial sample size of 10 4 forward sightlines: increasing the ensemble to 5 × 10 4
+
+changes the measured 𝜎 Δ (𝑧 ) by less than the realisation-to-realisation scatter at fixed 𝑁 . The convergence test is reported in Appendix B. Because the forward model is assembled from physically distinct channels, the same per-sightline traces that produce 𝑃 (DM IGM | 𝑧 )
+
+can be decomposed into their smooth, halo, and filament contri-butions. Figure 3 shows this decomposition at 𝑧 = 1. The smooth diffuse channel dominates the body of the distribution, with a mean of ≃ 872 pc cm −3 and a relatively symmetric core; the halo channel is strongly skewed, contributing a mean of ≃ 102 pc cm −3 but a 95th percentile of ≃ 361 pc cm −3; and the filament channel is the smallest and most sharply skewed, with a mean of ≃ 51 pc cm −3 and a median of only ≃ 19 pc cm −3. The decomposition makes explicit what the single combined PDF cannot show directly: the diffuse channel sets the location and width of the body, while the halo and filament chan-nels populate the shoulder and the extended high-DM tail. Within the adopted channel-budget prescription, the forward traces therefore show how each stochastic kernel populates the body and the tail of the total distribution. The shapes and the per-sightline realisations are outputs of the model; the mean partition between the three chan-nels is prescribed by 𝑓 ℎ0 and 𝑓 𝑓 0 through the budget step, so a good fit to the marginal 𝑃 (DM IGM | 𝑧 ) does not by itself single out this internal decomposition. Different weight choices could yield similar total PDFs with different channel splits. An illustrative DM– 𝑧 diagram showing the dispersion-measure quantiles of the calibrated model as continuous bands in the 
+
+(𝑧, DM IGM ) plane is shown in Figure 4.  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 8 Fortunato et al. 10 3             
+
+> DM IGM [pc cm 3]
+> 0.0000 0.0005 0.0010 0.0015 0.0020 0.0025 0.0030 0.0035
+> P(DM IGM  z)
+> redshift
+> z= 0.5
+> z= 1
+> z= 1.5
+> z= 2
+> z= 2.5
+> redshift
+> z= 0.5
+> z= 1
+> z= 1.5
+> z= 2
+> z= 2.5
+> TurboFRB Konietzka+2025 (TNG ray-traced)
+
+Figure 2. Distribution of intergalactic dispersion measures 𝑃 (DM IGM | 𝑧 ) in DM-space at 𝑧 = 0.5, 1.0, 1.5, 2.0, 2.5. Solid filled curves show turboFRB 
+
+forward samples from the frozen 4-parameter calibration; dashed curves show the corrected ray-traced TNG measurements of Konietzka et al. (2025). The broad skewed morphology is reproduced across the full range shown, and the DM-space mean is matched at the percent level. The remaining discrepancy is a modest excess high-DM tail of the forward model at the highest redshifts. 
+
+Table 2. Distribution-level comparison of turboFRB against the ray-traced TNG measurements of Konietzka et al. (2025), under the frozen four-parameter calibration. For each redshift we report the ensemble mean DM of both prescriptions, their ratio, and the two-sample KS and Jensen–Shannon statistics in both DM-space and Δ-space (each distribution normalised by its own sample mean). Both prescriptions adopt the same TNG cosmology and the same 𝑓 𝑒𝑏 (𝑧 ) electron fraction, so there is no convention-level offset between them: the Δ-space metrics isolate shape disagreement from the residual percent-level difference between the analytic mean relation and the sample mean of each finite ensemble. These are the five redshifts used in the calibration, so the statistics are in-sample. The normalised scatter 𝜎 Δ (𝑧 ) is reported in Table 3 and compared with external prescriptions in Fig. 5. DM-space Δ-space 
+
+𝑧 ⟨DM ⟩Kon ⟨DM ⟩Turbo ratio KS JSD KS JSD 0.50 505 500 0.990 0.042 0.0042 0.059 0.0047 1.00 1035 1016 0.982 0.027 0.0021 0.038 0.0021 1.50 1548 1531 0.989 0.031 0.0011 0.010 0.0005 2.00 2032 2003 0.986 0.069 0.0033 0.023 0.0009 2.50 2487 2451 0.986 0.098 0.0073 0.045 0.0030 
+
+3.1 Empirical scatter 𝜎 Δ (𝑧 ) and multi-prescription comparison 
+
+The most compact summary of the normalised width of the forward distribution is 
+
+𝜎 Δ (𝑧 ) ≡ √︄ Var 
+
+ DM IGM 
+
+⟨DM IGM (𝑧 )⟩ 
+
+
+
+. (34) Because turboFRB produces full samples rather than an assumed PDF family, this quantity can be measured directly from the forward realisations without imposing any parametric form, and without the asymptotic approximations that limit the validity of 𝜎 diff = 𝐹 /√𝑧 at low 𝑧 . This is a conceptual distinction worth making explicit: 𝜎 diff 
+
+is the internal width parameter of the Macquart-style PDF family of Eq. (5), whereas 𝜎 Δ is the true standard deviation of the normalised variable Δ, and the two are identified only in the asymptotic regime where the parametric form is exact (Zhuge et al. 2026). turboFRB 
+
+measures 𝜎 Δ directly and alongside the parametric 𝜎 diff references within the same construction, so the gap between them ceases to be a formal caveat and becomes a quantity we can read off Fig. 5 directly. We compare it with three external references: the corrected TNG measurements of Konietzka et al. (2025), the Macquart param-eterisation with 𝐹 = 0.357 (Macquart et al. 2020), and the Zhuge parameterisation with 𝑆 = 0.133 (Zhuge et al. 2026). For historical context, we also show the original Zhang curve (Zhang et al. 2021). Figure 5 summarises the result. The most important qualitative feature is that the turboFRB curve 
+
+crosses the Konietzka benchmark within the calibration window rather than lying systematically above it. The two curves are es-sentially coincident near 𝑧 ∼ 1.5–1 .8, where the Δ-space JSD also attains its minimum. Below the crossing point, the forward model is narrower than Konietzka; above it, the forward model is marginally broader. The agreement is closest at intermediate-to-high redshift: for 𝑧 ≳ 1 the relative deviation between the two curves stays within 
+
+≲ 15%, falling to near-coincidence around 𝑧 ∼ 1.5–1 .8 and rising only to ≃ 10% by 𝑧 = 2.5. At the low-redshift end, the deviation is larger — turboFRB predicts 𝜎 Δ ≃ 0.33 at 𝑧 = 0.3 against ≃ 0.47 for Konietzka, a ∼ 30% difference — so the close tracking is a statement about the 𝑧 ≳ 1 regime rather than the full interval. We note that this low-redshift regime is also where the absolute scatter is largest and where the Macquart 𝐹 /√𝑧 form itself becomes least reliable, and that the great majority of the localised-FRB sample relevant to 
+
+𝑃 (DM IGM | 𝑧 ) validation lies at 𝑧 ≳ 0.3 with increasing weight toward 𝑧 ∼ 1. 
+
+MNRAS 000 , 1–16 (2026) Stochastic FRB DM model 910 0 10 1 10 2 10 3
+
+DM contribution [pc cm 3]     
+
+> 0.0000 0.0025 0.0050 0.0075 0.0100 0.0125 0.0150 0.0175
+> probability density
+> Channel decomposition of P(DM z= 1)
+> total smooth (diffuse) halo (P0=19%) filament (P0=24%)
+
+Figure 3. Channel decomposition of 𝑃 (DM IGM | 𝑧 =1) into its smooth (diffuse), halo, and filament contributions, measured directly from 2 × 10 4
+
+turboFRB per-sightline traces under the calibration, shown on a logarithmic DM axis. A fraction of sightlines intersects no halo or filament, so these channels carry a finite probability of contributing exactly zero, which a log-arithmic axis cannot display; the structural-channel densities are therefore conditional on DM > 0 and weighted by the corresponding probability, with the zero fractions 𝑃 0 quoted in the legend. The smooth channel sets the body of the distribution; the halo and filament channels are increasingly skewed and populate the shoulder and high-DM tail. Dotted vertical lines mark the channel means, computed over all sightlines including zero contributions. 0.5 1.0 1.5 2.0 2.5 3.0 3.5    
+
+> redshift z
+> 01000 2000 3000 4000 5000
+> DM IGM  [pc cm  3]
+> 2interval
+> 1interval
+> 3interval
+> sample mean
+
+Figure 4. Illustrative DM– 𝑧 diagram of the calibrated turboFRB model, shown as percentile bands of DM IGM (𝑧 ) against host redshift. The figure visualises the width and skewness of the forward distribution across redshift. 
+
+4 EFFECTIVE HALO STATISTICS FROM PER-SIGHTLINE TRACES 
+
+One advantage of a forward model built from discrete structural encounters is that it can be interrogated at a level deeper than the final PDF (Alfradique et al. 2024). Most analytic descriptions of the FRB DM scatter compress the effect of halo encounters into a single effective parameter whose value is then quoted as a constant. 
+
+turboFRB produces the per-sightline encounter catalogue directly, and we can therefore measure each of these quantities as a function of redshift rather than assuming them constant. The resulting redshift dependence is itself the physical content extracted from the forward traces. For each forward realisation we record the mass, redshift, and impact parameter of every halo intersected along the line of sight. From this set of encounters we define the halo-induced scatter per 0.5 1.0 1.5 2.0 2.5     
+
+> z
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> (z)
+> Zhang+2021 (TNG, original) Zhuge S= 0.133 Macquart F= 0.357 Konietzka+2025 (TNG ray-traced) TurboFRB (forward model)
+
+Figure 5. Normalised dispersion-measure scatter 𝜎 Δ (𝑧 ) from turboFRB 
+
+forward samples (red triangles) compared with the corrected ray-traced TNG measurements of Konietzka et al. (2025) (black circles), the Macquart pa-rameterisation with 𝐹 = 0.357 (teal inverted triangles), the Zhuge param-eterisation with 𝑆 = 0.133 (gold diamonds), and the original fit of Zhang et al. (2021) (grey squares). The calibrated turboFRB curve crosses Koniet-zka near 𝑧 ∼ 1.5–1 .8 and tracks it to within ≲ 15% for 𝑧 ≳ 1; the deviation grows toward low redshift, where the absolute scatter is largest. No systematic high-redshift floor is present. Note that the turboFRB and Konietzka points are directly measured 𝜎 Δ, whereas the Macquart and Zhuge curves are the width parameter 𝜎 diff of their respective parametric families; their separation at low redshift is the 𝜎 diff –𝜎 Δ gap measured directly. 
+
+encounter, 
+
+𝜎 2halo (𝑧 ) = Var enc [DM halo ], (35) the mean number of halo encounters per sightline, ⟨𝑁 ℎ (𝑧 )⟩ , and the empirical Zhuge et al. (2026) parameter 
+
+𝑆 emp (𝑧 ) = 𝜎 2 
+
+> Δ
+
+(𝑧 ) 𝐽 2 (𝑧 )
+
+𝐼 (𝑧 ) , (36) which is the value of 𝑆 that would reproduce the forward-measured variance if inserted into the Zhuge ansatz at that redshift. Because 
+
+𝜎 Δ aggregates the diffuse, halo, filament and environmental contribu-tions, 𝑆 emp is an effective parameter reproducing the total normalised variance within that ansatz, not an isolated measurement of the halo channel. Here 𝐼 (𝑧 ) = ∫ 𝑧  
+
+> 0
+
+𝑑𝑧 ′/𝐸 (𝑧 ′) and 𝐽 (𝑧 ) = ∫ 𝑧  
+
+> 0
+
+(1+𝑧 ′) 𝑑𝑧 ′/𝐸 (𝑧 ′).We additionally compute 
+
+𝑙 (𝑧 ) = 𝐷 𝑐 (𝑧 )⟨𝑁 ℎ (𝑧 )⟩ , (37) the effective path length between halo encounters. No DM weighting enters Eq. (37): it is the comoving distance divided by the mean encounter count. Table 3 shows how the 4-parameter calibration shapes the halo channel. The mean number of halo encounters per LoS rises from 
+
+⟨𝑁 ℎ⟩ ≃ 0.47 at 𝑧 = 0.2 to ≃ 2.9 at 𝑧 = 2.5, while the halo-induced scatter per encounter increases from roughly 49 pc cm −3 at low red-shift to about 123 pc cm −3 by 𝑧 = 2.5, and the mean DM contribution per halo encounter grows from ≃ 37 to ≃ 85 pc cm −3 over the same interval. The effective encounter path length stabilises at 𝑙 ≃ 1.8– 2.1 Gpc over the full interval shown. The quantity 𝑙 (𝑧 ) ≃ 2 Gpc should not be read as the physical halo spacing: it is the path length between DM-relevant halo intersections, that is, those at impact pa-rameters where the projected gas column is non-negligible. The empirical 𝑆 emp (𝑧 ) rises monotonically from ≃ 0.036 at 𝑧 = 0.2to ≃ 0.10 by 𝑧 = 2.5, approaching the value 𝑆 = 0.133 +0.034  
+
+> −0.045
+
+of Zhuge et al. (2026) from below and entering its 1 𝜎 range only at high 
+
+MNRAS 000 , 1–16 (2026) 10 Fortunato et al.                                                                             
+
+> Table 3. Effective halo statistics extracted from turboFRB per-sightline traces. 𝜎 halo is the halo-induced DM scatter per encounter; 𝑙 =𝐷 𝑐 (𝑧 )/⟨ 𝑁 ℎ⟩
+> is the empirical halo path length; ⟨𝑁 ℎ⟩is the mean number of halo encoun-ters per LoS; 𝜎 Δis the empirical normalized DM scatter; 𝑆 emp is the inverted Zhuge parameter. The Zhuge published value is 𝑆 =0.133 +0.034
+> −0.045 .
+> 𝑧 𝜎 halo [pc cm −3]𝑙 [Gpc] ⟨𝑁 ℎ⟩𝜎 Δ𝑆 emp
+> 0.20 49 1.80 0.47 0.383 0.036 0.30 55 1.81 0.68 0.329 0.041 0.50 66 1.89 1.02 0.267 0.049 0.70 68 1.96 1.31 0.226 0.053 1.00 78 1.91 1.78 0.197 0.063 1.30 86 2.00 2.04 0.168 0.065 1.50 98 1.94 2.30 0.169 0.078 2.00 113 2.03 2.62 0.155 0.096 2.50 123 2.06 2.90 0.137 0.099
+
+redshift. This redshift dependence is not captured by the constant-
+
+𝑆 ansatz; within the turboFRB framework, the effective variance parameter increases by nearly a factor of three between 𝑧 = 0.2 and 
+
+𝑧 = 2.5, consistent with the growing encounter rate shown in Table 3. 
+
+5 APPLICATION TO LOCALISED FRBS 
+
+The forward likelihood 𝑃 (DM IGM | 𝑧 ) is more than a population-level diagnostic: at the level of individual events it provides a quan-titative answer to the question of how unusual an observed DM is under the full forward model of Eq. (38), which includes the IGM to-gether with the adopted host and Milky Way priors. Localised FRBs whose observed DM lies far in the tail of the cosmological distribu-tion are a heterogeneous population. Some are produced by genuine cosmological sightlines that happen to sample the high-percentile tail of the variance budget; others are systematically high because they are embedded in dense host environments that contribute a large in-source DM not captured by the cosmological channel. Distinguishing between these possibilities at the level of an individual event has his-torically been difficult, because the intrinsic cosmological scatter at typical localised-FRB redshifts is large enough to accommodate moderate excess without obvious tension. Our forward likelihood quantifies this directly through the tail probability of each event. For each localised event, we build the forward distribution of the 
+
+total observable dispersion measure at the host redshift by convolving the three independent contributions of Eq. (1), 
+
+𝑃 (DM tot | 𝑧 host ) = 𝑃 (DM IGM | 𝑧 host ) ⊗ 𝑃 (DM obs host ) ⊗ 𝑃 (DM MW ),
+
+(38) where 𝑃 (DM IGM | 𝑧 host ) is the forward-model output, 𝑃 (DM obs host )
+
+is the observer-frame host prior defined below in Eq. (40), and 
+
+𝑃 (DM MW ) is a Gaussian centred on the Galactic-foreground esti-mate. The tail probability is then 
+
+𝑃 tail =
+
+∫ ∞
+
+> DM obs
+
+𝑃 (DM tot | 𝑧 host ) 𝑑 DM tot , (39) the probability under the full forward model — cosmological IGM plus the assumed host and Milky Way priors — of obtaining a total DM at least as large as the observed value. A small 𝑃 tail therefore means the observation is unlikely even after the typical host and foreground contributions have been folded in, which is the quanti-tative signature of a required host excess. We adopt the convention DM MW ≃ 30 pc cm −3 for the Galactic halo contribution following the recent estimate of Connor et al. (2023); we note that higher values up to 50–80 pc cm −3 have been favoured by Prochaska & Zheng (2019) on the basis of hydrostatic CGM modelling, and that adopting the higher range would shift the inferred DM obs IGM of each event downward by tens of pc cm −3 without changing the qualitative reading of any event in the sample below. For the host contribution, we adopt a lognormal prior, the standard choice in the FRB literature (Macquart et al. 2020), with rest-frame parameters measured by Sang & Lin (2025) from a sample of 117 localised FRBs, 
+
+𝑃 (DM rest host ) = 1DM rest host 𝜎 host 
+
+√2𝜋 exp 
+
+"
+
+−
+
+ ln DM rest host − 𝜇 host 
+
+2
+
+2𝜎 2host 
+
+#
+
+, (40) with 𝜇 host = 5.03 and 𝜎 host = 0.96 (median ≃ 153 pc cm −3), trans-formed to the observer frame through 𝜇 host → 𝜇 host − ln (1 + 𝑧 host ).Sang & Lin (2025) also report a positive correlation between the rest-frame host DM and redshift, which we do not model: we adopt a redshift-independent rest-frame prior and apply only the (1+ 𝑧 )−1 di-lution. An evolving prior would raise the predicted host contribution at high redshift and hence increase 𝑃 tail there, so the values quoted for FRB 20240304B and FRB 20210912A understate, if anything, how typical those events are under an evolving-host model. 
+
+5.1 Tail-probability criteria for interpreting individual events 
+
+We use 𝑃 tail only as a descriptive statistic, not as a model-selection criterion. To make the event-level discussion reproducible, we group events into four regimes: 
+
+𝑃 tail < 1% : host excess required ,
+
+1% ≤ 𝑃 tail < 5% : moderate host excess ,
+
+5% ≤ 𝑃 tail < 20% : cosmic-variance tail ,𝑃 tail ≥ 20% : typical sightline .
+
+These boundaries are pragmatic and can be changed without altering the likelihood itself. The physical interpretation of any individual event should therefore be based on the reported 𝑃 tail value together with independent host and foreground information. 
+
+5.2 Representative events 
+
+We apply the diagnostic to four events in total: three with a confirmed host redshift, spanning 𝑧 = 0.241 to 𝑧 = 2.148, and one localised in radio but without an identified host, whose redshift is marginalised over. Two of the three localised events fall in the host-excess regimes defined above; the third, FRB 20240304B, is the highest-redshift localised event currently known and probes the high-redshift end of the calibration window. The host-undetected event illustrates the use of the forward likelihood for inferring 𝑧 host when no spectroscopic confirmation is available. The four panels are shown in Fig. 6, and the corresponding numerical values are tabulated in Table 4. 
+
+FRB 20190520B ( 𝑧 = 0.241 ): With DM obs = 1204 .7 pc cm −3
+
+and assumed Galactic foregrounds of DM MW ≃ 90 pc cm −3, this event lies deep in the tail of the cosmological forward distribution at its host redshift: 𝑃 tail ≃ 1.6%, against a forward-model mean 
+
+⟨DM tot ⟩model ≃ 506 pc cm −3. In our classification, this event sits at the boundary of the host-excess required regime. The reading is consistent with the independent observational characterisation of FRB 20190520B as a persistent host-excess source on the basis of its compact persistent radio source (Niu et al. 2022), its rapidly varying Faraday rotation measure (Anna-Thomas et al. 2023), and its dense  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Stochastic FRB DM model 11 200 400 600 800 1000 1200 1400 
+
+DM [pc cm 3]
+
+0.0000 0.0005 0.0010 0.0015 0.0020 0.0025 0.0030 
+
+> probability density
+
+(a) FRB 20190520B (z = 0.241)       
+
+> forward model
+> Ptail = 1.6% DM obs = 1205 pc cm 3
+> DM model = 506 pc cm 3
+
+200 400 600 800 1000 1200 1400 
+
+DM [pc cm 3]
+
+0.0000 0.0005 0.0010 0.0015 0.0020 0.0025 
+
+> probability density
+
+(b) FRB 20220831A (z = 0.262)       
+
+> forward model
+> Ptail = 2.8% DM obs = 1146 pc cm 3
+> DM model = 592 pc cm 3
+
+1500 1750 2000 2250 2500 2750 3000 
+
+DM [pc cm 3]
+
+0.00000 0.00025 0.00050 0.00075 0.00100 0.00125 0.00150 
+
+> probability density
+
+(c) FRB 20240304B (z = 2.148)       
+
+> forward model
+> Ptail = 20.8% DM obs = 2458 pc cm 3
+> DM model = 2248 pc cm 3
+
+0.50 0.75 1.00 1.25 1.50 1.75 2.00 
+
+zhost 
+
+0.0 0.5 1.0 1.5 2.0 
+
+> posterior density
+
+(d) FRB 20210912A (redshift marginalised)  
+
+> posterior prior
+> zpeak = 1.18
+
+Figure 6. Forward-model diagnostic for the four events of Section 5.2 under the frozen 4-parameter turboFRB configuration. Panels (a)–(c) show the forward distribution of the total observable DM at the host redshift (blue filled curve) with the observed DM obs marked (red solid vertical line) and the forward-model mean ⟨DM tot ⟩model marked (dark dashed vertical line); the tail above DM obs is shaded in red. The tail probability 𝑃 tail , DM obs , and ⟨DM tot ⟩model are reported in the legend of each panel. Panel (d) shows the posterior on 𝑧 host for the host-undetected event FRB 20210912A, marginalising the forward likelihood over a Gaussian prior N ( 𝜇 = 1.2, 𝜎 = 0.4) on the host redshift. 
+
+local environment (Niu et al. 2022). The residual required to reconcile the observation with the forward model is large; we quantify it explic-itly in Section 5.3. Spectroscopy of this field has since identified two foreground galaxy clusters with 𝑀 halo > 10 14 𝑀 ⊙ , at 𝑧 = 0.1867 and 
+
+𝑧 = 0.2170, whose characteristic radii are directly intersected by the sightline (Lee et al. 2023), and which account for a substantial part of the excess previously attributed to the host. The forward likelihood therefore correctly flags this sightline as anomalous, but does not by itself localise the origin of the excess: the residual of Section 5.3 is the total unmodelled line-of-sight excess, foreground structures plus host, and is an upper bound on the host term. 
+
+FRB 20220831A ( 𝑧 = 0.262 ): With DM obs = 1146 .2 pc cm −3 and DM MW ≃ 157 pc cm −3, this event has 𝑃 tail ≃ 2.8% under the full forward model, including the host and Milky Way priors, against a forward-model mean ⟨DM tot ⟩model ≃ 592 pc cm −3. In our clas-sification, this event sits in the moderate host-excess regime: the DM is uncommon but not extreme, and the required host contribu-tion is moderately smaller than for FRB 20190520B. The fact that two qualitatively distinct events (one with a confirmed dense local environment, one without similarly direct spectroscopic evidence) both fall in the 𝑃 tail < 5% region of the diagnostic confirms that the forward likelihood is sensitive to a real cosmological-versus-host discrepancy, and not to the specific astrophysical signatures that motivated each event independently. 
+
+FRB 20240304B ( 𝑧 = 2.148 ): The recent MeerKAT detection FRB 20240304B at 𝑧 = 2.148 (Caleb et al. 2025) is currently the highest-redshift localised FRB. With DM obs = 2458 .2 pc cm −3 and DM MW ≃ 58 pc cm −3 from the NE2001 model (Cordes & Lazio 2002) plus a halo term, the event has 𝑃 tail ≃ 20 .8% under the cal-ibrated turboFRB forward model, against a forward-model mean 
+
+⟨DM tot ⟩model ≃ 2248 pc cm −3. The event therefore falls just inside the typical sightline regime defined above: the observed DM is con-sistent with the body of the cosmological distribution at this redshift, with no host or foreground excess strictly required, though it sits close to the cosmic-variance-tail boundary and a modest host contri-bution is equally compatible. Two cautions are worth stating. First, even though the event is statistically unremarkable in the forward model, its high DM obs IGM probes the calibrated 𝑃 (DM IGM | 𝑧 ) at the high-redshift end of the calibration window, where the corrected hy-drodynamical reference is sparsest, since the Konietzka catalogue at 
+
+𝑧 > 2 is populated by relatively few simulation snapshots. Second, with a single 𝑧 > 2 event we cannot empirically discriminate be-tween the broader turboFRB prediction and the narrower Konietzka prediction at 𝑧 ≳ 2, despite the fact that the Konietzka tail probabil-ity for the same event would be smaller. A population of localised 
+
+𝑧 > 2 FRBs will be required to test whether the empirical tail at high redshift is closer to the forward-model prediction or to the corrected hydrodynamical reference. 
+
+MNRAS 000 , 1–16 (2026) 12 Fortunato et al. 
+
+FRB 20210912A (host-undetected): For events without a spectro-scopically confirmed host redshift, the same forward likelihood can be used in reverse. Instead of evaluating 𝑃 tail at a known 𝑧 host , we com-bine the observed DM with a redshift prior to infer a posterior on 𝑧 host .FRB 20210912A is a useful stress test for this procedure: although it was localised to sub-arcsecond precision, no host galaxy was identi-fied in deep optical and near-infrared follow-up (Marnoch et al. 2023). Its large observed dispersion measure, DM obs = 1233 .7 pc cm −3,suggests a high-redshift origin unless a substantial fraction of the excess DM is produced by the host or local environment. Using our adopted Galactic contribution, DM MW ≃ 61 pc cm −3, and a broad Gaussian prior 𝑝 (𝑧 host ) = N ( 𝜇 = 1.2, 𝜎 = 0.4) centred on the pho-tometric redshift range favoured by Marnoch et al. (2023) for the field, the posterior peaks at 𝑧 peak ≃ 1.18. The peak therefore largely reflects the prior; the DM likelihood alone is broad and only excludes 
+
+𝑧 ≲ 0.6 without a large host term. The result is therefore consistent with the interpretation that FRB 20210912A lies at 𝑧 ∼ 1.2, while still allowing lower-redshift solutions if the host or local DM con-tribution is unusually large. The posterior is shown in panel (d) of Fig. 6. This example illustrates how the same forward machinery used for event-level diagnostics can also provide a likelihood-based redshift estimator for FRBs lacking a spectroscopic host redshift. 
+
+5.3 Implied host dispersion measure for the localised events 
+
+The tail probability answers “how unusual is this event?”, but for the events that do require a host excess it is more physically informative to ask “how much host DM would reconcile the observation with the cosmological forward model?”. We answer this by inverting the decomposition (1) stochastically: for each forward draw of DM IGM 
+
+from 𝑃 (DM IGM | 𝑧 host ), we solve for the rest-frame host contribution DM rest host = (1 + 𝑧 host )  DM obs − DM MW − DM IGM 
+
+, (41) which converts the tail of the forward distribution into the implied distribution of the rest-frame residual DM rest host . Because no explicit host prior enters this inversion, and negative values are retained for bookkeeping, this is a required-residual distribution rather than a Bayesian posterior on the host DM. Draws for which the sampled IGM already exceeds the available budget yield DM rest host ≤ 0 and are reported as the fraction 𝑓 no host requiring no residual. The resulting distributions for the three localised events are summarised in Table 5. For FRB 20190520B the inferred host contribution is DM rest host =
+
+1115 +69  
+
+> −98
+
+pc cm −3 with no draws in the forward ensemble requiring zero residual ( 𝑓 no host consistent with zero at the resolution of the sam-ple): the required residual is well above the median of any standard lognormal host prior. Given the foreground clusters along this sight-line (Lee et al. 2023), it should be read as the sum of the host term and the excess from the intersected structures rather than as a host mea-surement; the dense magneto-ionic local environment inferred for this source (Niu et al. 2022; Anna-Thomas et al. 2023) independently supports a substantial, though not necessarily dominant, host contri-bution. FRB 20220831A requires a smaller but still significant resid-ual, DM rest host = 950 +76  
+
+> −109
+
+pc cm −3, again with no zero-residual draws observed. FRB 20240304B, by contrast, has a broad posterior con-sistent with zero, DM rest host = 989 +660  
+
+> −1021
+
+pc cm −3 with 𝑓 no host = 0.17: in 17% of forward draws the cosmological IGM alone already accounts for the observed budget before any host contribution; folding in the host and Milky-Way priors gives the tail probability 𝑃 tail ≃ 21%, consistent with the requirement 𝑃 tail ≥ 𝑓 no host . This event therefore does not require a host excess, but does not exclude a moderate one either. 
+
+6 BRIEF PROOF-OF-CONCEPT FOR 𝐻 0 INFERENCE 
+
+The same forward likelihood can be embedded in a cosmological analysis because both ⟨DM IGM (𝑧 )⟩ and 𝑃 (DM IGM | 𝑧, 𝐻 0) depend on the expansion history. As a closed-loop consistency check, we generate a synthetic catalogue of 𝑁 = 100 localised FRBs from the frozen 4-parameter model with 𝐻 true 0 = 67 .74 km s −1 Mpc −1,add host and Milky-Way contributions from the same priors used in the likelihood, and recover 𝐻 0 on a one-dimensional grid. The posterior is centred on the injected value and contains it within 1 𝜎 .Because the injection and recovery use the same calibration, host prior, Milky Way prior, and 𝑓 IGM prescription, this test should not be read as a forecast. It only verifies that the likelihood implementation is internally consistent; a real-data analysis with nuisance-parameter marginalisation is deferred to future work. 
+
+7 DISCUSSION 
+
+Different and independent methodologies now converge on a com-mon scale for the FRB DM scatter: the corrected TNG ray-tracing of Konietzka et al. (2025), the analytic baryonification model of Torkamani et al. (2026), the empirical FRB-data parameterisations of Macquart et al. (2020) and Zhuge et al. (2026), and the present forward model. We keep this statement qualitative: the references do not coincide exactly at every redshift, and turboFRB retains a residual shape mismatch at the edges of the window (a marginally heavier high-DM tail at 𝑧 = 2.5 and a narrower body at the lowest redshifts). It is worth situating turboFRB relative to the two methodologi-cally closest recent works, both of which target the same DM dis-tribution but by different routes. Konietzka et al. (2025) decompose the cosmic-web DM directly in IllustrisTNG by classifying each sightline segment as halo, filament, or void in post-processing of the simulation; this is a measurement of the simulated decomposition instead of a parametric generator, and it is complementary to our ap-proach in that it provides the physical target our forward channels are designed to reproduce. Torkamani et al. (2026), by contrast, construct a fully analytic DM PDF by convolving halo contributions weighted by the halo mass function and halo bias within the baryonification framework; this is an analytic halo-model calculation rather than a stochastic forward sampler, and in its present form it does not include an explicit geometrically distinct filament channel. turboFRB occu-pies the intermediate position of a stochastic forward generator: like the analytic models it is fast and parametric, but like the ray-tracing it produces full per-sightline realisations from which arbitrary statistics can be measured directly rather than assumed. A useful external cross-check on the calibrated halo channel is provided by the same cosmic-web decomposition. Walker et al. (2024) report that an FRB sightline originating at 𝑧 = 1 intersects on average ≃ 1.8 foreground collapsed structures in TNG, rising to ≃ 12 .4 by 𝑧 = 5. Our calibrated mean halo-encounter count at the same redshift is ⟨𝑁 ℎ⟩ ≃ 1.8 (Table 3), of the same order. That count includes collapsed structures down to subhalo masses 
+
+𝑀 ∼ 10 8 ℎ−1 𝑀 ⊙ , whereas our halo channel samples the more mas-sive range 𝑀 ∈ [ 10 12 , 10 14 .8] 𝑀 ⊙ that dominates the projected gas column, so the two counts are not defined over identical popula-tions. What is nonetheless reassuring is that the calibration, which had no access to the encounter count and was driven purely by the 
+
+Δ-space shape, lands on an encounter rate of the same order as the structure-intersection rate measured directly in the simulation.  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Stochastic FRB DM model 13                                                             
+
+> Table 4. Forward-likelihood diagnostics for the FRBs analysed in Section 5. ⟨DM ⟩model is the mean total DM predicted by turboFRB under the frozen 4-parameter calibration with host and Milky-Way priors; 𝑃 tail ≡𝑃 (DM tot ≥DM obs )under the same forward distribution. FRB 𝑧 host DM obs [pc cm −3]⟨DM ⟩model [pc cm −3]𝑃 tail
+> FRB 20190520B 0.241 1204.7 506 1.6% FRB 20220831A 0.262 1146.2 592 2.8% FRB 20240304B 2.148 2458.2 2248 20.8% FRB 20210912A ∼1.18 (post.) 1233.7 ——
+> Table 5. Implied rest-frame host dispersion measure required to reconcile each localised outlier with the cosmological forward model, obtained by inverting DM rest host =(1+𝑧 ) ( DM obs −DM MW −DM IGM )with DM IGM sampled from the forward distribution at 𝑧 host . Values are the median and 68% credible interval; 𝑓 no host is the fraction of forward draws for which the IGM alone already accounts for the observed budget. FRB 𝑧 host DM rest host [pc cm −3]𝑓 no host
+> FRB 20190520B 0.241 1115 +69
+> −98 0.00 FRB 20220831A 0.262 950 +76
+> −109 0.00 FRB 20240304B 2.148 989 +660
+> −1021 0.17
+
+7.1 Filaments as a physical channel 
+
+A separate but complementary line of evidence supports the explicit treatment of filaments as a contribution to DM IGM . Mo et al. (2025) have detected at ∼ 3𝜎 confidence a divergence in the DM-redshift relation between FRBs whose lines of sight intersect cosmic filaments identified by the DisPerSE algorithm in DESI imaging, and FRBs whose lines of sight do not, with the modelled filament gas described by an isothermal 𝛽 -model with central baryon overdensity 𝛿 0 =
+
+21 +13 
+
+> −12
+
+. The filament channel of turboFRB adopts the same isothermal 
+
+𝛽 -model functional form, while its absolute amplitude is fixed by budget enforcement. The channel decomposition of Fig. 3 shows that, at 𝑧 = 1, the filament channel contributes a mean of ≃ 51 pc cm −3
+
+but with a sharply skewed distribution, consistent with its expected role in populating the high-DM shoulder rather than the body. The explicit filament channel remains one of the methodological commitments that distinguishes turboFRB from purely halo-based forward models. Within the present calibration strategy, the main im-provement did not come from changing the filament sector, but from altering the halo encounter normalisation. That itself is informative: it suggests that the halo channel primarily controlled the residual variance budget, while the filament channel plays a secondary but still physically motivated role in shaping the shoulder and high-DM tail of 𝑃 (DM IGM | 𝑧 ).
+
+7.2 Implications for FRB cosmology 
+
+The recent demonstration by Andrew et al. (2026) that the FRB dis-persion measure is an effectively unbiased tracer of large-scale matter, with a bias parameter 𝑏 DM ≃ 1 on linear scales, has important im-plications for the cosmological use of FRBs. This result was derived under the assumption that the DM field traces the matter distribution without resolving the contributions of individual structures. Forward models such as turboFRB that decompose the DM into explicit halo and filament channels are therefore natural tools for testing and ex-tending this prediction, since halos and filaments are known to be biased tracers of the matter field with different bias parameters. They are particularly suited for cross-correlations between FRB DMs and galaxy positions, between FRB DMs and weak-lensing maps, and be-tween FRB DMs at different sightline pairs. The present paper does not attempt those analyses, but it establishes the forward machinery required for them. A second implication concerns the use of the DM-redshift relation for cosmological parameter inference, particularly the Hubble con-stant 𝐻 0. The forward model exposes the 𝐻 0 dependence of ⟨DM IGM ⟩
+
+but also provides the full 𝑃 (DM IGM | 𝑧, 𝐻 0) likelihood, allowing for Bayesian inference that does not rely on a Gaussian approximation around the mean relation. The closed-loop test of Section 6 shows that the inference machinery built on this likelihood recovers the injected value when fed mock data drawn from the same genera-tive model; a realistic analysis on real localised FRBs, including the joint marginalisation of 𝑓 IGM , the host prior parameters, and the four 
+
+turboFRB calibration parameters, is left to a forthcoming companion paper. 
+
+7.3 Limitations and future work 
+
+First, the host-galaxy contribution DM host is not modelled self-consistently; in Section 5 it is treated as a residual diagnosed through the forward likelihood, and in Section 6 it is encoded through a fixed lognormal prior. A complete cosmological likelihood will re-quire a joint host+IGM treatment, ideally along the lines of recent host-galaxy forward models (Theis et al. 2024). Second, a residual shape mismatch remains between the calibrated forward distribution and the corrected TNG reference at the edges of the calibration window: the calibrated 𝜎 Δ (𝑧 ) crosses the Konietzka benchmark near 𝑧 ∼ 1.5–1 .8 and tracks it to within ≲ 15% for 𝑧 ≳ 1, but the deviation grows toward low redshift (reaching ∼ 30% at 
+
+𝑧 = 0.3), and a marginally heavier high-DM tail persists at 𝑧 = 2.5. We attribute this residual to the cumulative effect of the engine’s remaining fixed assumptions (Tinker mass function, halo concentra-tion, filament cylinder geometry, 𝑓 gas values, environmental coupling exponents), each of which is anchored at a literature value rather than calibrated. Releasing any one of these to a calibrated effective param-eter would almost certainly reduce the residual further, at the cost of moving the model away from its currently transparent physical interpretation. We regard the present four-parameter configuration as a reasonable compromise between calibration quality and physical structure. Third, the environmental modulation as implemented here is a simplification of the full cosmic-web structure: the latent 𝐸 is drawn independently per line of sight, with no explicit angular correlation, while in nature the environmental overdensity field has substantial coherence on Mpc scales. This limitation is irrelevant for the marginal 
+
+𝑃 (DM IGM | 𝑧 ) that is the focus of the present paper, but it becomes relevant for FRB cross-correlation analyses, which we leave to future work. Fourth, the engine currently propagates only the background cos-mological sector. The diffuse mean (8) depends on 𝐻 0, Ω𝑚 , and Ω𝑏 ,and the encounter rates inherit the same background dependence; but perturbation-sector parameters such as 𝜎 8 and 𝑛 𝑠 , which would in principle modulate the halo mass function and therefore 𝑛 hbg , are  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 14 Fortunato et al. 
+
+not coupled dynamically and instead get absorbed into the calibrated effective 𝑛 hbg and into the fixed log-normal pool parameters. For the present study, in which the calibration is performed against a single hydrodynamical benchmark at fixed and matched cosmology, this is acceptable. For the broader cosmological applications, the engine will be extended to accept an external cosmology object (for instance via astropy.cosmology, CAMB, or CLASS) so that the forward likelihood can be embedded in a sampler such as Cobaya or Cos-moSIS and used to constrain background cosmology jointly with the host-galaxy and turboFRB nuisance parameters. Such a coupling would also permit a controlled study of how 𝜎 8 and 𝑛 𝑠 propagate into the FRB DM distribution through the halo channel, which the present engine cannot address. 
+
+8 CONCLUSIONS 
+
+We have presented turboFRB , a semi-analytic stochastic genera-tor for FRB intergalactic dispersion measures. The model builds 
+
+𝑃 (DM IGM | 𝑧 ) from a mean-preserving diffuse component, Poisson-sampled halo and filament encounters, and a latent line-of-sight en-vironmental modulation. Our main results are: (i) Of the 15 scalar parameters exposed by the sampling configu-ration, four are calibrated as effective nuisance parameters by a single-shot grid search against the Konietzka et al. (2025) ray-traced TNG catalogue in Δ-space, at matched (TNG) cosmology: 𝜎 0 = 0.375, 𝛾 𝑠 = −1.460, 𝜎 𝐸 = 0.450, and 
+
+𝑛 hbg = 2.60 × 10 −3 Mpc −3. The remaining parameters are fixed at literature values, engine defaults, or budget-closure relations. (ii) The calibrated forward model matches the corrected TNG benchmark to the percent level in mean DM across the cal-ibration window (mean ratios 0 .982–0 .990) and yields a per-redshift Δ-space Jensen–Shannon divergence (Lin 1991) at or below ≃ 5 × 10 −3 across 𝑧 = 0.5 to 𝑧 = 2.5. Calibrating at the benchmark cosmology ensures the four effective parameters capture genuine shape differences rather than a cosmological-parameter offset. (iii) The directly measured normalised scatter 𝜎 Δ (𝑧 ) crosses the Konietzka et al. (2025) benchmark near 𝑧 ∼ 1.5–1 .8, rather than lying systematically above it, and tracks it to within ≲ 15% for 𝑧 ≳ 1; the deviation grows toward low redshift, where the absolute scatter is largest. The high-redshift plateau in 𝜎 Δ
+
+characteristic of a 3-parameter baseline with 𝑛 hbg frozen at the Tinker integral is absent in the present calibration. (iv) The per-sightline halo statistics provide a physically inter-pretable effective decomposition of the shape match. The halo encounter population becomes more frequent, with ⟨𝑁 ℎ⟩ rising from ≃ 0.47 at 𝑧 = 0.2 to ≃ 2.9 by 𝑧 = 2.5, while the per-encounter halo scatter increases only moderately, from ≃ 49 to 
+
+≃ 123 pc cm −3. The effective encounter path length stabilises near 𝑙 ≃ 2.0 Gpc. (v) The event-level likelihood framework is applied to four repre-sentative FRBs: three with confirmed host redshifts spanning 
+
+𝑧 = 0.241–2 .148, and one radio-localised, host-undetected event whose redshift is marginalised over. The tail probability 
+
+𝑃 tail provides a single quantitative answer to “how unusual is this event under the cosmological forward model?”, and in-verting the forward likelihood yields the implied rest-frame residual DM distribution for each event; the interpretive clas-sification (host-excess required, moderate host-excess, cosmic-variance tail, typical sightline) is left to the user as descriptive vocabulary rather than encoded in the engine. (vi) A closed-loop 𝐻 0 self-consistency test on a synthetic catalogue of 𝑁 = 100 localised FRBs recovers the injected value within 1𝜎 . The artificially small posterior width is the result of hold-ing the calibration covariance, the 𝑓 IGM marginalisation, and the host prior uncertainty fixed on both sides of the loop, and should not be read as a realistic forecast; it demonstrates inter-nal consistency of the forward likelihood; a single closed-loop realisation does not establish absence of bias, which would require a coverage study over many realisations. The present implementation is limited mainly by the absence of a self-consistent host-galaxy DM model and by calibration against a single hydrodynamical benchmark. Incorporating host-galaxy forward modelling, calibration uncertainty, and baryon-fraction marginalisation is the next step toward applying turboFRB 
+
+to real FRB cosmological inference. 
+
+ACKNOWLEDGMENTS 
+
+We thank the authors of Konietzka et al. (2025) for making their ray-tracing catalogues publicly available. AW and JASF gratefully ac-knowledge financial support from the South African Research Chairs Initiative (SARChI) of the Department of Science and Technology and the National Research Foundation (NRF) of South Africa, as well as support from the National Institute for Theoretical and Com-putational Sciences (NITheCS). VM thanks CNPq (Brazil), CAPES (Brazil) and FAPES (Brazil) for partial financial support. WSHR thanks FAPES (Brazil) and CNPq (Brazil) for partial financial sup-port. 
+
+DATA AVAILABILITY 
+
+The code implementing turboFRB is publicly available at https:// github.com/jefersonfortunato/turbofrb . TNG ray-tracing catalogues used for calibration are publicly released by Konietzka et al. (2025). The frozen four-parameter configuration, the random seeds, and a script reproducing every figure and table of this paper are included in the repository release corresponding to this paper. 
+
+References  
+
+> Alfradique V., Castro T., Marra V., Quartin M., Giocoli C., Monaco P., 2024, The Open Journal of Astrophysics, 7 Andrew S., et al., 2026, arXiv preprint arXiv:2604.25828 Anna-Thomas R., et al., 2023, Science, 380, 599 Bhandari S., Flynn C., 2021, Universe, 7, 85 Caleb M., et al., 2025, arXiv preprint arXiv:2508.01648 Connor L., et al., 2023, The Astrophysical Journal Letters, 949, L26 Connor L., et al., 2024, arXiv preprint arXiv:2409.16952 Cordes J. M., Lazio T. J. W., 2002, arXiv preprint astro-ph/0207156 Deng W., Zhang B., 2014, The Astrophysical Journal Letters, 783, L35 Duffy A. R., Schaye J., Kay S. T., Dalla Vecchia C., 2008, Monthly Notices of the Royal Astronomical Society: Letters, 390, L64 Fortunato J. A. S., Bacon D. J., Hipólito-Ricaldi W. S., Wands D., 2025, JCAP, 01, 018 Fortunato J. A. S., Hipólito-Ricaldi W. S., Romero G. E., 2026, Phys. Rev. D, 113, 023537 Hagstotz S., Reischke R., Lilow R., 2022, Monthly Notices of the Royal Astronomical Society, 511, 662 Inoue S., 2004, Monthly Notices of the Royal Astronomical Society, 348, 999 MNRAS 000 , 1–16 (2026)
+
+# Stochastic FRB DM model 15           
+
+> Ioka K., 2003, Astrophysical Journal Letters, 598, L79 James C., Prochaska J., Macquart J., North-Hickey F., Bannister K., Dunning A., 2022a, Monthly Notices of the Royal Astronomical Society, 509, 4775 James C. W., et al., 2022b, Monthly Notices of the Royal Astronomical Society, 516, 4862 Kainulainen K., Marra V., 2009, Physical Review D—Particles, Fields, Grav-itation, and Cosmology, 80, 123020 Kainulainen K., Marra V., 2011, Physical Review D—Particles, Fields, Grav-itation, and Cosmology, 83, 023009 Konietzka R. M., Connor L., Semenov V. A., Beane A., Springel V., Hernquist L., 2025, arXiv e-prints Lee K.-G., et al., 2023, ApJL, 954, L7 Lin J., 1991, IEEE Transactions on Information theory, 37, 145 Lorimer D. R., Bailes M., McLaughlin M. A., Narkevic D. J., Crawford F., 2007, Science, 318, 777 Macquart J.-P., et al., 2020, Nature, 581, 391 Marnoch L., et al., 2023, Monthly Notices of the Royal Astronomical Society, 525, 994 McQuinn M., 2014, ApJ, 780, L33 Mo J.-F., Zhu W., Yang Q.-R., Zheng Y., Feng L.-L., 2025, The Astrophysical Journal, 995, 183 Navarro J. F., Frenk C. S., White S. D., 1997, The Astrophysical Journal, 490, 493 Niu C.-H., et al., 2022, Nature, 606, 873 Petroff E., Hessels J. W. T., Lorimer D. R., 2019, Astronomy and Astrophysics Review, 27, 4 Prochaska J. X., Zheng Y., 2019, MNRAS, 485, 648 Sang Y., Lin H.-N., 2025, Monthly Notices of the Royal Astronomical Society, 544, 2870 Theis A., Hagstotz S., Reischke R., Weller J., 2024, arXiv preprint arXiv:2403.08611 Tinker J., Kravtsov A. V., Klypin A., Abazajian K., Warren M., Yepes G., Gottlöber S., Holz D. E., 2008, Astrophysical Journal, 688, 709 Torkamani M., et al., 2026, Open Journal of Astrophysics, 9 Walker C. R. H., Spitler L. G., Ma Y.-Z., Cheng C., Artale M. C., Hummels C. B., 2024, A&A, 683, A71 Zhang Z. J., Yan K., Li C. M., Zhang G. Q., Wang F. Y., 2021, Astrophysical Journal, 906, 49 Zhuge J., Kalomenopoulos M., Zhang B., 2026, The Astrophysical Journal, 996, 66
+
+APPENDIX A: PROVENANCE OF FIXED INPUTS AND MODELLING CHOICES 
+
+The calibration described in Section 2.7 adjusts only four effective parameters. The remaining quantities entering the forward engine are fixed either by external physics, by representative values from published scaling relations, or by internal modelling choices. We refer to them here as fixed inputs rather than fixed parameters, since several entries in Table A1 are grouped modelling choices rather than independent scalar degrees of freedom. We use three provenance categories: (i) quantities fixed by atomic physics or by direct external constraints; (ii) representative single values adopted from published relations without evolving the full relation dynamically; and (iii) internal engine choices that define the structure of the forward model. The purpose of the table is not to assign a formal prior to each input, but to make clear which parts of the model are calibrated and which are held fixed. Most of the fixed inputs affect the shape of individual channel contributions rather than the ensemble mean, which is controlled by the budget-enforcement step of Section 2.6. This separation is useful because changes in profile shape, impact-parameter cuts, or environ-mental response alter the width and tails of 𝑃 (DM IGM | 𝑧 ) without freely shifting the mean relation. In particular, because the budget step fixes each channel mean and the environmental modulation is mean-preserving by construction (Section 2.5), the least externally anchored inputs — 𝑥 max and the couplings 𝑎 ℎ, 𝑎 𝑓 — cannot shift the ensemble mean and act only on the second moment and the tails. None of the fixed inputs was adjusted in light of the Konietzka com-parison, which is what makes the residual mismatch (Section 3.1) interpretable as the cumulative rigidity of these choices rather than exhausted fitting freedom. A full sensitivity scan over them is left to future work. 
+
+APPENDIX B: MONTE CARLO CONVERGENCE OF THE FORWARD ESTIMATOR 
+
+All distribution-level quantities reported in this work are estimated from finite ensembles of forward sightlines. We adopt 𝑁 = 10 4 sight-lines per redshift as the fiducial sample size and test its convergence by recomputing the normalised scatter 𝜎 Δ (𝑧 ) at 𝑧 = 0.5, 1.5, and 2 .5for 
+
+𝑁 ∈ { 2, 5, 10 , 20 , 50 } × 10 3.
+
+Each configuration is repeated with five independent random seeds. The results are shown in Table B1. Between 𝑁 = 10 4 and 𝑁 = 5 × 10 4, the central value of 𝜎 Δ
+
+changes by less than 0 .002 at all three redshifts, smaller than the seed-to-seed scatter at the fiducial sample size. We therefore regard the fiducial ensemble as sufficient for the validation statistics of Section 3; increasing the sample size would reduce Monte Carlo noise but would not change the conclusions of the study.  
+
+> This paper has been typeset from a TEX/L ATEX file prepared by the author. MNRAS 000 , 1–16 (2026)
+
+# 16 Fortunato et al. 
+
+Table A1. Provenance and role of the fixed inputs used by turboFRB . Category (i) denotes atomic-physics or direct external constraints; (ii) denotes representative values from published relations; and (iii) denotes internal engine choices. Input Value Category Role in the forward model 
+
+𝜒 𝑒 0.88 (i) Electron-per-baryon ratio for fully ionised primordial gas 
+
+𝑓 gas ,h 0.10 (ii) Gas fraction assigned to halo encounters (Prochaska & Zheng 2019) 
+
+𝛽 2/3 (ii) Isothermal index of the filament gas profile (Mo et al. 2025) 
+
+𝑓 gas ,f 0.28 (iii) Filament gas normalisation before budget enforcement 
+
+𝑐 200 5.0 (ii) Representative NFW concentration for the halo gas profile (Duffy et al. 2008) halo mass pool 10 12 – 10 14 .8 𝑀 ⊙ (ii) Mass range for cross-section-weighted halo encoun-ters (Tinker et al. 2008) 
+
+𝑥 max 0.85 (iii) Maximum halo impact parameter in units of 𝑅 200 
+
+𝑅 ref  
+
+> 𝑓
+
+, 𝐿 ref  
+
+> 𝑓
+
+0.65 , 6.0 Mpc (iii) Reference filament radius and length 
+
+𝑅 𝑓 ( 𝑀 ), 𝐿 𝑓 ( 𝑀 ) scalings 𝑀 0.20 , 𝑀 0.15 (𝑀 ref = 10 13 𝑀 ⊙ ) (iii) Mass dependence of the finite-cylinder filament geom-etry spine concentration 1.0 (iii) No additional filament-spine boost in the fiducial model 
+
+𝜂 ℎ , 𝜂 𝑓 , 𝜂 𝑛 ℎ , 𝜂 𝜆 𝑓 ∼ ± 0.1 – 0 .2 (iii) Mild redshift evolution of budget weights and en-counter rates 
+
+𝑎 ℎ , 𝑎 𝑓 0.60 , 0.45 (iii) Response of halo and filament rates to the latent envi-ronment halo mass-pool shape 𝜇 log 10 𝑀 = 12 .65, 𝜎 log 10 𝑀 = 0.35 (iii) Log-normal pool from which halo encounters are drawn filament mass pool 10 11 .8–10 14 .2 𝑀 ⊙ , 𝜇 log 10 𝑀 = 12 .55, 𝜎 log 10 𝑀 = 0.22 (iii) Log-normal pool for filament encounters gas-fraction scatter 0.12 (halo), 0 .10 (filament) (iii) Log-amplitude of per-encounter gas-mass scatter 
+
+𝜖 0.15 (iii) NFW core regularisation, in units of 𝑟 𝑠 
+
+𝑟 𝑐 0.18 𝑅 𝑓 (iii) Filament 𝛽 -model core radius 
+
+𝑅 ref 200 0.30 Mpc at 𝑀 ref = 10 13 𝑀 ⊙ (iii) Virial-radius normalisation 
+
+Table B1. Convergence of the forward-model normalised scatter 𝜎 Δ (𝑧 ) with the number of sampled sightlines 𝑁 . Each entry is the mean over 5 indepen-dent realisations, with the standard deviation across realisations in parenthe-ses. The estimator is converged at the fiducial 𝑁 = 10 4 to better than the per-bin scatter. 
+
+𝑁 𝜎 Δ (𝑧 = 0.5) 𝜎 Δ (𝑧 = 1.5) 𝜎 Δ (𝑧 = 2.5)
+
+2000 0.2663 (0.0094) 0.1625 (0.0039) 0.1413 (0.0034) 5000 0.2686 (0.0047) 0.1654 (0.0028) 0.1383 (0.0024) 10000 0.2681 (0.0031) 0.1668 (0.0030) 0.1405 (0.0031) 20000 0.2688 (0.0036) 0.1637 (0.0039) 0.1403 (0.0036) 50000 0.2688 (0.0017) 0.1635 (0.0014) 0.1398 (0.0024) MNRAS 000 , 1–16 (2026)
