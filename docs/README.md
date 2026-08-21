@@ -6,52 +6,47 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-20
-- 运行时间：2026-08-20 20:42:19 UTC
+- 最新运行日期：2026-08-21
+- 运行时间：2026-08-21 20:42:53 UTC
 - 运行状态：成功
-- 本次总论文数：10
+- 本次总论文数：9
 - 精读区：5
-- 速读区：5
+- 速读区：4
 
 ### 今日简报（AI）
-今日精读聚焦重复快速射电暴的能量释放层级与中子星状态方程不确定性量化，两篇均获满分推荐。  
-最值得关注：FRB存在不变的能量释放层级，以及用点估计+后验分布量化中子星物态方程的不确定性。  
-下一步建议：优先精读这两篇满分论文，速读部分可稍后补充了解中子星山脉与伽马暴临界现象。
-- 详情：[/202608/20/README](/202608/20/README)
+今日聚焦中子星与快速射电暴，精读两篇高分成果：安静脉冲星J1637−4642罕见三次自转突变，及活跃重复暴FRB 20240114A的多尺度记忆与状态转换。速读覆盖中子星模拟与振荡性质，适合关注致密天体物理的读者。建议从FRB 20240114A入手，理解重复暴的非随机行为。
+- 详情：[/202608/21/README](/202608/21/README)
 
 ### 精读区论文标签
-1. [An invariant energy release hierarchy in a repeating fast radio burst](/202608/20/2608.18455v1-an-invariant-energy-release-hierarchy-in-a-repeating-fast-radio-burst)  
-   标签：评分：10.0/10、query:pulsar-frb
-   evidence：重复快速射电暴能量分布的不变标度，直接关联FRB辐射机制
-2. [Quantifying uncertainty in the neutron-star equation of state using point estimates and posterior distributions](/202608/20/2608.19019v1-quantifying-uncertainty-in-the-neutron-star-equation-of-state-using-point-estimates-and-posterior-distributions)  
-   标签：评分：10.0/10、query:pulsar-frb
-   evidence：直接结合质量-半径与引力波潮汐形变观测来量化中子星状态方程不确定性
-3. [Detection of possible burst oscillation in the neutron star low-mass X-ray binary 4U 1323-62](/202608/20/2608.14010v1-detection-of-possible-burst-oscillation-in-the-neutron-star-low-mass-x-ray-binary-4u-1323-62)  
+1. [Discovery of Three Glitches in the previously quiet pulsar PSR J1637$-$4642](/202608/21/2608.19555v1-discovery-of-three-glitches-in-the-previously-quiet-pulsar-psr-j1637-4642)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：报道并分析了脉冲星PSR J1637-4642的三次自转突变，探测其内部性质
+2. [Multi-scale Memory and Regime Shift in the Hyperactive Repeating FRB 20240114A](/202608/21/2608.19713v1-multi-scale-memory-and-regime-shift-in-the-hyperactive-repeating-frb-20240114a)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：快速射电暴爆发统计与记忆性，与辐射机制和起源相关
+3. [Universal Relations for Neutron Stars from Asymptotic Analysis](/202608/21/2608.19939v1-universal-relations-for-neutron-stars-from-asymptotic-analysis)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：中子星普适关系的解析起源，可直接用于状态方程不敏感测量的分析
+4. [On coordinate frames relevant for pulsar physics](/202608/21/2608.18501v1-on-coordinate-frames-relevant-for-pulsar-physics)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：对中子星低质量X射线双星4U 1323-62的暴振荡计时给出可能自转频率
-4. [A stochastic forward model for the intergalactic dispersion-measure distribution of Fast Radio Bursts](/202608/20/2608.17658v1-a-stochastic-forward-model-for-the-intergalactic-dispersion-measure-distribution-of-fast-radio-bursts)  
+   evidence：面向脉冲星计时和天体测量的坐标框架
+5. [Testing Statistical Isotropy in the FRB Sky Distribution: A Selection-Function-Aware Framework](/202608/21/2608.20135v1-testing-statistical-isotropy-in-the-frb-sky-distribution-a-selection-function-aware-framework)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：快速射电暴星系际色散量分布的随机前向模型
-5. [The Mass Function of Neutron Stars from Core-Collapse Supernova Simulations](/202608/20/2608.18198v1-the-mass-function-of-neutron-stars-from-core-collapse-supernova-simulations)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：核塌缩超新星模拟给出的中子星质量函数约束状态方程相关的诞生质量
+   evidence：快速射电暴天区分布的各向同性检验
 
 ### 速读区论文标签
-1. [Modelling mountains on accreting magnetized neutron stars](/202608/20/2608.17508v1-modelling-mountains-on-accreting-magnetized-neutron-stars)  
+1. [Controlling artificial surface heating in neutron star simulations: Application to hybrid equations of state](/202608/21/2608.16945v2-controlling-artificial-surface-heating-in-neutron-star-simulations-application-to-hybrid-equations-of-state)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：中子星壳层形变模型，耦合磁应力、加热和弹性
-2. [Surface gravity wave on a neutron star ocean trapped around a magnetic pole](/202608/20/2608.17241v1-surface-gravity-wave-on-a-neutron-star-ocean-trapped-around-a-magnetic-pole)  
+   evidence：采用混合状态方程的中子星模拟，通过控制数值表面加热提高状态方程相关观测量的可靠性
+2. [Breakdown of Hydrodynamic Universality in Neutron Star Oscillations](/202608/21/2608.19334v1-breakdown-of-hydrodynamic-universality-in-neutron-star-oscillations)  
+   标签：评分：7.0/10、query:pulsar-frb
+   evidence：中子星振荡与内部耗散理论
+3. [Modelling mountains on accreting magnetized neutron stars](/202608/21/2608.17508v1-modelling-mountains-on-accreting-magnetized-neutron-stars)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：中子星海洋表面重力波被磁极俘获，与中子星外壳层振荡相关
-3. [Evidence of self-organized criticality in the prompt emission of a bright gamma-ray burst](/202608/20/2608.17964v1-evidence-of-self-organized-criticality-in-the-prompt-emission-of-a-bright-gamma-ray-burst)  
+   evidence：吸积磁化中子星连续引力波的山脉形变模型
+4. [Bayesian constraints on quadratic $f(Q)$ gravity from the ADM mass of white dwarfs](/202608/21/2608.19257v1-bayesian-constraints-on-quadratic-fq-gravity-from-the-adm-mass-of-white-dwarfs)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：伽马射线暴脉冲统计中的自组织临界性，方法可迁移至重复快速射电暴研究
-4. [Modeling the Gravitational Wave Signal from the X-ray Pulsar Her X-1](/202608/20/2608.18343v1-modeling-the-gravitational-wave-signal-from-the-x-ray-pulsar-her-x-1)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：对X射线脉冲星Her X-1中进动中子星引力波信号的建模
-5. [Real-Time RFI Mitigation in SPOTLIGHT: A Two-Stage Approach for Transient Searches](/202608/20/2608.19102v1-real-time-rfi-mitigation-in-spotlight-a-two-stage-approach-for-transient-searches)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：面向快速射电暂现源搜寻的实时射电干扰抑制框架
+   evidence：从白矮星质量-半径观测给出状态方程的贝叶斯约束，方法可迁移至中子星状态方程约束
 
 
 <div class="dpr-home-promo-card">

@@ -1,0 +1,633 @@
+Title: Testing Statistical Isotropy in the FRB Sky Distribution: A Selection-Function-Aware Framework
+
+URL Source: https://arxiv.org/pdf/2608.20135v1
+
+Published Time: Fri, 21 Aug 2026 01:00:36 GMT
+
+Number of Pages: 26
+
+Markdown Content:
+Prepared for submission to JCAP 
+
+# Testing Statistical Isotropy in the FRB Sky Distribution: A Selection-Function-Aware Framework 
+
+# Bruno W.N. Ribeiro a, 1 Thais Lemos b Carlos A.P. Bengaly b
+
+# Rodrigo Gonçalves c K.E.L. de Farias a,d Lázaro L. Sales a
+
+# Amilcar R. Queiroz a Jailson Alcaniz b
+
+> a
+
+Unidade Acadêmica de Física, Universidade Federal de Campina Grande, Campina Grande, PB, 58429-900, Brazil 
+
+> b
+
+Observatório Nacional, Rio de Janeiro, RJ, 20921-400, Brazil 
+
+> c
+
+Departamento de Física, Universidade Federal Rural do Rio de Janeiro, Seropédica, RJ, 23897-000, Brazil 
+
+> d
+
+Centre of Excellence ENSEMBLE3 Sp. z o. o., Wolczyńska Str. 133, 01-919, Warsaw, Poland E-mail: bruno_wesley@uaf.ufcg.edu.br, thaislemos@on.br, carlosbengaly@on.br, rsg_goncalves@ufrrj.br, klecio.lima@uaf.ufcg.edu.br, lazaro0254@gmail.com, amilcarq@df.ufcg.edu.br, alcaniz@on.br 
+
+Abstract. We perform a test of statistical isotropy in the Universe using the sky dis-tribution of fast radio bursts (FRBs), based on a compilation of 4066 events detected by multiple surveys. Our method is based on the two-point angular correlation function w(θ)
+
+as in the Landy–Szalay estimator, together with a tomographic absolute-anisotropy statistic, and estimates their observational uncertainties from complementary jackknife and bootstrap resampling. Both estimators are confronted with hierarchical ensembles of isotropic mock catalogs that propagate the uncertainties of empirically reconstructed survey selection func-tions, as well as the Poisson fluctuations of the isotropic realizations. The significances are obtained from a covariance-aware, SVD-regularized χ2 statistic calibrated empirically against the mock ensemble, and we evaluate four nested scenarios that progressively incorporate a Galactic-plane mask and the survey selection functions. As for our results, we find that the raw FRB sky is strongly inconsistent with isotropy; Galactic masking alone reduces the ten-sion by only a factor of ∼ 3, whereas the selection functions reduce it by nearly four orders of magnitude, showing that the apparent anisotropy is driven by the highly non-uniform sky coverage of the contributing surveys, overwhelmingly dominated by CHIME. Only when both effects are combined we obtain that the observed distribution is fully consistent with statisti-cal isotropy. This result is independently corroborated by the absolute-anisotropy estimator, and is stable under variations of the analysis parameters. Therefore, we find that the FRB sky distribution is consistent with statistical isotropy, helping confirm one of the main predictions of the standard model scenario. 
+
+> 1
+
+Corresponding author. arXiv:2608.20135v1 [astro-ph.CO] 20 Aug 2026 Contents 
+
+1 Introduction 12 The Observational Data Set 23 Methodology 4
+
+3.1 Sky Pixelization and Galactic Masking 53.2 Survey Selection Functions 53.3 Hierarchical Mock Ensembles 63.4 Angular Statistics and Uncertainty Estimation 73.5 Covariance Modeling and Statistical Inference 83.6 Nonparametric Diagnostics 9
+
+4 Results and Discussion 9
+
+4.1 Main analysis 94.2 Robustness Analysis 15 
+
+5 Conclusion 17 A Fiducial Analysis Parameters 19 B SF Validations and Survey Maps 19 C Supplementary Statistics and Covariance Diagnostics 21 
+
+1 Introduction 
+
+The current standard cosmological model, the Λ Cold Dark Matter ( ΛCDM) model, provides an excellent description of observations of the cosmic microwave background (CMB) and the large-scale structure of matter in the Universe [1]. One of its cornerstones is the so-called Cosmological Principle (CP), which is based on the fundamental assumptions that the Universe is statistically homogeneous and isotropic on sufficiently large scales (see [2, 3] for a discussion). This hypothesis allows cosmic distances and ages to be directly derived from the Friedmann-Lemaître-Robertson-Walker (FLRW) metric. Any violation of the CP would require a reformulation of the concordance cosmological model ( ΛCDM). For this reason, testing the assumption of cosmic isotropy with independent tracers of the large-scale Universe is essential to assess the validity of the CP. Several cosmological observations have been used to test the validity of the CP. For instance, CMB temperature anisotropies [4], Type Ia supernova (SNe Ia) distances [5–8], gamma-ray bursts (GRBs) [9, 10], galaxy number counts [11, 12], and galaxy clusters [13] have provided evidence that the CP holds in terms of statistical isotropy. However, some ob-servations have revealed statistically significant signals that may challenge the CP, such as the large-angle anomalies in the CMB [4, 14] and the dipole anisotropy observed in AGNs/quasar source counts observed in radio and infrared [15–17] (see [18, 19] for reviews on this subject). – 1 – In the context of cosmic homogeneity, there is evidence for the existence of a cosmic homogene-ity scale based on galaxy and quasar number count distributions across the Universe [20–24], as well as by means of null, cosmological model-independent tests [25, 26]. More recently, Fast Radio Bursts (FRBs) [27] have also been used as sources for CP tests. These are highly energetic transient events characterized by millisecond durations and radio-frequency emission (typically at GHz frequencies) (for reviews, see [28–30]). Their large dispersion measures (DMs) strongly suggest an extragalactic, and often cosmological, origin. The first FRB was detected in 2007 by the Parkes telescope [31], and since then, numerous events have been observed by different surveys, particularly by the Canadian Hydrogen In-tensity Mapping Experiment (CHIME), which recently released its second catalog containing approximately 4500 events [32]. Although the number of detected events has increased sig-nificantly in recent years owing to radio telescopes dedicated to FRB searches, only about 
+
+100 FRBs have been well localized, with the corresponding redshift. When combined with their DM, these measurements make FRBs powerful astrophysical and cosmological probes (see [33–40] for cosmological applications of FRBs). Since the number of detected events is increasing with the new surveys, the FRBs con-stitute a promising observational probe for testing large-scale isotropy. In the recent work [27], the authors test cosmic isotropy using the first CHIME/FRB catalog, showing results that are consistent with isotropy. However, in this case, the statistics are limited by the observational sample, which covers only the northern hemisphere and contains ∼ 500 FRBs, as the authors used only the CHIME first FRB catalog. In the present work, we expand the analysis of [27] by testing the statistical isotropy of the Universe using the sky distribution of the current FRB sample. Our analysis is based on a compilation of 4066 FRBs detected by multiple surveys across the entire sky, and we consider three additional scenarios: applying a Galactic plane mask, which restricts the sample to the 2518 FRBs with |b| > 20 ◦; applying a selection-function criterion specific to each survey; and combining both approaches. We then test the isotropy of each sample using two com-plementary estimators: the two-point angular correlation function (2pACF), calculated with the Landy–Szalay estimator, and the tomographic absolute-anisotropy statistic. Their obser-vational uncertainties are estimated through jackknife and bootstrap resampling, while both estimators are tested against ensembles of isotropic mock catalogs that account for uncertain-ties in the empirically reconstructed survey selection functions and Poisson fluctuations. The statistical significance is assessed using a covariance-aware statistical framework calibrated against these mock realizations. This paper is organized as follows. We present the sample data used in our analysis in Sec. 2. In Sec. 3, we describe the methodology and the data analysis performed. We present and discuss our main results in Sec. 4. Finally, in Sec. 5, we summarize the conclusions. 
+
+2 The Observational Data Set 
+
+For the present analysis of the statistical isotropy of the FRB sky distribution, we compile the FRBs detected by multiple surveys. The main source is the Transient Name Server (TNS) database 1, which includes the second CHIME/FRB catalog with ∼ 4500 events [32], Commensal Real-time ASKAP Fast Transient (CRAFT) [41], and Deep Synoptic Array-110 (DSA-110) [42]. We complement this sample with observations from the Five-hundred-meter 
+
+> 1https://www.wis-tns.org
+
+– 2 – Figure 1 . Mollweide projection of the sky positions of FRBs from different surveys. The plot was generated using the matplotlib.pyplot package. 
+
+Aperture Spherical radio Telescope (FAST) [43] data available at 2; and the Parkes telescope datasets [44]. Since our goal is to test statistical isotropy signal from FRBs, we remove the following events: (i) FRBs detected by the DSA-110 survey, whose highly non-uniform sky distribution, with all events concentrated in the northernmost region of the sky, could bias the signal; (ii) CHIME events whose reported flux density lies below the telescope’s minimum detection sensitivity 3; (iii) and the FRBs for which the reporting survey is not available and therefore cannot be assigned a selection function (described in the next section). The resulting working sample contains 4066 events and is used in the scenarios without Galactic masking. When the Galactic Plane mask is applied, the fiducial cut |b| > 20 ◦ further reduces the sample to 2518 
+
+FRBs. For each burst, we use the following main properties: (i) RA, the Right Ascension of the burst, given in J2000 decimal degrees; (ii) DEC, the Declination of the burst, also given in J2000 decimal degrees. It is worth noting that the positional uncertainties are unavailable for several FRBs in the catalogues. Therefore, we employ the jackknife and bootstrap resampling techniques to estimate the variance of our analysis. Both methods are described in the next section. The sky distribution of the selected FRBs is displayed in Fig. 1. Note that there are significantly more observed events in the northern hemisphere ( ∼ 3800 ) than in the southern hemisphere ( ∼ 250 ), mainly due to the CHIME survey, whose field of view covers the entire northern sky and extends slightly into the southern hemisphere ( 0◦ ≲ DEC ≲ 90 ◦ in our sample), and was specifically designed for transient radio searches, including FRBs. The CHIME Collaboration has also reported a decrease in the number of detections near the Galactic plane, which can be seen in Fig. 1. As a result, these observational selection effects may introduce a bias in tests of statistical isotropy, which we attempt to address with our methodology, as explained further. 
+
+> 2https://blinkverse.zero2x.org/
+> 3We apply this sensitivity selection criterion only to the CHIME survey, because this information is not provided for the other surveys, such as the observed flux density of each event and the telescope’s minimum detection sensitivity.
+
+– 3 – Figure 2 . Schematic overview of the analysis pipeline. The FRB catalog is subjected to Galactic masking and empirical survey selection, yielding four isotropic mock configurations. The observed and mock catalogs are analyzed through the Landy–Szalay two-point angular correlation function    
+
+> w(θ)and the absolute anisotropy estimator Aj, followed by resampling, covariance estimation and regularization, nonparametric diagnostics, and analytical and empirical inference. The masked plus selection-function weighted ensemble defines the fiducial observational null hypothesis.
+
+3 Methodology 
+
+In this section, we describe the methodology designed to test the hypothesis of statistical isotropy of the Universe in light of the observed FRB angular distribution presented in Sec. 2. The framework combines Galactic masking, empirical survey selection functions, hierarchical isotropic mock ensembles, covariance modeling, and covariance-aware statistical inference, evaluating whether the observed FRB distribution retains residual anisotropies beyond those expected from this empirically reconstructed observational model. Since publicly available survey information is insufficient to construct a consistent angular exposure model across all surveys, we estimate the survey selection functions (SFs) directly from the observed sky distributions, i.e., via an empirical approach. As a consequence, the inferred selection func-tions may partially absorb genuine large-scale anisotropy signals, as expected in typical raw observational data. A schematic overview of the complete pipeline is presented in Fig. 2. The pipeline is implemented in Python 4, relying on astropy [45] for equatorial-to-Galactic coordinate transformations, healpy [46] for spherical pixelization, TreeCorr [47] for angular pair counting, and scikit-learn [48] for the shrinkage covariance estimator. All fiducial parameters are introduced at their first appearance and consolidated in Appendix A for quick reference.  
+
+> 4The full analysis code is publicly available at https://github.com/bwesley92/FRB-isotropy-tests .
+
+– 4 – 3.1 Sky Pixelization and Galactic Masking 
+
+The celestial sphere is discretized using the HEALPix formalism [46], which provides an equal-area spherical pixelization optimized for large-scale sky analyses. All angular maps employed in this work, i.e., survey selection functions, jackknife regions, and overlap diagnostics, are constructed in HEALPix space, and each FRB is assigned to its pixel through the standard angular transformation p = ang2pix( Nside , θ, ϕ ), where (θ, ϕ ) are the spherical coordinates of the source position. We adopt a fiducial resolution N SF side = 32 for the selection-function reconstruction, and a coarser grid N JK side = 4 for the jackknife partitioning, chosen to guarantee sufficiently populated regions. Before any other step, the observed equatorial coordinates (RA, DEC) of each FRB are converted to the Galactic frame (l, b ), and a latitude mask is applied to suppress regions heavily contaminated by Galactic foregrounds — primarily driven by dispersion, scattering, sky temperature, source confusion, and survey incompleteness — which results in strong observational incompleteness. Throughout this work, we adopt the fiducial cut 
+
+|b| > b cut , bcut = 20 ◦. (3.1) The same masking operation is consistently propagated into the selection-function reconstruc-tion, the random and mock catalogs, the jackknife resampling, and the covariance estimators, so that the fiducial null hypothesis is defined only within the observable sky region after masking. 
+
+3.2 Survey Selection Functions 
+
+The catalog is partitioned according to the reporting survey of each FRB, and an important because the observed sky distribution is not determined solely by the underlying FRB popula-tion, but is also shaped by the distinct observational characteristics of each survey, including its field of view, sky coverage, sensitivity, and observing strategy. Combining FRBs from different surveys without accounting for their individual selection effects could introduce ar-tificial anisotropies into the observed distribution. For this reason, to take into account these effects, we construct an angular selection function of each survey from the spatial distribution of its detected FRBs. This is achieved by constructing a sky count map for each survey, in which the observed FRBs are used to characterize their corresponding angular distribution. For each survey, a sky count map is built by assigning every FRB to its HEALPix pixel at resolution N SF side . The raw selection function is 
+
+SF( p) = N (p)
+
+P 
+
+> p
+
+N (p) , (3.2) where N (p) is the number of FRBs in pixel p. By construction, SF( p) is normalized to unity and represents the probability that an FRB associated with a given survey is detected in the direction of pixel p.Because current FRB samples remain sparse, the raw pixelized maps are strongly affected by shot noise at small angular scales. To recover the large-scale observational response, each selection function is smoothed with a Gaussian kernel, 
+
+SFsmooth(ˆ n) = Gσsmooth ∗ SF(ˆ n), (3.3) where ∗ denotes spherical convolution, Gσsmooth is the corresponding Gaussian kernel with smoothing scale σsmooth , and ˆn is the position of the pixel p. We adopt the fiducial value – 5 – σsmooth = 3 ◦, a few times the native HEALPix pixel scale at the fiducial resolution N SF side = 32 ,implying θpix ≈ 1.8◦, large enough to average over pixel-to-pixel Poisson shot noise, yet nearly two orders of magnitude below the declination range over which genuine large-scale survey-footprint gradients occur. To remove the angular leakage across mask boundaries induced by the convolution, the Galactic mask is reapplied to the smoothed map, followed by a final renormalization. The total observational selection model is then a weighted mixture of the independent survey selection functions, with statistical weight 
+
+wi = Ni
+
+P 
+
+> j
+
+Nj
+
+, (3.4) where Ni is the number of FRBs associated with survey i. FRBs reported by multiple surveys contribute independently to each corresponding Ni.
+
+3.3 Hierarchical Mock Ensembles 
+
+Four distinct classes of isotropic realizations are considered throughout this work, defined by whether the Galactic mask and/or the empirical survey selection functions are applied: 1. Pure isotropy : ideal isotropic skies generated from a perfectly uniform angular distri-bution; 2. Masked isotropy : isotropic skies masked through the removal of the Galactic plane region; 3. SF-weighted isotropy : isotropic skies filtered through the empirical survey selection functions; 4. Fiducial : isotropic skies simultaneously masked and filtered through the empirical sur-vey selection functions. Each configuration is applied identically to the observed catalog and to its corresponding hierarchical mock ensemble: each mock isotropic catalog is drawn with the same number of objects as its corresponding observed catalog ( 4066 for the two unmasked scenarios and 2518 
+
+for the two masked ones) so that observed and simulated data are always compared on equal observational footing. Together, these four configurations isolate and quantify the individual and combined impacts of Galactic masking and instrumental selection on the inferred angular isotropy. The fourth class defines the primary observational null hypothesis tested in this work, namely whether the observed FRB distribution is statistically compatible with an intrinsically isotropic population after propagation through the observational response of the surveys. The Selection Function uncertainties are propagated through the ensemble construc-tion. Assuming Poisson statistics, the uncertainty of each HEALPix pixel is approximated by σN (p) = pN (p), with diagonal covariance contribution 
+
+Cov SF (p) = 
+
+ σN (p)
+
+Ntotal 
+
+2
+
+, (3.5) evaluated directly from the unsmoothed pixel counts, since the dominant source of uncertainty is shot noise at the native pixel scale. Perturbed realizations of each survey selection function – 6 – are then drawn as SF pert (p) = SF( p) + δSF( p), where δSF( p) is a Gaussian variate with zero mean and standard deviation pCov SF (p). Non-positive values are clipped at zero, and the perturbed map is renormalized to unit sum. Each perturbed SF realization defines one ensemble-level observational response, and multiple statistically independent mock catalogs are generated conditioned on that fixed real-ization. The mock hierarchy therefore simultaneously propagates instrumental uncertainties in the empirical SFs and intrinsic Poisson fluctuations of the isotropic realizations. In the fiducial configuration, we generate Nens = 20 SF realizations and N ens mocks = 50 isotropic mock catalogs per realization, for a total of Nmocks = Nens × N ens mocks = 1000 mock catalogs available for covariance estimation and empirical significance calibration. Individual mock events are generated by first drawing a survey label according to its statistical weight wi, and then sampling a HEALPix pixel from the corresponding perturbed selection function, P (ˆ n) ∝ SF pert (ˆ n). To avoid artificial angular quantization at the pixel scale, sampled positions are randomized within the solid angle of each pixel: a uniform subpixel offset is drawn in [−rpix , +rpix ], where rpix is the maximum pixel radius, and the right-ascension offset is rescaled by 1/ cos δ to preserve angular scales near the poles. This restores a continuous angular distribution while preserving the large-scale selection-function structure. For each isotropic realization, an independent random catalog is generated using the same observational selection model, including Galactic masking, survey weighting, and angular selection functions; its size and role within the two-point correlation estimator are detailed in the following subsection. 
+
+3.4 Angular Statistics and Uncertainty Estimation 
+
+The angular two-point correlation function (2pACF) is computed according to the Landy– Szalay estimator [49], 
+
+w(θ) = DD (θ) − 2DR (θ) + RR (θ)
+
+RR (θ) , (3.6) where DD , DR , and RR denote the normalized data–data, data–random, and random– random pair counts, with the random catalog enlarged to Nrand /N data = 20 to suppress Monte Carlo (MC) shot noise in the pair counts. Pair counting is performed with TreeCorr 
+
+[47] in linear angular bins spanning 0◦ ≤ θ ≤ 180 ◦, with a fiducial bin width ∆θ = 10 ◦, i.e., 
+
+Nbins = 18 fine–grained angular bins, by the same token of [9]. Fixed nominal bin edges are used across all mock realizations to guarantee a consistent covariance structure. In addition, we compute a coarse-grained absolute anisotropy estimator, following the tomographic form of [9], 
+
+Aj ≡ X   
+
+> θi∈bin j
+
+|w(θi)|, j = 1 , . . . , N tomo , (3.7) which avoids cancellations between positive and negative fluctuations. In practice, the fine-grained profile w(θi) is first partitioned into Ntomo = 9 coarser tomographic bins of width 
+
+∆θtomo = 20 ◦, spanning 0◦–180 ◦, and the absolute values of w(θi) falling within each tomo-graphic bin j are summed to form the tomographic profile. The global anisotropy statistic is then obtained by summing over all tomographic bins, A ≡ PNtomo  
+
+> j=1
+
+Aj , which measures the cumulative angular anisotropy power. The statistical uncertainties associated with both w(θ) and Aj are estimated using jack-knife [50] and bootstrap [51] resampling of the observed catalog. The jackknife procedure – 7 – follows a leave-one-region-out strategy based on HEALPix regions with N JK side = 4 , whereas the bootstrap is constructed from resampled catalogs generated with replacement. As with the mock ensemble, the jackknife and bootstrap procedures are controlled by their own fixed, independent random seeds, so that both resampling estimates are deterministically repro-ducible for a given configuration. 
+
+3.5 Covariance Modeling and Statistical Inference 
+
+The isotropic mock ensemble provides both the reference isotropic benchmark, defined as the ensemble mean of the angular statistics, and the covariance matrix adopted throughout the statistical inference. The covariance is estimated directly from the mock ensemble, regular-ized using the Ledoit–Wolf shrinkage estimator [52], corrected using the Hartlap factor [53], and further stabilized through a singular value decomposition (SVD) truncation 5. In the latter case, only eigenmodes satisfying λi > 10 −2λmax are retained, where λmax is the largest covariance eigenvalue. The number of retained eigenmodes is denoted by Nkept .The consistency between the observed catalog and the isotropic benchmark is evaluated using both the full-covariance statistic and its SVD-regularized counterpart [54]: 
+
+χ2red = ∆TC−1corr ∆
+
+Nbins 
+
+, χ2SVD ,red = αSVD 
+
+Nkept 
+
+X  
+
+> i∈kept
+
+(vT 
+
+> i
+
+∆) 2
+
+λi
+
+, (3.8) where C−1corr is the regularized inverse covariance, ∆ ≡ wobs − ⟨ wH0 ⟩ is the residual vector, vi
+
+are the retained eigenvectors of the covariance matrix, and αSVD is the Hartlap correction. For each statistic, analytical p-values are obtained from the corresponding χ2 distribution, 
+
+pan = P (χ2 ≥ χ2obs ), pSVD an = P (χ2SVD ≥ χ2SVD ,obs ), (3.9) while empirical Monte Carlo calibrations are computed from the isotropic mock ensemble, 
+
+pemp = N (χ2 
+
+> k
+
+≥ χ2obs ) + 1 
+
+Nmocks + 1 , pSVD emp = N (χ2SVD ,k ≥ χ2SVD ,obs ) + 1 
+
+Nmocks + 1 . (3.10) For convenience, the empirical significances are also expressed as Gaussian-equivalent significances, 
+
+σχ2 = Φ −1(1 − pemp ), σχ2SVD = Φ −1(1 − pSVD emp ), (3.11) where Φ−1 is the inverse standard-normal cumulative distribution. Throughout this work, the SVD-regularized, empirically-calibrated quantities χ2SVD ,red , pSVD emp , and σχ2SVD are adopted as the primary isotropy diagnostics, while the corresponding full-covariance quantities are reported for comparison. The same empirical Monte Carlo calibration is applied to the absolute anisotropy estima-tor A (Eq. 3.7), evaluated identically on the observed catalog and on every mock realization, 
+
+pemp (A) = N (Ak ≥ Aobs ) + 1 
+
+Nmocks + 1 . (3.12)  
+
+> 5For a symmetric covariance matrix, the SVD is equivalent to an eigendecomposition, factorizing it into an orthogonal basis of eigenmodes ranked by their eigenvalues λi; this provides a numerically robust way to identify and discard poorly constrained, noise-dominated directions before the covariance is inverted [54].
+
+– 8 – As a complementary, purely Gaussian measure of deviation, assuming an approximately Gaus-sian spread of A across mocks, rather than relying on its empirical rank, we further report the tension tension ≡ |Aobs − Amocks |
+
+std( Amocks ) . (3.13) Unlike the covariance-aware χ2 statistics, the global estimator carries no explicit angular-bin covariance information. Therefore, it is treated throughout this work as an independent cross-check on the SVD-regularized diagnostic rather than as a replacement for it. 
+
+3.6 Nonparametric Diagnostics 
+
+As a complementary diagnostic, we compare the observed w(θ) and Aj profiles with their corresponding isotropic benchmarks using the two-sample Kolmogorov–Smirnov (KS) and Anderson–Darling (AD) tests [55, 56]. Because the angular and tomographic bins are strongly correlated, we caution that the analytical p-values associated with these tests should be re-garded only as heuristic. We therefore complement them with empirical Monte Carlo p-values estimated directly from the isotropic mock ensemble by comparing the observed statistics with their distributions across the mock realizations; the KS and AD statistics are computed using the ks_2samp and anderson_ksamp routines of SciPy .
+
+4 Results and Discussion 
+
+In this section, we present and discuss the results of our main and robustness analyses. The main analysis reports the results of the isotropy diagnostics in the four complementary scenarios of Sec. 3.3, whereas the robustness analysis investigates the stability of these results in relation to our main modeling and methodology choices. 
+
+4.1 Main analysis 
+
+Our primary isotropy diagnostic is the SVD-regularized, empirically-calibrated significance 
+
+σχ2SVD , described in Sec. 3.5. Table 1 reports this quantity, alongside the SVD-regularized statistic χ2SVD , its reduced form χ2SVD ,red , and the analytic and empirical p-values, for the four isotropy scenarios. As an independent cross-check, Table 2 presents the corresponding absolute-anisotropy results. The associated angular-correlation profiles are shown in Figs. 3– 10. The empirical selection functions underlying the fiducial scenario are presented separately in Appendix B. Complementary results, including the full-covariance statistics, covariance-quality diagnostics, and heuristic KS/AD tests, are collected in Appendix C, where the full-covariance and SVD-regularized statistics are shown to agree to better than 1% throughout. Table 1 displays a clear and physically meaningful progression across the four scenarios. Masking alone reduces the SVD-regularized reduced statistic by only a factor of ∼ 3 (from 
+
+χ2SVD ,red ≃ 2.2 × 10 5 to ≃ 7.0 × 10 4), whereas selection-function weighting alone reduces it by a factor of ∼ 1.8 × 10 4 (down to χ2SVD ,red ≃ 11 .7) — nearly four orders of magnitude more effective. This indicates that the dominant source of the raw catalog’s apparent anisotropy is the highly non-uniform sky coverage of the contributing surveys, rather than Galactic-plane incompleteness. Combining both effects in the Fiducial configuration yields a further 
+
+∼ 19 × improvement, bringing χ2SVD ,red to 0.62 (σχ2SVD = −0.807 ), statistically consistent with a typical isotropic mock realization. We therefore find no evidence for residual large-scale anisotropy in the FRB sky distribution once both Galactic obscuration and empirical – 9 – Scenario Mask SF χ2SVD χ2SVD ,red pSVD an pSVD emp σχ2SVD                                       
+
+> Pure isotropy No No 3.66 ×10 62.15 ×10 50‡0.001 †3.09 †
+> Masked isotropy Yes No 1.20 ×10 67.04 ×10 40‡0.001 †3.09 †
+> SF-weighted No Yes 199 .14 11 .71 4.26 ×10 −33 0.001 †3.09 †
+> Fiducial Yes Yes 10 .49 0.62 0.882 0.790 −0.807
+
+Table 1 . Primary isotropy diagnostic for the four scenarios: the SVD-regularized statistic χ2SVD 
+
+and χ2SVD ,red , the analytic and empirical MC p-values, and the corresponding Gaussian-equivalent significance σχ2SVD . †Empirical p at the MC resolution floor 1/(Nmocks + 1) ≈ 0.001 . ‡Analytic p
+
+underflows double-precision arithmetic.                
+
+> Scenario Aobs pemp tension
+> Pure isotropy 14 .130 0.001 †2433 .36
+> Masked isotropy 12 .792 0.001 †1438 .80
+> SF-weighted 0.110 0.001 †9.18
+> Fiducial 0.028 0.984 1.70
+
+Table 2 . Independent absolute-anisotropy cross-check: observed statistic Aobs , its empirical MC p-value, and the Gaussian tension relative to the isotropic mock ensemble. Floor marker as in Table 1. 
+
+survey selection are accounted for. Notably, Galactic masking is far more effective once the selection function is applied ( ∼ 19 ×) than on its own ( ∼ 3×), consistent with survey coverage being the leading effect. The absolute-anisotropy statistic in Table 2 corroborates the Fiducial conclusion through an independent estimator, and exhibits the same physical progression as the covariance-aware analysis. The Gaussian tension falls only by a factor of ∼ 1.7 under Galactic masking alone (from 2433 to 1439 ), but by a factor of ∼ 265 under selection-function weighting alone (down to 9.18 ), confirming that survey coverage is primarily responsible for the raw catalog’s apparent anisotropy. Combining both effects brings the Fiducial tension to 1.70 , with Aobs well within the isotropic mock distribution ( pemp = 0 .984 ). The fact that two independently constructed estimators agree so closely reinforces the robustness of the isotropy conclusion. This p-value indicates that the observed sky exhibits less residual angular structure than the vast majority (∼ 98% ) of the isotropic mock realizations, consistent with the empirically reconstructed selection function partially absorbing intrinsic angular structure. The angular profiles in Figs. 3–10 display this same progression visually. In the un-corrected scenarios (Figs. 3–6), w(θ) exhibits a pronounced large-scale gradient, declining monotonically from strongly positive values at small separations ( w ≃ 2.5–2.7) through zero near θ ≃ 80 ◦ to negative values ( w ≃ − 0.7) at large separations, and lies everywhere far above the essentially null isotropic benchmark denoted by the H0 mean and confidence bands, which are visually suppressed in these plots, as well as the absolute statistic Aj shows the correspond-ing excess. The Pure and Masked profiles are nearly indistinguishable, confirming visually that Galactic masking alone barely alters the signal. Once the survey selection functions are folded into the null hypothesis (Figs. 7–10), the vertical scale is reduced by more than an order of magnitude: the observed w(θ) and Aj points scatter tightly around the isotropic – 10 – 0 25 50 75 100 125 150 175 
+
+[deg] 
+
+1
+
+01234        
+
+> w( )
+> 025 50 75 100 125 150 175 -0.01 0.00 0.01
+> H0band (zoom)
+
+Observed 2pACF Jackknife Bootstrap 
+
+H0 mean 
+
+H0 confidence bands Figure 3 . 2pACF w(θ) for the Pure isotropy scenario. Points show the observed catalog, with jack-knife (red) and bootstrap (black) error bars; the dashed line and the shaded bands show, respectively, the mean and the 1σ, 2σ, and 3σ confidence intervals. Moreover, the H0 mean and confidence bands denote the null hypothesis of statistical isotropy around w(θ) = 0 given Poisson noise and sky selection effects; the inset shows the band magnified around w(θ) = 0 , where it is otherwise imperceptible at the scale of the observational signal. 20 40 60 80 100 120 140 160 
+
+[deg] 
+
+012345        
+
+> Aj
+> 20 40 60 80 100 120 140 160 0.005
+> 0.000 0.005 0.010 0.015
+> H0band (zoom)
+
+Observed statistic Jackknife Bootstrap 
+
+H0 mean 
+
+H0 confidence bands 
+
+Figure 4 . Absolute-anisotropy statistic Aj for the Pure isotropy scenario. Symbols, error bars, and confidence bands as in Fig. 3. 
+
+– 11 – 0 25 50 75 100 125 150 175 
+
+[deg] 
+
+1
+
+01234        
+
+> w( )
+> 025 50 75 100 125 150 175 -0.02 -0.01 0.00 0.01 0.02
+
+H0 band (zoom) 
+
+Observed 2pACF Jackknife Bootstrap 
+
+H0 mean 
+
+H0 confidence bands Figure 5 . Same as Fig. 3, but for the Masked isotropy scenario. 20 40 60 80 100 120 140 160 
+
+[deg] 
+
+012345       
+
+> Aj
+> 20 40 60 80 100 120 140 160 0.005
+> 0.000 0.005 0.010 0.015 0.020
+
+H0 band (zoom) 
+
+Observed statistic Jackknife Bootstrap 
+
+H0 mean 
+
+H0 confidence bands 
+
+Figure 6 . Same as Fig. 4, but for the Masked isotropy scenario. 
+
+– 12 – 0 25 50 75 100 125 150 175 
+
+[deg] 
+
+0.20 
+
+0.15 
+
+0.10 
+
+0.05 
+
+0.00 0.05 0.10 0.15 
+
+> w( )
+
+Observed 2pACF Jackknife Bootstrap 
+
+H0 mean 
+
+H0 confidence bands Figure 7 . Same as Fig. 3, but for the SF-weighted scenario. 20 40 60 80 100 120 140 160 
+
+[deg] 
+
+0.10 
+
+0.05 
+
+0.00 0.05 0.10 0.15 
+
+> Aj
+
+Observed statistic Jackknife Bootstrap 
+
+H0 mean 
+
+H0 confidence bands 
+
+Figure 8 . Same as Fig. 4, but for the SF-weighted scenario. 
+
+– 13 – 0 25 50 75 100 125 150 175 
+
+[deg]   
+
+> 0.100
+> 0.075
+> 0.050
+> 0.025
+> 0.000 0.025 0.050 0.075
+> w( )
+> Observed 2pACF Jackknife Bootstrap
+> H0mean
+> H0confidence bands
+
+Figure 9 . Same as Fig. 3, but for the Fiducial scenario. The observed w(θ) is statistically consistent with the isotropic mock ensemble at all angular separations. 20 40 60 80 100 120 140 160 
+
+[deg]   
+
+> 0.04
+> 0.02
+> 0.00 0.02 0.04 0.06
+> Aj
+> Observed statistic Jackknife Bootstrap
+> H0mean
+> H0confidence bands
+
+Figure 10 . Same as Fig. 4, but for the Fiducial scenario. The observed Aj is likewise statistically consistent with the isotropic mock ensemble. 
+
+– 14 – mean and remain within both the H0 confidence bands and the resampling error bars at all separations, with the bands widening at the smallest and largest angles, where fewer pairs and mask boundaries reduce the statistical precision. This is the visual signature of a dipole-like footprint gradient, imprinted by the CHIME-dominated declination coverage, being absorbed into the observational model, leaving a residual consistent with statistical isotropy. In every figure, the jackknife error bars (red) are systematically larger than the bootstrap ones (black) — a visual reflection of jackknife’s known tendency to overestimate, and bootstrap’s tendency to underestimate, the true observational variance. 
+
+4.2 Robustness Analysis 
+
+To assess whether our conclusion of consistency with statistical isotropy is sensitive to the methodological choices entering the analysis, we perform a dedicated robustness study around our fiducial configuration, whose parameter values are given in Appendix A. We vary the four methodological parameters listed in Table 3 in a one-at-a-time (OAT) sweep, changing a single parameter while the others remain at their fiducial values. Because 
+
+σsmooth and N SF side jointly control the angular complexity of the empirical selection functions, we additionally explore their combined impact through a two-dimensional grid while keeping 
+
+bcut and ∆θ fixed. Nominally this comprises one fiducial run, twelve OAT variations, and a 
+
+3 × 3 grid, Nruns = 1 + 12 + 9 = 22 ; several combinations coincide by construction, so only 
+
+13 independent pipeline runs are required. All random seeds are held fixed across the sweep, so that differences between configurations are driven by the parameter variations rather than by independent Monte Carlo fluctuations. For each run we record the primary statistic σχ2SVD 
+
+and its displacement from the fiducial value, ∆σ(r)
+
+> χ2SVD
+
+= σ(r)
+
+> χ2SVD
+
+− σfid 
+
+> χ2SVD
+
+.              
+
+> Parameter Values
+> bcut 15 ◦,20 ◦,25 ◦
+> σsmooth 1◦,3◦,5◦
+> NSF side 16 ,32 ,64 ∆θ5◦,10 ◦,15 ◦
+
+Table 3 . Methodological parameters and the values explored in the OAT robustness sweep. The fiducial value is the central entry of each row. 
+
+Table 4 summarizes the OAT sweep, while Figs. 11 and 12 display the corresponding OAT sensitivity curves and the σsmooth × N SF side heatmap. Across all 13 independent con-figurations, the qualitative conclusion is unchanged: none rejects statistical isotropy, with 
+
+σχ2SVD < 3 and empirical p-values exceeding 0.01 throughout. The fiducial configuration yields 
+
+σχ2SVD = −0.807 , while all OAT configurations remain within the interval −1.05 ≤ σχ2SVD ≤
+
+1.28 . Relative to the fiducial configuration, the largest OAT displacement is |∆σχ2SVD | = 2 .08 ,obtained for the strongest selection-function smoothing ( σsmooth = 5 ◦). Considering the full 
+
+σsmooth ×N SF side grid, the explored range expands to −1.05 ≤ σχ2SVD ≤ 2.10 , with the largest ex-cursion ∆σχ2SVD ≃ 2.91 occurring at (σsmooth , N SF side ) = (5 ◦, 16) (σχ2SVD = 2 .10 , pemp = 0 .018 ). This configuration corresponds to the smoothest and lowest-resolution selection function, for which genuine angular structure is partially washed out, mildly increasing the apparent ten-sion, but still without approaching the 3σ rejection threshold. We therefore conclude that the qualitative isotropy result is robust, as the precise numerical significance only exhibits a – 15 – bcut σsmooth N SF side ∆θ pemp σχ2SVD ∆σχ2SVD 
+
+20 ◦ 3◦ 32 10 ◦ 0.790 -0.807 0.000 
+
+15 ◦ 3◦ 32 10 ◦ 0.258 0.650 +1.457 
+
+25 ◦ 3◦ 32 10 ◦ 0.852 -1.046 -0.239 
+
+20 ◦ 1◦ 32 10 ◦ 0.533 -0.084 +0.723 
+
+20 ◦ 5◦ 32 10 ◦ 0.101 1.276 +2.083 
+
+20 ◦ 3◦ 16 10 ◦ 0.635 -0.346 +0.461 
+
+20 ◦ 3◦ 64 10 ◦ 0.666 -0.430 +0.377 
+
+20 ◦ 3◦ 32 5◦ 0.614 -0.291 +0.516 
+
+20 ◦ 3◦ 32 15 ◦ 0.854 -1.054 -0.247 
+
+Table 4 . OAT robustness sweep, showing the full parameter configuration of every run. The first row is the fiducial configuration; in each subsequent block the parameter shown in bold is varied to two alternative values around its fiducial value, while the other three are held fixed. 15 20 25 
+
+Galactic cut (deg) 
+
+6
+
+3
+
+036
+
+> Signed SVD tension
+
+1 3 5
+
+SF smoothing (deg) 
+
+16 32 48 64 
+
+SF Nside 
+
+6
+
+3
+
+036
+
+> Signed SVD tension
+
+5 10 15 
+
+2pACF bin width (deg) 
+
+Figure 11 . OAT sensitivity of the primary statistic σχ2SVD to the four methodological parameters. Each panel varies a single parameter while the remaining ones are fixed at their fiducial values. The red marker denotes the fiducial configuration. 
+
+– 16 – 16 32 64 
+
+SF Nside                  
+
+> 135
+> SF smoothing sigma (deg)
+> 0.15 -0.08 -0.96 -0.35 -0.81 -0.43 2.10 1.28 0.57
+> 2
+> 1
+> 012
+> Signed SVD tension Figure 12 .Values of the primary statistic σχ2SVD over the σsmooth ×NSF side grid, with bcut and ∆θ
+> fixed at their fiducial values.
+
+moderate dependence on the adopted selection-function reconstruction only in this extreme corner of the parameter space. 
+
+5 Conclusion 
+
+In this work, we tested the assumption of statistical large-scale isotropy in the Universe through the angular distribution of FRBs on the celestial sphere. We used two comple-mentary estimators: the 2pACF w(θ), measured with the Landy–Szalay estimator, and the tomographic absolute-anisotropy statistic Aj (Eq. 3.7), which accumulates angular power, and it is more robust against cancellations between positive and negative fluctuations. Both estimators were confronted with hierarchical ensembles of isotropic mock catalogs that si-multaneously propagate the uncertainties of the empirically-reconstructed selection functions and the Poisson fluctuations of the isotropic realizations. The covariance was estimated from these ensembles and stabilized through Ledoit–Wolf shrinkage, Hartlap debiasing, and an SVD truncation of its near-singular eigenmodes, and the resulting significances were calibrated em-pirically against the mock ensemble rather than assumed from asymptotic distributions. Our analysis is based on the current FRB sample, a compilation of 4066 events detected by multiple surveys. Most of them are located in the northern hemisphere, due to the CHIME contribution. Because publicly available survey information is insufficient to construct a con-sistent angular exposure model across all instruments, the selection functions were recon-structed directly from the observed sky distributions, i.e., following an empirical approach. We performed the analysis under four nested scenarios: Pure isotropy , using the complete observed catalog; Masked isotropy , after removing the Galactic plane; SF-weighted isotropy ,applying the empirical survey selection functions; and Fiducial , combining the Galactic mask with the selection functions. All of these configurations were applied on MC realizations of objects evenly distributed across the sky, which comprises our null hypothesis here. – 17 – The four scenarios trace a clear and physically meaningful progression. Pure isotropy is largely inconsistent with the isotropic benchmark (Figs. 3 and 4), with χ2SVD ,red ≈ 2 × 10 5.Removing the Galactic plane reduces this by only a factor of ∼ 3 (χ2SVD ,red ≈ 7 × 10 4), leaving the distribution still strongly anisotropic (Figs. 5 and 6). Applying the empirical selection functions instead reduces it by nearly four orders of magnitude ( χ2SVD ,red ≈ 11 .7), although this scenario on its own remains formally inconsistent with isotropy (Figs. 7 and 8). Only when both effects are combined, in the Fiducial configuration, the observed distribution becomes fully consistent with the isotropic benchmark at all angular separations, as shown in Figs. 9 and 10), with χ2SVD ,red = 0 .62 and σχ2SVD = −0.807 . This conclusion is independently corroborated by the absolute-anisotropy estimator ( pemp = 0 .984 ). The dominant source of the raw catalog’s apparent anisotropy is therefore the highly non-uniform sky coverage of the contributing surveys, overwhelmingly dominated by CHIME, rather than Galactic plane contamination and/or incompleteness. We also explored the fiducial configuration under variations of four methodological pa-rameters (Table 3) to assess whether this conclusion is sensitive to such choices. None of the configurations rejects statistical isotropy (Table 4), showing that the qualitative result is stable against our modeling choices, even though the precise numerical significance varies under the most aggressive selection-function configurations. As a cautious note, two caveats frame the interpretation of this result. First, because the survey selection functions are reconstructed empirically from the observed distributions themselves, they may partially absorb a genuine large-scale anisotropy, so that our test is necessarily less sensitive to signals aligned with the survey footprint; quantifying this loss of sensitivity requires a dedicated injection-recovery analysis, which we address separately. Second, the sample remains dominated by a single survey, so that the effective sky coverage, rather than the total number of detected events, currently limits the constraining power of the test. Nevertheless, we were able to recover the expected underlying distribution of FRBs, considering that they are located in host galaxies that trace the matter density distribution in the Universe, and hence must follow large-scale statistical isotropy if the Cosmological Principle is indeed a physically valid assumption to describe it. We expect that the next generation of FRB surveys and facilities, such as the CHIME/FRB Outriggers [57], the Square Kilometre Array (SKA-Mid and SKA-Low) [58], and the DSA’s next-generation antennas, the DSA-2000 [59], which is designed to cover almost the entire observable sky, will significantly increase the number of detected events, especially in the southern hemisphere, where only a few detections are currently available. With a larger and more uniformly distributed sample, we expect a reduction in statistical uncertainties and, more importantly, a weakening of the degeneracy between a genuine cosmological signal and the observational response that limits the present analysis. As the number of FRB detections continues to grow, these events will provide increasingly robust tests of cosmic isotropy and further demonstrate the potential of FRBs as high-precision cosmological probes. 
+
+Acknowledgments 
+
+BWNR, ARQ, KELF and LLS thank the Fundação de Apoio à Pesquisa do Estado da Paraíba (FAPESQ). TL and KELF thank the financial support from the Conselho Nacional de De-senvolvimento Científico e Tecnológico (CNPq). CAPB acknowledges financial support from the CNPq grant 306630/2025-7. ARQ acknowledges the financial support by CNPq under process number 306884/2026-7. JSA is supported by Conselho Nacional de Desenvolvimento – 18 – Científico e Tecnológico (CNPq No. 307683/2022-2; CNPq No. 448158/2025-6) and Fundação de Amparo à Pesquisa do Estado do Rio de Janeiro (FAPERJ) grant 259610 (2021). K.E.L.F. also thanks FAPESQ for the exchange program Paraíba sem Fronteiras and the ENSEMBLE3 project, which is carried out within the 2.1 International Research Agendas programme of the Foundation for Polish Science co-financed by the European Union under the European Funds for Smart Economy 2021-2027 (FENG.02.01-IP.05-0044/24), project (MAB/2020/14), which is carried out within the International Research Agendas Programme (IRAP) of the Foundation for Polish Science co-financed by the European Union under the European Re-gional Development Fund and the Teaming Horizon 2020 programme (GA. No. 857543) of the European Commission and the project of the Minister of Science and Higher Education "Support for the activities of Centers of Excellence established in Poland under the Horizon 2020 program" under contract No. MEiN/2023/DIR/3797. 
+
+A Fiducial Analysis Parameters 
+
+The fiducial configuration adopted throughout this work is the isotropic null hypothesis H0
+
+propagated through both the Galactic mask and the empirical survey selection functions. Its complete specification is given in Table 5.                                    
+
+> Parameter Symbol Fiducial value
+> Galactic mask —Yes Selection functions —Yes Galactic latitude cut bcut 20 ◦
+> SF HEALPix resolution NSF side 32
+> SF smoothing scale σsmooth 3◦
+> JK HEALPix resolution NJK side 4
+> 2pACF bin width ∆θ10 ◦
+> Number of fine 2pACF bins Nbins 18
+> Number of coarse tomographic bins Ntomo 9
+> SF perturbation realizations Nens 20
+> Mocks per SF realization Nens mocks 50
+> Total isotropic mocks Nmocks 1000
+> Random-to-data ratio Nrand /N data 20
+> Bootstrap realizations NBS 500
+> SVD eigenvalue cut —10 −2λmax
+
+Table 5 . Complete specification of the fiducial configuration adopted in the primary analysis: the two observational ingredients (top) and the methodological parameter values (bottom). 
+
+B SF Validations and Survey Maps 
+
+The reconstructed selection functions SF(ˆ n), after smoothing, masking, and renormalization, underlying the fiducial analysis are shown for the six highest-weighted surveys, ordered by decreasing weight wi. Fig. 13 shows the maps individually; Fig. 14 overlays the observed FRB – 19 – CHIME | w=92.9% FRBCAT | w=3.1% CRAFT | w=1.3%        
+
+> PARKES | w=0.9% ALERT | w=0.6% MeerTRAP | w=0.3%
+> 0.00 0.04 0.16 0.36 0.64 1.00 SF / peak
+
+Figure 13 . Reconstructed selection-function maps SF(ˆ n) for the six highest-weight surveys, in equa-torial (ICRS) coordinates. CHIME | w=92.9% FRBCAT | w=3.1% CRAFT | w=1.3%        
+
+> PARKES | w=0.9% ALERT | w=0.6% MeerTRAP | w=0.3%
+> 0.00 0.04 0.16 0.36 0.64 1.00 SF / peak
+
+Figure 14 . Same selection-function maps as in Fig. 13, with the observed FRB positions (black dots) of each survey overlaid. 
+
+positions of each survey, confirming that the reconstruction traces the actual data footprint. Each panel is normalized to its own peak value ( SF /peak ) for display only, which does not affect the selection functions used in the analysis; a square-root stretch is applied to the shared color scale to enhance the visibility of broad, low-amplitude coverage (e.g., CHIME’s near-uniform footprint) relative to the sharply peaked coverage of smaller surveys. – 20 – C Supplementary Statistics and Covariance Diagnostics 
+
+This appendix collects the statistics that support the SVD-regularized empirical diagnostic reported in Sec. 4: the full-covariance χ2 statistics and analytic p-values, the covariance-quality diagnostics, and the heuristic KS/AD tests. Table 6 lists the full-covariance statistics and their analytic and empirical significances for the four scenarios. The two estimators agree to better than 1% in χ2 throughout (compare Tables 1 and 6), so that the SVD regularization stabilizes the covariance inversion without distorting the inferred significance. The larger offset between the reduced values reflects only the different normalization, Nbins = 18 against Nkept = 17 .                                             
+
+> Scenario Mask SF χ2χ2red pan pemp σχ2
+> Pure isotropy No No 3.66 ×10 62.03 ×10 50‡0.001 †3.09 †
+> Masked isotropy Yes No 1.20 ×10 66.64 ×10 40‡0.001 †3.09 †
+> SF-weighted No Yes 198 .96 11 .05 1.62 ×10 −32 0.001 †3.09 †
+> Fiducial Yes Yes 10 .58 0.59 0.911 0.789 −0.804
+
+Table 6 . Full-covariance χ2 statistics and significances for the four scenarios, complementary to the SVD-regularized values of Table 1. †p-value at the MC resolution floor. ‡Analytic p underflows double-precision arithmetic. 
+
+This agreement holds at the level of the calibrated p-values as well. For the Fiducial scenario the four available calibrations return pan = 0 .911 and pemp = 0 .789 under the full covariance, against pSVD an = 0 .882 and pSVD emp = 0 .790 under the regularized one: the two empirical values differ by 0.001 , the resolution of the mock ensemble 1/(Nmocks + 1) , and the two analytic ones by only 0.029 . The analytic values sit slightly above their empirical counterparts, as expected, since they assume an exact χ2 distribution whereas the empiri-cal calibration inherits the residual correlations and non-Gaussianity encoded in the mock ensemble; all four nonetheless agree that the Fiducial catalog is comfortably consistent with statistical isotropy. Table 7 reports the quality diagnostics of the covariance matrices. The Hartlap correction factors are close to unity ( α ≃ 0.98 ) and Nkept = 17 of 18 eigenmodes survive the SVD cut in every scenario. The condition number is reduced by a factor of ∼ 20 in all four cases (κSVD ≪ κfull ): the SVD truncation removes the near-singular directions responsible for the instability of the full-covariance inverse, which is what makes the regularized statistic numerically reliable. Table 8 reports the heuristic KS and AD tests for the w(θ) and Aj profiles, and illus-trates why they are used only as qualitative cross-checks. For the three scenarios that the covariance-aware statistic rejects outright ( σχ2SVD = 3 .09 ), the pointwise KS test applied to 
+
+w(θ) nonetheless reports no tension whatsoever ( pemp = 0 .219 , 0.333 , and 0.794 for Pure isotropy, Masked isotropy, and SF-weighted, respectively): KS is sensitive only to the single most discrepant point of the empirical distribution and cannot coherently accumulate evi-dence spread across correlated angular bins, whereas χ2SVD is explicitly constructed to do so. The same scenarios are, by contrast, correctly flagged by both tests when applied to the to-mographic Aj profile, where the departure is concentrated in fewer bins. The converse failure appears for the Fiducial scenario, where all four test/profile combinations return low empirical 
+
+p-values ( pemp ≃ 0.011 –0.040 ) despite the fully consistent covariance-aware result; given the – 21 – Hartlap corrections SVD truncation Cov. cond. numb. Scenario αfull αSVD Nkept /N bins Neff κfull κSVD 
+
+Pure isotropy 0.981 0.982 17 /18 7.6 288 .7 12 .6
+
+Masked isotropy 0.981 0.982 17 /18 9.5 169 .5 8.0
+
+SF-weighted 0.981 0.982 17 /18 3.7 1363 .7 58 .0
+
+Fiducial 0.981 0.982 17 /18 4.6 956 .7 45 .1
+
+Table 7 . Quality diagnostics of the covariance matrices: Hartlap correction factors, retained eigen-modes after SVD truncation, effective number of mocks, and covariance condition numbers before and after SVD regularization. 
+
+Scenario KS ( w) AD ( w) KS ( Aj ) AD ( Aj )
+
+pan pemp pan pemp pan pemp pan pemp 
+
+Pure isotropy 0.007 0.219 0.003 0.095 4.11 × 10 −5 0.002 0.001 § 0.002 
+
+Masked isotropy 0.007 0.333 0.003 0.210 4.11 × 10 −5 0.001 † 0.001 § 0.001 †
+
+SF-weighted 0.021 0.794 0.004 0.262 0.126 0.107 0.020 0.007 
+
+Fiducial 0.0004 0.013 0.002 0.012 0.034 0.040 0.020 0.011 
+
+Table 8 . Analytic and empirical KS and AD diagnostics for the w(θ) and Aj profiles in the four scenarios. Floor markers as in Table 6; §analytic AD p at SciPy ’s tabulated floor. 
+
+heuristic nature of these tests under correlated bins, we interpret this as a correlation-driven artifact rather than genuine residual anisotropy. We therefore adopt σχ2SVD as the statistically preferred diagnostic throughout. 
+
+References 
+
+[1] N. and Aghanim, Y. Akrami, M. Ashdown, J. Aumont, C. Baccigalupi, M. Ballardini et al., 
+
+Planck 2018 results: Vi. cosmological parameters , Astronomy & Astrophysics 641 (2020) A6. [2] J. Goodman, Geocentrism reexamined , Phys. Rev. D 52 (1995) 1821. [3] C. Clarkson and R. Maartens, Inhomogeneity and the foundations of concordance cosmology ,
+
+Classical and Quantum Gravity 27 (2010) 124008. [4] Y. and Akrami, M. Ashdown, J. Aumont, C. Baccigalupi, M. Ballardini, A.J. Banday et al., 
+
+Planck 2018 results: Vii. isotropy and statistics of the cmb , Astronomy & Astrophysics 641 
+
+(2020) A7. [5] U. Andrade, C. Bengaly, J. Alcaniz and B. Santos, Isotropy of low redshift type ia supernovae: A bayesian analysis , Physical Review D 97 (2018) . [6] U. Andrade, C.A.P. Bengaly, B. Santos and J.S. Alcaniz, A model-independent test of cosmic isotropy with low-z pantheon supernovae , The Astrophysical Journal 865 (2018) 119. [7] C.A. Bengaly, J.S. Alcaniz and C. Pigozzo, Testing the isotropy of cosmic acceleration with pantheon+ and sh0es datasets: A cosmographic analysis , Physical Review D 109 (2024) . [8] R. Mokeddem, M. Lopes, F. Avila, A. Bernui and W.S. Hipólito-Ricaldi, Probing cosmic isotropy: Hubble constant and matter density large-angle variations with the Pantheon+SH0ES data , Phys. Dark Univ. 51 (2026) 102185 [ 2504.00903 ]. 
+
+– 22 – [9] U. Andrade, C.A.P. Bengaly, J.S. Alcaniz and S. Capozziello, Revisiting the statistical isotropy of grb sky distribution , Monthly Notices of the Royal Astronomical Society 490 (2019) 4481–4488. [10] M. Lopes, A. Bernui, W.S. Hipólito-Ricaldi, C. Franco and F. Avila, Dipolar fluence distribution of statistically isotropic FERMI gamma-ray bursts , Astron. Astrophys. 694 (2025) A77 [ 2409.01480 ]. [11] C.A. Bengaly, R. Maartens and M.G. Santos, Probing the cosmological principle in the counts of radio galaxies at different frequencies , Journal of Cosmology and Astroparticle Physics 2018 
+
+(2018) 031–031. [12] C. Franco, F. Avila and A. Bernui, Probing cosmic isotropy in the Local Universe , Mon. Not. Roy. Astron. Soc. 527 (2023) 7400 [ 2312.03152 ]. [13] C.A.P. Bengaly, A. Bernui, I.S. Ferreira and J.S. Alcaniz, Probing cosmological isotropy with planck sunyaev–zeldovich galaxy clusters , Monthly Notices of the Royal Astronomical Society 
+
+466 (2016) 2799–2804. [14] C.E. Kester, A. Bernui and W.S. Hipólito-Ricaldi, Probing the statistical isotropy of the universe with Planck data of the cosmic microwave background , Astron. Astrophys. 683 (2024) A176 [ 2310.02928 ]. [15] C.A.P. Bengaly, C.P. Novaes, H.S. Xavier, M. Bilicki, A. Bernui and J.S. Alcaniz, The dipole anisotropy of wise × supercosmos number counts , Monthly Notices of the Royal Astronomical Society: Letters 475 (2018) L106–L110. [16] N. Secrest, S. von Hausegger, M. Rameez, R. Mohayaee and S. Sarkar, Colloquium: The cosmic dipole anomaly , Reviews of Modern Physics 97 (2025) 041001 [ 2505.23526 ]. [17] V. Mittal and G.F. Lewis, The Ellis and Baldwin test of the Cosmic Dipole: Exploring the impact of multiple flux density cuts , arXiv e-prints (2026) arXiv:2605.27520 [ 2605.27520 ]. [18] L. Perivolaropoulos and F. Skara, Challenges for ΛCDM: An update , New Astron. Rev. 95 
+
+(2022) 101659 [ 2105.05208 ]. [19] P. Kumar Aluri, P. Cea, P. Chingangbam, M.-C. Chu, R.G. Clowes, D. Hutsemékers et al., Is the observable Universe consistent with the cosmological principle? , Classical and Quantum Gravity 40 (2023) 094001 [ 2207.05765 ]. [20] P. Ntelis, J.-C. Hamilton, J.-M.L. Goff, E. Burtin, P. Laurent, J. Rich et al., Exploring cosmic homogeneity with the boss dr12 galaxy sample , Journal of Cosmology and Astroparticle Physics 
+
+2017 (2017) 019–019. [21] X. Shao, R.S. Gonçalves, C.A.P. Bengaly, U. Andrade, G.C. Carvalho and J. Alcaniz, Can the angular scale of cosmic homogeneity be used as a cosmological test? , Eur. Phys. J. C 84 (2024) 655 [ 2309.07263 ]. [22] X. Shao, C.A.P. Bengaly, R.S. Gonçalves, G.C. Carvalho and J. Alcaniz, Cosmological constraints from angular homogeneity scale measurements , Eur. Phys. J. C 85 (2025) 225 [2409.06009 ]. [23] X. Shao, R. Gonçalves, C.A.P. Bengaly, G.C. Carvalho and J. Alcaniz, Cosmic homogeneity: the effect of redshift-space distortions and bias and cosmological constraints , JCAP 07 (2026) 107 [ 2507.18720 ]. [24] M. Lopes-Dias, C.A.P. Bengaly, X. Shao, R. Gonçalves, P.S. Ferreira, G.C. de Carvalho et al., 
+
+Measurements of the angular homogeneity scale from desi dr1 , 2026. [25] M.L.S. Dias, A.F.B. da Cunha, C.A.P. Bengaly, R.S. Gonçalves and J. Morais, Non-parametric reconstructions of cosmic curvature: current constraints and forecasts , European Physical Journal C 85 (2025) 432 [ 2411.19252 ]. 
+
+– 23 – [26] B.R. Dinda, R. Maartens, S. Saito and C. Clarkson, Improved null tests of ΛCDM and FLRW in light of DESI DR2 , JCAP 2025 (2025) 018 [ 2504.09681 ]. [27] J.-Y. Shen and Y.-C. Zou, Testing the isotropy of the universe with the chime/frb catalog i ,2026. [28] D. Thornton, B. Stappers, M. Bailes, B. Barsdell, S. Bates, N.D.R. Bhat et al., A population of fast radio bursts at cosmological distances , Science 341 (2013) 53–56. [29] E. Petroff, M. Bailes, E.D. Barr, B.R. Barsdell, N.D.R. Bhat, F. Bian et al., A real-time fast radio burst: polarization detection and multiwavelength follow-up , Monthly Notices of the Royal Astronomical Society 447 (2014) 246–255. [30] E. Petroff, E.D. Barr, A. Jameson, E.F. Keane, M. Bailes, M. Kramer et al., Frbcat: The fast radio burst catalogue , Publications of the Astronomical Society of Australia 33 (2016) . [31] D.R. Lorimer, M. Bailes, M.A. McLaughlin, D.J. Narkevic and F. Crawford, A bright millisecond radio burst of extragalactic origin , Science 318 (2007) 777–780. [32] The CHIME/FRB collaboration, The Second CHIME/FRB Catalog of Fast Radio Bursts ,
+
+Astrophys. J. Suppl. 283 (2026) 34 [ 2601.09399 ]. [33] A. Walters, A. Weltman, B.M. Gaensler, Y.-Z. Ma and A. Witzemann, Future cosmological constraints from fast radio bursts , The Astrophysical Journal 856 (2018) 65. [34] J.-J. Wei, X.-F. Wu and H. Gao, Cosmology with gravitational wave/fast radio burst associations , The Astrophysical Journal Letters 860 (2018) L7. [35] H.-N. Lin and Y. Sang, Probing the anisotropic distribution of baryon matter in the universe using fast radio bursts * , Chinese Physics C 45 (2021) 125101. [36] Q. Wu, G.-Q. Zhang and F.-Y. Wang, An 8 % determination of the hubble constant from localized fast radio bursts , Monthly Notices of the Royal Astronomical Society: Letters 515 
+
+(2022) L1–L5. [37] T. Lemos, R. Gonçalves, J. Carvalho and J. Alcaniz, Cosmological model-independent limits on photon mass from frb and sne data , Journal of Cosmology and Astroparticle Physics 2025 
+
+(2025) 019. [38] L.L. Sales, K.E.L. de Farias, A.R. Queiroz, J.R.L. Santos, R.A. Batista, A.R.M. Oliveira et al., 
+
+Cosmographic constraints from late-time probes including fast radio bursts , arXiv (2025) [2507.06975 ]. [39] L.L. Sales, K.E.L. de Farias, A.R. Queiroz, R.A. Batista, B.W. Ribeiro and R.H. Santos, 
+
+Constraints on the baryon density from fast radio bursts using a non-parametric reconstruction of the Hubble parameter , arXiv (2026) [2605.01990 ]. [40] B.W.N. Ribeiro, L.L. Sales, K.E.L. de Farias, R.H. Santos, R.A. Batista and A.R. Queiroz, 
+
+Constraints on dark energy and modified gravity models from fast radio bursts and late-time geometric probes , 2026. [41] R.M. Shannon, K.W. Bannister, A. Bera, S. Bhandari, C.K. Day, A.T. Deller et al., The commensal real-time askap fast transient incoherent-sum survey , Publications of the Astronomical Society of Australia 42 (2025) . [42] L. Connor et al., A gas-rich cosmic web revealed by the partitioning of the missing baryons ,
+
+Nature Astron. 9 (2025) 1226 [ 2409.16952 ]. [43] R. NAN, D. LI, C. JIN, Q. WANG, L. ZHU, W. ZHU et al., The five-hundred-meter aperture spherical radio telescope (fast) project , International Journal of Modern Physics D 20 (2011) 989–1024. [44] X. Yang, S. Zhang and X. Wu, Nondetection of FAST and Parkes Follow-up Observation for 27 Parkes-discovered Fast Radio Bursts , Astrophys. J. 996 (2026) 47 [ 2512.01281 ]. 
+
+– 24 – [45] A. Collaboration, T.P. Robitaille, E.J. Tollerud, P. Greenfield, M. Droettboom, E. Bray et al., 
+
+Astropy: A community python package for astronomy , Astronomy & Astrophysics 558 (2013) A33. [46] K.M. Gorski, E. Hivon, A.J. Banday, B.D. Wandelt, F.K. Hansen, M. Reinecke et al., Healpix: A framework for high-resolution discretization and fast analysis of data distributed on the sphere , The Astrophysical Journal 622 (2005) 759–771. [47] M. Jarvis, G. Bernstein and B. Jain, The skewness of the aperture mass statistic , Monthly Notices of the Royal Astronomical Society 352 (2004) 338–352. [48] F. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O. Grisel et al., Scikit-learn: Machine Learning in Python , Journal of Machine Learning Research 12 (2011) 2825 [1201.0490 ]. [49] S.D. Landy and A.S. Szalay, Bias and Variance of Angular Correlation Functions , The Astrophysical J. 412 (1993) 64. [50] P. Norberg, C.M. Baugh, E. Gaztañaga and D.J. Croton, Statistical analysis of galaxy surveys -i. robust error estimation for two-point clustering statistics , Monthly Notices of the Royal Astronomical Society 396 (2009) 19–38. [51] M. Tarnopolski, Testing the anisotropy in the angular distribution of F ermi /GBM gamma-ray bursts , Mon. Not. Roy. Astron. Soc. 472 (2017) 4819 [ 1512.02865 ]. [52] O. Ledoit and M. Wolf, A well-conditioned estimator for large-dimensional covariance matrices , Journal of Multivariate Analysis 88 (2004) 365. [53] J. Hartlap, P. Simon and P. Schneider, Why your model parameter confidences might be too optimistic. unbiased estimation of the inverse covariance matrix , Astronomy & Astrophysics 
+
+464 (2006) 399–404. [54] W.H. Press, S.A. Teukolsky, W.T. Vetterling and B.P. Flannery, Numerical Recipes: The Art of Scientific Computing , Cambridge University Press (2007). [55] Z. Ivezic, A.J. Connolly, J.T. VanderPlas and A. Gray, Statistics, Data Mining, and Machine Learning in Astronomy: A Practical Python Guide for the Analysis of Survey Data , Princeton University Press (2014). [56] F.W. Scholz and M.A. Stephens, K-sample anderson-darling tests , Journal of the American Statistical Association 82 (1987) 918. [57] F. Collaboration, M. Amiri, B.C. Andersen, S. Andrew and et al., Chime/frb outriggers: Design overview , 2025. [58] P.E. Dewdney, P.J. Hall, R.T. Schilizzi and T.J.L.W. Lazio, The square kilometre array ,
+
+Proceedings of the IEEE 97 (2009) 1482. [59] G. Hallinan, V. Ravi, S. Weinreb, J. Kocz, Y. Huang, D.P. Woody et al., The dsa-2000 – a radio survey camera , 2019. 
+
+– 25 –
