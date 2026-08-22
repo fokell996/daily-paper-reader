@@ -1,0 +1,656 @@
+Title: Probabilistic kilonova prediction from gravitational wave inferred binary neutron star parameters
+
+URL Source: https://arxiv.org/pdf/2608.20262v1
+
+Published Time: Fri, 21 Aug 2026 01:10:20 GMT
+
+Number of Pages: 23
+
+Markdown Content:
+Draft version August 21, 2026 
+
+Typeset using L ATEX twocolumn style in AASTeX7.0.1 
+
+Probabilistic kilonova prediction from gravitational wave inferred binary neutron star parameters 
+
+Xiao-Fei Dong ,1 Ik Siong Heng ,1 Gavin P. Lamb ,2 Chris Messenger ,1 Nikhil Sarin ,3, 4 
+
+Benjamin Rayson ,5 Nial R. Tanvir ,5 Jessica Irwin ,6 Thomas Wallace ,1 Skye Rosetti, 7
+
+Bo Milvang-Jensen ,8, 9 Andrew J. Levan ,10 and Jens Hjorth 11 
+
+> 1
+
+SUPA, School of Physics and Astronomy, University of Glasgow, Glasgow G12 8QQ, UK 
+
+> 2
+
+Astrophysics Research Institute, Liverpool John Moores University, IC2 Liverpool Science Park, 146 Brownlow Hill, Liverpool L3 5RF, UK 
+
+> 3
+
+Kavli Institute for Cosmology, University of Cambridge, Madingley Road, CB3 0HA, UK 
+
+> 4
+
+Institute of Astronomy, University of Cambridge, Madingley Road, CB3 0HA, UK 
+
+> 5
+
+School of Physics and Astronomy, University of Leicester, University Road, Leicester LE1 7RH, UK 
+
+> 6
+
+Institute for Gravitational and Subatomic Physics (GRASP), Utrecht University, Princetonplein 1, 3584 CC Utrecht, The Netherlands 
+
+> 7
+
+Healey Close, Leicester, Leicestershire, LE4 2DH, UK 
+
+> 8
+
+Niels Bohr Institute, University of Copenhagen, Jagtvej 128, 2200 Copenhagen N, Denmark 
+
+> 9
+
+Cosmic Dawn Center (DAWN) 
+
+> 10
+
+Department of Astrophysics/IMAPP, Radboud University, 6525 AJ Nijmegen, The Netherlands 
+
+> 11
+
+DARK, Niels Bohr Institute, University of Copenhagen, Jagtvej 155A, 2200 Copenhagen N, Denmark 
+
+Abstract Kilonovae provide a key electromagnetic window into binary neutron star mergers, revealing the properties of the merging system while probing r-process nucleosynthesis of the Universe. However, only a few kilonova candidates have been detected to date, with AT2017gfo being the only one asso-ciated with a gravitational wave event, GW170817. In this work, we present Genova , a probabilistic framework for predicting kilonova spectra and light curves directly from gravitational wave posterior samples of binary neutron star mergers. This method uses a conditional normalising flow to learn the distribution of rest-frame spectra conditioned on the source-frame component masses, tidal deformabil-ities, viewing angle and time since merger. Other kilonova model parameters, such as ejecta opacities and lanthanide opening angle, are marginalised over during training, so that their effects are propa-gated into the predicted spectra as model predictive uncertainty. In the self-consistency test against the original kilonova model, the flow model reproduces the median light curves with residuals typically below ∼ 0.1 mag, and the ratio of the predicted central 68% interval widths remains predominantly between 0 .8 and 1 .4 over ∼ 0.4–8 .0 days post merger. Comparisons with a physically distinct kilonova model further show that the probabilistic prediction from the normalising flow can remain informative beyond the model used for training. We apply Genova to GW170817/AT2017gfo using multi-band observations, including newly re-reduced Y -, J-, Ks-band photometry from the Visible and Infrared Survey Telescope for Astronomy, which we present in this work. The resulting predictive intervals broadly encompass the observations while capturing both gravitational wave posterior uncertainty and the variation induced by marginalised kilonova model parameters. These results establish a proof of concept for an efficient probabilistic framework using a normalising flow for predicting kilonova observables directly from gravitational waves. 
+
+Keywords: High Energy astrophysics (739), Gravitational wave astronomy (675), light curves (918) 
+
+Corresponding author: Xiao-Fei Dong x.dong.2@research.gla.ac.uk 
+
+1. INTRODUCTION Kilonovae (KNe) are the optical/near-infrared (NIR) counterparts to gravitational wave (GW) emission, arising from the radioactive decay of heavy elements formed through rapid neutron captures (r-process) (F.-K. Thielemann et al. 2011) that can follow binary neu-arXiv:2608.20262v1 [astro-ph.HE] 20 Aug 2026 2tron star (BNS) mergers (L.-X. Li & B. Paczy´ nski 1998). Before the first direct GW detection of a BNS merger, observational evidence for KNe was primarily sought in association with short gamma-ray bursts (GRBs). The NIR excess observed in GRB 130603B provided the first strong KN candidate associated with a short GRB (N. R. Tanvir et al. 2013), with further KN can-didates later identified in other GRB events (e.g., Z.-P. Jin et al. 2016; B. Yang et al. 2015; G. P. Lamb et al. 2019; E. Troja et al. 2019). These observations estab-lished an early GRB–KN connection, suggesting that at least some short GRBs originate from the same compact binary mergers that can produce KN emission. This picture was directly confirmed by the landmark multimessenger observations of GW170817 (B. P. Ab-bott et al. 2017a,b), a BNS merger detected through GWs and accompanied by the short GRB 170817A (B. P. Abbott et al. 2017c; A. Goldstein et al. 2017; V. Savchenko et al. 2017), the KN AT2017gfo (e.g., D. A. Coulter et al. 2017; M. Soares-Santos et al. 2017; S. Valenti et al. 2017; I. Arcavi et al. 2017; P. S. Cow-perthwaite et al. 2017; M. R. Drout et al. 2017; P. A. Evans et al. 2017; E. Pian et al. 2017; S. J. Smartt et al. 2017; M. M. Kasliwal et al. 2017; N. R. Tanvir et al. 2017; L. Hu et al. 2017; M. C. D´ ıaz et al. 2017; V. M. Lipunov et al. 2017; I. Andreoni et al. 2017; Y. Utsumi et al. 2017; B. J. Shappee et al. 2017; R. Chornock et al. 2017; M. Nicholl et al. 2017; C. McCully et al. 2017; C. D. Kilpatrick et al. 2017; A. S. Pozanenko et al. 2018), and a multi-wavelength afterglow (e.g., E. Troja et al. 2017; D. Haggard et al. 2017; G. Hallinan et al. 2017; K. D. Alexander et al. 2017; R. Margutti et al. 2017, 2018; J. D. Lyman et al. 2018). This event marked a major milestone in GW-led multi-messenger astron-omy, providing the first compelling evidence that GWs, short GRBs, and KNe can originate from the same NS merger. The combined GW–EM observations enabled constraints on the equation of state (EOS) of neutron-rich dense matter (e.g, B. Margalit & B. D. Metzger 2017; D. Radice et al. 2018; T. Dietrich et al. 2020; M. Breschi et al. 2021, 2024), provided an observational channel for studying heavy r-process nucleosynthesis in the Universe (e.g., B. D. Metzger et al. 2010; D. Kasen et al. 2017; M. R. Drout et al. 2017; S. J. Smartt et al. 2017; E. Pian et al. 2017), and allowed for independent measurements of the Hubble constant H0 (see M. Bulla et al. 2022 for a review). The observations of AT2017gfo also played a central role in shaping current kilonova modelling. Earlier an-alytic and radiative-transfer studies had already shown that the emission is determined by ejecta mass, veloc-ity, radioactive heating, composition, etc (e.g. L.-X. Li & B. Paczy´ nski 1998; B. D. Metzger et al. 2010; J. Barnes & D. Kasen 2013; D. Kasen et al. 2013; M. Tanaka & K. Hotokezaka 2013). However, the rapid transition of AT2017gfo from blue optical emission to redder optical/NIR emission provided strong motivation for multi-component models, with different ejecta com-ponents contributing on different timescales and wave-lengths (e.g. P. S. Cowperthwaite et al. 2017; M. R. Drout et al. 2017; S. J. Smartt et al. 2017; D. Kasen et al. 2017; A. Perego et al. 2017; N. R. Tanvir et al. 2017; V. A. Villar et al. 2017; M. Nicholl et al. 2021). In this picture, the early blue emission is associated with relatively lanthanide-poor and hence low opacity ma-terial, while the later redder emission is produced by lanthanide-rich dynamical ejecta and/or disk-wind out-flows. In addition, ejecta geometry, viewing angle ef-fects, are important in kilonova modelling (e.g. M. Bulla 2023). Despite the importance of joint GW-KN observations, GW170817 remains the only confirmed event with both a GW detection and a well-observed kilonova counter-part. With the improving sensitivity of current and fu-ture GW detectors, more BNS merger candidates are expected to be detected. One of the important tasks is therefore how to use the information available from GW observations to rapidly predict the possible KN emission and hence inform EM follow-up observations. Predicting kilonova emission from GW observables requires connecting initial binary constraints to ejecta properties and a further detailed radiative transfer mod-elling. GW parameter estimation provides posterior samples for source parameters such as the compo-nent masses ( m1, m 2), dimensionless tidal deformabil-ities (Λ 1, Λ2), and the inclination angle θJN . These quantities provide physically motivated inputs for kilo-nova modelling, as the binary parameters directly affect key properties of the dynamical ejecta, such as its mass and characteristic velocity (e.g., T. Dietrich & M. Ujevic 2017; M. W. Coughlin et al. 2019; T. Dietrich et al. 2020; V. Nedora et al. 2022; C. J. Kr¨ uger & F. Foucart 2020), while the inclination angle sets the viewing orientation. The source parameters do not uniquely determine the kilonova spectra or light curves. The final kilonova observables also depend on further assumptions about both the dynamic and post-merger ejecta, and radiative transfer physics. These include the ejecta geometry and viewing angle dependence (e.g., A. Perego et al. 2017; M. Bulla 2019; R. T. Wollaeger et al. 2021), the ejecta composition and opacity (D. Kasen et al. 2013, 2017; M. Tanaka & K. Hotokezaka 2013; M. Bulla 2023; S. Banerjee et al. 2020, 2022, 2024), the radioactive heat-ing rate and thermalisation efficiency (M. Bulla 2023; S. 3Rosswog & O. Korobkin 2024), the disk-wind contribu-tion (e.g., L. Combi & D. M. Siegel 2023), and possible additional energy sources (e.g., M. Nicholl et al. 2021; S. Ai et al. 2025), which are either not directly or only weakly constrained by the GW signal. Therefore, their treatment depends on the adopted kilonova model and hence introduces an additional source of astrophysical uncertainty. The uncertainty from propagating GW posterior sam-ples to electromagnetic observables involves evaluating the kilonova forward model over both the GW-inferred binary parameters and the remaining model-dependent quantities. For large posterior ensembles, scalability therefore becomes an important practical consideration, especially when the aim is to construct predictive distri-butions of spectra and light curves rather than a single deterministic prediction. In this sense, surrogate models can provide an efficient approximation to the ensemble forward calculation while retaining the uncertainty as-sociated with model-dependent kilonova parameters. Recently, machine learning surrogates and simulation-based inference methods have increasingly been explored to accelerate kilonova modelling and inference, includ-ing spectra and light curve emulators (e.g. K. Lukoiute et al. 2022; S. Saha et al. 2024; M. Ristic et al. 2022; A. Kedia et al. 2023; Y. Peng et al. 2024), likelihood-free approaches for rapid KN parameter estimation (e.g. P. Darc et al. 2024; M. M. Desai et al. 2025; S. M. Brown et al. 2026), and broader multi-messenger infer-ence frameworks for kilonova, GW, and GRB-afterglow observations (e.g. P. T. H. Pang et al. 2023; H. Koehn et al. 2025). Much of this work targets rapid infer-ence within ejecta parameterisations from EM data. In this work, we focus on a complementary GW-led for-ward problem: predicting the range of kilonova spectra and light curves implied by GW-constrained binary pa-rameters. To achieve this, we develop a proof of con-cept probabilistic surrogate framework, Genova , using a conditional normalising flow, which maps GW poste-rior samples to distributions of kilonova spectra while marginalising over the less constrained kilonova model parameters. This allows both the GW inferred binary uncertainty and the model-dependent kilonova uncer-tainty to be propagated into the predicted light curves, while establishing a foundation for incorporating richer physical descriptions and multiple kilonova prescriptions in future applications. We demonstrate the framework by training and vali-dating the surrogate within the adopted kilonova model, testing its predictions against an independent radiative-transfer grid, and applying it to GW170817/AT2017gfo. The paper is structured as follows: Section 2 describes the kilonova model, the normalising flow framework, and the data preparation; Section 3 presents the sur-rogate validation, cross-model tests, and application on GW170817/AT2017gfo; In Section 4, we discuss the im-plications and limitations obtained from the test and ap-plication of Genova ; We finally summarises our main conclusions in Section 5.  
+
+> 2.
+
+METHODOLOGY 2.1. Kilonova modelling 
+
+This work focuses on the three-component kilonova model introduced by M. Nicholl et al. (2021) (hereafter referred to as N21), using its implementation in Red-back 1 (N. Sarin et al. 2024). In this work, the model generates kilonova spectra and light curves from the ini-tial binary neutron star properties, namely component masses ( m1, m 2) and dimensionless tidal deformabilities (Λ 1, Λ2), and additional parameters accounting for the ejecta properties and viewing angle effect. Here, instead of using the original radioactive heating rate based on simulations for an electron fraction Ye ≃ 0.04, we adopt the updated raw heating rate prescription (S. Rosswog & O. Korobkin 2024; N. Sarin & S. Rosswog 2024): ˙q(t) = q0
+
+ 12 − 1
+
+π arctan 
+
+ t − t0
+
+σ
+
+ α
+
+×
+
+ 12 + 1
+
+π arctan 
+
+ t − t1
+
+σ1
+
+ α1
+
++ C1e−t/τ 1 + C2e−t/τ 2 + C3e−t/τ 3 .
+
+(1) where t is the rest-frame time in days, which is defined such that t = 0 at merger 2, q0, α, t0, σ, α1, t1, σ1, Ci,and τi (i = 1 , 2, 3) are fitting coefficients that depend on the velocity and electron fraction of the ejecta. In the equation, the first factor models a constant heat-ing rate with t0 representing the time where there is a transition to power-law decay, while q0 set the normali-sation, α is the power-law index, and σ is the transition width. The second factor describes the subsecond rise of the heating rate, where α1, t1, and σ1 denote the cor-responding power-law index, threshold time, and tran-sition width, respectively. The final three terms are in-cluded for cases in which individual radioactive isotopes dominate the heating rate; Ci and τi denote their coef-        
+
+> 1Within Redback ,this model is available under the model name nicholl bns ; the implementation can be found at https: //github.com/nikhil-sarin/redback/.
+> 2Throughout this work, trepresents the rest-frame time since the binary merger. In the adopted kilonova modelling, this is also used as the ejecta expansion time in the rest frame, therefore neglecting the time delays between the merger and mass ejection.
+
+4ficients and decay timescales. We refer to the Tables A1 and A2 of S. Rosswog & O. Korobkin (2024) for the spe-cific fitting coefficients. For the numerical implementa-tion adopted here, we follow footnote 5 of N. Sarin & S. Rosswog (2024) using Redback . All other model ingre-dients follow the original N21 prescription of M. Nicholl et al. (2021). This model then serves as a practical for-ward generator for constructing a large synthetic spec-tra dataset that can be used for machine learning model development, while keeping a physically motivated con-nection between the binary parameters and the resulting kilonova emission. In this work, our main focus are the initial binary parameters that can be shared with both GW param-eter estimation and kilonova simulation, namely θ ∼
+
+(m1, m 2, Λ1, Λ2, μ obs ), where ( m1, m 2, Λ1, Λ2) represent the source-frame component masses and dimensionless tidal deformabilities, and μobs = cos θobs accounts for the viewing angle effect when observing the kilonova. For applications to GW events, we take the geometry information directly from the posterior samples of θJN 
+
+in GW parameter estimation, which is defined as the angle between the line of sight and the total angular momentum of the binary system. Here, we assume that the ejecta symmetry axis is aligned with the binary to-tal angular momentum and restrict 0 ≤ θobs ≤ π/ 2using the symmetry of the model with respect to the two polar directions. Under this mapping, μobs ≃| cos θJN |, and μobs is used as the viewing angle input throughout this work. Other additional parameters η =(MTOV , κ blue , κ red , T floor ,1−3, α, ϵ, μ open , μ cocoon ), which are not directly constrained by GW observation but re-quired for generating the kilonova observables in this model, are considered as nuisance parameters in the nor-malising flow framework described in Section 2.2. The definitions of all adopted parameters are listed in Ta-ble 1. 2.2. A normalising flow probabilistic framework 
+
+Normalising flows represent a class of generative ma-chine learning models designed to learn complex proba-bility distributions through a series of invertible trans-formations. These models map an implicit data distri-bution into a simple latent distribution (e.g., a stan-dard Gaussian) using a series of bijective functions (I. Kobyzev et al. 2021). During the training process, an input sample x ∈ X is guided by provided variables 
+
+θ ∈ Θ, where X and Θ denote the data space and the conditional space, respectively. The model learns a series of explicit transformation functions f that map the data distribution to a base distribution in the latent space Z, with the latent variable denoted as z = f (x; θ). The probability density of the conditional distribution is evaluated using the change-of-variables formula, 
+
+pX | Θ(x | θ) = pZ (f (x; θ)) |det Jf (x; θ)| , (2) where Jf (x; θ) = ∂f (x; θ)/∂x is the Jacobian of the transformation with respect to the data variable x. Once trained, the model allows for efficient predictions by sampling from the latent space and applying the inverse functions f −1. By learning the conditional distribution (p(x | θ)) explicitly, the normalising flow provides an efficient surrogate for the original numerical/analytical models, while preserving the corresponding probabili-ties. In this work, we develop a conditional normalising flow to predict kilonova spectra from GW-derived bi-nary parameters for binary neutron star mergers, with other KN parameters marginalised. In our setup, the data space consists of theoretical spectra x evaluated on a fixed wavelength grid with 20 points x ∈ R20 ,while the conditional space contains the associated phys-ical parameter set θ = ( t, m 1, m 2, Λ1, Λ2, μ obs ) on which each spectrum is conditioned. The latent space provides a twenty-dimensional standard Gaussian representation that makes sampling straightforward. Specifically, as illustrated in Figure 1, we pre-generate the dataset to perform the training, validation, and test-ing for the flow model: 
+
+D = {(xi, θi, ηi)}Ni=1 , (3) where N is the total number of spectra. η =(MTOV , κ blue , κ red , T floor ,1−3, α, ϵ, μ open , μ cocoon ) collects the remaining simulation parameters that vary across the dataset but are not explicitly provided to the flow model. Therefore, the flow predicts the conditional spec-tral distribution in the projected ( x, θ) space, rather than in the joint space of ( x, θ, η). In this sense, the effect of the unconditioned parameters η is absorbed implicitly into the learned distribution, with the corre-sponding probability written as 
+
+pϕ(x | θ) ≈ ptrain (x | θ) = 
+
+R ptrain (x, θ, η) d η
+
+ptrain (θ) , (4) where ϕ denotes the trainable parameters of the flow model, and ptrain is the probability distribution repre-sented by the training dataset, with different arguments indicating the corresponding joint, marginal, or condi-tional distribution. Once the flow model is trained, we can easily draw samples from the latent space for any conditional input θ = ( t, ϑ) within the support of the training distribution, where t is time and ϑ contains the remaining physical conditional parameters. For a fixed 5Data construction 
+
+Spectra Preprocessing 
+
+> flux clipping / scaling / noise / parameter normalisation
+
+Rest-frame spectra N21 
+
+> kilonova model
+
+Flow training 
+
+> e.g., ejecta opacities, disk fraction, …
+
+Nuisance parameters η
+
+Parameters as conditionals θ 
+
+> trained on scaled spectra and conditioned on θ
+
+Figure 1. Schematic overview of the training data construction for Genova . In the training stage, binary parameters and additional kilonova nuisance parameters are sampled within the adopted parameter ranges with astrophysical constraints. See Table 1 for the adopted parameter definitions and initial sampling distributions. They are then passed to the N21 model to generate source frame spectra, which are preprocessed through flux clipping and scaling, noise treatment, and parameter normalisation before being used to train the model. Rest-frame spectra Multi-band light curves 
+
+# Prediction / Application 
+
+Trained flow model Bandpass integration Predicted scaled spectra  
+
+> samples scaled spectra conditioned on median and uncertainty intervals
+
+Query new conditional inputs 
+
+Figure 2. Schematic overview of the prediction processes of Genova . In the prediction stage, the trained flow takes a new query θ∗ and predicts scaled spectra, which are then returned to flux density units by applying the inverse scaling. Given the luminosity distance and redshift information, the spectra are further converted to the observer frame and integrated through photometric bandpasses to generate final multi-band light curves with corresponding uncertainty intervals. 
+
+θ, enough repeated latent draws sample the predictive distribution pϕ(x | θ). More generally, when the remain-ing conditional parameters themselves form a distribu-tion q(ϑ), the corresponding predictive distribution at a given time t can be obtained by marginalising over these parameters as 
+
+pϕ, eq (x | t) = 
+
+Z
+
+pϕ(x | t, ϑ)eq(ϑ) d ϑ
+
+≈ 1
+
+NϑNϑX
+
+> i=1
+
+pϕ
+
+
+
+x | t, eϑi
+
+
+
+, eϑi ∼ eq(ϑ),
+
+(5) where eq(ϑ) represents q(ϑ) restricted to the support of the flow training conditions, and Nϑ is the num-ber of conditional parameter sets. Predictions from this marginal distribution can be produced by draw-ing one or more latent samples for each eϑi. When a sufficiently number of conditional inputs is available, one single independent draw for each eϑi already pro-vides a Monte Carlo sample from the predicted distri-bution marginalised over both nuisance parameters in Eq. 4 and the distribution of conditional inputs in Eq. 5. The resulting ensemble predictions therefore represents a probabilistic prediction of spectra for the given condi-6tional inputs distribution. Since all spectra in this work are generated in the rest frame at a fiducial distance of 10 pc, we can obtain the absolute AB magnitudes Mb
+
+for a given bandpass b, which is described as 
+
+Mb(t) = −2.5 log 10 
+
+Z
+
+λS b(λ) bF 10pc  
+
+> λ
+
+(t, λ ) dλ 
+
+Z
+
+λS b(λ) F AB  
+
+> λ, 0
+
+(λ) dλ 
+
+ , (6) where Sb(λ) is the throughput of band b, Fλ denotes the spectral flux density per unit wavelength. Since the pre-dicted spectra are available only at discrete wavelength points, bFλ specifically denotes the interpolated repre-sentation constructed from the predicted flux densities. The quantity F AB  
+
+> λ, 0
+
+is the AB reference flux density in wavelength units, corresponding to Fν, 0 = 3631 Jy. When luminosity distance dL is available, the corre-sponding redshift z can be obtained by assuming a spe-cific cosmological model. The 10 pc rest-frame spectrum can then be converted accordingly to the observer frame as 
+
+bF obs  
+
+> λ
+
+(tobs , λ obs ) = (10 pc /d L)2
+
+1 + z bF 10pc  
+
+> λ
+
+(trest , λ rest ), (7) where tobs = trest · (1 + z) and λobs = λrest · (1 + z). The apparent AB magnitude is then obtained by re-placing bF 10pc  
+
+> λ
+
+in Eq. 6 with bF obs  
+
+> λ
+
+. We use SNCosmo to perform the spectra interpolation and magnitude cal-culation. This process provides an approximation of the conditional predictive distribution for the magni-tude, p(Mb|θ), or p(mb|θ, d L, z ) when luminosity dis-tance and redshift information are included. Repeating the procedure over a time grid yields probabilistic light curves that propagate both nuisance parameter varia-tion, where applicable, the uncertainty from the condi-tional inputs. Throughout this work, the predicted distributions are characterised by their medians and central 68% and 90% quantile intervals, corresponding to the 50th, 16th– 84th and 5th–95th percentiles, respectively. The de-scribed prediction workflow is illustrated in Figure 2. To infer redshift from luminosity distance, we adopt the 
+
+Planck18 flat ΛCDM cosmology implemented in As-tropy , with H0 = 67 .66 km s −1 Mpc −1 and Ω m = 0 .31 ( Aghanim, N. & others. 2020). 2.3. Data preparation and training setup 
+
+To construct the spectra dataset mentioned in Sec-tion 2.2, we first sample ( m1, m 2, Λ1, Λ2) combinations following the initial distributions listed in the upper block of Table 1. During the generation, we keep 
+
+m1 ≥ m2, and only combinations satisfying the binary consistency criteria are retained to avoid extreme combi-nations that are less likely astrophysical. These criteria include Λ 1 ≤ Λ2, the allowed ranges and ordering re-lations for the component radii R1,2 and compactnesses 
+
+C1,2, and the range of the mass ratio q = m2/m 1. All cri-teria are listed in the middle block in Table 1. We finally obtain 10 6 distinct combinations of ( m1, m 2, Λ1, Λ2) in total though this process. For each combination, we independently draw one set of nuisance kilonova param-eters from the distributions listed in the lower block of Table 1 to generate spectra. This results in a total of 10 6 spectra at all times in the entire dataset. Each spec-trum is computed from 2800 −25000˚ A with 20 log-spaced wavelength bins at a distance of 10 pc in the rest frame. They are then clipped below at 10 −8 erg s −1 cm −2 ˚A−1.Figure 3 shows the central 68% and 90% quantile ranges of the samples used for training after clipping. We fur-ther rescale the spectra by a factor of 100 to bring their typical values closer to unity. We then add zero-mean Gaussian noise with a standard deviation of 10 −3 to im-prove the convergence of the flow training. Each condi-tional parameter is independently normalised to [0 , 1] using its initial sampling bounds to place the inputs on comparable numerical scales before training. During prediction, the spectra are transformed back to physical units by reversing the preprocessing scaling. 0.5 1.0 1.5 2.0 2.5 
+
+Wavelength, λ [Å] ×10 4 
+
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> Fλ(10 pc) [erg s −1  cm −2  Å −1 ] N= 800000
+
+t = 0.1-11.0 day  
+
+> 5-95% interval 16-84% interval
+> Figure 3. Distribution of training spectra before rescaling. The orange ranges show the central 68% and 90% intervals of the training set within the training time range, 0 .1–11 .0days post merger. The number of training samples is marked on the top right corner.
+
+The final dataset is split into training, validation, and test sets in the ( m1, m 2, Λ1, Λ2) space, using 80% of the samples for training, 10% for validation, and 10% for test. The validation set is held out from the opti-misation process and is used to monitor the generali-7
+
+Table 1. Definitions, initial sampling distributions, and binary consistency criteria adopted in constructing the N21 kilonova training set. Parameter Definition Distribution/Criterion 
+
+Binary input parameters 
+
+t/ days Rest-frame time since merger log U(0 .1, 11 .0) 
+
+m1,2/M ⊙ Source-frame component masses U(1 .1, 1.8) Λ1,2 Dimensionless component tidal deformabilities U(10 , 3000) 
+
+μobs Cosine of the viewing angle θobs U(0 , 1) 
+
+Binary consistency criteria 
+
+q Mass ratio, q = m2/m 1 q ∈ [0 .6, 1.0] Λ1,2 Tidal deformability ordering Λ1 ≤ Λ2
+
+C1,2 Component compactnesses C1,2 ∈ [0 .1, 0.23] , C1 ≥ C 2
+
+R1,2/km Component radii R1,2 ∈ [9 , 15] , R1 ≤ R2
+
+Nuisance kilonova parameters 
+
+MTOV /M ⊙ Tolman–Oppenheimer–Volkoff mass U(2 .05 , 2.4) 
+
+κblue /(cm 2 g−1) Gray opacity of the blue ejecta component U(0 .01 , 1.0) 
+
+κred /(cm 2 g−1) Gray opacity of the red ejecta component U(1 .0, 30 .0) 
+
+Tfloor ,i /K Temperature floor of ejecta component i = 1 , 2, 3 U(2000 , 4000) 
+
+α Enhancement of blue ejecta by neutron star surface winds U(0 .1, 1.0) 
+
+ϵ Fraction of the disk mass that becomes unbound U(0 .1, 0.3) 
+
+μopen Cosine of the lanthanide opening angle U(0 .5, 0.866) 
+
+μcocoon Cosine of the shocked-cocoon opening angle U(0 .866 , 1.0) 
+
+Note — The distributions in the upper and lower blocks describe only the initial parameter sampling distri-butions. The binary components are labelled such that m1 ≥ m2, and sampled combinations are retained only when all criteria in the middle block are satisfied. The mass ratio q, component compactnesses C1,2,and radii R1,2 are derived from the sampled binary parameters. The compactnesses are calculated using the Λ– C quasi-universal relation adopted by M. Nicholl et al. (2021). 
+
+sation performance of the normalising flow model. In this work, we use a real-valued non-volume preserving (RealNVP) normalising flow (L. Dinh et al. 2017), con-structed from stacked coupling transforms and imple-mented with Glasflow (M. J. Williams et al. 2024), which builds on nflows (C. Durkan et al. 2020) and 
+
+PyTorch (A. Paszke et al. 2019). The model is trained by minimising the Kullback–Leibler (KL) divergence (G. Papamakarios et al. 2021) from the empirical training distribution to the learned conditional distribution. The adopted model architecture and training configuration are described in Appendix A. 
+
+3. RESULTS In this section, we evaluate the trained flow model us-ing the prediction workflow described in Section 2.2. We first compare Genova predictions with the correspond-ing N21 outputs. We then perform a cross-model com-parison with the radiative transfer models chosen from D. Kasen et al. (2017) 3 (hereafter referred to as K17). Finally, we apply this workflow to the real detections of GW170817/AT2017gfo. 3.1. In-distribution tests 
+
+We first inspect representative in-distribution exam-ples to illustrate the form of the conditional predictive distribution, and then quantify the agreement with ref-erence N21 light curves over the test set. We begin by showing a representative in-distribution example for a set of test conditional inputs. The refer-ence N21 light curves correspond to a fixed set of nui-sance parameters, and are therefore used here as quali-tative consistency checks. Figure 4 shows the flow predictions in r-band for a selected example in the test sets. For each binary con-ditional input, the flow prediction is summarised by the       
+
+> 3The models are available at https://github.com/dnkasen/ Kasen Kilonova Models 2017.
+
+810 0 10 1      
+
+> Time [days]
+> −14 −13 −12 −11 −10
+> Absolute Magnitude
+> m1= 1.551, m2= 1.177 Λ1= 478.8, Λ 2= 2540.1
+> μobs = 0.530
+> N21 model Flow 50% Flow 16-84% Flow 5-95%
+
+Figure 4. Example light curve comparison for a test case. The corresponding ( m1, m 2, Λ1, Λ2) values are drawn from the test set. The predicted r-band light curves from the flow model are shown by the median and central 68% quan-tile interval, compared with the theoretical N21 light curve. Note that the median curve should be interpreted as a sum-mary of the marginal predicted distribution, rather than a reconstruction of the individual simulated example shown for comparison. 
+
+median and central 68% and 90% quantile intervals, while the reference light curve is generated from the N21 model using the same binary parameters with a fixed set of nuisance parameters taken within the model’s sup-porting range. The flow prediction is evaluated at 100 logarithmically spaced time points from 0 .4 to 10 days after merger. At each time, we draw 4000 latent sam-ples, map them back to the spectra space, and convert the predicted spectra into magnitudes as described to construct the corresponding light curves. Full compari-son plots in other representative photometric bands are shown in Figure B1 in Appendix B. Overall, the refer-ence light curve is consistent with the predicted distri-bution for the test example. The reference light curve is generated using a particular draw of the nuisance param-eters and hence represents one possible realisation of the nuisance-marginalised distribution, whereas the shaded region summarises the corresponding distribution pre-dicted by the flow. The purpose of this comparison is to access whether the predicted quantile intervals en-compass the example N21 light curve. The consistency between the reference light curve and the blue inter-val demonstrates that the flow captures the conditional training distribution and generalises to unseen inputs. While the test example illustrates the general agree-ment between the flow predictions and the theoretical light curves, a statistical summary over the full test-ing set is needed to assess the model behaviour more systematically. We evaluate the flow model on the test set containing 10 5 cases. Each test case i corresponds to a complete set of multi-band light curves evaluated on a common time grid {tk}, consisting of 20 logarith-mically spaced points over the time range of [0 .4, 10] days after merger. Specifically, for each test case i and time point tk, we draw Ndraw = 500 samples from the latent space using the trained flow model to form the predictive spectra distribution. These sampled spectra are then integrated over the chosen bandpasses to ob-tain the corresponding magnitude distributions in each photometric band b. The resulting flow prediction is compared against the corresponding distribution from the N21 model evaluated under the same conditions. For each test case, time point, and band, we first com-pare the central behaviour of the two distributions using the residual between their median magnitudes, ∆M 50%  
+
+> i,k,b
+
+≡ M flow 50% ,i,k,b − M N21 50% ,i,k,b , (8) where M flow 50% ,i,k,b and M N21 50% ,i,k,b denote the median mag-nitudes of the flow predictive distribution and the N21 model distribution for the i-th test case, time point tk,and band b, respectively. For a fixed test case and band, the set of ∆ M50% ,i,k,b over all time points forms a resid-ual light curve. Positive values of ∆ M50% ,i,k,b indicate that the flow prediction is fainter than the N21 model, while negative values indicate that it is brighter. In addition to the median residual, we compare the widths of the predictive distributions through the ratio of their central 68% intervals, 
+
+R68%  
+
+> i,k,b
+
+≡ W flow 68% ,i,k,b 
+
+W N21 68% ,i,k,b 
+
+, (9) where, for A ∈ { flow , N21 }, W A 
+
+> 68% ,i,k,b
+
+≡ M A 
+
+> 84% ,i,k,b
+
+−
+
+M A
+
+> 16% ,i,k,b
+
+. R68%  
+
+> i,k,b
+
+> 1 or R68%  
+
+> i,k,b
+
+< 1 indicates that the flow predictive distribution is broader or narrower than the theoretical distribution, respectively. Figure 5 shows an example test case comparison between the predictive distributions from the flow and the N21 model in the 
+
+r band, where the median residuals and width ratios with time are presented in the bottom two panels. The flow reproduces the time evolution against the reference N21 model, with the median residuals within ±0.1 mag over evaluated time. The predicted central 68% width is also generally consistent with the reference predic-tion, with the width ratio differing from unity by up to roughly 20% − 30% at some epochs. As a secondary practical benefit, the flow model also reduces the com-putational cost of spectra generation. For the example case considered here, using the current implementation, spectra generation with the flow model on a GPU re-quired only ∼ 1/64 of the runtime of direct generation 9with N21. However, we note that this example is in-tended to illustrate the potential computational benefit instead of providing a systematic performance evalua-tion. −15 −14 −13 −12 −11 −10        
+
+> Absolute Magnitude
+> m1= 1.386, m2= 1.307 Λ1= 419, Λ 2= 1729
+> μobs = 0.658
+> ps1::r band
+> N21 50% N21 16-84% Flow 50% Flow 16-84%
+> −0.1 0.0 0.1
+> ΔM 50%
+> 10 010 1
+> Time (days)
+> 1.00 1.25
+> R 68%
+
+Figure 5. Comparison between the N21 model and the flow model for an example test case in the r band. The median and central 68% quantile interval are shown for both models in the upper panel. The median residuals and central 68% width ratios are shown in the middle and lower panels, respectively. The ( m1, m 2, Λ1, Λ2) values for this example are drawn from the test set. 
+
+To examine the temporal evolution of the predictive behaviour, we summarise the median residual ∆ M 50% ,
+
+and the 68% width ratio R68% of all test cases as func-tions of time. These quantities respectively characterise the offset of the flow predictive median from the cor-responding N21 model median, and the relative central 68% width of the flow predictive distribution compared to the N21 model distribution. The resulting time-dependent summaries are shown in Figure 6. In general, the flow model performs well in most bands with the me-dian residual remaining within ∼ 0.1 mag and the 68% width ratio are consistently smaller than ∼ 1.4 between 
+
+∼ 0.4 − 8.0 days. However, the mismatch for both resid-ual and width ratio at the late time ( ∼ 8 days) is mainly due to the decrease of the brightness, the speed of which is faster from the bluer UV band to redder NIR bands. As the KN becomes dimmer, the flux starts to fall be-low the noise level, which washes out the true values and hence results in a relatively larger absolute residual and width ratio. Nevertheless, the effect is limited to within ∼ 0.25 mag for the median residual and 40% for the width ratio. This effect is more pronounced in the 
+
+u band. As shown in Figure 3, the u band probes the blue part of the spectrum, where the test spectra show a larger dynamical range, especially below ∼ 5000 ˚ A. The light curves also decline more rapidly after ∼ 1 day, and can reach ≳ −6 mags at 10 day. In this case, as the flux decreases with time, a similar absolute flux error corresponds to a larger fractional error, and is therefore amplified when converted into magnitudes. The residu-als in u band therefore most likely reflect the sensitivity of rapidly fading blue fluxes to small flux errors and noise effects at low flux ，resulting in a larger median residual of ∼ 0.1 − 0.25 mag compared to other bands. −0.2 −0.1 0.0 0.1        
+
+> Median Δ M 50%
+> 2massh 2massj 2massks ps1::g ps1::i ps1::r ps1::z sdssu
+> 0246810 1.0 1.2 1.4 1.6 1.8
+> Median  R 68%
+> N draws = 500 N cases = 100000
+> Rest-frame time, t[day]
+
+Figure 6. Time evolution of the flow predictive behaviour across 10 5 test cases in eight bands. Top panel: time-binned median residuals between the flow and the corresponding N21 predictive medians. Bottom panel: time-binned median of the ratio of the central 68% interval widths predicted by the flow and N21 model. Different colours represent different bands. 
+
+On the other hand, the width ratio in the Ks band reaches 1 .2 − 1.8 during the first day. This behaviour is likely driven by a combination of spectral resolution and low-flux effects. At early times, the Ks band emission lies on the red, relatively low flux tail of the early spec-trum and is close to the red end of the adopted wave-length range. With the current 20 points log-uniform spectra representation over 2800–25000 ˚ A, the bandpass is covered by only a small number of wavelength points. The resulting photometry is therefore more sensitive to interpolation uncertainties and to the low-amplitude 10 noise added in the spectral representation. In addition, the reference N21 predictive width is relatively narrow at early times (see Figure B2 as an example). Conse-quently, even a modest absolute broadening of the flow prediction can lead to an apparently large width ratio. The same effects are weaker, but still present, in the 
+
+J and H bands ，which probe shorter wavelengths than 
+
+Ks and are therefore less affected by the sampling at red end and low-flux behaviour. Nevertheless, the general agreement in both the me-dian evolution and the predictive width over 0 .4–10 days supports the use of the flow model for efficient prob-abilistic light-curve prediction within this time range. The main caveat is that predictions in the bluest ( u)and reddest ( Ks) bands require additional care in low-flux regimes, particularly after ∼ 1 day in the u band and before ∼ 1 day in the Ks band. In these regimes, in-terpolation and noise in the learned spectral representa-tion can have an amplified effect on the band-integrated magnitudes. 3.2. Cross-model comparison with K17 light curves 
+
+As an additional test of the predictive behaviour of 
+
+Genova , we compare the predicted light curve distri-butions with light curves constructed from K17. In contrast to the semi-analytical N21 prescription used to generate the training data, K17 is parametrised di-rectly by the ejecta properties, including the ejecta mass, velocity, and lanthanide fraction. The mod-els are based on radiative transfer calculations with wavelength-dependent opacities, and therefore provide a physically distinct reference model against which to compare with the Genova predictions. To perform the comparison, we first select one (m1, m 2, Λ1, Λ2) combination from the training set of the flow model. We compute the ejecta quantities us-ing the same prescription as adopted in the N21 model, while fixing the remaining kilonova parameters to a ref-erence set. This gives three ejecta components con-taining a lanthanide-poor blue dynamical component, a lanthanide-rich red dynamical component, and an intermediate-opacity disk wind component. We extract the ejecta mass and velocity of each component and use these quantities to construct an approximate counter-part in K17. K17 contains single component models parametrised by ejecta mass, ejecta velocity, and lan-thanide fraction. Therefore, to compare it with the three-component N21 model, we assign fixed lanthanide fractions of Xlan = 10 −9, 10 −2, and 10 −1 to the blue, purple, and red components, respectively, following the values adopted in M. Nicholl et al. (2021). For each component, we select the nearest K17 model in ejecta space, and then sum the three component spectra in flux space to obtain the total light curve. Since the K17 models are not parametrised by viewing angle, we gener-ate the flow predictions at fixed ( t, m 1, m 2, Λ1, Λ2) while marginalising over μobs . The predicted spectra are then integrated through the same bandpasses and converted to light curves. Figure 7 shows an example of this cross-model com-parison. Unlike the in-distribution tests, this is not a direct interpolation test within the training parameter space, but a photometric consistency check against light curves constructed from a different radiative transfer model. We emphasise that the purpose of this com-parison is not to require the median prediction to repro-duce the detailed morphology of the K17 light curves. Instead, we focus on whether the predicted probabilis-tic interval provides an informative range for the light curve behaviour. For this selected binary configuration, the K17 light curves are broadly contained within the central 68% predictive interval of the flow over the 0 .4– 10 day range in most bands. This suggests that the probabilistic prediction from Genova can remain infor-mative even when applied to light curves generated from a physically distinct reference model. 3.3. Application on GW170817 
+
+As a well-detected multi-messenger source in both gravitational wave and electromagnetic regime, GW170817 provides an optimal test ground for the flow model. In this section, we apply Genova to the gravita-tional wave posterior samples of GW170817, along with the real detections of the corresponding optical coun-terpart AT2017gfo. We demonstrate the capability of this framework for probabilistic light curve predictions directly using gravitational wave posterior samples. We take the low-spin posterior samples of GW170817 from GWTC-1 parameter estimation sample release of the LIGO/Virgo Collaboration from https://dcc.ligo. org/LIGO-P1800370/public (B. P. Abbott et al. 2019). For the photometric observations of AT2017gfo, we retain the optical r-, i-, and z-band measurements from N. R. Tanvir et al. (2017), while for the Y , J, and Ks
+
+bands we use a new reduction of imaging obtained with the European Southern Observatory (ESO) Visible and Infrared Survey Telescope for Astronomy (VISTA; W. Sutherland et al. 2015). The principal change relative to the previously published VISTA photometry is the use of late-time observations of NGC 4993, obtained on 2019 March 19 after the transient had faded, as refer-ence images for difference imaging. Three 240 s tiled exposures were obtained in each of the Y , J, and Ks
+
+bands. Image subtraction was performed independently 11 10 0 10 1
+
+Time since merger (days)        
+
+> −25 −20 −15 −10 −5 0
+> Absolute magnitude + offset
+> K -12.5 H -10 J -7.5 z -5 i -2.5 r +0 g +2.5 u +5
+> m1= 1.369, m2= 1.289 Λ1= 113.33, Λ 2= 1662.17
+> Flow median Flow 16-84% K17 test LC
+> Figure 7. Example cross-model light curve comparison between the flow model predictions and K17 in the optical/NIR bands. Solid curves show the median flow predictions, while shaded regions indicate the 16–84% predictive intervals. The points show the corresponding three-component K17 light curves. Light curves are vertically shifted for clarity, with the applied offsets labelled on the right. The binary parameters used for this example are shown on the upper-left.
+
+for each epoch using the Saccadic Fast Fourier Trans-form (SFFT) algorithm (L. Hu et al. 2022), with the reference image convolved to match the corresponding science image. This allows the transient flux to be mea-sured after removal of the underlying spatially varying light from NGC 4993. A full description of the image subtraction, calibration, and photometric procedure is given in Appendix C. The resulting revised Y -, J-, and Ks-band photometry is presented in Table 2 and replaces the corresponding VISTA measurements reported by N. R. Tanvir et al. (2017). The revised values remain closely consistent with the earlier photometry: the residuals have an rms scatter of 0 .045 mag and a mean offset of less than 0.01 mag. The mean residuals in the individual Y , J,and Ks bands are −0.02, −0.02, and +0 .03 mag, re-spectively, with all measurements differing by less than 0.1 mag. All VISTA observations listed here have an exposure time of 120 s. The full revised dataset is re-ported in the table, while only epochs within the 0 .4– 10 day prediction range of the flow model are used in the comparison to avoid temporal extrapolation. As the GW posteriors span a broader parameter re-gion than that covered by the flow training data, we restrict the posterior samples to remain within the train-ing domain during prediction. For each posterior sam-ple, the luminosity distance is first converted to red-shift for transforming the component mass to the source frame. We then select only samples that lie within the four-dimensional convex hull constructed from the training conditions in ( m1, m 2, Λ1, Λ2). The resulting filtered posteriors therefore form the approximation of the restricted distribution eq(ϑ) used in Eq. 5. Con-struction of the convex hull is performed using the Con-vexHull implementation in the scipy.spatial mod-ule from the SciPy package (P. Virtanen et al. 2020). This procedure retains 2363 samples out of the origi-nal 8078 posterior samples. The selected posteriors are shown as red dots in Figure 8, along with the train-ing distribution shown in gray. In particular, we take 
+
+μobs = | cos θJN | to account for the viewing angle con-dition. These ( m1, m 2, Λ1, Λ2, μ obs ) samples are nor-malised using the same scaling procedure as in training and used as conditional inputs for the prediction. For 12                                                                                                                                                                          
+
+> Table 2. Revised VISTA near-infrared photometry of AT2017gfo. ∆t(d) Telescope/Camera Filter Mag(AB) 0
+> (1) (2) (3) (4) 0.482 VISTA/VIRCAM Y17 .418 ±0.054 1.467 VISTA/VIRCAM Y17 .185 ±0.059 2.464 VISTA/VIRCAM Y17 .432 ±0.056 3.461 VISTA/VIRCAM Y17 .730 ±0.050 4.459 VISTA/VIRCAM Y18 .039 ±0.061 6.471 VISTA/VIRCAM Y18 .701 ±0.086 7.463 VISTA/VIRCAM Y19 .240 ±0.089 9.457 VISTA/VIRCAM Y20 .167 ±0.138 0.476 VISTA/VIRCAM J17 .781 ±0.055 1.460 VISTA/VIRCAM J17 .419 ±0.043 2.457 VISTA/VIRCAM J17 .634 ±0.047 3.453 VISTA/VIRCAM J17 .828 ±0.038 4.453 VISTA/VIRCAM J18 .058 ±0.036 6.465 VISTA/VIRCAM J18 .719 ±0.057 7.456 VISTA/VIRCAM J19 .069 ±0.097 9.450 VISTA/VIRCAM J20 .071 ±0.204 10.452 VISTA/VIRCAM J20 .967 ±0.301 11.453 VISTA/VIRCAM J21 .159 ±0.229 0.499 VISTA/VIRCAM Ks18 .570 ±0.108 1.454 VISTA/VIRCAM Ks17 .834 ±0.048 2.450 VISTA/VIRCAM Ks17 .669 ±0.071 3.447 VISTA/VIRCAM Ks17 .575 ±0.038 4.446 VISTA/VIRCAM Ks17 .638 ±0.042 6.458 VISTA/VIRCAM Ks17 .859 ±0.041 7.449 VISTA/VIRCAM Ks17 .988 ±0.045 9.443 VISTA/VIRCAM Ks18 .528 ±0.060 10.445 VISTA/VIRCAM Ks18 .807 ±0.042 12.450 VISTA/VIRCAM Ks19 .416 ±0.139 14.452 VISTA/VIRCAM Ks20 .051 ±0.205
+> Note —Column (1) gives the start time of the ob-servation relative to the GW170817 gravitational-wave trigger. All observations were obtained with VISTA/VIRCAM with an exposure time of 120 s. Magnitudes are reported on the AB system and cor-rected for Milky Way foreground extinction adopt-ing E(B−V) = 0 .105 mag (E. F. Schlafly & D. P. Finkbeiner 2011), corresponding to AY= 0 .107, AJ=0.074, and AKs= 0 .032 mag.
+
+each selected posterior sample, the flow model generates spectra at 100 logarithmically spaced times between 0 .4and 10 days after merger. At each time, 4000 latent samples are drawn to construct the predictive distribu-tion. The luminosity distance associated with each pos-terior sample is used to convert the predicted spectra to the observer frame at a specific distance. The resulting multi-band light curves with the real observations are shown in Figure 9, where ∼ 77% of the observations are well covered by the central 68% predictive intervals of the flow model, indicating that the model can produce informative probabilistic light curve predictions using only GW posterior samples.  
+
+> 4.
+
+DISCUSSION When Genova is applied to GW170817, the central 68% predictive range covers ∼ 77% of the observations in all bands, but does not fully enclose the earliest ob-servations at t ≲ 1.5 day. By comparing this result with light curves generated directly from the underlying N21 model using the same GW posterior samples, we find that this lack of early-time coverage is not unique to the surrogate prediction, but is already present in the underlying model distribution. This suggests that the early-time discrepancy is largely inherited from the adopted N21 model, rather than being introduced pri-marily by the flow surrogate. We note that, although the training data include variations in the shocked-cocoon contribution and the parameter that enhances the early blue emission, these effects are marginalised over the adopted parameter ranges. The resulting central pre-dictive range therefore captures the typical behaviour supported by the training distribution, which provides limited support for the most luminous early observations of AT2017gfo. This early-time behaviour should be viewed in the con-text of previous modelling of AT2017gfo. The early UV and optical observations revealed a luminous, rapidly evolving blue component within the first day after merger (e.g. M. R. Drout et al. 2017; P. S. Cowperth-waite et al. 2017; P. A. Evans et al. 2017; M. Nicholl et al. 2017). This phase may be particularly sensitive to effects that are not fully captured by radiative-heating only prescription. These include possible ejecta geomet-ric effects, additional luminosity sources such as wind-related blue emission and shock-cooling/cocoon emis-sion (e.g. A. Perego et al. 2017; A. L. Piro & J. A. Kollmeier 2018; B. D. Metzger 2020; M. Nicholl et al. 2021; H. Hamidani et al. 2024a). In particular, within the model comparison of M. Nicholl et al. (2021), the first day light curve of GW170817 strongly favours an additional luminosity source beyond the standard lanthanide-poor dynamical ejecta component, although the physical origin of this contribution is not unique (e.g., I. Arcavi 2018). The early and blue emission seen in AT2017gfo is also seen in the kilonova candidate associated with 13 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8                             
+
+> m1[M⊙]
+> 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8
+> m2 [M⊙ ]
+> (a)
+> Training samples Filtered GW170817 posteriors
+> 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50
+> log 10 Λ1
+> 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50
+> log 10  Λ2
+> (b)
+> 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8
+> m1[M⊙]
+> 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50
+> log 10  Λ1
+> (c)
+> 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8
+> m2[M⊙]
+> 1.75 2.00 2.25 2.50 2.75 3.00 3.25 3.50
+> log 10  Λ2
+> (d)
+
+Figure 8. Distribution of the selected GW170817 posterior samples relative to the training parameter domain of the flow model. The gray points represent the training samples, and the red points show the GW170817 posterior samples remained in the constructed convex hull. The four panels show two dimension projections onto (a) ( m1, m 2), (b) (log 10 Λ1, log 10 Λ2), (c) (m1, log 10 Λ1), and (d) ( m2, log 10 Λ2). 
+
+GRB 211211A, the only kilonova candidate with sim-ilarly early time observations. The blue excess in GRB 211211A is modelled by H. Hamidani et al. (2024b) to be consistent with late engine activity and subsequent interaction between the hot kilonova ejecta and a late jetted outflow. These examples highlight a broader limitation: the current mapping from the binary parameters to the kilo-nova emission should only be understood within the assumptions of the adopted kilonova prescription. In the present implementation, this can be summarised as three main caveats. 
+
+1. Magnetar energy injection. This is related to the possible formation of a long-lived neutron star remnant. For systems that form a stable or supermassive rem-nant that rotates rapidly, the rotation energy can dom-inate over the original radioactive heating and produce a significantly different KN and the late-time afterglow (e.g., N. Sarin et al. 2022). This effect is particularly relevant in the lower mass region (with the remnant mass Mrem ≲ 1.2MTOV ) in Figure 8. Although our cur-rent setup includes the blue enhancement effect from the magnetar wind and marginalises over MTOV , it does not explicitly include the additional energy injection from a magnetar remnant. 
+
+2. Restricted pre-merger spin configuration. A separate source of diversity arises from the pre-merger binary configuration. Although this work considers only low-spin scenarios, BNS systems with one highly spinning component can produce substantially more lanthanide-rich dynamical ejecta than corresponding irrotational systems, leading to brighter red kilonovae, which can constitute ∼ 4% of the merging NS binaries (S. Ross-wog et al. 2024). Though this effect may be partially degenerate with the dependence on mass ratio in exist-ing numerical-relativity calibrated mappings, they are not expected to be completely covered. 
+
+3. Kilonova-model and mapping systematics. A related limitation is that kilonova predictions are themselves model dependent. Current kilonova models differ not 14 18.0 20.0 22.0 24.0    
+
+> ps1::r
+> Flow 5%-95% Flow 16%-84% Flow median AT2017gfo
+> 17.0 18.0 19.0 20.0 21.0 22.0
+> ps1::i
+> 17.0 18.0 19.0 20.0 21.0 22.0
+> ps1::z
+> 10 010 1
+> 17.0 18.0 19.0 20.0 21.0
+> vista_y
+> 10 010 1
+> 17.0 18.0 19.0 20.0
+> vista_j
+> 10 010 1
+> 17.0 18.0 19.0 20.0 21.0
+> vista_ks Time since merger (day) Apparent magnitude
+
+Figure 9. Flow prediction for GW170817/AT2017gfo. The solid blue lines show the median prediction from the flow, while the shaded region indicate the central 68%, and 90% quantile intervals. The points are the observations of AT2017gfo. 
+
+only in their computational approach (e.g., analytical, semi-analytical, or radiative transfer), but also in their physical assumptions such as ejecta geometry, compo-sition, opacity treatment, radioactive heating rate, and thermalisation. Additional physical processes not in-cluded in many kilonova prescriptions, such as dust for-mation in the ejecta, could also affect the colour evo-lution of a KN through optical photon absorption and NIR re-emission (H. Takami et al. 2014). Although, dust is unlikely to dominate the NIR emission of AT2017gfo (C. Gall et al. 2017). These choices can lead to system-atic variations in both the predicted observables and inferred results even for the same binary parameters, motivating ≳ 1 mag uncertainties in light curves (e.g., J. Heinzel et al. 2021; N. Sarin & S. Rosswog 2024; T. Hussenot-Desenonges et al. 2025). Even within a fixed radiative-transfer framework, variations in atomic data and thermalisation efficiency prescriptions can produce substantial differences in both observables and inferred ejecta properties (e.g., M. Bulla 2023; D. Brethauer et al. 2024). We therefore emphasise that the uncertainty rep-resented in our probabilistic predictions reflects only the marginalised parameters within the adopted model, and does not fully capture the systematic uncertainty asso-ciated with the choice of kilonova prescription itself. These results highlight the need for more compre-hensive numerical simulations and a better understand-ing of kilonova model systematics. As kilonova mod-els evolve, more physical effects that are not captured by the models considered here can be incorporated, in-cluding magnetar-driven energy injection, late-time en-gine activity, and spin effects. Improved numerical-relativity mappings between the BNS source parame-ters and ejecta properties may also reduce an important uncertainty in current kilonova predictions (e.g., C. J. Kr¨ uger & F. Foucart 2020; D. Radice et al. 2018; V. Ne-dora et al. 2022; E. Loffredo et al. 2025). In this context, 
+
+Genova has the flexibility to be retained with alterna-tive kilonova models or mixed training datasets span-ning multiple model families, while introducing separate modal labels as additional flow model conditions. In this way, this framework can not only consider uncertainty in the binary parameters, but also compare systematics from different models, and potentially incorporate pre-dictions from multiple models in event-level analyses. 
+
+5. CONCLUSIONS We present Genova , a conditional normalising flow framework for probabilistic kilonova spectral prediction from GW-derived binary parameters. Conditioned only on rest-frame time, component masses, tidal deforma-bilities, and viewing angle, this framework can make probabilistic kilonova predictions with additional kilo-nova parameters marginalised. We validate its perfor-mance by comparing the median and central 68% width ratio of the predictive distribution with the N21 model. 15 This presents the general reliability of the flow model be-tween 0 .4–10 days after merger, with a relatively larger median error reaching ∼ 0.25 mag for u band after 1 day, and deviations of the width ratio from unity of 
+
+∼ 20% − 80% in the Ks band before 1 day. For other bands and epochs, the flow predictions remain consistent with the reference model, with the median residuals typ-ically within ∼ 0.1 mag and central width ratios within 
+
+∼ 20% of unity. Since the flow predicts spectra rather than fixed multi-band light curves, it gives more flexibil-ity for multi-band comparisons and observational appli-cations in any filter of interest within the training wave-length range 2800–25000 ˚ A in the rest frame. We also present newly reduced VISTA Y -, J-, and Ks-band pho-tometry for comparison with the flow predictions. Ap-plying Genova to GW170817 posterior samples demon-strates how the framework can propagate both GW pa-rameter and nuisance parameter uncertainties into kilo-nova light curve predictions. In this work, we adopt the N21 model to train the normalising flow as a proof of concept for probabilis-tic kilonova prediction. The cross-model comparisons with K17 illustrate that Genova can be used to iden-tify regions of parameter space where different kilonova prescriptions produce consistent photometric behaviour. This motivates a future development of this framework in incorporating multiple kilonova prescriptions through additional conditioning labels. Such extensions sup-port studying systematic difference between different KN models (e.g., M. Bulla 2019, 2023), while allow-ing model-specific predictive distributions to be com-pared or combined in one probabilistic analysis. Look-ing ahead, third-generation (3G) GW detectors are ex-pected to detect BNS mergers at substantially higher rates and out to larger distances (e.g., M. Maggiore et al. 2020; M. Evans et al. 2021), electromagnetic follow-up will therefore benefit from frameworks that can propa-gate GW-inferred source properties efficiently into kilo-nova observables. In this context, Genova could serve as a downstream tool combined with rapid GW param-eter estimation pipelines such as Dingo (M. Dax et al. 2021; M. Dax et al. 2025) for probabilistic kilonova pre-dictions from GW-detected BNS mergers. ACKNOWLEDGMENTS We thank Thibeau Wouters and Peter P.H. Pang for helpful discussions on kilonova simulation. We also thank Lami Suleiman for useful discussions and sug-gestions on neutron star equation of state. XD is sup-ported by Chinese Scholarship Council (CSC). GPL is supported by the Royal Society via a Dorothy Hodgkin Fellowship (Grant Nos. DHF-R1-221175 and DHF-ERE-221005). CM and ISH were supported by the Sci-ence and Technology Facilities Council (STFC) grants T/V005634/1 and UKRI2487. The Cosmic Dawn Cen-ter (DAWN) is funded by the Danish National Re-search Foundation under grant DNRF140. The obser-vations with VISTA were gathered by the ESO VIN-ROUGE Survey (198.D-2010). This work was supported by research grants (VIL16599,VIL54489) from VILLUM FONDEN. DATA AVAILABILITY The full newly reduced VISTA photometry of AT2017gfo is available in this manuscript. The nor-malising flow framework with its source code, and all figure scripts of the paper will be released in a public repository after publication. 
+
+## Facilities: ESO:VISTA(VIRCAM) 
+
+## Software: Redback (N. Sarin et al. 2024), 
+
+Glasflow (M. J. Williams et al. 2024), nflows 
+
+(C. Durkan et al. 2020), PyTorch (A. Paszke et al. 2019) ，SNCosmo (K. Barbary et al. 2016), Astropy 
+
+( Astropy Collaboration et al. 2022), SFFT (L. Hu et al. 2022), Photutils (L. Bradley et al. 2026), SciPy (P. Virtanen et al. 2020), Matplotlib (J. D. Hunter 2007), 
+
+NumPy (C. R. Harris et al. 2020). APPENDIX  
+
+> A.
+
+FLOW CONFIGURATION The spectra is trained for 3000 epochs with a batch size of 500. The architecture comprises 3 coupling layers with 32 neurons each. A learning rate scheduler ( CosAnnealingLR ) is applied for improved convergence, with an initial learning rate of 1 × 10 −3 and a minimum learning rate of 1 × 10 −5. We adopted AdamW as the optimiser during the training. The architecture of the adopted flow model is summarised in Table A1. Training was performed on a single NVIDIA GeForce RTX 5090 GPU and took approximately 10 h wall-clock time. 16 
+
+Table A1. Configuration of the conditional nor-malising-flow model. 
+
+Quantity Adopted setting Model type Conditional RealNVP flow Target variable Rest-frame spectrum, x ∈ R20 
+
+Conditionals (t, m 1, m 2, Λ1, Λ2, μ obs )Condition dimension 6Latent distribution N (0, I)Coupling transforms 3Hidden neurons 32 Activation function ReLU Training objective Negative log-likelihood Optimiser AdamW Initial learning rate 1 × 10 −3
+
+Scheduler CosineAnnealingLR 
+
+Minimum learning rate 1 × 10 −5
+
+Batch size 500 Training epoch 3000 
+
+Note — The remaining kilonova parameters are varied dur-ing data generation but are not included in the condi-tional parameters, their effect is absorbed implicitly into the learned conditional data distribution. 17 
+
+B. ALL BANDS PLOTS Figure B1 show the multi-band light curve predictions from the flow model for a test example. The predictions are shown against one corresponding example test light curve. Figure B2 presents the light curve distribution comparison between the flow prediction and N21 using one example set of test parameters. 10 0 10 1 
+
+> -12.0 -10.0 -8.0
+
+m1 = 1.551, m2 = 1.177 Λ1 = 478.8, Λ 2 = 2540.1 
+
+μobs = 0.530 
+
+sdssu  
+
+> 10 010 1
+> -14.0 -13.0 -12.0 -11.0 -10.0 -9.0
+
+ps1::g  
+
+> 10 010 1
+> -14.0 -13.0 -12.0 -11.0 -10.0
+
+ps1::r  
+
+> 10 010 1
+> -14.0 -13.0 -12.0 -11.0
+
+ps1::i  
+
+> 10 010 1
+> -14.5 -14.0 -13.5 -13.0 -12.5 -12.0
+
+ps1::z  
+
+> 10 010 1
+> -15.0 -14.5 -14.0 -13.5 -13.0 -12.5
+
+2massj  
+
+> 10 010 1
+> -15.0 -14.5 -14.0 -13.5 -13.0 -12.5 -12.0
+
+2massh  
+
+> 10 010 1
+> -15.0 -14.0 -13.0 -12.0
+
+2massks N21 model Flow 50% Flow 16-84% Flow 5-95% 
+
+Time [days] Absolute Magnitude 
+
+Figure B1. Multi-band light curve comparison for the in-distribution testing example. The predicted multi-band light curves from the flow model are shown by the median (blue solid line) and central 68% quantile interval (blue shaded region), compared with the theoretical N21 light curve (orange points). The ( m, Λ) values for this example are drawn from the testing distribution. 18 -14.0 -12.0 -10.0 -8.0 -6.0 median Δ M 50% = -0.00517 median R 68% = 1.09 
+
+sdssu -15.0 -14.0 -13.0 -12.0 -11.0 -10.0 -9.0 -8.0 median Δ M 50% = -0.00855 median R 68% = 1.06 
+
+m1 = 1.386, m2 = 1.307 Λ1 = 419, Λ 2 = 1729 
+
+μobs = 0.658 
+
+ps1::g -15.0 -14.0 -13.0 -12.0 -11.0 -10.0 median Δ M 50% = -0.00351 median R 68% = 1.05 
+
+ps1::r 
+
+-15.0 -14.0 -13.0 -12.0 -11.0 median Δ M 50% = -0.00472 median R 68% = 1.06 
+
+ps1::i 
+
+-15.0 -14.5 -14.0 -13.5 -13.0 -12.5 -12.0 -11.5 
+
+median Δ M 50% = -0.00189 median R 68% = 1.09 
+
+ps1::z 
+
+-15.0 -14.5 -14.0 -13.5 -13.0 -12.5 
+
+median Δ M 50% = -0.00385 median R 68% = 1.13 
+
+2massj 
+
+10 0 10 1
+
+-15.0 -14.5 -14.0 -13.5 -13.0 -12.5 
+
+median Δ M 50% = -0.00915 median R 68% = 1.16 
+
+2massh 
+
+10 0 10 1
+
+-15.0 -14.5 -14.0 -13.5 -13.0 -12.5 
+
+median Δ M 50% = -0.00897 median R 68% = 1.2 
+
+2massks 
+
+N21 50% N21 16-84% Flow 50% Flow 16-84% 
+
+Time (days) Absolute Magnitude 
+
+Figure B2. Multi-band light curve comparison between the N21 and the flow model for an example test case. The median and central 68% quantile interval are shown for both models (flow: blue; theory: orange). The average median residual and the ratio of uncertainty width over time for each band are shown at the left bottom corner in each panel. 19  
+
+> C.
+
+VISTA IMAGE SUBTRACTION AND PHOTOMETRY The Y -, J-, and Ks-band VISTA/VIRCAM observations of AT2017gfo were re-analysed using late-time imaging of NGC 4993, obtained after the transient had faded, as reference images. The late-time observations were obtained on 2019 March 19, with three tiled images acquired in each of the Y , J, and Ks bands, each with an exposure time of 240 s. The observations spanned 02:38:35–04:48:04 UTC. Starting from the reduced and astrometrically aligned science and reference images, the subtraction and photometric measurements were performed independently in each band. The final resampled images have an effective pixel scale of approximately 0 .341 arcsec pixel −1, as determined from their astrometric solutions. Prior to image subtraction, low-spatial-frequency background variations in both the science and reference images were modelled and removed using the Background2D implementation in Photutils (L. Bradley et al. 2026). The background was estimated using 48-pixel boxes, with a 5 × 5 median filter applied to the background mesh and iterative 2 .5σ clipping. The transient position was masked during the background estimation to prevent source flux from influencing the model. For each science epoch, five isolated field stars were copied to otherwise blank regions of the science image before subtraction. Each copied source was inserted using a 57 × 57 pixel stamp, after removing the median local background measured around the original star and matching the stamp pedestal to the background at the destination position. This provided a set of calibration sources that underwent the same convolution and subtraction procedure as the transient. The transient and host-galaxy region, together with the copied stars, were excluded from the source sample used to determine the subtraction solution. Difference images were produced using the SFFT image-subtraction algorithm (L. Hu et al. 2022). For each epoch, the reference image was convolved to match the corresponding science image. The convolution kernel was allowed to vary spatially as a second-order polynomial, while a spatially constant photometric scaling was adopted. The kernel half-width was determined automatically, with the allowed range restricted to 2–20 pixels. Following image subtraction, the remaining smooth residual associated with NGC 4993 was modelled locally within a radius of 140 pixels around the galaxy centre using a 15-pixel median filter. The transient position was masked while constructing this model, which was then subtracted to produce the final image used for photometry. Circular-aperture photometry was performed on the final difference images using an aperture radius of 3 pixels. The transient position was determined using DAOStarFinder from Photutils (L. Bradley et al. 2026) within a restricted region around its expected location. A detected centroid was accepted only when it lay within 4 pixels of the expected position; otherwise, including at low signal-to-noise epochs, forced photometry was performed at the expected transient coordinates. The local background was estimated using circular sky apertures with the same radius as the source aperture. These were positioned separately for each epoch and were adjusted interactively to avoid compact subtraction artefacts and structured residual emission from NGC 4993. For a source aperture containing a summed signal Str , the background-subtracted transient counts were calculated as 
+
+Ftr = Str − Aap Bj , (C1) where Aap is the area of the source aperture, Bj is the mean pixel value in the jth sky aperture, and the angle brackets denote the mean over the selected sky apertures. The same aperture radius was used to measure the five copied calibration stars. Their centroids were determined independently at each epoch and their local backgrounds were estimated using surrounding sky apertures. Each calibration star therefore provided an independent estimate of the transient magnitude, 
+
+mb,i = mb,⋆i − 2.5 log 10 
+
+ Ftr 
+
+F⋆i 
+
+
+
++ ∆ b, (C2) where mb,⋆i and F⋆i are the catalogue magnitude and measured background-subtracted counts of calibration star i
+
+in band b. The catalogue magnitudes are on the VISTA Vega system and were converted to the AB system using the VISTA/VIRCAM offsets of C. Gonz´ alez-Fern´ andez et al. (2018), YAB − YVega = 0 .600, JAB − JVega = 0 .916, and 
+
+Ks, AB − Ks, Vega = 1 .827 mag. The photometry was subsequently corrected for Milky Way foreground extinction. We adopt E(B − V ) = 0 .105 mag for the line of sight to AT2017gfo, following the recalibrated Galactic dust maps of E. F. Schlafly & D. P. Finkbeiner 20 (2011). Assuming RV = 3 .1, the VISTA/VIRCAM extinction coefficients AY /E (B − V ) = 1 .017, AJ /E (B − V ) = 0.705, and AKs /E (B − V ) = 0 .308 from C. Gonz´ alez-Fern´ andez et al. (2018) give AY = 0 .107, AJ = 0 .074, and 
+
+AKs = 0 .032 mag. The reported magnitude at each epoch was taken as the unweighted mean of the valid measurements obtained from the five calibration stars. The empirical transient-flux uncertainty was estimated from the dispersion of the integrated counts measured in the target sky apertures, 
+
+σm, tr = 2.5ln 10 
+
+σF, sky 
+
+Ftr 
+
+, σF, sky = [Var ( Ssky ,j )] 1/2 , (C3) where Ssky ,j is the summed signal in the jth sky aperture. For each calibration star, this term was combined in quadrature with the corresponding catalogue-magnitude uncertainty. The final uncertainty on the reported magnitude was calculated as 
+
+σmb =
+
+h
+
+s2(mb,i ) + σmb,i 
+
+> 2
+
+i1/2
+
+, (C4) where s(mb,i ) is the sample standard deviation of the independent star-calibrated magnitudes and ⟨σmb,i ⟩ is their mean formal uncertainty. 21 REFERENCES 
+
+Abbott, B. P., Abbott, R., Abbott, T. D., et al. 2017a, Phys. Rev. Lett., 119, 161101, doi: 10.1103/PhysRevLett.119.161101 Abbott, B. P., Abbott, R., Abbott, T. D., et al. 2017b, ApJL, 848, L12, doi: 10.3847/2041-8213/aa91c9 Abbott, B. P., Abbott, R., Abbott, T. D., et al. 2017c, The Astrophysical Journal Letters, 848, L13, doi: 10.3847/2041-8213/aa920c Abbott, B. P., et al. 2019, Phys. Rev. X, 9, 031040, doi: 10.1103/PhysRevX.9.031040 Aghanim, N., & others. 2020, Astronomy and Astrophysics, 641, A6, doi: 10.1051/0004-6361/201833910 Ai, S., Gao, H., & Zhang, B. 2025, ApJ, 978, 52, doi: 10.3847/1538-4357/ad93b4 Alexander, K. D., Berger, E., Fong, W., et al. 2017, The Astrophysical Journal Letters, 848, L21, doi: 10.3847/2041-8213/aa905d Andreoni, I., Ackley, K., Cooke, J., et al. 2017, Publications of the Astronomical Society of Australia, 34, e069, doi: 10.1017/pasa.2017.65 Arcavi, I. 2018, The Astrophysical Journal Letters, 855, L23, doi: 10.3847/2041-8213/aab267 Arcavi, I., Hosseinzadeh, G., Howell, D. A., et al. 2017, Nature, 551, 64, doi: 10.1038/nature24291 Astropy Collaboration, Price-Whelan, A. M., Lim, P. L., et al. 2022, ApJ, 935, 167, doi: 10.3847/1538-4357/ac7c74 Banerjee, S., Tanaka, M., Kato, D., & Gaigalas, G. 2024, ApJ, 968, 64, doi: 10.3847/1538-4357/ad4029 Banerjee, S., Tanaka, M., Kato, D., et al. 2022, The Astrophysical Journal, 934, 117, doi: 10.3847/1538-4357/ac7565 Banerjee, S., Tanaka, M., Kawaguchi, K., Kato, D., & Gaigalas, G. 2020, The Astrophysical Journal, 901, 29, doi: 10.3847/1538-4357/abae61 Barbary, K., Barclay, T., Biswas, R., et al. 2016, SNCosmo: Python library for supernova cosmology,, Astrophysics Source Code Library, record ascl:1611.017 http://ascl.net/1611.017 Barnes, J., & Kasen, D. 2013, ApJ, 775, 18, doi: 10.1088/0004-637X/775/1/18 Bradley, L., Sip˝ ocz, B. M., Robitaille, T. P., et al. 2026, Photutils, 3.0.0, Zenodo doi: 10.5281/zenodo.19636730 Breschi, M., Gamba, R., Carullo, G., et al. 2024, A&A, 689, A51, doi: 10.1051/0004-6361/202449173 Breschi, M., Perego, A., Bernuzzi, S., et al. 2021, MNRAS, 505, 1661, doi: 10.1093/mnras/stab1287 Brethauer, D., Kasen, D., Margutti, R., & Chornock, R. 2024, The Astrophysical Journal, 975, doi: 10.3847/1538-4357/ad7d83 Brown, S. M., Bulla, M., Peiris, H. V., et al. 2026, Rapid and robust simulation-based inference for kilonovae, https://arxiv.org/abs/2605.13983 Bulla, M. 2019, MNRAS, 489, 5037, doi: 10.1093/mnras/stz2495 Bulla, M. 2023, MNRAS, 520, 2558, doi: 10.1093/mnras/stad232 Bulla, M., Coughlin, M. W., Dhawan, S., & Dietrich, T. 2022, Universe, 8, 289, doi: 10.3390/universe8050289 Chornock, R., Berger, E., Kasen, D., et al. 2017, The Astrophysical Journal Letters, 848, L19, doi: 10.3847/2041-8213/aa905c Combi, L., & Siegel, D. M. 2023, Phys. Rev. Lett., 131, 231402, doi: 10.1103/PhysRevLett.131.231402 Coughlin, M. W., Dietrich, T., Margalit, B., & Metzger, B. D. 2019, Monthly Notices of the Royal Astronomical Society: Letters, 489, L91, doi: 10.1093/mnrasl/slz133 Coulter, D. A., Foley, R. J., Kilpatrick, C. D., et al. 2017, Science, 358, 1556, doi: 10.1126/science.aap9811 Cowperthwaite, P. S., Berger, E., Villar, V. A., et al. 2017, The Astrophysical Journal Letters, 848, L17, doi: 10.3847/2041-8213/aa8fc7 Darc, P., Bom, C. R., Fraga, B., & Kilpatrick, C. D. 2024, ApJ, 971, 82, doi: 10.3847/1538-4357/ad53c7 Dax, M., Green, S. R., Gair, J., et al. 2021, Phys. Rev. Lett., 127, 241103, doi: 10.1103/PhysRevLett.127.241103 Dax, M., Green, S. R., Gair, J., et al. 2025, Nature, 639, 49, doi: 10.1038/s41586-025-08593-z Desai, M. M., Chatterjee, D., Jhawar, S., et al. 2025, Monthly Notices of the Royal Astronomical Society, 541, 2619, doi: 10.1093/mnras/staf1045 D´ ıaz, M. C., Macri, L. M., Garcia Lambas, D., et al. 2017, ApJL, 848, L29, doi: 10.3847/2041-8213/aa9060 Dietrich, T., Coughlin, M. W., Pang, P. T. H., et al. 2020, Science, 370, 1450, doi: 10.1126/science.abb4317 Dietrich, T., & Ujevic, M. 2017, Classical and Quantum Gravity, 34, 105014, doi: 10.1088/1361-6382/aa6bb0 Dinh, L., Sohl-Dickstein, J., & Bengio, S. 2017, in International Conference on Learning Representations. https://arxiv.org/abs/1605.08803 Drout, M. R., et al. 2017, Science, 358, 1570, doi: 10.1126/science.aaq0049 Durkan, C., Bekasov, A., Murray, I., & Papamakarios, G. 2020, nflows: normalizing flows in PyTorch, v0.14 Zenodo, doi: 10.5281/zenodo.4296287 Evans, M., Adhikari, R. X., Afle, C., et al. 2021, arXiv e-prints, arXiv:2109.09882, doi: 10.48550/arXiv.2109.09882 22 
+
+Evans, P. A., Cenko, S. B., Kennea, J. A., et al. 2017, Science, 358, 1565, doi: 10.1126/science.aap9580 Gall, C., Hjorth, J., Rosswog, S., Tanvir, N. R., & Levan, A. J. 2017, ApJL, 849, L19, doi: 10.3847/2041-8213/aa93f9 Goldstein, A., Veres, P., Burns, E., et al. 2017, The Astrophysical Journal Letters, 848, L14, doi: 10.3847/2041-8213/aa8f41 Gonz´ alez-Fern´ andez, C., Hodgkin, S. T., Irwin, M. J., et al. 2018, MNRAS, 474, 5459, doi: 10.1093/mnras/stx3073 Haggard, D., Nynka, M., Ruan, J. J., et al. 2017, The Astrophysical Journal Letters, 848, L25, doi: 10.3847/2041-8213/aa8ede Hallinan, G., Corsi, A., Mooley, K. P., et al. 2017, Science, 358, 1579, doi: 10.1126/science.aap9855 Hamidani, H., Kimura, S. S., Tanaka, M., & Ioka, K. 2024a, ApJ, 963, 137, doi: 10.3847/1538-4357/ad20d0 Hamidani, H., Tanaka, M., Kimura, S. S., Lamb, G. P., & Kawaguchi, K. 2024b, ApJL, 971, L30, doi: 10.3847/2041-8213/ad6864 Harris, C. R., Millman, K. J., van der Walt, S. J., et al. 2020, Nature, 585, 357, doi: 10.1038/s41586-020-2649-2 Heinzel, J., Coughlin, M. W., Dietrich, T., et al. 2021, MNRAS, 502, 3057, doi: 10.1093/mnras/stab221 Hu, L., Wang, L., Chen, X., & Yang, J. 2022, ApJ, 936, 157, doi: 10.3847/1538-4357/ac7394 Hu, L., Wu, X., Andreoni, I., et al. 2017, Science Bulletin, 62, 1433, doi: https://doi.org/10.1016/j.scib.2017.10.006 Hunter, J. D. 2007, Computing in Science & Engineering, 9, 90, doi: 10.1109/MCSE.2007.55 Hussenot-Desenonges, T., Pillas, M., Antier, S., Hello, P., & Pang, P. T. H. 2025, arXiv e-prints, arXiv:2505.21392, doi: 10.48550/arXiv.2505.21392 Jin, Z.-P., Hotokezaka, K., Li, X., et al. 2016, Nature Communications, 7, 12898, doi: 10.1038/ncomms12898 Kasen, D., Badnell, N. R., & Barnes, J. 2013, The Astrophysical Journal, 774, 25, doi: 10.1088/0004-637X/774/1/25 Kasen, D., Metzger, B., Barnes, J., Quataert, E., & Ramirez-Ruiz, E. 2017, Nature, 551, 80, doi: 10.1038/nature24453 Kasliwal, M. M., Nakar, E., Singer, L. P., et al. 2017, Science, 358, 1559, doi: 10.1126/science.aap9455 Kedia, A., Ristic, M., O’Shaughnessy, R., et al. 2023, Physical Review Research, 5, 013168, doi: 10.1103/PhysRevResearch.5.013168 Kilpatrick, C. D., Foley, R. J., Kasen, D., et al. 2017, Science, 358, 1583, doi: 10.1126/science.aaq0073 Kobyzev, I., Prince, S. J., & Brubaker, M. A. 2021, IEEE Transactions on Pattern Analysis and Machine Intelligence, 43, 3964, doi: 10.1109/TPAMI.2020.2992934 Koehn, H., Wouters, T., Pang, P. T. H., et al. 2025, A&A, 704, A55, doi: 10.1051/0004-6361/202556626 Kr¨ uger, C. J., & Foucart, F. 2020, PhRvD, 101, 103002, doi: 10.1103/PhysRevD.101.103002 Lamb, G. P., Tanvir, N. R., Levan, A. J., et al. 2019, ApJ, 883, 48, doi: 10.3847/1538-4357/ab38bb Li, L.-X., & Paczy´ nski, B. 1998, ApJL, 507, L59, doi: 10.1086/311680 Lipunov, V. M., Gorbovskoy, E., Kornilov, V. G., et al. 2017, The Astrophysical Journal Letters, 850, L1, doi: 10.3847/2041-8213/aa92c0 Loffredo, E., et al. 2025, Astron. Astrophys., 697, A36, doi: 10.1051/0004-6361/202452863 Lukoiute, K., Raaijmakers, G., Doctor, Z., Soares-Santos, M., & Nord, B. 2022, Monthly Notices of the Royal Astronomical Society, 516, 1137, doi: 10.1093/mnras/stac2342 Lyman, J. D., Lamb, G. P., Levan, A. J., et al. 2018, Nature Astronomy, 2, 751, doi: 10.1038/s41550-018-0511-3 Maggiore, M., Broeck, C. V. D., Bartolo, N., et al. 2020, Journal of Cosmology and Astroparticle Physics, 2020, 050, doi: 10.1088/1475-7516/2020/03/050 Margalit, B., & Metzger, B. D. 2017, ApJL, 850, L19, doi: 10.3847/2041-8213/aa991c Margutti, R., Berger, E., Fong, W., et al. 2017, The Astrophysical Journal Letters, 848, L20, doi: 10.3847/2041-8213/aa9057 Margutti, R., Alexander, K. D., Xie, X., et al. 2018, The Astrophysical Journal Letters, 856, L18, doi: 10.3847/2041-8213/aab2ad McCully, C., Hiramatsu, D., Howell, D. A., et al. 2017, The Astrophysical Journal Letters, 848, L32, doi: 10.3847/2041-8213/aa9111 Metzger, B. D. 2020, Living Reviews in Relativity, 23, 1, doi: 10.1007/s41114-019-0024-0 Metzger, B. D., Mart ínez-Pinedo, G., Darbha, S., et al. 2010, Monthly Notices of the Royal Astronomical Society, 406, 2650, doi: 10.1111/j.1365-2966.2010.16864.x Nedora, V., Schianchi, F., Bernuzzi, S., et al. 2022, Classical and Quantum Gravity, 39, 015008, doi: 10.1088/1361-6382/ac35a8 Nicholl, M., Margalit, B., Schmidt, P., et al. 2021, Monthly Notices of the Royal Astronomical Society, 505, 3016, doi: 10.1093/mnras/stab1523 Nicholl, M., Berger, E., Kasen, D., et al. 2017, ApJL, 848, L18, doi: 10.3847/2041-8213/aa9029 23 
+
+Pang, P. T. H., Dietrich, T., Coughlin, M. W., et al. 2023, Nature Communications, 14, 8352, doi: 10.1038/s41467-023-43932-6 Papamakarios, G., Nalisnick, E., Rezende, D. J., Mohamed, S., & Lakshminarayanan, B. 2021, Journal of Machine Learning Research, 22, 1. http://jmlr.org/papers/v22/19-1028.html Paszke, A., Gross, S., Massa, F., et al. 2019, in Proceedings of the 33rd International Conference on Neural Information Processing Systems (Red Hook, NY, USA: Curran Associates Inc.) Peng, Y., Risti´ c, M., Kedia, A., et al. 2024, Phys. Rev. Res., 6, 033078, doi: 10.1103/PhysRevResearch.6.033078 Perego, A., Radice, D., & Bernuzzi, S. 2017, Astrophys. J. Lett., 850, L37, doi: 10.3847/2041-8213/aa9ab9 Pian, E., D’Avanzo, P., Benetti, S., et al. 2017, Nature, 551, 67, doi: 10.1038/nature24298 Piro, A. L., & Kollmeier, J. A. 2018, The Astrophysical Journal, 855, 103, doi: 10.3847/1538-4357/aaaab3 Pozanenko, A. S., Barkov, M. V., Minaev, P. Y., et al. 2018, The Astrophysical Journal Letters, 852, L30, doi: 10.3847/2041-8213/aaa2f6 Radice, D., Perego, A., Hotokezaka, K., et al. 2018, The Astrophysical Journal, 869, 130, doi: 10.3847/1538-4357/aaf054 Radice, D., Perego, A., Zappa, F., & Bernuzzi, S. 2018, ApJL, 852, L29, doi: 10.3847/2041-8213/aaa402 Ristic, M., Champion, E., O’Shaughnessy, R., et al. 2022, Phys. Rev. Res., 4, 013046, doi: 10.1103/PhysRevResearch.4.013046 Rosswog, S., Diener, P., Torsello, F., Tauris, T. M., & Sarin, N. 2024, MNRAS, 530, 2336, doi: 10.1093/mnras/stae454 Rosswog, S., & Korobkin, O. 2024, Annalen der Physik, 536, 2200306, doi: https://doi.org/10.1002/andp.202200306 Saha, S., Williams, M. J., Datrier, L., et al. 2024, The Astrophysical Journal, 961, 165, doi: 10.3847/1538-4357/ad02f4 Sarin, N., Omand, C. M. B., Margalit, B., & Jones, D. I. 2022, MNRAS, 516, 4949, doi: 10.1093/mnras/stac2609 Sarin, N., & Rosswog, S. 2024, The Astrophysical Journal Letters, 973, L24, doi: 10.3847/2041-8213/ad739d Sarin, N., H¨ ubner, M., Omand, C. M. B., et al. 2024, Monthly Notices of the Royal Astronomical Society, 531, 1203, doi: 10.1093/mnras/stae1238 Savchenko, V., Ferrigno, C., Kuulkers, E., et al. 2017, The Astrophysical Journal Letters, 848, L15, doi: 10.3847/2041-8213/aa8f94 Schlafly, E. F., & Finkbeiner, D. P. 2011, ApJ, 737, 103, doi: 10.1088/0004-637X/737/2/103 Shappee, B. J., Simon, J. D., Drout, M. R., et al. 2017, Science, 358, 1574, doi: 10.1126/science.aaq0186 Smartt, S. J., Chen, T.-W., Jerkstrand, A., et al. 2017, Nature, 551, 75, doi: 10.1038/nature24303 Soares-Santos, M., Holz, D. E., Annis, J., et al. 2017, The Astrophysical Journal Letters, 848, L16, doi: 10.3847/2041-8213/aa9059 Sutherland, W., Emerson, J., Dalton, G., et al. 2015, A&A, 575, A25, doi: 10.1051/0004-6361/201424973 Takami, H., Nozawa, T., & Ioka, K. 2014, ApJL, 789, L6, doi: 10.1088/2041-8205/789/1/L6 Tanaka, M., & Hotokezaka, K. 2013, ApJ, 775, 113, doi: 10.1088/0004-637X/775/2/113 Tanvir, N. R., Levan, A. J., Fruchter, A. S., et al. 2013, Nature, 500, 547, doi: 10.1038/nature12505 Tanvir, N. R., Levan, A. J., Gonz´ alez-Fern´ andez, C., et al. 2017, The Astrophysical Journal Letters, 848, L27, doi: 10.3847/2041-8213/aa90b6 Thielemann, F.-K., Arcones, A., K¨ appeli, R., et al. 2011, Progress in Particle and Nuclear Physics, 66, 346, doi: 10.1016/j.ppnp.2011.01.032 Troja, E., Piro, L., van Eerten, H., et al. 2017, Nature, 551, 71, doi: 10.1038/nature24290 Troja, E., Castro-Tirado, A. J., Becerra Gonz´ alez, J., et al. 2019, MNRAS, 489, 2104, doi: 10.1093/mnras/stz2255 Utsumi, Y., Tanaka, M., Tominaga, N., et al. 2017, Publications of the Astronomical Society of Japan, 69, 101, doi: 10.1093/pasj/psx118 Valenti, S., Sand, David, J., Yang, S., et al. 2017, The Astrophysical Journal Letters, 848, L24, doi: 10.3847/2041-8213/aa8edf Villar, V. A., Guillochon, J., Berger, E., et al. 2017, ApJL, 851, L21, doi: 10.3847/2041-8213/aa9c84 Virtanen, P., Gommers, R., Oliphant, T. E., et al. 2020, Nature Methods, 17, 261, doi: 10.1038/s41592-019-0686-2 Williams, M. J., McGinn, J., Stachurski, F., & Veitch, J. 2024, uofgravity/glasflow: v0.4.1, v0.4.1 Zenodo, doi: 10.5281/zenodo.13914483 Wollaeger, R. T., Fryer, C. L., Chase, E. A., et al. 2021, The Astrophysical Journal, 918, 10, doi: 10.3847/1538-4357/ac0d03 Yang, B., Jin, Z.-P., Li, X., et al. 2015, Nature Communications, 6, 7323, doi: 10.1038/ncomms8323

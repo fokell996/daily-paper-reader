@@ -6,47 +6,32 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-21
-- 运行时间：2026-08-21 20:42:53 UTC
+- 最新运行日期：2026-08-22
+- 运行时间：2026-08-22 20:32:31 UTC
 - 运行状态：成功
-- 本次总论文数：9
-- 精读区：5
-- 速读区：4
+- 本次总论文数：4
+- 精读区：1
+- 速读区：3
 
 ### 今日简报（AI）
-今日聚焦中子星与快速射电暴，精读两篇高分成果：安静脉冲星J1637−4642罕见三次自转突变，及活跃重复暴FRB 20240114A的多尺度记忆与状态转换。速读覆盖中子星模拟与振荡性质，适合关注致密天体物理的读者。建议从FRB 20240114A入手，理解重复暴的非随机行为。
-- 详情：[/202608/21/README](/202608/21/README)
+今日精读1篇、速读3篇，聚焦暴胀宇宙学与中子星物理。最值得关注的是格点标量-高斯-博内特单场暴胀模型（8.0分），另涉中子星吸积山脉、引力波约束的千新星预言及双星中子星踢腿速度。建议普通读者优先了解暴胀模型的格点模拟结论，再看中子星合并与吸积相关的天体物理现象。
+- 详情：[/202608/22/README](/202608/22/README)
 
 ### 精读区论文标签
-1. [Discovery of Three Glitches in the previously quiet pulsar PSR J1637$-$4642](/202608/21/2608.19555v1-discovery-of-three-glitches-in-the-previously-quiet-pulsar-psr-j1637-4642)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：报道并分析了脉冲星PSR J1637-4642的三次自转突变，探测其内部性质
-2. [Multi-scale Memory and Regime Shift in the Hyperactive Repeating FRB 20240114A](/202608/21/2608.19713v1-multi-scale-memory-and-regime-shift-in-the-hyperactive-repeating-frb-20240114a)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：快速射电暴爆发统计与记忆性，与辐射机制和起源相关
-3. [Universal Relations for Neutron Stars from Asymptotic Analysis](/202608/21/2608.19939v1-universal-relations-for-neutron-stars-from-asymptotic-analysis)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：中子星普适关系的解析起源，可直接用于状态方程不敏感测量的分析
-4. [On coordinate frames relevant for pulsar physics](/202608/21/2608.18501v1-on-coordinate-frames-relevant-for-pulsar-physics)  
+1. [Inflation on the lattice: scalar Gauss-Bonnet single field inflation](/202608/22/2608.20219v1-inflation-on-the-lattice-scalar-gauss-bonnet-single-field-inflation)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：面向脉冲星计时和天体测量的坐标框架
-5. [Testing Statistical Isotropy in the FRB Sky Distribution: A Selection-Function-Aware Framework](/202608/21/2608.20135v1-testing-statistical-isotropy-in-the-frb-sky-distribution-a-selection-function-aware-framework)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：快速射电暴天区分布的各向同性检验
+   evidence：利用当前脉冲星计时阵列观测约束标量Gauss-Bonnet暴胀及标量诱导引力波
 
 ### 速读区论文标签
-1. [Controlling artificial surface heating in neutron star simulations: Application to hybrid equations of state](/202608/21/2608.16945v2-controlling-artificial-surface-heating-in-neutron-star-simulations-application-to-hybrid-equations-of-state)  
+1. [Modelling mountains on accreting magnetized neutron stars](/202608/22/2608.17508v1-modelling-mountains-on-accreting-magnetized-neutron-stars)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：采用混合状态方程的中子星模拟，通过控制数值表面加热提高状态方程相关观测量的可靠性
-2. [Breakdown of Hydrodynamic Universality in Neutron Star Oscillations](/202608/21/2608.19334v1-breakdown-of-hydrodynamic-universality-in-neutron-star-oscillations)  
+   evidence：对吸积磁化中子星的四极‘山’建模，耦合磁应力、深壳加热与壳层弹性，与中子星内部物理及连续引力波源相关。
+2. [Probabilistic kilonova prediction from gravitational wave inferred binary neutron star parameters](/202608/22/2608.20262v1-probabilistic-kilonova-prediction-from-gravitational-wave-inferred-binary-neutron-star-parameters)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：中子星振荡与内部耗散理论
-3. [Modelling mountains on accreting magnetized neutron stars](/202608/21/2608.17508v1-modelling-mountains-on-accreting-magnetized-neutron-stars)  
+   evidence：利用引力波推断的中子星参数预测千新星，与中子星状态方程约束相关
+3. [The Kick Velocities of Neutron Stars in Binary Systems](/202608/22/2608.19690v1-the-kick-velocities-of-neutron-stars-in-binary-systems)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：吸积磁化中子星连续引力波的山脉形变模型
-4. [Bayesian constraints on quadratic $f(Q)$ gravity from the ADM mass of white dwarfs](/202608/21/2608.19257v1-bayesian-constraints-on-quadratic-fq-gravity-from-the-adm-mass-of-white-dwarfs)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：从白矮星质量-半径观测给出状态方程的贝叶斯约束，方法可迁移至中子星状态方程约束
+   evidence：用COMPAS做中子星双星族合成，比较含双中子星在内的轨道与kick，服务于射电脉冲星星族演化
 
 
 <div class="dpr-home-promo-card">
