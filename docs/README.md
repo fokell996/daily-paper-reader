@@ -6,32 +6,30 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-22
-- 运行时间：2026-08-22 20:32:31 UTC
+- 最新运行日期：2026-08-23
+- 运行时间：2026-08-23 20:20:05 UTC
 - 运行状态：成功
-- 本次总论文数：4
-- 精读区：1
+- 本次总论文数：3
+- 精读区：0
 - 速读区：3
 
 ### 今日简报（AI）
-今日精读1篇、速读3篇，聚焦暴胀宇宙学与中子星物理。最值得关注的是格点标量-高斯-博内特单场暴胀模型（8.0分），另涉中子星吸积山脉、引力波约束的千新星预言及双星中子星踢腿速度。建议普通读者优先了解暴胀模型的格点模拟结论，再看中子星合并与吸积相关的天体物理现象。
-- 详情：[/202608/22/README](/202608/22/README)
+今日速读3篇天体物理论文，聚焦中子星引力波与致密星内部结构。最值得关注的是X射线脉冲星Her X-1引力波信号建模（7.0分），以及吸积磁化中子星山脉形成机制。若想入门，建议从引力波探测与中子星物性关系的科普解读开始。
+- 详情：[/202608/23/README](/202608/23/README)
 
 ### 精读区论文标签
-1. [Inflation on the lattice: scalar Gauss-Bonnet single field inflation](/202608/22/2608.20219v1-inflation-on-the-lattice-scalar-gauss-bonnet-single-field-inflation)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：利用当前脉冲星计时阵列观测约束标量Gauss-Bonnet暴胀及标量诱导引力波
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Modelling mountains on accreting magnetized neutron stars](/202608/22/2608.17508v1-modelling-mountains-on-accreting-magnetized-neutron-stars)  
+1. [Modeling the Gravitational Wave Signal from the X-ray Pulsar Her X-1](/202608/23/2608.18343v1-modeling-the-gravitational-wave-signal-from-the-x-ray-pulsar-her-x-1)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：对吸积磁化中子星的四极‘山’建模，耦合磁应力、深壳加热与壳层弹性，与中子星内部物理及连续引力波源相关。
-2. [Probabilistic kilonova prediction from gravitational wave inferred binary neutron star parameters](/202608/22/2608.20262v1-probabilistic-kilonova-prediction-from-gravitational-wave-inferred-binary-neutron-star-parameters)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：利用引力波推断的中子星参数预测千新星，与中子星状态方程约束相关
-3. [The Kick Velocities of Neutron Stars in Binary Systems](/202608/22/2608.19690v1-the-kick-velocities-of-neutron-stars-in-binary-systems)  
+   evidence：X射线脉冲星Her X-1的进动定时参数用于引力波建模
+2. [Modelling mountains on accreting magnetized neutron stars](/202608/23/2608.17508v1-modelling-mountains-on-accreting-magnetized-neutron-stars)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：用COMPAS做中子星双星族合成，比较含双中子星在内的轨道与kick，服务于射电脉冲星星族演化
+   evidence：建立了吸积磁化中子星四极形变模型,关联磁场、加热与壳层弹性
+3. [An Analytical Two Incompressible Fluid Star with a Mixed Ordinary Dark Matter Core and an Ordinary Matter Envelope](/202608/23/2608.20185v1-an-analytical-two-incompressible-fluid-star-with-a-mixed-ordinary-dark-matter-core-and-an-ordinary-matter-envelope)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：解析相对论双流体星模型，含暗物质混合核，与中子星状态方程相关
 
 
 <div class="dpr-home-promo-card">
