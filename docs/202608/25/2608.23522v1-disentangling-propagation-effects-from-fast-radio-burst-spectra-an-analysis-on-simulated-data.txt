@@ -1,0 +1,976 @@
+Title: Disentangling propagation effects from Fast Radio Burst spectra: An analysis on simulated data
+
+URL Source: https://arxiv.org/pdf/2608.23522v1
+
+Published Time: Tue, 25 Aug 2026 02:23:45 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# Disentangling propagation e ff ects from Fast Radio Burst spectra: An analysis on simulated data 
+
+Aishwarya Kumar a, Fereshteh Rajabi b, Martin Houde a
+
+> aDepartment of Physics and Astronomy, The University of Western Ontario , 1151 Richmond Street, London, N6A 3K7, Ontario, Canada
+> bDepartment of Physics and Astronomy, McMaster University, 1280 Main Street West, Hamilton, L8S 4L8, Ontario, Canada
+
+Abstract 
+
+We present a methodology to decouple propagation e ff ects, specifically scattering and dispersion, from the intrinsic spectro-temporal properties of repeating Fast Radio Bursts. Utilizing the Triggered Relativistic Dynamical Model, and assuming superradi-ance as the emission mechanism, we generate simulated sub-bursts and inject controlled levels of scattering and residual dispersion. For each burst, we measure the sub-burst slope, defined as the trajectory of the centroids in the dynamic spectrum, and the char-acteristic duration of the burst profile. We then fit a modified sub-burst slope law to the resulting slope-duration measurements to recover the scattering timescale, residual dispersion measure, and other model parameters. Under the thin-screen approximation, the scattering timescale at 1 GHz is precisely recovered, typically to within ∼ 1 − 2% of the true value. In contrast, the residual dispersion is recovered with comparatively lower precision, with median absolute errors of ∼ 0.3−0.6 pc cm −3, reflecting its weaker constraint and degeneracy with an intrinsic parameter. Despite this, the modified sub-burst slope law successfully reproduces the spectro-temporal evolution and accurately constrains the scattering properties even for diverse intrinsic burst populations. These results demonstrate that our framework yields a tractable method for separating propagation-induced distortions from intrinsic emission characteristics to a meaningful degree, enabling more reliable inference of the physical properties of FRB sources. 
+
+Keywords: Radio transient sources, Interstellar scattering, Intergalactic medium, Computational astronomy 
+
+1. Introduction 
+
+Fast radio bursts are a form of highly energetic radio tran-sients of sub-second duration (Lorimer et al., 2007; Petro ff 
+
+et al., 2019; Cordes and Chatterjee, 2019). Observations have revealed distinct characteristics that di ff erentiate these events from other radio-frequency transients, such as Galactic pul-sars. FRBs are broadly classified as either repeating or non-repeating. These two categories appear to have distinct burst morphologies and properties, potentially indicating di ff erent progenitor sources (Hashimoto et al., 2020; CHIME /FRB Col-laboration et al., 2021; Pleunis et al., 2021; Zhang, 2023). Par-ticularly, repeating FRBs display remarkably complex time-frequency structures that are intrinsic to the bursts. A tempo-rally resolved dynamic spectrum of such bursts may reveal ei-ther a single, broadband pulse or multiple, narrowly confined components known as sub-bursts. Two key observables de-scribe their spectral structure: the drift rate and the sub-burst slope. Drift rate is the downward drift in frequency between di ff erent resolved components of a burst. Individual compo-nents of a burst, or sub-bursts, also show this downward drift in frequency, which constitutes the sub-burst slope. However, rare exceptions exhibiting upward frequency drift, sometimes referred to as “happy trombone” bursts, have also been reported in FRB 20201230B (Faber et al., 2024). The spectro-temporal features extracted from the burst morphology can be utilized to inform the nature of the emission process. Based on their energies, timescales, repeatability, and other observational features, there are a range of progenitor models proposed that usually involve a compact object. One of them is the Triggered Relativistic Dynamical Model (TRDM) pro-posed by Rajabi et al. (2020), which we use in our analysis. The model predicts an inverse relationship between the sub-burst slope and duration, an inverse scaling of duration with frequency, and a quadratic dependence of the sub-burst slope on frequency. These predictions have been substantiated across 10 sources (with over 1000 bursts) spanning frequencies from 149 to 7500 MHz by Rajabi et al. (2020); Chamma et al. (2021); Wang et al. (2022); Chamma et al. (2023); Jahns et al. (2023); Brown et al. (2024); Chamma et al. (2025). Nevertheless, some sub-bursts deviate from these trends, particularly at lower fre-quencies, suggesting the presence of a frequency dependent propagation or emission process. One such process capable of producing these spectral distortions in the dynamic spectrum is scattering. The extragalactic nature of FRBs exposes them to the plasma inhomogeneities in the intervening galactic and inter-galactic regions which introduces a frequency dependent variation in the burst profile. As a consequence, even an intrin-sically narrow burst would appear to be temporally smeared. This asymmetrical broadening of the burst profile can skew the relationships between the observed parameters. Another impor-tant propagation e ff ect is imperfect de-dispersion, which intro-duces residual dispersive delays that modify the burst structure, particularly the measured sub-burst slope. Kumar et al. (2026) (hereafter, Paper I) established a theoret-ical framework to assess the impact of the propagation e ff ects arXiv:2608.23522v1 [astro-ph.HE] 24 Aug 2026 on the sub-burst slope law, demonstrating that scattering and dispersion lead to clear deviations from the ideal relation pre-dicted by the TRDM. In the present work, we test this frame-work using simulated bursts to assess its ability to recover phys-ical parameters under controlled conditions. In a forthcoming study (Paper III), we will apply the algorithm to a sample of real repeating FRB data. Given the limited availability of observa-tions spanning broad frequency ranges, simulations provide an essential proof-of-concept prior to application to real data. Our paper is structured as follows. In Section 2, we de-scribe the emission model used to simulate FRB-like bursts and the procedure to introduce scattering and dispersion. In Sec-tion 3, we detail the construction of the simulated sub-bursts and the injection of dispersion and scattering e ff ects. We also summarize the measurement pipeline used to extract sub-burst slopes and durations from the simulated data, and present the framework for simultaneously fitting these observables using the modified sub-burst slope law. Section 4 discusses the re-covery of key parameters, such as the residual dispersion, scat-tering timescales, and intrinsic burst properties, and assesses the robustness of the methodology. The key insights and results of our analysis are summarized in Section 5. 
+
+2. Theoretical Framework 
+
+2.1. Superradiance model of emission 
+
+We employ the semi-classical model of superradiance (SR) to generate pulses that match the timescales and morphology of typical FRB emissions. SR is a coherent collective sponta-neous emission process observed in a macroscopic ensemble of 
+
+N atoms (or molecules; but we use the former for our discus-sion) initially having a population inversion between the two levels of a given spectral transition. In such an ensemble, inter-actions through a common radiation field can establish correla-tions between the atomic dipoles. The system then behaves as a single entity emitting radiation coherently via enhanced co-operative spontaneous decay (Dicke, 1954). The intensity of emission is proportional to N2, in contrast to the spontaneous emission emanating from a group of independent atoms, where the intensity is proportional to N. Furthermore, it is found that the characteristic timescale of SR emission, TR, scales as 1 /N
+
+times the spontaneous emission timescale ( τsp ) of the single-atom transition. While SR has been an intense subject of research in the quantum optics community for more than fifty years (Gross and Haroche, 1982; Benedict et al., 1996), Rajabi and Houde (2016a) laid down the necessary framework for applying SR to astrophysical domains, such as for explaining powerful flar-ing events in maser-hosting regions (Rajabi and Houde, 2016b; Rajabi et al., 2019; Rajabi and Houde, 2020a; Rashidi et al., 2025, 2026). The dynamics of SR emission is commonly mod-eled through the semi-classical Maxwell-Bloch equations that trace the evolution of the population inversion (i.e., the di ff er-ence between the population densities of the upper and lower energy levels of the transition), polarization and electric field in long cylindrical samples (Rajabi and Houde, 2016a). Ra-jabi and Houde (2020b) describes the conditions under which a sample of inverted atoms or molecules in a masing region can undergo SR. Briefly, SR occurs when ( i) the column density of the population inversion exceeds a critical threshold ( ii ) the timescale of relaxation ( T1) and dephasing ( T2), for example related to collisions, are longer than the characteristic timescale of SR emission ( TR), and ( iii ) atoms participating in the process should sustain su ffi cient velocity coherence to interact cooper-atively (as is required for the masing action). For regions harboring population inversion below the criti-cal threshold, SR could still ensue with the help of a triggering pulse. This triggering pulse can either (i) increase the popu-lation inversion of the sample (e.g., via a “pump” acting at a shorter wavelength; Gray 2012) or, (ii) inject coherence in the system at the frequency of the transition to e ff ectively lower the critical column density level. The sample needs some time to build up the coherence. Thus, we define the delay time, τ′
+
+> D
+
+,as the time between the injection of the trigger at the input of the sample and the onset of SR pulse at the output minus the propagation time within it (i.e., τ′ 
+
+> D
+
+is a retarded-time inter-val in the source’s reference frame). For FRBs, the triggering source could be a young and energetic radio pulsar, a magnetar or even a persistent radio source. Houde et al. (2019) devel-oped and used this framework to model bursts emanating from FRB121102A. 
+
+2.2. Triggered Relativistic Dynamical Model (TRDM) 
+
+In this model, we have a triggering source and an emitting source, i.e., the FRB source, aligned along the line of sight of the observer. The emitting source is moving relativistically ei-ther towards or away from the observer. The motion of particles within the source’s reference frame is assumed to be mildly rel-ativistic with some level of velocity coherence. The arrival of the triggering pulse induces favorable conditions for superradi-ant emission, and after some delay τ′
+
+> D
+
+, the source radiates an intense burst of coherent radio emission (see Figure 1 and 2 of Rajabi et al. 2020 for a schematic and temporal sequence of the model). We adopt the convention that primed quantities rep-resent source-frame values, while unprimed quantities denote observer-frame measurements. Although SR is used here as the emission mechanism of the source, the TRDM formalism is more general and may also apply to other coherent emission processes subject to the same relativistic dynamics. Mildly relativistic motions within the emitting region pro-duce frequency-dependent temporal variations across a single sub-burst, transforming an intrinsically narrowband emission process into the broad observed spectro-temporal structure of FRBs. Under these assumptions, Rajabi et al. (2020) showed that the frequency normalized sub-burst slope and duration obey the relation 1
+
+νobs 
+
+dνobs 
+
+dtD
+
+= − Atw
+
+, (1) where νobs , tD, tw are the frequency, delay and duration of the pulse in the observer’s frame. This expression constitutes the sub-burst slope law. The parameter 
+
+A = τ′
+
+> w
+
+τ′
+
+> D
+
+= tw
+
+tD
+
+(2) 2is a systemic quantity defined as the ratio of the intrinsic du-ration to the intrinsic delay. Fits of this law to observational data have been performed for several repeating FRB sources (Chamma et al., 2021, 2023; Brown et al., 2024; Chamma et al., 2025), yielding values of A typically in the range of 0 .08 − 0.3. The intrinsic pulse is subjected to relativistic transformations, such that the delay and duration measured in the observer’s frame are related to the corresponding intrinsic source-frame quantities by 
+
+tD = τ′
+
+> D
+
+ν′
+
+νobs 
+
+(3) 
+
+tw = τ′
+
+> w
+
+ν′
+
+νobs 
+
+(4) where ν′ denotes the emission frequency. Here, the observed frequency, νobs , is related to the source-frame emission fre-quency, ν′, through the relativistic Doppler factor, 
+
+νobs = ν′
+
+s
+
+1 + β
+
+1 − β . (5) where β is the velocity of the emitting region relative to the observer in units of the speed of light (Rajabi et al., 2020). Equation (4) therefore implies that bursts detected at higher frequencies would appear shorter in duration. Several obser-vational studies have demonstrated this duration-frequency de-pendence (Chamma et al., 2023; Brown et al., 2024; Chamma et al., 2025). These works report a characteristic scaling param-eter of τ′
+
+> w
+
+ν′ ≡ t0 ≈ 1500 ms MHz, albeit with some statistical scatter. In addition, Chamma et al. (2025) suggested that ultra-FRBs (Nimmo et al., 2021; Snelders et al., 2023) may follow a di ff erent scaling, potentially forming a distinct population in the tw–ν parameter space. Observational studies (Houde et al., 2019; Rajabi et al., 2020; Chamma et al., 2023; Brown et al., 2024) have further shown that the bandwidth of individual sub-bursts scales approxi-mately linearly with their central frequency, such that 
+
+∆νobs ≃ Bννobs (6) with νobs located at the central frequency of the sub-burst and 
+
+Bν, an empirical proportionality constant, typically in the range 0.14 − 0.16. Taken together, these relations form the basis for constructing wideband emission via Doppler broadening of an intrinsically narrow SR pulse, which for this study is centered at 1420 MHz in the source frame. 
+
+2.3. Scattering 
+
+Multipath propagation of radio waves through inhomoge-neous plasma causes asymmetrical temporal broadening of pulse profile. The observed signal can therefore be described as the convolution of the intrinsic pulse with the impulse response of the scattering medium. To model this e ff ect, we adopt the thin-screen approximation, in which the scattering material is assumed to be confined to a localized region along the line of sight. Under this approximation, the pulse broadening func-tion is represented by a one-sided exponentially decaying pro-file (Cronyn, 1970; Rickett, 1977) 
+
+S (ν, t) = 1
+
+τsc 
+
+exp − t
+
+τsc 
+
+!
+
+H(t), (7) where H(t) is the Heaviside step function. The power law de-pendence of the scattering time-scale τsc on the observing fre-quency is given by 
+
+τsc = Λ sc 
+
+ ν
+
+1 GHz 
+
+−n
+
+, (8) where, n is the scattering index and Λsc is the scattering constant whose value depends on the fluctuations in electron density, the scale size of the scattering medium, and the distance to the ob-ject (Lorimer and Kramer, 2012). Equivalently, it is defined as the scattering timescale evaluated at an observing frequency of 1 GHz. The observed pulse, I(ν, t), is generated through the convo-lution ( ∗) of the superradiant source profile, I0(ν, t), with the scattering function 
+
+I(ν, t) = I0(ν, t) ∗ S (ν, t). (9) As developed in Paper I, we approximate the intrinsic FRB signal as a one-sided exponential, 
+
+I0 (ν, t) = F0
+
+tw
+
+exp 
+
+" −(t − tD)
+
+tw
+
+#
+
+H(t), (10) where tD and tw are the delay and duration as mentioned be-fore, To ease the notation, we omit the Heaviside function from here on forward. Although exact FRB and SR pulse profiles can exhibit more complex temporal structure (see Fig. A.6), we adopt a one-sided exponential approximation for its simplicity and analytical tractability. However, our methodology is appli-cable, in principle, to any intensity profile. The convolution of this profile with scattering is 
+
+I (ν, t) = F0
+
+τsc − tw
+
+(
+
+exp 
+
+" −(t − tD)
+
+τsc 
+
+#
+
+− exp 
+
+" −(t − tD)
+
+tw
+
+#) 
+
+. (11) For the condition where τsc ≈ tw, we use the L’Hôpital’s rule to find the limiting solution lim 
+
+> τsc →tw
+
+I (ν, t) = F0
+
+(t − tD)
+
+t2w
+
+exp 
+
+" −(t − tD)
+
+tw
+
+#
+
+. (12) Equations (11) and (12) are used to fit our generated sub-burst profiles. Although scintillation e ff ects are present in observed bursts, for simplicity we have not included them in our analysis. 
+
+2.4. Residual dispersion 
+
+Dispersion is typically recovered with appreciable precision using both coherent and incoherent dedispersion techniques (Petro ff et al., 2019). However, some residual dispersion can persist and introduce bias in measured burst properties, such as 3the sub-burst slope. We define this residual dispersion, ∆DM, following the convention introduced in Paper I as 
+
+∆DM = DM true − DM est , (13) where DM true is the true DM of the source and DM est 
+
+is the value estimated from observational techniques such as structure-maximizing DM, or signal-to-noise maximizing dedispersion. Therefore, under our convention, ∆DM < 0corresponds to over-dedispersion (over-correction), whereas 
+
+∆DM > 0 corresponds to under-dedispersion (under-correction). The resulting dispersive delay present across the sub-burst bandwidth is given by 
+
+∆tDM = a ∆DM 
+
+ 1
+
+ν2 − 1
+
+ν2ref 
+
+ ms , (14) where a = 4.148 806 4239(11) GHz 2 cm 3 pc −1 ms (Kulkarni, 2020) and νref is the reference frequency. In practice, νref can be set to the highest frequency present in a dynamic spectrum or to infinity. In our model, this residual delay is incorporated by adding the ∆tDM term to relativistic delay tD in Equation (11). 
+
+3. Methodology 
+
+3.1. Simulating superradiance sub-bursts 
+
+We simulate the intrinsic emission using the formalism de-scribed in Section 2.1, adopting the 21-cm atomic hydrogen transition, although the choice is not necessarily limited to it. Other molecular transitions capable of sustaining a population inversion, such as the 1612 /1665 /1667 /1712 and 6030 MHz OH lines (Houde et al., 2018, 2019), are also candidates within this framework. We vary several physical parameters, such as the number density, relaxation and dephasing timescales, the strength and duration of the triggering pump signal, to generate a set of 15 distinct SR pulses. These pulses di ff er in duration, pulse shape, and delay time and are constructed to reproduce the characteristic timescales of a typical FRB emission. The re-sulting diversity of intrinsic profiles is reflected in Figure A.6. To generate sub-bursts from individual pulses, we apply the relativistic Doppler transformation defined in Equation (5) to shift the intrinsic 21-cm hydrogen line ( ν′ ≈ 1420 MHz) into di ff erent observing bands. In particular, we consider four cen-tral observing frequencies: 800 MHz, 1420 MHz, 4660 MHz, and 6030 MHz. The bandwidth of each band is determined using Equation (6). Observational measurements, however, ex-hibit some scatter around the nominal value of Bν = 0.16. To account for this variability, we introduce a Gaussian scatter with 
+
+σ = 0.01 in our simulations to reproduce the statistical spread in the observed bandwidths. This procedure generates the wide-band structure characteristic of a typical sub-burst, yielding a total of 60 sub-bursts, 15 in each of the four frequency bands. We reiterate that the TRDM is not restricted to a specific emission mechanism and may be applied to any model capable of producing a narrowband emission that exhibits the features of FRBs. Thus, any pulse emitted at some central frequency can be transformed to any desired frequency using Doppler shift, assuming relativistic motions in the source. Our SR-based emission model (Section 2.1) incorporates a trigger and a delay and naturally fits the framework of TRDM. We subsequently apply five distinct scattering constants: 
+
+Λsc ,true = 2 ms, 5 ms, 10 ms, 15 ms, 20 ms (at 1 GHz) into each sub-bursts through Equation (9). Together with the unscat-tered case, this results in a total of 360 simulated bursts. White Gaussian noise is then added to each burst to model random in-strumental and thermal noise present in radio observations. A representative subset of 24 sub-bursts is shown in Figure A.7. Up to this stage, our pipeline produces bursts with and with-out scattering while assuming a residual dispersion measure of ∆DM = 0.0 pc cm −3. To incorporate residual dispersion, we use the dedispersion routine in FRBGUI (Chamma et al., 2023) to inject a grid of ∆DM values spanning −5.0 pc cm −3 to 5.0 pc cm −3 in steps of 0 .5 pc cm −3. We then repeat the mea-surements of the sub-burst slope and duration for each sub-burst at every injected ∆DM trial. Although certain parameters (e.g., the scattering timescale or residual dispersion) are known a priori for the simulated bursts, the methodology developed hereafter is entirely gen-eral and does not rely on prior knowledge of these quantities. The known parameters are used only a posteriori to validate and quantify the performance of our methods. 
+
+3.2. Fits to individual sub-bursts 3.2.1. Burst pre-processing 
+
+To identify frequency channels that contain su ffi cient signal, we apply a Savitzky-Golay (SG) filter (Press et al., 2007) as a pre-processing step. The filter suppresses high-frequency noise while preserving the underlying burst morphology, thereby augmenting the contrast between signal-bearing and noise-dominated channels and enabling more accurate channel iden-tification. Here, the S /N is defined as the ratio of the peak am-plitude to the standard deviation of the o ff -pulse noise. Chan-nel selection is performed on the smoothed data using a fixed threshold of S /NSG > 10 ensuring that only channels with suf-ficient signal are retained. Importantly, all measurements hereafter are carried out on the original (unsmoothed) data to avoid introducing biases in the inferred burst properties. The smoothing is used solely for detection and does not a ff ect the quantitative analysis. Alter-native channel-selection strategies may likewise be employed, provided they reliably distinguish intrinsic pulse emission from noise or interference. 
+
+3.2.2. Sub-burst slope measurement 
+
+After pre-processing, the selected frequency channels are grouped into sets of four consecutive channels, and the inten-sities within each group are summed to produce a frequency-integrated pulse profile for each sub-band. We then fit the pro-file with our model, given in Equation (11), using non-linear least-squares minimization implemented via the scipy pack-age (Gommers et al., 2025). Although these fits appear visually credible, non-linear multi-exponential models are intrinsically 4ill-conditioned due to parameter non-identifiability and degen-eracy. In particular, when τsc ≈ tw, the model parameters be-come strongly correlated, leading to non-unique solutions and unreliable uncertainty estimates. Our algorithm switches to fit Equation (12) in this limit. However, our primary quantity of interest is the centroid of the pulse profile, a derived observ-able that remains well constrained by the data even when the underlying model parameters are not. To get reliable estimates of centroid uncertainties, we marginalize over all model profiles consistent with the data us-ing Goodman & Weare’s A ffi ne invariant Markov Chain Monte Carlo (MCMC) sampler implemented within the emcee pack-age (Foreman-Mackey et al., 2013). For each sub-band, an ensemble of acceptable model realizations is generated, from which the posterior distribution of the centroid is computed. The centroids of the sub-bands are measured using 
+
+tc =
+
+R ∞ 
+
+> 0
+
+t · I(ν, t) dt 
+
+R ∞ 
+
+> 0
+
+I(ν, t)dt , (15) following Paper I. The mean of the centroid posterior is adopted as the centroid measurement, while the standard deviation pro-vides the associated uncertainty. This approach naturally ac-counts for parameter degeneracies and yields reliable uncertain-ties on the derived quantity of interest. After obtaining cen-troids across all sub-bands spanning the burst bandwidth, we perform an orthogonal distance regression (ODR) (Gommers et al., 2025) to determine the sub-burst slope from the centroid trajectory. The burst duration, defined as the square root of the second central moment, 
+
+λ2(ν) =
+
+R ∞ 
+
+> 0
+
+(t − tc)2 · I(ν, t) dt 
+
+R ∞ 
+
+> 0
+
+I(ν, t) dt , (16) is measured at the central frequency of the sub-burst as the mean of the corresponding MCMC posterior distribution. The uncertainty in duration is taken as the standard deviation of that distribution. These measurements are repeated across the ∆DM values. 
+
+3.3. Fits to the sub-burst slope law 
+
+After obtaining the measurements, we group the sub-bursts into six populations based on their injected scattering constant 
+
+Λsc ,true . This classification rests on the astrophysical assump-tion that sub-bursts originating from a common progenitor tra-verse the same intervening medium, thereby experiencing a consistent scattering environment. The corresponding scatter-ing timescale varies with frequency for a particular source, ac-cording to Equation (8). Within each population, we model the (frequency-normalized) sub-burst slope using the modified law derived in Paper I, 
+
+* 1
+
+ν
+
+dν
+
+dt c
+
++
+
+> ν0
+
+= − 1
+
+∆ν
+
+Z ν0+∆ ν/ 2
+
+> ν0−∆ν/ 2
+
+dν
+
+tD + tw + 2∆tDM + nτsc 
+
+, (17) where we fix the scattering index to n = 4.0 under the thin screen approximation. Throughout this work, “sub-burst slope” refers to the frequency normalized quantity, unless explicitly noted otherwise. The sub-burst duration is obtained by substituting Equa-tion (11) into Equation (16), yielding 
+
+λc =
+
+q
+
+t2w(ν0) + τ2sc (ν0). (18) For each population, we repeat the measurements over the aforementioned range of ∆DM. To ensure that the retained measurements remain physically consistent with the assump-tions of the TRDM framework, we exclude sub-bursts that fail quality-control criteria. Specifically, we discard measurements for which no reliable fit is obtained, those with positive sub-burst slopes, those with relative slope uncertainties exceeding 40%, and those for which the measured normalized slope is not significantly larger than its associated uncertainty. These filter-ing criteria are implemented within FRBGUI (Chamma et al., 2023), which is used to construct the measurement data frames used in our analysis. The remaining sub-burst slopes and du-rations are then jointly fit to Equations (17) and (18) using the scipy non-linear least-squares package (Gommers et al., 2025). The simultaneous fitting of sub-burst slopes and durations across frequency helps break the degeneracy between τsc and 
+
+tw, leading to improved constraints on the scattering timescale, residual dispersion, intrinsic width, and other parameters enter-ing Equation (17). The recovered parameters are then compared with their true values to assess the accuracy of the method. 
+
+4. Results and Discussion 
+
+Having constructed a population of simulated FRBs both with and without propagation e ff ects, we now apply the modi-fied sub-burst slope law to evaluate how accurately these quan-tities can be recovered from the observed burst properties. The fitting procedure treats the A-parameter (Equation 2), the intrinsic timescale t0 = τ′
+
+> w
+
+ν′ (as discussed after Equation 5), the residual dispersion ( ∆DM meas ), and the scattering constant (Λsc ,meas ) as free parameters in Equation (17). Hereafter, the true values are denoted by ∆DM true and Λsc ,true , while the corre-sponding values recovered by our fitting procedure are denoted by ∆DM meas and Λsc ,meas .The model parameters are initialized at A0 = 0.12, t0,0 =
+
+1500 ms MHz, Λsc ,0 = 1.0 ms, and ∆DM 0 = 0.0. These pa-rameters are constrained within physically motivated bounds: 0.05 ≤ A ≤ 0.30, 1000 ≤ t0 ≤ 2500 ms MHz, 0 ≤ Λsc ≤ 50 ms, and −5 pc cm −3≤ ∆DM ≤ 5 pc cm −3. These limits ensure nu-merical stability and exclude unphysical solutions. We verify that the recovered parameters lie well within these bounds, in-dicating that the results are not driven by boundary e ff ects. For the remainder of the analysis, we set the bandwidth to 
+
+∆νobs ≃ 0.16 νobs (Equation 6). We define νobs as the cen-ter frequency of the selected frequency channels after burst-preprocessing. Tests performed by varying the proportionality 50.2 0.5 125820 50                   
+
+> Sub-burst Duration  c [ms]  sc, true = 0 ms
+> data model fit
+> sc, true = 20 ms
+> data model fit
+> 1000 2000 3000 4000 6000
+> Frequency obs (MHz)
+> 10 2
+> 10 1
+> 10 0
+> Sub-burst Slope  |d obs
+> dt D |(1/  obs ) (ms  1)
+> 1000 2000 3000 4000 6000
+> Frequency obs (MHz) Figure 1: Sub-burst duration (top) and sub-burst slope (bottom) as a function of frequency for bursts without scattering (left panels) and a scattering constant
+> Λsc ,true =20 .0 ms (right panels). The simulated data are shown as solid circles, while the model fits to the data are indicated by black crosses.
+
+constant Bν in the range 0 .1 − 0.2 resulted in quantitatively sim-ilar parameter estimates and associated uncertainties. 
+
+4.1. Interpretation of Fits in the Slope-Duration Plane 
+
+We present our results in the sub-burst slope-duration plane, rather than as separate functions of frequency, as this represen-tation provides a compact visualization of the burst evolution and enables direct comparison with previous studies. We note, however, that the fitted relations are not expected to pass exactly through the individual data points in this plane. This behavior arises primarily because the fitting proce-dure is performed jointly in the sub-burst slope-frequency and duration-frequency domains, rather than directly in the slope-duration plane. In the standard TRDM framework, Equation (1) implies a simple inverse dependence on the intrinsic timescale, with tw ∝ ν−1, such that the sub-burst slope-duration relation directly characterizes the burst properties. However, in the presence of propagation e ff ects, both the measured sub-burst slope and duration acquire additional frequency dependence through contributions from scattering and residual dispersion. The slope-duration relation therefore represents a projection of the underlying frequency-dependent fits, rather than the space in which the optimization is performed. An additional source of scatter stems from the intrinsic di-versity of the simulated burst population. Each population is constructed from 15 distinct SR profiles generated with di ff er-ent intrinsic parameters, producing variations in burst morphol-ogy and in quantities such as A and t0. Consequently, the fitted relations trace the aggregate behavior of the population rather than the properties of individual sub-bursts. To illustrate this, Figure 1 shows the measured sub-burst du-rations and slopes as functions of frequency, i.e., in the space where the fitting procedure is performed. In the absence of scat-tering ( Λsc ,true = 0.0 ms), we observe a broad scatter of data points at a particular frequency due their intrinsically di ff erent SR profiles. When scattering is introduced ( Λsc ,true = 20 .0 ms), it causes a strong frequency-dependent distortion of the profile that is most pronounced at lower frequencies, where it domi-nates over intrinsic timescales. This leads to a tighter clustering of sub-bursts and a closer alignment with the fitted relation. In contrast, at higher frequencies, where propagation e ff ects are weaker and intrinsic properties are retained, the population ex-hibits a broader spread even for a large scattering timescale. The fitted relation (denoted by black crosses) therefore repre-sents the aggregate behavior of the population, rather than the properties of individual sub-bursts. These considerations should therefore be kept in mind when interpreting the sub-burst slope-duration relations presented in Figures 2, 4, and 5. 
+
+4.2. Scattering-exclusive analysis 
+
+We begin by considering simulated sub-bursts that include scattering but no residual dispersion. Although dispersive de-lays are absent from the simulated data, ∆DM meas is retained as a free parameter in the modified sub-burst slope law. This al-lows us to test whether the fitting procedure can reliably distin-guish dispersive e ff ects from other contributions, and to eval-uate its likelihood of recovering non-zero ∆DM meas in its ab-sence. Figure 2 shows the modified sub-burst slope-duration rela-tion for six populations constructed with di ff erent scattering constants. Each panel corresponds to a fixed value of Λsc ,true ,with ∆DM true = 0.0 pc cm −3 in all cases. The most notable trend is the reduction in the normalized sub-burst slope with increasing Λsc ,true , which is more pronounced at low frequen-cies (or longer duration) where the scattering contribution is largest. In the scattering-dominated limit, characterized by 
+
+nτsc ≫ tD+tw+2∆tDM , the slope evolution is governed primarily by scattering rather than by the intrinsic timescales. As Λsc ,true 
+
+increases, this condition is satisfied over an increasingly broad frequency range, producing a visible transition in the slope-duration relation from a scattering-subdominant to a scattering-dominated regime. This transition is indicated by the blue up-ward arrows in Figure 2. To identify its location, we define the transition frequency, νκ, as the point at which the curvature of the trajectory in the logarithmic slope-duration plane is maxi-mized. The curvature of a two-dimensional parametric curve is given by 
+
+κ = x′y′′ − y′ x′′ 
+
+(x′2 + y′2)3/2 (19) where x = log λc and y = log [(1 /ν ) |dν/ dt c|] (Bancho ff and Lovett, 2022). Here, x′ ≡ dx /dν, y′ ≡ dy /dν, x′′ ≡ d2 x/dν2,and y′′ ≡ d2y/dν2, with all derivatives evaluated numerically along the model curve. We find that νκ shifts to higher frequen-cies, or equivalently shorter durations, as Λsc ,meas increases. For example, νκ ≈ 1200 MHz for Λsc ,meas = 2.1±0.021 ms, whereas 
+
+νκ ≈ 2600 MHz for Λsc ,meas = 20 .0 ± 0.055 ms. The scattering constant is recovered with high precision across all simulations, with a median absolute error of 0 .07 ms 610 2                                                                          
+
+> 10 1
+> 10 0
+> A= 0.14 ± 0.0069 ,
+> t0= 2017 ± 11 ms MHz ,
+> sc, meas = 0.41 ± 0.032 ms ,
+> sc, true = 0.0 ms ,
+> DM meas =0.33 ± 0.11 pc cm 3
+> DM true = 0.00 pc cm 3
+> = 709 MHz
+> A= 0.124 ± 0.0024 ,
+> t0= 1945 ± 14 ms MHz ,
+> sc, meas = 2.1 ± 0.021 ms ,
+> sc, true = 2.0 ms ,
+> DM meas =0.62 ± 0.04 pc cm 3
+> DM true = 0.00 pc cm 3
+> = 1238 MHz
+> A= 0.137 ± 0.0054 ,
+> t0= 2070 ± 21 ms MHz ,
+> sc, meas = 5.1 ± 0.061 ms ,
+> sc, true = 5.0 ms ,
+> DM meas =0.68 ± 0.11 pc cm 3
+> DM true = 0.00 pc cm 3
+> = 1629 MHz
+> 10 010 110 2
+> 10 2
+> 10 1
+> 10 0
+> A= 0.134 ± 0.0052 ,
+> t0= 1928 ± 10 ms MHz ,
+> sc, meas = 9.9 ± 0.047 ms ,
+> sc, true = 10.0 ms ,
+> DM meas =0.31 ± 0.22 pc cm 3
+> DM true = 0.00 pc cm 3
+> = 2087 MHz
+> 10 010 110 2
+> A= 0.157 ± 0.0075 ,
+> t0= 2026 ± 9 ms MHz ,
+> sc, meas = 15 ± 0.057 ms ,
+> sc, true = 15.0 ms ,
+> DM meas = 0.21 ± 0.20 pc cm 3
+> DM true = 0.00 pc cm 3
+> = 2342 MHz
+> 10 010 110 2
+> A= 0.0996 ± 0.0028 ,
+> t0= 2047 ± 10 ms MHz ,
+> sc, meas = 20 ± 0.055 ms ,
+> sc, true = 20.0 ms ,
+> DM meas =1.36 ± 0.16 pc cm 3
+> DM true = 0.00 pc cm 3
+> = 2639 MHz
+> 1000 2000 3000 4000 5000 6000
+> Frequency (MHz)
+
+Sub-burst Duration c [ms] 
+
+> Sub-burst Slope  |d obs
+> dt D |(1/  obs ) (ms  1)
+
+Figure 2: Fit to the modified sub-burst slope (Equation 17) and duration (Equation 18) following the procedure outlined in Section 3.3. The scattering timescale is varied, while no residual dispersion is present in the bursts. The legend reports the parameter values recovered from the fitting procedure. The true values of the residual dispersion and scattering timescale are denoted by the subscript “true,” while the measured values are labeled “meas.” The blue arrows reflect the frequency at which the slope-duration curve attains maximum curvature, as defined in Equation (19). 
+
+and a median absolute deviation (MAD) of 0 .02 ms, corre-sponding to a fractional accuracy of 1 .3 ± 0.9%. By contrast, the recovery of residual dispersion shows a systematic o ff set even though ∆DM true = 0 pc cm −3. The median absolute error in ∆DM meas is 0 .48 pc cm −3, with a MAD of 0 .18 pc cm −3, in-dicating that ∆DM is only weakly constrained by the modified sub-burst slope law in the scattering-exclusive case. The recovery of the A-parameter is more di ffi cult to inter-pret because the simulated SR profiles are intrinsically diverse. Since no single intrinsic value of A applies to the full popu-lation, the recovered value represents an e ff ective population average with inherent scatter. Across the six simulated popula-tions, the median recovered value of A is 0 .135, with a MAD of 0.012. For the largest scattering strength, Λsc ,true = 20 ms, the recovered value of A decreases to 0 .0996, a reduction of ∼ 26% relative to the population median. This large variance in the recovered A parameter, alongside the non-trivial recovery of a finite residual dispersion in its absence, can be understood in terms of the following e ff ects: 1. Relative importance of the scattering timescale: As the scattering strength increases, the scattering-dominated regime extends to higher frequencies (as evident by in-creasing νκ). A large fraction of sub-bursts therefore pri-marily constrain Λsc , leaving fewer sub-bursts in the intrin-sic regime where the slope law remains sensitive to A. The constraining power on A is consequently reduced. In ad-dition, scattering causes a reduction in the measured sub-burst slope magnitude across the band, including a mild suppression at the highest frequencies. The optimizer can partially accommodate this broadband reduction in slope magnitude by increasing the intrinsic drift timescale tD, or equivalently by decreasing A (refer Equation 2) in Equa-tion (17). As a result, the recovered value of A becomes systematically lower at large scattering timescales, despite the accurate recovery of Λsc .2. Degeneracy between ∆DM and the A −parameter: The ν−1
+
+and ν−2 contributions of tD and ∆tDM , which constrain 
+
+A and ∆DM, respectively, can partially mimic one an-other in the slope-law denominator (Equation 17) over a finite bandwidth, resulting in an inherent degeneracy be-tween them. In the absence of true dispersive delays, 
+
+∆DM becomes a redundant parameter, leading to an over-parameterized model in which the fit explores coupled A-
+
+∆DM solutions that produce comparable residuals, rather than converging to ∆DM = 0 pc cm −3. In particular, rel-atively steep slopes in the mid-to-high frequency regime (2.5-6 GHz) may be reproduced by an over-dedispersed solution ( ∆DM < 0), while a reduced value of A partially compensates for this steepening by increasing tD (Equa-tion 2). This combination can yield a better global fit across the band than a zero-DM solution. If we remove 7the ∆tDM term in Equation (17), an equivalent steepen-ing would instead be achieved by increasing A, which re-duces the intrinsic delay tD and thus the overall denomi-nator. However, because scattering still produces a global reduction in the slope magnitude, the recovered A does not return fully to the intrinsic population median. Thus, in the reduced model, A remains slightly biased at large scat-tering timescales, while in the full model the additional freedom in ∆DM makes the two parameters non-unique. 
+
+4.2.1. TRDM sub-burst slope law under scattering 
+
+In Paper I, we showed that the proportionality constant in the standard sub-burst slope law (Equation 1) is not invariant when the propagation e ff ects alter the burst morphology. Slope mea-surements that depend on the full observed profile, including the centroid-trajectory slopes used here, can therefore be bi-ased by propagation-induced broadening or distortion. To illus-trate this behavior, we evaluate the relation for bursts a ff ected by scattering, but without residual dispersion, and examine the resulting frequency dependence of an e ff ective proportionality constant. We denote this constant by A∗ to distinguish it from the intrinsic parameter A of the emission model. The e ff ective, frequency-averaged value is defined as A∗ 
+
+> eff
+
+= λc|s| (from Equa-tion 1), where λc is the measured duration and s is the sub-burst slope measured relative to the centroid (Equation 17). Figure 3 shows the frequency-binned values of A∗ 
+
+> eff
+
+, for dif-ferent scattering timescales. A clear transition is observed be-tween regimes in which scattering is sub-dominant and domi-nant. At high frequencies, where scattering is weak, A∗ 
+
+> eff
+
+ap-proaches the intrinsic value of A. This behavior is consistent with the limiting form of Equation (17), s ∝ A∗ 
+
+> eff
+
+/tw, valid for 
+
+A ≪ 1 and tw ≫ τsc . In contrast, at low frequencies, A∗
+
+> eff
+
+asymptotically approaches 1 /n ≈ 0.25, where n is the scatter-ing index defined in Equation (8). In this regime, Equation (17) reduces to the scattering-dominated form, s ∝ 1/(nτsc ), for 
+
+τsc ≫ tw. Thus, these asymptotic behaviors arise naturally within the centroid-based formulation of the modified sub-burst slope law, whose limiting forms provide a direct means of quan-tifying the transition between intrinsically dominated behavior and behavior dominated by propagation e ff ects. Alternative slope estimators may lead to di ff erent numerical values of A∗ 
+
+> eff
+
+,reflecting di ff erences in how the sub-burst slope law is defined and quantified. The centroid-based definition adopted here is advantageous as it captures this evolution through a simple and physically interpretable relation. This result demonstrates that the proportionality constant inferred from the sub-burst slope law is inherently regime-dependent. Therefore, fitting a single TRDM relation across the full frequency range, without accounting for propagation eff ects, can lead to biased estimates of A. Furthermore, the observed frequency dependence of A∗ 
+
+> eff
+
+provides a direct di-agnostic of the transition between intrinsic and propagation-dominated regimes, and highlights the necessity of incorporat-ing scattering when interpreting the sub-burst slope law. 
+
+4.3. Dispersion-exclusive analysis 
+
+Chamma et al. (2021) highlighted that inaccuracies in the 0.81 1.3 1.7 2.7 4.2 4.8 5.6 6.5 7.5                 
+
+> Frequency obs (GHz)
+> 0.14 0.16 0.18 0.2 0.22 0.24
+> Aeff  = c |s|
+> sc, true = 0.0 ms
+> sc, true = 2.0 ms
+> sc, true = 5.0 ms
+> sc, true = 10.0 ms
+> sc, true = 15.0 ms
+> sc, true = 20.0 ms
+> Figure 3: The median of the binned A∗-values for a frequency band against the mean frequency of that band for each scattering population. The dashed line is the constant 1 /n≈0.25 for our analysis. The residual DM is zero for each population.
+
+DM modify the apparent morphology of sub-bursts in the time-frequency plane, thereby altering the measured sub-burst slope while leaving the functional form of the inverse slope-duration relation (Equation 1) largely intact. As a result, the proportion-ality constant A, which is inferred from these measurements, can also be biased by residual DM errors, causing the recovered value to deviate from its intrinsic source-frame value. We seek to understand this behavior and ascertain whether our algorithm is able to reliably disentangle dispersive e ff ects from the intrin-sic burst dynamics. We begin by considering the dispersion-only limit of the modified slope law by removing the scattering term from Equation (17). This avoids over parameterization as seen in Section 4.2 and allows the residual dispersion contri-bution to be examined independently. The resulting expression (originally derived in Paper I, Section 3.3) is 
+
+* 1
+
+ν
+
+dν
+
+dt c
+
++
+
+> ν0
+
+= − 1
+
+∆ν
+
+Z ν0+∆ ν/ 2
+
+> ν0−∆ν/ 2
+
+dν
+
+tD + tw + 2∆tDM 
+
+, (20) The sub-burst duration in the absence of scattering is simply 
+
+λc = tw(ν0). (21) Figure 4 presents fits to the modified slope law and duration relations described by Equations (20) and (21) for simulated bursts spanning −3.0 pc cm −3≤ ∆DM true ≤
+
++3.0 pc cm −3. Although the full simulation grid extends to 
+
+±5.0 pc cm −3, strongly over-dedispersed cases with ∆DM true <
+
+−3.0 pc cm −3 frequently yield positive slopes, causing a sig-nificant fraction of the simulated bursts to be rejected by the measurement pipeline. The blue arrows mark the characteris-tic frequency, νκ, defined using Equation (19) as the point of 8maximum curvature along the plotted modified slope law in the slope-duration plane. For both types of dispersion, νκ shifts to-ward higher frequencies as |∆DM | increases. The fitting procedure is sensitive to both the ν−2 depen-dence and the sign of the dispersive delay. Across the range of 
+
+∆DM true values, the residual dispersion is recovered with a me-dian absolute error of 0 .30 pc cm −3 and a MAD of 0 .18 pc cm −3.We observe that under-dedispersion ( ∆DM true > 0 pc cm −3) re-duces the magnitude of the negative slope, causing the corre-sponding slope-law curves to bend downward relative to the 
+
+∆DM true = 0 pc cm −3 relation. This downward o ff set becomes more pronounced for larger positive values of ∆DM true and to-ward lower observing frequencies, where the dispersive delay is strongest. On the other hand, over-dedispersion ( ∆DM true < 0) steepens the slopes causing an upward curvature of the slope law, and can eventually drive the slopes to positive, unphysical values. Here, as ∆DM true becomes more negative, the frequency at which the slope law develops an upward curvature shifts to-ward higher frequencies. We find that the recovery of ∆DM depends on the sign and magnitude of the residual dispersive o ff set. This asymmetry is most evident at the largest o ff sets. For example, the ∆DM true =
+
+3.0 pc cm −3 case is recovered as ∆DM meas = 2.7±0.11 pc cm −3,corresponding to an absolute discrepancy of ∼ 0.30 pc cm −3.By contrast, the ∆DM true = −3.0 pc cm −3 case is recovered as ∆DM meas = −1.67 ± 0.27 pc cm −3 yielding a substantially larger discrepancy of ∼ 1.33 pc cm −3. The parameter t0 remains remarkably stable across all trials, while the inferred value of A
+
+exhibits moderate variations with ∆DM. The A value is slightly elevated when ∆DM true = −3.0 pc cm −3.The weaker recovery in the over-dedispersed regime arises from two related e ff ects. First, over-dedispersion introduces a delay term with the opposite sign to the intrinsic timescales, artificially steepening the sub-burst slope. When 2 |∆tDM | ≳
+
+tD + tw, the denominator of Equation (20) can change sign, causing the measured sub-burst slope to become positive. Since these points are excluded from the analysis, the fit is performed on a truncated subset of the over-dedispersed population, re-moving the low-frequency measurements where the ν−2 dis-persion signature is strongest. Second, among the retained measurements, the few lowest-frequency surviving points, par-ticularly those near 1420 MHz, provide the strongest remain-ing leverage on ∆DM meas . These bursts retain a su ffi ciently strong intrinsic contribution to prevent the slope-law denomi-nator from changing sign, such that tD + tw > 2|∆tDM |. Their slopes therefore do not cleanly trace the ν−2 dependence of the imposed residual dispersion, but instead reflect the combined influence of the intrinsic and dispersive terms in the denomi-nator of Equation (20). Since the fit constrains this combined denominator rather than the two contributions independently, di ff erent combinations of A and ∆DM can reproduce similar slope-duration measurements. The optimizer therefore selects a less negative e ff ective ∆DM true and a larger A, which together best reproduce the steepening seen in the retained population. In the case of under-dedispersed bursts, the residual disper-sive delay has the same sign as the intrinsic timescales, tD and 
+
+tw, and therefore contributes additively to the denominator of Equation (20). This produces a smooth low-frequency flatten-ing of the slope relation while keeping the denominator positive and away from zero, such that tD +tw +2∆tDM > 0. The a ff ected measurements are therefore retained in the fit and are disper-sion dominated, providing the low-frequency leverage needed to identify the ν−2 contribution. Under-dedispersed cases are consequently recovered more accurately. Since scattering is absent from both the simulated sub-bursts and the slope law, the model contains no additional broadening term that could act as an extra degree of freedom and absorb changes in the sub-burst slope and duration. Removing the scat-tering contribution therefore avoids over-parameterization and allows the dispersion-induced modifications to the slope law to be isolated more cleanly. This analysis demonstrates the utility of fitting reduced forms of the full modified slope law (Equa-tions 17 and 18). The flexibility of our framework allows scat-tering and dispersion e ff ects to be included or excluded straight-forwardly. For a detailed derivation of these reduced forms, see Paper I. This allows us to assess whether a simplified model is su ffi cient or whether the full scattering-dispersion formulation, discussed in the following section, is required to obtain reliable parameter constraints. 
+
+4.4. Joint scattering-dispersion analysis 
+
+Finally, in Figure 5, we evaluate the performance of the mod-ified sub-burst slope law, given by Equation (17), for bursts containing signatures of both scattering and residual dispersion. We consider residual dispersion values spanning −3.0 pc cm −3≤
+
+∆DM true ≤ +5.0 pc cm −3 and scattering timescales in the range 0 ≤ Λsc ,true ≤ 20 ms. The blue arrows mark νκ, the maximum-curvature point of the plotted slope-duration relation. These arrows therefore identify the transition from the approximately intrinsic inverse relation between slope and duration to the non-linear behavior introduced by propagation e ff ects. Relative to sub-bursts with no imposed scattering or residual dispersion, shown in the upper-left panel, these transitions shift toward higher frequencies as Λsc ,true and |∆DM true | increases. Addition-ally, as Λsc ,true increases, the low-frequency sub-bursts cluster at longer durations, with λc approaching τsc in the scattering-dominated limit, τsc ≫ tw.The scattering timescale is recovered with high precision, with a median absolute error of 0 .088 ms and a MAD of 0.041 ms. The residual dispersion measure is recovered with a median absolute error of 0 .54 pc cm −3 and a MAD of 0.154 pc cm −3. While the algorithm exhibits stable recovery of 
+
+A and ∆DM true in the under-dedispersed bursts, inconsistencies emerge in the over-dedispersed regime. This apparent contrast between the two dispersion regimes can be understood in the context of preceding discus-sions. In the case of under-dedispersion (0 pc cm −3 <
+
+∆DM ≤ 5.0 pc cm −3), the ν−2 dispersive delay contributes ad-ditively in the denominator of the modified slope law (Equation 17), in the same sense as the scattering term. It therefore shifts the relation downward toward flatter slopes relative to the case with no propagation e ff ects, while avoiding the asymptotic be-havior encountered in the over-dedispersed regime (Figure 4). 910 2                                                
+
+> 10 1
+> 10 0
+> 10 1
+> = 602 MHz
+> A= 0.149 ± 0.0076 ,
+> t0= 2031 ± 10 ms MHz ,
+> DM meas = 0.02 ± 0.13 pc cm 3
+> DM true = 0.00 pc cm 3
+> = 602 MHz
+> A= 0.135 ± 0.0035 ,
+> t0= 2034 ± 10 ms MHz ,
+> DM meas = 0.62 ± 0.05 pc cm 3
+> DM true = 1.00 pc cm 3
+> = 2224 MHz
+> A= 0.165 ± 0.0049 ,
+> t0= 2034 ± 10 ms MHz ,
+> DM meas = 1.97 ± 0.08 pc cm 3
+> DM true = 2.00 pc cm 3
+> 10 010 1
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> = 2783 MHz
+> A= 0.149 ± 0.0087 ,
+> t0= 2033 ± 9 ms MHz ,
+> DM meas = 2.70 ± 0.11 pc cm 3
+> DM true = 3.00 pc cm 3
+> 10 010 1
+> = 621 MHz
+> A= 0.149 ± 0.0048 ,
+> t0= 2056 ± 11 ms MHz ,
+> DM meas =0.70 ± 0.14 pc cm 3
+> DM true =1.00 pc cm 3
+> 10 010 1
+> = 1653 MHz
+> A= 0.168 ± 0.0072 ,
+> t0= 2058 ± 12 ms MHz ,
+> DM meas =1.67 ± 0.27 pc cm 3
+> DM true =3.00 pc cm 3
+> 2000 3000 4000 5000 6000
+> Frequency (MHz)
+> Sub-burst Duration c[ms]
+> Sub-burst Slope  |d obs
+> dt D |(1/  obs ) (ms  1)
+
+Figure 4: Fits to the modified sub-burst slope (Equation 20) and duration (Equation 21) for simulated bursts at varying residual dispersion measures ∆DM true .The legend reports the true and recovered residual dispersion measures, ∆DM true and ∆DM meas , along with the recovered sub-burst slope law parameter A. The frequency at which the slope-law attains maximum curvature is denoted by the blue arrow. 
+
+The fitting procedure remains stable for these populations, re-covering a mean value of A = 0.134 ± 0.006. Although degen-eracy between A and ∆DM produces a modest loss of sensitiv-ity in their estimation, it does not strongly bias the recovered parameters. The residual dispersion is constrained to within 
+
+∼ 0.5 pc cm −3 of the true value, and the corresponding adjust-ments in the slope law are absorbed by small shifts in A, which remains confined to a narrow range, A ∼ 0.13–0 .14. This loss is subtly enhanced by scattering, which reduces the slope at all frequencies. For moderate over-dedispersion, the algorithm retains partial sensitivity to the intrinsic behavior through the high-frequency sub-bursts, where propagation e ff ects are weaker. However, when strong over-dedispersion is combined with a large scat-tering timescale, the intrinsic parameters become much harder to constrain. In the ∆DM = −3.0 pc cm −3, Λsc = 20 ms case (shown in the bottom-right panel of Figure 5), the recovered value of A is significantly lower ( A = 0.101 ± 0.0026), about 26% below the median value of A = 0.136 recovered across the six populations. The fitted residual DM is also biased to-ward a more negative value, ∆DM meas = −4.15 ± 0.14 pc cm −3,compared with the true value of ∆DM true = −3.0 pc cm −3.The breakdown of parameter recovery in the over-dedispersed, high-scattering regime, can be attributed to the lack of undistorted bursts that directly constrain the intrinsic parameter A. For the plotted best-fit modified slope law, νκ
+
+shifts to 5358 MHz, indicating that the inferred slope-duration relation is strongly dominated by propagation e ff ects. Al-though this transition frequency may di ff er slightly from that obtained by fixing ∆DM to its true value, it shows that only the highest-frequency sub-bursts remain in the region of the slope-duration relation where the intrinsic timescales contribute ap-preciably. Consequently, most of the observed slope-duration relation is governed by scattering and residual dispersion, leav-ing the global fit only weakly sensitive to changes in A. This reduced leverage on A is further compounded by its degen-eracy with ∆DM. As discussed in the preceding subsections, di ff erent combinations of these parameters can reproduce sim-ilar slope-duration measurements over the available frequency range. For this regime, the fit favors a more negative value of 
+
+∆DM, which steepens the predicted slope, together with a re-duced value of A, which partially compensates for this e ff ect by increasing the intrinsic delay term. The recovered parameters therefore represent the best global compromise permitted by the coupled A − ∆DM degeneracy in a population dominated by propagation e ff ects. Reliable recovery of intrinsic parameters in over-dedispersed samples therefore requires su ffi cient mea-surements at frequencies where the intrinsic timescales domi-nate over both the scattering and residual dispersive terms. 10 10 2
+
+10 1
+
+10 0
+
+A = 0.14 ± 0.0069 ,
+
+t0 = 2017 ± 11 ms MHz , 
+
+> sc, meas
+
+= 0.41 ± 0.032 ms , 
+
+> sc, true
+
+= 0.0 ms ,
+
+DM meas = 0.33 ± 0.11 pc cm 3
+
+DM true = 0.00 pc cm 3
+
+= 709 MHz 
+
+A = 0.129 ± 0.0034 ,
+
+t0 = 1958 ± 13 ms MHz , 
+
+> sc, meas
+
+= 2 ± 0.015 ms , 
+
+> sc, true
+
+= 2.0 ms ,
+
+DM meas = 0.46 ± 0.06 pc cm 3
+
+DM true = 1.00 pc cm 3
+
+= 1208 MHz 
+
+A = 0.141 ± 0.0068 ,
+
+t0 = 2052 ± 18 ms MHz , 
+
+> sc, meas
+
+= 5.1 ± 0.059 ms , 
+
+> sc, true
+
+= 5.0 ms ,
+
+DM meas = 2.36 ± 0.13 pc cm 3
+
+DM true = 3.00 pc cm 3
+
+= 1629 MHz 
+
+10 0 10 1 10 2
+
+10 2
+
+10 1
+
+10 0
+
+A = 0.132 ± 0.0051 ,
+
+t0 = 1929 ± 10 ms MHz , 
+
+> sc, meas
+
+= 10 ± 0.046 ms , 
+
+> sc, true
+
+= 10.0 ms ,
+
+DM meas = 4.46 ± 0.18 pc cm 3
+
+DM true = 5.00 pc cm 3
+
+= 2070 MHz 
+
+10 0 10 1 10 2
+
+A = 0.16 ± 0.0076 ,
+
+t0 = 2028 ± 10 ms MHz , 
+
+> sc, meas
+
+= 15 ± 0.054 ms , 
+
+> sc, true
+
+= 15.0 ms ,
+
+DM meas = 1.12 ± 0.19 pc cm 3
+
+DM true = 1.00 pc cm 3
+
+= 2317 MHz 
+
+10 0 10 1 10 2
+
+A = 0.101 ± 0.0026 ,
+
+t0 = 2041 ± 9 ms MHz , 
+
+> sc, meas
+
+= 20 ± 0.056 ms , 
+
+> sc, true
+
+= 20.0 ms ,
+
+DM meas = 4.15 ± 0.14 pc cm 3
+
+DM true = 3.00 pc cm 3
+
+= 5358 MHz 
+
+1000 2000 3000 4000 5000 6000 
+
+> Frequency (MHz)
+
+Sub-burst Duration c [ms] 
+
+> Sub-burst Slope  |d obs
+> dt D |(1/  obs ) (ms  1)
+
+Figure 5: Same as Figure 2 but with varying scattering timescales and residual dispersion measures. 
+
+11 5. Summary 
+
+We have developed and validated an analytical framework to disentangle scattering and dispersion e ff ects from the intrinsic emission properties of repeating FRB sub-bursts. We gener-ate simulated bursts within the TRDM framework, assuming superradiance as the underlying emission mechanism, and in-corporate a broad range of scattering timescales and residual dispersion measures. For each sub-burst, we measure the slope from the centroid evolution in the dynamic spectrum and the characteristic duration at the center frequency of the sub-burst profile using parametric fitting. Then, by fitting the modified sub-burst slope law to the measured slope-duration pairs, we si-multaneously recover intrinsic emission parameters, scattering timescales, and residual dispersion measures. We divide our analyses across three cases. In the scattering-exclusive analysis, the scattering timescale is recovered with appreciable accuracy. However, as ∆DM is retained as a free parameter even when no residual dispersion is present in the sub-bursts, it results in an over-parameterized model. This, to-gether with the degeneracy between A and ∆DM, leads to com-paratively weak constraints on both parameters. In the dispersion-exclusive case, removing the scattering contribution alleviates over-parameterization and reveals an asymmetry in parameter recovery between the under- and over-dedispersed bursts. Under-dedispersed bursts are recovered more reliably as the residual dispersive delay adds to the intrin-sic timescales, creating a continuous slope-duration relation. Over-dedispersion instead subtracts from the intrinsic terms, and can cause the denominator of the sub-burst slope to be zero or even positive. These positive slopes are unphysical and are excluded from our model. This reduction in usable measure-ments, combined with the A − ∆DM degeneracy, weakens the recovery of both parameters in this regime. When both propagation e ff ects are varied simultaneously in the joint scattering-dispersion case, parameter recovery remains sensitive to the type of residual dispersion, and is further influ-enced by scattering. Although the scattering timescale is pre-cisely recovered across all regimes, parameters in the under-dedispersed regime are consistently better constrained than those in the over-dedispersed regime. This discrepancy peaks in the strongly scattered, strongly over-dedispersed regime, where the bulk of the emission is dominated by propagation e ff ects, leaving only a small subset of high-frequency sub-bursts par-tially sensitive to A. Consequently, the recovered parameters reflect a global compromise dictated by the inherent A-∆DM degeneracy, rather than a clean recovery of the imposed values. Extending the data set to even higher frequencies is therefore required to gain adequate leverage on A.These results demonstrate that our framework provides a powerful tool to detect and disentangle foreground propaga-tion e ff ects from the intrinsic properties of FRB sources un-der controlled conditions. The flexibility of our model allows nuisance parameters to be easily omitted, thereby improving constraints on the primary parameters of interest and avoid-ing overparameterization. This adaptability is particularly ad-vantageous when confronting real observations, which exhibit complexities such as varying intrinsic properties, limited sam-ple sizes, finite spectro-temporal resolution, variable S /N ra-tios, methodological and temporal DM variations, and limited frequency coverage. In Paper III, we will extend this analysis to observational datasets to assess how these factors impact pa-rameter recovery and the overall performance of our methods. 
+
+CRediT authorship contribution statement Aishwarya Kumar: Conceptualization, Methodology, Soft-ware, Formal analysis, Writing - Original Draft. Fereshteh Ra-jabi: Writing - Review & Editing, Supervision, Funding acqui-sition. Martin Houde: Conceptualization, Writing - Review & Editing, Supervision, Funding acquisition. 
+
+Acknowledgments 
+
+M.H.’s research is funded through the Natural Sciences and Engineering Research Council of Canada (NSERC) Discovery Grant RGPIN-2024-05242. F.R.’s research is supported by the NSERC Discovery Grant RGPIN-2024-06346. 
+
+Declaration of generative AI and AI-assisted technologies in the manuscript preparation process 
+
+During the preparation of this work, the authors used Chat-GPT to improve readability through grammar and language re-finement and to assist with Python code for positioning plot an-notations and inset elements. The authors reviewed and edited the output as needed and take full responsibility for the content of the publication. 
+
+Appendix A. Spectro-temporal diversity of the simulated FRB population 
+
+In Figure A.6, we illustrate the diversity of intrinsic burst profiles generated using the superradiance model. Each profile is produced with slightly di ff erent initial conditions, leading to variations in the intrinsic emission parameters. Consequently, the profiles exhibit a range of widths and morphologies, repre-sentative of the pulse-to-pulse variability observed in repeating FRB sources. To illustrate the diversity of spectro-temporal profiles in our simulated FRB population, Figure A.7 presents six intrinsic superradiant (SR) profiles, each assigned a distinct scattering timescale as indicated in the corresponding dynamic spectra. These profiles are Doppler-shifted to generate emission across four observing frequency bands, producing a representative set of sub-bursts. Residual dispersion is subsequently applied to each burst, enabling an analysis of both propagation e ff ects. 12 20 30 40 50 60 70 80 0.0 0.2 0.4 0.6 20 30 40 50 60 70 80 0.0 0.2 0.4 0.6 20 30 40 50 60 70 80 0.0 0.5 1.0 1.5 2.0 20 30 40 50 60 70 80 0.0 0.5 1.0 1.5 2.0 20 30 40 50 60 70 80 0.00 0.15 0.30 0.45 20 30 40 50 60 70 80 0.00 0.15 0.30 0.45  
+
+> Time (ms) Intensity (arb. units) Figure A.6: A subset of the superradiant emission profiles used to generate the simulated FRB population at 1.4 GHz, illustrating the diversity in burst morphology arising from di ff erences in the intrinsic emission parameters.
+
+References 
+
+Bancho ff , T.F., Lovett, S., 2022. Di ff erential geometry of curves and surfaces. doi: 10.1201/9781003295341 .Benedict, M.G., et al., 1996. Super-radiance: Multiatomic Co-herent Emission. IOP Publishing Ltd, Bristol. Brown, K., Chamma, M.A., Rajabi, F., Kumar, A., Rajabi, H., Houde, M., 2024. Validating the sub-burst slope law: a com-prehensive multisource spectro-temporal analysis of repeat-ing fast radio bursts. Monthly Notices of the Royal Astro-nomical Society 529, L152–L158. doi: 10.1093/mnrasl/ slae012 , arXiv:2308.11729 .Chamma, M.A., Pop, V., Rajabi, F., 2025. Spectro-temporal analysis of ultra-fast radio bursts using per-channel arrival times. Monthly Notices of the Royal Astronomical So-ciety 544, 2537–2556. doi: 10.1093/mnras/staf1799 ,
+
+arXiv:2412.12404 .Chamma, M.A., Rajabi, F., Kumar, A., Houde, M., 2023. A broad survey of spectro-temporal properties from FRB 20121102A. Monthly Notices of the Royal Astronomical Society 522, 3036–3048. doi: 10.1093/mnras/stad1108 ,
+
+arXiv:2210.00106 .Chamma, M.A., Rajabi, F., Wyenberg, C.M., Mathews, A., Houde, M., 2021. Evidence of a shared spectro-temporal law between sources of repeating fast radio bursts. Monthly Notices of the Royal Astronomical Society 507, 246–260. doi: 10.1093/mnras/stab2070 , arXiv:2010.14041 .CHIME /FRB Collaboration, Amiri, M., Andersen, B.C., Ban-dura, K., Berger, S., Bhardwaj, M., Boyce, M.M., Boyle, P., Brar, C., Breitman, D., et al., 2021. The First CHIME /FRB Fast Radio Burst Catalog. The Astrophysical Journal Sup-plement Series 257, 59. doi: 10.3847/1538-4365/ac33ab ,
+
+arXiv:2106.04352 .Cordes, J.M., Chatterjee, S., 2019. Fast radio bursts: an extra-galactic enigma. Annual Review of Astronomy and Astro-physics 57, 417–465. Cronyn, W.M., 1970. Interstellar scattering of pulsar radiation and its e ff ect on the spectrum of np0532. Science 168, 1453– 1455. doi: 10.1126/science.168.3938.1453 .Dicke, R.H., 1954. Coherence in Spontaneous Radiation Processes. Physical Review 93, 99–110. doi: 10.1103/ PhysRev.93.99 .Faber, J.T., Michilli, D., Mckinven, R., Su, J., Pearlman, A.B., Nimmo, K., Main, R.A., Kaspi, V., Bhardwaj, M., Chatterjee, S., et al., 2024. Morphologies of Bright Complex Fast Ra-dio Bursts with CHIME /FRB Voltage Data. The Astrophys-ical Journal 974, 274. doi: 10.3847/1538-4357/ad59aa ,
+
+arXiv:2312.14133 .Foreman-Mackey, D., Conley, A., Meierjurgen Farr, W., Hogg, D.W., Lang, D., Marshall, P., Price-Whelan, A., Sanders, J., Zuntz, J., 2013. emcee: The MCMC Hammer. Astrophysics Source Code Library, record ascl:1303.002. 
+
+arXiv:1303.002 .13 0 10 20 30 4800 5600 6400 7200 Sub_burst 1  
+
+> sc, true
+
+= 0 ms 
+
+0 15 30 3600 4200 4800 5400 
+
+Sub_burst 1  
+
+> sc, true
+
+= 0 ms 
+
+0 50 100 1200 1400 1600 
+
+Sub_burst 1  
+
+> sc, true
+
+= 0 ms 
+
+0 150 300 450 600 700 800 900 1000 Sub_burst 1  
+
+> sc, true
+
+= 0 ms 
+
+0 10 20 30 
+
+Sub_burst 2  
+
+> sc, true
+
+= 2 ms 
+
+0 15 30 
+
+Sub_burst 2  
+
+> sc, true
+
+= 2 ms 
+
+0 40 80 120 
+
+Sub_burst 2  
+
+> sc, true
+
+= 2 ms 
+
+0 150 300 450 
+
+Sub_burst 2  
+
+> sc, true
+
+= 2 ms 
+
+0 10 20 30 
+
+Sub_burst 3  
+
+> sc, true
+
+= 5 ms 
+
+0 15 30 
+
+Sub_burst 3  
+
+> sc, true
+
+= 5 ms 
+
+0 50 100 
+
+Sub_burst 3  
+
+> sc, true
+
+= 5 ms 
+
+0 150 300 450 
+
+Sub_burst 3  
+
+> sc, true
+
+= 5 ms 
+
+0 10 20 30 
+
+Sub_burst 4  
+
+> sc, true
+
+= 10 ms 
+
+0 15 30 
+
+Sub_burst 4  
+
+> sc, true
+
+= 10 ms 
+
+0 50 100 
+
+Sub_burst 4  
+
+> sc, true
+
+= 10 ms 
+
+0 150 300 450 
+
+Sub_burst 4  
+
+> sc, true
+
+= 10 ms 
+
+0 10 20 30 
+
+Sub_burst 5  
+
+> sc, true
+
+= 15 ms 
+
+0 15 30 
+
+Sub_burst 5  
+
+> sc, true
+
+= 15 ms 
+
+0 50 100 
+
+Sub_burst 5  
+
+> sc, true
+
+= 15 ms 
+
+0 150 300 450 
+
+Sub_burst 5  
+
+> sc, true
+
+= 15 ms 
+
+0 10 20 30 
+
+Sub_burst 6  
+
+> sc, true
+
+= 20 ms 
+
+0 15 30 
+
+Sub_burst 6  
+
+> sc, true
+
+= 20 ms 
+
+0 50 100 
+
+Sub_burst 6  
+
+> sc, true
+
+= 20 ms 
+
+0 150 300 450 
+
+Sub_burst 6  
+
+> sc, true
+
+= 20 ms 
+
+0.6 
+
+0.4 
+
+0.2 
+
+0.0 0.2 0.4 0.6 0.8 1.0 
+
+> Intensity (arb. units)
+
+Time (ms) 
+
+> Frequency (MHz)
+
+Figure A.7: Dynamic spectra of a subset of simulated sub-bursts used in our analysis, shown across multiple observing frequencies and scattering timescales. Each tile shows the frequency-time waterfall of an individual sub-burst, with the normalized frequency-integrated pulse profile (in arbitrary units) plotted above. Rows correspond to our four observing bands (as labeled on the left), centered at 800 MHz, 1420 MHz, 4660 MHz, and 6030 MHz. Each column of dynamic spectra corresponds to a distinct scattering population characterized by a fixed value Λsc ,true , increasing from left to right, as indicated in the upper-right corner of each dynamic spectrum. 
+
+14 Gommers, R., Virtanen, P., Haberland, M., Burovski, E., Reddy, T., Weckesser, W., Oliphant, T.E., Nelson, A., Cour-napeau, D., alexbrc, Roy, P., Polat, I., Peterson, P., Wil-son, J., endolith, Mayorov, N., Colley, L., van der Walt, S., Brett, M., Laxalde, D., Bowhay, J., Larson, E., Sakai, A., Millman, J., Lars, peterbell10, Carey, C., van Mulbregt, P., eric-jones, Steppi, A., 2025. scipy /scipy: SciPy 1.15.3. doi: 10.5281/zenodo.15366870 .Gray, M., 2012. Maser Sources in Astrophysics. Cambridge University Press. Gross, M., Haroche, S., 1982. Superradiance: An essay on the theory of collective spontaneous emission. Physics reports 93, 301–396. doi: 10.1016/0370-1573(82)90102-8 .Hashimoto, T., Goto, T., Wang, T.W., Kim, S.J., Ho, S.C.C., On, A.Y.L., Lu, T.Y., Santos, D.J.D., 2020. Luminosity-duration relations and luminosity functions of repeating and non-repeating fast radio bursts. Monthly Notices of the Royal Astronomical Society 494, 2886–2904. doi: 10.1093/ mnras/staa895 , arXiv:2004.02079 .Houde, M., Mathews, A., Rajabi, F., 2018. Explaining fast ra-dio bursts through Dicke’s superradiance. Monthly Notices of the Royal Astronomical Society 475, 514–522. doi: 10. 1093/mnras/stx3205 , arXiv:1710.00401 .Houde, M., Rajabi, F., Gaensler, B.M., Mathews, A., Tran-chant, V., 2019. Triggered superradiance and fast ra-dio bursts. Monthly Notices of the Royal Astronomical Society 482, 5492–5499. doi: 10.1093/mnras/sty3046 ,
+
+arXiv:1810.04364 .Jahns, J.N., Spitler, L.G., Nimmo, K., Hewitt, D.M., Snelders, M.P., Seymour, A., Hessels, J.W.T., Gourdji, K., Michilli, D., Hilmarsson, G.H., 2023. The FRB 20121102A November rain in 2018 observed with the Arecibo Telescope. Monthly Notices of the Royal Astronomical Society 519, 666–687. doi: 10.1093/mnras/stac3446 , arXiv:2202.05705 .Kulkarni, S.R., 2020. Dispersion measure: Confusion, Con-stants & Clarity. arXiv e-prints , arXiv:2007.02886doi: 10. 48550/arXiv.2007.02886 , arXiv:2007.02886 .Kumar, A., Rajabi, F., Houde, M., 2026. Impact of Propaga-tion E ff ects on the Spectro-temporal Properties of Fast Radio Bursts. The Astrophysical Journal 998, 18. doi: 10.3847/ 1538-4357/ae3145 , arXiv:2412.00232 .Lorimer, D.R., Bailes, M., McLaughlin, M.A., Narkevic, D.J., Crawford, F., 2007. A Bright Millisecond Radio Burst of Extragalactic Origin. Science 318, 777. doi: 10.1126/ science.1147532 , arXiv:0709.4301 .Lorimer, D.R., Kramer, M., 2012. Handbook of Pulsar Astron-omy. Cambridge university press. Nimmo, K., Hessels, J.W.T., Keimpema, A., Archibald, A.M., Cordes, J.M., Karuppusamy, R., Kirsten, F., Li, D.Z., Mar-cote, B., Paragi, Z., 2021. Highly polarized microstruc-ture from the repeating FRB 20180916B. Nature Astron-omy 5, 594–603. doi: 10.1038/s41550-021-01321-3 ,
+
+arXiv:2010.05800 .Petro ff , E., Hessels, J., Lorimer, D., 2019. Fast radio bursts. The Astronomy and Astrophysics Review 27, 1–75. Petro ff , E., Hessels, J.W.T., Lorimer, D.R., 2019. Fast ra-dio bursts. The Astronomy and Astrophysics Review 27, 4. doi: 10.1007/s00159-019-0116-6 , arXiv:1904.07947 .Pleunis, Z., Good, D.C., Kaspi, V.M., Mckinven, R., Ransom, S.M., Scholz, P., Bandura, K., Bhardwaj, M., Boyle, P., Brar, C., et al., 2021. Fast Radio Burst Morphology in the First CHIME /FRB Catalog. The Astrophysical Journal 923, 1. doi: 10.3847/1538-4357/ac33ac , arXiv:2106.04356 .Press, W.H., Teukolsky, S.A., Vetterling, W.T., Flannery, B.P., 2007. Numerical Recipes 3rd Edition: The Art of Scientific Computing. Rajabi, F., Chamma, M.A., Wyenberg, C.M., Mathews, A., Houde, M., 2020. A simple relationship for the spectro-temporal structure of bursts from FRB 121102. Monthly Notices of the Royal Astronomical Society 498, 4936–4942. doi: 10.1093/mnras/staa2723 , arXiv:2008.02395 .Rajabi, F., Houde, M., 2016a. Dicke’s Superradiance in Astrophysics. I. The 21 cm Line. The Astrophysical Journal 826, 216. doi: 10.3847/0004-637X/826/2/216 ,
+
+arXiv:1601.01717 .Rajabi, F., Houde, M., 2016b. Dicke’S Superradiance in As-trophysics. II. The OH 1612 MHz Line. The Astrophysi-cal Journal 828, 57. doi: 10.3847/0004-637X/828/1/57 ,
+
+arXiv:1601.01718 .Rajabi, F., Houde, M., 2020a. Astronomical masers and Dicke’s superradiance. Monthly Notices of the Royal Astronomical Society 494, 5194–5206. doi: 10.1093/mnras/staa1067 ,
+
+arXiv:2004.07327 .Rajabi, F., Houde, M., 2020b. Astronomical masers and Dicke’s superradiance. Monthly Notices of the Royal Astronomical Society 494, 5194–5206. doi: 10.1093/mnras/staa1067 ,
+
+arXiv:2004.07327 .Rajabi, F., Houde, M., Bartkiewicz, A., Olech, M., Szymczak, M., Wolak, P., 2019. New evidence for Dicke’s superra-diance in the 6.7 GHz methanol spectral line in the inter-stellar medium. Monthly Notices of the Royal Astronomi-cal Society 484, 1590–1597. doi: 10.1093/mnras/stz074 ,
+
+arXiv:1810.04365 .Rashidi, T., Anari, V., Bartkiewicz, A., Wolak, P., Szym-czak, M., Rajabi, F., 2025. Modelling the Periodic 6.7 GHz Methanol Flaring in G22.356 +0.066. Monthly Notices of the Royal Astronomical Society: Letters 542, L12–L18. doi: 10.1093/mnrasl/slaf061 , arXiv:2409.09209 .15 Rashidi, T., Anari, V., Powles, O., MacLeod, G.C., Tanabe, Y., Yonekura, Y., Rajabi, F., 2026. A unified Maxwell-Bloch framework for multiperiodic 6.7 GHz methanol flaring in G9.62 + 0.20E. Monthly Notices of the Royal Astronomi-cal Society 545, staf2200. doi: 10.1093/mnras/staf2200 ,
+
+arXiv:2510.16265 .Rickett, B.J., 1977. Interstellar scattering and scintillation of ra-dio waves. In: Annual review of astronomy and astrophysics. Volume 15.(A78-16576 04-90) Palo Alto, Calif., Annual Re-views, Inc., 1977, p. 479-504. 15, 479–504. doi: 10.1146/ annurev.aa.15.090177.002403 .Snelders, M.P., Nimmo, K., Hessels, J.W.T., Bensellam, Z., Zwaan, L.P., Chawla, P., Ould-Boukattine, O.S., Kirsten, F., Faber, J.T., Gajjar, V., 2023. Detection of ultra-fast radio bursts from FRB 20121102A. Nature Astron-omy 7, 1486–1496. doi: 10.1038/s41550-023-02101-x ,
+
+arXiv:2307.02303 .Wang, W.Y., Yang, Y.P., Niu, C.H., Xu, R., Zhang, B., 2022. Magnetospheric Curvature Radiation by Bunches as Emis-sion Mechanism for Repeating Fast Radio Bursts. The As-trophysical Journal 927, 105. doi: 10.3847/1538-4357/ ac4097 , arXiv:2111.11841 .Zhang, B., 2023. The physics of fast radio bursts. Reviews of Modern Physics 95, 035005. doi: 10.1103/RevModPhys. 95.035005 , arXiv:2212.03972 .16
