@@ -1,0 +1,1194 @@
+Title: Validating Timing-Model Accuracy for Continuous Gravitational Waves: A Comparison of LALSuite and PINT
+
+URL Source: https://arxiv.org/pdf/2608.26271v1
+
+Published Time: Fri, 28 Aug 2026 00:10:40 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# Validating Timing-Model Accuracy for Continuous Gravitational Waves: A Comparison of LALSuite and PINT 
+
+Kartikey Sharma, 1, 2 Reinhard Prix, 1, 2 Maria Alessandra Papa, 1, 2 and Curt Cutler 3, 4 
+
+> 1
+
+Max Planck Institute for Gravitational Physics (Albert Einstein Institute), D-30167 Hannover, Germany 
+
+> 2
+
+Leibniz University Hannover, D-30167 Hannover, Germany 
+
+> 3
+
+Jet Propulsion Lab, California Institute of Technology, 4800 Oak Grove Drive, Pasadena, California 91109, USA 
+
+> 4
+
+Theoretical Astrophysics, California Institute of Technology, Pasadena, California 91125, USA 
+
+We present results of a systematic validation of the LALSuite timing model for continuous gravitational waves against Pint , a modern high-accuracy pulsar-timing package. An accurate timing model is essential for tracking the signal phase, and hence for detecting and accurately characterizing continuous gravitational waves. In order to quantify the impact of timing inaccuracies, we derive and validate the leading-order relation μ ≈ (2 πf )2σ2 
+
+> δτ
+
+, where μ is the fractional loss of signal power, f is the signal frequency, and σ2 
+
+> δτ
+
+is the variance of the timing errors. We then compare the solar-system and binary components of the LALSuite timing model against the corresponding models in Pint . With the original LALSuite Einstein-delay implementation, the total disagreement is dominated by that component and has σδτ ≃ 2.3 μs (corresponding to μ ≃ 0.02 % at f = 1000 Hz). With the newer Einstein-delay implementation, the total disagreement (over one year) drops to 
+
+σδτ <
+
+∼ 31 ns (or μ <
+
+∼ 4 × 10 −8 at f = 1000 Hz) and is dominated by the observatory contribution to the Rømer delay, owing to the approximate Earth-rotation model used by LALSuite . We additionally test binary delays using orbital parameters from 474 catalogued binary pulsars and verify the self-consistency of the LALSuite source-time derivatives. Finally, we derive and discuss the LALSuite Shapiro delay for signals passing through the solar interior, a case only relevant to gravitational waves. 
+
+I. INTRODUCTION 
+
+Continuous gravitational waves (or continuous waves 
+
+for short) are long-lasting, quasi-monochromatic signals. The amplitudes of such continuous waves are several or-ders of magnitude lower than those of the typical tran-sient signals from the merger of compact binaries that current ground-based detectors routinely observe [1]. Searches for continuous waves have been an area of active research for the past two decades, e.g., see recent examples of targeted searches [2, 3], directed searches [4, 5] and all-sky searches [6, 7], as well as the reviews [8, 9]. The first detection of continuous waves will be a milestone event, unlocking gravitational-wave astronomy beyond the transient sky and opening a new window into the extreme-matter regime inside neutron stars [10]. The primary sources for ground-based detectors are expected to be rapidly rotating neutron stars with de-viations from perfect axisymmetry (e.g., see [11, 12] and references therein). Despite steady improvements in search breadth and depth, with current searches in-creasingly probing plausible neutron-star deformations, no continuous-wave signal has yet been detected. While the absence of a detection is consistent with pre-dicted source populations lying below current sensitivity levels (e.g., [13]), it is important to examine and validate all elements of our search methods and implementations. In this paper we focus on one particularly critical ele-ment: the timing model .The timing model relates detector-frame arrival times to effective source-frame times by accounting for the relevant time-dependent delays. Long integrations re-quire accurate tracking of the signal phase, while a time-dependent timing error produces a phase error (propor-tional to signal frequency). Timing accuracy is therefore essential for detecting and accurately characterizing such signals. Every continuous-wave search method relies on a tim-ing model, and many of the current search pipelines use the timing code in LALSuite [14]. Precision pulsar tim-ing relies on the same barycentric and binary time-delay models, with accuracy requirements at least as stringent as those of continuous-wave searches. This is why we have chosen Pint [15], a modern Python-based pulsar-timing package, as an independent high-accuracy refer-ence implementation for our comparison. The most recent published validations of the 
+
+LALSuite timing-model implementation (against 
+
+tempo [16]) date back approximately two decades, namely [17] (Fig. 2), and [18] (Fig. 6) for binary sources. While there have been internal spot-checks since then, in light of the central importance of this part of the search codes, it is timely and necessary to perform and document a systematic validation study. The plan of this paper is as follows: in Sec. II we in-troduce the full continuous-wave timing model, and in Sec. III we derive and validate an expression linking tim-ing errors to loss of signal power. In Sec. IV we perform numerical timing-model comparisons against Pint , and Sec. V gives our conclusions. In Appendix A we derive the Shapiro delay for signals passing through the Sun. arXiv:2608.26271v1 [gr-qc] 26 Aug 2026 2 
+
+> II. TIMING MODEL
+
+In this section we describe the timing model that the continuous-wave signal model is built upon, as well as its implementation in LALSuite [14].  
+
+> A. The signal model
+
+A continuous-wave signal in the detector can be writ-ten [19] as 
+
+h(t) = F+(ˆ n, ψ ; t) h+(t) + F×(ˆ n, ψ ; t) h×(t), (1) where ˆ n is a unit-vector pointing to the source, ψ is the gravitational-wave polarization angle and F+ and F× are detector beam-pattern functions for the two polariza-tions, + and ×. The two polarization waveforms take the form 
+
+h+(t) = A+ cos ϕ(t), h×(t) = A× sin ϕ(t), (2) where ϕ(t) is the signal phase in the detector frame, and 
+
+A+ and A× are the corresponding polarization ampli-tudes, which can be further expressed in terms of an in-trinsic gravitational-wave amplitude h0 and the source-inclination angle ι (with respect to ˆ n), namely 
+
+A+ = 12 h0(1 + cos 2 ι), A× = h0 cos ι. (3) Continuous waves from spinning neutron stars are quasi-monochromatic, so the (true) source-frame phase can be written as ˇϕ(ˇ τ ) = ˇϕ0 + 2 π
+
+Z ˇτ
+
+> ˇτ0
+
+ˇf (τ ′) dτ ′, (4) in terms of a slowly-varying intrinsic frequency ˇf (τ ).  
+
+> B. Time delays
+
+If we consider a wavefront phase ϕ(t) at the detector that was emitted by the source at time ˇ τ (t), then 
+
+ϕ (t) = ˇϕ (ˇ τ (t)) . (5) We define the time delay ˇ∆ between emission- and arrival time as ˇ τ (t) = t− ˇ∆( t), using the sign convention 1 “delay 
+
+≡ arrival-time - emission-time”. This true delay can be separated into ˇ∆ ≡ ∆d + ∆, where ∆ d ≡ d/c is the light-travel time over the dis-tance d between the solar-system barycenter (SSB) and     
+
+> 1Following pulsar astronomy, e.g., Pint Eq. (2) in [15], tempo2
+> Eq. (8) in [20], while other sign conventions also exist in the literature, e.g., Eq. (4) in [21] or Eq. (1) in [22].
+
+the source-system barycenter (which would be the source frame for isolated sources, or the binary-system barycen-ter for sources in binaries). The distance d is generally time dependent and unknown, but we can absorb it by defining an effective source frame with phase ϕsrc (τ ), de-fined as 
+
+ϕsrc (τ ) ≡ ˇϕ (τ − ∆d(τ )) , (6) where τ is the arrival time in the effective source frame of a wavefront emitted at time ˇ τ (τ ) = τ − ∆d(τ ) in the true source frame. We can therefore describe the wavefront ϕ(t) arriving at the detector as being emitted from the effective source frame at time τ (t), namely 
+
+ϕ(t) = ϕsrc (τ (t)) , where 
+
+τ (t) = t − ∆( t), (7) with an effective time delay ∆( t), which is fully deter-mined for a given sky position and binary-orbital param-eters, and can be separated into several contributions: ∆ ≡ ∆Rømer + ∆ Shapiro + ∆ Einstein + ∆ Binary , (8) namely the solar-system Rømer delay ∆ Rømer , relativis-tic Shapiro delay ∆ Shapiro , and Einstein delay ∆ Einstein ,as well as a binary-orbital time delay ∆ Binary for sources in binary systems. Note that gravitational waves always travel at the speed of light, and are therefore not affected by interstellar medium or atmospheric effects (contrary to electromagnetic waves), which is why the correspond-ing delay terms of the pulsar timing model (e.g., see Eq. (3) in [15]) are absent here. The (effective) frequency- and spindown parameters 
+
+f, ˙f , ¨f , . . . of a continuous-wave signal are defined in terms of a Taylor expansion of the (effective) source-frame phase ϕsrc around a reference time τ0, namely 
+
+ϕsrc (τ ) = ϕ0 + 2 π
+
+
+
+f (τ − τ0) + 12 ˙f (τ − τ0)2 + . . . 
+
+
+
+, (9) which can differ from the true frequency- and spindown parameters due to relative velocity ˙d and acceleration ¨d
+
+between source-system and SSB frames, as observed for systems in globular clusters [23], for example. For performance reasons, the F-statistic implementa-tions in LALSuite employ a piecewise-linear approxi-mation to the detector-frame phase ϕ(t) of Eq. (7), by computing the time delay ∆( t) and its derivative ˙∆( t)in steps ti+1 = ti + Tsft with Tsft ∼ O (60 − 1800s), and using linear interpolation in between, i.e., ∆( t) ≈
+
+∆( ti) + ( t − ti) ˙∆( ti) for |t − ti| < T sft /2. The step size 
+
+Tsft is chosen such that the maximal expected loss of signal power (see Sec. III) due to this approximation is bounded below a certain value (by default 1 %), e.g., see Eq. (C2) in [24]. 3 
+
+> 1. Solar-system Rømer delay
+
+The solar-system Rømer delay ∆ Rømer refers to the purely geometric (flat space-time) delay between a wave-front reaching the SSB (at tSSB ) and arriving at the de-tector at time t, therefore ∆Rømer ≡ t − tSSB (t) = −⃗r(t) · ˆnc , (10) where ⃗r(t) is the instantaneous position of the detector with respect to the SSB, and we are neglecting finite-distance parallax effects. We can write the detector position as ⃗r =⃗r geo +⃗ robs ,in terms of the Earth geocenter ⃗ r geo and the relative detector-position offset ⃗ robs , separating ∆ Rømer into cor-responding geocentric- and observatory contributions, i.e., ∆ Rømer = ∆ Rømer ,geo + ∆ Rømer ,obs .The geocentric position ⃗r geo (t) in the SSB is computed from the JPL solar-system ephemerides [25], which are provided as Chebyshev polynomial fits. These are first converted 2 to ephemeris files holding time-sampled po-sition, velocity and acceleration tables for the Earth, sampled every 2 hours (and for the Sun, sampled every 20 hours). From these the instantaneous position of the Earth ⃗r geo (t) (and Sun ⃗r ⊙(t)) can be computed by ex-trapolation from the closest sample point. To compute the observatory offset ⃗ robs (t) for a detec-tor, the rotational state of the Earth at time t is approx-imated using an analytical Earth-rotation model [27], which also takes leap seconds into account. Note, how-ever, that the pulsar-astronomy codes tempo2 and Pint 
+
+use the more accurate empirical IERS Earth orientation data [28] instead.  
+
+> 2. Solar-system Shapiro delay
+
+The Shapiro delay ∆ Shapiro accounts for the relativistic delay incurred by the propagation of a signal through the curved spacetime in the solar system. For signal rays not traversing the Sun, the leading-order term for the Shapiro delay is ∆ext Shapiro = − 2GM ⊙
+
+c3 ln 
+
+⃗r o · ˆn + |⃗r o|
+
+1AU 
+
+
+
+, (11) where M⊙ is the solar mass, ⃗ r o ≡⃗ r −⃗r ⊙ is the vec-tor from the Sun ⃗ r ⊙ to the observer ⃗ r, and the ar-gument in the log is normalized by a length scale of 1AU (the average Earth-Sun distance), consistently with 
+
+tempo2 /Pint conventions. The numerical scale of this delay is 2 GM ⊙/c 3 ∼ 10 μs.       
+
+> 2Using the LALSuite tool lalapps create solar system ephemeris ,or the newer python package solar-system-ephemerides [26].
+
+LALSuite uses an approximate version of this expres-sion, with ⃗r o pointing to the geocenter instead of the ob-servatory, i.e., ⃗r o ≈⃗r geo −⃗r ⊙, which neglects the obser-vatory offset ⃗ robs =⃗r −⃗r geo . Furthermore tempo2 /Pint 
+
+include additional delay contributions from other solar-system bodies and higher-order corrections for close-by sources, see Eq. (32) in [20]. The solar-exterior Shapiro-delay expression of Eq. (11) does not hold for rays traversing the Sun and diverges for sources exactly centered behind the Sun, i.e. ⃗r o · ˆn →− | ⃗r o|. This is not a concern for electromagnetic waves and is therefore ignored in tempo2 /Pint , but it does need to be dealt with for gravitational waves. We define the relative impact parameter b as, 
+
+b ≡ R−1
+
+> ⊙
+
+q
+
+|⃗r o|2 − (⃗r o · ˆn)2, (12) where R⊙ is the radius of the Sun. For a ray going through the Sun, namely b < 1 and ⃗r o · ˆn < 0, LAL-Suite implements the regular solar-interior expression ∆int Shapiro = 4GM ⊙
+
+c3 (1 − b) + ∆ ext ,b=1 
+
+> Shapiro
+
+, (13) where the second term is the external Shapiro delay of Eq. (11) evaluated for a grazing ray at b = 1, by substi-tuting |⃗r o| =
+
+q
+
+R2 
+
+> ⊙
+
++ ( ⃗r o · ˆn)2 in Eq. (11). This expres-sion was derived [29] for a simple density model of the Sun. In Appendix A we give its full derivation and com-pare it to a numerically-integrated standard solar density model, which shows a maximal discrepancy of underes-timating the Shapiro delay by about ∼ 14 .5 μs near the solar center.  
+
+> 3. Solar-system Einstein delay
+
+The Einstein delay ∆ Einstein refers to the time dilation experienced by terrestrial clocks due to the Earth’s or-bital motion and the local gravitational potential (domi-nated by the Sun) with respect to an SSB time standard such as Barycentric Coordinate Time (TCB) or Barycen-tric Dynamical Time (TDB) [30, 31]. Here we focus ex-clusively on TDB as the barycentric time standard, which is the default (and better supported) by both LALSuite 
+
+and Pint , so the corresponding Einstein delay is defined as ∆Einstein ≡ tTT − tTDB , (14) where tTT is the time coordinate of an event (such as a wavefront arriving at the detector) measured in the terrestrial-time (TT) standard, while tTDB is the barycentric (TDB) time coordinate of the same event. The Einstein delay therefore only depends on the rel-ative position and velocity of the detector in the solar system, and is independent of the signal parameters. We can separate ∆ Einstein into two contributions, sim-ilarly to Rømer-delay, namely ∆ Einstein = ∆ Einstein ,geo +4∆Einstein ,obs , where ∆Einstein ,geo is the Einstein de-lay experienced at the center of the Earth ⃗ r geo , and ∆Einstein ,obs = −⃗robs · ˙⃗r geo /c 2 ∼ O (2 μs) is the correction due to the offset ⃗ robs of the detector from the geocenter (cf. [20, 32] and implementations in tempo2 , Pint and 
+
+Astropy [33]). 
+
+LALSuite has two different implementations of ∆Einstein :
+
+• the original XLALBarycenterEarth (C. Cutler (2001)), which computes ∆Einstein ,geo using the first 20 terms (of about 800 used by tempo [16]) from an analytical series-expansion approximation [34], and which neglects the observatory correction ∆Einstein ,obs .
+
+• the newer XLALBarycenterEarthNew (M. Pitkin (2012)), which interpolates ∆Einstein ,geo from numerically-computed [35] tempo2 time-ephemeris files, and which includes 3 the ob-servatory contribution ∆ Einstein ,obs .We note that LALSuite always uses the idealized TT(TAI) = TAI + 32 .184 s realization of the TT time standard (where TAI = GPS + 19 s), while Pint can op-tionally use the more accurate TT(BIPM) realization 4,which is empirically corrected for long-term drifts in the atomic-time standard TAI. 
+
+4. Binary Delay 
+
+A signal emitted by a source in a binary system is sub-ject to an additional time delay ∆ Binary due to orbital motion and relativistic effects. Here we focus on the 
+
+F-statistic-related code paths 5 in LALSuite , namely the function XLALAddBinaryTimes() , which only im-plements the Keplerian Blandford & Teukolsky (BT) model [37] with parameters λB: the orbital period PB,the projected semi-major axis ap (measured in light-seconds), the eccentricity e, the time of periapsis pas-sage tp, and the argument of periapsis ω. In this non-relativistic model the binary delay consists only of the orbital Rømer-delay, namely ∆Binary = RB(τ )
+
+c , (15) where RB is the radial (i.e., along the line of sight) dis-tance of the source with respect to the binary barycenter (BB), at the emission time τ . Note that RB > 0 means the source is farther away from the observer than the BB.     
+
+> 3technically this step happens in XLALBarycenter ()
+> 4https://www.bipm.org/en/time-ftp/tt-bipm-
+> 5The Glasgow known-pulsar pipeline [36] implements more binary models, some of which are discussed in [18].
+
+Following [24, 38], this can be expressed as 
+
+RB
+
+c = ap
+
+h
+
+sin ω(cos E − e) + cos ω sin Ep1 − e2
+
+i
+
+, (16) where the eccentric anomaly E(τ ) is given by the tran-scendental equation 
+
+τ − tp = PB
+
+2π (E − e sin E) , (17) and the emission time τ (t) itself depends on RB via Eqs. (7),(8). This set of equations is therefore solved numerically 6.
+
+III. MISMATCH DUE TO TIMING ERRORS 
+
+The timing model τ (t) of Eq. (7) relates the detector-frame phase ϕ(t) of Eq. (1) to the corresponding source-frame phase ϕsrc (τ (t)), and is needed to construct matched-filter detection statistics such as the F-statistic [19]. Inaccuracies δτ (t) in the timing model can therefore result in a loss of (recovered) signal power, as these cor-respond effectively to a template waveform that is mis-matched with respect to the signal. Namely, from the phase relation Eq. (7), the phase error δϕ due to a tim-ing error δτ (t) can be expressed as 
+
+δϕ (t) = 2 π f src (τ ) δτ (t) + O  δτ 2 , (18) where fsrc (τ ) ≡ dϕ src (τ )/(2 πdτ ) is the instantaneous source-frame signal frequency, which in the following we assume to be approximately constant, i.e., fsrc ≈ f .In order to estimate the corresponding loss in matched-filter signal power, we first construct a simplified constant-amplitude detection statistic. 
+
+A. Simplified detection statistic 
+
+The measured data timeseries in a detector is xj ≡
+
+x(tj ) at sampling timesteps tj with j = 1 , . . . N . For a gravitational signal h(t) embedded in additive stationary Gaussian detector noise nxj = nj + hj . (19) The probability density function for n is 
+
+P(n) = k e − 12 (n|n) , (20) with zero mean and covariance Σ jl ≡ E [nj nl], with k be-ing a normalisation constant. We use the scalar-product notation (x|y) ≡
+
+> N
+
+X
+
+> jl
+
+xj Σ−1 
+
+> jl
+
+yl . (21)          
+
+> 6More details can be found in the documentation of
+> XLALAddBinaryTimes() .
+
+5Using the equations above we can write the likelihood for the data under the signal hypothesis as P (x|h) = P(x −
+
+h), and for the noise hypothesis as P (x|h = 0) = P(x), resulting in the (log) likelihood ratio ln Λ( x) ≡ ln P (x|h)
+
+P (x|h = 0) = ( x|h) − 12 (h|h) . (22) Here we only consider narrow-band signals h, where only the noise in the narrow signal band can affect the scalar product Eq. (21) [19, 39]. We further assume the noise to be white over this narrow frequency band, i.e., uncor-related in the time domain, namely Σjl ≡ E [nj nl] ≈ σ2δjl , (23) resulting in the simpler scalar-product expression (x|y) = 2 γ ⟨xy ⟩ , (24) where the data factor γ and the standard time-average 
+
+⟨·⟩ are defined as 
+
+γ ≡ N
+
+2σ2 , ⟨xy ⟩ ≡ 1
+
+N
+
+> N
+
+X
+
+> j=1
+
+xj yj , (25) in analogy to the continuous-time formulation in [40]. The factor of two in the γ denominator accounts for the single-sided power-spectral density used in the continuous-time version. We further simplify the problem by neglecting the sig-nal amplitude modulation in Eq. (1) stemming from the antenna-pattern functions F+ and the F×, as timing er-rors only affect the phase, thus yielding the constant-amplitude signal model 
+
+h(t) = As sin ϕ(t) + Ac cos ϕ(t), (26) following the approach of [41]. For this signal model we obtain (x|h) = 2 γ (Asxs + Acxc) , (27) where xs ≡ ⟨ x sin ϕ⟩, xc ≡ ⟨ x cos ϕ⟩. We further find (h|h) = 2 γ h2 ≈ γ  A2s + A2c
+
+ , (28) where averages over many phase cycles are approximated as sin 2 ϕ ≈ cos 2 ϕ ≈ 1/2, and ⟨sin ϕ cos ϕ⟩ ≈ 0. We can now write the likelihood ratio of Eq. (22) as ln Λ( x) = 2 γ (Asxs + Acxc) − γ
+
+2
+
+ A2s + A2c
+
+ , (29) which can be analytically maximized over the two un-known amplitude parameters {As, A c}, yielding 
+
+Fϕ(x) ≡ max  
+
+> {As,A c}
+
+ln Λ = 2 γ  x2s + x2c
+
+ , (30) which is a two degrees-of-freedom version of the classic four degrees-of-freedom F-statistic [19] for the full signal model including amplitude modulation. This “constant-response” Fϕ-statistic agrees with Eq. (9) in [41] and is also discussed in the appendix of [42]. Assuming the data contains a signal s, such that xj =
+
+nj + sj , with zero-mean noise n, the expectation values of the two scalar products are E [xs,c] = ss,c, and their variance is 
+
+E n2s
+
+ = 1
+
+N 2
+
+X
+
+> jk
+
+E [nj nk] sin ϕj sin ϕk
+
+= σ2
+
+N 2
+
+X
+
+> j
+
+sin 2 ϕj ≈ σ2
+
+2N = 14γ , (31) using the white-noise assumption Eq. (23) and the data factor γ defined in Eq. (25). Both √4γ x s,c are Gaussian distributed with unit vari-ance and means √4γ s s,c, and we see from Eq. (30) that 2Fϕ is therefore χ2-distributed with two degrees of free-dom and expectation 
+
+E [2 Fϕ] = 2 + ρ2 , (32) with the signal power ρ2 in the template with phase ϕ(t)defined as 
+
+ρ2 ≡ 4γ(s2s + s2c ) = 4 γ s e −iϕ 2 . (33)  
+
+> B. Relative loss of signal power
+
+Assuming a signal of the form Eq. (26) with phase 
+
+ϕ′(t), which we can write as 
+
+s(t) = As sin ϕ′ + Ac cos ϕ′
+
+= A
+
+2
+
+
+
+ei(ϕ′+φ0) + e−i(ϕ′+φ0)
+
+, (34) where A2 ≡ A2s +A2c and tan φ0 ≡ − As/A c, then Eq. (33) yields the signal power in the template as 
+
+ρ2 ≈ ρ20 eiδϕ 2 , (35) where 
+
+ρ20 ≡ (s|s) = γ  A2s + A2c
+
+ , (36) is the perfect-match signal power, and 
+
+δϕ (t) ≡ ϕ′(t) − ϕ(t) , (37) is the phase error between signal and template. Here we used the fact that for small phase-errors, ϕ′ ≈ ϕ and therefore 
+
+D
+
+ei(ϕ′+ϕ)
+
+E
+
+≈ 0. We define the mismatch μ between the signal and the template as the relative loss of signal power [43], namely 
+
+μ ≡ ρ20 − ρ2
+
+ρ20
+
+= 1 − eiδϕ 2 , (38) 6and Taylor-expanding in small δϕ yields 
+
+μ = δϕ 2 − ⟨ δϕ ⟩2 + O  δϕ 4 . (39) In the more common context of parameter-space met-rics [44], the phase error is due to an offset δλ in phase-evolution parameters, namely δϕ = ( ∂ϕ/∂λ i) δλ i +
+
+O  δλ 2, resulting in the well-known phase metric [43, 45], namely gij ≡ ⟨ ∂iϕ ∂ j ϕ⟩ − ⟨ ∂iϕ⟩ ⟨ ∂j ϕ⟩, with corre-sponding mismatch μ = gij δλ iδλ j + O  δλ 3.Here we consider instead a phase error δϕ that is due to timing errors δτ via Eq. (18), resulting in the mismatch expression 
+
+μ = (2 πf )2 σ2 
+
+> δτ
+
++ O  δτ 3 , (40) where we defined the standard deviation σδτ of the timing errors δτ (t), i.e., 
+
+σ2 
+
+> δτ
+
+≡ δτ 2 − ⟨ δτ ⟩2 . (41) To leading order, the mismatch μ due to timing errors is proportional to their variance , and we can write 
+
+μ ≃ 4 × 10 −5
+
+ f
+
+1000 Hz 
+
+2  σδτ 
+
+1 μs
+
+2
+
+. (42)  
+
+> C. Numerical validation of the mismatch prediction
+
+We validate the robustness of the mismatch prediction Eq. (40) by signal injections in data without noise and us-ing the F-statistic with matched phase-evolution param-eters to recover the injected signals. In order to gener-ate timing errors δτ (t) between injections and F-statistic templates, we use two (widely) different ephemeris ver-sions, namely DE430 for the injections and DE200 for the mismatched F-statistic, yielding ρ2. To compute the perfectly-matched F-statistic for ρ20 we use DE430 again, and the resulting mismatch μ is then given by Eq. (38). We perform these injections and recoveries at 20 dif-ferent signal frequencies, drawn uniformly from f ∈
+
+[40 , 3200] Hz, 80 sky-positions uniformly sampled in α ∈
+
+[0 , 2π] and δ ∈ [−π/ 2, π/ 2], and for each point we use 6 randomly-drawn amplitude-parameter pairs {cos ι, ψ }
+
+for the injections. These tests were performed for the L1 detector, with data spanning 237 days from the start of O4 and an SFT timebase of Tsft = 600 s. The resulting mismatches span about six orders of magnitude, μ ∼ [1 × 10 −6, 0.3]. In order to illustrate the predictive power of Eq. (40), in Fig. 1 we plot the distribution (over the 6 amplitudes × 20 frequencies) of the rescaled mismatch μ/ (2 πf )2 versus timing-error vari-ance σ2 
+
+> δτ
+
+(each value corresponding to one sky position). We see that the measured mismatch is generally in good agreement with the prediction. We also note a weak de-pendency of the mismatches on signal latitude δ, namely (for this setup) at similar σ2 
+
+> δτ
+
+the mismatches at higher latitude tend to be slightly larger than at lower latitudes. This effect is not captured by our prediction Eq. (40), as the derivation in Sec. III A neglects antenna patterns. 0 2 4 6
+
+σ2 
+
+> δτ
+
+×10 −10 
+
+0246
+
+> μ/ (2 πf  )2
+
+×10 −10 
+
+−
+
+π/ 2 − π/ 4 0 π/ 4 π/ 2
+
+# latitude δ [rad]                
+
+> FIG. 1. Violin plot showing the distribution of rescaled mis-matches μ/ (2 πf )2versus timing-error variance σ2
+> δτ , gener-ated by injecting signals using DE430 ephemeris and recov-ering them with the F-statistic using an offset ephemeris ver-sion DE200 .Each value of σ2
+> δτ corresponds to one of the 80 randomly-drawn sky positions, with the distribution of mis-matches over random signal frequencies and amplitude pa-rameters {cos ι, ψ }. The dashed black line represents the mis-match prediction of Eq. (40).
+> IV. COMPARISON OF LALSUITE WITH PINT
+
+In order to validate the LALSuite timing model, we compare it against Pint [15, 46] (version 1.1.5), a state-of-the-art software package for high-precision pul-sar timing. Pint itself was validated against inde-pendent timing-model implementations in tempo and 
+
+tempo2 , see [15, 47]. The numerical timing compar-isons reported below were generated with LALSuite 
+
+commit 84e7563cfc (LALPulsar version 3.1.0.1) and 
+
+pyCW commit 4ba7705ea2 (version 0.1.5.dev20260813). We define the disagreement δτ between the LALSuite 
+
+time delay ∆ LALSuite and Pint ’s ∆ Pint as 
+
+δτ ≡ ∆LALSuite − ∆Pint , (43) and similar for individual timing-model components ∆ C
+
+(discussed in Sec. II B), defining per-component disagree-ments δτ C .The results shown here use JPL ephemeris version 
+
+DE405 [25] for the Earth and Sun, and we also tested 
+
+DE200 , DE421 , DE430 , DE435 , DE436 and DE440 , yielding virtually identical results.  
+
+> A. Shapiro delay when crossing the Sun
+
+We first consider the differences in Shapiro delay for signals crossing the Sun, as discussed in Sec. II B 2. For 7this we use a single sky position and a timespan of six days centered on a GPS mid-time t0 for which a sig-nal arriving at the LIGO Livingston (L1) observatory would pass very close 7 to the center of the Sun. The Sun-crossing itself takes about 13 h and we compute Shapiro delay in steps of ∼ 43 min. The disagreement δτ Shapiro (t)is shown in Fig. 2 as a function of the (geocentric) rel-ative impact parameter bgeo of Eq. (12). We see that 0 2 4 6 8 10 
+
+bgeo 
+
+−10 5
+
+−10 4
+
+−10 3
+
+−10 2
+
+−10 1
+
+−10 0
+
+010 0
+
+10 1
+
+10 2
+
+> δτ Shapiro  [ns]
+
+approaching receding 
+
+FIG. 2. Shapiro-delay disagreement δτ Shapiro versus relative (geocentric) impact parameter bgeo for a sky position and a timespan of six days around an instant where the signal ray passes very close ( ∼ 100 m) to the center of the Sun. The vertical axis is linear within ±1 ns and logarithmic in mag-nitude outside this range, with the sign retained. The left-and right-arrow lines show the approaching and receding time segments, respectively. The dashed vertical line at bgeo = 1 indicates the surface of the Sun. At the center of the Sun 
+
+Pint ’s ∆ Shapiro diverges. 
+
+the disagreement is oscillatory and not symmetrical when approaching and departing the center of the Sun, due to 
+
+Pint computing Shapiro delay (more accurately) with respect to the detector, while LALSuite is using the geocenter instead. Outside the Sun the disagreement is bounded by |δτ Shapiro | < 100 ns, then rapidly diverges when approaching the center of the Sun ( b → 0). As discussed in Sec. II B 2, this is due to the point-mass Shapiro-delay approximation in Pint diverging in this limit, which is not a problem for electromagnetic signals that cannot pass through the Sun. In the following tests we therefore filter timesteps where a signal would be crossing the Sun, as the Pint 
+
+comparison reference is not valid in this case.           
+
+> 7Sky position α= 5 .79203216752 rad, δ=−0.20168795317 rad, mid-time t0= 1 234 567 890 s, avoiding perfect Sun-alignment by
+> ∼100 m to prevent Pint ’s Shapiro delay from overflowing.
+
+B. Comparing solar-system delays 
+
+For the following tests we use the location of the L1 observatory and a one-year timespan starting May 24, 2023 (GPS 1 368 921 618 or MJD 60 088), which overlaps with the first year of the O4 LIGO-Virgo-KAGRA ob-serving run. The results were similar for the H1 detec-tor. Time delays are computed and compared in steps of 1 h, resulting in a total of 8760 timesteps per signal-parameter-space point. We first look at the disagreement timeseries δτ C (t)for different delay components C, using three randomly-picked sky positions. Given there are different Einstein-delay implementations available in both LALSuite and 
+
+Pint (cf. Sec. II B 3), we consider three relevant com-binations for comparison, labeled as TDB TAI old , TDB TAI new ,and TDB BIPM new .
+
+1. TDB TAI old : XLALBarycenterEarth vs Pint TT(TAI) 
+
+Using the original LALSuite Einstein-delay code path 
+
+XLALBarycenterEarth , with Pint set to use the same idealized TT(TAI) realization that LALSuite assumes, the resulting disagreement timeseries are shown in Fig. 3. We see that the total disagreement is dominated by the Einstein delay, with a standard deviation of σEinstein  
+
+> δτ
+
+∼
+
+2323 ns, followed by Rømer delay σRømer  
+
+> δτ
+
+∼ 25 ns and Shapiro delay σShapiro  
+
+> δτ
+
+∼ 1 ns. Note that Einstein delay is independent of sky position, which is why there is only one timeseries for δτ Einstein .Separating the Einstein delay into its geocenter- and observatory components, shown in the last row in Fig. 3, we see that both contribute significantly, namely 
+
+σEinstein ,geo  
+
+> δτ
+
+∼ 1768 ns, and σEinstein ,obs  
+
+> δτ
+
+∼ 1272 ns, respectively. This is consistent with the fact that 
+
+XLALBarycenterEarth uses a truncated approximation to the geocentric Einstein delay and neglects the obser-vatory correction, as discussed in Sec. II B 3. These comparison results agree with the original 
+
+tempo comparison performed in [17], which found that 
+
+|δτ | < 4 μs, and estimated the resulting mismatch to be of order 10 −4. Using the observed σδτ ∼ 2300 ns for a sig-nal at f ∼ 1284 Hz, our prediction Eq. (40) would result in μ ∼ 3.4 × 10 −4. This original implementation is there-fore (easily) within the design accuracy requirements for the detection of continuous waves. For reference, the 
+
+F-statistic implementation uses various speed-optimizing approximations resulting in mismatches of order of a few percent. 
+
+2. TDB TAI new : XLALBarycenterEarthNew vs Pint TT(TAI) 
+
+Using the newer Einstein-delay implementation 
+
+XLALBarycenterEarthNew in LALSuite , comparing against Pint ’s idealized TT(TAI) realization, the result-8−5000 
+
+−
+
+2500 02500 5000 
+
+> δτ total  [ns]
+
+σtotal  
+
+> δτ
+
+∈ [2317 , 2329] ns 
+
+−
+
+100 
+
+−
+
+50 050 100 
+
+> δτ Rømer  [ns]
+
+σRømer  
+
+> δτ
+
+∈ [22 , 28] ns 
+
+−
+
+5000 
+
+−
+
+2500 02500 5000 
+
+> δτ Einstein  [ns]
+
+σEinstein  
+
+> δτ
+
+∼ 2323 ns 0246
+
+> δτ Shapiro  [ns]
+
+σShapiro  
+
+> δτ
+
+∈ [0 .31 , 1.8] ns 60100 60200 60300 60400 MJD [days] 
+
+−
+
+2000 02000 
+
+> δτ Einstein ,geo  [ns]
+
+σEinstein ,geo  
+
+> δτ
+
+∼ 1768 ns 60100 60200 60300 60400 MJD [days] 
+
+−
+
+2000 
+
+−
+
+1000 01000 2000 
+
+> δτ Einstein ,obs  [ns]
+
+σEinstein ,obs  
+
+> δτ
+
+∼ 1272 ns 
+
+FIG. 3. Time-delay disagreements for isolated sources (for three random sky positions, represented by the three colours) over a one-year timespan, showing the total delay δτ total (top left ), Rømer delay δτ Rømer (top right ), total Einstein delay δτ Einstein 
+
+(middle left ) and Shapiro delay δτ Shapiro (middle right ), as well as the geocentric δτ Einstein ,geo (bottom left ) and observatory component δτ Einstein ,obs (bottom right ) of the Einstein delay. This plot shows the TDB TAI old comparison between the original 
+
+LALSuite Einstein-delay implementation ( XLALBarycenterEarth ) and Pint ’s TT(TAI). 
+
+ing disagreement timeseries are shown in Fig. 4. We see ns-level agreement in both geocentric- and observatory Einstein delays, resulting in the Rømer-delay σRømer  
+
+> δτ
+
+∼
+
+25 ns of Fig. 3 now being the overall bottleneck. 
+
+3. TDB BIPM new : XLALBarycenterEarthNew vs TT(BIPM) 
+
+Using the more accurate TT(BIPM) realiza-tion in Pint , and comparing against LALSuite 
+
+XLALBarycenterEarthNew (which uses TT(TAI)), the resulting disagreement for δτ Einstein ,geo is shown in the top-right panel of Fig. 5 (the observatory Einstein delay 
+
+δτ Einstein ,obs is not affected by this change). We see that this results in an overall disagreement shift by about 27 .7 μs, with a slow drift over time, such that the resulting standard deviation σEinstein ,geo  
+
+> δτ
+
+∼ 0.92 ns (over one year) is essentially unchanged. However, depending on the long-term drift between TT(TAI) and TT(BIPM), this can result in larger variances for longer 9−202
+
+> δτ Einstein ,geo  [ns]
+
+σEinstein ,geo  
+
+> δτ
+
+∼ 0.88 ns 60100 60200 60300 60400 MJD [days] 
+
+−
+
+2024
+
+> δτ Einstein ,obs  [ns]
+
+σEinstein ,obs  
+
+> δτ
+
+∼ 1.2 ns 
+
+FIG. 4. Time-delay disagreements for isolated sources over a one-year timespan, showing the geocentric δτ Einstein ,geo (top )and observatory component δτ Einstein ,obs (bottom ) of the Ein-stein delay. This plot shows the TDB TAI new comparison be-tween the newer LALSuite Einstein-delay implementation (XLALBarycenterEarthNew ) and Pint ’s TT(TAI). 
+
+observations. 
+
+4. Rømer delay disagreements 
+
+When using XLALBarycenterEarthNew , the total timing-disagreement variation of σtotal  
+
+> δτ
+
+∼ O (25 ns) is now dominated by the Rømer delay, as seen in Fig. 5. Further-more, we see that the observatory contribution σRømer ,obs 
+
+> δτ
+
+is larger than the geocentric disagreement σRømer ,geo  
+
+> δτ
+
+, as confirmed by more extensive Monte-Carlo tests in the next section. The latter can be traced to the differ-ent numerical handling of the JPL ephemerides, while the former stems from the approximate Earth-rotation model used in LALSuite as opposed to the more accu-rate empirical IERS Earth rotation model used in Pint ,see Sec. II B 1. 
+
+5. Monte-Carlo sampled comparison 
+
+For a more comprehensive comparison, we sample 1000 random sky points, for each of the three Einstein-delay test cases discussed above. The resulting ranges in stan-dard deviation σCδτ for different delay-components C are given in Table I. As we can see, these ranges are largely 
+
+[min, max] 
+
+σδτ [ns] TDB TAI old TDB TAI new TDB BIPM new 
+
+δτ total [2314, 2332] [19, 30] [18, 31] 
+
+δτ Rømer ,geo [0.94, 15] [0.94, 15] [1.0, 17] 
+
+δτ Rømer ,obs [17, 26] [17, 26] [17, 26] 
+
+δτ Shapiro [0.27, 6.3] [0.27, 6.3] [0.27, 6.3] 
+
+δτ Einstein ,geo 1768 0.88 0.92 
+
+δτ Einstein ,obs 1272 1.2 1.2 TABLE I. Measured ranges (over 1000 random sky positions) in standard deviations σδτ of timing disagreement, for differ-ent delay components (rows) and different comparison vari-ants for the Einstein-delay (columns). 
+
+consistent with the illustrative results shown above. In Fig. 6 we show the distribution of σtotal  
+
+> δτ
+
+for the most realistic TDB BIPM new comparison case. We see that overall disagreement variation (using 
+
+XLALBarycenterEarthNew ) satisfies σtotal  
+
+> δτ
+
+<
+
+∼ 31 ns. As-suming a search at f = 1000 Hz, the resulting mismatch Eq. (40) would therefore be about μ <
+
+∼ 4 × 10 −8.
+
+C. Comparing binary-system delays 
+
+In order to test the binary-delay component δτ Binary 
+
+of Sec. II B 4, we use the ATNF Pulsar Catalogue 8 [48] to generate a realistic test set of binary orbital param-eters: we use the 474 binary systems with well-defined periods PB and semi-major axes ap > 10 −2 s (filter-ing out a few low-ap planetary systems producing low-disagreement outliers in the plots), as shown in Fig. 7. For each of these ATNF binaries, we use their sky po-sition, ap, PB and eccentricity e, and randomly sample 100 realizations for time of periapse tp ∈ [0 , P B] and ar-gument of periapse ω ∈ [0 , 2π]. The distributions of the resulting disagreements σBinary  
+
+> δτ
+
+are shown in Fig. 8, com-paring either against Pint ’s BT model or the DD model [49] with these parameters. Note, however, that here we are only using the “BT-subset” of the DD model, which we denote as DD BT . This comparison therefore does not 
+
+imply that the BT model is an accurate description of all these binaries, only that the BT-model implementa-tion agrees with Pint for these binary parameters. It is interesting to note that Pint ’s DD-model implemen-tation seems to agree substantially better with LAL-Suite on the BT parameter subset compared to its BT-model implementation. To further visualize these distri-butions over the binary parameter space, in Fig. 9 we     
+
+> 8Catalogue version 2.8.1, https://www.atnf.csiro.au/ research/pulsar/psrcat/index.php?version=2.8.1
+
+10 27600 27650 27700 27750 
+
+> δτ total  [ns]
+
+σtotal  
+
+> δτ
+
+∈ [21 , 29] ns 27668 27670 27672 
+
+> δτ Einstein ,geo  [ns]
+
+σEinstein ,geo  
+
+> δτ
+
+∼ 0.92 ns 60100 60200 60300 60400 MJD [days] 
+
+−
+
+20 020 40 
+
+> δτ Rømer ,geo  [ns]
+
+σRømer ,geo  
+
+> δτ
+
+∈ [4 .6, 16] ns 60100 60200 60300 60400 MJD [days] 
+
+−
+
+50 050 100 
+
+> δτ Rømer ,obs  [ns]
+
+σRømer ,obs  
+
+> δτ
+
+∈ [19 , 23] ns 
+
+FIG. 5. Time-delay disagreements for isolated sources over a one-year timespan, showing the total delay δτ total (top left ), geocentric Einstein delay δτ Einstein ,geo (top right ), and the geocentric δτ Rømer ,geo (bottom left ) and observatory δτ Rømer ,obs 
+
+(bottom right ) components of the Rømer delay. This plot shows the TDB BIPM new comparison between the newer LALSuite 
+
+Einstein-delay implementation ( XLALBarycenterEarthNew ) and Pint ’s TT(BIPM). 20 .0 22 .5 25 .0 27 .5 30 .0
+
+σtotal  
+
+> δτ
+
+[ns] 010 20 30 count 
+
+FIG. 6. Histogram of standard deviations σtotal  
+
+> δτ
+
+of the total timing disagreement over a one-year timespan for 1000 ran-dom sky positions, using the TDB BIPM new Einstein-delay com-parison. 
+
+plot σBinary  
+
+> δτ
+
+versus projected orbital velocity at periapse 
+
+vp/c ≡ (2 πa p/P B)p(1 + e)/(1 − e), and versus eccen-tricity e. This shows a slight upward trend with vp and 10 −1 10 0 10 1 10 2 10 3 10 4
+
+PB [d] 10 −2
+
+10 0
+
+10 2
+
+10 4
+
+> ap [s]
+
+e = 0 
+
+e > 0
+
+10 −7 10 −5 10 −3 10 −1
+
+e
+
+FIG. 7. Binary orbital parameters (semi-major axis ap, period 
+
+PB, and eccentricity e) of 474 binaries from the ATNF cat-alog, for which we measure the binary-timing disagreements 
+
+δτ Binary .
+
+wider distribution spreads when approaching e → 1, but otherwise we see consistently very high agreement, typ-11 10 −3 10 −2 10 −1 10 0 10 1 10 2 10 3 10 4
+
+σBinary  
+
+> δτ
+
+[ns] 02000 4000 count BT DD BT 
+
+FIG. 8. Histograms of standard deviations σBinary  
+
+> δτ
+
+of the bi-nary timing disagreement (between LALSuite ’s BT model and Pint ’s BT and DD BT models, respectively) over a one-year timespan, for the 474 binary systems shown in Fig. 7 with 100 randomly-sampled values for tp and ω for each sys-tem. 10 −5 10 −4 10 −3
+
+vp/c 
+
+10 −2
+
+10 0
+
+10 2
+
+10 4
+
+> σBinary
+> δτ  [ns]
+
+BT DD BT 10 −6 10 −4 10 −2 10 0
+
+e
+
+10 −2
+
+10 0
+
+10 2
+
+10 4
+
+> σBinary
+> δτ  [ns]
+
+BT DD BT 
+
+FIG. 9. Standard deviations σBinary  
+
+> δτ
+
+of binary timing dis-agreement (of LALSuite ’s BT versus Pint ’s BT and DD BT 
+
+models, respectively) versus projected orbital velocity at pe-riapse vp (upper plot ) and orbital eccentricity e (lower plot )for systems with e > 0. Circles mark the median and error bars span the minimum and maximum over the 100 random draws of tp and ω done per binary system. 
+
+ically sub-nanosecond, between LALSuite and Pint ’s DD BT model. 
+
+D. Self-consistency check of LALSuite source-time derivatives ˙τ
+
+In addition to the time delays, LALSuite indepen-dently computes the source-time derivative ˙ τ ≡ dτ /dt =1 − ˙∆, which is used, for example, in the F-statistic implementation to linearly interpolate the timing model (computed only once per timestamp) over the timestamp separation (typically the data SFT timebase of <
+
+∼ 1800 s). We test the internal consistency of the LALSuite source-time derivative ˙ τ against a centered finite-difference esti-mate obtained from its total time delay ∆( t), namely ˙τnum (ti) ≡ 1 − ∆( ti+1 ) − ∆( ti−1)
+
+ti+1 − ti−1
+
+. (44) We use 3000 consecutive timestamps at a spacing of 1 s, starting at GPS time 1 368 921 618, for the L1 de-tector and the DE430 ephemeris with the newer TDB Einstein-delay implementation. The comparison cov-ers 200 isotropically sampled sky positions and orbital phases of binaries with parameters ap = 1 .4 s, PB =68 400 s and e = 0 .1, with tp and ω sampled randomly. Over the resulting approximately 6 × 10 5 comparisons, the mean and maximum absolute errors | ˙τnum − ˙τ | are found as 9 .5 × 10 −12 s/s and 3 .7 × 10 −11 s/s, respectively. 
+
+V. CONCLUSIONS 
+
+We have performed a systematic validation of the 
+
+LALSuite timing model for continuous gravitational waves, using Pint as an independent high-accuracy ref-erence implementation, comparing the individual solar-system and binary time-delay components. To quantify the impact of timing inaccuracies on searches, we first derived and numerically validated the leading-order rela-tion Eq. (40) between the mismatch μ and the variance 
+
+σ2 
+
+> δτ
+
+of the timing errors. With the original Einstein-delay implementation 
+
+XLALBarycenterEarth , total timing disagreement is dominated by that component and has σδτ ≃ 2.3 μs, corresponding to a mismatch of only μ ≃ 0.02 % at a frequency of f = 1000 Hz, well within accuracy require-ments for continuous-wave searches. With the newer Einstein-delay XLALBarycenterEarthNew , the total dis-agreement drops to σδτ <
+
+∼ 31 ns, corresponding to μ <
+
+∼
+
+4 × 10 −8 at 1000 Hz, see Sec. IV for details. We tested the LALSuite binary-delay implementation using or-bital parameters of 474 binary pulsars from the ATNF catalog and found consistently small disagreements with 
+
+Pint ’s DD BT model of order σBinary  
+
+> δτ
+
+<
+
+∼ O (ns). We also verified the self-consistency of the independently com-puted LALSuite source-time derivatives to absolute er-rors of <
+
+∼ 3.7 × 10 −11 s/s. 12 Finally, we derived LALSuite ’s solar-interior Shapiro-delay expression and compared its underlying density model with a realistic solar model. While this approxima-tion regularizes the Shapiro delay at the solar center, it underestimates the solar-interior delay by up to ∼ 14 .5 μsnear the center. These results validate the LALSuite timing model for the tested continuous-wave search configurations, and provide quantitative information about current accuracy bottlenecks for future improvements, should they ever be needed. 
+
+> ACKNOWLEDGMENTS
+
+We are grateful to Colin J. Clark for helping us nav-igate our way around Pint and for useful discussions about the intricacies of different Einstein-delay approxi-mations. We thank Heinz-Bernd Eggenstein for pointing out the subtleties around accurately predicting the Earth rotation and the IERS Earth rotation models. CC’s re-search was carried out at the Jet Propulsion Labora-tory, California Institute of Technology, under a contract with the National Aeronautics and Space Administration (80NM0018D0004). 
+
+AI tool use : The Pi coding agent was used with OpenAI’s GPT-5.5 and, subsequently, GPT-5.6-sol (both with medium reasoning effort) to assist in writing the Python scripts for the LALSuite –Pint comparisons and all figure-plotting scripts. GPT-5.6-sol also helped iden-tify a realistic solar-density model and implement its nu-merical integration in the Shapiro-delay analysis. AI as-sistance was further used to polish the Abstract and In-troduction and to review the manuscript for correctness, identifying several minor errors and inaccuracies. All AI-assisted code and text was carefully reviewed, tested, and sanity-checked by the authors, who take full responsibil-ity for the contents of the manuscript. 
+
+> Appendix A: Solar-interior Shapiro delay derivation
+
+In this section we provide a derivation for the LAL-Suite Shapiro-delay expressions, namely the standard solar-exterior solution of Eq. (11), but especially Eq. (13) for rays traversing the solar interior.  
+
+> 1. General Shapiro delay
+
+Let U (⃗x) denote the Newtonian potential, determined by the mass density ρ(⃗x) via Poisson’s equation, 
+
+∇2U = 4 πGρ. (A1) In isotropic coordinates the metric for a static, weak grav-itational field (to first order in U/c 2) is 
+
+ds 2 = −
+
+
+
+1 + 2Uc2
+
+
+
+c2dt 2 +
+
+
+
+1 − 2Uc2
+
+
+
+d⃗ x 2, (A2) e.g., Eq. (4.13) in [50]. For a null ray, ds 2 = 0, and expanding to first order therefore gives 
+
+dt = dℓ c − 2Uc3 dℓ, (A3) where dℓ = |d⃗ x|. The second term denotes the relativis-tic correction to the flat-space propagation time, and we can therefore write the general expression for the Shapiro delay as ∆Shapiro = − 2
+
+c3
+
+Z arrival emission 
+
+U (⃗x) dℓ, (A4) which can be evaluated along the unperturbed straight ray, as corrections from gravitational bending enter at higher orders of U/c 2.Let ⃗r o ≡⃗r −⃗r ⊙ denote the vector from the Sun to the observer. It is useful to define the observer height zo and impact vector B with respect to the lens plane , namely 
+
+zo ≡⃗r o · ˆn, B ≡⃗r o − zo ˆn, (A5) such that B · ˆn = 0, and further denote 
+
+ro ≡ | ⃗r o| = pz2o + B2, B ≡ | B| . (A6) The unperturbed ray can now be parametrized directly by the axial coordinate z, increasing along ˆ n from the observer towards the source, namely ⃗x(z) = B + z ˆn, with z o ≤ z ≤ zs, (A7) where ⃗x is relative to the solar center, and z s is the source height over the lens plane. Using these coordinates we can write Eq. (A4) as ∆Shapiro (B, z o, z s) = − 2
+
+c3
+
+Z zs
+
+> zo
+
+U (B, z ) dz, (A8) where z increases from observer to source, therefore dℓ =
+
+|dz | = −dz and we reversed the integration direction.  
+
+> 2. Exterior solution
+
+Using the exterior potential for a spherical Sun, i.e., 
+
+U (r) = −GM ⊙/|⃗x|, with |⃗x(z)| = √B2 + z2, we find ∆ext Shapiro = 2GM ⊙
+
+c3
+
+Z zs
+
+> zo
+
+dz 
+
+√B2 + z2
+
+= 2GM ⊙
+
+c3 ln 
+
+"
+
+zs + pz2s + B2
+
+zo + pz2o + B2
+
+#
+
+. (A9) Note that the original result by Shapiro [51] contains an extra term, which is a coordinate artifact from using Schwarzschild coordinates instead of isotropic ones, see [52] for further discussion. For a distant source, zs ≫ B,the numerator is approximately constant ≈ 2zs, corre-sponding to the unknown (true) source emission time (see 13 Sec. II B). Following tempo2 /Pint conventions, we set this arbitrary constant to 1AU, resulting in ∆ext Shapiro (B, z o) = − 2GM ⊙
+
+c3 ln 
+
+"
+
+zo + pz2o + B2
+
+1AU 
+
+#
+
+, (A10) in agreement with Eq. (11). 
+
+3. Interior solution 
+
+For a ray traversing the solar interior, i.e., zo < 0 with 
+
+B ≤ R⊙ and |zo| ∼ 1AU ≫ R⊙, we can approximate both source and observer as very distant from the lens plane and take Eq. (A8) from zo → −∞ to zs → ∞ . Ap-plying the transverse two-dimensional Laplacian ∇2 
+
+> ⊥
+
+≡∇2 −∂2 
+
+> z
+
+, the integral over the second term ( ∝ [∂z U ]z=∞
+
+> z=−∞
+
+)vanishes, and using Poisson’s equation Eq. (A1) we ob-tain 
+
+∇2
+
+> ⊥
+
+∆Shapiro (B) = − 8πG c3 Σ( B), (A11) in terms of the projected surface density, defined as Σ( B) ≡
+
+Z ∞−∞ 
+
+ρ(B, z ) dz. (A12) This corresponds to the thin-lens formulation Eqs. (5.13), (4.27a-c) in [50] (with their potential bψ related to Shapiro delay as ∆ Shapiro = − bψ/c ). For an axially-symmetric density distribution, Σ and ∆Shapiro only depend on B, and Eq. (A11) reduces to 1
+
+BddB 
+
+
+
+B d∆Shapiro 
+
+dB 
+
+
+
+= − 8πG c3 Σ( B). (A13) Integrating this from 0 to B and assuming regularity at ∆Shapiro (B = 0), we obtain 
+
+d∆Shapiro 
+
+dB = − 4Gc3
+
+m(B)
+
+B , (A14) with the cumulative mass m(B) within cylindrical radius 
+
+B defined as 
+
+m(B) ≡ 2π
+
+Z B
+
+> 0
+
+Σ( B′)B′ dB ′. (A15) A second integration, this time from B to R⊙, yields ∆int Shapiro (B) = ∆ ext ,B=R⊙ 
+
+> Shapiro
+
++ 4Gc3
+
+Z R⊙
+
+> B
+
+m(B′)
+
+B′ dB ′, (A16) where we match ∆ Shapiro (B = R⊙) to the exterior re-sult of Eq. (A10) for a ray grazing the surface. This allows us to compute the Shapiro delay for any given axially-symmetric mass distribution m(B) by simple 1D integration. 
+
+4. Solar density-profile models 
+
+In the following we consider three different density profiles, (a) the LALSuite “singular isothermal-sphere” model, (b) a uniform-density model and (c) a realistic tabulated solar density profile. This comparison serves to illustrate the sensitivity of the Shapiro delay to differ-ences in mass profiles and also allows us to estimate the error compared to a realistic solar model. 
+
+a. LALSuite ’s singular isothermal-sphere model 
+
+A simple projected surface-density toy model is Σ ∝
+
+B−1, which is inspired by 9 the singular isothermal-sphere model in [50]. Normalizing the mass inside B ≤ R⊙ to be M⊙, the LALSuite model is therefore ΣLS (B) = M⊙
+
+2πR ⊙B , (A17) with cumulative mass function mLS (B) = M⊙B/R ⊙.Defining the relative impact parameter b ≡ B/R ⊙,Eq. (A16) yields ∆LS Shapiro = ∆ ext ,B=R⊙ 
+
+> Shapiro
+
++ 4GM ⊙
+
+c3 (1 − b) , (A18) which is the solar-interior expression of Eq. (13) that is implemented in LALSuite .
+
+b. Uniform-density sphere 
+
+As an (extreme) example that is less centrally con-densed than the LALSuite model, consider a uniform-density sphere, i.e., 
+
+ρUnif = 3M⊙
+
+4πR 3
+
+> ⊙
+
+. (A19) Its projected surface density is ΣUnif (B) = 3M⊙
+
+2πR 2
+
+> ⊙
+
+p1 − b2, (A20) with the corresponding cumulative mass 
+
+mUnif (b) = M⊙
+
+
+
+1 − (1 − b2)3/2
+
+, (A21) inserted into Eq. (A16) yields ∆Unif Shapiro = ∆ ext ,B=R⊙ 
+
+> Shapiro
+
++ 4GM ⊙
+
+c3 f (b), with 
+
+f (b) = 4 − b2
+
+3
+
+p1 − b2 − ln 
+
+
+
+1 + p1 − b2
+
+
+
+.
+
+(A22)       
+
+> 9This would correspond to the projection of a ρ∝r−2density profile if the integration cutoff is large compared to B, as assumed for the singular isothermal model in Sec. 8.1.4 of Ref. [50].
+
+14 At b = 0, this interior correction is smaller than the LAL-Suite model by 4GM ⊙
+
+c3
+
+
+
+ln 2 − 13
+
+
+
+≃ 7.1 μs. (A23) 
+
+c. Realistic solar model 
+
+As a representative realistic reference, we use the tab-ulated density profile 10 for the BS05(OP) solar model [53]. This density profile is substantially more centrally condensed than the LALSuite model except very close to the center, as seen in Fig. 10 (lower plot), comparing the cumulative mass function m(b) for the three mod-els considered. We now numerically integrate the master equation (A16) for this density profile, the resulting inte-rior Shapiro delay ∆ BS05(OP) Shapiro as a function of b is shown in Fig. 10 (upper plot), comparing all three models. The larger central mass concentration of the BS05(OP) model yields a larger Shapiro delay compared to the LALSuite 010 20 30 ∆Shapiro (b) − ∆ext ,b=1
+
+> Shapiro  [μs]
+
+LALSuite model constant density BS05(OP) 0.0 0.2 0.4 0.6 0.8 1.0Relative impact parameter b = B/R 
+
+0.00.20.40.60.81.0
+
+> m(b)/M
+
+FIG. 10. Solar-interior Shapiro delay ∆ Shapiro (b) relative to a grazing ray ( upper plot ) and cumulative mass func-tion m(b)/M ⊙ (lower plot ) versus relative impact parameter 
+
+b = B/R ⊙, for three different solar-density models. 
+
+model, by about 14 .5 μs near the center (at b ≃ 0.045). We note that a simple scaling of the current LALSuite 
+
+model would produce a substantially better fit to the more realistic BS05(OP) model, which could be a cheap way to improve the accuracy of the current solar-interior Shapiro implementation, if needed.  
+
+> 10 https://www.sns.ias.edu/~jnb/SNdata/Export/BS2005/ bs05op.dat .
+
+15 
+
+[1] A. G. Abac et al. (LIGO Scientific, VIRGO, KAGRA), GWTC-4.0: Updating the Gravitational-Wave Transient Catalog with Observations from the First Part of the Fourth LIGO-Virgo-KAGRA Observing Run, arXiv e-prints (2025), arXiv:2508.18082 [gr-qc]. [2] A. G. Abac et al. (LIGO Scientific, VIRGO, KAGRA), Search for Continuous Gravitational Waves from Known Pulsars in the First Part of the Fourth LIGO-Virgo-KAGRA Observing Run, The Astrophysical Journal 983 ,10.3847/1538-4357/adb3a0 (2025). [3] B. McGloughlin, J. Ming, M. A. Papa, K. Sharma, R. Prix, B. Steltner, H.-B. Eggenstein, N. Wang, and J. Yuan, Search for continuous gravitational waves from the pulsar J0435+3233 (2026), arXiv:2607.18219 [gr-qc]. [4] J. Ming, M. A. Papa, H.-B. Eggenstein, B. Machenschalk, J. Martins, B. Steltner, B. McGloughlin, V. Dergachev, R. Prix, and M. Bensch, Observational Constraints on the Spin/Anisotropy of the Central Compact Objects of Cassiopeia A, Vela Jr., and G347.3–0.5 and a Single Sur-viving Continuous Gravitational Wave Candidate, The Astrophysical Journal 1004 , 10.3847/1538-4357/ae6e41 (2026). [5] A. G. Abac et al. (LIGO Scientific, VIRGO, KAGRA), Searches for Continuous Gravitational Waves from Su-pernova Remnants in the first part of the LIGO-Virgo-KAGRA Fourth Observing run (2026), arXiv:2603.25808 [gr-qc]. [6] P. B. Covas, M. A. Papa, and R. Prix, Wide parameter-space O3 search for continuous gravitational waves from unknown neutron stars in binary systems (2026). [7] A. G. Abac et al. (LIGO Scientific, VIRGO, KAGRA), All-sky Searches for Continuous Gravitational Waves from Isolated Neutron Stars in the Data from the First Part of the Fourth LIGO-Virgo-KAGRA Observing Run (2026), arXiv:2603.14168 [gr-qc]. [8] K. Riles, Searches for continuous-wave gravitational ra-diation, Living Rev. Rel. 26 , 3 (2023), arXiv:2206.06447 [astro-ph.HE]. [9] K. Wette, Searches for continuous gravitational waves from neutron stars: A twenty-year retrospective, As-troparticle Physics 153 , 102880 (2023). [10] N. Lu, S. M. Scott, and K. Wette, What are neutron stars made of? Gravitational waves may reveal the answer, Int. J. Mod. Phys. D 32 , 2341005 (2023), arXiv:2305.06606 [gr-qc]. [11] F. Gittins and N. Andersson, Modelling neutron star mountains in relativity, Mon. Not. Roy. Astron. Soc. 507 ,116 (2021), arXiv:2105.06493 [astro-ph.HE]. [12] J. A. Morales and C. J. Horowitz, Anisotropic neu-tron star crust, solar system mountains, and grav-itational waves, Phys. Rev. D 110 , 044016 (2024), arXiv:2309.04855 [astro-ph.HE]. [13] G. Pagliaro, M. A. Papa, J. Ming, J. Lian, D. Tsuna, C. Maraston, and D. Thomas, Continuous Gravitational Waves from Galactic Neutron Stars: Demography, De-tectability, and Prospects, Astrophys. J. 952 , 123 (2023), arXiv:2303.04714 [gr-qc]. [14] LIGO Scientific Collaboration, Virgo Collaboration, and KAGRA Collaboration, LVK Algorithm Library - LAL-Suite, Free software (GPL) (2018). [15] Luo et al. , PINT: A Modern Software Package for Pulsar Timing, Astrophys. J. 911 , 45 (2021), arXiv:2012.00074 [astro-ph.IM]. [16] Nice et al. , Tempo: Pulsar timing data analysis, Astro-physics Source Code Library, record ascl:1509.002 (2015). [17] Abbott et al. (LIGO Scientific Collaboration), Setting upper limits on the strength of periodic gravitational waves from psr J1939 + 2134 using the first science data from the geo 600 and ligo detectors, Phys. Rev. D 69 ,082004 (2004). [18] M. Pitkin and G. Woan, Binary system delays and tim-ing noise in searches for gravitationalwaves from known pulsars, Physical Review D 76 , 042006 (2007). [19] Jaranowski, Kr´ olak, and Schutz, Data analysis of gravitational-wave signals from spinning neutron stars: The signal and its detection, Phys. Rev. D 58 , 063001 (1998). [20] R. T. Edwards, G. B. Hobbs, and R. N. Manchester, tempo2, a new pulsar timing package – II. The timing model and precision estimates, Monthly Notices of the Royal Astronomical Society 372 , 1549 (2006). [21] R. Abbott et al. (KAGRA, LIGO Scientific, VIRGO), All-sky search for continuous gravitational waves from isolated neutron stars using Advanced LIGO and Ad-vanced Virgo O3 data, Phys. Rev. D 106 , 102008 (2022), arXiv:2201.00697 [gr-qc]. [22] M. Pitkin, S. Doolan, L. McMenamin, and K. Wette, Re-duced order modelling in searches for continuous gravita-tional waves – I. Barycentring time delays, Monthly No-tices of the Royal Astronomical Society 476 , 4510 (2018). [23] S. M. Ransom, Pulsars in Globular Clusters, Proceedings of the International Astronomical Union 3, 291 (2007). [24] P. Leaci and R. Prix, Directed searches for continuous gravitational waves from binary systems: Parameter-space metrics and optimal scorpius x-1 sensitivity, Phys. Rev. D 91 , 102003 (2015). [25] Ryan Park, JPL Planetary and Lunar Ephemerides, 
+
+https://ssd.jpl.nasa.gov/planets/eph_export.html 
+
+(2020). [26] M. Pitkin, PyPI: solar-system-ephemerides, https:// pypi.org/project/solar-system-ephemerides (2026). [27] P. K. Seidelmann, Explanatory Supplement to the Astro-nomical Almanac (University Science Books, 1992). [28] IERS, Earth orientation data, https://www.iers.org/ IERS/EN/DataProducts/EarthOrientationData/eop. html .[29] C. Cutler, unpublished, implemented in LALSuite 
+
+(2001). [30] G. H. Kaplan, The IAU Resolutions on Astronomical Ref-erence Systems, Time Scales, and Earth Rotation Models (2006). [31] S. A. Klioner, Relativistic scaling of astronomical quan-tities and the system of astronomical units, A&A 478 ,10.1051/0004-6361:20077786 (2008). [32] T. D. Moyer, Transformation from proper time on Earth to coordinate time in solar system barycentric space-time frame of reference, Celestial mechanics 23 , 33 (1981). [33] The Astropy Collaboration, The Astropy Project: Sus-taining and Growing a Community-oriented Open-source Project and the Latest Major Release (v5.0) of the Core Package, The Astrophysical Journal 935 , 167 (2022). 16 
+
+[34] L. Fairhead and P. Bretagnon, An analytical formula for the time transformation TB-TT., A&A 229 , 240 (1990). [35] A. W. Irwin and T. Fukushima, A numerical time ephemeris of the Earth, A&A 348 , 642 (1999). [36] M. Pitkin, CWInPy: A Python package for inference with continuous gravitational-wave signals from pulsars, Journal of Open Source Software 7, 4568 (2022). [37] R. Blandford and S. A. Teukolsky, Arrival-time analysis for a pulsar in a binary system., APJ 205 , 580 (1976). [38] A. E. Roy, Orbital Motion , 4th ed. (CRC Press, 2004). [39] L. S. Finn, Detection, measurement, and gravitational radiation, Phys. Rev. D 46 , 5236 (1992). [40] R. Prix, Analytic weak-signal approximation of the Bayes factor for continuous gravitational waves, Class. Quan-tum Grav. 42 , 065006 (2025). [41] R. Prix and Y. Itoh, Global parameter-space correlations of coherent searches for continuous gravitational waves, Classical and Quantum Gravity 22 , S1003 (2005). [42] P. Covas and R. Prix, Improved short-segment detection statistic for continuous gravitational waves, Phys. Rev. D 105 , 124007 (2022). [43] R. Prix, Search for continuous gravitational waves: Met-ric of the multidetector F-statistic, Physical Review D 
+
+75 , 023004 (2007). [44] B. J. Owen, Search templates for gravitational waves from inspiraling binaries: Choice of template spacing, Phys. Rev. D 53 , 6749 (1996). [45] P. R. Brady, T. Creighton, C. Cutler, and B. F. Schutz, Searching for periodic sources with LIGO, Physical Re-view D 57 , 2101 (1998). [46] A. Susobhanan, D. L. Kaplan, A. M. Archibald, J. Luo, P. S. Ray, T. T. Pennucci, S. M. Ransom, G. Agazie, W. Fiore, B. Larsen, P. O’Neill, R. van Haasteren, A. Anumarlapudi, M. Bachetti, D. Bhakta, C. A. Cham-pagne, H. T. Cromartie, P. B. Demorest, R. J. Jennings, M. Kerr, S. Levina, A. McEwen, B. J. Shapiro-Albert, and J. K. Swiggum, PINT: Maximum-likelihood Estima-tion of Pulsar Timing Noise Parameters, The Astrophys-ical Journal 971 , 150 (2024). [47] M. F. Alam et al. , The NANOGrav 12.5 yr Data Set: Observations and Narrowband Timing of 47 Millisecond Pulsars, The Astrophysical Journal Supplement Series 
+
+252 , 4 (2020). [48] R. N. Manchester, G. B. Hobbs, A. Teoh, and M. Hobbs, The Australia Telescope National Facility Pulsar Cata-logue, The Astronomical Journal 129 , 1993 (2005). [49] T. Damour and N. Deruelle, General relativistic celes-tial mechanics of binary systems. I. The post-newtonian motion, Annales de l’I.H.P. Physique th´ eorique 43 , 107 (1985). [50] P. Schneider, J. Ehlers, and E. E. Falco, Gravitational Lenses , edited by I. Appenzeller, G. B¨ orner, M. Har-wit, R. Kippenhahn, J. Lequeux, P. A. Strittmatter, and V. Trimble, Astronomy and Astrophysics Library (Springer Berlin Heidelberg, Berlin, Heidelberg, 1992). [51] I. I. Shapiro, Fourth Test of General Relativity, Physical Review Letters 13 , 789 (1964). [52] M. P¨ ossel, The Shapiro time delay and the equivalence principle (2019), arXiv:2001.00229 [gr-qc]. [53] J. N. Bahcall, A. M. Serenelli, and S. Basu, New so-lar opacities, abundances, helioseismology, and neu-trino fluxes, The Astrophysical Journal Letters 621 , L85 (2005), arXiv:astro-ph/0412440.

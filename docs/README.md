@@ -6,41 +6,38 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-26
-- 运行时间：2026-08-26 20:32:53 UTC
+- 最新运行日期：2026-08-28
+- 运行时间：2026-08-28 04:01:28 UTC
 - 运行状态：成功
-- 本次总论文数：7
+- 本次总论文数：5
 - 精读区：5
-- 速读区：2
+- 速读区：0
 
 ### 今日简报（AI）
-今日聚焦快速射电暴与中子星物理，精读红移-脉冲星计时等价性及FRB宿主星系色散关系，并速读双星中子星速度与自旋效应研究。最值得关注：红移与脉冲星计时调制的精确等价关系，以及FRB色散-恒星质量关系的本地起源解释。建议普通读者优先了解这两篇高分工作，它们分别连接了宇宙学观测与致密星天体物理前沿。
-- 详情：[/202608/26/README](/202608/26/README)
+今日精读5篇论文，聚焦连续引力波探测与快速射电暴起源两大前沿方向。  
+最值得关注的是：优化脉冲星计时阵列可提升超巨质量黑洞双星引力波探测效率；FRB 121102可能并非超新星或磁星驱动，而暗示白矮星并合机制。  
+建议普通读者留意引力波与FRB协同观测的后续进展，这两类信号或将揭示极端宇宙事件的新物理。
+- 详情：[/202608/28/README](/202608/28/README)
 
 ### 精读区论文标签
-1. [Exact Equivalence of the Observed Redshift and the Pulsar Timing Modulation in the Infinitesimal-Pulse Limit](/202608/26/2608.23684v1-exact-equivalence-of-the-observed-redshift-and-the-pulsar-timing-modulation-in-the-infinitesimal-pulse-limit)  
+1. [The properties of the first continuous gravitational waves: Optimizing pulsar timing observations for supermassive black hole binary detection](/202608/28/2608.25715v1-the-properties-of-the-first-continuous-gravitational-waves-optimizing-pulsar-timing-observations-for-supermassive-black-hole-binary-detection)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：直接推进脉冲星计时阵列理论，证明计时调制与红移的精确等价
-2. [The Local Origin of a Host Dispersion Measure-Stellar Mass Relation in Fast Radio Bursts](/202608/26/2608.23868v1-the-local-origin-of-a-host-dispersion-measure-stellar-mass-relation-in-fast-radio-bursts)  
+   evidence：脉冲星测时观测优化，直接对应脉冲星测时应用
+2. [FRB 121102: No supernova-like ejecta or magnetar power, hinting at a binary WD merger](/202608/28/2608.26567v1-frb-121102-no-supernova-like-ejecta-or-magnetar-power-hinting-at-a-binary-wd-merger)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：直接研究快速射电暴宿主环境与弥散量关系，涉及FRB起源
-3. [Gravitational Wave Parity-Violating Strain from Pulsar Glitches in Chern-Simons Modified Gravity](/202608/26/2608.24002v1-gravitational-wave-parity-violating-strain-from-pulsar-glitches-in-chern-simons-modified-gravity)  
+   evidence：直接分析重复暴FRB 121102的引擎性质，限制其起源与磁星能源
+3. [Spectro-Polarimetric Properties of CHIME FRB Sources](/202608/28/2608.26654v1-spectro-polarimetric-properties-of-chime-frb-sources)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：脉冲星自转突变在Chern-Simons引力中产生宇称破坏的引力波信号
-4. [Sub-Millisecond Pulsars: Missing or Impossible?](/202608/26/2608.23704v1-sub-millisecond-pulsars-missing-or-impossible)  
+   evidence：对CHIME快速射电暴进行系统谱偏振分析，测量退偏振参数以探测前身星环境
+4. [A Bayesian Framework for Constraining Magnetar Magnetic Fields from Repeating FRB Statistics](/202608/28/2608.26857v1-a-bayesian-framework-for-constraining-magnetar-magnetic-fields-from-repeating-frb-statistics)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：从重复快速射电暴统计约束磁星磁场，直接涉及磁星与FRB的联系
+5. [Validating Timing-Model Accuracy for Continuous Gravitational Waves: A Comparison of LALSuite and PINT](/202608/28/2608.26271v1-validating-timing-model-accuracy-for-continuous-gravitational-waves-a-comparison-of-lalsuite-and-pint)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：中子星状态方程对最小自转周期的约束
-5. [Quantum-Gravity-Inspired Effects in Neutron Stars: A Critical Map from Microscopic Assumptions to Observables](/202608/26/2608.24796v1-quantum-gravity-inspired-effects-in-neutron-stars-a-critical-map-from-microscopic-assumptions-to-observables)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：系统梳理量子引力启发修改如何影响中子星质量、半径和潮汐形变等可观测量并给出与观测比较的一致性条件，直接关联状态方程约束
+   evidence：验证脉冲星计时模型精度，支撑精确计时应用
 
 ### 速读区论文标签
-1. [The Kick Velocities of Neutron Stars in Binary Systems](/202608/26/2608.19690v2-the-kick-velocities-of-neutron-stars-in-binary-systems)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：通过双星族合成比较约束中子星踢速度，直接关联脉冲星种群演化
-2. [The imprint of individual neutron star spins on ejecta, $r$-process nucleosynthesis, and kilonovae in binary neutron star mergers](/202608/26/2608.22058v1-the-imprint-of-individual-neutron-star-spins-on-ejecta-r-process-nucleosynthesis-and-kilonovae-in-binary-neutron-star-mergers)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：利用SFHo状态方程和数值相对论研究双中子星自旋效应，与中子星状态方程约束相关
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
