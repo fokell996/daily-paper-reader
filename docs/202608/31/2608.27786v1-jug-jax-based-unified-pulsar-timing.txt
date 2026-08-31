@@ -1,0 +1,560 @@
+Title: JUG: JAX-based Unified pulsar timinG
+
+URL Source: https://arxiv.org/pdf/2608.27786v1
+
+Published Time: Mon, 31 Aug 2026 00:20:37 GMT
+
+Number of Pages: 24
+
+Markdown Content:
+Draft version August 31, 2026 
+
+Typeset using L ATEX default style in AASTeX7.0.1 
+
+JUG: JAX-based Unified pulsar timinG 
+
+M. T. Miles, 1, 2 S. R. Taylor, 1 M. Bailes, 3, 2 A. Chalumeau, 4 H. T. Cromartie, 1 K. A. Gersbach, 1
+
+R. van Haasteren, 5 M. J. Keith, 6 N. Laal, 1 M. T. Lam, 7 K. Liu, 8 A. Parthasarathy, 9, 10, 11 S. M. Ransom, 12 
+
+D. J. Reardon, 3, 2 R. M. Shannon, 3, 2 D. C. Wright, 13 and A. Zic 14, 2 
+
+> 1
+
+Department of Physics & Astronomy, Vanderbilt University, 2301 Vanderbilt Place, Nashville, TN 37235, USA 
+
+> 2
+
+OzGrav: The ARC Center of Excellence for Gravitational Wave Discovery, Hawthorn VIC 3122, Australia 
+
+> 3
+
+Centre for Astrophysics and Supercomputing, Swinburne University of Technology, Hawthorn VIC 3122, Australia 
+
+> 4
+
+LPC2E, OSUC, Univ Orleans, CNRS, F-45071 Orleans, France 
+
+> 5
+
+Max Planck Institute for Gravitational Physics (Albert Einstein Institute), Leibniz Universit¨ at Hannover, Callinstrasse 38, D-30167, Hannover, Germany 
+
+> 6
+
+Jodrell Bank Centre for Astrophysics, Department of Physics and Astronomy, University of Manchester, Manchester M13 9PL, UK 
+
+> 7
+
+SETI Institute, 339 N Bernardo Ave Suite 200, Mountain View, CA 94043, USA 
+
+> 8
+
+State Key Laboratory of Radio Astronomy and Technology, Shanghai Astronomical Observatory, CAS, 80 Nandan Road, Shanghai 200030, P. R. China 
+
+> 9
+
+ASTRON, Netherlands Institute for Radio Astronomy, Oude Hoogeveensedijk 4, 7991 PD Dwingeloo, The Netherlands 
+
+> 10
+
+Anton Pannekoek Institute for Astronomy, University of Amsterdam, Science Park 904, 1098 XH Amsterdam, The Netherlands 
+
+> 11
+
+Max-Planck-Institut f¨ ur Radioastronomie, Auf dem H¨ ugel 69, 53121, Bonn, Germany 
+
+> 12
+
+National Radio Astronomy Observatory, 520 Edgemont Rd., Charlottesville, VA 22903 
+
+> 13
+
+Department of Physics, Oregon State University, Corvallis, Oregon 97331, USA 
+
+> 14
+
+Australia Telescope National Facility, CSIRO, Space and Astronomy, PO Box 76, Epping, NSW 1710, Australia 
+
+ABSTRACT We present JUG (JAX-based Unified pulsar timinG), a JAX -based, fully independent pulsar timing package emphasising speed and ease of use, designed to confidently handle the increasingly large and complex pulsar timing array datasets that are being created in the pulsar timing field. JUG implements the entire pulsar timing pipeline itself, from data handling and clock corrections through to the timing model and fitting, without relying on other timing software. It enables Pythonic programming at the speed of compiled code, is GPU-capable, and can be operated via a Python API or an interactive GUI. A user of JUG can interactively explore data, fit timing models with complex stochastic noise, model deterministic signals such as continuous gravitational waves, and obtain accurate point estimates of the parameters of the stochastic processes present, thereby bridging frequentist timing and Bayesian noise analysis. JUG is faster than PINT by more than fifty times and is comparably fast to Tempo2 ,can handle millions of arrival times, agrees with PINT at the picosecond level, and can reliably recover known timing model and noise parameter values. In this paper we describe its design, performance, and validation, and demonstrate its advantages for pulsar timing data analysis. 
+
+Keywords: Pulsars, Millisecond Pulsars, Astronomy Software 
+
+1. INTRODUCTION Since their discovery (A. Hewish et al. 1968) pulsars have been responsible for a litany of scientific breakthroughs. The study of their emission, particularly the emission of millisecond pulsars (D. C. Backer et al. 1982; M. A. Alpar et al. 1982), has been used for tests of general relativity (J. H. Taylor & J. M. Weisberg 1982; M. Burgay et al. 2003; M. Kramer et al. 2006), led to the discovery of planetary systems (A. Wolszczan & D. A. Frail 1992; A. Wolszczan 1994), and put constraints on nuclear equations of state (P. B. Demorest et al. 2010; J. Antoniadis et al. 2013; E. Fonseca et al. 2021; M. C. Miller et al. 2021; T. E. Riley et al. 2021; H. T. Cromartie et al. 2020). More recently, long-term pulsar timing experiments have led to results detailing the first evidence for a gravitational wave background (H. Xu 
+
+Email: matthew.t.miles@vanderbilt.edu arXiv:2608.27786v1 [astro-ph.IM] 27 Aug 2026 2et al. 2023; J. Antoniadis et al. 2023; G. Agazie et al. 2023a; D. J. Reardon et al. 2023; M. T. Miles et al. 2025), and it is expected that these methods will soon be used to directly detect a discrete source of nanohertz-gravitational waves (P. A. Rosado et al. 2015; L. Z. Kelley et al. 2018; B. B´ ecsy et al. 2022). These discoveries have had significant impact on the astronomy field, but they are also all drawn from a single mechanism of analysis: that of pulsar timing (J. H. Taylor 1989; M. Bailes 2009). By this method, pulsed emission incoming from distant pulsars is cross-correlated against high-fidelity representations of the pulse and “timed”, their arrival to the Earth predicted in some cases to nanoseconds. Analysis of this emission leads to the discoveries previously mentioned, but few software options exist for this type of work, described entirely by Tempo , Tempo2 , and PINT 
+
+(earlier codes such as psrtime 15 also saw wide use). These packages have been more than capable for the analysis of pulsar timing data using current datasets, however, pulsar timing array (PTA) datasets are rapidly increasing in volume. With new facilities such as the Deep Synoptic Array (G. Hallinan et al. 2019) and the SKA (P. E. Dewdney et al. 2009) soon to be commissioned, PTA datasets in the gravitational-wave detection era are including more arrival times, more pulsars, and more complex modelling to achieve more precise pulsar timing. The combination of these strains existing tools, necessitating a new architecture that is built to handle these more complicated data. 
+
+Tempo (D. Nice et al. 2015) and Tempo2 (G. B. Hobbs et al. 2006) are commonly used, fast, compiled options to handle pulsar timing data. However, they are not easily extensible and are written in Fortran and C/C++ respectively, languages that are less widely used for analysis tasks in the astronomy community than Python. A more recent successor to these is PINT (J. Luo et al. 2021), an independent Python implementation of the pulsar timing algorithms. This software is very extensible and easy to understand, however, it does not scale well with large numbers of arrival times in pulsar datasets or with complicated models. Finally, there is also Vela (A. Susobhanan 2025), a recently developed independent timing model software written in the Julia language, focused on enabling Bayesian pulsar timing, relying on PINT only for some data handling tools. To try and tackle these pressure points in the existing software, we introduce JUG , a fully independent timing software written in Python and built prioritising the handling of large datasets at speed using JAX (J. Bradbury et al. 2018). 
+
+JUG makes use of the JAX software package to just-in-time (JIT) compile and fuse the timing model delays into a single kernel evaluated over all the vectorised arrival times at once. This allows the speed of JUG to reach that of a compiled codebase, but written in Python, resulting in a package that is more than an order of magnitude faster than PINT and comparable to Tempo2 ’s fast QR solver, while scaling at speed to large datasets (10 6 arrival times). 
+
+JUG has been developed to operate completely independently of other timing software. This independence is of the software itself rather than its development process, and PINT in particular was used as a reference implementation against which JUG is validated (Section 5). Further, JUG does not operate only as a forward model evaluator. It also fits timing parameters through weighted or generalised least-squares solver routines (WLS/GLS) optimised for speed, and is able to quickly estimate parameters of common pulsar noise processes through a fast maximum-a-posteriori point estimate method, bridging the gap between frequentist timing analysis and Bayesian noise parameter estimation. 
+
+JUG is able to model various additional deterministic signals that are not usually included in the pulsar timing model, and JAX natively exposes auto-differentiation for forward modelled elements that may soon enable alternative fitting mechanisms. Further, JUG is designed to be operated according to user preference, allowing those more familiar with the use of a Tempo2 style graphical user interface (GUI) to operate JUG through this manner, or those more familiar with PINT ’s programmatic style of data analysis to use the JUG API. In this paper we provide a brief background on the art of pulsar timing (Section 2), the design and implementation of the JUG software package (Section 3), the performance of JUG (Section 4), its validation compared to other timing software (Section 5), and a summary and planned future steps for its continued development (Section 6).  
+
+> 2.
+
+A BACKGROUND ON PULSAR TIMING In traditional pulsar timing data analysis, collecting and interpreting the time of arrival (TOA) of the pulse from the pulsar is the principal aim. Formally, this TOA is defined as the observable time that the pulse from the pulsar arrives at the observing station on the Earth. In practice, pulsar timing relies on averaging many individual pulses together and assigning that average a corresponding arrival time. This is necessary because pulsar timing assumes the pulse is a stable, well-averaged representation of the pulse-energy distribution through phase. After averaging many pulses together, the integrated profile converges to a stable shape as a consequence of the central limit theorem (D. J. Helfand  
+
+> 15 https://www.jb.man.ac.uk/ ∼pulsar/observing/progs/psrtime.html
+
+3et al. 1975), while often the individual pulses will appear markedly different from one another. In addition, averaging individual pulses together in the radiometer-noise limit increases the signal-to-noise ratio (S/N) as S /N ∝ pNp, where here Np represents the total number of pulses averaged together. The most common way to calculate this TOA is by cross-correlating the prepared data products with a high-fidelity representation of the pulsar’s average pulse profile (J. H. Taylor 1992). This representation is commonly referred to as a template in the case that it is a single-frequency representation, and a portrait where it is resolved through radio frequency (T. T. Pennucci et al. 2016). As mentioned earlier, we assume that the pulse after a degree of averaging can be considered stable through time (D. R. Lorimer & M. Kramer 2004), and as such any averaged pulse from a particular observation ( O(t)) can be measured simply through (M. Bailes 2009) 
+
+O(t) = α + βP(t − τ ) + ϵ(t) (1) where α is an arbitrary offset, β is a scale factor, P(t) is the template or portrait, ϵ(t) is any noise perturbing the profile, and τ is the shift in time between O(t) and P(t). The calculated shift, τ , is estimated through matched-filtering the observation against the template, usually in the Fourier domain. This is ultimately applied to the time of the observation recorded at the telescope site, resulting in a TOA measurement and a corresponding uncertainty derived from the matched-filtering algorithm. The series of TOAs that can be measured in this manner for a given pulsar must be interpreted from an understanding of the pulsar’s underlying physics and the relative environment along the Earth-pulsar line of sight. Facilitating this, a pulsar timing model, or ephemeris, is constructed to describe both the pulsar’s rotational phase and the chain of delays that alter the pulse arrival time. Only when these mechanisms are accurately determined to the sensitivity of the data can a pulsar be timed accurately and scientific inquiry be informed. Here we describe the pulsar timing model in brief as it is well established in pulsar timing literature (G. B. Hobbs et al. 2006; J. Luo et al. 2021) and JUG has followed this, not attempting to improve upon the well established convention. The rotation of a pulsar is represented in the timing model through the pulsar’s rotational phase ϕ(t), a frame of reference that is comoving with the pulsar itself expressed as a function of time, t. While pulsars are very rotationally stable, their rotational frequency ( f ) will change slowly through time as energy is lost via the emission of the pulse. The degree to which this occurs is unacceptable for the precision desired in pulsar timing experiments, and this is accounted for by expanding the phase as a Taylor expansion in time of the form 
+
+ϕ(t) = ϕ0 + f (t − t0) + 12 ˙f (t − t0)2 + 16 ¨f (t − t0)3 + ... (2) where ϕ0 is the initial phase of the pulsar at time t0, and the dots above f denote the degree of time derivative applied to the rotational frequency. Equation 2 refers to the rotational phase as a function of time in a frame comoving with the pulsar (from here 
+
+tpsr ), however, the arrival time measured as a consequence of Equation 1 is measured on Earth against a clock at the observatory (from here ttopo ). These are not equivalent, and in order to evaluate the pulsar phase, ttopo must be transformed to the same comoving frame as tpsr through the aforementioned timing model delay chain ∆ 
+
+tpsr = ttopo − ∆. (3) The corrections in the delay chain fall into two distinct classes: a timescale transformation, converting the obser-vatory clock reading onto a uniform coordinate time, and a transformation of the reference frame from the moving topocenter to the Solar System Barycenter (SSB), an approximation to an inertial frame in which the phase model of Equation 2 applies. The total delay ∆ comprises contributions from the clock chain, the SSB transformation, the Ionised Interstellar Medium (IISM), and, for binary systems, the pulsar’s orbital motion, ∆ = ∆ tclock + ∆ tSSB + ∆ tIISM + ∆ tB, (4) which must be applied in this order, as each correction is evaluated given the correction in its preceding term. These effects constitute the dominant contributions to ∆ and are intended to be illustrative rather than exhaustive. The complete set of deterministic modeling components that are implemented in JUG is given in Appendix A. 2.1. Timescale Transformation 
+
+The timescale adjustment tclock must be performed as each pulse is measured relative to a local clock at the obser-vatory. While highly stable, the clocks used by observatories (commonly Hydrogen masers) drift over long periods of 4time, accumulating offsets of tens to hundreds of nanoseconds over months. Due to this, the TOA must instead be defined at a globally agreed upon time standard, known as Terrestrial Time (TT). The clocks maintained at observa-tories are monitored via the Global Positioning System (GPS), providing a transfer to a common standard expressed in UTC. This timescale is not continuous, as it contains discrete offsets (leap seconds) to align with the rotation of the Earth. This is adjusted for by converting the timescale into International Atomic Time (TAI), which is a continuous timescale formed by the average of many atomic clocks globally. Finally, this is transferred into TT with a fixed offset. In practice, this is done by using a retrospective realisation, correcting for imperfections in TAI and providing the most uniform standard possible. 16 This timescale is still defined at Earth, however, and it must still be transformed to the pseudo-inertial reference frame of the SSB. 2.2. Solar System Barycenter Transformation 
+
+The corrections to the SSB are the largest that are performed in the delay chain, reaching hundreds of seconds and varying annually with the Earth’s orbital motion. These delays can generally be separated into three portions: the Roemer delay, the solar system Shapiro delay, and the solar system Einstein delay (T. Damour & N. Deruelle 1986; D. C. Backer & R. W. Hellings 1986). The Roemer delay accounts for the light-travel time between the Earth and the SSB projected onto the line of sight to the pulsar. This is heavily dependent on an accurate solar system ephemeris (e.g. the DE series from JPL (R. S. Park et al. 2021)), and the pulsar’s astrometry. The solar system Shapiro delay is the general-relativistic delay accumulated by the pulse’s passage through the gravitational potential of the Sun and the planets. The solar system Einstein delay accounts for the time dilation and gravitational redshift relating TT to a barycentric coordinate time. Two coordinate times are commonly used in pulsar timing: Barycentric Coordinate Time (TCB), and Barycentric Dynamical Time (TDB) (G. B. Hobbs et al. 2006). TCB is defined as a time running at an unscaled Barycentric rate, whereas TDB is rescaled to be close to TT. The difference between the two standards amounts to a constant rate factor, which results in parameters measured in either system differing by corresponding scale factors. JUG natively operates in TDB, but ingests and converts TCB-defined models internally. 2.3. Propagation and Chromatic Delays 
+
+The pulsed emission interacts with free electrons as it travels through the IISM, altering the phase and propagating speed of the radio waves; this causes delays to the TOAs as a function of the radio-frequency of the pulse. This phenomenon is known as dispersion, and is corrected to a degree by measuring the dispersion measure (DM), the column density of electrons along the Earth-pulsar line of sight, and adjusting for its expected effect on the pulse. This can be done as the effect is known a-priori, with the delay of the pulse relative to its frequency expected to be 
+
+δt DM =
+
+ DM 
+
+κ
+
+
+
+ν−2 (5) where κ is a dispersion measure constant. There are conflicting dispersion measure constants in use in the pulsar timing field, JUG makes use of κ = 2 .41 × 10 −4MHz −2cm −3pc s −1 (D. R. Lorimer & M. Kramer 2004). Accurately constraining this is of paramount importance to accurate timing, and heavily motivates the use of multi-frequency data as standard practice in pulsar timing. Through time, it is not expected that the DM should remain constant and instead it is expected to change as the line of sight sweeps through the turbulent, inhomogeneous IISM. These variations are often modeled as a smooth deterministic component, captured by a Taylor expansion similar to that of the rotational phase expressed in Equation 2, together with a stochastic component typically expressed as a Gaussian process. Alternatively, the use of a piecewise fit to DM (e.g. DMX) is common in pulsar timing applications, capturing the total variation. However, using this method can lead to difficulties in modeling other radio frequency dependent (otherwise known as chromatic) features in pulse arrival times. A further dispersive contribution arises from the solar wind (X. P. You et al. 2007). As the Earth-pulsar line of sight passes near the Sun, the ionised solar plasma results in chromatic delays that are taken into account in the pulsar timing model. These features have the same chromaticity as signatures from DM, and are the largest where the solar angle (the angle between the Earth-pulsar line of sight and the Sun) is at a minimum, allowing them to be    
+
+> 16 During this process, a small additional delay is accounted for from the propagation of the signal through the atmosphere above the observatory that is dependent on the elevation of the observatory. We denote these as tropospheric effects, and while JUG does model them, we will not go into detail here.
+
+5separable to a degree. A distinct chromatic effect arises from multipath propagation through the IISM, which produces a steep frequency dependent ( ∼ ν−4) pulse broadening effect (N. D. R. Bhat et al. 2004), inducing a chromatic delay that is distinct from dispersion. JUG does not fit for these as timing delays, and instead assumes that frequency resolved timing methods and further modeling of scattering noise processes will account for this. Finally, not all chromatic structure originates in propagation. Frequency-dependent (FD) parameters account for the evolution of the pulse shape through radio frequency. This exists in JUG as a phenomenological polynomial that is fit for in log ν ( NANOGrav Collaboration et al. 2015). Although these are highly covariant with dispersive delays, FD parameters are not accounting for propagation delays but instead intrinsic shape changes of the pulsar’s pulse. 2.4. Binary Delays 
+
+The preceding transformations and delays allowed for the pulsar to be interpretable at the SSB, however, a pulsar in a binary possesses a dynamic emission point. In order to appropriately reference the emission to a comoving frame we must account for that binary motion. The major impact of the binary motion can be accounted for in much the same way as the transformation to the SSB, through three main terms: the orbital Roemer delay, the orbital Shapiro delay, and the orbital Einstein delay (T. Damour & N. Deruelle 1986; R. T. Edwards et al. 2006). The orbital Roemer delay is once again the term with the largest impact. Modeling it accounts for the light travel time across the pulsar’s orbit as projected onto the Earth-pulsar line of sight, parameterised by Keplerian orbital parameters. The orbital Shapiro delay accounts for the additional light-travel time of the pulse as it moves through the gravitational potential of the companion. This term, where it is measurable, is of great interest to pulsar astronomers as it can be used to determine the orbital inclination and companion mass (T. Damour & N. Deruelle 1986; P. B. Demorest et al. 2010). The orbital Einstein delay accounts for the time-dilation and gravitational redshift imparted through the varying speed of the pulsar and impacts from its companion. We note here that this is a very general description of pulsar orbital dynamics, as different geometric configurations of the binary system as observed by Earth will alter what is modeled in the binary. There are several different binary models in use by the pulsar timing community that are better suited to particular orbital configurations. These are commonly, but not exhaustively, determined through the eccentricity of the orbit, and its inclination with respect to the Earth. More details of the models included in JUG can be found in Section 3.3. 2.5. Timing Residuals 
+
+The terms detailed here broadly outline the most impactful transformations and delays informing ∆. Accounting for these, the arrival time can be expressed in terms of tpsr , allowing for the evaluation of Equation 2. For any given TOA, the predicted phase is obtained by evaluating ϕ at the corresponding pulsar comoving frame time, ϕi ≡ ϕ(tpsr ,i ). Because the pulsar signal is periodically repeating, the number of rotations between any two TOAs is not known a-priori, rather the phase is only known for a single rotation. The construction of a timing model that correctly accounts for the pulsar rotation and derivatives will predict each arrival time within a small fraction of a pulse period, allowing an integer rotation count to be employed unambiguously. The timing residual, the difference between the observed and model-predicted arrival times, is then given by the deviation of the predicted phase from the nearest integer number of rotations, expressed in units of time 
+
+ri = ϕi − [ϕi]
+
+f (6) where [ ϕi] is the integer nearest to ϕi, and f here is the spin frequency of the pulsar, as described in J. Luo et al. (2021). From this evaluation, it follows that in cases where there are few observations of a pulsar, or a particularly large gap in said observations, resolving a phase-connected solution can be difficult. 2.6. The Timing Likelihood 
+
+The residual defined by Equation 6 is for a single TOA. Here we define a vector r, collecting the residuals from all of the TOAs in a dataset ( NTOA ), providing a foundation that can be used to estimate further timing model parameters. Many of the timing model parameters are non-linear (e.g. those in the binary model), and so any estimation must be performed by linearising about a reference solution or initial estimate, p0. A small perturbation ε = p − p0 alters the timing residuals by 
+
+r(p) ≈ r(p0) − M ε , (7) 6where the design matrix M is constructed of columns defining the partial derivatives of the residuals with respect to each parameter that is being varied. As demonstrated earlier (Section 2.5), a phase-connected solution will yield residuals that are small fractions of a rotation given the change in the parameter value. It follows then that if the steps from the initial parameter value p0 are small, the linear approximation of Equation 7 is reasonable and any resultant parameter corrections are accurate (R. van Haasteren & Y. Levin 2013; S. R. Taylor 2021). This can naturally be optimised by iterating the linearised fit through solving Equation 7 for ε, updating the reference solution to p0 +
+
+ε, which becomes the expansion point for the following iterations until the solution converges under a pre-decided criterion. How we have treated both the formation of the residuals and the construction of the data model so far has been under the assumption that they are completely deterministic, this is not the case. In practice we expect to observe stochastic structures within the residuals that are correlated in time, or within observing epochs; non-exhaustively, these include spin noise, DM noise, and the stochastic changes in phase and morphology of individual pulses that compound to form jitter noise, modelled as an epoch-correlated process (ECORR). These also must be accounted for if we are to attempt to measure the timing parameters without bias. Following the standard in the literature (L. Lentati et al. 2014; R. van Haasteren & M. Vallisneri 2014), these processes are represented as Gaussian processes in a Fourier basis ( F ), the coefficients ( a) of which are assigned zero-mean Gaussian priors with a covariance Φ, the diagonal of which encodes the power spectral density (PSD) of each Gaussian process and is governed by a set of hyperparameters (e.g. the amplitude and spectral index of a power-law red noise spectrum). There is also uncorrelated white noise ( n)that we include in the model, accounting for measurement or systematic uncertainties on the data. Following this, the data model of Equation 7 is represented as 
+
+r = M ε + F a + n. (8) The hyperparameters that govern these processes are not estimated as part of the timing model fit in JUG , consistent with other timing model software such as Tempo2 and PINT , with the exception of Vela which samples the timing model parameters and hyperparameters jointly (A. Susobhanan 2025). In JUG , these are supplied as a fixed noise model which conditions the estimate of the timing corrections ε and the coefficients of the Fourier sine and cosine basis a. However, JUG does possess the architecture for fast estimation of these hyperparameters, which we describe in Section 3.5. The white noise n has a diagonal covariance matrix we define as N , which is built of the rescaled measured arrival time uncertainties via two parameters generally applied per backend system. These are a multiplicative factor (EFAC), and another term added in quadrature (EQUAD), accounting for additional uncorrelated noise in the data. To keep consistent with the operations in PINT , JUG adopts the convention 17 that the diagonal entries of N are 
+
+Nii = EFAC 2  σ2 
+
+> i
+
++ EQUAD 2 , (9) where σi is the unscaled measured uncertainty of the i-th TOA from the Fourier domain arrival time measurement. ECORR is also a white-noise process as it is uncorrelated between observing epochs, however it is fully correlated within them. Rather than including it in N , JUG models ECORR through the reduced-rank formalism used for the time-correlated processes. This is done through the use of an epoch-quantisation matrix, U , that has columns mapping each observing epoch to its arrival times. This is appended to the basis with the Fourier modes with the per-epoch ECORR variances contained in J. The equivalent kernel-based model of ECORR, in which the epoch covariance blocks are whitened directly, is also implemented in JUG , however this is not the default. The total covariance of the residuals is 
+
+C = N + U JU T + F ΦF T. (10) Here, the diagonal N captures the uncorrelated white noise, while the time and epoch-correlated processes are gathered into F ΦF T. Under this covariance, the optimal timing solution is the generalised least-squares (GLS) estimate coinciding with the maximum-likelihood solution of the corresponding Gaussian noise model. However, forming C explicitly is an NTOA × NTOA operation that becomes prohibitively expensive for large datasets. To navigate this as datasets grow, JUG obtains an equivalent solution by instead estimating the timing corrections ε
+
+jointly with the stochastic coefficients a, minimising the penalised least-squares objective min   
+
+> ε,a
+
+N −1/2 (r − M ε − F a ) 2
+
++ aTΦ−1a, (11)     
+
+> 17 We note that there is an alternate convention to account for the white noise in pulsar timing of the form: Nii = EFAC 2σ2
+> i+ EQUAD 2.
+
+7where N −1/2 weights each residual by its scaled uncertainty (Equation 9) and the second term is the Gaussian prior on a acting as a penalty on the stochastic coefficients. The minimiser of this objective is equivalent to the marginalised generalised least-squares solution, but is solved as a single augmented linear problem rather than inverting the expensive 
+
+C.When no correlated noise is present, the stochastic term is removed, C is exactly equal to N which is diagonal, and Equation 11 reduces simply to a weighted least-squares (WLS) fit. At each iteration, the quality of the updated solution is assessed with the marginalised quadratic form rTC−1r, evaluated using a Woodbury identity so that C
+
+is never formed. The parameter update itself, however, is produced directly by the augmented least-squares solve (Section 3.4).  
+
+> 3.
+
+DESIGN AND IMPLEMENTATION 3.1. Architecture Overview 
+
+The core module of JUG is the TimingSession object that defines a pulsar dataset. It contains the input pulsar ephemeris and timing files, the timing model itself, any additional noise model included, and intermediate products needed to manipulate the data that are cached after the first load. The design of this module was built with a single primary goal: to minimise the computational cost of pulsar timing data analysis by caching the operations that remain static across the analysis of a pulsar. These include operations such as: parsing the par and tim files, loading clock corrections, converting to TDB, and evaluating the barycentric geometry. Performing these operations a single time and retaining them allows for all subsequent computations to reuse them rather than rebuilding them each time. In practice, on a 35 , 000-TOA dataset (PSR J1909 −3744 from the NANOGrav 15-yr data release (G. Agazie et al. 2023b)), constructing a TimingSession and computing the first set of residuals takes ∼ 1.3 s once JAX ’s compilation cache is populated, ∼ 0.8 s of which is a one-time JIT compilation occurring only when the cache is empty. Further residual evaluations use the cached intermediate products, costing only ∼ 0.2 s when forcing recomputation and effectively instantaneous retrieval when the result is unchanged. 18 
+
+The caching structure we employ is separated into three tiers. Within a TimingSession , input files, clock corrections, TDB conversion, and parameter-independent barycentric geometries are held in memory and reused across calls. The memory cache is lost when a TimingSession ends, however, to avoid repeating the most expensive computation when the same dataset is reloaded, the barycentric geometry is written to disk. This persistent cache is keyed by a hash of the TDB epochs, observatory coordinates, ephemeris, and the Astropy and ERFA versions, so a stored result is reloaded only for an identical dataset computed in an identical environment where it would be reproduced bit-for-bit. Any change therefore invalidates the cached entry and forces recomputation. If the cache becomes uninterpretable for any reason, the path falls through to the initial computation. Finally, JUG configures JAX ’s persistent compilation cache, so that the JIT compilation of its numerical kernels (Section 3.3) is retained across process launches and not repeated needlessly. Internally, JUG organises the timing model parameters and the noise processes into registries, with an additional registry holding the set of alternate binary models that can be applied to a pulsar. Each major component of the pulsar model is held in these registries against the parameters they consume and the operations they provide. This allows any relevant set to be assembled automatically from the ephemeris file input. This configuration also means that it can be extended simply without modifying any of JUG ’s core architecture. The command-line tools, Python API, and graphical interface (Section 3.7) are all built on the same compute engine. A schematic of this architecture is shown in Figure 1. 3.2. Numerical Precision Strategy 
+
+Accurate pulsar timing necessitates extreme numerical precision on parameters, residuals, and the interpretation of the arrival times in order to infer astrophysical quantities. There are many quantities that need to be held in high precision for accurate timing, however, arguably the most important is that of the rotational frequency and corresponding derivatives. As the rotational phase accumulates as ϕ ≈ f (t − t0), over multi-year baselines this can reach extreme values. For a pulsar such as PSR J1909 −3744 ( f ≈ 339 Hz) observed over ∼ 15 .5 years in the NANOGrav 15-year dataset, ϕ accumulates greater than 10 11 rotations. As the timing residual is the fractional portion of this  
+
+> 18 Measured on an Intel Core Ultra 9 285K CPU. See Section 4 for full benchmarking.
+
+8
+
+Figure 1. Schematic of the JUG architecture. A pulsar ephemeris ( .par ) and TOA file ( .tim ) are taken in by the compute engine, which evaluates the timing model operations: parsing, the observatory clock chain and conversion to TDB, the barycentric geometry, a single fused JIT delay kernel evaluating the dispersion, solar-wind, frequency-dependent, and binary delays, and finally the rotational phase to timing residuals. The geometry and JIT compilations are cached for repeated use. The fitter wraps the engine, re-evaluating the residuals at each iteration of the solver, with the parameter, binary-model, and noise registries checked during fit setup to identify what is present in fitting the model. These output into a new fitted timing model, updated post-fit residuals, and diagnostic summaries for the user. 
+
+number, accurately recovering it requires a representation of the phase that is far more precise than simply the integer number of rotations. As a software that heavily makes use of JAX , this would raise an issue for JUG were it to naively employ JAX 
+
+across the architecture as JAX supports precision only up to float64 (15 − 16 significant digits). With rotations on the scale of 10 11 as above, this leaves too few remaining significant figures to accurately represent the fractional turn (the timing residual) of the pulsar. The calculated uncertainty on f likewise amplifies across the timing baseline, resulting in a timing error on the order of tens of nanoseconds. This may seem a small number for those unfamiliar with 9pulsar timing, but it is in fact comparable to the residual precision for some of the most precisely timed pulsars. This then necessitates that a higher precision is held across this parameter in JUG , as well as other similarly compounding parameters. JUG addresses this by using a hybrid precision strategy. It is designed to confine extended precision to the quantities that require it while performing most of the calculations in float64 . The rotational frequency and derivatives, the reference epochs ( PEPOCH , the binary epochs T0 and TASC , and the DM and astrometric epochs) as well as the phase accumulation already mentioned are carried in extended precision ( longdouble ). These parameters are read directly as strings from the ephemeris into extended precision. The phase is accumulated via Horner’s method entirely with longdouble precision, and only the fractional turn is represented in float64 before conversion to residuals in seconds. Measured against an arbitrary precision reference calculation using mpmath , JUG reproduces its residuals to an absolute accuracy of ≤ 20 ps over the baseline of PSR J1909 −3744. This is the error of JUG ’s phase representation against exact arithmetic, and is distinct from any agreement assessed between software packages in Section 5.1. In contrast, the chain of propagation and geometric delays is evaluated completely using float64 inside the JIT-compiled kernel (Section 3.3). This is reasonable as the magnitudes that are used in the calculations are simply the delays referenced to the timing residuals rather than defined at the times of the absolute epochs themselves. The Roemer delay is on the scale of hundreds of ms, the solar-system Shapiro delay is on the order of ∼ 100 μs , and the dispersive delays are on the order of 1 ms. These magnitudes are held accurately in float64 , accumulating a precision uncertainty on the order of 0 .1 fs, far lower than attainable timing precision in the foreseeable future. An exception to these is the binary phase which requires a higher precision to accurately constrain the environment of the pulsar binary. In this case, JUG reduces this delay per the orbital period that is kept in extended precision prior to the call to the JIT kernel. The result of this is that only a small fractional in-orbit phase is passed into the lower precision handle. Similarly, the delays are evaluated over lag times formed as ( tMJD − t0,MJD ) × 86400, differencing in days before scaling to seconds, countering an O(100 ps) bias that would otherwise arise. The division we describe here is completely sufficient for maintaining the required precision and we note that the strategy is well suited to potential hardware acceleration. GPUs do not support extended precision, and should it become beneficial to evaluate residuals on such a unit, the hybrid architecture we describe here is a viable method to do so. 3.3. Timing Model Components 
+
+Section 2 described a chain of delays that are necessary to compute the pulsar’s rotational phase from the arrival time collected at an observatory. These delays are usually evaluated in pulsar timing software packages by separate routines and are combined iteratively for each component. This method embraces modularity, but incurs a repeated overhead of dispatching and allocating arrays for each component of the model being solved. JUG sacrifices in part this modularity, evaluating the chromatic and orbital delays within a single fused, JIT compiled kernel compute total delay jax . This fuses these delays into a single compiled function, evaluated over all of the arrival times simultaneously, and reused in subsequent function calls; principally this is the main source of JUG ’s per-TOA speed (Section 4). A deliberate exclusion from this chain is the optional evaluation of a piecewise dispersion model (DMX), which is instead handled as part of the design matrix as a windowed linear offset. In handling binary pulsars, JUG supports the most widely used binary models: ELL1 (C. Lange et al. 2001), DD (T. Damour & N. Deruelle 1986), BT (R. Blandford & S. A. Teukolsky 1976), DDK (S. M. Kopeikin 1995, 1996), and T2 
+
+(G. B. Hobbs et al. 2006), as well as their common variants. In these, the orbital Roemer, Shapiro, and Einstein delays are computed together with any post-Keplerian parameters that are included in the model. The DDGR model derives its post-Keplerian parameters from the binary masses under general relativity (GR), and DDK includes the Kopeikin corrections describing contributions of the annual-orbital parallax and the proper motion to the orbital geometry. In an effort to support ephemerides formed from both PINT and Tempo2 the general-use T2 model is supported but directly dispatched to the appropriate binary model as inferred by the ephemeris parameters. Beyond these components, JUG 
+
+also models rotational glitches (B. Bhat et al. 2026), chromatic exponential events, tropospheric delays, planetary contributions to the solar-system Shapiro delay, and phase jumps that absorb instrumental and system-dependent offsets. Additionally, for convenience, JUG will convert an ephemeris defined in TCB units to TDB internally, evaluating the parameters under the TDB convention. The complete set of supported deterministic components is listed in Appendix A. Further than the timing model capabilities as they stand, JUG also models deterministic signals of astrophysical interest, such as continuous gravitational waves, bursts-with-memory, and chromatic transient events. 10 Given that the waveform models are differentiable within the JAX framework, the architecture supports gradient-based parameter estimation which we plan to develop into full parameter fitting. 3.4. Fitting 
+
+In Section 2 it was established that the fit to the timing model is performed as the minimisation of a penalised least-squares objective (Equation 11). Here, we describe how JUG meets that objective. The design matrix M per Equation 7 is assembled from the partial derivatives of the residuals with respect to the parameters being fit at each iteration. These derivatives are exact. JUG evaluates them as analytic expressions for the spin, astrometric, dispersion, frequency-dependent, solar-wind, and jump parameters, as well as the DD and ELL1 19 
+
+family of binary models. The BT family of binary models are instead evaluated through exact automatic differenti-ation provided automatically by JAX 20 . The analytic derivatives implemented in JUG follow standard conventions established in existing literature as implemented by Tempo2 and PINT (G. B. Hobbs et al. 2006; J. Luo et al. 2021). Consistent with the other operations in JUG , these are written using JAX , JIT compiled, and vectorised over the set of arrival times. Section 2.6 established the penalised objective (Equation 11) and that it is solved as a single augmented linear system, rather than by forming the large covariance matrix C. JUG solves this system through a singular-value decomposition (SVD) where, in the WLS case, ε is found from the SVD of the whitened design matrix: N −1/2M .In the GLS case, the timing and the noise bases are stacked into an augmented matrix [ M , F ] and recovered from an SVD of the same form. This SVD is used instead of forming the poorly conditioned matrix M TN −1M . The fit iterates as described in Section 2.6, re-evaluating r and M at the updated solution until convergence. Figure 2 demonstrates the differences in fitting that occur from the use of each fitter on a noisy dataset. 3.5. Noise Parameter Estimation 
+
+The GLS fit described in Section 3.4 relies on a fixed noise model, both white noise parameters and the hyperpa-rameters of a power spectrum (amplitude and spectral index) are supplied, and the fit estimates the solution to the timing parameters given the noise. These noise parameters must also be determined by the data. Conventionally, this is done in a cyclic manner: an initial timing solution is formed, the noise parameters are determined from the resulting residuals, usually through sampling with the timing model marginalised, and the timing model parameters are measured again considering the noise. 21 To simplify this workflow, JUG enables a fast, in-package alternative to find the maximum-a-posteriori (MAP) point estimate of the noise hyperparameters. Point estimation of pulsar noise parameters from the marginalised likelihood is well established (e.g. R. van Haasteren & Y. Levin 2013), and JUG ’s implementation is adapted directly from the pulsar-map-noise-estimates package. 22 JUG integrates this with the cached timing products and JAX machinery of the timing fit. The marginalised likelihood of the data given the noise model is implemented as a model using Numpyro (D. Phan et al. 2019), and the MAP estimate is obtained through stochastic variational inference with a delta-function guide, optimised by gradient descent. 23 
+
+JUG estimates the white-noise parameters, achromatic red-noise, DM noise, and chromatic scattering noise with a variable chromaticity that can likewise be fit. Each of these time-correlated processes are modeled as a power-law spectrum with a Fourier basis. The MAP estimate returns a point estimate rather than a posterior so it is considerably faster than a thorough Bayesian analysis, however, the uncertainty information and the rigor of a Bayesian assessment is lost. Therefore it is best to consider the use of this module as a bridge between the frequentist timing regime and the full Bayesian treatment that usually follows. The accuracy of the point estimate depends on how well-constrained the noise processes are. For instance, for well-constrained spectra it can reach parity with a Bayesian analysis, however steep spectra that dominate the residuals can bias the estimate. Figure 3 compares the MAP estimate framework in 
+
+JUG against posteriors sampled with Discovery 24 for two simulated cases. The left demonstrates a well recovered spectrum that is shallower than the right, which biases the recovery of the parameters. Nevertheless, the MAP framework is a fast and well-motivated process that reduces potential bias in the initial fit timing solution, while providing a cross-check for a subsequent analysis.                     
+
+> 19 We note that JUG includes the cos Φ factor in the derivative of the ELL1 Shapiro delay with respect to orbital phase, as per C. Lange et al. (2001). This term is absent from the ELL1 model of PINT v1.1.4, although it is present in the DD and ELL1H models. The impact of including this term is almost negligible.
+> 20 This choice was made as this was a late addition to the binary model tree, it provides an identical solution.
+> 21 This is true for workflows built from Enterprise (J. A. Ellis et al. 2019) and Discovery, however, we note that when using Temponest (L. Lentati et al. 2014) a post-noise ephemeris is produced.
+> 22 https://github.com/davecwright3/pulsar-map-noise-estimates
+> 23 The algorithm uses an Adam optimiser (D. P. Kingma & J. Ba 2014).
+> 24 https://github.com/nanograv/discovery/tree/main
+
+11 10                      
+
+> 010
+> Residuals (  s)  WLS (No noise)
+> 2006 2008 2010 2012 2014 2016 2018 2020 10
+> 010
+> Residuals (  s)  GLS (Red + DM noise) red noise DM noise (1.4 GHz) red + DM
+> 2006 2008 2010 2012 2014 2016 2018 2020
+> Year
+> 4
+> 2
+> 024
+> Whitened normalised residuals
+> 0.0 0.1 0.2 0.3 0.4
+> density
+> (0, 1)
+
+Figure 2. An example of WLS and GLS fitting using a simulated dataset of PSR J1909 −3744 containing achromatic red noise and DM noise. (Top) The post-fit residuals (grey) of a WLS solution, not modeling the injected noise processes. (Centre) The post-fit residuals (grey) of a GLS solution, taking into account the noise models. Overlaid on the residuals are the achromatic red noise (red) and DM noise (blue) as realised by JUG and referenced to 1 .4 GHz. The curve in dark blue represents the sum of these processes. The visible differences between the noise realisations and the timing residuals are a product of the DM noise structure being referenced to a single radio frequency. (Bottom) The noise subtracted residuals normalised by their scaled uncertainties (green), demonstrated to be well approximated by a Gaussian distribution with mean 0 and unit variance as expected. 
+
+The MAP estimates are obtained through iterating a variational optimisation thousands of times, a process which is very well suited to GPU acceleration. For warm evaluations, we find that it is approximately an order of magnitude faster on a GPU than a CPU, with the speed advantage growing as the dataset size increases. As a comparison, a 5000 iteration optimisation on 50 , 000 arrival times completes in ∼ 19 seconds on a GPU (NVIDIA GeForce RTX 4090) as compared to ∼ 245 seconds on a CPU (Section 4). 3.6. Data handling 
+
+JUG has its own parser and writer to handle ephemeris and timing files following the conventions of Tempo2 (G. B. Hobbs et al. 2006; R. T. Edwards et al. 2006), without dependencies on Tempo2 or PINT 25 . This independence is general to the full timing pipeline, with all the parsing, clock corrections, and barycentric geometry data computed within JUG itself (Section 2) rather than wrapping or using other software. To support the pipeline without reliance on outside timing software, JUG ships with the additional data that the timing model requires, including the clock-correction files, solar system ephemeris, and observatory coordinates. Upon loading a dataset, JUG reads the arrival times and only parses the clock corrections for the observatories that are present in the data, rather than loading the correction chain for all known observatories. Several of these products are updated with some frequency, so 
+
+JUG provides tools to keep them updated. Earth-orientation parameters and solar-system ephemerides are retrieved       
+
+> 25 JUG reads Tempo2 /IPTA format arrival time files, and is able to understand MODE ,TIME ,INCLUDE , and other comment directives.
+
+12 log 10 Ared = 13.69 +0.16 0.26                              
+
+> 1.5 3.0 4.5 6.0 7.5
+> red
+> red = 2.97 +0.73 0.48
+> 14.0
+> 13.6
+> 13.2
+> log 10  ADM
+> log 10 ADM =13.40 +0.10 0.12
+> 0.0 1.5 3.0 4.5
+> DM
+> DM = 2.23 +0.50 0.41
+> 14.25
+> 14.00
+> 13.75
+> 13.50
+> log 10  Achr
+> log 10 Achr =13.84 +0.11 0.12
+> 1.6 2.4 3.2 4.0
+> chr
+> chr = 2.63 +0.37 0.33
+> 15.0
+> 14.4
+> 13.8
+> 13.2
+> log 10 Ared
+> 3.6 4.0 4.4 4.8
+> chr
+> 1.5 3.0 4.5 6.0 7.5
+> red
+> 14.0
+> 13.6
+> 13.2
+> log 10 ADM
+> 0.0 1.5 3.0 4.5
+> DM
+> 14.25
+> 14.00
+> 13.75
+> 13.50
+> log 10 Achr
+> 1.6 2.4 3.2 4.0
+> chr
+> 3.6 4.0 4.4 4.8
+> chr
+> chr = 4.04 +0.20 0.19
+> Discovery posterior injected truth JUG MAP log 10 Ared =14.09 +0.28 0.36
+> 3.0 4.5 6.0 7.5
+> red
+> red = 4.48 +0.99 0.73
+> 13.6
+> 13.4
+> 13.2
+> 13.0
+> log 10  ADM
+> log 10 ADM =13.36 +0.08 0.08
+> 1.6 2.4 3.2 4.0
+> DM
+> DM = 2.59 +0.39 0.36
+> 14.8
+> 14.4
+> 14.0
+> 13.6
+> log 10  Achr
+> log 10 Achr =14.19 +0.14 0.19
+> 3456
+> chr
+> chr = 3.76 +0.53 0.43
+> 15.0
+> 14.5
+> 14.0
+> 13.5
+> log 10 Ared
+> 3.75 4.00 4.25 4.50
+> chr
+> 3.0 4.5 6.0 7.5
+> red
+> 13.6
+> 13.4
+> 13.2
+> 13.0
+> log 10 ADM
+> 1.6 2.4 3.2 4.0
+> DM
+> 14.8
+> 14.4
+> 14.0
+> 13.6
+> log 10 Achr
+> 3456
+> chr
+> 3.75 4.00 4.25 4.50
+> chr
+> chr = 4.08 +0.12 0.12
+> Discovery posterior injected truth JUG MAP
+
+Figure 3. Comparison of JUG ’s MAP noise estimates against posteriors sampled with Discovery for two simulated PSR J1909 −3744-like datasets with injected red, DM, and chromatic-scattering noise. Each parameter sampled here describes a hyperparameter of those noise processes. (Left) The MAP estimates (red) lie within the posteriors and agree with the injected values (green). (Right) The recovery of a dataset with steeper noise. The MAP recovery is mainly biased with reference to the chromatic amplitude. These illustrate the bias incurred where the noise processes are steep. 
+
+through Astropy , and the clock correction files are refreshed against the IPTA clock repository 26 , updating files that have become out of date. Upon reading a dataset, JUG validates the TOAs by identifying non-finite arrival times, frequencies, uncertainties, duplicated arrival times, or entries lacking system flags. For inspection of a timing solution, JUG can represent epoch-averaged residuals. The averaging is performed on the computed residuals rather than arrival times themselves as the residuals are formed in the high-precision pipeline and are already corrected for deterministic delays. An inverse-variance weighted average of the residuals within an epoch preserves the timing precision that would be lost when averaging the arrival times instead. JUG establishes the integer rotation count by phase-connected tracking: the first arrival time is rounded to the nearest turn and each subsequent count is advanced by the rounded phase difference from the previous arrival time, equivalent to Tempo2 ’s TRACK -2 behaviour. This coincides with Equation 6 whenever the timing solution holds all residuals within half a turn. Pulse numbers computed this way can be written to a pulse-numbered .tim file from the GUI or python API. 3.7. Interfaces: Python API, CLI, and GUI 
+
+JUG can be operated through three entry points. These are a set of command-line tools for quick checks, the Python API, and a graphical user interface (GUI), which all share the same computational engine and will therefore produce identical results (Section 3.1). The command-line tools cover the most common operations: jug-compute-residuals 
+
+computes the timing residuals for a given timing model and associated arrival times, jug-fit creates a post-fit solution given the fitting flags present in the ephemeris file, and jug-gui launches the GUI. The Python API is organised around the TimingSession object and was introduced earlier in this Section. From the Python API both the fitting pathways and the MAP estimator can be reached. An example of the code can be found in Appendix B. The GUI is built to enable users to perform timing interactively. This is a common method of interacting with Tempo2 , so we have implemented this to support the familiar workflow of those users coming from 
+
+Tempo2 . Using the GUI, a dataset can be loaded and fit interactively with a choice of which parameters or noise to 
+
+26 https://github.com/ipta/pulsar-clock-corrections 13  
+
+> Figure 4. Examples of the JUG GUI on a simulated dataset of PSR J1909 −3744, demonstrating a loaded dataset’s pre-fit residuals (top), and a post-fit solution with noise realisations overplotted (bottom). The figure is annotated to describe features of the GUI.
+
+include. In addition, residuals can be inspected across different axes including Modified Julian Date (MJD), orbital phase, or serial. An example of the GUI can be viewed in Figure 4.  
+
+> 4.
+
+PERFORMANCE We benchmark JUG against PINT and Tempo2 on a controlled series of datasets mimicking and extending the NANOGrav 15-year PSR J1909 −3744 data, with the DMX entries replaced with a Taylor series expansion of DM. In this, we measure the computational cost of the fitting as a function of NTOA and noise model complexity included in the ephemeris. These tests assess speed and scaling only, and the accuracy of the solutions will be considered in Section 5. 4.1. Benchmarking Setup 
+
+Subsets of NTOA are drawn, ranging from 250 to 10 6 arrival times. The data are injected with achromatic red noise and DM noise. We have considered two regimes in this benchmark: one which operates a WLS fit and another operating a GLS fit where achromatic red and DM noise are modelled with 60 Fourier modes each. In both cases, F0 ,14 10 3 10 4 10 5
+
+## Number of TOAs 
+
+10 1
+
+10 0
+
+10 1
+
+10 2
+
+10 3
+
+> Wall-clock runtime (s)
+
+JUG PINT Tempo2 GLS (red+DM, 60 modes) WLS (white) 
+
+Figure 5. A computational speed comparison of JUG (blue), PINT (yellow), and Tempo2 (orange) evaluated through NTOA 
+
+using a simulated dataset for both GLS (solid) and WLS (dashed) fits. While JUG is the fastest across the range of dataset sizes tested, the Tempo2 -qrfit solver approaches JUG ’s speed as the data size increases and noise is included in the pulsar ephemeris. 
+
+F1 , DM , DM1 , and DM2 are fit for five iterations 27 . All three software packages are tested on the same machine as their performance will be dependent on the underlying hardware: a workstation with an Intel Core Ultra 9 285K CPU (24 cores), 64 GB of RAM, and an NVIDIA GeForce RTX 4090 GPU (24 GB). We note that the Vela software package is deliberately excluded from this comparison: Vela directly samples the timing model and noise parameters rather than solving a linearised system, so its computational cost is that of a stochastic sampler outputting a posterior rather than a least-squares fit producing a point estimate. Attempting to provide a computational comparison here would not be able to be done using like quantities. 4.2. Benchmarking Results 
+
+Figure 5 shows the wall-clock runtime as a function of NTOA for each package. In the WLS case, JUG is faster than PINT by a factor growing from ∼ 25 × at 250 TOAs to ∼ 56 × at 20 ,000 TOAs, with the relative speed of JUG 
+
+growing as the dataset sizes increase. In the GLS regime, where the correlated noise model increases the number of design matrix columns, JUG is faster than PINT by factors 28 of ∼ 5 − 20 ×. Against Tempo2 ’s -qrfit solver, JUG 
+
+is several times faster on the scale of small to intermediate sized datasets, but become comparable at larger datasets 29 ,converging to similar runtimes as NTOA s approaches 10 6 (Figure 5). The per-TOA computations and linear algebra          
+
+> 27 The residual weighted RMS is stable and equivalent between software at all iterations past this number of iterations.
+> 28 This is heavily dependent on the dataset and noise model assessed. The largest increase in speed for JUG over PINT is >50 ×.
+> 29 We note that Tempo2’s default SVD solver demonstrates approximately the same speed as PINT.
+
+15 10 3 10 4 10 5 10 6
+
+# Number of TOAs 
+
+# 0.0 0.2 0.4 0.6 0.8 1.0 
+
+> Fraction of cold runtime
+
+GLS solve Phase residuals 
+
+Delay kernel Bary. geometry TDB Clock Parse (par+tim)        
+
+> Figure 6. The fractional breakdown of JUG ’s computation for a fresh load and fit versus the number of arrival times using the GLS fitter. The fractional share of the GLS computation drops at ∼6×10 3arrival times, once the stages that scale with arrival times begin to dominate.
+
+are written to run on either a CPU or a GPU via JAX . We tested the performance of both capabilities, initialising the data from a cold-start and repeating fits so that the caching strategy activates, comparing only the linear solve. For these tests the GPU offered no advantage over the CPU for the timing fit, demonstrating that at these dataset sizes GPU acceleration of the linear solve is not favourable. The noise estimation outlined in Section 3.5, however, does benefit substantially from the use of a GPU. For this, the GPU pathway is a useful feature to have in JUG ’s design. Future, substantially larger, datasets will appear with more complex noise models than we implement here, and at these scales the per-TOA computations may begin to outweigh the compilation and host-to-GPU transfer costs. Figure 6 decomposes JUG runtime into the stages of its pipeline as a function of NTOA , separating the one-time operations that are subsequently cached across the session (Section 3.1) from those evaluated at every iteration. At small dataset sizes, the linear solve dominates the runtime, as its cost is set by the number of design-matrix columns which is independent of NTOA . As the dataset increases, the stages that scale with NTOA begin to dominate and the fractional cost of the solve falls for the runtime. This demonstrates that even with the optimisation that JUG employs in its solve, it is still the single largest computational stage and is naturally the target for future improvements.  
+
+> 5.
+
+VALIDATION The performance gains described in Section 4 are only worthwhile should JUG produce correct results. A simple way to demonstrate this is validating JUG by confirming that it reproduces the solutions of PINT at the precision that is required for pulsar timing, and that it is able to recover known parameters in simulated data. 5.1. Residual Level Agreement 
+
+We evaluate the residuals of PSR J1909 −3744 from the NANOGrav 15-year dataset (G. Agazie et al. 2023b) in both 
+
+JUG and PINT at the same given parameters, using the same solar-system ephemeris (DE440), timescale (TDB) and clock corrections. Figure 7 shows this result, demonstrating that the residuals between the two packages are virtually 16 15 
+
+## 10 
+
+## 5
+
+## 0510 15 
+
+> Residual (  s)
+
+PINT JUG 
+
+## 54000 55000 56000 57000 58000 59000 
+
+# MJD 
+
+## 50 
+
+## 050 
+
+> JUG  PINT (ps)
+
+RMS = 5.2 ps             
+
+> Figure 7. (Top) The residuals of JUG and PINT overlaid on top of each other validated at the same timing model parameter values for PSR J1909 −3744 from the NANOGrav 15-year data set. It is difficult to see the PINT data as JUG matches them almost exactly. (Bottom) The residual difference between the residuals formed by each software, demonstrating ps level of agreement and a relative RMS difference between them of 5 .25 ps. The bowtie structure seen in the bottom panel is a signature of the dataset growth from the PEPOCH set in the ephemeris. The horizontal banding reflects the quantization due to precision handling of the phase residual.
+
+indistinguishable. The RMS of the difference between them is 5 .25 ps over the 15 year baseline, more than four orders of magnitude below the uncertainties on the arrival times. This agreement is distinct from JUG ’s precision against exact arithmetic (Section 3.2). PINT and JUG share a strategy to account for the extended precision of the phase, so they track each other more closely than either tracks the exact arithmetic. The difference is smallest at the centre of the dataset where PEPOCH is defined in the pulsar ephemeris, growing to either end. This is the signature of the accumulation of the precision representations between JUG and PINT , a fundamental precision floor rather than any disagreement in the timing model. 5.2. Fit Level Parity 
+
+In Section 5.1 we established that JUG and PINT compute the same residuals at given identical parameters. We now confirm that they converge to the same solution through fitting. To test this we take two pulsars from the NANOGrav 15-year dataset: PSR J1909 −3744 and PSR J0437 −4715. PSR J1909 −3744 is in a ELL1 binary and is generally considered one of the best millisecond pulsars to time, and PSR J0437 −4715 is the closest and brightest millisecond pulsar with a DD binary model. Both are fit in JUG and PINT using the same data and the same fitted parameters, with the ephemeris, clock corrections and timescales identical, using a GLS fit to include the noise model. 17                   
+
+> Pulsar NTOA Binary RMS ( μs) max |∆|/σ N>0.1σ
+> J1909 −3744 35 ,037 ELL1 0.365 0.0136 0J0437 −4715 5,830 DD 0.398 0.0072 0
+> Table 1. Summary of the fit parity on two NANOGrav 15-year pulsars, fit with GLS including the noise model. For both pulsars we list the number of TOAs, binary model, post-fit weighted RMS, the maximum per-parameter difference in units of the formal uncertainty, and the number of parameters differing by more than 0 .1σ. The full per-parameter comparison is given in Appendix C.
+
+We assess the parity of these fits by comparing each post-fit parameter against the difference expected from its reported parameter uncertainty, such that for a parameter p with uncertainty σp, we report |pJUG − pPINT |/σ p. Asummary of the results of this are reported in Table 1 with the full results displayed in Table 5. The table here shows that between the two software packages, the fitted parameters agree to better than 0 .014 σ, and no parameter difference exceeds 0 .1σ. This shows that JUG is able to reproduce PINT ’s timing solution to a small fraction of the parameter uncertainties. The parity above holds as these fits are well-conditioned and the data well-described by the model. Where this is not the case, the objective may become degenerate in the covariant directions. In a valley such as this, the data are not able to constrain the parameter combinations consistently across any timing software, amplifying the inherent differences between the software into large parameter differences. A fit on a deliberately degenerate pulsar, the same PSR J1909 −3744 but without the noise included in the model, demonstrates that JUG , PINT , and Tempo2 all diverge from each other on the order of tens of σ in the covariant parameters, with no individual software the outlier. This divergence is a reflection of the conditioning of the problem, rather than in the timing machinery of any of the programs. 5.3. Injection Recovery 
+
+The agreement between JUG and PINT in Sections 5.1 and 5.2 establishes that JUG is consistent with PINT by design. However this does not necessarily establish that either software is able to recover the true parameters of a dataset. To test this directly, we construct a simulated dataset to verify the ability of JUG to converge to a known truth that is simulated independently of JUG . We create this simulated dataset by mimicking PSR J1600 −3053 from the NANOGrav 15 year dataset, chosen as it is a well understood binary. We alter this pulsar’s model slightly by removing the DMX parameters and replacing them with a smooth Taylor-series approximation of the DM, and then establish a ground truth ephemeris and adjust the arrival times using PINT so that the residuals are zero when represented by these chosen parameters. Following this, we perturb each of the fitted parameters by ±3σ of each parameter’s uncertainty and fit from this point using both packages, recovering the injected values. Figure 8 shows this result, demonstrating that both packages are able to recover each parameter to far below the formal uncertainties of the parameters. Neither code is systematically closer to the truth, with each recovering some parameters marginally better than the other. From this we conclude that JUG is able to recover the true parameters of an independently constructed dataset to the same level as PINT . 
+
+> 6.
+
+SUMMARY AND FUTURE WORK 
+
+JUG is a JAX based pulsar timing package, built to operate independently of other available timing software while possessing demonstrable parity with existing packages. It is comparably fast to the compiled Tempo2 and at least an order of magnitude faster than PINT . It has been validated to agree with PINT to the picosecond level while not relying on any architecture found in either PINT or Tempo2 . It is designed to be operated through multiple entry points, combining fitting, interactive use, and noise estimation within a single fast and independent package. JUG does require a one-time JIT compilation cost, however, even accounting for this the speed is still equivalent to or greater than the otherwise fastest timing software. Further, it possesses full GPU capabilities. While GPU acceleration is not yet advantageous for the timing fit at current dataset sizes, the MAP noise estimation completes up to an order of magnitude faster on a GPU than a CPU. We did not compare JUG against the Vela timing package directly, as JUG 
+
+and Vela approach the divide between frequentist and Bayesian analyses from opposite directions. Vela replaces the fitting process by sampling the timing model, while JUG accelerates the fit and bridges towards the Bayesian regime through a MAP noise estimation. The two can be considered complementary rather than competitive approaches. 18 3 1 10 2 10 4 0 10 4 10 2 1 3
+
+(value injected truth) / JUG 
+
+ELONG ELAT PMELONG PMELAT PX F0 F1 DM1 DM2 PB A1 XDOT ECC T0 OM OMDOT M2 SINI FD1 FD2 JUMP1 
+
+perturbed start (±3 ) JUG recovered PINT recovered injected truth ±1             
+
+> Figure 8. The recovery of the timing parameters of a simulated dataset of PSR J1600 −3053 for both JUG (blue) and PINT
+> (orange), from a starting ephemeris where all parameters were perturbed by ±3σfrom their simulated values. Both JUG and
+> PINT recover the timing solution to approximately the same accuracy, within 0 .02 σof each parameter’s true simulated value. The greyed out region in the centre of the plot represents the ±1σregion of parameter uncertainty.
+
+As JUG currently stands, it is a fully capable timing package verified against pulsars from the NANOGrav 15-year dataset. Naturally, this testing data does not amount to all pulsar timing data, nor the specific requirements other datasets may possess, so JUG is not yet expected to be a general purpose timing program. However it is being actively developed, and we anticipate that it will become a general purpose tool. In future work we plan to extend JUG to wideband timing, fully Bayesian timing, fitting deterministic signals via JAX auto-differentiation, and an extended GPU-based pipeline. Currently, JUG presumes a phase-connected timing solution and refines it. It does not yet provide a mechanism for the interactive insertion of pulse turns or automated solution finding in the style of psrtime ,
+
+Dracula (P. C. C. Freire & A. Ridolfi 2018) or the algorithmic approach presented in J. Taylor et al. (2024), which we consider a natural direction for future development. Further, we intend to integrate it with profile domain timing with the SCULPT package (Miles et al., in prep.), and the in-development PTA global fit software package ATLAS 19 (Gersbach et al., Laal et al., in prep.). In support of this, JUG is open-source and welcomes contributions. Interested users are encouraged to contact the corresponding author. ACKNOWLEDGMENTS We acknowledge the use of large language model based tools during the development of the JUG codebase. The tools assisted with code implementation and all resulting code was reviewed, tested and validated by the authors. The correctness of JUG ’s outputs is detailed in Section 5. MM, SRT, and NL acknowledge support from the NANOGrav Collaboration’s National Science Foundation (NSF) Physics Frontiers Center award numbers 1430284, 2020265, and 2607948. Parts of this work were supported by the Australian Research Council Centre of Excellence of Gravitational Wave Discovery (CE230100016). SRT and KAG acknowledge support from NSF CAREER #2146016. SRT also acknowledges support from NSF AST-2307719, NSF NRT-2125764, NASA LPS-80NSSC26K0342, and a Chancellor’s Faculty Fellowship from Vanderbilt University. The National Radio Astronomy Observatory is a facility of the Na-tional Science Foundation operated under cooperative agreement by Associated Universities, Inc. SMR is a CIFAR Fellow and is supported by the NSF Physics Frontiers Center award 2020265 and NSF AAG award 2510064. ML acknowledges support from NSF Physics Frontiers Center award number 2020265 and 2607948 (NANOGrav), NSF AAG award number 2511107. N.L. is supported by the Vanderbilt Initiative in Data Intensive Astrophysics (VIDA) Fellowship. This work was conducted in part using the resources of the Advanced Computing Center for Research and Education (ACCRE) at Vanderbilt University, Nashville, TN. A.P acknowledge financial support from the European Research Council (ERC) starting grant ’GIGA’ (grant agreement number: 101116134). A.P. also acknowledges support through the NWO-I Veni fellowship. We acknowledge financial support from the ”Programme National de Cosmolo-gie et Galaxies” (PNCG), ”Programme National Hautes Energies” (PNHE) and ”Programme National Gravitation, R´ ef´ erences, Astronomie, M´ etrologie” (PNGRAM) of CNRS/INSU, France. We acknowledge financial support from Agence Nationale de la Recherche (ANR-18-CE31-0015), France. 
+
+## Software: JAX (J. Bradbury et al. 2018), NumPy (C. R. Harris et al. 2020), SciPy (P. Virtanen et al. 2020), Astropy ( Astropy Collaboration et al. 2022), ERFA, NumPyro (D. Phan et al. 2019), optax ( DeepMind et al. 2020), PySide6, PINT (J. Luo et al. 2021), Tempo2 (G. B. Hobbs et al. 2006) APPENDIX  
+
+> A.
+
+PARAMETER SUPPORT TABLES Tables 2 and 3 summarise the binary timing models and the deterministic and stochastic model components imple-mented in JUG . 
+
+> B.
+
+CODE EXAMPLES & INTERFACE REFERENCE MATERIAL Figure 9 demonstrates the core JUG Python API workflow: loading a pulsar dataset, computing residuals, fitting the timing model with the noise model and free parameters read from the ephemeris, estimating the noise-model parameters, and writing the post-fit ephemeris. The starting ephemeris has had its fitted parameters deliberately perturbed away from the converged solution, so the example demonstrates the fit recovering the timing solution. Figure 10 demonstrates interactive control of the fitted parameter set: restricting the fit to a subset of parameters, and freeing or introducing parameters without editing the ephemeris file. The executed notebook versions of these examples are available in the JUG repository.  
+
+> C.
+
+FIT PARITY REFERENCES 
+
+> Agazie, G., Anumarlapudi, A., Archibald, A. M., et al. 2023a, ApJL, 951, L8, doi: 10.3847/2041-8213/acdac6 Agazie, G., Alam, M. F., Anumarlapudi, A., et al. 2023b, ApJL, 951, L9, doi: 10.3847/2041-8213/acda9a
+
+20 
+
+Model Description Principal fitted parameters 
+
+BT Blandford–Teukolsky (R. Blandford & S. A. Teukolsky 1976) PB, A1, ECC, OM, T0, OMDOT, EDOT, GAMMA, PBDOT 
+
+DD Damour–Deruelle (T. Damour & N. Deruelle 1986) PB, A1, ECC, OM, T0, OMDOT, EDOT, PBDOT, GAMMA, M2, SINI 
+
+DDS DD with alternative Shapiro shape DD parameters with SHAPMAX replacing SINI 
+
+DDH DD with orthometric Shapiro DD parameters with H3, H4, STIG 
+
+DDGR DD in general relativity PB, A1, ECC, OM, T0, MTOT, M2 (post-Keplerian terms derived from the masses) 
+
+DDK DD with Kopeikin terms (S. M. Kopeikin 1995, 1996) DD parameters with KIN, KOM 
+
+ELL1 Low-eccentricity (C. Lange et al. 2001) PB, A1, TASC, EPS1, EPS2, EPS1DOT, EPS2DOT, PBDOT, M2, SINI 
+
+ELL1H ELL1 with orthometric Shapiro ELL1 parameters with H3, H4, STIG 
+
+T2 General model, dispatched as below (G. B. Hobbs et al. 2006) Inferred from the ephemeris parameters present 
+
+Table 2. Binary timing models supported by JUG and the principal parameters fitted by each. Derivatives are analytic for all models except BT , which uses automatic differentiation. Component Representative parameters Spin / phase F0–F n, PEPOCH Astrometry (equatorial) RAJ, DECJ, PMRA, PMDEC Astrometry (ecliptic) ELONG, ELAT, PMELONG, PMELAT Parallax PX Dispersion DM, DM1–DM n, DMEPOCH, DMX Solar wind NE SW Frequency-dependent FD1–FD n, FD jumps Glitches GLEP, GLPH, GLF0, GLF1, GLF0D, GLTD Chromatic events exponential dips, chromatic exponential and annual events System offsets phase jumps (JUMP) Deterministic GW continuous waves, bursts with memory Other delays troposphere, planetary Shapiro delay White noise EFAC, EQUAD, ECORR Correlated noise power-law Gaussian processes: achromatic red, DM, chromatic scattering 
+
+Table 3. Deterministic and stochastic model components implemented in JUG , with representative parameters for each. Alpar, M. A., Cheng, A. F., Ruderman, M. A., & Shaham, J. 1982, Nature, 300, 728, doi: 10.1038/300728a0 Antoniadis, J., Freire, P. C. C., Wex, N., et al. 2013, Science, 340, doi: 10.1126/science.1233232 Antoniadis, J., Arumugam, P., Arumugam, S., et al. 2023, arXiv e-prints, arXiv:2306.16214, doi: 10.48550/arXiv.2306.16214 Astropy Collaboration, Price-Whelan, A. M., Lim, P. L., et al. 2022, ApJ, 935, 167, doi: 10.3847/1538-4357/ac7c74 Backer, D. C., & Hellings, R. W. 1986, ARA&A, 24, 537, doi: 10.1146/annurev.aa.24.090186.002541 Backer, D. C., Kulkarni, S. R., Heiles, C., Davis, M. M., & Goss, W. M. 1982, Nature, 300, 615, doi: 10.1038/300615a0 Bailes, M. 2009, Proceedings of the International Astronomical Union, 5, 212–217, doi: 10.1017/S1743921309990421 21 
+
+>>> import os >>> os.environ["JAX_PLATFORMS"] = "cpu" # optionally switch to CPU driven code >>> from jug.engine.session import TimingSession >>> session = TimingSession("J1909-3744.par", "J1909-3744.tim") >>> print(session) TimingSession(par=’J1909-3744.par’, tim=’J1909-3744.tim’) >>> pre = session.compute_residuals() >>> print(f"pre-fit RMS = {pre[’rms_us’]:.3f} us") pre-fit RMS = 101.771 us >>> fit = session.fit_parameters() # GLS fit; noise model and free ... # parameters read from the ephemeris >>> print(f"post-fit RMS = {fit[’final_rms’]:.3f} us, converged = {fit[’converged’]}") post-fit RMS = 0.497 us, converged = True >>> noise = session.estimate_noise() # MAP estimate of the noise model >>> print(f"log10 A_DM = {noise.params[’TNDMAMP’]:.2f}") log10 A_DM = -13.47 >>> session.save_par("J1909-3744_postfit.par", fit_result=fit) 
+
+Figure 9. Code example showing the core JUG API used to time PSR J1909 −3744. A TimingSession is constructed from the ephemeris and arrival-time files, residuals are computed, and the timing model is fit with a generalised least-squares solve using the noise model carried in the ephemeris. The starting ephemeris is deliberately perturbed, and the fit recovers the solution, reducing the residual RMS by over two orders of magnitude. The noise-model hyperparameters are then estimated with the maximum-a-posteriori framework of Section 3.5, and the post-fit ephemeris is written out. 
+
+>>> sub = TimingSession("J1909-3744.par", "J1909-3744.tim") >>> # Fit a subset: freeze everything except F0, F1, DM1 >>> sub.set_frozen([p for p in sub.free_params if p not in ("F0", "F1", "DM1")]) >>> print("fitting:", sub.free_params) fitting: [’DM1’, ’F0’, ’F1’] >>> # Free a parameter the par file carries but does not flag (DM), >>> # and one the par file omits entirely (F2, starting from zero) >>> sub.set_free("DM", "F2") >>> sub_fit = sub.fit_parameters() >>> print(f"F2 = {sub_fit[’final_params’][’F2’]:.3e}") F2 = -1.290e-25 
+
+Figure 10. Interactive control of the fitted parameter set through the JUG API. The fit flags are edited in memory with 
+
+set frozen() and set free() rather than by modifying the ephemeris file: the fitted set is restricted to a chosen subset, a parameter present in the ephemeris but not flagged for fitting ( DM ) is freed, and a parameter absent from the ephemeris entirely (F2 ) is introduced through the parameter registry and included in the fit. B´ ecsy, B., Cornish, N. J., & Kelley, L. Z. 2022, ApJ, 941, 119, doi: 10.3847/1538-4357/aca1b2 Bhat, B., Keith, M. J., Cognard, I., et al. 2026, MNRAS, 545, staf2034, doi: 10.1093/mnras/staf2034 Bhat, N. D. R., Cordes, J. M., Camilo, F., Nice, D. J., & Lorimer, D. R. 2004, ApJ, 605, 759, doi: 10.1086/382680 Blandford, R., & Teukolsky, S. A. 1976, ApJ, 205, 580, doi: 10.1086/154315 Bradbury, J., Frostig, R., Hawkins, P., et al. 2018, JAX: composable transformations of Python+NumPy programs, 0.3.13 http://github.com/jax-ml/jax Burgay, M., D’Amico, N., Possenti, A., et al. 2003, Nature, 426, 531, doi: 10.1038/nature02124 Cromartie, H. T., Fonseca, E., Ransom, S. M., et al. 2020, Nature Astronomy, 4, 72, doi: 10.1038/s41550-019-0880-2 Damour, T., & Deruelle, N. 1986, Annales de L’Institut Henri Poincare Section (A) Physique Theorique, 44, 263 22 
+
+Key / interaction Action 
+
+Files and session 
+
+Ctrl+P Open .par file Ctrl+T Open .tim file Ctrl+S Save .par file Ctrl+Shift+S Save .tim file Ctrl+N Save pulse-numbered .tim file Ctrl+E Open the parameters panel Ctrl+Q Exit 
+
+Fitting and TOAs 
+
+Ctrl+F Run the fit Ctrl+R Restart (reset to the original ephemeris) Ctrl+A Average TOAs (dialog) Ctrl+Shift+A Restore original TOAs 
+
+Plot interaction 
+
+Z Box zoom: first press sets a corner at the cursor, second press applies the zoom Shift+Z Box delete: first press sets a corner, second press deletes the TOAs in the box Ctrl+0 Zoom to fit U Unzoom to the full view Esc Cancel an active box zoom or box delete; closes an open overlay menu first if present 
+
+Display 
+
+W Toggle weighted / unweighted RMS in the statistics panel R Toggle residual error-bar visibility Shift+K Toggle subtraction of the red-noise realization Shift+F Toggle subtraction of the DM-noise realization 
+
+Mouse 
+
+Left click, backend legend Expand or collapse the backend colour legend Left click, noise panel row Expand or collapse the process’s parameter fields Click outside an open menu Close the menu 
+
+Table 4. Keyboard and mouse controls in the JUG GUI. DeepMind, Babuschkin, I., Baumli, K., et al. 2020, The DeepMind JAX Ecosystem, http://github.com/deepmind Demorest, P. B., Pennucci, T., Ransom, S. M., Roberts, M. S. E., & Hessels, J. W. T. 2010, Nature, 467, 1081, doi: 10.1038/nature09466 Dewdney, P. E., Hall, P. J., Schilizzi, R. T., & Lazio, T. J. L. W. 2009, IEEE Proceedings, 97, 1482, doi: 10.1109/JPROC.2009.2021005 Edwards, R. T., Hobbs, G. B., & Manchester, R. N. 2006, MNRAS, 372, 1549, doi: 10.1111/j.1365-2966.2006.10870.x Ellis, J. A., Vallisneri, M., Taylor, S. R., & Baker, P. T. 2019, ENTERPRISE: Enhanced Numerical Toolbox Enabling a Robust PulsaR Inference SuitE,, Astrophysics Source Code Library, record ascl:1912.015 http://ascl.net/1912.015 Fonseca, E., Cromartie, H. T., Pennucci, T. T., et al. 2021, ApJL, 915, L12, doi: 10.3847/2041-8213/ac03b8 Freire, P. C. C., & Ridolfi, A. 2018, MNRAS, 476, 4794, doi: 10.1093/mnras/sty524 Hallinan, G., Ravi, V., Weinreb, S., et al. 2019, in Bulletin of the American Astronomical Society, Vol. 51, 255, doi: 10.48550/arXiv.1907.07648 Harris, C. R., Millman, K. J., van der Walt, S. J., et al. 2020, Nature, 585, 357, doi: 10.1038/s41586-020-2649-2 23 
+
+Parameter JUG PINT σJUG |∆|/σ 
+
+PSR J1909 −3744 (NTOA = 35 ,037, ELL1, GLS, RMS = 0 .365 μs) ELONG 284 .2208459 284 .2208459 6.439 × 10 −10 0.0061 ELAT −15 .15553321 −15 .15553321 2.596 × 10 −9 0.0011 PMELONG −13 .86991921 −13 .86991807 5.483 × 10 −4 0.0021 PMELAT −34 .31364843 −34 .31365324 2.278 × 10 −3 0.0021 PX 0.890994687 0.8910300496 7.751 × 10 −3 0.0046 F0 339 .3156923 339 .3156923 9.622 × 10 −14 0.0000 F1 −1.614808267 × 10 −15 −1.614808243 × 10 −15 5.615 × 10 −21 0.0044 PB 1.533449452 1.533449452 7.796 × 10 −13 0.0023 PBDOT 5.089342103 × 10 −13 5.089467189 × 10 −13 9.167 × 10 −16 0.0136 A1 1.897991012 1.897991012 1.619 × 10 −8 0.0061 XDOT −1.95649777 × 10 −16 −1.958319478 × 10 −16 3.634 × 10 −17 0.0050 M2 0.2087061874 0.208699517 9.326 × 10 −4 0.0072 SINI 0.9980128482 0.9980131322 4.387 × 10 −5 0.0065 TASC 56121 .04496 56121 .04496 8.496 × 10 −10 0.0086 EPS1 4.448930721 × 10 −8 4.453678437 × 10 −8 7.901 × 10 −9 0.0060 EPS2 −9.90179524 × 10 −8 −9.902859443 × 10 −8 4.624 × 10 −9 0.0023 FD1 −8.745089653 × 10 −7 −8.744268619 × 10 −7 1.060 × 10 −8 0.0077 JUMP1 −1.777923582 × 10 −5 −1.777941029 × 10 −5 1.761 × 10 −8 0.0099 JUMP2 −1.949915552 × 10 −5 −1.949930813 × 10 −5 2.121 × 10 −8 0.0072 PSR J0437 −4715 (NTOA = 5 ,830, DD, GLS, RMS = 0 .398 μs) ELONG 50 .46886858 50 .46886858 2.533 × 10 −8 0.0005 ELAT −67 .87322632 −67 .87322632 1.989 × 10 −8 0.0012 PMELONG 86 .04772109 86 .04770265 3.137 × 10 −2 0.0006 PMELAT −111 .6714273 −111 .6713821 3.396 × 10 −2 0.0013 PX 9.700709869 9.6992485 9.468 × 10 −1 0.0015 F0 173 .687948 173 .687948 2.816 × 10 −13 0.0000 F1 −1.728365385 × 10 −15 −1.728365376 × 10 −15 2.211 × 10 −20 0.0004 PB 5.741042383 5.741042383 1.551 × 10 −10 0.0005 PBDOT 2.725374176 × 10 −12 2.725285613 × 10 −12 4.777 × 10 −13 0.0002 A1 3.366740695 3.366740695 4.472 × 10 −8 0.0004 XDOT 7.908466436 × 10 −14 7.908447701 × 10 −14 1.111 × 10 −15 0.0002 ECC 1.929696849 × 10 −5 1.929693119 × 10 −5 3.901 × 10 −8 0.0010 T0 58089 .63373 58089 .63373 1.514 × 10 −3 0.0015 OM 2.324135007 2.323991125 9.495 × 10 −2 0.0015 FD1 4.691555868 × 10 −5 4.691914799 × 10 −5 4.976 × 10 −7 0.0072 FD2 −2.491638394 × 10 −5 −2.491872734 × 10 −5 5.566 × 10 −7 0.0042 FD3 6.096304892 × 10 −6 6.096864915 × 10 −6 2.085 × 10 −7 0.0027 JUMP1 4.372414228 × 10 −5 4.372405292 × 10 −5 1.668 × 10 −7 0.0005 
+
+Table 5. Post-fit parameter comparison between JUG and PINT for PSR J1909 −3744 and PSR J0437 −4715, both fit to the NANOGrav 15-year dataset with a GLS fit including the noise model, using matched ephemeris, clock, and timescale conventions. Parameters are listed in the order given in the pulsar ephemerides. For each parameter we list the post-fit values, 
+
+JUG ’s 1 σ uncertainty σJUG , and the difference between them in units of that uncertainty, |∆|/σ . The per-epoch DMX dispersion parameters are held fixed and omitted. Every parameter agrees between the two packages to better than 0 .014 σ.24 
+
+Helfand, D. J., Manchester, R. N., & Taylor, J. H. 1975, ApJ, 198, 661, doi: 10.1086/153644 Hewish, A., Bell, S. J., Pilkington, J. D. H., Scott, P. F., & Collins, R. A. 1968, Nature, 217, 709, doi: 10.1038/217709a0 Hobbs, G. B., Edwards, R. T., & Manchester, R. N. 2006, MNRAS, 369, 655, doi: 10.1111/j.1365-2966.2006.10302.x Kelley, L. Z., Blecha, L., Hernquist, L., Sesana, A., & Taylor, S. R. 2018, MNRAS, 477, 964, doi: 10.1093/mnras/sty689 Kingma, D. P., & Ba, J. 2014, arXiv preprint arXiv:1412.6980 Kopeikin, S. M. 1995, ApJL, 439, L5, doi: 10.1086/187731 Kopeikin, S. M. 1996, ApJL, 467, L93, doi: 10.1086/310201 Kramer, M., Stairs, I. H., Manchester, R. N., et al. 2006, Science, 314, 97, doi: 10.1126/science.1132305 Lange, C., Camilo, F., Wex, N., et al. 2001, MNRAS, 326, 274, doi: 10.1046/j.1365-8711.2001.04606.x Lentati, L., Alexander, P., Hobson, M. P., et al. 2014, MNRAS, 437, 3004, doi: 10.1093/mnras/stt2122 Lorimer, D. R., & Kramer, M. 2004, Handbook of Pulsar Astronomy, Vol. 4 Luo, J., Ransom, S., Demorest, P., et al. 2021, ApJ, 911, 45, doi: 10.3847/1538-4357/abe62f Miles, M. T., Shannon, R. M., Reardon, D. J., et al. 2025, MNRAS, 536, 1489, doi: 10.1093/mnras/stae2571 Miller, M. C., Lamb, F. K., Dittmann, A. J., et al. 2021, ApJL, 918, L28, doi: 10.3847/2041-8213/ac089b NANOGrav Collaboration, Arzoumanian, Z., Brazier, A., et al. 2015, ApJ, 813, 65, doi: 10.1088/0004-637X/813/1/65 Nice, D., Demorest, P., Stairs, I., et al. 2015, Tempo: Pulsar timing data analysis,, Astrophysics Source Code Library, record ascl:1509.002 http://ascl.net/1509.002 Park, R. S., Folkner, W. M., Williams, J. G., & Boggs, D. H. 2021, AJ, 161, 105, doi: 10.3847/1538-3881/abd414 Pennucci, T. T., Demorest, P. B., & Ransom, S. M. 2016, Pulse Portraiture: Pulsar timing, http://ascl.net/1606.013 Phan, D., Pradhan, N., & Jankowiak, M. 2019, arXiv e-prints, arXiv:1912.11554, doi: 10.48550/arXiv.1912.11554 Reardon, D. J., Zic, A., Shannon, R. M., et al. 2023, ApJL, 951, L6, doi: 10.3847/2041-8213/acdd02 Riley, T. E., Watts, A. L., Ray, P. S., et al. 2021, ApJL, 918, L27, doi: 10.3847/2041-8213/ac0a81 Rosado, P. A., Sesana, A., & Gair, J. 2015, MNRAS, 451, 2417, doi: 10.1093/mnras/stv1098 Susobhanan, A. 2025, ApJ, 980, 165, doi: 10.3847/1538-4357/adaaec Taylor, J., Ransom, S., & Padmanabh, P. V. 2024, ApJ, 964, 128, doi: 10.3847/1538-4357/ad1ce9 Taylor, J. H. 1989, in NATO Advanced Study Institute (ASI) Series C, Vol. 262, Timing Neutron Stars, ed. H. ¨Ogelman & E. P. J. van den Heuvel, 17 Taylor, J. H. 1992, Philosophical Transactions of the Royal Society of London Series A, 341, 117, doi: 10.1098/rsta.1992.0088 Taylor, J. H., & Weisberg, J. M. 1982, ApJ, 253, 908, doi: 10.1086/159690 Taylor, S. R. 2021, arXiv e-prints, arXiv:2105.13270, doi: 10.48550/arXiv.2105.13270 van Haasteren, R., & Levin, Y. 2013, MNRAS, 428, 1147, doi: 10.1093/mnras/sts097 van Haasteren, R., & Vallisneri, M. 2014, PhRvD, 90, 104012, doi: 10.1103/PhysRevD.90.104012 Virtanen, P., Gommers, R., Oliphant, T. E., et al. 2020, Nature Medicine, 17, 261, doi: 10.1038/s41592-019-0686-2 Wolszczan, A. 1994, Science, 264, 538, doi: 10.1126/science.264.5158.538 Wolszczan, A., & Frail, D. A. 1992, Nature, 355, 145, doi: 10.1038/355145a0 Xu, H., Chen, S., Guo, Y., et al. 2023, Research in Astronomy and Astrophysics, 23, 075024, doi: 10.1088/1674-4527/acdfa5 You, X. P., Hobbs, G., Coles, W. A., et al. 2007, MNRAS, 378, 493, doi: 10.1111/j.1365-2966.2007.11617.x
