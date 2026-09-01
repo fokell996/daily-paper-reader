@@ -6,38 +6,49 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-31
-- 运行时间：2026-08-31 23:13:19 UTC
+- 最新运行日期：2026-09-01
+- 运行时间：2026-09-01 22:57:25 UTC
 - 运行状态：成功
-- 本次总论文数：6
-- 精读区：4
-- 速读区：2
+- 本次总论文数：9
+- 精读区：6
+- 速读区：3
 
 ### 今日简报（AI）
-今日精读聚焦中子星形状误差与快速射电暴起源，两篇均获9分高分，另有双中子星合并与超子粘滞性速读。最值得关注：旋转中子星在扁球近似下的形状误差影响，以及年轻贫尘H II区产生高色散快速射电暴的新机制。建议普通读者从快速射电暴的“年轻起源”假说入手，理解宇宙极端天体环境。
-- 详情：[/202608/31/README](/202608/31/README)
+今日精读聚焦中子星 crust 的涡旋钉扎与弹性响应，以及基于多观测样本的中子星物态方程推断，两篇均获 9 分高分。  
+最值得关注的是：涡旋钉扎模型揭示轴对称加载下星壳的弹性行为，而 NS-UNO 方法无需预设观测数量即可约束中子星内部物态。  
+建议普通读者后续可关注暗物质与中子星物质相互作用对引力波波形的影响，以及磁化等离子体中波碰撞的能量耗散机制。
+- 详情：[/202609/01/README](/202609/01/README)
 
 ### 精读区论文标签
-1. [The Impact of Errors in the Shape Function of Rotating Neutron Stars in the Oblate Schwarzschild Approximation](/202608/31/2608.27744v1-the-impact-of-errors-in-the-shape-function-of-rotating-neutron-stars-in-the-oblate-schwarzschild-approximation)  
+1. [Vortex pinning and the elastic response of neutron-star crusts - I. Axisymmetric loading](/202609/01/2608.30029v1-vortex-pinning-and-the-elastic-response-of-neutron-star-crusts---i-axisymmetric-loading)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：研究旋转中子星形状函数误差对X射线观测约束半径和状态方程的影响
-2. [High Dispersion Measure Fast Radio Bursts from Young, Dust-Poor H II Regions](/202608/31/2608.27779v1-high-dispersion-measure-fast-radio-bursts-from-young-dust-poor-h-ii-regions)  
+   evidence：涡旋钉扎、脉冲星自转突变与中子星星壳弹性
+2. [NS-UNO: Neutron Star EoS Inference from an Unconstrained Number of Observations](/202609/01/2608.30573v1-ns-uno-neutron-star-eos-inference-from-an-unconstrained-number-of-observations)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：提出年轻无尘HII区解释重复快速射电暴的高色散量，涉及FRB起源与发射环境
-3. [JUG: JAX-based Unified pulsar timinG](/202608/31/2608.27786v1-jug-jax-based-unified-pulsar-timing)  
+   evidence：神经后验估计用于从可变数量观测推断中子星状态方程
+3. [Constraining equation of state of neutron star using neutron star-black hole mergers](/202609/01/2608.30995v1-constraining-equation-of-state-of-neutron-star-using-neutron-star-black-hole-mergers)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：面向脉冲星计时阵数据的计时软件包
-4. [Distinct Modes of Pulsar Glitch Activity Revealed by the Waiting-Time--Amplitude Morphology](/202608/31/2608.28523v1-distinct-modes-of-pulsar-glitch-activity-revealed-by-the-waiting-time--amplitude-morphology)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：等待时间-振幅形态的脉冲星突跳分类
+   evidence：利用中子星-黑洞并合潮汐形变约束中子星状态方程
+4. [A first-principles binary neutron star merger model of GW170817, GRB170817A, and AT2017gfo](/202609/01/2608.27555v1-a-first-principles-binary-neutron-star-merger-model-of-gw170817-grb170817a-and-at2017gfo)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：第一性原理双中子星并合模型再现多信使观测并约束状态方程
+5. [The multi-frequency radio light curve of the sub-pc SMBH binary candidate PG 1302-102](/202609/01/2608.29682v1-the-multi-frequency-radio-light-curve-of-the-sub-pc-smbh-binary-candidate-pg-1302-102)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：该双黑洞候选体与脉冲星计时阵搜寻纳赫兹引力波相关
+6. [The DSA/Chronoscope fast radio burst survey: forecasts and science overview](/202609/01/2608.30943v1-the-dsachronoscope-fast-radio-burst-survey-forecasts-and-science-overview)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：DSA/Chronoscope快速射电暴巡天预测及起源相关科学目标
 
 ### 速读区论文标签
-1. [A first-principles binary neutron star merger model of GW170817, GRB170817A, and AT2017gfo](/202608/31/2608.27555v1-a-first-principles-binary-neutron-star-merger-model-of-gw170817-grb170817a-and-at2017gfo)  
+1. [Effects of the interaction of dark matter and neutron-star matter on extreme and intermediate mass-ratio inspirals](/202609/01/2608.26274v1-effects-of-the-interaction-of-dark-matter-and-neutron-star-matter-on-extreme-and-intermediate-mass-ratio-inspirals)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：基于第一性原理的双中子星并合多信使模型，是中子星天体物理的核心主题
-2. [Hyperon bulk viscosity effects in neutron-star inspirals](/202608/31/2608.28000v1-hyperon-bulk-viscosity-effects-in-neutron-star-inspirals)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：中子星并合中的超子体粘滞与状态方程效应
+   evidence：暗物质与中子星物质相互作用影响旋进引力波
+2. [G(2) Glueball Boson Stars as Restricted Kerr Mimickers in the Thomas--Fermi Limit](/202609/01/2608.28688v1-g2-glueball-boson-stars-as-restricted-kerr-mimickers-in-the-thomas--fermi-limit)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：利用TOV和潮汐形变研究致密星状态方程
+3. [Rapid Energy Dissipation by Colliding Waves in Strongly Magnetized Plasmas](/202609/01/2608.29365v1-rapid-energy-dissipation-by-colliding-waves-in-strongly-magnetized-plasmas)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：强磁化等离子体中磁能耗散的动力学模型，可应用于磁星磁层与爆发辐射
 
 
 <div class="dpr-home-promo-card">

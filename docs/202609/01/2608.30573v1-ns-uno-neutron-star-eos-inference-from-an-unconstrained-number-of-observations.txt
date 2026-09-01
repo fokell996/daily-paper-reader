@@ -1,0 +1,718 @@
+Title: NS-UNO: Neutron Star EoS Inference from an Unconstrained Number of Observations
+
+URL Source: https://arxiv.org/pdf/2608.30573v1
+
+Published Time: Tue, 01 Sep 2026 03:06:48 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+## NS-UNO: Neutron Star EoS Inference from an Unconstrained Number of Observations 
+
+Valéria Carvalho, 1, 2, ∗ Márcio Ferreira, 1, † Michał Bejger, 2, 3, ‡ and Constança Providência 1, §
+
+> 1
+
+CFisUC, Department of Physics, University of Coimbra, P-3004 - 516 Coimbra, Portugal 
+
+> 2
+
+Nicolaus Copernicus Astronomical Center, Polish Academy of Sciences, Bartycka 18, 00-716, Warsaw, Poland 
+
+> 3
+
+INFN Sezione di Ferrara, Via Saragat 1, 44122 Ferrara, Italy 
+
+(Dated: September 1, 2026) Future multimessenger observations of neutron stars (NS) are expected to substantially increase both the number and precision of astrophysical constraints on the equation of state (EoS) of dense matter. This motivates inference frameworks capable of accommodating a variable, non fixed number of observations while preserving the posterior information associated with each measurement. In this work, we introduce NS-UNO, a Neural Posterior Estimation framework for NS EoS inference designed to accommodate an Unconstrained Number of Observations (UNO). NS-UNO combines a hierarchical DeepSets model with a conditional normalising flow, enabling a single trained model to perform inference from mass-radius observation sets of varying size, with each observation represented by a set of posterior samples. We demonstrate accurate and well calibrated posterior reconstructions using a model trained jointly on piecewise polytropic and non-parametric Gaussian process EoS ensembles. The reconstruction improves as observations probe a broader range of NS masses, while remaining robust to variations in the number and precision of the observations. The model also generalises to EoSs outside the families used during training. Finally, we qualitatively demonstrate the framework on current multimessenger constraints from NICER and GW170817. NS-UNO provides a flexible and scalable approach to NS EoS inference, naturally suited to the increasingly diverse observational datasets expected from next generation multimessenger astronomy. 
+
+I. INTRODUCTION 
+
+Understanding the equation of state (EoS) of neutron star (NS) matter remains one of the central challenges in nuclear physics and astrophysics, as it governs the structure and ob-servable properties of NS, including their masses, radii, and tidal deformabilities [1–3]. Since matter at these densities cannot be reproduced in terrestrial laboratories, the EoS must be constrained indirectly by combining theoretical models of dense matter with astrophysical observations [4]. Over the past decade, multimessenger observations have substantially improved these constraints. Gravitational-wave (GW) detections of binary NS mergers, notably the GW170817 event [5] (for the current state of the LIGO-Virgo-KAGRA (LVK) Collaboration [6–8] detections, see [9]) have constrained the tidal deformability of NSs [10], while X-ray pulse-profile modelling with NS Interior Composition Ex-plorer (NICER) has provided increasingly precise M (R) mea-surements for several pulsars [11–16]. Together with theoret-ical constraints from chiral effective field theory ( χEFT) at low densities [17] and perturbative QCD (pQCD) at asymp-totically high densities [18, 19], these observations have con-siderably narrowed the range of viable EoSs. Nevertheless, the behaviour of matter above approximately twice nuclear saturation density remains poorly constrained, leaving open questions regarding the possible existence of phase transitions and other exotic degrees of freedom. Bayesian inference of the NS EoS has traditionally relied 
+
+> ∗Electronic address: val.mar.dinis@uc.pt
+> †Electronic address: marcio.ferreira@uc.pt
+> ‡Electronic address: bejger@camk.edu.pl
+> §Electronic address: cp@uc.pt
+
+on Markov Chain Monte Carlo (MCMC) or nested sampling methods [20, 21]. While highly successful, these approaches require the posterior to be recomputed whenever new ob-servations are incorporated or different EoS parametrizations are considered. As future observatories such as the Einstein Telescope [22] and Cosmic Explorer [23] dramatically in-crease both the number and diversity of multimessenger ob-servations, this repeated inference will become increasingly computationally expensive. More importantly, future infer-ence frameworks must naturally accommodate observational datasets of variable size. Simulation based inference (SBI) offers an attractive al-ternative by learning the posterior directly from simulated data. In particular, Neural Posterior Estimation (NPE) ap-proximates the posterior distribution of the model parameters conditioned on the observations, enabling fast amortized pos-terior inference once the model has been trained. NPE has already demonstrated excellent performance in GW parame-ter estimation [24, 25] and has recently been applied to NS EoS inference [26–28]. In our previous work [26], we introduced an NPE frame-work for NS EoS inference from synthetic mass, radius, and tidal deformability observations. Although it produced accu-rate and well-calibrated posterior reconstructions, the archi-tecture assumed a fixed number of observations, each rep-resented by a single point estimate. Consequently, it could not naturally process future observational datasets containing variable numbers of sources represented by posterior samples. To the best of our knowledge, existing approaches are de-signed for fixed-size conditioning vectors rather than hierar-chical observational sets in which both the number of obser-vations and the posterior samples associated with each obser-vation may vary, [27, 29–31]. Therefore we introduce NS-UNO (Neutron Star EoS in-ference from an Unconstrained Number of Observations ), an arXiv:2608.30573v1 [nucl-th] 31 Aug 2026 2NPE framework capable of handling both an arbitrary number of NS observations and the posterior samples associated with each observation. NS-UNO combines a hierarchical DeepSets model [32] with a Conditional Normalizing Flow (CNF) [33], mapping hierarchical observational sets of arbitrary size into a fixed-dimensional, permutation-invariant representation that conditions the posterior over EoSs. To reduce dependence on a specific EoS parametrization, the framework is trained and validated using both piecewise-polytropic [34] and non-parametric Gaussian-process EoS ensembles [35]. We demonstrate that NS-UNO provides accurate and well calibrated posterior reconstructions while remaining robust to varying observational configurations. We investigate how re-construction depends on the number of observations, NS mass distribution coverage, and uncertainty of the available obser-vations, evaluate its generalization to previously unseen EoS families, and finally present a qualitative application to current NICER and the LVK GW170817 observations. The remainder of this paper is organized as follows. Sec-tion II describes the datasets and the generation of the mock observations. Section III presents the NS-UNO architecture and its implementation. Section IV discusses the reconstruc-tion performance and generalization tests, while Sec. V sum-marizes the main conclusions and outlines future directions.  
+
+> II. DATASET
+
+The objective of this work is to develop a model capa-ble of inferring the NS EOS independently of any specific parametrization. To achieve this, we combine the two datasets introduced in our previous work [26], rather than training sep-arate models for each. This merged dataset exposes the net-work to a wide range of physically plausible EoSs, allowing us to assess its ability to generalize across fundamentally dif-ferent descriptions of dense matter. 
+
+Piecewise-polytropic (PT) EoSs . This family is generated following the prescription of [34]. Each EoS is described by five connected polytropic segments, providing a flexible parametrization capable of representing a broad range of stiff-nesses and phase transition like behaviour. All models sat-isfy causality and support NSs with masses above 2 M⊙. For each EoS, the Tolman Oppenheimer Volkoff (TOV) equations [36, 37] are solved to obtain the corresponding M (R) relation, from which synthetic observations are generated by sampling NS masses and adding Gaussian observational uncertainties. 
+
+Gaussian Process (GP) EoSs . This family is based on the non-parametric framework developed in [35, 38]. GP regres-sion is used to interpolate between χEFT at low densities and pQCD at high densities, producing EoSs that satisfy causality and thermodynamic stability. The prior is further constrained using current astrophysical observations, including measure-ments of massive pulsars [39, 40], tidal deformability from GW170817 [5], and M (R) measurements from X-ray obser-vations such as NICER [13, 41, 42]. Unlike the PT family, the GP ensemble does not assume an explicit functional form for the EoS, providing a complementary and highly model inde-pendent description of dense matter. By combining PT and GP EoS families into a single train-ing set, the framework learns from both parametric and non-parametric EoSs, spanning a broad range of physical be-haviours and reducing dependence on any particular EoS rep-resentation.   
+
+> A. Generation of Mock Datasets
+> 1. EoS representation
+
+After merging the PT and GP families, the final dataset con-tains 118 419 EoSs. We use 90% of the dataset for training and validation and the remaining 10% for testing. The training and validation subset is further divided into 90% for training and 10% for validation, resulting in 106 567 EoSs for training and validation and 11 852 for testing. Prior to training, the GP ensemble is filtered by requir-ing each EoS to support a NS with a maximum mass above 
+
+2 M⊙. No likelihood-based filtering is applied, ensuring that the training set spans a broad range of physically viable EoSs. Each EoS is represented by the pressure evaluated at twenty equally spaced baryon densities, 
+
+p = [ p(n1), p (n2), . . . , p (n20 )] , (1) where n1 = 0.13 fm −3, n20 = 1.28 fm −3 and ∆n =0.0605 fm −3. The pressure values are transformed to log 10 (p)
+
+before training to reduce the dynamic range and improve nu-merical stability.  
+
+> 2. Mock observations
+
+Unlike previous approaches, the proposed framework is de-signed to infer the EoS from an arbitrary number of NS obser-vations. Consequently, the training data should not be tied to the characteristics of the current observational sample alone, but should also encompass plausible future scenarios. The construction of the mock observations is therefore guided by four unknown aspects of present and future datasets: 1. number of observed NSs, 2. number of synthetic samples available for each obser-vation, 3. distribution of NS masses, 4. observational uncertainties. To account for these unknowns, we randomly vary each of these quantities during training, allowing the model to learn a posterior that is robust to different observational configura-tions. The following subsections describe how each aspect is modelled. For each EoS, we first generate a set of Nobs synthetic NS observations. Stellar masses are sampled using a stratified scheme spanning the accessible mass range 1M⊙ < M <Mmax (EoS) such that different mass regimes of the corre-sponding TOV sequence are represented during training. This 3sampling strategy is used only to ensure that different mass regimes are represented during training and is not intended to model the current astrophysical NS mass distribution. The corresponding radii are obtained by interpolating the TOV M (R) relation of the underlying EoS. Each synthetic observation is then represented by a cloud of correlated sam-ples drawn from a bivariate Gaussian distribution, 
+
+Mo,s 
+
+Ro,s 
+
+
+
+∼ N 
+
+ Mo
+
+Ro(Mo)
+
+
+
+, Σo
+
+
+
+, (2) where (Mo, R o(Mo)) denotes the noiseless M (R) pair ob-tained from the TOV solution for the selected EoS and 
+
+Σo =
+
+ σ2 
+
+> M,o
+
+ρoσM,o σR,o 
+
+ρoσM,o σR,o σ2
+
+> R,o
+
+
+
+. (3) The uncertainties are independently sampled for each obser-vation according to 
+
+σM,o ∼ U(0 .05 , 0.10) M⊙,σR,o ∼ U(0 .10 , 0.30) km , (4) 
+
+ρo ∼ U(−0.5, 0.5) .
+
+Each observation is represented by NS samples drawn inde-pendently from the multivariate Gaussian distribution defined above. These samples provide a simplified representation of the observational uncertainty associated with each measure-ment, rather than a single point estimate. In real astrophysical analyses, observations are commonly represented by poste-rior distributions over the measured quantities, which are of-ten provided as publicly available sets of posterior samples in the (M, R ) plane. Consequently, the inference model is designed to operate directly on sets of samples while accom-modating an arbitrary number of observations. Unless otherwise stated, we adopt NS = 300 synthetic samples per observation, while the total number of observa-tions, Nobs , is randomly selected between 5 and 40 during training. Although the architecture can accommodate a vari-able number of samples per observation, we fix NS during training so that all synthetic observations are represented by the same number of samples and therefore receive equal treat-ment by the network. We acknowledge that this Gaussian construction provides a deliberately simplified representation of observational uncer-tainties. It is intended to generate controlled synthetic samples rather than to reproduce the full complexity of current obser-vational posteriors.  
+
+> B. Variable-size observational sets
+
+The resulting dataset has a hierarchical structure, EoS −→ observations −→ samples ,
+
+where each EoS is associated with a variable number of ob-servations and each observation contains a fixed number of synthetic samples. This representation closely resembles the output of astrophysical analyses and naturally motivates the hierarchical structure of the proposed inference framework. Each training example corresponds to a single EoS and is associated with a variable number of mock observations. We denote the collection of observations for the i-th EoS by Oi =
+
+{Oi,j }Nobs,i  
+
+> j=1
+
+, where i labels the EoS, Nobs,i is the number of observations generated for that EoS, and Oi,j denotes the j-th observation. Each observation is represented by a set of NS
+
+measurement samples, 
+
+Oi,j = {xi,j,s }NS 
+
+> s=1
+
+, xi,j,s ∈ Rdin , (5) where s labels synthetic measurement samples associated with the j-th observation and din = 2 corresponds to the mass and radius of an individual sample. For efficient mini-batch training, all EoSs within abatch are padded to the largest number of observations, 
+
+Nmax = max i Nobs,i , yielding an input tensor of shape 
+
+(B, N max , N S , d in ), where B denotes the batch size. A bi-nary mask is stored alongside the tensor to distinguish valid observations from padded elements during the pooling opera-tions. This representation naturally accommodates a variable number of observations while preserving the posterior infor-mation associated with each measurement.  
+
+> III. THE MODEL
+
+NS-UNO follows the SBI NPE approach, in which a neu-ral density estimator is trained to approximate the posterior distribution of the EoS parameters conditioned on observa-tional data. The framework consists of two main components: a hierarchical DeepSets architecture [32] that maps a variable number of observations, each represented by a set of measure-ment samples, into a fixed-dimensional context vector, and a CNF that learns the posterior distribution of the EoS condi-tioned on this representation. Conventional neural networks require fixed size inputs and are therefore not directly applicable to our problem, since the number of observations varies from one EoS to another. Fur-thermore, the ordering of both the observations and the poste-rior samples within each observation is arbitrary and should not affect the inferred posterior. Consequently, the archi-tecture must satisfy two key requirements: it must naturally accommodate variable sized inputs and remain permutation-invariant for both observation and sample sets.  
+
+> A. Hierarchical DeepSets
+
+DeepSets [32] provide a natural solution to these require-ments. They map an unordered set of arbitrary size into a fixed dimensional representation while guaranteeing permu-tation invariance. According to the DeepSets representation theorem, any permutation-invariant function can be written as 
+
+f (X) = ρ (pool x∈X ϕ(x)) , (6) 4where ϕ is an element-wise embedding network, pool is a permutation-invariant aggregation operator, and ρ maps the aggregated representation into the final set representation. The pooling operator summarizes all elements of the set into a sin-gle fixed-size vector. Typical choices include the mean, sum, second moment or maximum over the embedded elements. Our input contains a two-level hierarchy: each EoS is repre-sented by a set of observations, while each observation is itself represented by a set of posterior samples. We therefore apply the DeepSets construction hierarchically [43]. 
+
+Level 1: within-observation pooling. Each observation Oi,j 
+
+is represented by a set of NS measurement samples, Oi,j =
+
+{xi,j,s }NS
+
+> s=1
+
+, where xi,j,s ∈ Rdin denotes the s-th measure-ment sample of the j-th observation associated with the i-th EoS, and mi,j,s ∈ { 0, 1} is the corresponding validity mask. Each sample is first embedded through a shared multilayer perceptron (MLP) ϕ1 : Rdin → Rdh , which is applied in-dependently to every measurement sample, yielding zi,j,s =
+
+ϕ1(xi,j,s ). To obtain a permutation-invariant representation of each observation, the embedded samples are aggregated using masked mean pooling together with the masked second mo-ment, 
+
+μi,j =
+
+P 
+
+> s
+
+mi,j,s zi,j,s 
+
+P 
+
+> s
+
+mi,j,s 
+
+and νi,j =
+
+P 
+
+> s
+
+mi,j,s z⊙2
+
+> i,j,s
+
+P 
+
+> s
+
+mi,j,s 
+
+, (7) where ⊙2 denotes element-wise squaring. The concatena-tion [μi,j ; νi,j ] captures both the first- and second-order statis-tics of the posterior samples, producing a richer representa-tion than mean pooling alone while remaining permutation-invariant. A second network, ρ1 : R2dh → Rdobs , maps the pooled representation to an observation embedding, hi,j =
+
+ρ1([ μi,j ; νi,j ]) .
+
+Level 2: observations aggregation. The observation em-beddings are first projected into a higher-dimensional space through a second shared network, ϕ2 : Rdobs → Rdh2 , yield-ing ui,j = ϕ2(hi,j ).
+
+Rather than assigning the same importance to every obser-vation, we aggregate the observation embeddings using an at-tention pooling mechanism [43, 44]. An attention network 
+
+a : Rdh2 → R, assigns a scalar score to each observation, which is converted into normalized attention weights through a softmax function, 
+
+αi,j = exp( a(ui,j )) 
+
+PNobs,i  
+
+> k=1
+
+exp( a(ui,k )) . (8) The resulting context representation for the i-th EoS is ob-tained as the weighted average 
+
+si =
+
+> Nobs,i
+
+X
+
+> j=1
+
+αi,j ui,j , (9) which remains permutation-invariant because the attention weights depend only on the observation embeddings. Finally, a network ρ2 : Rdh2 → Rdctx , maps the pooled representa-tion into the context vector, ci = ρ2(si), which conditions the CNF. 
+
+Tensor shapes. Denoting the batch size by B, the maximum number of observations in the batch by Nmax , and the number of measurement samples per observation by NS , the architec-ture processes tensors according to the following scheme: 
+
+(B, N max , N S , d in ) ϕ1
+
+−→ (B, N max , N S , d h) −→
+
+> moment pooling
+
+−−−−−−−−→ (B, N max , 2dh) ρ1
+
+−→ (B, N max , d obs ) −→
+
+> ϕ2
+
+−→ (B, N max , d h2 ) attention 
+
+−−−−→ (B, d h2 ) ρ2
+
+−→ (B, d ctx ).
+
+The hierarchical DeepSets architecture is particularly well suited to this problem, as it naturally accommodates a vari-able number of observations while remaining permutation-invariant. Since neither the ordering of the observations nor that of the samples within each observation carries physi-cal meaning, the inferred posterior should be independent of their ordering. The hierarchical pooling operations ensure this property while mapping an arbitrary sized observational set into a fixed-dimensional context vector. This context vector therefore provides a learned summary of all available obser-vations and is subsequently used to condition the CNF. 
+
+Hyperparameters. All MLP use two hidden layers with ReLU activations. The architecture dimensions are din = 2 ,
+
+dh = 128 , dobs = 128 , dh2 = 256 , and dctx = 128 . 
+
+> B. Conditional Normalizing Flows
+
+The context vector ci produced by the hierarchical DeepSets model provides a fixed-dimensional summary of the complete observational set Oi associated with the i-th EoS. This representation is then used to condition a CNF, which approximates the posterior distribution of the EoS parameters 
+
+θ. In our implementation, 
+
+θ = [log p(n1), log p(n2), . . . , log p(n20 )] , (10) where the pressure p is evaluated at the 20 fixed baryon-density points ni, i ∈ (1 , . . . , 20) introduced in Sec. II. Fol-lowing our previous work [26], the CNF transforms a simple base distribution pz (z) into the target posterior through a se-quence of invertible transformations fϕ,
+
+qϕ(θ | ci) = pz
+
+
+
+f −1 
+
+> ϕ
+
+(θ; ci)
+
+
+
+det J−1 
+
+> fϕ
+
+. (11) The flow is implemented using rational quadratic spline cou-pling transforms, in which each coupling layer updates a sub-set of the variables conditioned on the remaining ones. This construction guarantees invertibility while allowing the Jaco-bian determinant to be evaluated efficiently. Training minimizes the expected negative log-posterior density of the reference EoS parameters under the learned pos-terior approximation, 
+
+LNLL = −E(θ,c ) [log qϕ(θ | c)] . (12) To enforce physically consistent EoS, we include a mono-tonicity regularization term that penalizes decreasing pressure with increasing baryon density, 5     
+
+> FIG. 1: Schematic representation of the NS-UNO architecture for one EoS. Each of the Nobs observations is represented by NSsynthetic measurement samples, which are first embedded and aggregated using mean and second moment pooling (Level 1). The resulting observation representations are then combined through attention pooling (Level 2) to produce a fixed-dimensional context vector that conditions the CNF, and then allows obtaining the posterior over the EoS parameters.
+
+Lmono =
+
+> 19
+
+X
+
+> k=1
+
+max (0 , p (nk) − p(nk+1 )) . (13) The total loss is therefore 
+
+L = LNLL + λ Lmono , (14) where λ controls the strength of the physical regularization. A schematic representation of the model is shown in Fig. 1. Im-plementation details, including the network architecture and optimization strategy, are provided in Appendix B.  
+
+> IV. RESULTS
+
+We evaluate the proposed NS-UNO framework through a series of complementary experiments. We first assess the re-construction accuracy and calibration of the inferred poste-rior over the complete test set. We then investigate the im-pact of the (unknown) NS mass distribution and the number of available observations, the robustness to observational un-certainties, and the ability of the model to generalize across different EoS families. Finally, we demonstrate the frame-work in a qualitative application to current NICER and the LVK GW170817 observations.  
+
+> A. Reconstruction accuracy
+
+We first study the model by reconstructing one representa-tive EoS from both the PT and GP in the test set. Figure 2 shows one randomly selected EoS from each dataset together with the corresponding posterior reconstruction. For consis-tency, we use the same number of observations, Nobs = 6 , for both EoSs. Through all obtained samples we impose monotonicity, thermodynamic consistency and causality as hard physical constraints. For the pQCD matching criterion we adopt the least restrictive prescription where we use the QCD likelihood function implementation [45]. For both examples, the posterior median accurately repro-duces the true EoS over the density range directly constrained by the observations. As expected, the posterior uncertainty gradually increases at higher baryon densities, reflecting the reduced amount of observational information available be-yond the maximum central density nc,max , represented by a dot in each EoS, reached by the observed NS. The right plot shows the corresponding mock M (R) observations used to condition the inference. This illustrates how the observational mass distribution determines the region of the EoS that is di-rectly constrained. The examples above provide an illustrative view of the re-construction behaviour for individual EoSs. To assess the re-construction accuracy systematically across the two EoS fam-ilies, we next evaluate the model on a larger and balanced sample of test EoSs. Next we estimate the reconstruction ac-curacy for both datasets. Although the GP and PT datasets are not equally represented during training, all results presented in this section are computed using 4 000 randomly selected EoSs from each test set, providing a balanced comparison between the two EoS families. For each EoS, we draw Np = 1 000 
+
+samples from the inferred posterior distribution, yielding pos-terior realizations θ(i,l ) 
+
+> P
+
+(n), where i = 1 , . . . , 4 000 labels the EoS and l = 1 , . . . , N p labels the posterior samples predicted 60.5 1.0      
+
+> n [fm 3]
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> p [MeV/fm 3]
+> training region
+> PT EOS GP EOS
+> 10 11 12 13 14
+> R [km]
+> 1.00 1.25 1.50 1.75 2.00 2.25
+> M [M  ]
+
+FIG. 2: Left panel: representative posterior reconstructions for one randomly selected GP EoS (blue color) and one PT EoS (yellow color). The dashed curves denote the true EoS, while the solid line curves and shaded regions show the posterior median and the cor-responding 90% credible interval, and the dots nc,max . The grey region denotes the pressure range covered during training. Right panel: corresponding simulated M (R) observations (dots) used to condition the reconstruction, and the “ground truth” TOV solutions (dashed curves). 
+
+by the model. Each EoS is associated with a set of observa-tions Oi containing a variable number of observations, Nobs ,i,within the range considered during training. Section II A 2 contains details on the construction of the mock observations. All reconstruction metrics are computed from these posterior samples. To quantify the reconstruction accuracy, we compute the relative residual for each EoS, 
+
+RelRes (i)(n) = Med l
+
+"
+
+θ(i,l ) 
+
+> P
+
+(n) − θ(i) 
+
+> T
+
+(n)
+
+θ(i) 
+
+> T
+
+(n)
+
+#
+
+× 100 , (15) where the median ( Med ) is taken over the Np = 1 000 pos-terior samples and θ(i) 
+
+> T
+
+(n) denotes the corresponding ground truth pressure profile. The reconstruction error is then sum-marized over the 4 000 test EoS through the median absolute relative residual, 
+
+|RelRes( n)| = Med i RelRes (i)(n) , (16) which provides a robust estimate of the typical reconstruction error as a function of baryon density. Left plot of Fig. 3 presents the reconstruction error for the PT (yellow curves) and GP (blue curves) test sets. Over the full density range, the model achieves a median absolute rela-tive residual of 7.28% for the GP dataset and 11 .86% for the PT dataset. Compared to our previous model in [26], we ob-tain overall better accuracy. At low densities, both datasets ex-hibit comparable reconstruction accuracy. However, the resid-ual gradually increases above n ≃ 0.6 fm −3, particularly for the PT models, reflecting the larger diversity of high density EoSs contained in the PT dataset. The dotted curves show the reconstruction error computed only up to the maximum central density reached by the avail-able observations. In both datasets, the filtered residual re-mains significantly lower than the full residual, demonstrating that the model reconstructs the EoS most accurately within the density regime directly constrained by the observed NSs. Be-yond this region, the posterior naturally broadens as the model infers the EoS in density regimes that are not directly con-strained by the available observations. As a SBI method, NPE requires not only accurate posterior predictions but also well-calibrated uncertainty estimates. To assess the calibration of the inferred posterior, we compute the relative Coverage Calibration Error (CCE) at each baryon density, 
+
+CCE( n) = 1
+
+K
+
+> K
+
+X
+
+> k=1
+
+C(k)P (n) − C(k)T
+
+C(k)T
+
+× 100 , (17) the average is computed over the K credible levels, C(k)T ∈
+
+[0 , 1] . Here, C(k)P (n) ∈ [0 , 1] denotes the empirical coverage at baryon density n, i.e. the fraction of test EoSs whose true pressure at density n lies within the nominal credible interval corresponding to the k-th credible level. Right panel of Fig. 3 shows CCE( n) as a function of baryon density for both datasets, while the inset displays the calibra-tion curve obtained by averaging the empirical coverage over all density points, En[C(k)P (n)] , and plotting it against the cor-responding nominal credible level. The calibration curves closely follow the diagonal, indicat-ing excellent agreement between the empirical and nominal coverages. Consistently, CCE remains below approximately 
+
+20% over the entire density range and is typically below 10% .The largest deviations occur at the lowest densities, where the posterior is most constrained and therefore more sensitive to small discrepancies between the true and predicted confidence intervals. Overall, these results demonstrate that the proposed framework provides well-calibrated posterior uncertainty es-timates in addition to accurate EoS reconstructions. 0.25 0.50 0.75 1.00 1.25            
+
+> n[fm 3]
+> 010 20 30
+> |RelRes | [%]
+> 68% nc, max
+> 90% nc, max
+> PT - 11.86 % GP - 7.28 % 0.25 0.50 0.75 1.00 1.25
+> n[fm 3]
+> 0510 15
+> CCE  [%]
+> 0.00 0.25 0.50 0.75 1.00
+> C(k)T
+> 0.00 0.25 0.50 0.75 1.00
+> n[C(k)P (n)]
+> PT GP
+
+FIG. 3: Left panel: Median absolute relative residual as a func-tion of baryon density for the PT (yellow) and GP (blue) test sets. Solid curves show the reconstruction error over the full density range, while dotted curves are computed only up to the maximum central density, nc, max , reached by the observed NSs. The vertical shaded bands indicate the 68% (dark) and 90% (light) intervals of the nc, max 
+
+distribution across the dataset. Right panel: Coverage Calibration Er-ror (CCE) as a function of baryon density for the PT and GP test sets, Eq. 17. The inset shows the calibration curve obtained by averaging the empirical coverage over all density points and plotting it against the corresponding credible levels. A perfectly calibrated posterior lies on the diagonal. 7 
+
+> B. Effects of observational coverage
+
+To investigate how the observational NS mass range affects the reconstruction, Fig. 4 shows the prediction for a represen-tative EoS from the test set using three different observational configurations: a) six observations clustered around low-mass NSs ( ∼1.1 M⊙), b) six observations clustered around high-mass NSs ( ∼2.0 M⊙), and c) six observations approximately uniformly distributed along the entire TOV curve. The left plot compares the reconstructed EoSs, while the right plot shows the corresponding observational samples in the M (R) plane together with the central densities they probe. Since each NS mass is associated with a different central den-sity, the observations directly constrain only a limited region of the EoS. Consequently, when only low-mass observations are available, case a), the reconstruction is tightly constrained only up to the central densities reached by those NSs, and the posterior uncertainty increases rapidly at higher densities. The opposite behaviour is observed for case b), where only the high-density region is strongly constrained. The most accu-rate and stable reconstruction is obtained when observations span the entire TOV sequence, case c). In this case, the in-ferred posterior remains consistent with the true EoS over the full density range considered. 0.5 1.0             
+
+> n [fm 3]
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> p [MeV/fm 3]
+> a) b) c) True EOS
+> 10 11 12
+> R[km]
+> 1.0 1.5 2.0 2.5
+> M [M ]
+> 0.45 0.52 0.59 0.67 0.78 1.08
+> nc [fm  3]
+> FIG. 4: Reconstruction of a representative EoS from the test set us-ing three different observational mass distributions: a) six low-mass observations ( ∼1.1M⊙), b) six high-mass observations ( ∼2.0M⊙)and c) six observations approximately uniformly distributed over the full TOV sequence. Left: reconstructed EoSs with their 90% credible intervals, with the true curve shown in dashed black. Right: corre-sponding M(R)observations. The secondary vertical axis indicates the central densities ncof the “ground truth” TOV curves.
+
+Figure 5 investigates how the reconstruction accuracy de-pends on both the number of available observations and the mass range they cover. We randomly selected 1000 EoSs from the test set and considered six observational mass intervals: 
+
+[1 .0, 1.4] , [1 .4, 1.8] , [1 .0, 1.8] , [1 .8, M max ], [1 .4, M max ], and 
+
+[1 .0, M max ], in units of M⊙. For each, the model was evalu-ated using Nobs = 5 , 10 , 20 , 40 , 50 , and 100 observations. Each heatmap cell is divided diagonally to compare the reconstruction error computed over two density ranges. The lower (purple) triangle reports the median abso-lute relative residual evaluated only up to the maximum central density reached by the observations (“filtered”) 
+
+Med n<n c, max 
+
+|RelRes( n)|, while the upper (brown) triangle corresponds to the error computed over the full density range 
+
+Med n
+
+|RelRes( n)|.Several trends emerge. Firstly, increasing the number of ob-servations consistently improves the reconstruction accuracy, although the improvement becomes progressively smaller be-yond approximately Nobs ≃ 40 . Secondly, for every observa-tional configuration, the filtered reconstruction error remains substantially lower than the error computed over the full den-sity range, confirming that the model performs best within the density ranges constrained by the available observations. This distinction is particularly important from a theoretical perspective. Since NS observations can only probe densities up to the maximum central density reached by the observed stars, no inference framework can be expected to accurately reconstruct the EoS beyond this regime. The filtered met-ric therefore quantifies the predictive performance within the physically accessible density range, whereas the full density metric additionally reflects the model extrapolation to uncon-strained densities. More importantly, the mass coverage of the observations has a considerably larger impact on the reconstruction ac-curacy than the number of observations alone. The small-est reconstruction errors are obtained when the observations span the full accessible mass range, [1 .0, M max ] M⊙, whereas restricting the observations to either only low-mass NSs, 
+
+[1 .0, 1.4] M⊙, or only high-mass NSs, [1 .8, M max ] M⊙, leads to significantly poorer performance. This behaviour indicates that observations sampling a broad range of NS masses pro-vide complementary constraints on different density regions of the EoS. The contrast between the filtered and full-density recon-struction is largest for the [1 .0, M max ] M⊙ interval with 
+
+Nobs = 100 , highlighted by the gold star in Fig. 5. In this case, the observations constrain only part of the density range, allowing the model to reconstruct the directly probed region with high accuracy while naturally increasing its un-certainty at higher densities. Conversely, the smallest differ-ence is found for the [1 .8, M max ] M⊙ interval with Nobs = 5 
+
+(grey star), where the observations already probe relatively high densities, reducing the gap between the filtered and full-density evaluations. Overall, these results demonstrate that extending the mass range covered by the observations is more beneficial than sim-ply increasing their number. Including high mass NS sub-stantially improves the reconstruction of the high density EoS, whereas adding many observations confined to a narrow mass interval provides comparatively limited additional informa-tion.  
+
+> C. Generalization to different EoS families
+
+To evaluate the NS-UNO ability to generalize beyond the EoS ensembles used during training, we consider twelve rep-resentative EoSs drawn from different theoretical models. Figure 6 summarizes the reconstruction quality for each EoS through two complementary quantities. The left panel shows the median absolute relative residual, 
+
+Med n
+
+|RelRes( n)|, defined in Eq. 16, which quantifies the 85 10 20 40 50 100    
+
+> Nobs
+> 1.0 1.4
+> 1.4 1.8
+> 1.0 1.8
+> 1.8 Mmax
+> 1.4 Mmax
+> 1.0 Mmax
+> Mass interval
+> 19.6 13.2 19.2 12.7 18.9 12.2 18.9 12.1 18.8 12.1 18.8 12.0 16.1 11.0 15.8 10.7 15.6 10.5 15.6 10.5 15.5 10.5 15.4 10.4 14.2 8.0 13.5 7.2 13.4 7.0 13.2 6.7 13.2 6.7 13.2 6.7 17.5 13.5 16.9 12.9 16.5 12.4 16.3 12.3 16.1 12.3 16.1 12.2 13.4 8.5 11.7 7.1 11.1 6.7 10.6 6.4 10.6 6.4 10.5 6.2 11.5 6.4 9.9 5.1 9.0 4.6 8.7 4.3 8.7 4.2 8.5 4.0
+> 10 12 14 16 18
+> Med n[|RelRes (n)| ] [%]
+> 5678910 11 12
+> Med n < nc, max [|RelRes (n)| ] [%]
+
+FIG. 5: Median absolute relative residual (%) as a func-tion of the number of observations, Nobs , and the observa-tional mass interval, evaluated using 1000 randomly selected test EoSs. Six mass intervals are considered: [1 .0, 1.4] , [1 .4, 1.8] ,
+
+[1 .0, 1.8] , [1 .8, M max ], [1 .4, M max ], and [1 .0, M max ] M⊙. Each cell is divided diagonally: the lower (purple) triangle shows 
+
+Med n<n c, max 
+
+|RelRes( n)|, computed only up to the maximum central density reached by the observations, while the upper(brown) triangle shows Med n
+
+|RelRes( n)|, computed over the full density range. The green and red triangles identify the best and worst recon-struction errors, respectively, while the gold and grey stars mark the largest and smallest differences between the filtered and full-density errors. 
+
+typical relative residual of the inferred EoS, with smaller val-ues corresponding to more accurate predictions. The right panel shows f 90%  
+
+> n
+
+and f 99%  
+
+> n
+
+, defined as the fraction of den-sity points whose true pressure lies within the predicted 90% and 99% credible intervals, respectively. Larger values of f xn
+
+indicate that the inferred posterior captures the true EoS over a larger fraction of the density range. The present test considers the following EoSs: SLy4 and SLy9, which were developed to reproduce the properties of nuclear matter in neutron-rich environments [46, 47]; the relativistic mean field (RMF) models BMPF220, BMPF240, BMPF260, and BMPF275, which differ in the incompressibil-ity at nuclear saturation density [48]; DD2, a relatively stiff density-dependent RMF EoS [49]; SFHo, a softer RMF EoS [50]; and the RMF models NL3 [51] and TM1 [52], both fit-ted to finite nuclei, with TM1 exhibiting a softer behaviour at high densities. We additionally consider the hyperonic ex-tensions DD2Y and SFHoY [53], which include hyperons as additional degrees of freedom and therefore provide a more stringent test of the model’s ability to generalize to EoSs with different microscopic compositions. Overall, most of the considered EoSs exhibit median ab-solute relative residual below approximately 40% , while si-multaneously capturing a large fraction of the density points within both the predicted 90% and 99% credible intervals. In particular, SFHo achieves the highest value of f 90%  
+
+> n
+
+, with all density points lying inside the predicted 90% credible interval while also exhibiting one of the smallest reconstruction errors. Similarly, BMPF220, SLy4, and SLy9 EoS models combine low reconstruction errors with high values of both f 90%  
+
+> n
+
+and 
+
+f 99%  
+
+> n
+
+, indicating that the inferred posterior accurately recov-ers the EoS over most of the considered density range. The reconstruction quality nevertheless varies across EoS families. TM1 and BMPF240 models maintain f 90%  
+
+> n
+
+values above 80% , despite exhibiting moderately larger reconstruc-tion errors than the best performing models. DD2 displays one of the lowest reconstruction errors but only approximately half of the density points are contained within the predicted 
+
+90% credible interval, whereas all density points lie inside the predicted 99% credible interval. This indicates that the inferred posterior remains informative but that the 90% credi-ble interval is comparatively narrow for this EoS. Conversely, BMPF260 exhibits a larger reconstruction error while still re-taining high values of both f 90%  
+
+> n
+
+and f 99%  
+
+> n
+
+, indicating that the inferred uncertainties remain well calibrated despite the reduced reconstruction accuracy. The largest reconstruction errors are obtained for NL3 and BMPF275, which also exhibit the lowest values of both f 90% 
+
+> n
+
+and f 99%  
+
+> n
+
+. Both models display relatively extreme M (R) re-lations compared with the remaining EoSs considered here, suggesting that they occupy regions of the EoS space that are more challenging for the proposed framework to reconstruct accurately. The hyperonic models DD2Y and SFHoY exhibit recon-struction errors comparable to those of their nucleonic coun-terparts while retaining f 90%  
+
+> n
+
+values above 80% and nearly complete coverage at the 99% credible level. More generally, all the EoSs considered in this section belong to theoretical families that are distinct from the agnostic PT and GP en-sembles used for training. The ability of the proposed frame-work to accurately reconstruct these previously unseen mod-els demonstrates that it captures the underlying relationship between NS observables and the EoS, enabling robust gener-alization across a broad range of theoretical descriptions of dense matter. EoSs containing phase transitions are not included in the present generalization analysis, as such features are not ex-plicitly represented in the training data and were not recon-structed reliably by the current implementation. Nevertheless, a proof of concept study investigating the model sensitivity to phase transition like signatures in the M (R) relation is pre-sented in Appendix A. 
+
+D. Generalization to noisier and real observations 
+
+The observational uncertainties adopted during training are intentionally simplified and do not reproduce the full com-plexity of current NICER and the LVK posteriors. They are instead intended to approximate the precision expected from next-generation multimessenger observations. Before apply-ing the model to real observations, we therefore investigate whether the learned posterior responds consistently to increas-ing measurement uncertainty. For each test EoS we generate synthetic observations with 980 60 40 20 0        
+
+> Med n[|RelRes( n)| ][%]
+> BMPF220 SLy9 SFHo SFHoY SLy4 DD2Y DD2 BMPF240 TM1 BMPF260 BMPF275 NL3
+> 025 50 75 100
+> f90%
+> n[%] f99%
+> n[%]
+
+FIG. 6: Generalization performance of the proposed framework on representative EoSs belonging to theoretical families not included in the training ensembles. The left panel shows the median recon-struction error, Med n
+
+|RelRes( n)|. The right panel shows f 90% 
+
+> n
+
+(hatched bars) and f 99%  
+
+> n
+
+(lighter color bars), defined as the percent-age of density points contained within the predicted 90% and 99% credible intervals, respectively. Smaller values of the reconstruction error and larger empirical coverages correspond to better reconstruc-tion quality. 
+
+progressively larger uncertainties and compute 
+
+∆ [log qϕ(θT | O ∆σ )] = = log qϕ(θT | O ∆σ=1 ) − log qϕ(θT | O ∆σ ) , (18) where O∆σ denotes the set of mock observations generated by scaling the training uncertainties by a factor ∆σ, and θT is the corresponding ground-truth EoS. Figure 7 shows that increasing the observational uncer-tainty systematically reduces the log posterior density as-signed to the true EoS relative to the training uncertainty. As the observations become less informative, the posterior becomes broader and the true EoS receives a lower posterior density. This demonstrates that, despite being trained over a restricted uncertainty range, the model responds qualitatively as expected to degraded observational information. Having established that the model behaves consistently un-der increasing observational uncertainty, we now perform a qualitative test using currently available NS observations. As the conditioning set, we use the mass and radius con-straints inferred for the binary NS merger GW170817 [5, 54], together with the M (R) measurements obtained from X-ray pulse-profile modelling by NICER. The NICER observa-tions include PSR J0030+0451 [11], PSR J0740+6620 [55], PSR J0437 −4715 [14], PSR J1231 −1411 [15], and PSR J0614 −3329 [16]. For each source, we use the publicly re-leased posterior samples. To provide a consistent input rep-resentation, each observation is represented by 2000 poste-rior samples. When posterior weights are available, the 2000 samples with the highest weights are retained. This choice corresponds to the maximum common sample size across the observational datasets considered. 0 200 400 600          
+
+> log q(T= 1 )log q(T)
+
+0.000 0.005 0.010 0.015 
+
+> Density = 29.9
+> = 95.6
+> = 141.8
+> = 218.0  = 2
+> = 3
+> = 4
+> = 5
+
+FIG. 7: Distribution of the change in the log posterior density as-signed by the network to the true EoS as the observational uncer-tainties are increased by a factor ∆σ, relative to the trained uncer-tainty ( ∆σ = 1 ). For each test EoS, we compute Eq. 18 where 
+
+O∆σ denotes the set of mock observations generated with uncertain-ties scaled by ∆σ. The dashed vertical lines indicate the mean of each distribution, with the corresponding values shown alongside the lines. 
+
+Because the model was trained using synthetic observations with simplified Gaussian uncertainties, these data do not ex-actly match the uncertainty distributions of current measure-ments. The Gaussian uncertainties adopted during training, 
+
+σM ∈ [0 .05 , 0.10] M⊙ and σR ∈ [0 .10 , 0.30] km , are gener-ally smaller than those of current observations, especially for the radius measurements. Moreover, the real posteriors are often non-Gaussian and exhibit irregular shapes that are not represented in the training set. Consequently, the resulting posterior should not be inter-preted as a physical inference of the NS EoS. Instead, the pur-pose of this experiment is to investigate whether the learned posterior remains sensitive to physically meaningful differ-ences between candidate EoSs when conditioned on real ob-servations. More specifically, we ask whether the model assigns sys-tematically different posterior densities to representative the-oretical EoSs whose M (R) relations exhibit different levels of compatibility with the currently available observations. This therefore constitutes an out of distribution test of the frame-work, since both the observational uncertainties and the pos-terior shapes differ from those encountered during training. Since posterior densities are only defined up to an arbitrary normalization, their absolute values are not directly informa-tive when comparing different candidate EoSs. We therefore report the posterior density of each candidate relative to that of the most probable EoS within the considered set, 
+
+∆
+
+h
+
+log qϕ(θ(i) 
+
+> N
+
+|O real )
+
+i
+
+== max  
+
+> j
+
+log qϕ(θ(j) 
+
+> N
+
+|O real ) − log qϕ(θ(i) 
+
+> N
+
+|O real ) . (19) where Oreal denotes the collection of current observations and θ(i) 
+
+> N
+
+denotes the i-th new candidate EoS described in Sec. IV C. 10 The subtraction of the maximum posterior density, 
+
+max j log qϕ(θ(j) 
+
+> N
+
+|O real ) simply shifts all values by a constant. Equation 19 therefore provides a relative ranking of the can-didate EoSs: values closer to zero indicate posterior densities closer to that of the highest ranked candidate, while larger pos-itive values indicate lower posterior densities relative to this reference. Figure 8 summarises the results of this qualitative test, where the EoS used to test the model were the same as the ones used in Fig. 6. The upper plot shows the relative pos-terior density assigned to each candidate EoS, ordered from the highest to the lowest posterior density. The lower plot shows the corresponding M (R) relations together with the currently available NICER and LVK observations, using the same colour coding as the upper plot. This allows the rela-tive posterior ranking to be interpreted in the context of the corresponding M (R) relations and the current observational constraints. We emphasize that the quantity shown in Fig. 8 is not the likelihood of the observations given a particular EoS, but rather the posterior density assigned by the learned NPE. The purpose of this experiment is therefore not model selection, but to assess whether the learned posterior distinguishes be-tween candidate EoSs when presented with real observational data. The preferred EoSs generally pass through the regions favoured by the current observations, whereas the least pre-ferred models exhibit larger deviations. Nevertheless, many of the M (R) relations overlap within the observational un-certainties; among the EoSs considered, BMPF220, SLy9 and SFHo, which have an intermediate stiffness, receive the highest relative posterior densities, whereas NL3, BMPF275 and BMPF260, some of the stiffest EoSs, receive the lowest. Since many of the corresponding M (R) relations overlap with the current observational uncertainties, these rankings should not be interpreted as a definitive preference for specific nu-clear models, but rather as a qualitative demonstration that the learned posterior distinguishes between different candi-date EoSs. Overall, these experiments demonstrate that the proposed framework can naturally accommodate current datasets con-taining an arbitrary number of observations while remaining sensitive to physically meaningful changes in both the ob-servational uncertainties and the underlying M (R) relations. Quantitative inference using current NICER and the LVK ob-servations, however, will require training on more realistic ob-servational uncertainty models that accurately reproduce the structure of the measured posteriors. 
+
+V. CONCLUSIONS 
+
+We have presented NS-UNO, to the best of our knowledge, the first NPE framework designed to infer the NS EoS from an unconstrained number of observations while preserving the posterior samples associated with each measurement. NS-UNO achieves this through a hierarchical DeepSets architec-ture that reflects the two-level structure of the observational BMPF220 SLy9 SFHo SFHoY SLy4 DD2Y DD2 BMPF240 TM1 BMPF260 BMPF275 NL3      
+
+> (i)
+> N
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> 10 4
+> [log  q ( (i)
+> N | real )]
+> max j log  q ( (j)
+> N | real )810 12 14 16 18
+
+R [km]         
+
+> 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75
+> M [M ]
+> [log q((i)
+> N|real )]
+> Highest Lowest J0437 4715
+> J0740+6620 J0030+0451 J1231 1411
+> J0614 3329
+> GW170817
+
+FIG. 8: Upper panel: Relative posterior assigned by the trained model to a representative set of theoretical EoSs using the currently available observations described in the text. The quantity shown is 
+
+∆
+
+h
+
+log qϕ(θ(i) 
+
+> N
+
+|O real )
+
+i
+
+, see Eq. 19, where Oreal denotes the collec-tion of current observations and θ(i) 
+
+> N
+
+the different EoS. Values closer to zero indicate greater compatibility with the observations according to the learned posterior, whereas increasingly positive values corre-spond to less favoured EoSs. The results should be interpreted only in a relative sense and do not constitute a quantitative model selec-tion analysis. Lower panel: Corresponding M (R) relations for the same EoSs, using the same colour coding as the upper plot. The dashed curves indicate the three highest ranked EoSs, while the dot-ted curves correspond to the three lowest ranked EoSs. 
+
+data: a set of NS observations, each itself represented by a set of samples. The architecture is permutation-invariant at both levels and maps observational sets of varying size into a fixed dimensional context representation that conditions a CNF, al-lowing a single trained model to infer the posterior distribu-tion of the EoS for different observational configurations. The model was trained jointly on PT and GP EoS datasets, exposing the network to substantially different descriptions of dense matter within a single inference framework. Across both test sets, the model provides accurate EoS reconstruc-tions together with well-calibrated posterior uncertainties. The reconstruction is most accurate within the density range directly probed by the available NS observations, while the uncertainty and reconstruction error increase beyond the max-imum central density reached by the observed stars. This be-haviour reflects the decreasing amount of observational infor-11 mation available to constrain the EoS at higher densities. By systematically varying the observational configuration, we further showed that the mass range covered by the obser-vations is more important than simply increasing their num-ber. Although additional observations generally improve the reconstruction, the gain becomes progressively smaller as 
+
+Nobs increases. In contrast, observations distributed over a broad range of NS masses provide complementary informa-tion about different density regimes of the EoS. In particular, the inclusion of high-mass NSs extends the observational sen-sitivity towards higher densities and improves the reconstruc-tion of the high density EoS. These results emphasize that the constraining power of future datasets will depend not only on the number and precision of detected sources, but also on the region of the M (R) relation that they probe. We additionally assessed the ability of the model to gen-eralize beyond the EoS ensembles used during training by considering several microscopic and phenomenological EoS models. The framework successfully reconstructs a broad range of previously unseen EoSs, although the reconstruction quality deteriorates for models with more extreme M (R) re-lations. Notably, the hyperonic EoSs DD2Y and SFHoY are reconstructed with an accuracy comparable to their nucleonic counterparts, despite the training data not explicitly encoding microscopic particle composition. This demonstrates that the framework can generalize to physically motivated EoSs with properties and compositions not explicitly represented as dis-tinct model classes during training. Finally, we investigated the behaviour of the learned pos-terior outside the observational conditions represented dur-ing training. The model responds systematically to increasing observational uncertainties and can directly process posterior samples from current multimessenger measurements. When conditioned on current NICER and the LVK GW170817 ob-servations, it assigns different posterior densities to candidate theoretical EoSs in a manner qualitatively consistent with their 
+
+M (R) relations and the observational constraints. This appli-cation should not be interpreted as a quantitative EoS infer-ence or model selection analysis, but demonstrates that the architecture can operate directly on realistic posterior samples and remains sensitive to physically meaningful differences be-tween candidate EoSs. The present work is primarily a methodological proof of concept and several limitations remain. In particular, the training observations are represented by correlated Gaussian distributions with uncertainty ranges that are generally nar-rower and structurally simpler than the posteriors of current NICER and LVK measurements. Quantitative application to present observations will therefore require training on more realistic uncertainty models, including non-Gaussian poste-rior structures, which will be exploited in future work. Fur-thermore, the present implementation assumes the same set of observables for each observation. Although the hierarchi-cal set based architecture provides a natural basis for combin-ing heterogeneous measurements, this capability remains to be explicitly developed and tested. Several extensions are therefore particularly relevant. Anatural next step is the inclusion of additional observables, most notably tidal deformabilities from GW measurements, enabling a fully multimessenger implementation in which dif-ferent observations may provide different combinations of as-trophysical information. The treatment of observational un-certainties should also be extended to encompass the broader range and complexity expected from both current and future measurements. Finally, EoSs containing phase transitions re-main challenging for the present model to reconstruct reliably. Overall, NS-UNO provides a flexible and scalable approach to NS EoS inference that is not tied to a fixed number of ob-servations or to a single EoS parametrization. By operating directly on sets of posterior samples and accommodating ob-servational datasets of varying size, it provides a natural foun-dation for exploiting the increasingly numerous and hetero-geneous multimessenger observations expected from the next generation of NS experiments. 
+
+> Acknowledgements
+
+V.C. expresses sincere gratitude to the FCT for their gen-erous support through Ph.D. grant number 2024.00311.BD. This work was partially supported by national funds from FCT (Fundação para a Ciência e a Tecnologia, I.P, Portugal) under the projects 2022.06460.PTDC with the DOI identifier 10.54499/2022.06460.PTDC, and UIDB/04564/2020 and UIDP/04564/2020, with DOI identifiers 10.54499/UIDB/04564/2020 and 10.54499/UIDP/04564/2020, respectively, by the Euro-pean Union-Next Generation EU, Mission 4 Component 1 CUP J53D23001550006 with the PRIN Project No. 202275HT58, and the Polish National Science Center OPUS grant no. 2021/43/B/ST9/01714. Computing resources were partially provided by the Nicolaus Copernicus Astronomical Center of the Polish Academy of Sciences. 12 
+
+Appendix A: Sensitivity to phase transition like signatures 
+
+To test the limits of generalization capabilities of the model, we investigate whether the model is sensitive to modifications of the M (R) relation resembling signatures that may arise from a first-order phase transition. Following the approach adopted in [56], we introduce an artificial discontinuous reduction in the stellar radius above a chosen transition mass and analyse its impact on the inferred EoS. Figure 9 presents the results for transition masses of 1.2 M⊙ (left plots) and 1.6 M⊙ (right plots). Radius jumps of 0, 0.5, 1.0, and 2.0 km are shown in blue, yellow, green, and orange, respectively. Each reconstruction is performed using six mock observations. The upper plot shows the inferred pressure slope, dp/dn , the lower plot the reconstructed pressure as a function of baryon density, and the right plot the corresponding M (R) observations. The results show that the inferred EoS responds systematically to the artificial modifications of the M (R) relation. As the imposed radius jump increases, corresponding changes appear in the reconstructed EoS and its pressure gradient. In particular, 
+
+dp/dn exhibits a localized reduction around the central density associated with the imposed transition mass, indicated by the vertical dashed line. This feature shifts towards higher densities when the transition mass is increased from 1.2 M⊙ to 1.6 M⊙.This experiment therefore suggests that the model is sensitive to localized modifications of the M (R) relation and can reflect them in the corresponding density region of the inferred EoS. 02000         
+
+> dp /dn [MeV]
+> (a)
+> 0.5 1.0
+> n[fm 3]
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> p [MeV/fm 3] (b)
+> Radius jump
+> 0 km 0.5 km 1.0 km 2.0 km True EOS
+> 10 12
+> R [km]
+> 1.0 1.5 2.0 2.5
+> M [M  ]
+> MT
+> (c) 02000
+> dp /dn [MeV]
+> (a)
+> 0.5 1.0
+> n[fm 3]
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> p [MeV/fm 3] (b)
+> Radius jump
+> 0 km 0.5 km 1.0 km 2.0 km True EOS
+> 10 12
+> R [km]
+> 1.0 1.5 2.0 2.5
+> M [M  ]
+> MT
+> (c)
+
+FIG. 9: Sensitivity of the inferred EoS to artificial phase transition like signatures introduced in the M (R) relation. The left and right panels correspond to transition masses MT = 1 .2 M⊙ and MT = 1 .6 M⊙, respectively. Above MT , the stellar radius is artificially reduced by 0, 0.5, 1.0, and 2.0 km (blue, yellow, green, and orange), and each inference is performed using six mock observations. Panels (a) show the inferred pressure gradient, dp/dn , panels (b) the reconstructed EoS together with the true EoS (black dashed curve), and panels (c) the corresponding 
+
+M (R) observations. The vertical dashed lines in panels (a) and the horizontal dashed lines in panels (c) indicate the transition density and transition mass, respectively. 
+
+We additionally tested the framework on EoSs containing explicit phase transitions. In these cases, the model was not able to reliably reconstruct the sharp changes in the EoS associated with the transition. Therefore, the results presented here should only be interpreted as a test of the model sensitivity to phase transition like modifications of the M (R) relation, rather than as evidence that the framework can accurately reconstruct EoSs containing first order phase transitions. Extending the training data to better represent such features and investigating their reconstruction will be addressed in future work. 
+
+Appendix B: Implementation Details 
+
+Our architecture uses the following components: • Software : Implemented in PyTorch [57] with the nflows library [58]. • Flow Design :
+
+– Number of flow transformations: 16, 
+
+– 3 ResNet blocks [59] per flow with 120 hidden units, 
+
+– Exponential Linear Unit (ELU) activation functions [60] for smooth gradients. • Optimization :
+
+– Adam optimizer [61] with an initial learning rate of 10 −3 and weight decay 10 −5. The learning rate is reduced by a factor of 10 every 800 epochs using a StepLR scheduler. 
+
+– Batch size of 384 and training for 2000 epochs. 13 
+
+– We set the strength of the physical regularization λ = 0 .7 (see Eq. 14 for the definition of the total training loss) based on empirical optimisation. 
+
+[1] P. Haensel, A. Y. Potekhin, and D. G. Yakovlev, Neutron Stars 1: Equation of State and Structure , Astrophysics and Space Sci-ence Library, Vol. 326 (Springer, New York, NY, 2007). [2] N. K. Glendenning, Compact stars: Nuclear physics, particle physics and general relativity (Springer Science & Business Media, 2012). [3] N. Andersson, Gravitational-Wave Astronomy: Exploring the Dark Side of the Universe (Oxford University Press, 2019). [4] K. Chatziioannou, H. Cromartie, S. Gandolfi, I. Tews, D. Radice, A. W. Steiner, and A. L. Watts, arXiv preprint arXiv:2407.11153 (2024). [5] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. X9 ,011001 (2019), arXiv:1805.11579 [gr-qc] . [6] J. Aasi et al. , CQG 32 , 074001 (2015). [7] F. Acernese et al. , CQG 32 , 024001 (2015). [8] Y. Aso et al. , PRD 88 , 043007 (2013). [9] A. G. Abac et al. , arXiv e-prints , arXiv:2605.27223 (2026), arXiv:2605.27223 [gr-qc] . [10] E. Annala, T. Gorda, A. Kurkela, and A. Vuorinen, Physical review letters 120 , 172703 (2018). [11] T. E. Riley, A. L. Watts, S. Bogdanov, P. S. Ray, R. M. Lud-lam, S. Guillot, Z. Arzoumanian, C. L. Baker, A. V. Bilous, D. Chakrabarty, K. C. Gendreau, A. K. Harding, W. C. G. Ho, J. M. Lattimer, S. M. Morsink, and T. E. Strohmayer, The As-trophysical Journal 887 , L21 (2019). [12] M. C. Miller, F. K. Lamb, A. J. Dittmann, S. Bogdanov, Z. Ar-zoumanian, K. C. Gendreau, S. Guillot, A. K. Harding, W. C. G. Ho, J. M. Lattimer, R. M. Ludlam, S. Mahmoodifar, S. M. Morsink, P. S. Ray, T. E. Strohmayer, K. S. Wood, T. Enoto, R. Foster, T. Okajima, G. Prigozhin, and Y. Soong, The Astro-physical Journal 887 , L24 (2019). [13] E. Fonseca et al. , Astrophys. J. Lett. 915 , L12 (2021), arXiv:2104.00880 [astro-ph.HE] . [14] D. Choudhury, T. Salmi, S. Vinciguerra, T. E. Riley, Y. Kini, A. L. Watts, B. Dorsman, S. Bogdanov, S. Guillot, P. S. Ray, 
+
+et al. , The Astrophysical Journal Letters 971 , L20 (2024). [15] T. Salmi, J. S. Deneva, P. S. Ray, A. L. Watts, D. Choudhury, Y. Kini, S. Vinciguerra, H. T. Cromartie, M. T. Wolff, Z. Ar-zoumanian, et al. , The Astrophysical Journal 976 , 58 (2024). [16] L. Mauviard, S. Guillot, T. Salmi, D. Choudhury, B. Dors-man, D. González-Caniulef, M. Hoogkamer, D. Huppenkothen, C. Kazantsev, Y. Kini, et al. , The Astrophysical Journal 995 , 60 (2025). [17] I. Tews, T. Krüger, K. Hebeler, and A. Schwenk, Physical re-view letters 110 , 032504 (2013). [18] A. Kurkela, P. Romatschke, and A. Vuorinen, Physical Review D—Particles, Fields, Gravitation, and Cosmology 81 , 105021 (2010). [19] O. Komoltsev and A. Kurkela, Physical Review Letters 128 ,202701 (2022). [20] S. Sharma, Ann. Rev. Astron. Astrophys. 55 , 213 (2017), arXiv:1706.01629 [astro-ph.IM] . [21] J. Skilling, Bayesian Analysis 1, 833 (2006). [22] A. Abac, R. Abramo, S. Albanesi, A. Albertini, A. Agapito, M. Agathos, C. Albertus, N. Andersson, T. Andrade, I. An-dreoni, et al. , Journal of Cosmology and Astroparticle Physics 
+
+2026 , 081 (2026). [23] D. Reitze, R. X. Adhikari, S. Ballmer, B. Barish, L. Barsotti, G. Billingsley, D. A. Brown, Y. Chen, D. Coyne, R. Eisenstein, 
+
+et al. , arXiv preprint arXiv:1907.04833 (2019). [24] M. Dax, S. R. Green, J. Gair, J. H. Macke, A. Buonanno, and B. Schölkopf, Physical review letters 127 , 241103 (2021). [25] M. Dax, S. R. Green, J. Gair, N. Gupte, M. Pürrer, V. Raymond, J. Wildberger, J. H. Macke, A. Buonanno, and B. Schölkopf, Nature 639 , 49 (2025), arXiv:2407.09602 [gr-qc] . [26] V. Carvalho, M. Ferreira, M. Bejger, and C. Providência, Phys-ical Review D 112 , 083044 (2025). [27] P. Thakur and T. Malik, arXiv preprint arXiv:2606.25446 (2026). [28] L. Brandes, C. Modi, A. Ghosh, D. Farrell, L. Lindblom, L. Heinrich, A. W. Steiner, F. Weber, and D. Whiteson, Journal of Cosmology and Astroparticle Physics 2024 , 009 (2024). [29] G. Bezerra, V. Dexheimer, and R. Negreiros, arXiv preprint arXiv:2605.31198 (2026). [30] T. Zhao, F. Yan, A. Ross, and J. M. Lattimer, arXiv preprint arXiv:2605.27562 (2026). [31] Y. Fujimoto, K. Fukushima, S. Kamata, and K. Murase, Phys. Rev. D 110 , 034035 (2024), arXiv:2401.12688 [nucl-th] . [32] M. Zaheer, S. Kottur, S. Ravanbakhsh, B. Poczos, R. Salakhut-dinov, and A. Smola, “Deep sets,” (2018), arXiv:1703.06114 [cs.LG] . [33] C. Winkler, D. Worrall, E. Hoogeboom, and M. Welling, arXiv e-prints , arXiv:1912.00042 (2019), arXiv:1912.00042 [cs.LG] .[34] M. Ferreira and M. Bejger, Physical Review D 111 , 023035 (2025). [35] E. Annala, T. Gorda, J. Hirvonen, O. Komoltsev, A. Kurkela, J. Nättilä, and A. Vuorinen, Nature Communications 14 , 8451 (2023). [36] R. C. Tolman, Physical Review 55 , 364 (1939). [37] J. R. Oppenheimer and G. M. Volkoff, Physical Review 55 , 374 (1939). [38] O. Komoltsev, A. Kurkela, and T. Gorda, “Gp ensemble of neutron star equations of state,” (2023). [39] J. Antoniadis, P. C. Freire, N. Wex, T. M. Tauris, R. S. Lynch, M. H. Van Kerkwijk, M. Kramer, C. Bassa, V. S. Dhillon, T. Driebe, et al. , Science 340 , 1233232 (2013). [40] H. T. Cromartie, E. Fonseca, S. M. Ransom, P. B. Demor-est, Z. Arzoumanian, H. Blumer, P. R. Brook, M. E. DeCesar, T. Dolch, J. A. Ellis, et al. , Nature Astronomy 4, 72 (2020). [41] A. Shaw, C. O. Heinke, A. W. Steiner, S. Campana, H. N. Cohn, W. C. Ho, P. M. Lugger, and M. Servillat, Monthly Notices of the Royal Astronomical Society 476 , 4713 (2018). [42] A. W. Steiner, C. O. Heinke, S. Bogdanov, C. K. Li, W. C. Ho, A. Bahramian, and S. Han, Monthly Notices of the Royal Astronomical Society 476 , 421 (2018). [43] J. Lee, Y. Lee, J. Kim, A. Kosiorek, S. Choi, and Y. W. Teh, in 
+
+International conference on machine learning (PMLR, 2019) pp. 3744–3753. [44] M. Ilse, J. Tomczak, and M. Welling, in International confer-ence on machine learning (PMLR, 2018) pp. 2127–2136. [45] O. Komoltsev, T. Gorda, and A. Kurkela, “Qcd likelihood func-14 
+
+tion,” (2023). [46] E. Chabanat, Interactions effectives pour des conditions ex-trêmes d’isospin , PhD thesis, Lyon U. (1995). [47] E. Chabanat, P. Bonche, P. Haensel, J. Meyer, and R. Schaeffer, Nucl. Phys. A 635 , 231 (1998), [Erratum: Nucl.Phys.A 643, 441–441 (1998)]. [48] T. Malik, M. Ferreira, M. B. Albino, and C. Providência, Phys-ical Review D 107 , 103018 (2023). [49] S. Typel, G. Ropke, T. Klahn, D. Blaschke, and H. H. Wolter, Phys. Rev. C 81 , 015803 (2010), arXiv:0908.2344 [nucl-th] . [50] A. W. Steiner, M. Hempel, and T. Fischer, Astrophys. J. 774 ,17 (2013), arXiv:1207.2184 [astro-ph.SR] . [51] G. A. Lalazissis, J. Konig, and P. Ring, Phys. Rev. C 55 , 540 (1997), arXiv:nucl-th/9607039 . [52] Y. Sugahara and H. Toki, Nucl. Phys. A 579 , 557 (1994). [53] M. Fortin, M. Oertel, and C. Providência, Publications of the Astronomical Society of Australia 35 , e044 (2018). [54] B. P. Abbott, R. Abbott, T. Abbott, F. Acernese, K. Ackley, C. Adams, T. Adams, P. Addesso, R. X. Adhikari, V. B. Adya, 
+
+et al. , Physical review letters 121 , 161101 (2018). [55] T. Salmi, D. Choudhury, Y. Kini, T. E. Riley, S. Vinciguerra, A. L. Watts, M. T. Wolff, Z. Arzoumanian, S. Bogdanov, D. Chakrabarty, et al. , The Astrophysical Journal 974 , 294 (2024). [56] V. Carvalho, M. Ferreira, and C. Providência, Physical Review D 109 , 123038 (2024). [57] A. Paszke, S. Gross, F. Massa, A. Lerer, J. Bradbury, G. Chanan, T. Killeen, Z. Lin, N. Gimelshein, L. Antiga, A. Desmaison, A. Kopf, E. Yang, Z. DeVito, M. Raison, A. Te-jani, S. Chilamkurthy, B. Steiner, L. Fang, J. Bai, and S. Chin-tala, in Advances in Neural Information Processing Systems 32 
+
+(Curran Associates, Inc., 2019) pp. 8024–8035. [58] C. Durkan, A. Bekasov, I. Murray, and G. Papamakarios, “nflows: normalizing flows in PyTorch,” (2020). [59] K. He, X. Zhang, S. Ren, and J. Sun, in Proceedings of the IEEE conference on computer vision and pattern recognition 
+
+(2016) pp. 770–778. [60] D.-A. Clevert, T. Unterthiner, and S. Hochreiter, arXiv preprint arXiv:1511.07289 4, 11 (2015). [61] D. P. Kingma and J. Ba, arXiv preprint arXiv:1412.6980 (2014).
