@@ -1,0 +1,909 @@
+Title: GRMHD Simulations of Accreting Proto-Magnetars I. Implications for Gamma-Ray Burst Jets and Energetic Explosions
+
+URL Source: https://arxiv.org/pdf/2609.00174v1
+
+Published Time: Wed, 02 Sep 2026 00:08:12 GMT
+
+Number of Pages: 26
+
+Markdown Content:
+> Draft version September 2, 2026
+> Typeset using L ATEX twocolumn style in AASTeX63
+
+GRMHD Simulations of Accreting Proto-Magnetars I. Implications for Gamma-Ray Burst Jets and Energetic Explosions 
+
+Tejas Prasanna, 1 Kyle Parfrey, 2 Brian D. Metzger, 1, 3 Ore Gottlieb, 4 Andrei Beloborodov, 1 and Koushik Chatterjee 5
+
+> 1Department of Physics and Columbia Astrophysics Laboratory, Columbia University, New York, NY 10027, USA
+> 2Princeton Plasma Physics Laboratory, Princeton, NJ 08540, USA
+> 3Center for Computational Astrophysics, Flatiron Institute, 162 5th Ave, New York, NY 10010, USA
+> 4Department of Physics and Kavli Institute for Astrophysics and Space Research, Massachusetts Institute of Technology, Cambridge, MA 02139, USA
+> 5Canadian Institute for Theoretical Astrophysics, University of Toronto, 60 St. George Street, Toronto, ON M5S 3H8, Canada
+
+ABSTRACT Newly formed, rapidly rotating, strongly magnetized neutron stars (“millisecond proto-magnetars”) are promising central engines for gamma-ray bursts (GRBs) and luminous supernovae. Although often modeled in isolation, they can be born surrounded by accretion disks in stellar collapse, neutron-star mergers, or accretion-induced collapse. We present axisymmetric GRMHD simulations of hyperaccre-tion onto such objects, including a physical equation of state and charged-current weak interactions. Holding the weakly magnetized accretion torus fixed, we vary the stellar dipole field strength to span crushed-magnetosphere, magnetically channeled accretion, and centrifugal-propeller regimes, and com-pare the results with an otherwise similar accreting black hole. Accretion compresses the stellar magnetosphere and opens additional magnetic flux, producing rel-ativistic jet powers that exceed isolated-dipole spin-down estimates by factors of a few to ∼ 10. Even while the magnetosphere remains compressed against the stellar surface, stronger fields increasingly impede accretion and enhance the outflows. Channeled-accretion models show strong jet variability driven by plasmoid eruptions and intermittent magnetospheric accretion, whereas the propeller model produces a steadier, more powerful jet and a rapid spin-down torque. The disk–magnetosphere interac-tion also regulates how efficiently the neutron star grows in mass and whether it spins up or spins down; near spin equilibrium, inefficient accretion can delay collapse to a black hole relative to estimates based on the external mass-supply rate. Accreting proto-magnetars can therefore power relativistic jets and baryon-rich outflows with energetics comparable to those inferred for long GRBs and GRB-supernovae, respectively. A companion paper explores the implications of the disk–magnetosphere interaction for neutron-rich ejecta and r-process nucleosynthesis. 
+
+1. INTRODUCTION Young, rapidly rotating neutron stars (NS) with strong large-scale magnetic fields ≳ 10 15 G are promis-ing central engines of gamma-ray bursts (GRBs), lu-minous supernovae, and electromagnetic counterparts to compact object mergers (e.g., Usov 1992; Blackman & Yi 1998; Klu´ zniak & Ruderman 1998; Thompson et al. 2004; Metzger et al. 2011; Kasen & Bildsten 2010; Woosley 2010; Beniamini et al. 2017). Such “millisec-ond proto-magnetars” can form during the core-collapse of rotating massive stars (e.g., M¨ osta et al. 2014; Ober-gaulinger & Aloy 2021), the accretion-induced collapse (AIC) of rapidly spinning white dwarfs (e.g., Dessart et al. 2006; Metzger et al. 2008a), or as leftover remnants following the merger of binary NSs (e.g., Bucciantini et al. 2012; Metzger et al. 2018b; Kiuchi et al. 2024). For spin periods P⋆ ∼ 1 ms, the magnetar possesses a large rotational energy Erot ≳ 10 52 erg, which can be extracted through magnetized outflows on timescales as short as tens of seconds. Although the origin of such strong, large-scale magnetic fields remains uncertain, dynamo action powered by differential rotation provides a plausible mechanism in the fastest-spinning neutron stars (Duncan & Thompson 1992; Raynaud et al. 2020; Most & Quataert 2023; Kiuchi et al. 2024; Combi et al. 2025a). arXiv:2609.00174v1 [astro-ph.HE] 31 Aug 2026 2In magnetar models for GRBs, a relativistic jet 1 is powered by the electromagnetic luminosity carried along open polar magnetic field lines which are relatively free of baryons and hence achieve high magnetization σ ≫ 1and ultra-relativistic speeds (Bucciantini et al. 2006; Komissarov & Barkov 2007; Uzdensky & MacFadyen 2007; Metzger et al. 2011; Combi & Siegel 2023; Combi et al. 2025a; Desai et al. 2026). More heavily baryon-loaded outflows emerge at lower latitudes, where neu-trino heating and centrifugal acceleration enhance the mass-loss rate and kinetic power (Thompson et al. 2004; Metzger et al. 2018a; Ciolfi & Kalinani 2020; Prasanna et al. 2023; Curtis et al. 2024; Prasanna et al. 2025). On larger scales, the magnetar jet and wind can interact with and boost the energy of the supernova or merger ejecta (e.g., Thompson et al. 2004; Metzger & Piro 2014; Kasen et al. 2016; Chen et al. 2016; Suzuki & Maeda 2021). However, most theoretical proto-magnetar mod-els neglect continued accretion and instead assume that the star spins down in isolation. In realistic formation channels, however, continued ac-cretion onto the newly formed neutron star is likely to be common. In collapsars, high-angular-momentum stellar material can circularize into a disk on timescales of sec-onds (MacFadyen & Woosley 1999; Zhang et al. 2008; Burrows et al. 2023; Gottlieb et al. 2024). Neutron-star mergers produce massive, neutrino-cooled tori, while rapidly rotating white-dwarf AIC can likewise leave a compact disk around the remnant (Lee & Ramirez-Ruiz 2007; Fern´ andez & Metzger 2013; Fahlman & Fern´ andez 2018; Dessart et al. 2006; Metzger et al. 2008a; Cheong et al. 2025; Combi et al. 2025a). Typical disk masses 
+
+Md ∼ 10 −2 − 1 M⊙ and accretion timescales ∼ 0.1–10 s imply hyperaccretion rates up to ˙M ∼ M⊙ s−1 dur-ing the first seconds after the collapse or merger. As a result, one must in general consider the coupled in-teraction between the magnetized rotating star and a powerful accretion flow. Previous analytic and numerical studies show that accretion can qualitatively alter both the power and time dependence of a proto-magnetar engine (Piro & Ott 2011; Gompertz et al. 2014; Metzger et al. 2018a).    
+
+> 1Throughout this paper we use the term “jet” to denote a rel-ativistic, magnetically powered polar outflow launched by the proto-magnetar, even when its opening angle near the engine is large. This terminology is motivated by the expected role of this component as the GRB-powering outflow: in a collapsar, for example, the stellar envelope can help collimate an initially wide-angle relativistic wind into a narrower jet on larger scales (e.g., Bromberg et al. 2014; Gottlieb et al. 2022). We reserve the term “wind” for the slower, baryon-rich disk or propeller outflow, unless otherwise specified.
+
+By pushing the magnetosphere inside the light cylin-der, the disk can open additional stellar magnetic flux and enhance the spin-down luminosity relative to that of an isolated dipole (Parfrey et al. 2016; Metzger et al. 2018a). The resulting increase in early energy injection can affect the dynamics and nucleosynthesis of the sur-rounding supernova ejecta, including the production of radioactive 56 Ni (Nakamura et al. 2001; Suwa & Tomi-naga 2015). Accretion can also make the engine strongly time dependent: intermittent penetration of the magne-tosphere may modulate the jet power and baryon load-ing, while the competing accretion and electromagnetic torques govern the longer-term spin evolution (Bernar-dini et al. 2013; Gompertz et al. 2014; Metzger et al. 2018a). These changes at the engine can subsequently shape the high-energy radiation produced by dissipa-tion at much larger radii (Giannios & Spruit 2007; Be-loborodov 2010). Here, we present axisymmetric GRMHD simulations of neutrino-cooled accretion onto rapidly spinning proto-magnetars. Holding the initial torus and its outer mass-supply rate approximately fixed, we vary the stellar dipole strength to follow the progression from a crushed magnetosphere, through magnetically channeled accre-tion and approximate spin equilibrium, to the centrifu-gal propeller regime. We compare this sequence directly with an otherwise similar black-hole accretion flow. This paper, hereafter Paper I, focuses on how the disk– magnetosphere interaction regulates the power, magne-tization, variability, and angular-momentum flux of the relativistic polar jet, as well as the accretion and spin evolution of the neutron star. The same interaction also regulates the mass, velocity, entropy, and electron frac-tion of the baryon-rich ejecta. Those consequences and their implications for r-process nucleosynthesis are ex-plored in the companion Paper II. In Sec. 2 we review the analytic estimates that de-fine the relevant physical scales. In Sec. 3 we describe the numerical methods and model suite. In Sec. 4 we present the disk–magnetosphere interaction, jet energet-ics and variability, and neutron-star torques. In Sec. 5 we discuss applications to collapsars, neutron-star merg-ers, and AIC. We summarize our conclusions and limi-tations in Sec. 6.  
+
+> 2.
+
+ACCRETING PROTO-MAGNETARS We consider an accretion disk of mass Md ∼ 10 −2 −
+
+1 M⊙ formed around a newly born compact object of mass M⋆ in stellar core-collapse, AIC, or a NS merger event, with a characteristic radius Rd ≳ 30 rg , where 
+
+rg ≡ GM ⋆/c 2 is the gravitational radius (see Fig. 1 for a schematic illustration). The accretion rate can be es-3
+
+Figure 1. Schematic illustration of an accreting proto-magnetar central engine. An NS with rotational angular frequency Ω ⋆ (spin period P⋆ = 2 π/ Ω⋆) and magnetic dipole moment μ⋆ accretes from a neutron-rich disk at a high rate ˙M ≳ 10 −2 M⊙ s−1. The accretion flow is truncated where it encounters the stellar magnetosphere, at approximately the Alfv´ en radius Rm. Open polar magnetic field lines power a relativistic jet, whose power is enhanced relative to that of isolated dipole spin-down by the additional poloidal mag-netic flux opened by the interaction between the inner disk and the rotating magnetosphere. The star–disk interaction can also enhance baryon-rich disk/propeller winds, whose composition and nucleosynthetic implications are the sub-ject of Paper II. 
+
+timated as ˙M ∼ Md
+
+tvisc 
+
+≈ 0.05 M⊙ s−1
+
+ Md
+
+0.2 M⊙
+
+
+
+×
+
+ Rd
+
+50 rg
+
+−3/2  M⋆
+
+2 M⊙
+
+−1  h/r 
+
+0.3
+
+2  α
+
+0.01 
+
+
+
+, (1) where tvisc is the viscous timescale within an α viscosity prescription (Shakura & Sunyaev 1973), and h/r is the disk aspect ratio scaled to a characteristic value for thick neutrino-cooled disks (e.g., Narayan et al. 2001). At such high accretion rates, the inner regions of the disk can become dense and hot enough that weak interactions—primarily electron and positron captures on free nucleons—proceed faster than the local accre-tion time (e.g., Beloborodov 2003). In this regime, the disk cools efficiently and its midplane electron fraction 
+
+Ye is driven toward a low equilibrium value through a self-regulated balance between weak interactions, neu-trino cooling, and electron degeneracy (Chen & Be-loborodov 2007; Siegel & Metzger 2017; Hern´ andez-Morales & Siegel 2025). This neutron-rich transition occurs interior to an ignition radius Rign , defined by the condition that weak interactions become faster than the local inflow time. Equivalently, at a specified disk radius 
+
+r ≲ Rd, the transition occurs above a critical “ignition” accretion rate, which can be expressed as (Metzger et al. 2008b) ˙Mign ≈ 5 × 10 −3 M⊙ s−1
+
+×
+
+ r
+
+50 rg
+
+5/6  M⋆
+
+2 M⊙
+
+4/3  α
+
+0.01 
+
+5/3
+
+. (2) For ˙M ≫ ˙Mign , the disk midplane is dense and moder-ately electron-degenerate, suppressing positron captures and driving the electron fraction towards characteristic values Ye ≈ 0.1 − 0.2, largely independent of the initial composition (e.g., Chen & Beloborodov 2007; Siegel & Metzger 2017). For a magnetized NS, the accretion disk is trun-cated roughly where magnetic stresses balance the stresses of the inflowing disk. A commonly used order-of-magnitude estimate is the spherical Alfv´ en radius (Davidson & Ostriker 1973; Ghosh & Lamb 1979), 
+
+Rm ≈
+
+ μ4
+
+> ⋆
+
+2GM ⋆ ˙M 2
+
+1/7
+
+≈ 4.5 rg
+
+ B⋆
+
+2 × 10 15 G
+
+4/7
+
+×
+
+ R⋆
+
+12 km 
+
+12 /7  M⋆
+
+2 M⊙
+
+−8/7 ˙M
+
+0.1 M⊙ s−1
+
+!−2/7
+
+,(3) where μ⋆ = B⋆R3 
+
+> ⋆
+
+is the magnetic dipole moment of the magnetar of radius R⋆ and equatorial surface field strength B⋆. The normalization and scaling can differ for a geometrically thick, disk-confined magnetosphere; indeed, our simulations yield a somewhat shallower de-pendence on B⋆ (Fig. 8). Absent accretion, the magnetar will spin down via a magnetically dominated wind. For an aligned rotator in the force-free limit 2, the spin-down luminosity can be written as (Gruzinov 2005; Spitkovsky 2006) ˙E0 ≃ k μ2
+
+> ⋆
+
+Ω4
+
+> ⋆
+
+c3 ≈ 4.3 × 10 49 erg s −1 ×
+
+ k
+
+0.25 
+
+  B⋆
+
+10 15 G
+
+2  R⋆
+
+12 km 
+
+6  P⋆
+
+1 ms 
+
+−4
+
+(4) where Ω ⋆ and P⋆ = 2 π/ Ω⋆ are the rotational frequency and spin-period of the NS, respectively. Here k accounts for the mapping between the reported fluid-frame sur-face field and the magnetic dipole moment entering the   
+
+> 2Early in the magnetar evolution, the wind is not force-free as a result of neutrino-driven mass-loss along the open magnetic field lines. These inertial effects open additional magnetic field lines and can substantially increase the wind power relative to the force-free spin-down rate (e.g., Thompson et al. 2004; Metzger et al. 2007; Prasanna et al. 2022, 2023; Desai et al. 2026), even absent an accretion disk.
+
+4asymptotic spin-down solution. For our stellar compact-ness, a fixed dipole moment corresponds to a fluid-frame surface field approximately twice the flat-space value. Because ˙E0 ∝ μ2
+
+> ⋆
+
+, expressing the spin-down luminosity in terms of the reported fluid-frame field gives k ≃ 0.25. Accretion can increase the spin-down luminosity of the magnetar jet by increasing the fraction of open magnetic flux (Parfrey et al. 2016; Metzger et al. 2018a). This oc-curs if the magnetospheric radius Rm (Eq. (3)) is located inside the light-cylinder radius, 
+
+RLC = cP ⋆
+
+2π ≃ 16 rg
+
+ P⋆
+
+1 ms 
+
+  M⋆
+
+2 M⊙
+
+−1
+
+. (5) When Rm < RLC , the disk–magnetosphere interac-tion enhances the spin-down power relative to the iso-lated dipole rate by a factor ≃ (RLC /R m)2. Combining Eqs. (3)–(5) gives an estimate of the enhanced electro-magnetic spin-down power available to the relativistic jet, ˙E ≃ ˙E0
+
+ RLC 
+
+Rm
+
+2
+
+≈ 2 × 10 51 erg s −1
+
+ B⋆
+
+2 × 10 15 G
+
+6/7
+
+×
+
+ R⋆
+
+12 km 
+
+18 /7  P⋆
+
+1 ms 
+
+−2
+
+×
+
+ M⋆
+
+2M⊙
+
+2/7 ˙M
+
+0.1 M⊙ s−1
+
+!4/7
+
+, (6) where the numerical normalization assumes k = 0 .25; this expression is valid for R⋆ < Rm < RLC . For high enough accretion rates, such that Rm ∝ ˙M −2/7
+
+approaches the NS surface ( Rm → R⋆), the spin-down power approaches that of a split-monopole. However, in this regime the polar outflow may become heavily mass-loaded or confined by the accretion flow, reducing the fraction of the spin-down power that emerges in a high-σ relativistic jet. The efficiency with which disk material is able to pen-etrate the magnetosphere depends on the rotation rate of the magnetar. One can define the corotation radius, 
+
+Rc =
+
+ GM ⋆
+
+Ω2
+
+> ⋆
+
+1/3
+
+≃ 6.3rg
+
+ P⋆
+
+1 ms 
+
+2/3  M⋆
+
+2 M⊙
+
+−2/3
+
+,(7) as the location in the disk where the Keplerian orbital frequency Ω = ( GM ⋆/r 3)1/2 matches that of the NS rotation, Ω ⋆. Schematically, if Rm ≲ Rc, accretion can proceed onto the star along closed magnetic field lines, whereas for a magnetosphere maintained outside corotation, Rm ≳ Rc, the system enters the propeller regime (Illarionov & Sunyaev 1975; Romanova et al. 2004), leading to suppressed and/or intermittent accre-tion onto the NS surface and more powerful outflows than in the accretion regime. 10 −3 10 −2 10 −1 10 0             
+
+> ˙M(Ms−1)10 1
+> 10 2
+> Radius ( rg)
+> Rc
+> RLC
+> R?
+> Rm, B ?= 10 15 GRm, B ?= 10 16 GPropeller Accretion
+> Rign , α = 0 .01 Neutron -rich
+> Rign , α = 0 .1Neutron -rich Crushed Magnetosphere
+
+Figure 2. Critical radii for accretion onto a millisecond proto-magnetar as a function of the mass accretion rate ˙M ,shown in units of rg = GM/c 2 for M⋆ = 2 M⊙, P⋆ = 1 .26 ms, and R⋆ = 12 km. Solid blue lines show the magnetospheric radius Rm from Eq. (3) for surface dipole fields B⋆ = 10 15 Gand 10 16 G. Solid red lines show the ignition radius Rign 
+
+obtained by inverting Eq. (2) for α = 0 .01 and 0 .1. Horizon-tal dashed, dash-dotted, and dotted lines mark the neutron-star radius R⋆, corotation radius Rc, and light-cylinder ra-dius RLC , respectively. The region to the lower right of the ignition boundary is neutron-rich, ˙M ≳ ˙Mign . For 
+
+Rm ≲ RLC , disk accretion enhances the open magnetic flux and spin-down power relative to the usual isolated dipole rate (Eq. (4)), while the transition across Rm ≃ Rc separates the propeller regime, Rm ≳ Rc, from accretion onto the surface, 
+
+Rm ≲ Rc.
+
+As summarized in Fig. 2, the same region of parame-ter space that produces neutron-rich disks, ˙M ≳ ˙Mign ,also spans the key disk–magnetosphere regimes for mil-lisecond proto-magnetars. At fixed ˙M and P⋆ ∼ 1 ms, increasing the stellar dipole field moves the system from a crushed-magnetosphere state, Rm ≲ R⋆, to magneti-cally channeled accretion, R⋆ ≲ Rm ≲ Rc, and finally to the centrifugal propeller regime, Rm ≳ Rc. Throughout much of this sequence Rm < R LC , so disk compression of the stellar magnetosphere can open additional mag-netic flux and enhance the electromagnetic luminosity to ˙E ∼ 10 50 –10 52 erg s −1 (Eq. 6), comparable to that required of GRB central engines. Thus, for the accre-tion rates relevant to neutron-rich disks and the mag-netic fields capable of powering relativistic jets, the in-ner flow can naturally transition between crushed, ac-creting, and propeller states. Fully capturing this disk– magnetosphere–jet interaction requires global GRMHD simulations, which we now describe. 
+
+3. NUMERICAL METHODS 5We perform GRMHD simulations of accreting neutron stars (NSs) and black holes (BHs) using the H-AMR code (Liska et al. 2022). We employ the extension de-veloped for NS magnetospheres (Chatterjee et al. 2026), which self-consistently evolves MHD and magnetically dominated force-free regions within a single calculation (Parfrey & Tchekhovskoy 2017, 2024). We further mod-ify the code to incorporate a general tabular equation of state (EOS) and passive-scalar evolution of the electron fraction (Murguia-Berthier et al. 2021), as described be-low. The ideal GRMHD equations include baryon conser-vation, 
+
+∇μ (ρu μ) = 0 , (8) energy-momentum conservation, 
+
+∇μT μν = Qu ν , (9) and Maxwell’s equations, 
+
+∇ν ∗F μν = 0 , (10) where 
+
+T μν =
+
+
+
+ρ + ϵ + p + b2
+
+c2
+
+
+
+uμuν +
+
+
+
+p + b2
+
+2
+
+
+
+gμν − bμbν
+
+(11) is the total energy-momentum tensor. Here, ρ, ϵ, and 
+
+p are the fluid-frame mass density, internal energy den-sity, and gas pressure respectively; uμ is the fluid four-velocity, gμν is the metric tensor, bμ is the fluid-frame magnetic four-vector in Lorentz-Heaviside units, and 
+
+> ∗
+
+F μν = bμuν − bν uμ is the dual of the electromagnetic field tensor. The source term Q(ρ, T, Y e) in Eq. (9) is the net heating/cooling rate per unit volume in the rest frame of the fluid due to neutrino emission, as described in Sec. 3.5. Weak interactions also change the electron fraction of the fluid, which is evolved as a separate pas-sive scalar: 
+
+∇μ (Yeρu μ) = ρR, (12) where R(ρ, T, Y e) is the specific lepton emis-sion/absorption rate in the fluid rest frame (Sec. 3.5). We also evolve a separate passive scalar F obeying, 
+
+∇μ (Fρu μ) = 0 , (13) which we use to separate disk material from the back-ground atmosphere in the neutron star simulations (Par-frey & Tchekhovskoy 2017). We adopt a fixed Kerr metric with spin parameter 
+
+a = 1 /3 for both the BH and NS simulations, with the NS surface imposed at R⋆ = 4 rg. Thus, the NS calcu-lation uses a Kerr exterior rather than a self-consistent rotating stellar spacetime. This approximation permits a controlled comparison between compact objects with the same mass and angular momentum while isolating the effects of the stellar surface and anchored magnetic field. A constant central mass is a good approximation because for accretion rates of interest, the NS or BH would grow by ≲ 1% over the duration of the simula-tions. Likewise, our chosen torus mass (0 .2M⊙; Sec. 3.4) is sufficiently small that self-gravity is not expected to play an important role in the evolution of the system. 3.1. Computational Grid and Boundary Conditions 
+
+We employ a 2D spherical polar grid with Nr cells in the radial direction, and Nθ cells in the polar direction. The radial domain extends from the inner boundary at a radius of Rin = R⋆ = 4 rg in the NS models and from 
+
+Rin = 1 .8 rg in the BH models to Rout = 10 4 rg. The radial grid is logarithmically spaced, and the angular grid spanning [0 , π ] is uniformly spaced. All our sim-ulations adopt Nr = 512, Nθ = 256. In Sec. 3.4, we show that this choice allows a sufficient resolution of the fastest-growing MRI mode. We use reflective boundary conditions in the θ direc-tion and apply the same outflow prescription for the hy-drodynamic primitive variables at the inner and outer radial boundaries of the NS and BH models, copying their values from the nearest active cell into the ghost cells. At the inner boundary, this permits nearly unim-peded inflow into the compact object. For the NS mod-els, this treatment is physically motivated by the effi-cient neutrino cooling of the accretion layer at the rates of interest, ˙M ≳ 10 −3 M⊙ s−1 (Chevalier 1993; Combi et al. 2025b). In the NS models we apply electromag-netic inner boundary conditions that anchor the stel-lar magnetic field into the surface. The magnetic field normal to the surface is held fixed while its tangen-tial components evolve freely. The tangential electric fields (EMFs) that constitute the fluxes for the induc-tion equation are found from the spacetime-appropriate form of E = −v × B, where here vr = vθ = 0, vϕ = Ω ⋆.We impose density floors in low-density, strongly mag-netized regions to limit the maximum magnetization and maintain numerical stability. For the NS simulations, we enforce a maximum b2/ρ = 50 at the stellar surface and a maximum b2/ρ = 25 outside the light cylinder, with a smooth interpolation between these limits. For the BH simulations, we impose a maximum b2/ρ = 25 through-out the domain. Here the ceiling is imposed on b2/ρ ,whereas elsewhere we define the relativistic magnetiza-tion as σ = b2/(hρ ) where h is the specific enthalpy. This enables the relativistic “jet” to be distinguished from more weakly magnetized ( σ < 1) accreting or un-6bound disk material (see also Fig. 1). We have verified that, over the radii analyzed in this paper, the total electromagnetic power carried by material with σ > 1is insensitive to the adopted density-floor prescription. The floors do, however, affect how this power is dis-tributed at higher magnetization, particularly for σ ≳ 5. We therefore interpret the simulations as measuring the electromagnetic power supplied to the relativistic funnel, rather than the absolute high-σ distribution or detailed terminal Lorentz-factor structure of the jet. In a physical proto-magnetar, baryon loading is reg-ulated by neutrino heating in the stellar atmosphere and depends on the neutrino luminosity and cooling age (Thompson et al. 2004; Metzger et al. 2011; De-sai et al. 2026). Our adopted floors permit peak values 
+
+σ ≃ 20 in both the accreting jets and the disk-free model 
+
+NS-B1e15-nodisk , within the broad range σ ∼ 10–10 3
+
+expected several seconds after NS birth. For the accret-ing magnetars of interest, irradiation of the NS surface by neutrinos from the hot accretion flow may further regulate the baryon loading of the jet and limit its max-imum magnetization (Metzger et al. 2018a; see Sec. 5 for further discussion). 3.2. Equation of State 
+
+We employ the general Helmholtz EOS (Timmes & Swesty 2000), tabulated as a function of density ρ, tem-perature T , and electron fraction Ye. We assume nuclear statistical equilibrium among free neutrons (n), free pro-tons (p), and α particles, whose relative abundances we determine as a function of ( ρ, T, Y e) by numerically solving the Saha equation simultaneously with baryon number conservation and charge conservation as follows (Siegel & Metzger 2018): 
+
+n2pn2n = 2 nα
+
+ mbkBT
+
+2πℏ2
+
+9/2
+
+exp ( −Qα/k BT ) (14) 
+
+nb = nn + np + 4 nα (15) 
+
+nbYe = np + 2 nα, (16) where nb, nn, np, and nα are number densities of baryons, neutrons, protons, and α particles respectively, 
+
+mb is the baryon mass, kB is the Boltzmann constant, 
+
+ℏ is the reduced Planck’s constant, and Qα ≃ 28 .3 MeV is the nuclear binding energy of an α particle. We have modified the Helmholtz EOS to include the effects of nuclear binding energy from α particle dissoci-ation or formation. We do this by modifying the specific internal energy in the EOS as (Fern´ andez & Metzger 2013) 
+
+eint = eint ,0 − Qα
+
+mα
+
+Xα, (17) where eint ,0 is the specific internal energy of the pure nucleon state, mα is the α particle mass, and Xα is the mass fraction of α particles. We also include the effects of α particles on the thermodynamic derivatives in the EOS. Since eint can be negative for certain combinations of 
+
+eint ,0 and Xα, we take additional care while evolving the internal energy. If the internal energy is negative, the flooring procedures used in the GRMHD code can cause unphysical energy injection. To avoid this, we evolve 
+
+eint ,0 = eint + Qα 
+
+> mα
+
+Xα, and account for Qα 
+
+> mα
+
+Xα in the EOS subroutines only. 3.3. The Neutron Star 
+
+We choose the NS angular velocity Ω ⋆ = 0 .05 c/r g,corresponding to a spin period of P⋆ ≃ 1.26 ms, similar to values expected for rapidly spinning remnants formed in collapsar and post-merger environments (M¨ osta et al. 2014; Radice et al. 2018). The spacetime is fixed with 
+
+a = 1 /3 throughout the calculation, but the imposed rotation of the stellar surface and magnetosphere is ini-tially set to zero. Beginning at t = 500 rg/c , we ramp Ω ⋆
+
+smoothly to its final value over the next 500 rg/c . We assume the NS to be rotating as a solid body. Physically, the NS is likely born differentially rotating, providing a reservoir of free energy that may amplify its magnetic field (e.g., Klu´ zniak & Ruderman 1998). However, a variety of instabilities are expected to lead to the redis-tribution of angular momentum and erase differential rotation on timescales of seconds or less (e.g., Margalit et al. 2022). We initialize the magnetosphere with the analytic Schwarzschild dipole solution of Wasserman & Shapiro (1983), used here as an approximate initial field config-uration in the subsequently evolved Kerr spacetime, 
+
+Aϕ(r, θ ) = 3μ⋆ sin 2 θ
+
+2
+
+x2 ln(1 − x−1) + x + 0 .5 , (18) where x ≡ r/ 2, μ⋆ is the magnetic dipole moment in units of r3g
+
+p4πρ max c2, and ρmax denotes the peak den-sity in the torus in CGS units (Sec. 3.4). See Das et al. (2022) for a discussion of accretion onto non-dipolar stel-lar fields. As described in Sec. 3.6, we explore a range of ac-creting NS models with surface magnetic field strengths between B⋆ = 3 × 10 13 G and B⋆ = 10 16 G. We also simulate an NS with no accretion disk (model 
+
+NS-B1e15-nodisk ). As a check on the code, we have verified that the total outflow luminosity of an isolated magnetar matches the expected force-free spin-down rate, ˙E0 (Eq. (4)), to within ≲ 2 − 3%. 3.4. Initial Torus 7For the initial torus, we employ the commonly used equilibrium Fishbone & Moncrief (1976) configuration, with an inner edge at rin = 25 rg, and density maximum at rmax = 47 rg. The former is larger compared to previ-ous simulations of BH accretion (e.g., Siegel & Metzger 2018 take rin ≈ 4 rg) to enable a clear separation be-tween the initial torus and the NS magnetosphere. We set a constant electron fraction Ye = 0 .4 in the initial torus, though our results are not sensitive to this choice because we shall find that weak interactions in the disk rapidly reset Ye. To set the initial density (ρ) and temperature ( T ) profiles of the torus, we first have to specify the specific enthalpy h = 1 + ϵ/ρ + p/ρ ,and the entropy per baryon. We follow Fishbone & Moncrief (1976, their Eq. (3.6)) to obtain the specific enthalpy h(ρ, T, Y e), and then pick a constant entropy 
+
+s(ρ, T, Y e) = 5 k b baryon −1. Although derived assum-ing a barotropic EOS, the Fishbone & Moncrief (1976) expression for enthalpy is valid here because we take entropy to be constant throughout the initial torus. Be-cause our EOS includes α particles, the internal energy can be negative, and so the torus boundary is not de-fined by a minimum specific enthalpy of hmin = 1. We instead choose hmin = 0 .9939 to define the torus bound-ary. We then simultaneously solve enthalpy and en-tropy equations using a 2D Newton-Raphson method to set the density and temperature at each grid point. These choices of the torus geometry, entropy, and en-thalpy yield a peak density of 8 .5 × 10 9 g cm −3, and a peak temperature of 1 .65 × 10 10 K. The resulting torus has a total mass of 0 .2 M⊙. This mass should not be interpreted as the total mass available in the global sys-tem, particularly in the collapsar application where fall-back from the stellar envelope may continue to replenish the disk for many seconds. Rather, in our local engine calculation the torus mass is chosen to provide a finite reservoir that produces the desired hyper-accretion rate, ˙M ∼ 0.01–0 .1 M⊙ s−1, over the simulated time interval. Since the initial torus extends inward to 25 rg, we de-form the shape of the initial NS magnetosphere (see Fig. 3) to avoid the torus (Parfrey & Tchekhovskoy 2024). If we omit this step, the strong NS field is baked into the torus through the initial conditions. The deformation is justified because rin is located outside the eventual light cylinder radius, RLC (as described in Sec. 3.3, the NS achieves its maximum angular velocity by t = 1000 rg/c ). We choose two poloidal loops of opposite polarity across the equator to minimize the net vertical magnetic flux delivered to the central object and thereby maintain a SANE rather than MAD accretion state. This permits a cleaner comparison of the outflows generated by the stellar dipole across the NS sequence. We use a purely poloidal vector potential Aϕ, torus ∝
+
+MAX( ρ − ρcut , 0) r4 sin 3(θ) cos( θ) for the torus magnetic field, where the cut-off density ρcut = 10 −3ρmax limits the magnetic field to only the dense parts of the torus. We normalize the torus magnetic field such that the min-imum plasma β = 2 p/b 2 (where b2 is the squared mag-nitude of the fluid-frame magnetic 4-vector in Lorentz-Heaviside units) is 300 in those cells of the torus that have a density of at least 0 .05 ρmax . We add a random 
+
+∼ 4% perturbation to the initial energy-density profile to seed the turbulence. We assess the numerical resolution of the fastest-growing MRI mode with wavelength (Siegel & Metzger 2018) 
+
+λMRI = 2π
+
+Ω
+
+b
+
+pρh + b2 , (19) where h is the specific enthalpy, b = √b2 is the fluid-frame magnetic field, and Ω = uϕ/u t. The quality factor is defined as 
+
+Qθ ≡ λMRI 
+
+r∆θ , (20) where r∆θ is the angular grid spacing. Fig. 4 shows that the fastest-growing MRI mode is resolved by Qθ ≳ 10 throughout most of the dense torus after the instabil-ity develops. This establishes adequate local resolution of the linear MRI, although sustained MRI turbulence cannot be captured indefinitely in axisymmetry. We note that for the same torus geometry, the den-sity scale and corresponding mass of the torus can be changed by varying its initial entropy. This also allows us to tune the time-averaged mass accretion rate, to values ˙M ∼ 0.01 − 0.1 M⊙ s−1 in the range expected for collapsar or post-merger disks (Eq. 1). The average mass accretion rate can also be changed by varying the distribution of plasma β in the initial torus. 3.5. Weak Interactions 
+
+Weak interactions are important in both cooling the accretion flow and changing its electron fraction. We include the effects of the charged-current URCA pair capture reactions, 
+
+e− + p → n + νe
+
+e+ + n → p + ¯ νe (21) which are the dominant neutrino emission channel for the high densities and temperatures of interest. We calculate the neutrino cooling Q(ρ, T, Y e) and lepton-changing rates R(ρ, T, Y e) which enter Eqs. (9), (12), arising from the capture reactions for electrons 8
+
+Figure 3. Structure of the initial torus at large (left panel) and small (right panel) radial scales in the left half of the x − z
+
+plane. Shading denotes contours of the density ρ, while the lines with arrows indicate the magnetic field lines. The deformation of the initial dipole magnetic field of the NS to avoid the torus is evident. 
+
+Figure 4. Angular MRI quality factor Qθ ≡ λMRI /(r∆θ) at three representative times. The fastest-growing MRI mode is resolved by Qθ ≳ 10 throughout most of the dense torus after the instability develops. Lower values occur primarily near the symmetry axes, where the imposed initial poloidal field is weak. 9and positrons of arbitrary relativism and degeneracy fol-lowing Chen & Beloborodov (2007), Chen & Metzger (2025). As our GRMHD simulations do not include neutrino transport, we assume optically thin neutrino cooling. This approximation is reasonable because the optical depth out of the accretion flow in our simulations to νe and ¯ νe emitted by the disk is ≲ 1 at all times, as we verify in Appendix A. Neutrino absorption can also heat the disk surface and modify the electron fraction of the unbound ejecta. The dominant neutrino irradiation generally originates at small radii, from the inner accretion flow, a cool-ing accretion layer on the NS surface, or the diffusive cooling luminosity of the newly formed proto-neutron star. Although we neglect neutrino absorption in our fiducial simulations, we assess its influence on the en-ergetics and electron fraction of the disk outflows by including in a subset of models a central isotropic “light-bulb” neutrino source, intended to mimic emission from near the NS surface. Specifically, we include an addi-tional optically thin heating source term Q ∝ Lν /r 2 in Eq. (9) and an additional Ye−changing absorption term 
+
+R ∝ Lν /r 2 in Eq. (12) following Qian & Woosley (1996, their Eq. (10) and Eq. (64), respectively), assuming equal electron-neutrino and antineutrino luminosities, 
+
+Lνe = L¯νe , and two values of the total electron-flavor luminosity, Lνe + L¯νe = 2 × 10 51 and 2 × 10 52 erg s −1,spanning the expected range given the ages and accre-tion rates of the NSs of interest (see Fig. 12 and Paper II for further discussion). In calculating the absorp-tion cross sections, we assume mean neutrino energies 
+
+ϵνe = ϵ¯νe = 10 MeV, typical of proto-neutron stars or post-merger remnants several seconds in their cooling evolution (e.g., Pons et al. 1999; Dessart et al. 2009). Because the electron-fraction-changing absorption rates scale approximately as Lν ϵν , the adopted luminosity and mean energy should be viewed jointly: a larger lumi-nosity with a lower mean energy can produce a simi-lar degree of weak processing. Because the effects of neutrino irradiation do not appreciably alter the disk-magnetosphere interaction and are mostly relevant to the composition and nucleosynthesis of the ejecta, we defer a detailed analysis of the irradiated models to Pa-per II. 3.6. Model suite 
+
+Our suite of NS and BH simulations is summarized in Table 1. All models assume a compact object of mass M⋆ = 2 M⊙ and the same angular momentum, corresponding to a Kerr parameter a = 1 /3 and, in the NS models, to a spin period P⋆ = 1 .26 ms. Other key radii include the innermost stable circular orbit (ISCO), Risco ≃ 4.9 rg; light cylinder radius RLC = 20 rg
+
+(Eq. (5)), and corotation radius Rc = 7 .3 rg (Eq. (7)). Given our assumed initial torus mass ( Md = 0 .2M⊙)and its characteristic outer radius, rmax = 47 rg, Eq. (1) predicts an inflow rate ˙M ≳ 0.1 M ⊙ s−1 (for h/r ∼
+
+0.5 at the density maximum), for values of the effective viscosity α ∼ 10 −2 similar to those generated by the MRI. This exceeds the critical accretion rate ˙Mign ∼
+
+10 −2M⊙ s−1 (Eq. (2)) necessary for the disk to become neutron-rich at radii ≲ rmax on the inflow timescale. Thus, we expect the inflowing matter to be neutron-rich with Ye ∼ 0.1 by the time it reaches the magnetosphere, regardless of its initial composition. The accreting NS sequence spans equatorial surface dipole strengths from B⋆ = 3 × 10 13 to 10 16 G. In 
+
+NS-B3e13 and NS-B3e14 , the magnetosphere is com-pressed to the stellar surface. Model NS-B1e15 remains nominally within the crushed-magnetosphere regime, al-though its compressed field is already dynamically im-portant near the surface. At larger field strengths, the disk is increasingly trun-cated outside the star. Model NS-B3e15 lies in the mag-netically channeled accretion regime, with R⋆ < R m <Rc. Model NS-B4e15 lies close to corotation, Rm ≃ Rc,and therefore near the transition between accretion-dominated spin-up and magnetically dominated spin-down. Finally, model NS-B1e16 lies securely in the pro-peller regime, Rm > R c, where centrifugal coupling to the rotating magnetosphere suppresses direct accretion. This expanded sequence allows us to follow the contin-uous progression from an accretion-dominated crushed magnetosphere, through channeled accretion and ap-proximate spin equilibrium, to propeller-driven spin-down. To explore the influence of neutrino absorption (Sec. 3.5), we perform irradiated counterparts of the black-hole model, the near-corotation model NS-B4e15 ,and the propeller model NS-B1e16 . These models are de-noted BH ν2e51 , NS-B4e15 ν2e51 , NS-B1e16 ν2e51 , and 
+
+NS-B1e16 ν2e52 , where the suffix gives the imposed to-tal electron-flavor neutrino luminosity in erg s −1. We also perform a spinning NS calculation without an ac-cretion disk, NS-B1e15-nodisk , to provide a reference for isolated magnetar spin-down. The simulations are run for a total duration of 0 .9 seconds ( ∼ 9 × 10 4 rg/c ), sufficient to capture the disk–magnetosphere interaction over several local inflow times. All time averages pre-sented in this paper are taken from 0 .4 to 0 .9 s after the start of the simulation, by which time the electron frac-tion has decreased sufficiently from its initial value in the torus and the inflow has reached an approximately steady composition. 10 10 1 10 2 10 3 10 4
+
+r (rg)10 −5
+
+10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+10 0
+
+> Inflow  ˙M (M s−1)
+
+BH NS-B3e13 NS-B1e15 NS-B1e16 
+
+10 1 10 2 10 3 10 4
+
+r (rg)10 −4
+
+10 −3
+
+10 −2
+
+10 −1
+
+10 0
+
+10 1
+
+> ρ/ 10 10  (g cm −3)
+
+10 1 10 2 10 3 10 4
+
+r (rg)0.00.51.01.52.02.53.0
+
+> T (MeV)
+
+10 1 10 2 10 3 10 4
+
+r (rg)0.05 0.10 0.15 0.20 0.25 0.30 0.35 0.40 
+
+> Ye
+
+Figure 5. Time-averaged (from 0.4 s to 0.9 s after the start of the simulation) radial profiles of mass inflow rate, density, temperature, and electron fraction. The mass inflow rate is measured through spherical shells while the latter three are measured in the equatorial plane. The drop in ˙M inside r ≲ 40 rg demonstrates the development of strong outflows. We terminate the NS profiles at the average magnetosphere radius (or the NS radius, whichever is larger). 4. RESULTS 4.1. Disk–Magnetosphere Interaction 
+
+The simulations are designed so that each compact object is fed by essentially the same accretion flow at large radii. This is shown in Fig. 5, whose time-averaged radial profiles demonstrate that the net mass inflow rate supplied by the torus is nearly identical across the BH and NS models, with an outer feeding rate ˙Md ≃ 0.2 M⊙ s−1. The thermodynamic structure of the disk is also similar at large radii: the density and tem-perature profiles follow the expected behavior of a hot, neutrino-cooled accretion flow, and the gas neutronizes to Ye ≃ 0.1 − 0.15 near the density maximum. The models therefore differ primarily in what happens once this common inflow reaches the central object. For the BH, and for sufficiently weak neutron-star dipole fields, the gas can continue inward with little interrup-tion. For stronger B⋆, however, the stellar magnetic field halts the disk outside the stellar surface, and the sub-sequent evolution depends on the location of the mag-11 
+
+Table 1. Summary of Simulations Model (1) B(2)  
+
+> ⋆
+
+⟨Re1 
+
+> m
+
+⟩(3) ⟨Re2 
+
+> m
+
+⟩(3) ˙M⋆
+
+> (4)
+
+(G) (rg) (rg) (M⊙ s−1)
+
+BH – – – 1.9 × 10 −2
+
+BH ν2e51 – – – 1.5 × 10 −2
+
+NS-B3e13 3 × 10 13 4.0 ± 0.0 4.0 ± 0.01 1.2 × 10 −2
+
+NS-B3e14 3 × 10 14 4.0 ± 0.0 4.0 ± 0.01 9.0 × 10 −3
+
+NS-B1e15-nodisk 10 15 – – –
+
+NS-B1e15 10 15 4.3 ± 0.4 4.1 ± 0.1 10 −2
+
+NS-B3e15 3 × 10 15 5.9 ± 0.5 5.1 ± 0.7 9.0 × 10 −3
+
+NS-B4e15 4 × 10 15 6.5 ± 0.5 6.0 ± 0.7 8.0 × 10 −3
+
+NS-B4e15 ν2e51 4 × 10 15 6.8 ± 0.5 6.4 ± 0.7 7.0 × 10 −3
+
+NS-B1e16 10 16 10 .8 ± 2.3 10 .8 ± 2.4 4.0 × 10 −3
+
+NS-B1e16 ν2e51 10 16 12 .8 ± 1.3 12 .8 ± 1.4 3.0 × 10 −3
+
+NS-B1e16 ν2e52 10 16 17 .4 ± 2.7 17 .4 ± 2.3 10 −4
+
+Note —All models assume a compact object mass M⋆ = 2 M⊙ and Kerr spin parameter a = 1 /3, corresponding to a NS spin period 
+
+P⋆ = 1 .26 ms, and an initial torus mass Md = 0 .2 M⊙ and initial entropy s = 5 k b baryon −1. Critical radii include: the NS surface 
+
+R⋆ = 4 rg, ISCO Risco = 4 .9 rg, corotation Rc = 7 .3 rg (Eq. (7)), and light cylinder RLC = 20 rg (Eq. (5)). For all the NS models, we report the NS magnetic field in the fluid frame. The time-averaged quantities have been averaged from 0.4 s to 0.9 s after the start of the simulation, to allow sufficient time for Ye to decrease from its initial value in the torus. 
+
+> (1)
+
+Model identifier: Neutron-star models are named according to their equatorial surface dipole field strength, while the suffix ν fol-lowed by a luminosity identifies simulations with an imposed neu-trino light bulb. 
+
+> (2)
+
+Surface equatorial magnetic field strength of the NS in fluid frame; this is not applicable for BH accretors. 
+
+> (3)
+
+Angle- and time-averaged magnetosphere (Alfv´ en) radius over zones within π/ 24 of the equator for the accreting NS models (Fig. 7), calculated using two different methods (Sec. 4.1). Val-ues are reported in the format average ± standard deviation. 
+
+> (4)
+
+Time-averaged mass accretion rate, as measured through the in-ner boundary of the simulation. 
+
+netospheric radius Rm relative to the stellar radius R⋆
+
+and the corotation radius Rc.For stronger B⋆, however, the stellar magnetic field halts the disk outside the surface, and the subsequent evolution depends on the location of the magnetospheric radius Rm relative to the stellar radius R⋆ and the coro-tation radius Rc. Thus, the same large-scale feeding rate can lead to a crushed magnetosphere, magnetically channeled accretion, or a centrifugal propeller, depend-ing on B⋆.Figure 6 illustrates this progression in snapshots of the inner accretion flow. In the BH model, the inner accretion flow is turbulent, but little mass is launched from the inner disk at r ≲ 15 rg, and most of the gas that reaches these radii falls through the inner bound-ary (see also the nearly radially constant ˙M in Fig. 5). In the lowest-field NS model, NS-B3e13 , the stellar field has little effect on the inflow and the magnetosphere is compressed completely against the stellar surface. The magnetosphere likewise remains nominally crushed in 
+
+NS-B1e15 , although the stronger compressed field pro-duces appreciable structure close to the surface. At larger field strengths, the disk is increasingly truncated outside the star: NS-B3e15 exhibits magnetically chan-neled accretion, NS-B4e15 lies close to corotation, and 
+
+NS-B1e16 lies securely in the propeller regime, where centrifugal coupling to the rotating magnetosphere sup-presses direct accretion onto the star. The remaining panels of Fig. 5 show that the thermo-dynamic structure of the disk is broadly similar among the models outside the immediate vicinity of the com-pact object, and agrees well with one-dimensional mod-els of neutrino-cooled disks (Chen & Beloborodov 2007). The disk neutronizes rapidly, reaching Ye ≃ 0.1 − 0.15 near the density maximum of the outer torus. The main differences appear only at small radii, where the flow begins to interact directly with the inner bound-ary or the stellar magnetosphere. In the lowest-field model NS-B3e13 , the profiles remain close to those of the BH model because the stellar field is too weak to maintain a distinct magnetospheric cavity. In NS-B1e15 ,density and temperature enhancements appear near the stellar surface as the compressed magnetosphere begins to modify the inflow. In the propeller model NS-B1e16 ,the disk is truncated at r ≃ 10 − 15 rg.To quantify these regimes, Fig. 7 shows the time evolu-tion of the angle-averaged magnetospheric radius ⟨Rm⟩.We estimate this radius using two diagnostics, following Zhu et al. (2024). First, moving inward from the initial torus edge at rin = 25 rg, we identify the radius at which the magnetization, averaged over zones within π/ 24 of the equator, first exceeds unity: ⟨σ⟩ = ⟨b2/(hρ )⟩ > 1(Parfrey & Tchekhovskoy 2024). As a second estimate, we identify the radius at which the magnetic energy density, Eb = btbt − b2utut − b2/2, first exceeds the kinetic energy density, Ekin = −ρ(ut +1), after summing both quantities over the same equa-torial angular range. Fig. 8 shows the time-averaged value of ⟨Rm⟩ as a function of B⋆. The measured scaling agrees reasonably well with Rm ∝ B2/5 
+
+> ⋆
+
+, as expected for a disk-compressed magnetosphere (Kulkarni & Romanova 2013), rather than the simpler spherical Alfv´ en scaling Rm ∝ B4/7
+
+> ⋆
+
+from Eq. (3). 12                   
+
+> Figure 6. Inner accretion-flow structure for the black-hole model and for neutron-star models spanning different disk– magnetosphere regimes at time t= 0 .4 s after the onset of the simulation. At fixed outer mass supply, increasing the neutron-star dipole field moves the magnetospheric radius Rmfrom a crushed state, Rm≲R⋆, to magnetically-channeled accretion,
+> R⋆≲Rm≲Rc, and finally to a centrifugal propeller, Rm≳Rc. Color denotes gas density, arrowed curves trace magnetic field lines, and vertical red dashed lines mark the corotation radius Rcin the neutron-star panels.
+
+When the magnetosphere is pushed close to the NS surface, differential rotation between the star and disk twists the connected field lines, building up toroidal magnetic flux. The field inflates outward into a helmet-streamer-like configuration (Aly & Kuijpers 1990; Lynden-Bell & Boily 1994; Uzdensky 2004), which becomes unstable to reconnection and plasmoid ejection (Zanni & Ferreira 2013; Parfrey et al. 2017). Fig. 9 shows a representative eruption. Such events recur while the magnetosphere remains compressed near the stellar surface and produce substantial jet variability (Sec. 4.2). 4.2. Energetics of the outflows and the polar jet 
+
+We next quantify how the disk–magnetosphere inter-action modifies the power, magnetization, and velocity structure of the outflows. The electromagnetic (EM) luminosity through a spherical surface is 
+
+LEM = −
+
+Z Z
+
+(b2ur ut − br bt)√−g dθ dϕ. (22) We also compute the bulk kinetic-energy luminosity of the matter outflow, excluding rest-mass energy, 
+
+Lkin =
+
+Z Z
+
+ρ(−ut − 1) ur √−g dθ dϕ. (23) We define the relativistic jet power, Ljet , as the por-tion of LEM carried by magnetically dominated material with σ > 1, measured at r = 20 rg, corresponding to the equatorial light-cylinder radius. The upper-left panel of Fig. 10 shows the time evolution of Ljet , while Table 2 reports the time-averaged values and rms variability. These diagnostics separate the relativistic, magnetically dominated polar component from the broader baryon-loaded disk/propeller wind, and quantify the electro-magnetic and bulk kinetic contributions to the outflow power. Accretion substantially enhances the jet power rela-tive to isolated magnetar spin-down, although the en-hancement factor depends strongly on field strength. In the very weak-field models NS-B3e13 and NS-B3e14 ,the isolated-dipole power is itself extremely small, so even a weak disk-associated polar outflow corre-sponds to a large formal value of Ljet / ˙E0. For the magnetar-strength models most relevant to GRB en-gines, NS-B1e15 through NS-B1e16 , the mean jet lumi-nosity exceeds the corresponding isolated-dipole value by factors of approximately 2–11 (Table 2). This en-hancement is the same open-flux effect estimated in Sec. 2: once the disk pushes the magnetospheric radius 13 46810 12 14 16 18 20                     
+
+> 〈Rm〉 (rg)
+> NS-B3e13
+> Rc
+> NS-B1e15
+> Rc
+> NS-B3e15
+> Rc
+> 0.40.50.60.70.8Time (s) 46810 12 14 16 18 20
+> 〈Rm〉 (rg)
+> NS-B4e15
+> Rc
+> 0.40.50.60.70.8Time (s)
+> NS-B1e16
+> Rc
+> 0.40.50.60.70.8Time (s)
+> NS-B1e16 ν2e52
+> Rc
+> Figure 7. Angle-averaged magnetosphere radius in the zones within π/ 24 of the equator as a function of time, for models spanning different NS magnetic fields B⋆. The horizontal orange lines denote the corotation radius, Rc. We show results starting at t= 0 .4 s to capture the approximately steady state after Yehas decreased from its initial value.
+
+inside the light cylinder, Rm < R LC , additional stel-lar magnetic flux is opened and the spin-down power rises above the isolated-dipole value. The measured en-hancement is somewhat smaller than the simple esti-mate ˙E/ ˙E0 ≃ (RLC /R m)2 (Eq. (6)), but remains con-sistent at the order-of-magnitude level. Even in the pro-peller model NS-B1e16 , where direct accretion onto the stellar surface is suppressed, the jet luminosity remains enhanced by a factor ≃ 2 relative to isolated dipole spin-down. Thus, the usual isolated-dipole estimate un-derpredicts the relativistic power of an accreting proto-magnetar. The disk–magnetosphere interaction also makes the jet highly time-variable. This variability is most pro-nounced in the models where the magnetosphere is pushed close to the NS surface and undergoes repeated reconnection-driven plasmoid eruptions (Fig. 9). These events produce large spikes in Ljet , in sharp contrast to the disk-free magnetar model NS-B1e15-nodisk , whose outflow is smooth and nearly steady. The variability is reduced in the propeller model NS-B1e16 , for which the magnetosphere remains farther from the stellar surface and direct accretion is less frequent. The angular structure of the outflow further illus-trates the distinction between the relativistic jet and the baryon-loaded disk/propeller wind. The upper-middle and upper-right panels of Fig. 10 show the time-averaged angular profiles of the isotropic-equivalent “jet” lumi-nosity, 4 π dL EM ,σ> 1/d Ω, and magnetization σ, where 
+
+dΩ = 2 π sin θ dθ . The isolated magnetar provides a useful reference: apart from the narrow low-σ equato-rial current sheet, its outflow approximately follows the force-free aligned-rotator scaling dL jet /d Ω ∝ sin 2 θ and remains highly magnetized, with σ ≃ 20, over most po-lar angles. Once an accretion disk is present, the outflow separates into the two components sketched in Fig. 1: a magnetically dominated polar jet with σ > 1 and a 14 
+
+Table 2. Outflow and Jet Luminosities, Torques Model L(1) jet Ljet / ˙E(2) 0 τ / |τ0|(3) J/τ (4) L(5) EM ,σ> 1 L(6) EM ,tot L(7) kin 
+
+(erg s −1) (s) (erg s −1) (erg s −1) (erg s −1)
+
+BH (2 .2, 1.4) × 10 48 – – (+)11 (4 .8, 6.0) × 10 47 (2 .6, 1.5) × 10 48 (1 .3, 1.8) × 10 48 
+
+BH ν2e51 (2 .9, 1.2) × 10 48 – – (+)14 (6 .8, 6.0) × 10 47 (3 .2, 1.3) × 10 48 (4 .0, 3.3) × 10 48 
+
+NS-B3e13 (4 .1, 3.5) × 10 48 (2 .1, 1.8) × 10 2 (2 .6, 0.9) × 10 5 (+)8 (1 .0, 8.1) × 10 46 (3 .1, 1.3) × 10 48 (3 .9, 1.7) × 10 49 
+
+NS-B3e14 (1 .2, 1.1) × 10 50 (62 .5, 57 .3) (1 .2, 0.8) × 10 3 (+)16 (1 .0, 4.6) × 10 47 (5 .9, 3.1) × 10 49 (5 .9, 2.2) × 10 50 
+
+NS-B1e15-nodisk (4 .9, 0.006) × 10 49 (1 .0, 10 −3) (−1.0, 10 −3) (−)1250 (3 .5, 0.02) × 10 49 (3 .6, 0.006) × 10 49 (9 .0, 0.08) × 10 48 
+
+NS-B1e15 (5 .8, 8.4) × 10 50 (11 .4, 16 .7) (19 .5, 13 .1) (+)43 (2 .4, 1.2) × 10 49 (9 .4, 3.0) × 10 49 (1 .0, 0.3) × 10 51 
+
+NS-B3e15 (9 .0, 20 .4) × 10 50 (4 .5, 10 .2) (3 .0, 5.0) (+)69 (1 .7, 0.4) × 10 50 (2 .6, 0.6) × 10 50 (1 .1, 0.7) × 10 51 
+
+NS-B4e15 (1 .1, 0.7) × 10 51 (2 .5, 1.6) (−0.4, 4.4) (−)339 (4 .0, 0.7) × 10 50 (5 .0, 1.0) × 10 50 (1 .0, 0.7) × 10 51 
+
+NS-B4e15 ν2e51 (1 .0, 0.6) × 10 51 (2 .4, 1.4) (−1.4, 4.2) (−)92 (3 .8, 0.7) × 10 50 (4 .8, 0.9) × 10 50 (9 .5, 0.4) × 10 50 
+
+NS-B1e16 (1 .2, 0.2) × 10 52 (2 .3, 0.3) (−2.5, 0.7) (−)5 (5 .7, 0.9) × 10 51 (6 .5, 1.0) × 10 51 (5 .2, 1.5) × 10 51 
+
+NS-B1e16 ν2e51 (1 .2, 0.1) × 10 52 (2 .4, 0.3) (−2.3, 0.6) (−)5 (5 .9, 1.0) × 10 51 (6 .6, 1.0) × 10 51 (5 .3, 1.5) × 10 51 
+
+NS-B1e16 ν2e52 (7 .4, 1.1) × 10 51 (1 .5, 0.2) (−1.1, 0.3) (−)11 (4 .5, 0.6) × 10 51 (5 .0, 0.7) × 10 51 (2 .5, 1.0) × 10 51 
+
+Note —With the exception of the spin-down time, all values are presented in the format (average, standard deviation). For all the NS models, we report the NS magnetic field in the fluid frame. The time-averaged quantities have been averaged from 0.4 s to 0.9 s after the start of the simulation, to allow sufficient time for Ye to decrease from its initial value in the torus. For the final three columns, we measure the outflow luminosities at r = 1000 rg, sufficiently far from the compact object while remaining well inside the outer boundary. Over the range 
+
+r = 300–2000 rg, LEM ,tot generally decreases outward while Lkin increases, indicating conversion of electromagnetic and residual thermal energy into bulk kinetic energy. The individual luminosities vary by factors of at most ∼ 1.5–2 across this radial range, so measurements at 1000 rg are adequate for the comparisons made here.  
+
+> (1)
+
+Time-averaged relativistic jet power measured through a spherical surface at the light cylinder radius 20 rg. 
+
+> (2)
+
+Relativistic jet power relative to the corresponding power for an isolated NS (Eq. (4)).  
+
+> (3)
+
+Time-averaged torque on the NS relative to the magnitude of the corresponding torque on an isolated NS (the torque on an isolated NS is always negative, but we consider only the magnitude here when reporting the relative values). A negative average value indicates spin-down, while a positive average value indicates spin-up.  
+
+> (4)
+
+Time-averaged spin-up/spin-down time J/τ , where J = 25 M⋆R2
+
+> ⋆
+
+Ω⋆ is the angular momentum of the NS. Negative in the parentheses indicates spin-down, while positive indicates spin-up.  
+
+> (5)
+
+Time-averaged electromagnetic power contained in σ > 1 measured through a spherical surface of radius 1000 rg. 
+
+> (6)
+
+Time-averaged total electromagnetic power measured through a spherical surface of radius 1000 rg. 
+
+> (7)
+
+Time-averaged total kinetic (excluding rest mass) power carried by matter, measured through a spherical surface of radius 1000 rg.
+
+lower-σ, more equatorially concentrated disk/propeller wind. As B⋆ increases, the angular jet-power profile becomes both brighter and broader, with its peak shifting to larger polar angle. Consistent with this trend, Table 2 shows that the mean jet luminosity rises from Ljet ≃
+
+5.8 × 10 50 erg s −1 in NS-B1e15 to ≃ 1.2 × 10 52 erg s −1 in 
+
+NS-B1e16 . The weaker-field accreting models therefore produce narrower polar jets, possibly because of con-finement by the inertia of the baryon-loaded disk wind at lower latitudes. Additional collimation may occur outside our simulation domain as the jet interacts with surrounding merger or supernova ejecta (e.g., Bromberg et al. 2014; Gottlieb & Nakar 2022). The distribution of outflow power with magnetization is shown in the lower-left panel of Fig. 10. In the accret-ing NS models, most of the EM luminosity is carried by material of moderate magnetization, σ ≲ 5, but a non-negligible high-σ tail extends to σ ∼ 10–20. This high-magnetization component becomes most prominent in the propeller model NS-B1e16 , reflecting the larger frac-tion of the outflow power carried by the relativistic polar jet. The absolute normalization of σ is floor-dependent and should not be interpreted as a direct prediction of the physical jet magnetization. In reality, the proto-magnetar wind mass loading is set by neutrino heating from the stellar atmosphere and accretion flow, and may evolve with the neutrino luminosity (e.g., as the magne-tar cools); the simulated σ distribution is therefore most useful for comparing the relative degree of disk entrain-ment and mixing across models. The relative importance of the electromagnetic and matter components also changes systematically with B⋆.Table 2 gives the electromagnetic luminosity in σ > 115 10 15 10 16            
+
+> B?(G) 10 1
+> 4×10 0
+> 6×10 0
+> 〈Rm〉 (rg)
+> B2/5
+> ?scaling Simulation data
+> Figure 8. Time- and angle-averaged magnetosphere radius from the simulations as a function of the NS magnetic field. Comparison with the scaling Rm∝B2/5
+> ⋆(Kulkarni & Ro-manova 2013) shows reasonable agreement.
+
+material, the total electromagnetic luminosity, and the kinetic luminosity, all measured at r = 1000 rg. In the crushed and channeled-accretion models, most of the large-radius outflow power is carried by the baryon-loaded matter component. For example, in NS-B1e15 ,
+
+Lkin ≃ 10 51 erg s −1 exceeds LEM ,tot ≃ 9.4 × 10 49 erg s −1
+
+by about an order of magnitude. As the stellar field is increased, the electromagnetic component grows more rapidly than the kinetic component. By NS-B1e16 , the two are comparable, with LEM ,tot ≃ 6.5 × 10 51 erg s −1
+
+and Lkin ≃ 5.2 × 10 51 erg s −1. Thus, increasing B⋆
+
+not only strengthens the relativistic polar jet, but also changes the global outflow from a kinetic-energy-dominated disk wind to a propeller/jet system with com-parable electromagnetic and kinetic powers. Finally, the lower-middle panel of Fig. 10 shows how the kinetic power is distributed with asymptotic ra-dial four-velocity, ( γv )∞. In the BH model, most of the outflow power is carried by sub-relativistic mate-rial with ( γv )∞ ∼ 0.1, consistent with previous simula-tions of neutrino-cooled BH accretion disks (e.g., Siegel & Metzger 2018). By contrast, the accreting NS models place a substantial fraction of their outflow energy into trans-relativistic ejecta with ( γv )∞ ∼ 1. In the pro-peller model NS-B1e16 , the distribution extends beyond (γv )∞ ∼ 1 and reaches values of order 10, showing that rapidly rotating, strongly magnetized NSs can simulta-neously drive baryon-rich winds and powerful relativistic jets. 4.3. Torques on the Neutron Star 
+
+The same disk–magnetosphere interaction that en-hances the jet power also determines whether the NS spins up or spins down. Accreting matter tends to add angular momentum to the star whereas the magnetized polar jet extracts it. The star–disk magnetic connec-tion can add or remove angular momentum depending on whether the magnetically connected disk material ro-tates faster or slower than the star, which roughly cor-responds to connection inside or outside the corotation radius. The net torque therefore depends on the compe-tition between hydrodynamic accretion through the sur-face, electromagnetic stresses near the magnetosphere, and the Poynting-flux torque carried by the relativistic jet. We separate the torque into contributions associ-ated with matter crossing the stellar surface, mag-netic stresses exerted locally by the closed magneto-sphere/accretion columns, and the angular momentum carried away by the open-field relativistic jet. This sepa-ration is useful because these components are measured most cleanly on different surfaces. The jet torque is as-sociated with the quasi-steady Poynting-flux outflow on open polar magnetic field lines, and is therefore mea-sured through a spherical surface at the light-cylinder radius. By contrast, the accretion and closed-field mag-netic torques are applied directly to the star through the inner magnetosphere and are measured just outside the neutron-star surface, where the accretion columns and closed star–disk field lines intersect the inner boundary. We therefore define the total stellar torque as the sum of three bookkeeping components: the matter torque through the surface, the near-surface electromagnetic torque after removal of the open-field jet contribution, and the jet torque carried away along open field lines. Operationally, we compute the angular-momentum fluxes as follows. The hydrodynamic torque is 
+
+τhydro = −
+
+Z
+
+ρhu r uϕ
+
+√−g dθdϕ, (24) while the electromagnetic torque is 
+
+τEM = −
+
+Z  b2ur uϕ − br bϕ
+
+ √−g dθdϕ. (25) For the jet contribution, we evaluate Eq. (25) at RLC 
+
+and restrict to the magnetically dominated open-field outflow. This gives the angular momentum loss associ-ated with the large-scale Poynting flux, which is com-paratively steady and less sensitive to the highly time-dependent dynamics of the inner magnetosphere. For the surface contribution, we evaluate the same stress tensor just outside the inner boundary and subtract the 16   
+
+> Figure 9. Sequence of snapshots of the model NS-B1e15 , showing a plasmoid eruption driven by magnetic reconnection when the magnetosphere is pushed close to the NS surface.
+
+contemporaneous jet torque, thereby isolating the re-maining “EM non-jet” torque from closed field lines, accretion columns, and the disk–magnetosphere connec-tion. When the magnetosphere is pushed close to the NS surface in the accretion regime, dynamic plasmoid erup-tions occur (Fig. 9), creating transient regions with large positive radial velocity near the inner boundary. These regions are part of the time-dependent magneto-spheric outflow rather than material being accreted by the star. To avoid counting them as hydrodynamic ac-cretion torque, we include in τhydro only grid cells with negative radial velocity. When calculating the near-surface EM torque, we retain both terms in Eq. (25) in zones with negative radial velocity. In zones with pos-itive radial velocity, we retain only the Maxwell stress term, −br bϕ, since this represents the magnetic stress exerted on the star even when the plasma itself is mov-ing outward. Fig. 11 shows the time evolution of these torque con-tributions, normalized to the magnitude of the dipole spin-down torque of an otherwise equivalent isolated NS at B⋆ = 4 × 10 15 G, τ0 = ˙E0/Ω⋆. Unlike Table 2, which normalizes each model to its own isolated-dipole torque, Fig. 11 uses this single reference value so that the absolute torque amplitudes can be compared across the model sequence. Negative torques indicate spin-down, while positive torques indicate spin-up. Blue curves denote the hydrodynamic torque from matter accreted through the inner boundary, green curves de-note the jet torque measured from the open-field Poynt-ing flux at RLC , and orange curves denote the remain-ing near-surface electromagnetic torque after subtract-ing the jet contribution, i.e., the “EM non-jet” torque from closed field lines, accretion columns, and the local disk–magnetosphere interaction. The thick red curve in each panel shows the cumulative time average of the to-tal torque. The net torque changes systematically across the model sequence. In the weakest-field models NS-B3e13 
+
+and NS-B3e14 , the stellar field is dynamically unimpor-tant and hydrodynamic accretion strongly spins up the star. Model NS-B1e15 also spins up, with a mean torque approximately twenty times the magnitude of the cor-responding isolated dipole spin-down torque (Table 2). As the field is increased, the negative jet and magne-tospheric torques grow while the hydrodynamic spin-up torque declines. In NS-B3e15 , the net torque remains positive but is substantially reduced. By NS-B4e15 , the positive accretion torque and negative electromagnetic torques nearly cancel, placing the system close to spin equilibrium; its time-averaged torque is slightly nega-tive but consistent with zero relative to its large tem-poral fluctuations. This near cancellation is consistent with ⟨Rm⟩ ≃ Rc: for NS-B4e15 , the two estimates give 
+
+⟨Rm⟩ ≃ 6.0–6 .5 rg, close to Rc = 7 .3 rg (Table 1). In 
+
+NS-B1e16 , the magnetosphere lies outside corotation, little matter crosses the centrifugal barrier, and the star spins down electromagnetically. The spin-down torque remains enhanced by roughly a factor of 2 relative to an isolated magnetar because the disk opens magnetic flux that would otherwise remain closed. The resulting spin-evolution timescale ranges from several tens of seconds in the accreting spin-up models, to hundreds of seconds near torque balance, and to only about five seconds in the propeller model (Table 2).  
+
+> 5.
+
+APPLICATION TO GRB CENTRAL ENGINES 5.1. Collapsars 
+
+As a concrete application of our findings, consider the collapse of a rotating helium core of mass ∼ 3 − 10 M⊙,the canonical stripped-envelope progenitors of most 17 0.5 0.6 0.7 0.8 0.9Time (s) 10 48                 
+
+> 10 49
+> 10 50
+> 10 51
+> 10 52
+> Ljet  at  RLC  (erg s −1)0123
+> θ(rad) 10 49
+> 10 50
+> 10 51
+> 10 52
+> 10 53
+> Ljet , iso  at  RLC  (erg s −1)0123
+> θ(rad) 10 −2
+> 10 −1
+> 10 0
+> 10 1
+> σ at  RLC
+> BH NS-B3e13 NS-B1e15-nodisk NS-B1e15 NS-B4e15 NS-B1e16
+> 0510 15 20 25
+> σ
+> 10 47
+> 10 48
+> 10 49
+> 10 50
+> 10 51
+> 10 52
+> Cumulative  LEM  at 10 3 rg (erg s −1)10 −210 −110 010 1
+> (γv )∞
+> 10 47
+> 10 48
+> 10 49
+> 10 50
+> 10 51
+> 10 52
+> dL kin
+> dlog 10 (γv )∞ at 10 3 rg (erg s −1)
+
+Figure 10. Outflow energetics, magnetization, and velocity structure across models. The upper-left panel shows the time-dependent relativistic jet power, defined as the Poynting flux in σ > 1 material measured at RLC = 20 rg. The upper-middle and upper-right panels show the time-averaged angular profiles of the isotropic-equivalent jet luminosity, 4 π dL EM ,σ> 1/d Ω, and mag-netization σ, respectively. The lower-left panel shows the cumulative electromagnetic luminosity above a given magnetization, while the lower-middle panel shows the kinetic luminosity as a function of asymptotic radial four-velocity, ( γv )∞. Together, these diagnostics show how the disk–magnetosphere interaction redistributes the outflow power between magnetically dominated jets, lower-σ winds, and faster ejecta. The absolute normalization of σ in the polar jet depends on the imposed floor density, which stands in for unresolved baryon loading of the proto-magnetar jet by neutrino heating from the stellar atmosphere. The shown distribution of σ for σ ≳ 5 is thus dependent on the assumed magnetization of the magnetar jet. 
+
+long-duration GRBs (Woosley & Bloom 2006). Rather than immediately forming a black hole, the iron core of the collapsing star first produces a massive, rapidly ro-tating proto-neutron star (e.g., Dessart et al. 2008). We assume that the NS acquires, likely through an MHD dynamo powered by differential rotation (Kiuchi et al. 2024), a large-scale dipole field B⋆ ∼ few × 10 15 G, com-parable to the near-corotation model NS-B4e15 studied below and somewhat stronger than the inferred dipole fields of most Galactic magnetars. The outer layers of the stellar core, with greater an-gular momentum, form an accretion disk around the magnetar, which feeds it at a characteristic outer rate ˙Md ≳ 0.1 M⊙ s−1 similar to those sampled by our simu-lations, for a duration tacc ∼ 10 −30 s, as set by the infall time of the stellar core (e.g., Kumar et al. 2008; though, as we discuss below, not all of this inflowing mass is ulti-mately accreted by the magnetar). This timescale being comparable to the observed durations of long GRBs (von Kienlin et al. 2020) is one of the chief motivations for the collapsar model (MacFadyen & Woosley 1999). We focus attention on the near-corotation model 
+
+NS-B4e15 , because it lies closest to spin equilibrium at the adopted accretion rate, with ⟨Rm⟩ ≃ Rc. In this model, the positive accretion torque and negative electromagnetic torques nearly cancel, giving a time-averaged torque that is slightly negative but consis-tent with zero relative to its large temporal fluctua-tions (Table 2). More generally, if the accretion rate and stellar magnetic field evolve slowly compared with 18 −40               
+
+> −30
+> −20
+> −10 010 20 30 40 Torque ( τ0, NS-B4e15 )
+> NS-B3e13
+> Hydro accretion EM non -jet EM jet Cumulative average NS-B3e14 NS-B1e15
+> 0.50.60.70.80.9Time (s)
+> −40
+> −30
+> −20
+> −10 010 20 30 40 Torque ( τ0, NS-B4e15 )
+> NS-B3e15
+> 0.50.60.70.80.9Time (s)
+> NS-B4e15
+> 0.50.60.70.80.9Time (s)
+> NS-B1e16
+
+Figure 11. Contributions to the neutron-star torque as a function of time, normalized to the magnitude of the isolated-dipole torque for B⋆ = 4 × 10 15 G. Blue curves show the hydrodynamic torque from matter crossing the stellar surface, orange curves show the near-surface electromagnetic torque excluding the jet, and green curves show the spin-down torque carried by the magnetically dominated jet. Each panel is labeled by the neutron-star model. Thick red curves show the cumulative average of the total torque. Positive values indicate spin-up and negative values spin-down. 
+
+the torque-adjustment time, an accreting magnetar will tend toward an approximate equilibrium spin for which 
+
+Rm ∼ Rc. A star initially rotating more slowly than this equilibrium value will tend to spin up through accretion, whereas a more rapidly rotating star will tend to spin down through its magnetosphere and relativistic jet. Although the disk supplies material at an outer rate ˙Md ≳ 0.1 M⊙ s−1, only a fraction of this material reaches the stellar surface. For NS-B4e15 , the time-averaged stellar accretion rate is ˙M⋆ ≃ 8 × 10 −3 M⊙ s−1
+
+(Fig. 5; Table 1). If this time-averaged rate and mag-netospheric state were maintained for tacc ∼ 10–30 s, the neutron star would accrete ∆ M⋆ ∼ ˙M⋆tacc ≃ 0.08– 0.24 M⊙. Thus, provided the initial proto-neutron star lies more than a few tenths of a solar mass below its time-dependent maximum supported mass, it could survive throughout the active accretion phase without prompt collapse to a black hole. For the same model, the mean relativistic jet power is Ljet ≃ 1.1 × 10 51 erg s −1 (Table 2), broadly within the range required of long-GRB central engines. For a prompt radiative efficiency ϵγ ∼ 0.1, this corre-sponds to a beaming-corrected gamma-ray luminosity 
+
+Lγ = ϵγ Ljet ∼ 10 50 erg s −1, comparable to observation-ally inferred beaming-corrected GRB luminosities (Frail et al. 2001; Yi et al. 2017). Previous studies of isolated proto-magnetar spin-down show that the jet magnetization, as set by neutrino-driven baryon loading near the stellar surface, can rise rapidly as the magnetar cools over a timescale of tens of seconds (Metzger et al. 2011). Such strong sec-ular evolution may be in tension with time-resolved GRB observations, which generally show more moder-ate evolution of the high-energy prompt-emission prop-erties over the duration of the burst (Metzger et al. 2011; Beniamini et al. 2017; Uhm et al. 2018). In an 19 accreting proto-magnetar, however, the accretion flow supplies an additional, comparatively steady source of neutrinos. For the near-corotation model NS-B4e15 ,the volume-integrated electron-flavor neutrino luminos-ity generated within the simulated accretion flow is of order Lνe + L¯νe ∼ 10 51 erg s −1 (Fig. 12). This accretion-powered component can become comparable to or ex-ceed the declining internal cooling luminosity of the proto-neutron star after the first several seconds. Ir-radiation of the polar cap by the accretion flow could therefore maintain a more nearly constant baryon load-ing and jet magnetization than in the isolated-magnetar case (Metzger et al. 2018a), potentially reducing the sec-ular evolution of the jet’s high-energy emission. Over the same characteristic interval of tens of sec-onds, the large-radius electromagnetic and bulk kinetic components carry a combined power LEM ,tot + Lkin ≃
+
+1.5×10 51 erg s −1 for NS-B4e15 (Table 2). If sustained for 
+
+tacc ∼ 10–30 s, these components alone would inject an energy of order 10 52 erg into the surrounding star. This partitioning of the engine power is qualitatively similar to that inferred for GRB-supernovae, in which the ki-netic energy of the accompanying broad-lined Type Ic supernova, ∼ 10 52 erg, typically exceeds the beaming-corrected GRB gamma-ray energy, ∼ 10 51 erg (Frail et al. 2001; Cano et al. 2017; Gottlieb et al. 2025). 5.2. Mergers and AIC 
+
+Closely related considerations apply to accreting neutron-star remnants formed in the AIC of rapidly spinning white dwarfs and in neutron-star mergers, which are possible central engines of short-duration GRBs (e.g., Usov 1992; Dessart et al. 2006; Metzger et al. 2008a; Bucciantini et al. 2012; Combi et al. 2025a; Cheong et al. 2025; Gottlieb et al. 2025). In these en-vironments, the characteristic disk masses ∼ 10 −2 −
+
+0.1 M⊙ and hyper-accretion rates ˙Md ∼ 0.1M⊙ s−1
+
+overlap those of our simulations and those achieved in collapsars. One key difference is that a neutron-star-merger remnant is generally formed much closer to its maximum supported mass than an AIC remnant. Its lifetime may therefore be controlled not only by accre-tion from the surrounding disk, but also by internal re-distribution of thermal energy and angular momentum (Margalit et al. 2022). Nevertheless, while the remnant survives as a rapidly rotating, strongly magnetized NS, the local disk–magnetosphere interaction should still be governed primarily by the ordering of R⋆, Rm, Rc, and 
+
+RLC . Thus, even though the global environment differs from collapsars, the local disk–magnetosphere interac-tion can redistribute the engine power between a rela-tivistic jet and a baryon-rich outflow in much the same way. For a magnetar to power a short-duration GRB, its polar outflow must become sufficiently relativistic within the first few seconds after formation, comparable to the observed prompt-emission duration tγ ≲ 2 s. Recent GRMHD simulations of young millisecond magnetars in-cluding neutrino-transport suggest that comparatively baryon-clean polar funnels with magnetizations as large as σ ∼ 10 can be achieved even in the presence of strong neutrino-driven or magnetically driven mass loss present within the first second after formation (Combi & Siegel 2023; Desai et al. 2026). If such conditions are real-ized, the polar component could power a short-duration GRB, while the accompanying disk/propeller outflow would add mass and energy to the kilonova ejecta. For otherwise similar disk masses, the resulting ejecta mass and kinetic energy could exceed those expected following prompt black-hole formation, where the outflow is pow-ered only by the black-hole–torus system (Siegel & Met-zger 2017). This additional outflow component could therefore modify both the luminosity and color evolu-tion of the kilonova, as well as the amount of neutron-rich material available for r-process nucleosynthesis (see Paper II for further discussion). The coexistence of a rel-ativistic jet with a more broadly distributed, baryon-rich outflow in the near-equilibrium models is qualitatively compatible with events in which substantial energy is in-ferred in both the short-GRB jet and the kilonova ejecta (Rastinejad et al. 2025; Gottlieb et al. 2025).  
+
+> 6.
+
+SUMMARY AND CONCLUSIONS We have presented axisymmetric GRMHD simula-tions of hyperaccretion onto rapidly rotating, mag-netized neutron stars, including a physical equa-tion of state and charged-current weak interactions. Rather than modeling a complete collapsar, neutron-star merger, or accretion-induced collapse event, we iso-late the local disk–magnetosphere interaction in a con-trolled numerical experiment. Holding fixed the ini-tial torus and compact-object properties, we vary the neutron-star dipole field strength from 3 ×10 13 to 10 16 G, following the progression from a crushed magnetosphere through channeled accretion and approximate spin equi-librium to propeller-driven spin-down, and compare this sequence with an otherwise similar accreting black hole. This strategy allows us to separate the effects of the stellar surface and magnetosphere from those of the ac-cretion flow itself. Our calculations focus on a SANE-like disk whose magnetic field is weak compared with the stellar dipole. The chosen parameters place the inner disk above the 20                            
+
+> Table 3. Summary of accretion regimes for proto-magnetar disk interaction. Regime Ordering of radii Properties Models Crushed magnetosphere Rm≲R⋆< R cMagnetosphere compressed to the stellar surface; NS-B3e13
+> Inner flow resembles that of a weakly magnetized accretor; NS-B3e14
+> Compressed stronger-field cases can exhibit plasmoid-driven jet variability. NS-B1e15
+> Channeled accretion R⋆< R m≲RcAccretion channeled along closed magnetic field lines; NS-B3e15
+> System approaches spin equilibrium as Rm→Rc;NS-B4e15
+> Enhanced baryon-rich disk outflows (Paper II). Propeller R⋆< R c< R mCentrifugal coupling suppresses direct accretion; NS-B1e16
+> Baryon-rich propeller outflow; Rapid electromagnetic spin-down; Reduced jet variability.
+
+neutronization threshold while resolving the stellar, magnetospheric, corotation, and light-cylinder radii. Al-though the specific field strengths and accretion rate are tailored to this setup, the magnetospheric regimes are approximately scalable: at fixed Rm/r g and stellar pa-rameters, B⋆ ∝ ˙M 1/2, or equivalently ˙M ∝ B2 
+
+> ⋆
+
+. In contrast to black-hole accretion in the SANE regime, the accreting proto-magnetars generically launch both strong baryon-rich outflows with γβ ∼ 1 and ultrarela-tivistic, magnetically dominated jets. Increasing the stellar dipole strength produces acontinuous transition from a crushed magnetosphere, through magnetically channeled accretion and near-corotation torque balance, to a centrifugal propeller. Even before a distinct magnetospheric cavity forms, a sufficiently strong compressed field can modify the near-surface inflow and enhance the outflows. As Rm ap-proaches Rc, direct accretion becomes increasingly in-termittent; once Rm > R c, it is suppressed and a larger fraction of the supplied mass is redirected into disk and magnetospheric outflows. Accretion opens additional stellar magnetic flux inside the light cylinder and increases the relativistic jet power above the isolated dipole value (Parfrey et al. 2016; Met-zger et al. 2018a). For the magnetar-strength models most relevant to GRB engines, the mean jet power is enhanced by factors of approximately 2–11. Even in the propeller regime, where direct accretion is suppressed, the jet remains about twice as powerful as that of an isolated dipole with the same field and spin. Isolated-dipole estimates can therefore substantially underpre-dict the power of an accreting proto-magnetar. The disk–magnetosphere interaction also makes the jet strongly time-variable. Channeled-accretion and near-corotation models undergo reconnection-driven plasmoid eruptions, whereas the propeller model pro-duces a steadier jet. As the fallback rate evolves in a collapsar or the disk drains in a merger or AIC event, transitions among crushed, channeled, near-equilibrium, and propeller states may therefore imprint additional variability on the central engine (Piro & Ott 2011; Gom-pertz et al. 2014; Metzger et al. 2018a). The stellar torque changes qualitatively across the same sequence: weak-field models spin up, near-corotation models approach torque balance, and pro-peller models spin down rapidly. Thus, the accretion regime controls not only the jet power and variability, but also the secular spin evolution of the neutron star. The magnetosphere also regulates how efficiently the neutron star gains mass. In the propeller regime, most of the gas supplied at large radii fails to reach the sur-face, while even channeled and near-corotation models redirect a substantial fraction of the inflow into outflows. The lifetime of an accreting proto-magnetar may there-fore depend not only on the external fallback supply, but also on its instantaneous magnetospheric regime. Ineffi-cient accretion can delay collapse to a black hole while the system continues to power relativistic and baryon-rich outflows. The composition and nucleosynthetic im-plications of the baryon-rich disk and propeller outflows are explored in Paper II. Applied to collapsars, our results suggest that a mil-lisecond proto-magnetar with a dipole field of a few 
+
+×10 15 G can reside near spin equilibrium while powering a long-GRB jet. Because only a fraction of the exter-nally supplied mass reaches the surface, such a neutron star may avoid prompt collapse for tens of seconds while its relativistic jet and baryon-rich outflows inject an en-ergy comparable to that inferred for GRB-supernovae. Accretion-powered neutrino irradiation may also mod-erate the secular evolution of the jet baryon loading rel-ative to an isolated proto-magnetar. These results sup-port accreting proto-magnetars as viable central engines for long GRBs and energetic explosions. A major assumption is that the newly formed neutron star amplifies and organizes a large-scale field ≳ 10 15 G21 before unimpeded early accretion drives it to collapse. A comparable assumption—the presence of a strong, ordered magnetic flux threading the central object—is also required in black-hole GRB models powered by the Blandford–Znajek mechanism (Gottlieb et al. 2022), al-though the relevant field-amplification timescale may be less restrictive in the black-hole case. Our results also connect to simulations of isolated, neutrino-heated proto-magnetar winds. During the first seconds after birth, rapid rotation can produce a baryon-rich equatorial wind while leaving the polar field lines comparatively clean (Combi & Siegel 2023; Desai et al. 2026). The disk-fed systems studied here provide a later-time realization of the same basic geometry: a high-magnetization polar jet confined by a more baryon-rich, lower-latitude outflow. The transition from an early neutrino-wind-dominated phase to a later disk-fed phase may therefore maintain rather than disrupt the jet and its collimating environment. 6.1. Limitations and Future Work 
+
+Several limitations of this work motivate future study. First, we have focused on disks with relatively weak magnetic fields. A stronger disk field, such as might be produced by a dynamo associated with the MRI (Jacquemin-Ide et al. 2024; Chan et al. 2026), could change the amount of magnetic flux delivered to the cen-tral object, the degree of jet collimation, and the recon-nection geometry at the disk–magnetosphere interface. In neutron-star accretion, the relative polarity between the disk field and the stellar dipole introduces an ad-ditional degree of freedom. Parfrey & Tchekhovskoy (2024) found in 3D GRMHD simulations that the jet power and inner-disk structure can depend on whether the stellar and disk fields are parallel or anti-parallel, especially when the disk penetrates well inside the coro-tation radius, whereas the polarity dependence weak-ens in the propeller regime. Future simulations should explore how such polarity effects operate in neutrino-cooled proto-magnetar disks. Second, our simulations are axisymmetric. Three-dimensional effects can alter both the accretion flow and the reconnection dynamics. In particular, Zhu et al. (2024) found that plasmoid eruptions can be overesti-mated in two dimensions because interchange instabil-ities in three dimensions provide an additional source of effective resistivity, allowing the disk and stellar fields to reconnect in a more quasi-steady manner. Ax-isymmetry may exaggerate the intermittency of disk– magnetosphere reconnection: in 3D, non-axisymmetric fingers can penetrate the magnetosphere and provide more continuous accretion or mass leakage through the stellar field. Moreover, propagation through the stel-lar envelope or merger/AIC ejecta can substantially re-shape any variability imprinted by the engine before ra-diation is produced at larger radii (e.g., Gottlieb et al. 2022). At the same time, three-dimensional simulations are required to capture the full development of the MRI, the possibility of a disk dynamo, non-axisymmetric mass loading of the magnetosphere, and the stability of the jet–wind interface. Extending the present calculations to 3D, with neutrino microphysics and a physical equa-tion of state, will therefore be essential for determining whether the episodic jet variability found here persists in more realistic settings. It is also necessary to break axisymmetry to investigate the effect of a nonzero an-gle between the star’s spin and magnetic axes (e.g. Ro-manova et al. 2003), which can reduce the relative jet-power enhancement due to accretion (Murguia-Berthier et al. 2024; Das & Porth 2024). Third, our treatment of the neutron-star surface is idealized. We impose an artificial inner boundary at the stellar surface and therefore do not resolve the proto-neutron-star atmosphere, where the baryon loading of open magnetic field lines is physically set. In reality, the mass flux emerging from the surface is determined by the balance between neutrino heating from the cooling proto-neutron star and neutrino cooling in the subsonic portion of the wind, with additional latitude-dependent modifications from centrifugal support along rotating field lines (Metzger et al. 2007; Desai et al. 2026). As a result, the angular structure of the jet magnetization in our simulations, shown in Fig. 10, reflects only baryon loading produced by interaction and mixing between the polar magnetosphere and the accretion flow. In a physi-cal proto-magnetar, the same σ(θ) structure would also depend on the intrinsic, latitude-dependent mass load-ing from the neutron-star atmosphere. Resolving this atmosphere, together with neutrino heating and cooling at the stellar surface, will be necessary to predict the absolute magnetization of the jet and its angular depen-dence throughout the magnetar’s cooling evolution. ACKNOWLEDGEMENTS T. P. and B. D. M. gratefully acknowl-edge support from the National Science Foun-dation (grant AST-2406637), NASA (grants 80NSSC24K0408,80NSSC26K0299,80NSSC22K0807), the Gordon and Betty Moore Foundation (grant 13920; PI Ruben Gonzalez), and the Simons Foundation (grant 727700). The Flatiron Institute is supported by the Simons Foundation. KP acknowledges support from the Laboratory Directed Research and Development Program at Princeton Plasma Physics Laboratory, a 22 10 50                  
+
+> 10 51
+> Neutrino luminosity (erg s −1)
+> BH νe
+> ¯νe
+> NS-B4e15 NS-B1e16
+> 0.40.50.60.70.80.9Time (s) 1.01.52.02.53.03.54.04.55.0
+> Tν (MeV)
+> BH
+> 0.40.50.60.70.80.9Time (s)
+> NS-B4e15
+> 0.40.50.60.70.80.9Time (s)
+> NS-B1e16
+
+Figure 12. Electron-neutrino and electron-antineutrino luminosities for the BH and NS models (top panels), and the corre-sponding luminosity-weighted average emission temperatures (bottom panels; Eq. (A3)). 
+
+national laboratory operated by Princeton University for the U.S. Department of Energy under Prime Con-tract No. DE-AC02-09CH11466 and from NASA grant 80NSSC21K1746. We thank Rodrigo Fernandez and Yixian Chen for helpful discussions on microphysics related aspects. APPENDIX 
+
+A. CHECKING THE OPTICALLY THIN ASSUMPTION Our simulations neglect neutrino transport and assume optically thin neutrino cooling (Sec. 3.5). Here we verify that this approximation is adequate for the models presented in this paper. Fig. 12 shows that the accretion flows produce electron-flavor neutrino luminosities Lνe + L¯νe ∼ 10 51 erg s −1, with luminosity-weighted emission temperatures of a few MeV. Despite these high luminosities, Fig. 13 shows that the maximum optical depth to infinity remains below unity for nearly all times and locations. The only brief excursions to τνe,abs ∼ 1 occur in a small number of cells close to the NS surface, where localized density and temperature spikes form near the disk–magnetosphere interface in the propeller regime. We estimate the minimum optical depth for neutrinos to escape from each location in the simulation domain using a local path-minimization procedure. The optical depth from a given cell to infinity is written as the optical depth from infinity to a neighboring cell plus the optical depth between the two cells (Neilsen et al. 2014; Siegel & Metzger 2018). We first set the optical depth to zero in all cells with density below 10 −6ρmax , where ρmax is the maximum grid density, and initialize the remaining cells with infinite optical depth. We then sweep across the grid and update the 23 0.4 0.5 0.6 0.7 0.8 0.9Time (s) 10 −3          
+
+> 10 −2
+> 10 −1
+> 10 0
+> Max . grid optical depth
+> BH
+> νe
+> ¯νe
+> 0.40.50.60.70.80.9Time (s)
+> NS-B4e15
+> 0.40.50.60.70.80.9Time (s)
+> NS-B1e16
+
+Figure 13. Maximum local optical depth to infinity across the grid as a function of time for electron neutrinos and electron antineutrinos in the BH and NS models. 
+
+Figure 14. Two-dimensional maps of density, temperature, electron fraction, and local optical depth near the NS surface at one of the brief instances when the maximum optical depth on the grid spikes to ∼ 1 in the propeller regime (right panel of Fig. 13). 
+
+optical depth in each cell according to 
+
+τcell = min [ κ ds + τneighbor ] , (A1) where the minimization is performed over neighboring cells whose optical depths have already been updated, ds is the distance between cell centers computed using the metric averaged between them, and κ is the opacity between the two cells. To account for different escape directions, we perform four sweeps corresponding to the different combinations of radially inward/outward and north/south motion. After these sweeps, each cell contains an estimate of the minimum optical depth from that cell to infinity. For this diagnostic, we include charged-current absorption of electron neutrinos and antineutrinos on free nucleons, corresponding to the inverse reactions of Eq. (21). We neglect neutral-current scattering, so the resulting optical depths should be interpreted as absorption optical depths rather than complete transport optical depths. The charged-current opacities are 
+
+κ¯νe =
+
+ Ye − Xα/2
+
+mn
+
+
+
+σρ ; κνe =
+
+ 1 − Ye − Xα/2
+
+mn
+
+
+
+σρ, (A2) where Xα is the mass fraction of α particles, mn is the nucleon mass, and σ = 9 × 10 −44 ϵ2 
+
+> ν, MeV
+
+cm 2 is the neutrino absorption cross section. The quantities ρ(Ye − Xα/2) and ρ(1 − Ye − Xα/2) are averaged between neighboring cells. We estimate a representative neutrino energy as ϵν, MeV = 5 .1Tν, MeV , appropriate for optically thin pair-capture emission (Chen & Beloborodov 2007). Because the opacity scales as ϵ2 
+
+> ν
+
+, this grey estimate does not capture the full neutrino energy distribution and should be regarded as an order-of-magnitude optical-depth diagnostic. The 24 luminosity-weighted emission temperature is 
+
+Tν =
+
+R T Q ν γ√−g d 3x
+
+R Qν γ√−g d 3x , (A3) where T is the local gas temperature, Qν is the neutrino cooling rate, and γ is the Lorentz factor. The neutrino luminosity shown in Fig. 12 is computed as 
+
+Lν =
+
+Z
+
+αQ ν γ√−g d 3x, (A4) where α is the lapse function. When computing Tν , we exclude radii r < 6 rg in the channeled-accretion models. A small number of localized, surface-adjacent cells reach very high temperatures when matter impacts the inner boundary along magnetic field lines; because the stellar surface and cooling layer are not resolved physically, including these cells would allow an inner-boundary artifact to dominate the inferred characteristic neutrino energy. The resulting optical depths are shown in Fig. 13. In all models, the flow remains optically thin to both νe and ¯νe over essentially the entire simulation. The largest values occur for νe in the propeller model with B⋆ = 10 16 G, where brief spikes push the maximum optical depth close to unity. These spikes arise from localized density and temperature enhancements when a small amount of matter penetrates the centrifugal barrier and reaches the vicinity of the NS surface. Fig. 14 shows that the corresponding τνe ∼ 1 region occupies only a small number of cells, while the surrounding flow has much smaller optical depth. We therefore conclude that the accretion flows in the present simulations are optically thin to charged-current absorption over essentially the entire domain. Although additional scattering opacity could modestly increase the total transport optical depth in the small, transient regions where τνe,abs ∼ 1, these regions occupy only a few cells and are unlikely to qualitatively affect the global disk–magnetosphere interaction studied here. REFERENCES 
+
+Aly, J. J., & Kuijpers, J. 1990, A&A, 227, 473 Beloborodov, A. M. 2003, ApJ, 588, 931, doi: 10.1086/374217 —. 2010, MNRAS, 407, 1033, doi: 10.1111/j.1365-2966.2010.16770.x Beniamini, P., Giannios, D., & Metzger, B. D. 2017, MNRAS, 472, 3058, doi: 10.1093/mnras/stx2095 Bernardini, M. G., Campana, S., Ghisellini, G., et al. 2013, ApJ, 775, 67, doi: 10.1088/0004-637X/775/1/67 Blackman, E. G., & Yi, I. 1998, ApJL, 498, L31+, doi: 10.1086/311311 Bromberg, O., Granot, J., Lyubarsky, Y., & Piran, T. 2014, MNRAS, 443, 1532, doi: 10.1093/mnras/stu995 Bucciantini, N., Metzger, B. D., Thompson, T. A., & Quataert, E. 2012, MNRAS, 419, 1537, doi: 10.1111/j.1365-2966.2011.19810.x Bucciantini, N., Thompson, T. A., Arons, J., Quataert, E., & Del Zanna, L. 2006, MNRAS, 368, 1717, doi: 10.1111/j.1365-2966.2006.10217.x Burrows, A., Vartanyan, D., & Wang, T. 2023, ApJ, 957, 68, doi: 10.3847/1538-4357/acfc1c Cano, Z., Wang, S.-Q., Dai, Z.-G., & Wu, X.-F. 2017, Advances in Astronomy, 2017, 8929054, doi: 10.1155/2017/8929054 Chan, H.-S., Gottlieb, O., Jacquemin-Ide, J., Cantiello, M., & Renzo, M. 2026, arXiv e-prints, arXiv:2605.12931, doi: 10.48550/arXiv.2605.12931 Chatterjee, K., Philippov, A., Beloborodov, A. M., et al. 2026, arXiv e-prints, arXiv:2602.17755, doi: 10.48550/arXiv.2602.17755 Chen, K.-J., Woosley, S. E., & Sukhbold, T. 2016, ApJ, 832, 73, doi: 10.3847/0004-637X/832/1/73 Chen, W.-X., & Beloborodov, A. M. 2007, ApJ, 657, 383, doi: 10.1086/508923 Chen, Y.-X., & Metzger, B. D. 2025, ApJL, 991, L22, doi: 10.3847/2041-8213/ae045d Cheong, P. C.-K., Pitik, T., Longo Micchi, L. F., & Radice, D. 2025, ApJL, 978, L38, doi: 10.3847/2041-8213/ada1cc Chevalier, R. A. 1993, ApJL, 411, L33, doi: 10.1086/186905 Ciolfi, R., & Kalinani, J. V. 2020, ApJL, 900, L35, doi: 10.3847/2041-8213/abb240 Combi, L., & Siegel, D. M. 2023, arXiv e-prints, arXiv:2303.12284, doi: 10.48550/arXiv.2303.12284 25 
+
+Combi, L., Siegel, D. M., & Metzger, B. D. 2025a, arXiv e-prints, arXiv:2509.19799, doi: 10.48550/arXiv.2509.19799 Combi, L., Thompson, C., Siegel, D. M., Philippov, A., & Ripperda, B. 2025b, ApJ, 987, 71, doi: 10.3847/1538-4357/addc57 Curtis, S., Bosch, P., M¨ osta, P., et al. 2024, ApJL, 961, L26, doi: 10.3847/2041-8213/ad0fe1 Das, P., & Porth, O. 2024, ApJL, 960, L12, doi: 10.3847/2041-8213/ad151f Das, P., Porth, O., & Watts, A. L. 2022, MNRAS, 515, 3144, doi: 10.1093/mnras/stac1817 Davidson, K., & Ostriker, J. P. 1973, ApJ, 179, 585, doi: 10.1086/151897 Desai, D. K., Combi, L., Siegel, D. M., & Metzger, B. D. 2026, arXiv e-prints, arXiv:2601.07918. https://arxiv.org/abs/2601.07918 Dessart, L., Burrows, A., Livne, E., & Ott, C. D. 2008, ApJL, 673, L43, doi: 10.1086/527519 Dessart, L., Burrows, A., Ott, C. D., et al. 2006, ApJ, 644, 1063, doi: 10.1086/503626 Dessart, L., Ott, C. D., Burrows, A., Rosswog, S., & Livne, E. 2009, ApJ, 690, 1681, doi: 10.1088/0004-637X/690/2/1681 Duncan, R. C., & Thompson, C. 1992, ApJL, 392, L9, doi: 10.1086/186413 Fahlman, S., & Fern´ andez, R. 2018, ApJL, 869, L3, doi: 10.3847/2041-8213/aaf1ab Fern´ andez, R., & Metzger, B. D. 2013, MNRAS, 435, 502, doi: 10.1093/mnras/stt1312 Fishbone, L. G., & Moncrief, V. 1976, ApJ, 207, 962, doi: 10.1086/154565 Frail, D. A., Kulkarni, S. R., Sari, R., et al. 2001, ApJL, 562, L55, doi: 10.1086/338119 Ghosh, P., & Lamb, F. K. 1979, ApJ, 232, 259, doi: 10.1086/157285 Giannios, D., & Spruit, H. C. 2007, A&A, 469, 1, doi: 10.1051/0004-6361:20066739 Gompertz, B. P., O’Brien, P. T., & Wynn, G. A. 2014, MNRAS, 438, 240, doi: 10.1093/mnras/stt2165 Gottlieb, O., Liska, M., Tchekhovskoy, A., et al. 2022, ApJL, 933, L9, doi: 10.3847/2041-8213/ac7530 Gottlieb, O., Metzger, B. D., Foucart, F., & Ramirez-Ruiz, E. 2025, ApJ, 984, 77, doi: 10.3847/1538-4357/adc577 Gottlieb, O., & Nakar, E. 2022, MNRAS, 517, 1640, doi: 10.1093/mnras/stac2699 Gottlieb, O., Renzo, M., Metzger, B. D., Goldberg, J. A., & Cantiello, M. 2024, ApJL, 976, L13, doi: 10.3847/2041-8213/ad8563 Gruzinov, A. 2005, PhRvL, 94, 021101, doi: 10.1103/PhysRevLett.94.021101 Hern´ andez-Morales, J., & Siegel, D. M. 2025. https://arxiv.org/abs/2507.23691 Illarionov, A. F., & Sunyaev, R. A. 1975, A&A, 39, 185 Jacquemin-Ide, J., Rincon, F., Tchekhovskoy, A., & Liska, M. 2024, MNRAS, 532, 1522, doi: 10.1093/mnras/stae1538 Kasen, D., & Bildsten, L. 2010, ApJ, 717, 245, doi: 10.1088/0004-637X/717/1/245 Kasen, D., Metzger, B. D., & Bildsten, L. 2016, ApJ, 821, 36, doi: 10.3847/0004-637X/821/1/36 Kiuchi, K., Reboul-Salze, A., Shibata, M., & Sekiguchi, Y. 2024, Nature Astronomy, 8, 298, doi: 10.1038/s41550-024-02194-y Klu´ zniak, W., & Ruderman, M. 1998, ApJL, 505, L113, doi: 10.1086/311622 Komissarov, S. S., & Barkov, M. V. 2007, MNRAS, 382, 1029, doi: 10.1111/j.1365-2966.2007.12485.x Kulkarni, A. K., & Romanova, M. M. 2013, MNRAS, 433, 3048, doi: 10.1093/mnras/stt945 Kumar, P., Narayan, R., & Johnson, J. L. 2008, MNRAS, 388, 1729, doi: 10.1111/j.1365-2966.2008.13493.x Lee, W. H., & Ramirez-Ruiz, E. 2007, New Journal of Physics, 9, 17, doi: 10.1088/1367-2630/9/1/017 Liska, M. T. P., Chatterjee, K., Issa, D., et al. 2022, ApJS, 263, 26, doi: 10.3847/1538-4365/ac9966 Lynden-Bell, D., & Boily, C. 1994, MNRAS, 267, 146, doi: 10.1093/mnras/267.1.146 MacFadyen, A. I., & Woosley, S. E. 1999, ApJ, 524, 262, doi: 10.1086/307790 Margalit, B., Jermyn, A. S., Metzger, B. D., Roberts, L. F., & Quataert, E. 2022, ApJ, 939, 51, doi: 10.3847/1538-4357/ac8b01 Metzger, B. D., Beniamini, P., & Giannios, D. 2018a, ApJ, 857, 95, doi: 10.3847/1538-4357/aab70c Metzger, B. D., Giannios, D., Thompson, T. A., Bucciantini, N., & Quataert, E. 2011, MNRAS, 413, 2031, doi: 10.1111/j.1365-2966.2011.18280.x Metzger, B. D., & Piro, A. L. 2014, MNRAS, 439, 3916, doi: 10.1093/mnras/stu247 Metzger, B. D., Quataert, E., & Thompson, T. A. 2008a, MNRAS, 385, 1455, doi: 10.1111/j.1365-2966.2008.12923.x Metzger, B. D., Thompson, T. A., & Quataert, E. 2007, ApJ, 659, 561, doi: 10.1086/512059 —. 2008b, ApJ, 676, 1130, doi: 10.1086/526418 —. 2018b, ApJ, 856, 101, doi: 10.3847/1538-4357/aab095 Most, E. R., & Quataert, E. 2023, ApJL, 947, L15, doi: 10.3847/2041-8213/acca84 26 
+
+M¨ osta, P., Richers, S., Ott, C. D., et al. 2014, ApJL, 785, L29, doi: 10.1088/2041-8205/785/2/L29 Murguia-Berthier, A., Parfrey, K., Tchekhovskoy, A., & Jacquemin-Ide, J. 2024, ApJL, 961, L20, doi: 10.3847/2041-8213/ad16eb Murguia-Berthier, A., Noble, S. C., Roberts, L. F., et al. 2021, ApJ, 919, 95, doi: 10.3847/1538-4357/ac1119 Nakamura, T., Umeda, H., Iwamoto, K., et al. 2001, ApJ, 555, 880, doi: 10.1086/321495 Narayan, R., Piran, T., & Kumar, P. 2001, ApJ, 557, 949, doi: 10.1086/322267 Neilsen, D., Liebling, S. L., Anderson, M., et al. 2014, PhRvD, 89, 104029, doi: 10.1103/PhysRevD.89.104029 Obergaulinger, M., & Aloy, M. ´A. 2021, MNRAS, 503, 4942, doi: 10.1093/mnras/stab295 Parfrey, K., Spitkovsky, A., & Beloborodov, A. M. 2016, ApJ, 822, 33, doi: 10.3847/0004-637X/822/1/33 —. 2017, MNRAS, 469, 3656, doi: 10.1093/mnras/stx950 Parfrey, K., & Tchekhovskoy, A. 2017, ApJL, 851, L34, doi: 10.3847/2041-8213/aa9c85 —. 2024, ApJ, 975, 57, doi: 10.3847/1538-4357/ad737b Piro, A. L., & Ott, C. D. 2011, ApJ, 736, 108, doi: 10.1088/0004-637X/736/2/108 Pons, J. A., Reddy, S., Prakash, M., Lattimer, J. M., & Miralles, J. A. 1999, ApJ, 513, 780, doi: 10.1086/306889 Prasanna, T., Coleman, M. S. B., Raives, M. J., & Thompson, T. A. 2022, MNRAS, 517, 3008, doi: 10.1093/mnras/stac2651 —. 2023, MNRAS, 526, 3141, doi: 10.1093/mnras/stad2948 Prasanna, T., Coleman, M. S. B., Thompson, T. A., et al. 2025, ApJ, 994, 55, doi: 10.3847/1538-4357/ae093a Qian, Y.-Z., & Woosley, S. E. 1996, ApJ, 471, 331, doi: 10.1086/177973 Radice, D., Perego, A., Bernuzzi, S., & Zhang, B. 2018, MNRAS, 481, 3670, doi: 10.1093/mnras/sty2531 Rastinejad, J. C., Fong, W., Kilpatrick, C. D., Nicholl, M., & Metzger, B. D. 2025, ApJ, 979, 190, doi: 10.3847/1538-4357/ad9c77 Raynaud, R., Guilet, J., Janka, H.-T., & Gastine, T. 2020, Science Advances, 6, eaay2732, doi: 10.1126/sciadv.aay2732 Romanova, M. M., Ustyugova, G. V., Koldoba, A. V., & Lovelace, R. V. E. 2004, ApJL, 616, L151, doi: 10.1086/426586 Romanova, M. M., Ustyugova, G. V., Koldoba, A. V., Wick, J. V., & Lovelace, R. V. E. 2003, The Astrophysical Journal, 595, 1009, doi: 10.1086/377514 Shakura, N. I., & Sunyaev, R. A. 1973, Astronomy and Astrophysics, 24, 337 Siegel, D. M., & Metzger, B. D. 2017, PhRvL, 119, 231102, doi: 10.1103/PhysRevLett.119.231102 —. 2018, ApJ, 858, 52, doi: 10.3847/1538-4357/aabaec Siegel, D. M., & Metzger, B. D. 2018, ApJ, 858, 52, doi: 10.3847/1538-4357/aabaec Spitkovsky, A. 2006, ApJL, 648, L51, doi: 10.1086/507518 Suwa, Y., & Tominaga, N. 2015, MNRAS, 451, 282, doi: 10.1093/mnras/stv901 Suzuki, A., & Maeda, K. 2021, ApJ, 908, 217, doi: 10.3847/1538-4357/abd54c Thompson, T. A., Chang, P., & Quataert, E. 2004, ApJ, 611, 380, doi: 10.1086/421969 Timmes, F. X., & Swesty, F. D. 2000, ApJS, 126, 501, doi: 10.1086/313304 Uhm, Z. L., Zhang, B., & Racusin, J. 2018, The Astrophysical Journal, 869, 100, doi: 10.3847/1538-4357/aaeb30 Usov, V. V. 1992, Nature, 357, 472, doi: 10.1038/357472a0 Uzdensky, D. A. 2004, Ap&SS, 292, 573, doi: 10.1023/B:ASTR.0000045064.93078.87 Uzdensky, D. A., & MacFadyen, A. I. 2007, ApJ, 669, 546, doi: 10.1086/521322 von Kienlin, A., Meegan, C. A., Paciesas, W. S., et al. 2020, ApJ, 893, 46, doi: 10.3847/1538-4357/ab7a18 Wasserman, I., & Shapiro, S. L. 1983, ApJ, 265, 1036, doi: 10.1086/160745 Woosley, S. E. 2010, ApJL, 719, L204, doi: 10.1088/2041-8205/719/2/L204 Woosley, S. E., & Bloom, J. S. 2006, ARAA, 44, 507, doi: 10.1146/annurev.astro.43.072103.150558 Yi, S.-X., Lei, W.-H., Zhang, B., et al. 2017, Journal of High Energy Astrophysics, 13, 1, doi: 10.1016/j.jheap.2017.01.001 Zanni, C., & Ferreira, J. 2013, Astronomy & Astrophysics, 550, A99, doi: 10.1051/0004-6361/201220168 Zhang, W., Woosley, S. E., & Heger, A. 2008, ApJ, 679, 639, doi: 10.1086/526404 Zhu, Z., Stone, J. M., & Calvet, N. 2024, Monthly Notices of the Royal Astronomical Society, 528, 2883, doi: 10.1093/mnras/stae117
