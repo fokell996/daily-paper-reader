@@ -6,43 +6,35 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-09-03
-- 运行时间：2026-09-03 23:00:36 UTC
+- 最新运行日期：2026-09-04
+- 运行时间：2026-09-04 22:50:00 UTC
 - 运行状态：成功
-- 本次总论文数：7
+- 本次总论文数：4
 - 精读区：3
-- 速读区：4
+- 速读区：1
 
 ### 今日简报（AI）
-今日聚焦磁星爆发与快速射电暴重复源，兼顾中子星模拟及脉冲星观测。  
-最值得精读的是费米卫星17年磁星爆发监测（10/10），以及重复暴源在已知FRB中的普遍性分析（9/10）。  
-建议从天体物理爱好者角度，优先关注磁星与快速射电暴之间的物理联系。
-- 详情：[/202609/03/README](/202609/03/README)
+- 今日共生成 4 篇推荐（精读 3 篇，速读 1 篇）
+- 精读：《Single-pulse reanalysis of the 2024 Vela glitch and new observations of PSR~J0437$-$4715 and PSR~J1644$-$4559》（9.0/10）, 《A targeted search for fast radio bursts from magnetars in elliptical galaxies》（9.0/10）
+- 速读：《A fast, wide-field, and real-time imaging prototype for large aperture arrays》（6.0/10）
+- 这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。
+- 详情：[/202609/04/README](/202609/04/README)
 
 ### 精读区论文标签
-1. [17 Yr of Magnetar Bursts Observed with the Fermi Gamma-ray Burst Monitor](/202609/03/2609.02809v1-17-yr-of-magnetar-bursts-observed-with-the-fermi-gamma-ray-burst-monitor)  
-   标签：评分：10.0/10、query:pulsar-frb
-   evidence：给出费米GBM十七年观测的1254个磁星短暴完整星表，直接刻画磁星爆发活动。
-2. [Are Repeaters Prevalent Among the Known Fast Radio Burst Sources?](/202609/03/2609.02037v1-are-repeaters-prevalent-among-the-known-fast-radio-burst-sources)  
+1. [Single-pulse reanalysis of the 2024 Vela glitch and new observations of PSR~J0437$-$4715 and PSR~J1644$-$4559](/202609/04/2609.03056v1-single-pulse-reanalysis-of-the-2024-vela-glitch-and-new-observations-of-psrj0437-4715-and-psrj1644-4559)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：检验快速射电暴中重复暴的普遍性及其对起源的启示
-3. [Vortex pinning and the elastic response of neutron-star crusts II. Non-axisymmetric loading and Magnus mountains](/202609/03/2609.02863v1-vortex-pinning-and-the-elastic-response-of-neutron-star-crusts-ii-non-axisymmetric-loading-and-magnus-mountains)  
+   evidence：对2024年Vela脉冲星自转突变的单脉冲再分析，直接涉及脉冲星突变现象
+2. [A targeted search for fast radio bursts from magnetars in elliptical galaxies](/202609/04/2609.04118v1-a-targeted-search-for-fast-radio-bursts-from-magnetars-in-elliptical-galaxies)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：针对椭圆星系中磁星FRB的定向搜索发现靠近M49的FRB 20240817A
+3. [Observational selection effects on radio pulsars are minimal for masses, but significant for orbits and spins](/202609/04/2609.03157v1-observational-selection-effects-on-radio-pulsars-are-minimal-for-masses-but-significant-for-orbits-and-spins)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：涡旋钉扎与中子星星壳弹性响应，与脉冲星glitch内部物理相关
+   evidence：量化塑造射电脉冲星观测族群的观测选择效应，其质量分布可用于限制致密物质状态方程
 
 ### 速读区论文标签
-1. [GRMHD Simulations of Accreting Proto-Magnetars I. Implications for Gamma-Ray Burst Jets and Energetic Explosions](/202609/03/2609.00174v1-grmhd-simulations-of-accreting-proto-magnetars-i-implications-for-gamma-ray-burst-jets-and-energetic-explosions)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：原初磁星吸积模拟，与磁星中心引擎及喷流相关
-2. [Portraits of the young and old in X-ray: New millisecond pulsar detections and updated characterisation of young neutron stars](/202609/03/2609.00176v1-portraits-of-the-young-and-old-in-x-ray-new-millisecond-pulsar-detections-and-updated-characterisation-of-young-neutron-stars)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：对毫秒脉冲星和年轻中子星做X射线探测与表征，助力脉冲星种群与演化研究。
-3. [Searching for optical pulsations from spider millisecond pulsars with the fast photometer SiFAP2](/202609/03/2609.02395v1-searching-for-optical-pulsations-from-spider-millisecond-pulsars-with-the-fast-photometer-sifap2)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：针对蜘蛛毫秒脉冲星样本开展光学脉动搜寻，服务射电脉冲星种群与演化研究。
-4. [High performance Stingray](/202609/03/2609.02857v1-high-performance-stingray)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：开源时间序列分析库可进行脉冲星数据分析
+1. [A fast, wide-field, and real-time imaging prototype for large aperture arrays](/202609/04/2609.03027v1-a-fast-wide-field-and-real-time-imaging-prototype-for-large-aperture-arrays)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：面向快速射电暴探测定位的实时成像原型，支撑FRB主题的研究
 
 
 <div class="dpr-home-promo-card">
