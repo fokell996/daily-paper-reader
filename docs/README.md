@@ -6,32 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-09-05
-- 运行时间：2026-09-05 22:10:36 UTC
+- 最新运行日期：2026-09-06
+- 运行时间：2026-09-06 20:55:18 UTC
 - 运行状态：成功
-- 本次总论文数：3
-- 精读区：0
-- 速读区：3
+- 本次总论文数：2
+- 精读区：1
+- 速读区：1
 
 ### 今日简报（AI）
-今日速读3篇论文，聚焦中子星与黑洞天体物理，暂无精读文章。  
-最值得关注的是两份7分工作：强耦合夸克物质在中子星及其并合中的表现，以及快速自旋双黑洞的磁化吸积与双喷流机制。  
-建议普通读者优先了解中子星内部物质状态与并合过程的联系，这是当前高能天体物理的热点方向。
-- 详情：[/202609/05/README](/202609/05/README)
+今日精读聚焦致密双星与玻色子暗物质的混合状态方程，另览射电阵列实时成像方案。最值得关注的是“超紧凑双星”模型，揭示暗物质如何塑造中子星内部结构。明日可延伸阅读暗物质与致密星观测的交叉验证案例。
+- 详情：[/202609/06/README](/202609/06/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Ultra-compact twin stars with hybrid equations of state from bosonic dark matter](/202609/06/2609.03964v1-ultra-compact-twin-stars-with-hybrid-equations-of-state-from-bosonic-dark-matter)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：致密星混合状态方程与孪生星结构，关联中子星状态方程
 
 ### 速读区论文标签
-1. [Strongly coupled quark matter in neutron stars and their mergers](/202609/05/2608.28879v1-strongly-coupled-quark-matter-in-neutron-stars-and-their-mergers)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：对中子星及其并合中强耦合夸克物质的理论建模，直接贡献于致密物质状态方程研究
-2. [Magnetized accretion onto rapidly spinning binary black holes: mini-disk thermodynamics, magnetic transport, and dual jets](/202609/05/2609.02867v1-magnetized-accretion-onto-rapidly-spinning-binary-black-holes-mini-disk-thermodynamics-magnetic-transport-and-dual-jets)  
-   标签：评分：7.0/10、query:pulsar-frb
-   evidence：模拟可被脉冲星计时阵列探测的超大质量双黑洞电磁源，属脉冲星计时应用范畴
-3. [Transient discs around isolated accreting neutron stars](/202609/05/2609.02442v1-transient-discs-around-isolated-accreting-neutron-stars)  
+1. [A fast, wide-field, and real-time imaging prototype for large aperture arrays](/202609/06/2609.03027v1-a-fast-wide-field-and-real-time-imaging-prototype-for-large-aperture-arrays)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：孤立中子星总体合成并考虑磁场衰减与螺旋桨自转减速，与射电脉冲星晚期演化相关
+   evidence：面向快速射电暴毫秒级实时探测定位的成像原型
 
 
 <div class="dpr-home-promo-card">
