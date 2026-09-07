@@ -1,0 +1,829 @@
+Title: Through a glass, darkly: a combined framework for estimating fast radio burst host galaxy and population properties in an era of uncertain host identification
+
+URL Source: https://arxiv.org/pdf/2609.04765v1
+
+Published Time: Mon, 07 Sep 2026 00:41:41 GMT
+
+Number of Pages: 23
+
+Markdown Content:
+> Cambridge Large Two (2020), 1–23
+
+ARTICLE TYPE 
+
+# Through a glass, darkly: a combined framework for estimating fast radio burst host galaxy and population properties in an era of uncertain host identification 
+
+C. W. James, 1 B. C. Andersen, 2 L. Marnoch, 3,4,5 J.L. Hoffmann, 6 N. Loudas, 7 J. X. Prochaska, 2,8,9 S. D. Ryder, 3,4 and M. Woodland 2
+
+> 1
+
+International Centre for Radio Astronomy Research, Curtin University, Bentley, 6102, WA, Australia 
+
+> 2
+
+Department of Astronomy and Astrophysics, University of California, Santa Cruz, CA 95064, USA 
+
+> 3
+
+School of Mathematical and Physical Sciences, Macquarie University, NSW 2109, Australia 
+
+> 4
+
+Astrophysics and Space Technologies Research Centre, Macquarie University, Sydney, NSW 2109, Australia 
+
+> 5
+
+Australia Telescope National Facility, CSIRO Space & Astronomy, Box 76 Epping, NSW 1710, Australia 
+
+> 6
+
+International Centre for Radio Astronomy Research, Curtin University, Bentley, WA 6102, Australia 
+
+> 7
+
+Department of Astrophysical Sciences, Princeton University, 4 Ivy Lane, Princeton, NJ 08544, USA 
+
+> 8
+
+Kavli Institute for the Physics and Mathematics of the Universe, 5-1-5 Kashiwanoha, Kashiwa 277-8583, Japan 
+
+> 9
+
+Division of Science, National Astronomical Observatory of Japan, 2-21-1 Osawa, Mitaka, Tokyo 181-8588, Japan 
+
+Author for correspondence: Clancy W. James, Email: clancy.james@curtin.edu.au. 
+
+Abstract 
+
+The identification of fast radio burst (FRB) host galaxies, and subsequently their redshifts ( z), has allowed the FRB dispersion measure (DM) to be used to probe the cosmological distribution of ionised gas, and study the properties of the FRB population itself. However, current methods cannot account for FRBs with uncertain host galaxy associations, leading to underutilisation of data, and potential biases towards nearby, bright hosts. In this work, we develop a methodology which can. We do so by combining three ingredients — the ZDM code, for modelling the Macquart relation; PATH, for statistical host galaxy identification; and a set of models able to describe the intrinsic FRB host galaxy distribution — into a single formalism. We prove the fidelity of our formalism by using a synthetic set of FRB observations, with simulated hosts sampled from galaxy catalogues, and show that it reproduces intrinsic host galaxy properties even for FRB localisation uncertainties of 30 ”, where a traditional PATH analysis produces no confidant host associations. When applied to a sample of FRBs localised by the Australian Square Kilometre Array Pathfinder, we confirm previous results showing that FRBs prefer host galaxies fainter than that predicted by star-formation, consistent with an exponential surface density scaling as 0.41 +0.13  
+
+> −0.09
+
+times the half-light radius. We encourage the application of this formalism to data-sets from other FRB-hunting instruments. 
+
+Keywords: radio transient sources, radio bursts 
+
+1. Introduction 
+
+The identification of fast radio burst (FRB) host galaxies is critical to both using FRBs as probes of the baryonic matter distribution of the Universe, and identifying their progenitors. Spectroscopy performed on hosts has yielded the Macquart relation, being an empirical linear correlation between FRB dispersion measure (DM) and host redshift (z) (Macquart et al. 2020), showing that the local Universe is consistent with early Universe constraints on Ωbh2 (Planck Collaboration et al. 2020). Numerous other studies have analysed the relation-ship between FRB dispersion measure and host galaxy redshift, yielding constraints on the fraction of baryons in the circum-galactic medium (Baptista et al. 2024; Khrykin et al. 2024; Connor et al. 2025), the Hubble constant (Wu, Zhang, and Wang 2022; Hagstotz, Reischke, and Lilow 2022; C W James et al. 2022), and FRB population parameters (Luo et al. 2020; Gardenier and van Leeuwen 2021; Shin et al. 2023; Hoffmann et al. 2025). Simultaneously, the properties of FRB host galax-ies yield information on their progenitors, with their masses, color, star-formation rates and histories, metallicities, and posi-tion of the FRB within the galaxy being analysed to determine their formation pathways, with key questions being if FRBs come from one or more populations and/or are analogous to populations of known transients (Bhandari et al. 2022; Gordon et al. 2023; Sharma et al. 2024), and if they correlate with time-frequency properties of the FRB itself (Cordes, Ocker, and Chatterjee 2022; Glowacki et al. 2025). Both directions of investigation are extremely active and are rapidly evolving — recent reviews are more complete than the brief summary given here (Zhang 2023; Lorimer, McLaughlin, and Bailes 2024; Glowacki and Lee 2026), but may already be outdated. Key to both directions of study is the correct identifica-tion of the FRB host galaxy. To this end, the Probabilistic Association of Transients to their Hosts (PATH; Aggarwal et al. 2021) framework was developed, being a Bayesian approach to determining the probability of a galaxy observed in opti-cal follow-up images being the true host, given the galaxy’s properties, and the FRB localisation. In a recent work, we showed how to update the PATH framework to account for expectations based on FRB DM (C. W. James et al. 2026). By using an expectation for FRB redshift based on an FRB’s DM, P(z|DM), and a model for FRB host galaxies giving their magnitude dependence on redshift, 
+
+P(m|z), one can calculate both informed prior expectations for arXiv:2609.04765v1 [astro-ph.HE] 4 Sep 2026 2 C. W. James et al. 
+
+the FRB host magnitude distribution, and posteriors for each observed host candidate. This methodology allows models for the FRB host galaxy distribution to be tested against data, while accounting for incompleteness of galaxies observed in optical images. Such an approach becomes increasingly important as FRB-hunting telescopes detect more FRBs, increasing the reliance on less-sensitive wide-field optical surveys for host galaxy identification. However, there is one very obvious flaw in our approach. Models of the FRB population use “confident” FRB hosts to calibrate the FRB z–DM relation, typically those with poste-rior PATH probabilities of 90–95% or greater. With over 100 confident hosts now identified (Shannon et al. 2025; Pastor-Marazuela et al. 2025; Sharma et al. 2024; Chime/Frb Collab-oration et al. 2025), it is reasonable to conclude that several identifications are incorrect. And as discussed by C W James et al. (2022), a single mis-identified FRB host lying below the Macquart relation (i.e., having a high redshift for its DM) can severely skew population analyses, since models have few ways to account for underdensities of ionised baryons (this is known as the ‘DM cliff’ effect). Furthermore, B.C. Andersen et al. (in prep., 2026) has shown that placing cuts on posterior PATH probabilities biases the posterior FRB host distribution, since it is much easier to confidently associate FRBs with bright host galaxy candidates, than the much more common — and difficult to identify — dwarf galaxies. Producing a complete sample of confident FRB hosts also requires only using hosts from low-DM, well-localised FRB where identification of the host is guaranteed (Hoffmann et al. 2025). However, the diversity of radio localisation ac-curacy of FRBs spans a vast range, from ∼ 10 arcmin for the CHIME/FRB Catalogues (Chime/Frb Collaboration et al. 2026), through to a few mas for the VLBI localisations of repeaters (Marcote et al. 2017). Optical follow-up depth spans an equally wide range, from relatively shallow, wide-field cat-alogues at a depth of mR < 19.5 (Mahony et al. 2018; Bilicki et al. 2016), to deep JWST observations down to 29 th magni-tude (Caleb et al. 2025). This diversity makes constructing a complete sample of firm FRBs hosts increasing complex, and requires discarding an increasingly large fraction of data. In order to produce a fully self-consistent model of FRB population parameters, the inherent uncertainty in FRB host galaxy identification (which depends on the intrinsic host galaxy distribution) must be incorporated into FRB population modelling. Since this in turn informs host galaxy probabilities, a methodology to simultaneously fit both FRB host galaxy and population parameters is required. The development of such a statistical methodology is the subject of this paper. In this work, we combine the likelihoods of the observed radio properties of an FRB, encapsulated by the parameters 
+
+xrad , with the observed optical properties of a follow-up image, 
+
+xopt . In § 2, we review how radio properties are used to produce an estimate for the z–DM distribution of FRBs using the ZDM code, before showing in § 3 how to simultaneously incorporate optical properties into a combined statistic using PATH. Useful derived values are calculated in § 4, and we demonstrate our method on FRB FRB 20190611B in § 5. In § 6, we use simulated FRBs inserted into optical catalogues to test our analysis, before in § 7 applying our analysis to the catalogue of FRBs and optical images detected by the Australian Square Kilometre Array Pathfinder (ASKAP; Hotan et al. 2021). We discuss the uses and flaws in our methodology in § 8 
+
+2. Calculation of P(xrad ) and P(z, | xrad )We first aim to calculate the probability distribution of radio observables P(xrad ), and a prediction for the redshift distribu-tion of the host, P(z|xrad ). We do so in the context of the ZDM code, which has been progressively developed over a series of works (James, Prochaska, et al. 2022; C W James et al. 2022; Baptista et al. 2024; James 2023; Hoffmann et al. 2025; Hoff-mann et al. 2026); here, we re-iterate the procedure for clarity. However, our underlying statistical principles apply to any methodology allowing redshift predictions for FRBs based on their DMs, e.g. Shin et al. (2023). Those readers familiar with the ZDM code, or similar works, could skip to § 3. 
+
+2.1 Detection probability 
+
+We take the primary radio properties of an FRB to be its dis-persion measure, DM, signal-to-noise ratio, S/N, and radio localisation region, θ; all are routinely published as part of FRB catalogues. Secondary properties, which we have incor-porated into modelling within the ZDM code, include FRB intrinsic width, w, scattering time, τ, beam-value at which it was detected, B, and number of repetitions, Nrep (if any). For simplicity, we ignore FRB repetition in this work. For reasons outlined in James, Ekers, et al. (2019), we use 
+
+s ≡ S/N S/N th 
+
+, (1) rather than S/N directly, as the observable property of the FRB’s signal-to-noise ratio. The FRB effective width, weff , is calculated as per Cordes and McLaughlin (2003), 
+
+weff =
+
+q
+
+w2 
+
+> i
+
++ τ2 + δt2 + w2DM , (2) where τ is the characteristic scattering time, δt is the search time resolution, and wDM is the dispersion measure smearing within each frequency channel of width δν ,
+
+wDM = 8.3 ms DM pc cm −3
+
+δν 
+
+1 GHz 
+
+ ν
+
+1 GHz 
+
+−3
+
+. (3) It is possible to estimate intrinsic distributions of τ and wi
+
+using the ZDM code, and modelling the redshift dependence of these parameters can affect the z-dependence of the rate by 
+
+O ∼ 10% (Clancy William James et al. 2026). However, doing so significantly reduces computational speed — and weff can be estimated more robustly than the individual components wi
+
+and τ. Hence, in this work, we consider only s, B, weff , DM ∈Cambridge Large Two 3
+
+xrad . These properties allow the intrinsic fluence of an FRB, 
+
+F, to be calculated, 
+
+F = s F1ms 
+
+B
+
+ weff 
+
+1 ms 
+
+0.5 
+
+, (4) where F1ms is the characteristic fluence threshold of the ex-periment. This is defined as the fluence required for an FRB to produce a threshold S/N value of S/N th at beam centre (B = 1) — this value is commonly quoted by FRB detection experiments at a normalised time-duration of 1 ms. At a given redshift z, this fluence implies an isotropic-equivalent energy of 
+
+E = 4πL2
+
+> d
+
+(1 + z)2+ α ∆ν F, (5) where ∆ν is the detection bandwidth, Ld the luminosity dis-tance, and α is the assumed spectral dependence of FRB fluence — the factor (1 + z)α is used to normalise E at the observer frequency ν in the rest-frame of the host. The probability of an FRB produced at redshift z being detected in the range s
+
+to s + ds is therefore 
+
+P(s|z, B, weff ) = L(E) dE ds R ∞ 
+
+> Emin
+
+L(E)dE (6) where L(E) is the FRB energy distribution, and from Eq. 4 and 5, 
+
+dE ds = 4πL2
+
+> d
+
+(1 + z)2+ α ∆ν F0
+
+B
+
+ weff 
+
+1 ms 
+
+0.5 
+
+. (7) The exponent of 2 + α is due to three factors: a factor of 
+
+α, which scales the emission energy to the normalisation fre-quency (here, 1.3 GHz is used); a factor of unity, which undoes the factor of 1 + z due to time-dilation in luminosity, which is not present in fluence, since all relevant emission times are being integrated over; and another factor of unity, which accounts for the increased bandwidth in the emission frame. Energies in ZDM are calculated at a fixed emission bandwidth of 1 GHz; other works model the observable energy, and thus do not include the last factor, with the total exponent of 1 + z
+
+in the numerator of Eq. 7 being 1 + α. Our treatment is more appropriate for emission bandwidths broader than the obser-vation bandwidth, whereas the latter treatment is more appro-priate for emission bandwidths narrower than the observation bandwidth. In this work, we use a Schechter function for L(E), defined by 
+
+L(E) = Eγ exp( −E/Ecut ), (8) for some characteristic cut-off energy, Ecut . The model also considers a minimum energy, Emin , below which FRBs do not emit. All energies are normalised to 1.3 GHz; when the spectral-dependence α̸ = 0, Eq. 7 renormalises to this fre-quency. We note that the choice of an exponential for the high-energy cutoff is arbitrary; the only work deriving a non-parametric luminosity function, Arcus et al. (2025), finds equal consistency with a pure power-law, while detailed studies of the luminosity function of strong repeaters find complex be-haviour (e.g. Li et al. 2021; Ould-Boukattine et al. 2026). 
+
+2.2 Volumetric rate in z–DM space 
+
+The above section calculates the probability of observing an FRB with properties xrad given that one occurs at a specific point in z–DM space. We now calculate the rate of such occur-rences. The redshift-dependence of the FRB rate is a product of the volume element 
+
+V(z) ≡ dV dz d Ω
+
+= DH
+
+(1 + z)2D2
+
+> A
+
+(z)
+
+E(z) , (9) a time-dilation factor dτ/dt = (1 + z)−1, and the FRB popu-lation density Φ(z) (typically expressed in units of FRBs per comoving Mpc 3 per proper year). This last is expressed as being proportional to the star-formation rate, modulated by a power nsfr , i.e. 
+
+Φ(z) =
+
+ SFR( z)SFR( z = 0) 
+
+nsfr 
+
+(10) SFR( z) = 1.0025738 (1 + z)2.7 
+
+1 + 
+
+ 1+ z
+
+> 2.9
+
+5.6 .In the case that FRBs are treated as intrinsically narrow-band objects, α is interpreted as governing the frequency dependent rate; it is set to 0 for purposes of calculating the intrinsic energy via Eq. 7, but the volumetric rate Φ(z) is adjusted as 
+
+Φ(α, z) = Φ(z)
+
+
+
+(1 + z) νν0
+
+α
+
+. (11) The next ingredient is the DM budget, i.e. p(DM| z), which we decompose as per Macquart et al. (2020), DM = DM MWISM + DM halo + DM cosmic + DM host , (12) representing DM contributions from the Milky Way’s interstel-lar medium (ISM) and halo, cosmological contributions from the intergalactic medium (IGM) and the circumgalactic media (CGM) of intervening halos, and a host contribution covering the halo and ISM of the host galaxy, together with any local contribution from the FRB progenitor and surrounding envi-ronment. We take DM MWISM from Ocker and Cordes (2026), aka NE2025, and treat DM halo as a constant but variable fit parameter as per Hoffmann et al. (2026). The expectation value for the cosmological contribution is given as per Ioka (2003), Inoue (2004), and Deng and Zhang (2014), 
+
+DM cosmic (z) =
+
+> z
+
+Z
+
+> 0
+
+c¯ne(z′) dz ′
+
+H0(1 + z′)2E( z′) . (13) 4 C. W. James et al. 
+
+The mean electron density, ¯ne, is calculated as 
+
+¯ne = fd (z) ρb(z)m−1 
+
+> p
+
+χe (14) where fd (z) is the fraction of baryons in a diffuse ionised state (∼ 85%), ρb the mass density of baryons 
+
+ρb(z) = 3ΩbH20
+
+8πG (1 + z)3, (15) and χe = YH +YHe /2 the electron/baryon ratio, calculated from the primordial hydrogen and helium mass fractions YH and 
+
+YHe . Other constants are the proton mass mp, gravitational constant G, and baryonic density Ωb.Eq. 13 predicts an almost 1-1 correlation between the mean value of DM cosmic and z, now known as the Macquart relation (Macquart et al. 2020). It is almost completely degenerate in the product H0Ωbfd ; here, we fix the product Ωb(H0/100) 2 =0.02242 (Planck Collaboration et al. 2020), vary H0, and take 
+
+fd (z) from the FRB codebase (Prochaska et al. 2023). We adopt a simplified cosmology accounting only for matter density Ωm
+
+and dark energy ΩΛ appropriate to the low-redshift Universe, giving E( z) =
+
+q
+
+Ωm(1 + z)3 + ΩΛ. (16) Relative fluctuations in the Macquart relation are taken from the probability distribution 
+
+p(∆DM ) = A∆−β 
+
+> DM
+
+exp 
+
+"
+
+− (∆−α 
+
+> DM
+
+− C0)2
+
+2α2σ2DM 
+
+#
+
+(17) 
+
+∆DM ≡ ∆DM cosmic /DM cosmic , (18) with α = 3 and β = 3 as per Macquart et al. (2020); C0
+
+is set such that the mean of the distribution is unity. This functional form has been shown to give a good description of the distribution of DM cosmic for a wide range of cosmological parameters and prescriptions for galactic feedback (Guo and Lee 2025), although the best-fit values of α and β do vary. In theory, our approach could be used to fit these parameters; however, we do not consider that we have sufficient statistical power to do so, and hold these constant for the time being. The fluctuations parameter F determines the standard de-viation via 
+
+σDM = Fz −0.5 . (19) Unless otherwise noted, we fix F = 0.32, which is consistent with the best-fit values from Baptista et al. (2024) when using a uniform prior on H0 covering both CMB and cosmological distance ladder estimates. While F is a purely empirical param-eter, it is inversely proportional to the baryon spread metric, which is a tracer of the strength of galactic feedback (Medlock et al. 2025). The final component of the DM budget, DM halo , is pa-rameterised as a lognormal via μhost , σhost 
+
+p(log 10 DM ′
+
+> host
+
+) = 1
+
+σhost 
+
+√2π e− (log 10 DM ′ 
+
+> host −μhost )22σ2host
+
+, (20) where the observed DM host is scaled from the rest-frame as DM host = DM ′
+
+> host
+
+1 + z . (21) The calculation proceeds by first calculating the extragalactic dispersion measure, DM EG = DM − DM halo − DM MWISM , (22) and then integrating over the distributions of DM cosmic (Eq. 13 and 17) and DM host (Eq. 20) to produce P(DM EG |z). 
+
+2.3 Probabilistic calculation 
+
+We use the z–DM code for two calculations: to find the proba-bility of the measured radio properties, P(xrad ) ≡ P(DM, w, s, B), and the probability of redshift z given those properties, P(z|xrad ). The code fundamentally calculates the rate of FRB de-tections as a function of DM and z, by first calculating the effective energy detection threshold corresponding to s = 1, 
+
+E0(B, w, DM), giving the conditional probability 
+
+R(z, DM| B, weff ) = P(DM |z)Φ(z) V(z)1 + z
+
+Z ∞
+
+> E0
+
+L(E)dE .(23) The rate R(z, DM, B, weff ) is then given by 
+
+R(z, DM, B, weff ) = R(z, DM| B, weff )Ω(B)P(weff ),(24) where Ω(B) is the ‘inverse’ beamshape giving the solid angle of sky viewed at beam sensitivity B, and P(weff ) is the distribution of widths calculated from Eq. 2. In this work, by default, we assume log 10 -normal distributions for wi and τ, which by default have μw, σw = (0, 0.42) and μτ, στ = (0.305, 0.75) at 600 MHz (CHIME/FRB Collaboration et al. 2021). The total rate, R(z, DM), then becomes 
+
+R(z, DM) =
+
+Z 1
+
+> B=0
+
+Z ∞ 
+
+> weff =0
+
+R(z, DM, B, weff )dw eff dB , (25) Rates are related to probabilities by normalising by the total rate, 
+
+RFRB =
+
+Z ∞
+
+> 0
+
+Z ∞
+
+> 0
+
+R(z, DM) dzd DM, (26) e.g. 
+
+P(z, DM, B, weff ) = R(z, DM, B, weff )
+
+RFRB 
+
+. (27) This also allows the total expected number of FRB detections can be calculated, 
+
+NFRB = RFRB ∆t, (28) given observation time ∆t (typically expressed in days). The probability of observing NFRB is assumed to be Poissonian, such that 
+
+P(NFRB ) = NFRB NFRB e− NFRB 
+
+NFRB ! . (29) Cambridge Large Two 5
+
+The probability, P(s|z, B, w, DM), can then be calculated as per Eq. 6. From these values, various conditional probabilities can be constructed. Of most relevance to this work is the joint probability P(DM, B, w, s), and the conditional probability 
+
+P(z|DM, B, w, s). This latter is a critical input to expectations for the FRB host galaxy contribution, described in the next section.          
+
+> Figure 1. P(s|z,B,w, DM) for FRB 20190611B, and the two components by which it is calculated: p(z, DM) , and p(s,B,w|z,DM ), as a function of redshift. Thick lines use width and scattering distributions from CHIME/FRB Collabo-ration et al. (2021); thin lines from Clancy William James et al. (2026).
+
+For now, Figure 1 gives an example of the probability cal-culations, in the case of FRB 20190611B, with DM = 294 pc cm −3,detected by the CRAFT Incoherent Sum Survey (Shannon et al. 2025). We have used both the standard parameterisation of width and scattering, and the redshift-dependent prescription of Clancy William James et al. (2026). Very little difference is observed between these prescriptions, justifying our approxi-mation. 
+
+3. Calculating P(xopt |xrad )The primary optical properties of an image are the apparent magnitudes of identified galaxies, m, their angular extent, ϕ,positions of the galaxies on sky, RA and DEC, and galaxy red-shifts, z (if known); secondary properties, which we do not deal with here, might include include metallicity, orientation, morphology etc. Since only the relative sky positions of can-didate galaxies and the radio localisation of the FRB matter, for simplicity, we define this angular offset vector to be ⃗x k for candidate k.Our calculation of P(xopt |xrad ) proceeds according to C. W. James et al. (2026), with the addition that we show how to incorporate partial redshift information. For clarity, we repeat the derivation of the method here, but extend the method to include host redshift, z, alongside host magnitude, m.Our approach factorises the joint probability as 
+
+P(xopt , xrad ) = P(xopt |xrad )P(xrad )= P(xopt |U)P(U|xrad )P(xrad ) (30) + X
+
+> k
+
+P(xopt |Ok)P(Ok|xrad )P(xrad ), where U represents the instance that the true host galaxy is unseen in optical images, and Ok the probability that galaxy k
+
+is the true host.         
+
+> Figure 2. Prior on host galaxy magnitude mr, for the case of FRB 20190611B, using the Marnoch23 model. P(O|DM EG )and P(mr|DM EG )respectively do and do not account for the chance of not identifying galaxies in an image.
+
+To calculate P(O|xrad ) and P(U|xrad ), we require a host galaxy model, which can predict the FRB host galaxy mag-nitude P(m|z). In C. W. James et al. (2026), we present three such models — we defer readers to that work for a detailed description. This is combined with a model of optical image sensitivity which defines the chance of a galaxy of magnitude 
+
+m being identified in the image, P(O|m). Combined with the prediction for P(z|xrad ) from § 2, we calculate these probabili-ties as 
+
+P(O|xrad ) =
+
+Z
+
+P(O|m)P(m|z)P(z|xrad )dz (31) 
+
+P(U|xrad ) =
+
+Z Z 
+
+(1. − P(O|m)) P(m|z)P(z|xrad )dz dm .(32) An example is given in Figure 2. In C. W. James et al. (2026), we show how Eq. 31 and 32 can be used as priors in a PATH analysis, using r-band magnitudes, mr. Here, we extend this to include redshift information from an arbitrary subset of candidate host galaxies. We divide xopt into the total number of galaxies observed in an image, NO; their positions relative to the FRB, ⃗x ; and their magnitudes, m, and allow for Nz galaxies to have their redshifts, 
+
+z, measured, leaving Nm with only magnitude information. If none of the galaxies are the true host, then ignoring galaxy clustering and treating them independently, the probability of 6 C. W. James et al. 
+
+observing this configuration is 
+
+P(xopt |U) = ΠNm 
+
+> j=1
+
+ρ(mj)ΠNz
+
+> i=1
+
+PF(zi|mi)ρ(mi). (33) where PF refers to a probability relating to a field galaxy, and all P refers to probabilities for the FRB host; thus PF(z|m)is the redshift distribution for field galaxies of magnitude m.
+
+ρ(m) is the angular density of galaxies of magnitude m on the sky, modified by the probability of that galaxy being detected, i.e. ρ(m) = P(O|m)ρD16 (m), where ρD16 (m) is the true galaxy density, which we take from Driver et al. (2016) in the case of 
+
+r-band magnitudes. If instead galaxy k is the true host, then if k ∈ Nz,
+
+P(xopt |Ok ∈ Nz) = ΠNm 
+
+> j=1
+
+ρ(mj)ΠNz 
+
+> i=1, i̸=k
+
+PF(zi|mi)ρ(mi)
+
+·P(⃗x k|Ok)P(zk|mk), (34) and for k ∈ Nm,
+
+P(xopt |Ok ∈ Nm) = ΠNm 
+
+> j=1, j̸=k
+
+ρ(mj)P(⃗x k|Ok) (35) 
+
+·ΠNz
+
+> i=1
+
+PF(zi|mi)ρ(mi). Removing the common factor of P(xopt |U) from these equa-tions produces 
+
+P(xopt |Ok ∈ Nz)
+
+P(xopt |U) = P(z|mk)P(⃗x|O k)
+
+PF(z|mk)ρ(mk) , (36) 
+
+P(xopt |Ok ∈ Nm)
+
+P(xopt |U) = P(⃗x|O k)
+
+ρ(mk) . (37) The right-hand-sides of Eq. 36 and 37 simply consist of odds ratios of the galaxy parameters of FRB hosts compared to field galaxies. These could be readily be extended to include parameters such as morphology, inclination, and/or metallicity. Example distributions of P(z|xrad , mr) and PF(z|mr) are given in Figure 3. With these factors, we construct our full probabilities as 
+
+P(xopt , xrad )
+
+P(xopt |U) =
+
+
+
+> Nz
+
+X
+
+> k=1
+
+P(z|mk)P(⃗x|O k)
+
+PF(z|mk)ρ(mk) P(Ok|xrad ) (38) +
+
+> Nm
+
+X
+
+> k=1
+
+P(⃗x|O k)
+
+ρ(mk) P(Ok|xrad ) + P(U|xrad )
+
+ P(xrad ). We note that P(xopt |U) is not a function of any model param-eters, but of the distribution of field galaxies in the Universe. This varies from image-to-image, but is independent of FRB host models, population, and cosmological parameters. Hence, our calculation is somewhat simplified by ignoring it, equiva-lent to setting it to unity. We use two ingredients to calculate PF(z|m), i.e the dis-tribution of redshift for an m-magnitude field galaxy. Firstly, we use a similar procedure as for the Loudas25 model from C. W. James et al. (2026), where galaxies are sampled from the GALFRB package (Loudas et al. 2025). However, where the                 
+
+> Figure 3. Probabilities of redshift P(z|mr)for both FRB hosts predicted by the Marnoch23 model, P(z|xrad ,mr), and field galaxies, PF(z|mr), for the most probable host of FRB 20190611B, with magnitude mr= 19.63 .
+> Figure 4. Example distributions of P(z|F,mr)for field galaxies (see text for method).
+
+Cambridge Large Two 7
+
+FRB host galaxy model samples galaxies weighted by their star-formation rate, SFR, or their stellar mass, M∗, field galaxies are sampled without weighting. This produces distributions of PF(m|z). We then calculate PF(z|m) using 
+
+P(m, z) = PF(m|z)PF(z) (39) 
+
+PF(z|m) = PF(m, z)
+
+PF(m) . (40) We take PF(z) to be proportional to the total volume element 
+
+V(z) from Eq. 9, i.e. assuming a constant number of galax-ies per comoving volume throughout cosmological time, and calculate PF(m) by integrating PF(m|z)PF(z) over redshift. Sample distributions of PF(z|m) are given in Figure 4 for dif-ferent magnitudes, while the distribution for the host galaxy of FRB 20200627 at mr = 19.63 is compared to P(z|m) in Figure 3. Since FRB hosts tend to be dimmer than field galaxies, the probability mass is shifted towards higher redshifts in the case of field galaxies compared to true hosts. Thus, the likelihood of a host galaxy candidate being the true host will increase with decreasing redshift, as per Eq. 36.   
+
+> Figure 5. Comparison of r-band magnitude distributions of field galaxies,
+> P(mr), calculated as Eq. 39, with the result from Driver et al. (2016).
+
+To investigate the fidelity of this model, we plot the re-sulting PF(m) distribution in Figure 5. We see a discontinuity at z = 2, likely caused by the distributions PF(mr|z) being calculated only up to z = 2. The probability density function 
+
+ρ(SFR, M∗, z) within GALFRB is given by the trained neural network (NN) presented by Leja et al. (2022), which is based on data from the COSMOS-2015 (Laigle et al. 2016) and 3D-HST (Skelton et al. 2014) UV-IR catalogs in the redshift range 0.2–3. In turn, this uncertainty makes the normalisation of 
+
+PF(z|m) unreliable even within the z ≤ 2 range for galaxies with mr ≳ 20, since uncertainties on the probability mass for z > 2 affects the normalisation at all redshifts. This issue will only get worse for dimmer FRB host candidates, and we consider our current treatment to limit the accuracy of our entire model. 
+
+3.1 Validity of partial redshift information 
+
+Our inclusion of redshift information for a partial sample of galaxies in a field — usually, the single most likely host, which has been selected for spectroscopic follow-up — is valid pro-vided that obtaining the redshift from spectroscopic infor-mation always succeeds, i.e., it is complete. If spectroscopic observations fail to identify a redshift for reasons which are correlated with the redshift itself (e.g., because the host is too faint for the spectrograph), then the resulting redshift sample becomes biased. This is a similar consideration to previous discussions about the inclusion or otherwise of redshift infor-mation within ZDM (see e.g. Hoffmann et al. 2025), where partial redshift information for a subset of FRBs can be validly used provided that redshifts are always obtained for that sam-ple. Incompleteness in redshift was treated by excluding all redshifts for FRBs with DM EG above some cutoff value where the sample became incomplete. With our new methodology, we can account for this redshift incompleteness. However, should spectroscopic observations of a host candidate fail, red-shift information for all host candidates at or above that galaxy magnitude should be excluded due to completeness considera-tions. 
+
+4. Derived values 
+
+The above section illustrates the likelihood calculation of joint FRB and optical information through Eq. 39. However, there are several useful derived distributions, which we discuss be-low. 
+
+4.1 Posterior host and unseen probabilities 
+
+Our likelihood functions of Eqs. 34 and 36 give the relative probability densities of optical images given that a galaxy is the true host, whereas Eq. 32 gives the probability given that the true host is unseen. Posterior probabilities of the true host being unseen, or any given galaxy being the true host, can therefore be calculated by normalising by the sum of these likelihoods, since these three cases (the true host is unseen, it is seen and has a measured redshift, and it is seen but does not have a measured redshift) form a mutually exclusive and collectively exhaustive set. Thus 
+
+P(U|xopt , xrad ) = P(xopt |U)P(U|xrad )P(xrad )
+
+P(xopt , xrad ) (41) 
+
+P(Oi|xopt , xrad ) = P(xopt |Ok)P(Ok|xrad )P(xrad )
+
+P(xopt , xrad ) . (42) However, inspection shows that all terms in the above include common factors of P(xrad ) and P(xopt |U) (see Eq. 39). For 8 C. W. James et al. 
+
+brevity, we therefore use Eq. 39 to write 
+
+Pnorm ≡ P(xopt , xrad )
+
+P(xopt |U)P(xrad ) (43) =
+
+> Nz
+
+X
+
+> k=1
+
+P(z|mk)P(⃗x|O k)
+
+PF(z|mi)ρ(mi) P(Ok|xrad )+
+
+> Nm
+
+X
+
+> k=1
+
+P(⃗x|O k)
+
+ρ(mi) P(Ok|xrad ) + P(U|xrad ). 
+
+4.2 Probability of redshift given the true host is unseen  
+
+> Figure 6. Probability of the redshift of FRB 20190611B, given that the true host is unseen in hypothetical images taken with different instru-ments/surveys, with sensitivity characterised as per C. W. James et al. (2026).
+
+Given a viable host is unseen in an optical image, the re-sulting redshift can be calculated as 
+
+P(z|U) =
+
+R +∞−∞ P(m, z|xopt , xrad )(1 − P(O|m)) dm P(U|xopt , xrad ) . (44) This is illustrated in Figure 6 for the FRB 20190611B, assuming three characteristic optical image depths. Clearly, the deeper an optical image, the more distant an FRB must be to be unseen in that image. However, the total redshift is still limited by the Macquart relation, such that the upper end of the P(z|U)distribution suffers a similar sharp cutoff in all cases. We note that for this particular FRB, the probability P(U) varies greatly between the three cases, being 1.8% for VLT/FORS2 images, 18% for Pan-STARRS (Pan-STARRS; Chambers et al. 2016), and 52% for Dark Energy Spectroscopic Instrument Legacy Imaging Surveys (Dey et al. 2019). 
+
+5. Demonstration of dependencies — FRB 20190611B 
+
+FRB 20190611B was detected as part of CRAFT incoherent sum (ICS) observations, having a DM of 322.2 pc cm −3 (Mac-quart et al. 2020). Follow-up imaging with FORS2 in g,
+
+R, and I-bands revealed a host galaxy candidate (J212258.0-792350, which we denote as ‘Galaxy A’) with mR = 23.03 located approximately 2 ′′ from the FRB position. The orig-inal work by Macquart et al. (2020) did not consider this galaxy to be a secure association; however, the development of the PATH framework assigned the galaxy a probability 
+
+P(O|xopt ) = 0.948 Aggarwal et al. 2021, which was later re-vised to P(O|xopt ) = 0.9799 by Shannon et al. (2025) after minor changes to PATH itself, and a reduction in the scale size of the exponential prior to ϕ/2. Critically, both analyses used an unseen prior P(U) = 0. Galaxy A has a redshift of 0.378, which is relatively high for its DM. Cordes, Ocker, and Chatterjee (2022) note that its median cosmological DM estimate of ∼320 pc cm −3 leaves little allowance for a Milky Way or host DM contribution, especially given that FRB 20190611B’s scattering timescale of 0.18 ms, while small, is not negligible, and thus suggestive of passage through the host interstellar medium (ISM). As noted by C W James et al. (2022), this high redshift provides a strong lower limit on the Hubble Constant, since while many structures in the Universe can produce excess DM, it is very difficult to produce large under-fluctuations (this is known as the ‘DM cliff’ effect). Indeed, it was the very question of the fidelity of this FRB’s host identification that first motivated our work on how to incorporate host uncertainty into the ZDM framework. In C. W. James et al. (2026), we used three models of FRB host galaxy magnitudes and a prediction for the redshift distribution from ZDM, finding an unseen prior of P(U) = 0– 0.16, depending on the host galaxy model being used, with a posterior confidence of 0.956–0.959 of Galaxy A being the true host. Combined with a revised high-time-resolution analysis of FRB 20190611B giving a maximum scattering value of 0.03 ± 0.015 ms (Scott et al. 2025), we concluded that this galaxy is indeed the true host. Our new framework, however, does not require any thresh-old for confident host classification, and also allows the redshift of Galaxy A to be used to weight its probability against the alternative of it being a field galaxy. We have also now anal-ysed deeper optical images, which reveal another, fainter host candidate close to the FRB host localisation region. We there-fore use this particular example to illustrate how our statistical method works in practice. 
+
+5.1 Deeper optical images 
+
+Motivated by the potential lack of a correct host association in Macquart et al. 2020, several deep optical images were taken in the Rspecial filter on VLT/FORS2 on four observing blocks (OBs): 2023-11-09, 2023-11-22, 2024-05-03 and 2024-05-13. Five 400 s dither positions were observed for each OB (except for 2023-11-22, with one repeated position). These were processed using the CRAFT Optical Pipeline a, following the procedure provided by Marnoch et al. (2023). To maximise the depth reached, all of the individual frames across these four epochs were co-added, for a total integration time of 8400 s and a depth of the combined image of approximately 
+
+> a. https://github.com/Lachimax/craft-optical-followup
+
+Cambridge Large Two 921 h23 m06 s 03 s 00 s 22 m57 s 54 s   
+
+> −79 ◦23 ′40 ′′
+> 50 ′′
+> 24 ′00 ′′
+> 10 ′′
+> Right Ascension (J2000) Declination (J2000)
+> 0.00.10.20.30.40.50.60.70.8
+> P(O|x)i
+> ABFigure 7. R-band image of the FRB20190611B field, taken with FORS2 on the VLT. The FRB 1 σlocalisation region is shown with a white circle, while the centroids of identified galaxies are given by crosses. Candidate galaxies A (J212258.0-792350) and B (J212259.0-792352) are marked.
+
+26.7. This combined image is shown in Figure 7. It reveals many very faint galaxy candidates not otherwise visible in the original image — in particular, a very faint ( mR = 26.4) host candidate J212259.0-792352 (‘Galaxy B’) separated by only 0.74 ′′ from the FRB, and within 1 σ of the localisation error. No spectroscopic observations have been taken of this candidate. We therefore apply our updated methodology to compare the relative probabilities of Galaxy A and Galaxy B being the host. 
+
+5.2 Host analysis 
+
+We fix the standard ZDM parameters from Hoffmann et al. (2026), which gives the P(z|xrad ) distribution given in Figure 8. We see that the predicted redshift distribution based on radio prop-erties, P(z|xrad ), has a peak near z = 0.325, and cuts off by 
+
+z = 0.5 — the redshift of 0.378 of Galaxy A is well below the cutoff at z = 0.5, and agrees very closely with the pre-dicted redshift distribution once its magnitude is considered, 
+
+P(z|xrad , m = 23.03). However, if Galaxy B is the true host, its expected redshift, P(z|xrad , m = 23.03), is likely to be even higher than that of Galaxy A, and hence be more discrepant from the Macquart Relation. Furthermore, this would require Galaxy A to be a field galaxy of very low redshift for its faint magnitude, since the probability distribution, PF(z|m = 23.03), peaks at z > 1. Hence, it is far more likely that Galaxy A is the true host. In Table 1, we give the relevant likelihood values for optical parameters (the relative likelihood of this FRB being detected at all, P(xrad ), is independent of the host scenario). While the probability P(⃗x |O) of observing the FRB localisation ellipse given that a galaxy is the true host is four times more likely              
+
+> Figure 8. Predicted redshift distributions for the host galaxy of FRB 20190611B. Shown is the predicted redshift based on observed radio properties, P(z|xrad ); distributions given a specific host galaxy magnitude,
+> P(z|xrad ,m), for magnitudes corresponding the two host galaxy candidates, J212258.0-792350 (‘Galaxy A’) and J212259.0-792352 (‘Galaxy B’); and the predicted redshift distributions of these galaxies if they are field galaxies,
+> PF(z|m). The detected redshift of Galaxy A, z= 0.378 , is also indicated.
+
+for the fainter galaxy, both the magnitude (relative values of P(O|xrad ) and ρ(m)), and the redshift (relative values of 
+
+P(z|m, xrad ) and PF(z|m, xrad ), point to Galaxy A being the true host, with a probability P(O|xrad , xopt ) = 0.97. We also note that the density of m = 26.4 galaxies on the sky is approximately one per 50 arcsec 2 — it is therefore not surprising that, in a sample of 35 localised FRBs, one has such a dim field galaxy overlapping its localisation region. It would be extremely surprising, however, were Galaxy B to be the true host, that it would coincidentally be located on the sky very close to a rarer m = 23.03 galaxy — especially one with such a low redshift. Both considerations are quantitatively included in our new framework, and the resulting likelihoods reflect these arguments. 
+
+6. Verification 
+
+We now proceed to show that our methodology correctly re-produces model parameters. We model the CRAFT CRACO system (Wang et al. 2025), with survey parameters from the 900 MHz band at 12.8 ms time resolution Z. Wang et al., 2016 (in prep), using the FRB population and cosmological parameters from Hoffmann et al. (2026). We then sample Monte-Carlo-generated FRBs as performed in James, Ghosh, et al. (2022), producing the set { z, DM , w, B, s}. The appar-ent magnitude distribution of host galaxies is taken from the ‘Loudas25’ model described in C. W. James et al. (2026), and based on the work of Loudas et al. (2025). We choose this model because it allows model fitting by varying a single pa-rameter, fsfr . For this test, we set fsfr = 1.5, approximately the lower limit found by C. W. James et al. (2026), reflecting that FRB host galaxies tend to be fainter than predicted when tracing star-formation, and much fainter than predicted by following stellar mass. 10 C. W. James et al.                                   
+
+> Table 1. Calculated probabilities of hosts for FRB 20190611B, showing the relative posterior likelihoods for the original host galaxy, J212258.0-792350 (‘Galaxy A’), against that of the alternative, J212259.0-792352 (‘Galaxy B’), using our combined PATH and ZDM framework. Candidate mrθϕP(O|xrad )ρ(m)P(⃗x|O)P(z|m)PF(z|m)P(O|xrad ,xopt )
+> Galaxy A: J212258.0-792350 23.03 2.05 0.54 0.127 0.128 0.0013 4.95 0.32 0.97 Galaxy B: J212259.0-792352 26.4 0.74 0.29 0.00029 0.020085 0.020 N/A N/A 0.0006
+> Figure 9. Distribution of Monte-Carlo sampled FRBs and host galaxies from the ASKAP/CRACO 900 MHz survey.
+
+The resulting sample of 1,000 FRBs is shown in the scatter plots of Figure 9. Each of these simulated hosts are assigned a real host galaxy according to the procedure of B.C. Andersen et al. (in prep., 2026). Briefly, each FRB’s nominal host mr is matched to a real galaxy detected in the DESI Legacy Imaging Surveys (Dey et al. 2019) for 14 ≤ mr ≤ 22, the the Hyper Suprime-Cam Subaru Strategic Program (HSC-SSP) 3 rd public data release for 22 < mr (Aihara et al. 2022), and the Heraklion Extragalactic Catalogue (HECATE; Kovlakas et al. 2021) for very bright hosts ( mr < 14). We assume a true FRB offset distribution of an exponential with scale size ϕ equal to half of the host’s angular scale ψ, and generate a random offset corresponding to a localisation uncertainty of σFRB = 0.5 ”.Cutouts of 10 ” square are then taken about each nominal FRB position using the DESI Legacy surveys only. A comparison of the (simulated) distributions of galaxy magnitudes for all hosts, visible hosts, and “field” galaxies (i.e., catalogue galaxies within the 10 ” cutouts that are not hosts) is given in Figure 10. Since FRB host galaxies were selected from this survey in the magnitude range 14 ≤ mr ≤ 22, we also restrict the field galaxies the same range. This leaves 623 true FRB hosts, 377 FRBs with no true host, and 440 field galaxies in the sample. As noted in the Introduction, FRB observations have a wide range of localisation fidelities. To investigate how our proce-dure behaves in a regime where localisation is relatively poor, we re-run the galaxy assignment procedure of B.C. Andersen et al. (in prep., 2026) when using an accuracy of σFRB = 30 ”,and extend the region of analysed galaxies to be all within 2 ′     
+
+> Figure 10. Histogram of galaxy magnitudes, representing the true host magni-tude distribution estimated by ZDM ; the visible host distribution of matched galaxies taken from the DESI Legacy surveys; the distribution of non-host galaxies in the 2′cutouts about the simulated galaxy locations from the
+> 30 ”localisation sample; and the expected field galaxy angular density from Driver et al. (2016).
+
+of the simulated FRB position. This means that the host offset distribution f (θ/ϕ), and hence P(O|⃗x ), contains no informa-tion, since all except the most nearby galaxies will be point-like with respect to the localisation. In this sample, the 41,800 field galaxies dominate over the 637 hosts. We can see from Figure 10 that the angular density of field galaxies in the DECaLS catalogue matches the expectation from Driver et al. (2016), when the 30 ” localisation sample is analysed. However, we see a slight excess of field galaxies beyond expectations at low magnitudes. We therefore derive a correction function c(mr) of the form 
+
+ρ′ = c(mr)ρD16 
+
+c(mr) = 1.03 + 4.26 exp(14.0 − mr), (45) and use it where noted below. 
+
+6.1 MCMC verification 
+
+In order to show the utility of our likelihood function of Eq. 39, we run an MCMC using Python’s EMCEE package (Foreman-Mackey et al. 2013) as per Hoffmann et al. (2025). We allow our full set of ZDM parameters to vary: the Hubble constant 
+
+H0, fluctuation parameter F, mean μhost and standard devia-tion σhost of log 10 DM host , the Milky Way halo contribution DM halo , and FRB energy function parameters log 10 Emax and 
+
+γ, respectively describing the turnover energy (in ergs, assum-ing 1 GHz emission bandwidth) and cumulative slope of the Cambridge Large Two 11                                                                                          
+
+> Table 2. Parameters fit to our synthetic FRB data, giving the prior minimum and maximum ranges, truth values, and estimates using combined PATH
+> and ZDM analysis developed in this work, and using only confidant hosts with P(O|X) > 0.95 in a ZDM -only analysis. Parameters are: F, the ‘fluctua-tion’ parameter from Eq. 19 governing the intrinsic variation in DM cosmic ;nsfr ,which modulates the scaling of the FRB population with the star-formation rate according to Eq. 10; α, being the frequency-dependent FRB rate in Eq. 11;
+> μhost and σhost are the mean and standard deviation of the assumed log-normal distribution of host galaxy DMs; Emax , and γare the parameters of the FRB luminosity function, which is parameterised as a Schechter function via Eq. 8, with log 10 Emin (erg) = 30 ;H0is the Hubble constant; fsfr is the scal-ing of the FRB host galaxy magnitudes with the star-formation rate according to the Loudas25 model; and ϕis the exponential scale size of FRB offsets from their host galaxy centres relative to the galaxy’s half-light radius. Priors Estimates Parameter Min Max Truth Combined Confidant
+> log 10 F-2 0-0.49 −0.64 +0.19
+> −0.16 −0.52 +0.21
+> −0.21
+> nsfr 0.0 4.0 2.88 3.05 +0.65
+> −0.94 2.9 +0.8
+> −1.1
+> α-4 0. -1.55 −2.2 +2.3
+> −1.6 −2.7 +2.6
+> −2.0
+> μhost 1.0 3.0 2.13 2.16 +0.09
+> −0.09 2.17 +0.09
+> −0.09
+> σhost 0.1 1.5 0.46 −0.52 +0.08
+> −0.08 0.46 +0.10
+> −0.08
+> log 10 Emax (erg) 40 43.0 40.9 40.84 +0.10
+> −0.08 40.91 +0.12
+> −0.12
+> γ-2.0 0.0 -1.12 −1.08 +0.06
+> −0.05 −1.07 +0.06
+> −0.06
+> H0[pc cm −3]60 80 70.63 75.0 +6.7
+> −7.2 70.7 +8.5
+> −7.8
+> DM halo 0100 68 67.0 +7.0
+> −9.6 61.2 +9.4
+> −14.0
+> fsfr 021.5 1.57 +0.06
+> −0.07 N/A
+> ϕ0.01 60.5 0.45 +0.03
+> −0.03 N/A
+
+FRB energy function; scaling of the FRB rate according to the star-formation rate to the power nsfr ; and α, which governs the frequency-dependence of the FRB rate as R ∼ να. We do not fit Emin in this dataset, due to numerical instabilities regarding the sharp minimum cut-off in the energy function, as described in Appendix Appendix 1. We fit the data using the Loudas25 model, with free pa-rameter fsfr , and also fit for the exponential width of the FRB offset distribution, θ0. These parameters, their simulated truth values, and their (uniform) priors, are defined in Table 2. We estimate the likelihood according to the equations given in § 3, and use the EMCEE (Foreman-Mackey et al. 2013) package to run a Markov Chain Monte Carlo with 40 walkers, with 2400 steps each. We allow for a burn-in of 1000 steps per walker, giving 40 × 1400 total samples. The resulting corner plot and parameter estimates are given in Figure 11 and Table 2, respectively. Pearson correlation coefficients between parameters are given in Figure 12. We see from Figure 11 that all parameters are correctly estimated (i.e., the simulated truth lies within a small, well-defined error range), and deviations from the expected mean values are purely due to random statistical errors, with two exceptions. The first is α, where a single survey contains very little constraining power — primarily due to its degeneracy with nsfr . Thus constraints are primarily due to the priors. The other is θ0, the characteristic scale size of the exponential distribution of FRB offsets from their host centres. We show in § 6.1.1 that this is due to the 10 ” × 10 ” image size missing relatively nearby hosts. As shown in Figure 12, our analyses reproduces well-studied correlations in FRB population parameters, i.e. be-tween H0, Emax , μhost , and log 10 F (Baptista et al. 2024); DM halo , μhost , and σhost (Hoffmann et al. 2026); and α and 
+
+nsfr (James, Prochaska, et al. 2022). Importantly, we find only very weak correlations between our optical parameters ( fsfr , θ0)and others. Nonetheless, the fact that weak correlations do exist (e.g. -6% between θ0 and H0, or 8% between fsfr and DM halo ) illustrates that precision cosmological measurements will require an accurate estimate of FRB host behaviour, to avoid the influence of host galaxy bias. 
+
+6.1.1 Biasing effects of image size 
+
+Our MCMC procedure estimates θ0 = 0.45 ± 0.03, compared to a simulated truth of 0.5. In Figure 13, we plot L(θ0) when holding all other parameters constant at their simulated truth values, reproducing the bias with a best-estimate of θ0 = 0.44. What causes it? An incorrect estimate of the field galaxy density ρ(m) affects θ0 through Eq. 39. Increasing ρ(m) de-creases the factor multiplying P(⃗x |O) for field galaxies, which causes the likelihood to maximise by decreasing P(⃗x |O) further. For field galaxies which are (on average) further from the FRB, this means decreasing θ0. As shown in Figure 13, artificially increasing ρ(m) by a factor of 10 causes the estimated θ0 to decrease by ∼0.1, and vice versa. However, while our esti-mates of background density are imprecise (see Figure 10 and Eq. 45), they are not sufficiently inaccurate to account for this effect. It turns out that this bias is due to the 10 ” × 10 ” image size used in our synthetic sample, which fails to include the host for FRBs located in the outskirts of large, nearby galaxies. For our simulated sample, galaxies with 14 ≤ mrle 15 have a mean half-light radius of 8.6 ”, meaning that these images will miss a large fraction of all true hosts — and hence, host offsets. These missing, high-offset hosts will cause the estimated offset distri-bution to be biased towards FRBs close to their host centres, i.e., a low value of θ0. Using simulated images of 60 ′′ × 60 ′′ 
+
+causes the estimated value of θ0 to increase from 0.45 to 0.48. We therefore conclude that this is the cause of the observed bias. 
+
+6.2 Verification of posterior distributions 
+
+To more precisely test the utility of our framework in re-producing the underlying FRB host galaxy distributions, we compare in Figure 14 the cumulative magnitude distributions of the underlying truth (both the model, and the distribution of hosts assigned by the procedure of B.C. Andersen et al. (in prep., 2026)), and the posterior distributions when weighting candidates by P(O|xopt , xrad ) from Eq. 44. We also compare this against results from a PATH only analysis when setting priors P(U) = 0.1. In this latter case, we construct posterior distributions both by selecting ‘confident’ associations only, i.e. only host candidates with P(O|x) > 0.95, and when weighting all candidates by their posteriors, P(O|x). This is repeated for both the σFRB = 0.5 ” and σFRB = 30 ” localisation samples. 12 C. W. James et al. 
+
+Figure 11. Cornerplot showing parameter estimates based on our synthetic dataset. In the single-parameter plots, simulated truth values are shown as vertical blue dashed lines, while vertical black dashed lines indicate the 16%, 50%, and 0.84% quantiles. Cambridge Large Two 13 
+
+Figure 12. Pearson correlation coefficients between our estimated parame-ters, using the synthetic sample of CRACO FRBs generated according to the methods of B.C. Andersen et al. (in prep., 2026). 
+
+Figure 13. Likelihood of exponential scale size of FRB offset from host galaxy centre, L(θ0), evaluated on our simulated CRACO sample of FRB host galax-ies. Shown are estimates for the standard sample of 1,000 FRBs, using images of simulated size 10 ” × 10 ”, with a systematic bias towards low values of θ0;evaluations of 1,000 FRBs where the background galaxy density ρ(m) has been artificially increased to 10 ρ(m) and decreased to 0.1 ρ(m); and when using simulated images of 60 ” × 60 ”.
+
+Figure 14. Cumulative magnitude distributions of FRB host galaxy candidates for the synthetic samples with localisation accuracy of a: σFRB = 0.5 ”, and b: 30 ”. Shown are the true host galaxy distribution; distribution of assigned hosts according to the procedure of B.C. Andersen et al. (in prep., 2026); the posterior distribution found via the combined ZDM and PATH analysis of this work; the same, but for an uncorrected galaxy density function; the resulting posterior distributions when performing a traditional PATH analysis by assuming P(U) = 0.1 and taking only ‘firm’ candidates with P(O|x) > 0.95 ; and the same, but without cutting on P(O|x), and instead weighting all candidates by P(O|x). Note that in a), the ZDM + PATH and PATH ∝ P(O|x)
+
+curves overlap, while in b), no candidates satisfied the P(O|x) > 0.95 criteria. 14 C. W. James et al. 
+
+Applied to the σFRB = 0.5 ” sample, we see that both our combined ZDM and PATH framework, and the PATH-only analysis when weighted by P(O|x), reproduce the distribution of assigned hosts to very high accuracy. The correction factor to ρD16 has negligible effect, since in this sample, the term 
+
+P(x|O) (for the probability of observing an FRB at the given position x given O is the host) in Eq. 39 contains more infor-mation than the relative number of candidates compared to expectations, ρ(m). Using confident hosts only (of which there are 537) produces a slight bias against bright host galaxies, which get down-weighted compared to the distribution of all host candidates. We suspect this is because the large angular size of bright galaxies limits the maximum value of P(x|O), since that probability gets distributed over a large region of sky — in the limit that a galaxy takes up the entire sky, the term 
+
+P(x|O) will be (4 π)−1 sr −1. This in turn limits the maximum value of P(O|x) for these galaxies, pushing them below the 0.95 ‘confidant’ threshold. Applied to the σFRB = 30 ” sample, our combined ZDM and PATH methodology well-reproduces the true host distri-bution, albeit with a slight excess of 18 < mr < 21 hosts. We expect that this difference is statistically significant, and may arise from within either the ZDM or PATHframework. It is not due to the correction factor to the background galaxy density ρ(mr) of Eq. 45, which produces only a small change in the distribution. We leave studying this systematic to a fu-ture analysis, perhaps similar to the methods of B.C. Andersen et al. (in prep., 2026), to uncover this error. What is certain however is that our estimates produce a vast improvement over the a PATH-only analysis: not a single candidate passes the P(O|x) > 0.95 confidence cut, and even a PATH analy-sis which has been correctly weighted by P(O|x) produces a highly biased posterior distribution towards bright galaxies. 
+
+6.3 Estimation of host galaxy bias 
+
+To estimate the potential bias of only using well-identified FRB hosts in population analyses, we construct the following example. We take only the 537 FRBs from our synthetic 
+
+σFRB = 0.5 ” sample identified to have P(U|x) > 0.95 in a traditional PATH analysis as described above, and use these in a ZDM-only analysis studying FRB population properties. This very approximately simulates the sample of FRBs used by Sharma et al. (2024) and Connor et al. (2025), which primarily uses optical data from the DESI Legacy Imaging Surveys (Dey et al. 2019) to identify FRBs detected by DSA, which has a sensitivity similar to that of CRACO. To avoid artificial bias due to our mr ≥ 14 cut, we assume all FRBs with true hosts of magnitude mr < 14 have a correctly identified host. The resulting parameter estimates are compared to truth values in Table 2. Differences in parameter estimates between this and the combined PATH and ZDM analysis above are due both to biases from using confidant galaxies only, and also random statistical errors from the properties of the 463 FRBs without confidant hosts (since precisely the same sample of FRBs is used, random errors from FRBs with confidant hosts behave identically). This shows that any biases present when using confidant host galaxies only are smaller than ran-dom statistical errors, since approximately half the parameters (F, nsfr , σhost , Emax , H0) are better-estimated with confidant hosts only, and the other half ( α, μhost , γ, DM halo ) are not. This suggests that these effects are not very important when using a sample of 1000 FRBs. We observe however that parameter estimates made us-ing the combined analysis are more precise (reduced errors) for some parameters ( nsfr , α, σhost , Emax , H0, DM halo ; error re-ductions of ∼20%), while they are equally precise for others (F, μhost , γ). This is due to the information contained in the FRBs without confidant hosts — both through their DM, and constraints placed on their redshift. This suggests that the primary advantages of using our updated method are an unbiased distribution of FRB hosts, and increased precision in host identification, with a small increase in precision of FRB population parameter estimates being a secondary benefit. 
+
+7. Analysis of CRAFT data 
+
+Having verified the ability of our model to reproduce simulated truths in the face of experimental biases, we proceed to apply it to real FRB data. We now apply our methodology to the ASKAP/CRAFT ICS survey, which are modelled in ZDM as described in C W James et al. (2022). This dataset has now been expanded by Hoffmann et al. (2026) to consist of 43 FRBs presented by Shannon et al. (2025), detected over the frequency range 663.5–1799.5 MHz, up until mid 2024. Of these, 37 have DM, s, B, weff ∈ xrad , and six FRBs have DM, s, weff ∈ xrad .This is because the beam values B are taken from Arcus et al. (2025), which used a subset of these FRBs up until the end of 2023. While the scattering τ and intrinsic widths wi of these bursts have been analysed in Scott et al. (2025), and can be used to constrain the FRB scattering and intrinsic width distributions as shown by Clancy William James et al. (2026), only weff affects detectability. Modelling these intrinsic dis-tributions allows for their redshift-dependence, and can affect the inferred z-dependent rate. However, there is no current empirical evidence for a redshift dependence of these proper-ties, and including such dependence in ZDM causes the code to take significantly longer to run, so we do not use them here. Optical properties xopt , i.e. galaxy magnitudes, positions, and angular sizes, are available from Shannon et al. (2025) for a total of 32 of these FRBs — note that the image of FRB 20240210A was accidentally omitted from this work, but has since been published by Gordon et al. (2025). To these we add the FRB 20210912A field, which as shown by Marnoch et al. (2023), did not yield any apparent host. All images are taken by the FOcal Reducer and low dispersion Spectrograph (FORS2; Appenzeller and Rupprecht 1992) on the ESO Very Large Telescope (VLT) in a combination of 
+
+g, R, and I bands — we approximately adjust between bands according to C. W. James et al. (2026), by adding/subtracting 0.65 from I and g band magnitudes, respectively, to scale to 
+
+R band magnitudes. The probability of identifying a galaxy Cambridge Large Two 15 
+
+Figure 15. Cornerplot of our MCMC analysis of the CRAFT ICS sample. Definitions of parameters are given in Table 2. See text for explanations. 16 C. W. James et al. 
+
+within these images, P(O|m), is also modelled in C. W. James et al. (2026), where P(O|m) is 50% at mR = 26.18, and is 90% (10%) at 25.42 (26.93). This makes for a total of 33 FRBs for which P(xopt , xrad ) is calculated according to Eq. 39, and 10 for which only P(xrad ) is calculated. We optimise over the same set of parameters given in § 6, using an MCMC with 40 walkers, and 6000 steps, again dis-carding the first 1,000 as a burn-in sample. The results are shown in Figure 15. Firstly, we note that the limits shown on cosmological ( F,
+
+H0) and FRB population parameters (e.g., α) are not the most stringent in the literature. The CRAFT ICS sample spans a limited range of frequency and sensitivity, and contains rela-tively few high-redshift FRBs. In particular, the measured rates are inconsistent with previous observations in Fly’s Eye mode (James, Bannister, et al. 2019; Shannon et al. 2025), making estimation of α (which is mostly influenced by the measured rate as a function of observing frequency) particularly poor. Therefore, we find relatively weak constraints on most pa-rameters, and several are not constrained within their prior limits. Combining these observations with localised FRBs from more-sensitive telescopes, such as MeerTRAP (Pastor-Marazuela et al. 2025) and DSA (Sharma et al. 2024), gives the most up-to-date limits on these parameters — see Hoffmann et al. (2026) for our most recent results. Hence, in this calculation, we are not overly concerned with parameters pressing up against their priors. Rather, we seek to show that our extended likelihood analysis does not skew previously well-established results with this dataset — and our results are clearly consistent with those of Hoffmann et al. (2026). Our results also reproduce the strong preference for high values of fsfr > 1 originally seen in C. W. James et al. (2026), which as discussed there, is driven by the FRB hosts being pre-dominantly faint galaxies. We also quantitatively constrain the exponential offset distribution scale parameter θ0 = 0.41 +0.13 
+
+> −0.09
+
+,which is the first time this parameter has been fit while con-sidering the influence of field galaxies. Our value is consistent with θ0 = 0.5 found by Shannon et al. (2025) when assuming confident host associations. We leave it to other works to inter-pret this relatively centrally dominated distribution in light of expectations from different FRB progenitor models, e.g. using the methods of Bhandari et al. (2022). 
+
+8. Discussion 
+
+We have developed a combined framework for simultaneously fitting radio FRB data and optical follow-up images in § 3, shown that it correctly estimates simulated truth parameters in § 6, applied it to a sample of CRAFT FRBs in § 7 — and found that it yields very little new information. However, the methodology presented here was explicitly developed to consider cases where there is significant host uncertainty, and the CRAFT ICS sample has the least in the entire FRB liter-ature. We therefore now discuss cases where we expect this methodology to have a significant impact. 
+
+8.1 Overcoming completeness cuts in ZDM Previous work in the ZDM code relied on analysing a ‘com-plete’ section of the z–DM parameter space, represented by confident P(U|x) ≳ 0.95 host galaxies estimated by PATH. This could create a bias in the z–DM relation, since distant (high-z) FRBs would be less likely to have confidant hosts. While we have shown in § 6.3 that such biases with current FRB samples are likely to be small, confirming the conclusions of Sharma et al. (2026), the actual bias in true FRB population parameters (as opposed to our simulated estimates of the truth) remains unknown. The lower the DM of an FRB however, the lower the maximum FRB redshift, and hence the lower the chance of the host redshift distribution being biased. To ensure a complete sample therefore, in previous works using ZDM, a maximum FRB DM, DM max EG , was identified for each FRB survey, such that all FRBs with DMs up to and including DM max EG would have confidant hosts (except where reasons unrelated to an FRB host’s redshift, e.g. missing radio data or Galactic extinction, prevented optical follow-up). For the CRAFT ICS sample of Shannon et al. (2025), we have set DM max EG = 1000 pc cm −3,due to the host of FRB 20210912A, with DM EG ≈ 1150, being unidentified (Marnoch et al. 2023). Consequently, the measured redshift of 1.016 of FRB 20220610A (Gordon et al. 2024), with DM EG ≈ 1380 pc cm −3 (Ryder et al. 2023), has not been used in ZDM analyses. This has proven to be a similarly minor effect for MeerKAT. Pastor-Marazuela et al. (2025) published the sample of 15 FRBs detected by MeerKAT, of which 13, when combined with FRB 20230808F published by Hanmer et al. (2025), represents a complete sample of all MeerKAT FRBs detected during 2023. Of these, nine have arcsecond localisations, yielding four con-fidant hosts with spectroscopic redshifts, and three with photo-metric redshifts. Of the two FRBs without confident hosts, one is located in the Galactic plane, so that DM max EG = 1395 pc cm −3
+
+is set by FRB 20230827E, for which no host was found. How-ever, this cut does not reduce the amount of available data, since neither FRB with higher DM EG had an identifiable host. Four of the 13 FRBs have arcminute-scale localisations, and do not have confidant hosts. Our first example where such completeness cuts severely impact the usable data volume is for DSA. Hoffmann et al. (2025) analysed the sample of 25 DSA FRBs presented by Sherman et al. (2024), of which 11 had confidant hosts and measured red-shifts (Law et al. 2023). FRB 20220121B, with DM EG ≈ 183, did not have a measured redshift, setting DM max EG = 183 pc cm −3.This cut excluded eight of the redshifts from the analysis. The low value of DM max EG was due to the relatively shallow Pan-STARRS1 catalogue (Chambers et al. 2016) being used for host identification. An even more extreme example is that of CHIME FRBs, where the ∼ 10 ′ localisation accuracy of the majority of the 3641 unique sources (Chime/Frb Collaboration et al. 2026) precludes confidant host associations. The lack of host galaxy associations within the local volume for low-DM FRBs in the first CHIME catalog (CHIME/FRB Collaboration et al. 2021; Cambridge Large Two 17 
+
+Mohit Bhardwaj et al. 2025) constrains the low end of the FRB energy distribution — however, this non-observation, like other non-observations of FRB host candidates of suffi-cient nearness and/or brightness to be significant, could not be comprehensively included in a z–DM analysis. The sample of 81 FRBs localised to approximately 2 ” × 60 ” by Chime/Frb Collaboration et al. (2025) has 21 securely identified hosts. The completeness of this sample is limited by FRB 20230913A, with DM EG ≈ 150 pc cm −3, meaning that only 10 of the 21 FRBs with hosts lie within the DM EG < DM cut EG = 150 region. Our new methodology dispenses with the notion of com-pleteness cuts, either in DM-space, or in P(O|x), by fully mod-elling the bias against detecting more-distant FRB hosts. This will allow not just the many FRBs with confident FRB host associations, but which fail the DM EG < DM cut EG criteria, to be included in analyses — it will also allow the information of a non-observation of a confident host, or the properties of ambiguous hosts, to be included in constraining FRB host and population models. We have not included such a re-analysis of the above sam-ples in this current work, purely because we wish to focus on the methodology. We instead leave this to future works, where we will aim to include MeerTRAP FRBs with arcminute lo-calisations, DSA FRBs with and without confidant hosts, and a very large number of FRBs from CHIME, potentially ranging from VLBI localisations using CHIME outriggers, to those without even baseband data. 
+
+8.2 Inclusion of repeating FRBs 
+
+The question of whether or not all FRBs repeat has been the subject of much debate — a good discussion covering recent results is given in Cook et al. (2026). For now, we high-light the suggestion that repeating FRBs favour dwarf, low-metallicity hosts, while apparently once-off FRBs more closely track star-formation. The first evidence of this came when once-off FRB 20180924A was localised to a large spiral galaxy (Bannister et al. 2019), in contrast to the dwarf host of re-peating FRB 20121102A (Chatterjee et al. 2017; Tendulkar et al. 2017). Statistical tests of host properties of repeaters and once-offs, e.g. those performed Bhandari et al. (2022), have been hampered however by the localisation bias. It is much easier to localise, and hence find the host galaxies for, repeat-ing FRBs, both because multiple detections further constrain the localisation region (as was used to identify NGC 3252 as the host of FRB 20181030A by M. Bhardwaj et al. 2021), and because they can be followed up with more-sensitive, higher angular resolution telescopes than the discovery in-strument (for example, the localisation of the first repeater, FRB 20121102A Chatterjee et al. 2017; Tendulkar et al. 2017). Thus, dwarf hosts can be pinpointed much more securely for repeating than once-off FRBs, as most obviously demon-strated by the confirmation of the lowest-mass FRB host galaxy yet, being the log 10 (M∗/M⊙) = 7.88 dwarf host for repeat-ing FRB 20190417A by Ibik et al. (2024) and Moroianu et al. (2026). Repeating FRBs are expected to have different redshift distributions than non-repeating FRBs, since they must neces-sarily be closer for multiple bursts to be detectable (Gardenier et al. 2021). FRBs observed to repeat more frequently will also be more likely to have a known host, because follow-up observations will be more likely to detect subsequent bursts, as well as having close hosts. The simplest demonstration of this is FRB 20180916B (Marcote et al. 2020), which remains the CHIME FRB with the greatest number of repeats seen (Cook et al. 2026), and has a host galaxy at only z = 0.0337. A simple implementation of repeating FRBs, which as-sumes Poissonian arrival times, and time/frequency structures which are independent of repetition strength, has been im-plemented in ZDM. It has been used to show that the dec-lination and rate distribution of repeating FRBs, and the ra-tio of once-off to multiple bursts, in CHIME Catalogues 1 (James 2023) and 2 (Cook et al. 2026) are consistent with all FRBs being due to intrinsically repeating sources. How-ever, to date, no repeating FRB redshift has been included in ZDM. Until now, doing so would require identifying a completeness region in DM EG and Nrep space, where all re-peating FRBs with at least Nrep > Ncut rep detected repeats, and DM EG < DM cut EG , have an identified host. However, when applied to the 16 repeaters identified from CHIME Catalogue 1, some FRBs with Nrep = 3 do not have confident hosts, so that only FRB 20180916B ( Nrep = 19) and FRB 20180814A (Nrep = 11) pass the Nrep > Ncut rep criteria. The scarcity of repeating FRBs passing this completeness cut means that the redshift distribution of repeating FRBs is poorly constrained, since it is possible to fit the sample with a lower density of rapidly repeating objects, which are then detectable from a greater distance, and a large number of more rarely repeating progenitors, which are more likely to be located close enough to be detected (James 2023). Within our framework, the number of observed repeats, 
+
+Nrep , becomes a measureable radio property, i.e. Nrep ∈ xrad .Using repeating FRBs therefore requires modelling P(Nrep )and P(z|Nrep ) — which the ZDM code is already capable of doing. Thus, our framework should allow the known redshifts of repeating FRBs to be used to constrain their distribution. Such an analysis could also allow tests of whether or not the host galaxy distribution of repeating FRBs is significantly dif-ferent from that of apparently once-off FRBs. Since our code accounts for this bias, it should be able to reliably test (for instance) whether or not the true host magnitude distributions are consistent between repeaters and apparent once-offs. There is one complication to this optimism however. In order to localise most repeaters, follow-up observations need to detect at least one burst. Care will therefore have to be taken to account for any such biases arising from the follow-up procedure. We also leave such considerations to a future work. 
+
+8.3 Biases we cannot correct for 
+
+There is one remaining biases in the FRB literature that our new methodology cannot overcome — and that is reporting bias. There is a tendency, especially within astronomical liter-18 C. W. James et al. 
+
+ature, to only publish positive results, and not report observa-tions where nothing is seen. In the case of FRB literature, this can result in preferential publication of FRBs with unusual host galaxy properties, with an example being Ryder et al. (2023), where the high ( z > 1) redshift of the host led to publication before several less interesting FRBs from the same survey were made public. Another example is the 40 DSA FRBs presented by Sharma et al. (2024) and Connor et al. (2025). In those works, only FRBs with confident ( P(U|x) > 0.95) host associa-tions were published, leading to expected biases towards low-redshift, bright host galaxies. However, since FRBs without confident hosts were not published, completeness conditions could not even be estimated. In terms of our framework, these and similar works are choosing to include P(xopt |xrad ) based on the observed proper-ties of xopt — which opens one up to bias. As noted previously, one is free to choose any set of selection cuts based on xrad , and include P(xopt |xrad ) based on these, provided that the distribu-tion P(xopt |xrad ) accounts for those selection effects. A good example would be removing FRBs detected at low Galactic latitudes, which should not correlate at all with FRB host prop-erties, but does significantly increase uncertainty in DM EG ,and reduces the fidelity of follow-up images. Another is the aforementioned calculation of P(xopt |Nrep ∈ xrad ), where the observation of Nrep repeat bursts, required to include optical data, is explicitly accounted for. 
+
+8.4 Deficiencies in the current work 
+
+The key result of this is § 3, which merely presents the frame-work for simultaneously accounting for both optical and radio biases in FRB host galaxy analysis. However, our specific implementation of this framework is imperfect, and we here highlight several areas which we consider should be targeted for improvements. Firstly, there are the deficiencies in the three host galaxy models presented in C. W. James et al. (2026). As discussed in that work, the only host model based on theoretical expecta-tions (the Loudas25 model, based on scaling FRBs with host star-formation and/or stellar mass as per Loudas et al. 2025) only fits the expected FRB host galaxy distribution when taken to an unphysical limit ( fsfr ≫ 1). The other, better-fitting models are empirical, and based on FRB data mostly in the 
+
+z ≲ 0.5 range, and thus may not extrapolate well to higher redshifts. We have also specified these models in terms of R-band magnitude, mR, only — ideally, they should be adaptable to any commonly used optical band. We strongly encourage the community to continue to improve on FRB host models. Secondly, our current model for PF(z|m) (i.e., the redshift distribution of field galaxies) is only approximate, and is poorly estimated above z = 2, which affects PF(z|m) when m ≳ 20. This could be improved with the use of deeper spectroscopic catalogues, which we aim to implement in future works. Thirdly, in our methodology, host models are treated inde-pendently of FRB population properties. However, in reality, they will not be. For instance, a host model with FRBs tracing star-formation ( fsfr = 1) should also imply that the FRB popu-lation evolves with the star-formation rate ( nsfr = 1), while a fit for FRBs originating from the centres of hosts (i.e., low val-ues of θ0) should also yield higher expected values of DM host .Currently, it is probably best to keep these parameters inde-pendent, which allows fits that produce inconsistent values to be discarded, and greater emphasis to be placed on those results that tell a consistent story. However, as FRB analysis has grown more sophisticated, so has the number of correlated parameters being fit, meaning that the precision on measure-ments of key properties, such as H0, has not greatly improved with time. It may therefore be necessary to reduce the number of degrees of freedom by linking such analyses in the future. Fourthly, there have been several works suggesting cor-relations between FRB properties and hosts — in particular, higher scattering is expected to correlate with higher DM host 
+
+(Cordes, Ocker, and Chatterjee 2022), though such a relation is not seen empirically (Scott et al. 2025), possibly due to obser-vational biases and fluctuations in DM cosmic (Mas-Ribas and James 2026). Correlations have also been observed between a host’s inclination and an FRB’s DM L. Marnoch et al., in prep 2026 and rotation measure, RM (Glowacki et al. 2025). Including such correlations into our analysis would be possible, but would require adding RM to xrad (τ is already included, albeit not used in this work) and inclination to xopt , with a resulting increase in the complexity of the analysis. Fifthly and lastly, our method of generating synthetic im-ages only includes FRB hosts in the magnitude range 14 ≤
+
+mr ≤ 22, which limits our ability to simulate real FRB exper-iments. Furthermore, it only allows us to know the redshift of the true host. This should not be a problem if the statis-tical derivation of § 3 is correct, but it does prevent us fully testing the effect of P(z|m) terms in Eq. 39. We suggest per-forming a dedicated analysis, similar to the one performed by B.C. Andersen et al. (in prep., 2026) for the PATH-only case, but with full redshift information. 
+
+9. Conclusion 
+
+We have developed a methodology that fully accounts for uncertainty in the host galaxies of FRBs when estimating both host galaxy and FRB population parameters. We have extended previous work that provides well-motivated priors on FRB host magnitudes, using the FRB z–DM (Macquart) relation and host galaxy models, to produce a joint probability distribution of both radio and optical observables. We have so-far included only FRB host galaxy magnitude and redshift in the optical observables, but our methodology could be extended to include other parameters, such as angular size, or morphology. We have implemented our methodology by combining the ZDM and PATH codes. Tests using a synthetic sample of FRBs shows that both FRB host galaxy, and FRB popula-tion parameters, can be estimated accurately, with biases only occurring because of small image sizes. We have found correla-tions between FRB host galaxy properties and FRB population parameters to be less than 10%, and little bias in FRB population parameters when using confidant hosts only in a traditional PATH analysis, for a synthetic sample of well-localised FRBs. Cambridge Large Two 19 
+
+Nonetheless, such a bias may become important for precision cosmological measurements using more than 1,000 FRBs — and our methodology negates this, except for the inevitable bias due to the influence of the priors used in the analysis. We find that the main advantages of our method are to be able to directly fit for FRB host and population parameters, while fully and consistently accounting for biases; to be able to use poorly localised FRBs (i.e., with 30 ” localisation uncer-tainty) to study FRB host galaxies, where traditional methods, using confidant FRB hosts, fail; to improve confidence in un-certain FRB host associations, as demonstrated by confirming the previously identified host of FRB 20190611B; and (least significantly) to improve statistical confidence in parameter estimates, due to the ability to include more data. Applied to the CRAFT sample of FRBs, we find both FRB host and population parameters consistent with previous results, due to the high localisation accuracy of radio measurements, and deep optical follow-up. This also allows us to fit the FRB offset distribution, finding that FRBs are strongly biased to-wards the centres of their hosts, consistent with an exponential surface density with scale factor 0.41 +0.13  
+
+> −0.09
+
+times the half-light radius. Our methodology was developed however for cases where deep optical follow-up is not possible, and/or the FRB localisa-tion region is insufficient to clearly identify the host galaxy. We hope to apply our model to such data in the future. We have also identified several deficiencies in the current work, and highlight the need to test our model with a more de-tailed synthetic host galaxy sample, and to improve our models of FRB hosts. Future extensions to the work might include adding priors according to other host properties, e.g. incorpo-rating correlations between DM and host galaxy inclination (L. Marnoch et al., in prep 2026); we have been made aware, for instance, that Lee et al. (in prep) make use of spectroscopic fore-ground data (e.g. as per Lee et al. 2022; Khrykin et al. 2024) as conditional information for simultaneous inference of PATH posteriors, host DMs, and IGM/halo gas fractions. 
+
+Acknowledgement 
+
+This scientific work uses data obtained from Inyarrimanha Ilgari Bundara, the CSIRO Murchison Radio-astronomy Ob-servatory. We acknowledge the Wajarri Yamaji People as the Traditional Owners and native title holders of the Observatory site. CSIRO’s ASKAP radio telescope is part of the Australia Telescope National Facility (https://ror.org/05qajvd42). Op-eration of ASKAP is funded by the Australian Government with support from the National Collaborative Research Infras-tructure Strategy. ASKAP uses the resources of the Pawsey Supercomputing Research Centre. Establishment of ASKAP, Inyarrimanha Ilgari Bundara, the CSIRO Murchison Radio-astronomy Observatory and the Pawsey Supercomputing Re-search Centre are initiatives of the Australian Government, with support from the Government of Western Australia and the Science and Industry Endowment Fund. This work was performed on the OzSTAR national facility at Swinburne University of Technology. The OzSTAR pro-gram receives funding in part from the Astronomy National Collaborative Research Infrastructure Strategy (NCRIS) allo-cation provided by the Australian Government, and from the Victorian Higher Education State Investment Fund (VHESIF) provided by the Victorian Government. Based on observations collected at the European Organisa-tion for Astronomical Research in the Southern Hemisphere under ESO programme 1108.A-0027(A). 
+
+Funding Statement The authors declare no external sources of funding. 
+
+Competing Interests The authors declare no competing in-terests. 
+
+Data Availability Statement The data and results from this work can be obtained from the ZDM GitHub codebase (James, Prochaska, and Ghosh 2021), at https://github.com/FRBs/zdm. 
+
+References          
+
+> Aggarwal, Kshitij, Tamás Budavári, Adam T. Deller, Tarraneh Eftekhari, Clancy W. James, J. Xavier Prochaska, and Shriharsh P. Tendulkar. 2021. Probabilistic Association of Transients to their Hosts (PATH). ApJ 911, no. 2 (April): 95. https://doi.org/10.3847/1538- 4357/abe8d2. arXiv: 2102.10627 [astro-ph.HE] .Aihara, Hiroaki, Yusra AlSayyad, Makoto Ando, Robert Armstrong, James Bosch, Eiichi Egami, Hisanori Furusawa, et al. 2022. Third data release of the Hyper Suprime-Cam Subaru Strategic Program. PASJ 74, no. 2 (April): 247–272. https : / / doi . org / 10 . 1093 / pasj / psab122. arXiv: 2108.13045 [astro-ph.IM] .Appenzeller, I., and G. Rupprecht. 1992. FORS - the focal reducer for the VLT. The Messenger 67 (March): 18–21. Arcus, Wayne R., Clancy James, Ron Ekers, Jean-Pierre Macquart, Elaine Sadler, Randall B. Wayth, Keith Bannister, et al. 2025. The fast radio burst population energy distribution. PASA 42 (January): e003. https: //doi.org/10.1017/pasa.2024.114. arXiv: 2408.09351 [astro-ph.HE] .Bannister, K. W., A. T. Deller, C. Phillips, J. -P. Macquart, J. X. Prochaska, N. Tejos, S. D. Ryder, et al. 2019. A single fast radio burst localized to a massive galaxy at cosmological distance. Science 365, no. 6453 (August): 565–570. https://doi.org/10.1126/science.aaw5903. arXiv: 1906.11476
+> [astro-ph.HE] .Baptista, Jay, J. Xavier Prochaska, Alexandra G. Mannings, C. W. James, R. M. Shannon, Stuart D. Ryder, A. T. Deller, Danica R. Scott, Marcin Glowacki, and Nicolas Tejos. 2024. Measuring the Variance of the Mac-quart Relation in Redshift–Extragalactic Dispersion Measure Modeling. ApJ 965, no. 1 (April): 57. https://doi.org/10.3847/1538-4357/ad2705. arXiv: 2305.07022 [astro-ph.CO] .Bhandari, Shivani, Kasper E. Heintz, Kshitij Aggarwal, Lachlan Marnoch, Cherie K. Day, Jessica Sydnor, Sarah Burke-Spolaor, et al. 2022. Charac-terizing the Fast Radio Burst Host Galaxy Population and its Connection to Transients in the Local and Extragalactic Universe. AJ 163, no. 2 (February): 69. https://doi.org/10.3847/1538- 3881/ac3aec. arXiv: 2108.01282 [astro-ph.HE] .Bhardwaj, M., A. Yu. Kirichenko, D. Michilli, Y. D. Mayya, V. M. Kaspi, B. M. Gaensler, M. Rahman, et al. 2021. A Local Universe Host for the Repeating Fast Radio Burst FRB 20181030A. ApJ 919, no. 2 (October): L24. https://doi.org/10.3847/2041-8213/ac223b. arXiv: 2108.12122
+> [astro-ph.HE] .
+
+20 C. W. James et al. 
+
+Bhardwaj, Mohit, Victoria M. Kaspi, K. W. Masui, B. M. Gaensler, Adaeze L. Ibik, and Mawson W. Sammons. 2025. Constraining the Faint-end Slope of the Fast Radio Burst Energy Function Using CHIME/FRB Catalog-1 and Local Volume Galaxies. ApJ 989, no. 2 (August): 130. https : / / doi . org / 10 . 3847 / 1538 - 4357 / aded17. arXiv: 2506 . 21753 
+
+[astro-ph.HE] .Bilicki, Maciej, John A. Peacock, Thomas H. Jarrett, Michelle E. Cluver, Natasha Maddox, Michael J. I. Brown, Edward N. Taylor, et al. 2016. WISE × SuperCOSMOS Photometric Redshift Catalog: 20 Million Galaxies over 3/pi Steradians. ApJS 225, no. 1 (July): 5. https://doi.org/ 10.3847/0067-0049/225/1/5. arXiv: 1607.01182 [astro-ph.CO] .Caleb, Manisha, Themiya Nanayakkara, Benjamin Stappers, Inés Pastor-Marazuela, Ilya S. Khrykin, Karl Glazebrook, Nicolas Tejos, et al. 2025. A fast radio burst from the first 3 billion years of the Universe. arXiv e-prints (August): arXiv:2508.01648. https://doi.org/10.48550/arXiv. 2508.01648. arXiv: 2508.01648 [astro-ph.HE] .Chambers, K. C., E. A. Magnier, N. Metcalfe, H. A. Flewelling, M. E. Huber, C. Z. Waters, L. Denneau, P. W. Draper, D. Farrow, D. P. Finkbeiner, et al. 2016. The Pan-STARRS1 Surveys. arXiv e-prints (December): arXiv:1612.05560. https://doi.org/10.48550/arXiv.1612.05560. arXiv: 1612.05560 [astro-ph.IM] .Chatterjee, S., C. J. Law, R. S. Wharton, S. Burke-Spolaor, J. W. T. Hessels, G. C. Bower, J. M. Cordes, et al. 2017. A direct localization of a fast radio burst and its host. Nature 541, no. 7635 (January): 58–61. https: //doi.org/10.1038/nature20797. arXiv: 1701.01098 [astro-ph.HE] .Chime/Frb Collaboration, Thomas Abbott, Bridget C. Andersen, Shion An-drew, Kevin Bandura, Mohit Bhardwaj, Yash Bhusare, et al. 2026. The Second CHIME/FRB Catalog of Fast Radio Bursts. ApJS 283, no. 1 (March): 34. https : / / doi . org / 10 . 3847 / 1538 - 4365 / ae3828. arXiv: 2601.09399 [astro-ph.HE] .Chime/Frb Collaboration, Mandana Amiri, Daniel Amouyal, Bridget C. An-dersen, Shion Andrew, Kevin Bandura, Mohit Bhardwaj, et al. 2025. A Catalog of Local Universe Fast Radio Bursts from CHIME/FRB and the KKO. ApJS 280, no. 1 (September): 6. https://doi.org/10.3847/1538-4365/addbda. arXiv: 2502.11217 [astro-ph.HE] .CHIME/FRB Collaboration, Mandana Amiri, Bridget C. Andersen, Kevin Bandura, Sabrina Berger, Mohit Bhardwaj, Michelle M. Boyce, et al. 2021. The First CHIME/FRB Fast Radio Burst Catalog. ApJS 257, no. 2 (December): 59. https://doi.org/10.3847/1538-4365/ac33ab. arXiv: 2106.04352 [astro-ph.HE] .Connor, Liam, Vikram Ravi, Kritti Sharma, Stella Koch Ocker, Jakob Faber, Gregg Hallinan, Charlie Harnach, et al. 2025. A gas-rich cosmic web revealed by the partitioning of the missing baryons. Nature Astronomy 9(August): 1226–1239. https://doi.org/10.1038/s41550-025-02566-y. arXiv: 2409.16952 [astro-ph.CO] .Cook, Amanda M., Kaitlyn Shin, Ziggy Pleunis, Maxwell Fine, Naman Jain, Derek Bingham, Alice P. Curtin, et al. 2026. Discovery of 30 Repeating Fast Radio Burst Sources and Uniform Population Statistics of 80 Repeat-ing Sources from CHIME/FRB. arXiv e-prints (May): arXiv:2605.08410. https : / / doi . org / 10 . 48550 / arXiv . 2605 . 08410. arXiv: 2605 . 08410 
+
+[astro-ph.HE] .Cordes, J. M., and M. A. McLaughlin. 2003. Searches for Fast Radio Transients. ApJ 596 (October): 1142–1154. https://doi.org/10.1086/378231. eprint: astro-ph/0304364. Cordes, J. M., Stella Koch Ocker, and Shami Chatterjee. 2022. Redshift Es-timation and Constraints on Intergalactic and Interstellar Media from Dispersion and Scattering of Fast Radio Bursts. ApJ 931, no. 2 (June): 88. https://doi.org/10.3847/1538- 4357/ac6873. arXiv: 2108.01172 
+
+[astro-ph.HE] .Deng, Wei, and Bing Zhang. 2014. Cosmological Implications of Fast Radio Burst/Gamma-Ray Burst Associations. ApJ 783, no. 2 (March): L35. https://doi.org/10.1088/2041- 8205/783/2/L35. arXiv: 1401.0059 
+
+[astro-ph.HE] .Dey, Arjun, David J. Schlegel, Dustin Lang, Robert Blum, Kaylan Burleigh, Xiaohui Fan, Joseph R. Findlay, Doug Finkbeiner, David Herrera, Stéphanie Juneau, et al. 2019. Overview of the DESI Legacy Imag-ing Surveys. AJ 157, no. 5 (May): 168. https://doi.org/10.3847/1538-3881/ab089d. arXiv: 1804.08657 [astro-ph.IM] .Driver, Simon P., Stephen K. Andrews, Luke J. Davies, Aaron S. G. Robotham, Angus H. Wright, Rogier A. Windhorst, Seth Cohen, Kim Emig, Rolf A. Jansen, and Loretta Dunne. 2016. Measurements of Extragalactic Background Light from the Far UV to the Far IR from Deep Ground-and Space-based Galaxy Counts. ApJ 827, no. 2 (August): 108. https: / / doi . org / 10 . 3847 / 0004 - 637X / 827 / 2 / 108. arXiv: 1605 . 01523 
+
+[astro-ph.GA] .Foreman-Mackey, Daniel, David W. Hogg, Dustin Lang, and Jonathan Goodman. 2013. emcee: The MCMC Hammer. PASP 125, no. 925 (March): 306. https : / / doi . org / 10 . 1086 / 670067. arXiv: 1202 . 3665 
+
+[astro-ph.IM] .Gardenier, D. W., L. Connor, J. van Leeuwen, L. C. Oostrum, and E. Petroff. 2021. Synthesising the repeating FRB population using frbpoppy. A&A 647 (March): A30. https://doi.org/10.1051/0004- 6361/202039626. arXiv: 2012.02460 [astro-ph.HE] .Gardenier, D. W., and J. van Leeuwen. 2021. Multi-dimensional population modelling using frbpoppy: Magnetars can produce the observed fast radio burst sky. A&A 651 (July): A63. https://doi.org/10.1051/0004-6361/202040119. arXiv: 2012.06396 [astro-ph.HE] .Glowacki, Marcin, Apurba Bera, Clancy James, Jasper Patterson, Adam T. Deller, Alexa Gordon, Lachlan Marnoch, et al. 2025. An investigation into correlations between FRB and host galaxy properties. PASA 42 (November): e157. https://doi.org/10.1017/pasa.2025.10122. arXiv: 2506.23403 [astro-ph.HE] .Glowacki, Marcin, and Khee-Gan Lee. 2026. Cosmology with fast radio bursts. In Encyclopedia of astrophysics, volume 5, 5:448–470. January. https: //doi.org/10.1016/B978-0-443-21439-4.00073-0. arXiv: 2410.24072 
+
+[astro-ph.CO] .Gordon, Alexa C., Wen-fai Fong, Adam T. Deller, Lachlan Marnoch, Sung-soon Lim, Eric W. Peng, Keith W. Bannister, et al. 2025. Mapping the Spatial Distribution of Fast Radio Bursts within their Host Galaxies. ApJ 993, no. 1 (November): 119. https://doi.org/10.3847/1538-4357/ae0298. arXiv: 2506.06453 [astro-ph.GA] .Gordon, Alexa C., Wen-fai Fong, Charles D. Kilpatrick, Tarraneh Eftekhari, Joel Leja, J. Xavier Prochaska, Anya E. Nugent, et al. 2023. The Demo-graphics, Stellar Populations, and Star Formation Histories of Fast Radio Burst Host Galaxies: Implications for the Progenitors [in en]. Publisher: The American Astronomical Society, ApJ 954, no. 1 (August): 80. ISSN: 0004-637X, accessed September 16, 2023. https://doi.org/10.3847/1538-4357/ace5aa. https://dx.doi.org/10.3847/1538-4357/ace5aa. Gordon, Alexa C., Wen-fai Fong, Sunil Simha, Yuxin Dong, Charles D. Kilpatrick, Adam T. Deller, Stuart D. Ryder, et al. 2024. A Fast Radio Burst in a Compact Galaxy Group at z ∼ 1. ApJ 963, no. 2 (March): L34. https://doi.org/10.3847/2041-8213/ad2773. arXiv: 2311.10815 
+
+[astro-ph.GA] .Guo, Qi, and Khee-Gan Lee. 2025. A neural network model for the cosmic dispersion measure in the CAMELS simulations. MNRAS 540, no. 1 (June): 289–297. https : / / doi . org / 10 . 1093 / mnras / staf 730. arXiv: 2501.16709 [astro-ph.CO] .Hagstotz, Steffen, Robert Reischke, and Robert Lilow. 2022. A new measure-ment of the Hubble constant using fast radio bursts. MNRAS 511, no. 1 (March): 662–667. https://doi.org/10.1093/mnras/stac077. arXiv: 2104.04538 [astro-ph.CO] .Hanmer, K. Y., I. Pastor-Marazuela, J. Brink, D. Malesani, B. W. Stappers, P. J. Groot, A. J. Cooper, et al. 2025. Contemporaneous optical-radio observations of a fast radio burst in a close galaxy pair. MNRAS 538, no. 3 (April): 1800–1815. https://doi.org/10.1093/mnras/staf 289. arXiv: 2502.10153 [astro-ph.HE] .Cambridge Large Two 21 
+
+Hoffmann, Jordan Luke, Clancy James, Marcin Glowacki, Xavier Prochaska, Alexa Gordon, Adam Deller, Ryan M. Shannon, and Stuart Ryder. 2025. Modelling DSA, FAST, and CRAFT surveys in a z-DM analysis and constraining a minimum FRB energy. PASA 42 (January): e017. https: //doi.org/10.1017/pasa.2024.127. arXiv: 2408.04878 [astro-ph.CO] .Hoffmann, Jordan Luke, Clancy James, Xavier Prochaska, and Marcin Glowacki. 2026. I can see your halo: Constraining the MilkyWay halo DM with FRB population studies. PASA 43 (January): e017. https://doi.org/10. 1017/pasa.2026.10143. arXiv: 2601.05496 [astro-ph.GA] .Hotan, A. W., J. D. Bunton, A. P. Chippendale, M. Whiting, J. Tuthill, V. A. Moss, D. McConnell, et al. 2021. Australian square kilometre array pathfinder: I. system description. PASA 38 (March): e009. https: //doi.org/10.1017/pasa.2021.1. arXiv: 2102.01870 [astro-ph.IM] .Ibik, Adaeze L., Maria R. Drout, B. M. Gaensler, Paul Scholz, Navin Srid-har, Ben Margalit, T. E. Clarke, et al. 2024. A Search for Persistent Radio Sources toward Repeating Fast Radio Bursts Discovered by CHIME/FRB. ApJ 976, no. 2 (December): 199. https : / / doi . org / 10 . 3847 / 1538 -4357/ad808e. arXiv: 2409.11533 [astro-ph.HE] .Inoue, Susumu. 2004. Probing the cosmic reionization history and local en-vironment of gamma-ray bursts through radio dispersion. MNRAS 348, no. 3 (March): 999–1008. https : / / doi . org / 10 . 1111 / j . 1365 -2966.2004.07359.x. arXiv: astro-ph/0309364 [astro-ph] .Ioka, Kunihito. 2003. The Cosmic Dispersion Measure from Gamma-Ray Burst Afterglows: Probing the Reionization History and the Burst En-vironment. ApJ 598, no. 2 (December): L79–L82. https://doi.org/10. 1086/380598. arXiv: astro-ph/0309200 [astro-ph] .James, C W, E M Ghosh, J X Prochaska, K W Bannister, S Bhandari, C K Day, A T Deller, et al. 2022. A measurement of Hubble’s Constant using Fast Radio Bursts. MNRAS 516, no. 4 (November): 4862–4881. ISSN: 0035-8711, accessed January 16, 2023. https://doi.org/10.1093/mnras/stac2524. https://doi.org/10.1093/mnras/stac2524. James, C. W. 2023. Modelling repetition in zDM: A single population of repeating fast radio bursts can explain CHIME data. PASA 40 (Decem-ber): e057. https://doi.org/10.1017/pasa.2023.51. arXiv: 2306.17403 
+
+[astro-ph.HE] .James, C. W., K. W. Bannister, J.-P. Macquart, R. D. Ekers, S. Oslowski, R. M. Shannon, J. R. Allison, et al. 2019. The performance and calibration of the CRAFT fly’s eye fast radio burst survey. PASA 36 (February): e009. https : / / doi . org / 10 . 1017 / pasa . 2019 . 1. arXiv: 1810 . 04356 
+
+[astro-ph.HE] .James, C. W., R. D. Ekers, J.-P. Macquart, K. W. Bannister, and R. M. Shannon. 2019. The slope of the source-count distribution for fast radio bursts. MNRAS 483, no. 1 (February): 1342–1353. https://doi.org/10. 1093/mnras/sty3031. arXiv: 1810.04357 [astro-ph.HE] .James, C. W., E. M. Ghosh, J. X. Prochaska, K. W. Bannister, S. Bhandari, C. K. Day, A. T. Deller, et al. 2022. A measurement of Hubble’s Con-stant using Fast Radio Bursts. MNRAS 516, no. 4 (November): 4862– 4881. https://doi.org/10.1093/mnras/stac2524. arXiv: 2208.00819 
+
+[astro-ph.CO] .James, C. W., N. Loudas, M. Woodland, B. C. Andersen, J. X. Prochaska, J. L. Hoffmann, L. Marnoch, and S. D. Ryder. 2026. Updating the PATH framework with FRB host galaxy models. arXiv e-prints (June): arXiv:2606.10538. https://doi.org/10.48550/arXiv.2606.10538. arXiv: 2606.10538 [astro-ph.HE] .James, C. W., J. X. Prochaska, and E. M. Ghosh. 2021. Zdm. https://zenodo. org/record/5213780\#.YRxh5BMzZKA. V. 0.1, August 18, 2021. James, C. W., J. X. Prochaska, J.-P. Macquart, F. O. North-Hickey, K. W. Bannister, and A. Dunning. 2022. The z–DM distribution of fast radio bursts. MNRAS 509, no. 4 (February): 4775–4802. ISSN: 0035-8711, accessed August 31, 2023. https://doi.org/10.1093/mnras/stab3051. https://doi.org/10.1093/mnras/stab3051. James, Clancy William, Jordan Luke Hoffmann, J. Xavier Prochaska, and Marcin Glowacki. 2026. Estimation of intrinsic fast radio burst width and scattering distributions from CRAFT data. PASA 43 (March): e038. https : / / doi . org / 10 . 1017 / pasa . 2026 . 10173. arXiv: 2510 . 05654 
+
+[astro-ph.HE] .Khrykin, Ilya S., Metin Ata, Khee-Gan Lee, Sunil Simha, Yuxin Huang, J. Xavier Prochaska, Nicolas Tejos, et al. 2024. FLIMFLAM DR1: The First Constraints on the Cosmic Baryon Distribution from Eight Fast Radio Burst Sight Lines. ApJ 973, no. 2 (October): 151. https://doi.org/ 10.3847/1538-4357/ad6567. arXiv: 2402.00505 [astro-ph.GA] .Kovlakas, K., A. Zezas, J. J. Andrews, A. Basu-Zych, T. Fragos, A. Horn-schemeier, K. Kouroumpatzakis, B. Lehmer, and A. Ptak. 2021. The Heraklion Extragalactic Catalogue (HECATE): a value-added galaxy catalogue for multimessenger astrophysics. MNRAS 506, no. 2 (Septem-ber): 1896–1915. https : / / doi . org / 10 . 1093 / mnras / stab1799. arXiv: 2106.12101 [astro-ph.GA] .Laigle, C., H. J. McCracken, O. Ilbert, B. C. Hsieh, I. Davidzon, P. Capak, G. Hasinger, et al. 2016. The COSMOS2015 Catalog: Exploring the 1 < z < 6 Universe with Half a Million Galaxies. ApJS 224, no. 2 (June): 24. https://doi.org/10.3847/0067-0049/224/2/24. arXiv: 1604.02350 
+
+[astro-ph.GA] .Law, C. J., K. Sharma, V. Ravi, G. Chen, M. Catha, L. Connor, J. T. Faber, et al. 2023. Deep Synoptic Array Science: First FRB and Host Galaxy Catalog. arXiv e-prints (July): arXiv:2307.03344. https://doi.org/10. 48550/arXiv.2307.03344. arXiv: 2307.03344 [astro-ph.HE] .Lee, Khee-Gan, Metin Ata, Ilya S. Khrykin, Yuxin Huang, J. Xavier Prochaska, Jeff Cooke, Jielai Zhang, and Adam Batten. 2022. Constraining the Cos-mic Baryon Distribution with Fast Radio Burst Foreground Mapping. ApJ 928, no. 1 (March): 9. https://doi.org/10.3847/1538-4357/ac4f 62. arXiv: 2109.00386 [astro-ph.CO] .Leja, Joel, Joshua S. Speagle, Yuan-Sen Ting, Benjamin D. Johnson, Charlie Conroy, Katherine E. Whitaker, Erica J. Nelson, Pieter van Dokkum, and Marijn Franx. 2022. A New Census of the 0.2 < z < 3.0 Universe. II. The Star-forming Sequence. ApJ 936, no. 2 (September): 165. https://doi. org/10.3847/1538-4357/ac887d. arXiv: 2110.04314 [astro-ph.GA] .Li, D., P. Wang, W. W. Zhu, B. Zhang, X. X. Zhang, R. Duan, Y. K. Zhang, et al. 2021. A bimodal burst energy distribution of a repeating fast radio burst source. Nature 598, no. 7880 (October): 267–271. https://doi.org/ 10.1038/s41586-021-03878-5. arXiv: 2107.08205 [astro-ph.HE] .Lorimer, Duncan R., Maura A. McLaughlin, and Matthew Bailes. 2024. The discovery and significance of fast radio bursts. Ap&SS 369, no. 6 (June): 59. https://doi.org/10.1007/s10509-024-04322-6. arXiv: 2405.19106 
+
+[astro-ph.HE] .Loudas, Nick, Dongzi Li, Michael A. Strauss, and Joel Leja. 2025. Unveiling the Origin of Fast Radio Bursts by Modeling the Stellar Mass and Star Formation Distributions of Their Host Galaxies. ApJ 991, no. 1 (September): 85. https://doi.org/10.3847/1538- 4357/adf 555. arXiv: 2502.15566 [astro-ph.HE] .Luo, Rui, Yunpeng Men, Kejia Lee, Weiyang Wang, D. R. Lorimer, and Bing Zhang. 2020. On the FRB luminosity function - - II. Event rate density. MNRAS 494, no. 1 (May): 665–679. https://doi.org/10.1093/ mnras/staa704. arXiv: 2003.04848 [astro-ph.HE] .Macquart, J.-P., J. X. Prochaska, M. McQuinn, K. W. Bannister, S. Bhandari, C. K. Day, A. T. Deller, et al. 2020. A census of baryons in the Universe from localized fast radio bursts. Nature 581, no. 7809 (May): 391–395. https://doi.org/10.1038/s41586- 020- 2300- 2. arXiv: 2005.13161 
+
+[astro-ph.CO] .Mahony, Elizabeth K., Ron D. Ekers, Jean-Pierre Macquart, Elaine M. Sadler, Keith W. Bannister, Shivani Bhandari, Chris Flynn, et al. 2018. A Search for the Host Galaxy of FRB 171020. ApJ 867, no. 1 (November): L10. https : / / doi . org / 10 . 3847 / 2041 - 8213 / aae7cb. arXiv: 1810 . 04354 
+
+[astro-ph.HE] .22 C. W. James et al. 
+
+Marcote, B., K. Nimmo, J. W. T. Hessels, S. P. Tendulkar, C. G. Bassa, Z. Paragi, A. Keimpema, et al. 2020. A repeating fast radio burst source localized to a nearby spiral galaxy. Nature 577, no. 7789 (January): 190– 194. https://doi.org/10.1038/s41586-019-1866-z. arXiv: 2001.02222 
+
+[astro-ph.HE] .Marcote, B., Z. Paragi, J. W. T. Hessels, A. Keimpema, H. J. van Langevelde, Y. Huang, C. G. Bassa, et al. 2017. The Repeating Fast Radio Burst FRB 121102 as Seen on Milliarcsecond Angular Scales. ApJ 834, no. 2 (January): L8. https://doi.org/10.3847/2041- 8213/834/2/L8. arXiv: 1701.01099 [astro-ph.HE] .Marnoch, Lachlan, Stuart D. Ryder, Clancy W. James, Alexa C. Gordon, Mawson W. Sammons, J. Xavier Prochaska, Nicolas Tejos, et al. 2023. The unseen host galaxy and high dispersion measure of a precisely localized fast radio burst suggests a high-redshift origin. MNRAS 525, no. 1 (October): 994–1007. https://doi.org/10.1093/mnras/stad2353. arXiv: 2307.14702 [astro-ph.HE] .Mas-Ribas, Lluis, and Clancy W. James. 2026. A τ–DM Relation for Fast Radio Burst Hosts? ApJ 998, no. 1 (February): 1. https://doi.org/10.3847/1538-4357/ae36a9. arXiv: 2508.13317 [astro-ph.GA] .Medlock, Isabel, Daisuke Nagai, Daniel Anglés-Alcázar, and Matthew Geb-hardt. 2025. Constraining Baryonic Feedback Effects on the Matter Power Spectrum with Fast Radio Bursts. ApJ 983, no. 1 (April): 46. https : / / doi . org / 10 . 3847 / 1538 - 4357 / adbc9c. arXiv: 2501 . 17922 
+
+[astro-ph.CO] .Moroianu, Alexandra M., Shivani Bhandari, Maria R. Drout, Jason W. T. Hessels, Danté M. Hewitt, Franz Kirsten, Benito Marcote, et al. 2026. A Milliarcsecond Localization Associates FRB 20190417A with a Compact Persistent Radio Source and an Extreme Magnetoionic Environment. ApJ 996, no. 1 (January): L16. https://doi.org/10.3847/2041- 8213/ ae28c7. arXiv: 2509.05174 [astro-ph.HE] .Niu, C.-H., K. Aggarwal, D. Li, X. Zhang, S. Chatterjee, C.-W. Tsai, W. Yu, et al. 2022. A repeating fast radio burst associated with a persis-tent radio source [in en]. Number: 7916 Publisher: Nature Publishing Group, Nature 606, no. 7916 (June): 873–877. ISSN: 1476-4687, accessed September 5, 2023. https://doi.org/10.1038/s41586- 022- 04755- 5. https://www.nature.com/articles/s41586-022-04755-5. Niu, Chen-Hui, Di Li, Rui Luo, Wei-Yang Wang, Jumei Yao, Bing Zhang, Wei-Wei Zhu, et al. 2021. CRAFTS for Fast Radio Bursts: Extending the Dispersion-Fluence Relation with New FRBs Detected by FAST. ApJ 909, no. 1 (March): L8. https://doi.org/10.3847/2041-8213/abe7f 0. arXiv: 2102.10546 [astro-ph.HE] .Ocker, S. K., and J. M. Cordes. 2026. NE2025: An Updated Electron Density Model for the Galactic Interstellar Medium. arXiv e-prints (February): arXiv:2602.11838. https://doi.org/10.48550/arXiv.2602.11838. arXiv: 2602.11838 [astro-ph.GA] .Ould-Boukattine, O. S., P. Chawla, J. W. T. Hessels, A. J. Cooper, M. P. Gawroński, W. Herrmann, D. M. Hewitt, et al. 2026. A probe of the maximum energetics of fast radio bursts through a prolific repeating source. MNRAS 545, no. 2 (January): staf1937. https://doi.org/10.1093/ mnras/staf 1937. arXiv: 2410.17024 [astro-ph.HE] .Pastor-Marazuela, Inés, Alexa C. Gordon, Ben Stappers, Ilya S. Khrykin, Nico-las Tejos, Kaustubh Rajwade, Manisha Caleb, et al. 2025. Localisation and host galaxy identification of new Fast Radio Bursts with MeerKAT. MNRAS (December). https://doi.org/10.1093/mnras/staf 2144. arXiv: 2507.05982 [astro-ph.HE] .Planck Collaboration, N. Aghanim, Y. Akrami, M. Ashdown, J. Aumont, C. Baccigalupi, M. Ballardini, et al. 2020. Planck 2018 results. VI. Cos-mological parameters. A&A 641 (September): A6. https://doi.org/10. 1051/0004-6361/201833910. arXiv: 1807.06209 [astro-ph.CO] .Prochaska, J. Xavier, Sunil Simha, Almannin, Keheintz, Nicolas Tejos, Alexa ”Muethel” Gordon, JayChittidi, et al. 2023. FRBs/FRB: Release to sync with Gordon et al. 2023 (July): 10.5281/zenodo.8125230. https://doi. org/10.5281/zenodo.8125230. Ryder, S. D., K. W. Bannister, S. Bhandari, A. T. Deller, R. D. Ekers, M. Glowacki, A. C. Gordon, et al. 2023. A luminous fast radio burst that probes the Universe at redshift 1. Science 382, no. 6668 (October): 294– 299. https://doi.org/10.1126/science.adf 2678. arXiv: 2210.04680 
+
+[astro-ph.HE] .Scott, D. R., T. Dial, A. Bera, A. T. Deller, M. Glowacki, K. Gourdji, C. W. James, et al. 2025. High-time-resolution properties of 35 fast radio bursts detected by the Commensal Real-time ASKAP Fast Transients Survey. 
+
+arXiv e-prints (May): arXiv:2505.17497. https://doi.org/10.48550/arXiv. 2505.17497. arXiv: 2505.17497 [astro-ph.HE] .Shannon, Ryan M., Keith W. Bannister, Apurba Bera, Shivani Bhandari, Cherie K. Day, Adam T. Deller, Tyson Dial, et al. 2025. The commen-sal real-time ASKAP fast transient incoherent-sum survey. PASA 42 (January): e036. https://doi.org/10.1017/pasa.2025.8. Sharma, Kritti, Vikram Ravi, Liam Connor, Elisabeth Krause, Pranjal R. S., and Dhayaa Anbajagane. 2026. Quantifying the Impact of Selection Effects on FRB DM-z Relation Cosmological Inference. ApJ 999, no. 2 (March): 202. https://doi.org/10.3847/1538- 4357/ae4696. arXiv: 2511.16850 [astro-ph.CO] .Sharma, Kritti, Vikram Ravi, Liam Connor, Casey Law, Stella Koch Ocker, Myles Sherman, Nikita Kosogorov, et al. 2024. Preferential occurrence of fast radio bursts in massive star-forming galaxies. Nature 635, no. 8037 (November): 61–66. https://doi.org/10.1038/s41586-024-08074-9. arXiv: 2409.16964 [astro-ph.HE] .Sherman, Myles B., Liam Connor, Vikram Ravi, Casey Law, Ge Chen, Mor-gan Catha, Jakob T. Faber, et al. 2024. Deep Synoptic Array Science: Polarimetry of 25 New Fast Radio Bursts Provides Insights into Their Origins. ApJ 964, no. 2 (April): 131. https://doi.org/10.3847/1538-4357/ad275e. arXiv: 2308.06813 [astro-ph.HE] .Shin, Kaitlyn, Kiyoshi W. Masui, Mohit Bhardwaj, Tomas Cassanelli, Pragya Chawla, Matt Dobbs, Fengqiu Adam Dong, et al. 2023. Inferring the Energy and Distance Distributions of Fast Radio Bursts Using the First CHIME/FRB Catalog. ApJ 944, no. 1 (February): 105. https://doi.org/ 10.3847/1538-4357/acaf 06. arXiv: 2207.14316 [astro-ph.HE] .Skelton, Rosalind E., Katherine E. Whitaker, Ivelina G. Momcheva, Gabriel B. Brammer, Pieter G. van Dokkum, Ivo Labbé, Marijn Franx, et al. 2014. 3D-HST WFC3-selected Photometric Catalogs in the Five CANDELS/3D-HST Fields: Photometry, Photometric Redshifts, and Stellar Masses. ApJS 214, no. 2 (October): 24. https://doi.org/10.1088/ 0067-0049/214/2/24. arXiv: 1403.3689 [astro-ph.GA] .Tendulkar, S. P., C. G. Bassa, J. M. Cordes, G. C. Bower, C. J. Law, S. Chatterjee, E. A. K. Adams, et al. 2017. The Host Galaxy and Redshift of the Repeating Fast Radio Burst FRB 121102. ApJ 834, no. 2 (January): L7. https://doi.org/10.3847/2041-8213/834/2/L7. arXiv: 1701.01100 
+
+[astro-ph.HE] .Wang, Z., K. W. Bannister, V. Gupta, X. Deng, M. Pilawa, J. Tuthill, J. D. Bunton, et al. 2025. The CRAFT coherent (CRACO) upgrade I: System description and results of the 110-ms radio transient pilot survey. PASA 42 (January): e005. https://doi.org/10.1017/pasa.2024.107. arXiv: 2409.10316 [astro-ph.HE] .Wu, Qin, Guo-Qiang Zhang, and Fa-Yin Wang. 2022. An 8 per cent determi-nation of the Hubble constant from localized fast radio bursts. MNRAS 515, no. 1 (September): L1–L5. https://doi.org/10.1093/mnrasl/slac022. arXiv: 2108.00581 [astro-ph.CO] .Zhang, Bing. 2023. The physics of fast radio bursts. Reviews of Modern Physics 
+
+95, no. 3 (July): 035005. https://doi.org/10.1103/RevModPhys.95. 035005. arXiv: 2212.03972 [astro-ph.HE] .Zhang, Yong-Kun, Pei Wang, Yi Feng, Bing Zhang, Di Li, Chao-Wei Tsai, Chen-Hui Niu, et al. 2022. FAST Observations of an Extremely Active Episode of FRB 20201124A. II. Energy Distribution. Research in Astron-omy and Astrophysics 22, no. 12 (December): 124002. https://doi.org/10. 1088/1674-4527/ac98f 7. arXiv: 2210.03645 [astro-ph.HE] .Cambridge Large Two 23 
+
+Appendix 1. Estimating Emin 
+
+Within ZDM, the two implemented luminosity functions are a power-law, and a Schechter function, with the Schechter function having a smooth exponential cut-off at high energies. Since Hoffmann et al. (2025), works using ZDM have used the Schechter function, simply because the sharp cut-off of the power-law at Emax was seen as unphysical — even though there is no direct experimental evidence for any kind of cut-off, exponential or otherwise, either from non-parametric studies of the energy distribution (Arcus et al. 2025), or from detailed studies of repeating FRBs (C.-H. Niu et al. 2022; Zhang et al. 2022; Ould-Boukattine et al. 2026). However, both functions have a sudden, sharp cut-off at Emin , below which the probability of observing an FRB becomes zero. In the first ZDM paper, Emin was set to log 10 Emin (erg) = 10 30 —well below the energy probed by the data — since it was shown that there was no evidence for a low-energy cut-off in FRB emission; a 90% confidence upper limit on log 10 Emin (erg) = 39.0 was set (James, Prochaska, et al. 2022). Due to the deficit in low-DM FRBs observed by FAST however (Chen-Hui Niu et al. 2021), Hoffmann et al. (2025) re-introduced Emin 
+
+as a minimisation parameter, with the optimisation finding log 10 Emin (erg) = 39.47 +0.54  
+
+> −1.28
+
+at 68% confidence. This was interpreted not as a literal minimum energy, but instead as a potential flattening of the FRB luminosity function at low energies, since repeating FRBs had been observed to emit at significantly lower energies (e.g. Li et al. 2021).    
+
+> Figure 16. Likelihood of samples of fake FRBs as a function of log 10 Emin (erg) ,normalised by the number of FRBs used. The simulated truth value is also given.
+
+Here, we use our Monte Carlo FRB sample to determine the ability of ZDM to correctly identify such an Emin . We generate FRBs as described in § 6, albeit using the value of log 10 Emin (erg) = 38.22 found by Hoffmann et al. (2026). We then estimate L(Emin ) as a function of Emin only using Eq. 39, with all other parameters set to their true values. The result is shown in Figure 16. When using 10,000 FRBs, we find that the resulting likeli-hood distribution is well-behaved, and peaks at the true value. However, for small samples of FRBs, neither is true – for 1,000 FRBs, the likelihood fluctuates, while for 100, it experi-ences large, sudden jumps. In reality of course, the apparently smooth behaviour of the 10,000 FRB distribution is due to averaging over a very large number of such jumps. The cause of this behaviour is the manner in which the function F(B, weff , s) from Eq. 4 is calculated. In reality, all three variables — weff , B, and s — have a smooth probabil-ity distribution. However, within ZDM, the distributions 
+
+p(B) and p(weff ) are parameterised by histograms, with bin values b1, b2, . . . , bNb and w1, w2, . . . , wNw , where typically 
+
+Nb ∼ Nw ∼ 10. Any given FRB with measured s will there-fore have a finite number possible fluences F(B, weff , s), cor-responding to all possible combinations of width and beam bin. If B and weff are also measured for that FRB, then its likelihood will be calculated via a weighted sum over the two 
+
+b and two w bins bracketing its measured values. As Emin 
+
+increases, it will generally increase the likelihood of all FRBs, except when Emin exceeds the implied energy corresponding to some combination of B and w for a particular FRB. At that point, the likelihood will suddenly drop, since it will lose the probability mass associated with those bins in B and w. And as Figure 16 shows, a very large number of FRBs is required for this behaviour to average out to produce a well-behaved likelihood. The ideal solution to this behaviour is to introduce a lu-minosity function without a sharp cut-off at low-energies — either an exponential turn-on, or a broken power-law, seem reasonable possibilities. However, extending ZDM anal-ysis to further luminosity variables is beyond the scope of the current work. Hence, for now, we recommend setting log 10 Emin (erg) = 30 (or some other very low number) for purposes of modelling the FRB population.

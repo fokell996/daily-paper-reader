@@ -1,0 +1,273 @@
+Title: Detectability-Aware Screening of Post-Merger Gravitational-Wave Damping Anomalies in Real Detector Noise: A Graph-Spectral Approach with Empirical Null Calibration
+
+URL Source: https://arxiv.org/pdf/2609.00095v1
+
+Published Time: Wed, 02 Sep 2026 00:04:29 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+Detectability-Aware Screening of Post-Merger Gravitational-Wave Damping Anomalies in Real Detector Noise: A Graph-Spectral Approach with Empirical Null Calibration 
+
+Ruslan Alaskarov ∗
+
+Independent Researcher, Moscow, Russia 
+
+(Dated: September 2, 2026) The post-merger phase of binary neutron star (BNS) coalescences may encode information about matter at extreme densities and could, in principle, be sensitive to non-standard energy-loss channels, including scenarios motivated by dark-sector physics. Deviations in the effective damping time of post-merger oscillations have been proposed as phenomenological proxies for such channels, but identifying short, high-frequency transients in real, non-stationary detector noise remains difficult, and standard statistical assumptions used to calibrate detection thresholds often do not hold in that regime. We present a two-stage screening framework for a phenomenological damped-sinusoid post-merger proxy, h(t) = Ae −t/τ sin(2 πf peak t + ϕ), injected directly into real LIGO Livingston (L1) background noise. Stage 1 builds a local time-frequency coherence graph from a Constant-Q representation of each whitened candidate window and computes its leading eigenvalue as a detectability statistic, motivated by the detectability-transition logic of spiked random matrices (the Baik–Ben Arous– P´ ech´ e transition) rather than a closed-form Gaussian-noise assumption. We validate the matched-filter SNR normalization with a synthetic Gaussian-noise control, and separately validate the graph statistic with power-comparison and tile-shuffling tests showing sensitivity to local time-frequency organization beyond total integrated power, with the effect strongest for the shortest, most compact injected transients. Its null distribution is calibrated empirically on real detector noise, since we find directly that real LIGO noise does not satisfy the Gaussian assumptions a closed-form threshold would require. Stage 2 estimates an effective damping time for Stage-1-passing candidates using an interpretable ridge/energy-decay fit and a classical nonlinear least-squares fit, and compares each against a threshold calibrated on the standard damping-time distribution ( τ = 5–40 ms). All thresholds and models are fixed on independent calibration and training data and evaluated once, after the design was frozen, on a held-out real-noise segment untouched during development. The least-squares estimator is the strongest Stage-2 discriminator (AUC = 0 .943); the ridge/energy-decay estimator is a secondary, model-light, time-frequency-native alternative with competitive ranking-level separation but lower recall at a matched low-false-positive operating point. A simple total-power baseline is shown to be a real but substantially weaker, direction-sensitive discriminator. 
+
+I. INTRODUCTION 
+
+The direct detection of gravitational waves from the bi-nary neutron star coalescence GW170817 initiated multi-messenger constraints on the equation of state of dense matter [1]. While the inspiral phase constrains the macroscopic properties of cold neutron stars, the post-merger remnant may encode information about matter at extreme temperatures and densities [2]. Deviations in the dominant post-merger frequency and effective damp-ing time have been proposed as phenomenological probes of the remnant’s thermal and dynamical evolution; ad-ditional energy-loss channels, including dark-sector de-grees of freedom, could in principle modify this evolution and motivate searches for anomalous damping. Post-merger emission is nonetheless difficult to detect with current interferometers: the relevant frequencies are typ-ically in the kilohertz range, where detector sensitivity is    
+
+> ∗ruslanalas@gmail.com; ORCID: 0009-0006-1030-3031. The au-thor completed an M.Sc. in Physics at the Faculty of Physics, Lomonosov Moscow State University. The present work was con-ducted independently after graduation.
+
+limited and non-stationary instrumental artifacts com-plicate interpretation, and the true waveform depends on dense-matter microphysics in ways that make exhaus-tive matched-filter searches computationally challenging across broad classes of non-standard scenarios. The purpose of this paper is methodological, not waveform-modeling. We do not attempt to model the full post-merger dynamics of a binary neutron star remnant, whose structure, rotation, and quadrupole moment evolve after merger and whose gravitational-wave emission can therefore include multiple modes, amplitude modulation, and a time-dependent instanta-neous frequency. Instead, we use a deliberately sim-ple damped-sinusoid injection family as a controlled proxy for short, high-frequency, post-merger-like time-frequency excess, in order to isolate a narrower statistical question: whether an empirically calibrated detectability pipeline can identify compact damping-time anomalies in real detector noise more effectively than a power-only baseline. Section III A states explicitly what this sim-plification omits and where it is expected to fail; Sec. V returns to this point with a specific, mechanistic caveat about how an unmodeled frequency drift could bias the Stage-2 damping estimator. arXiv:2609.00095v1 [astro-ph.IM] 31 Aug 2026 2An earlier version of this project explored this prob-lem using a frozen, pretrained audio-spectrogram trans-former as a generic time-frequency feature extractor, combined with a two-stage Mahalanobis metric-learning framework. On review, that approach was found to have a manuscript/code mismatch (the frozen backbone was pretrained on ∼10 s audio clips and applied to 100 ms windows, dominated by padding), used an incorrect an-alytic detector-noise power spectral density (PSD), and did not adequately account for close prior art applying pretrained audio transformers to gravitational-wave data [4]. We abandoned that framing and rebuilt the analy-sis from the data-processing layer up, adopting instead a detection-statistics approach with an explicit, testable connection to random-matrix detectability theory and an empirically calibrated null distribution, motivated di-rectly by the finding (Sec. III C) that real detector noise does not satisfy the statistical assumptions a closed-form Gaussian threshold would require. In this work we treat post-merger anomaly screening as a two-stage detectability problem. Stage 1 asks whether a candidate window’s time-frequency content is organized in a way that is statistically distinguishable from real de-tector noise, using a graph-spectral statistic inspired by (but not a literal implementation of) the detectability-transition logic developed for spiked random matrices and, separately, for community detection in the stochas-tic block model [12–14]. Stage 2 is applied only to candi-dates that pass this gate and estimates an effective damp-ing time, compared against a threshold fixed on the stan-dard ( τ = 5–40 ms) manifold. Both stages are calibrated on real LIGO noise and their thresholds are frozen before any evaluation on held-out data.  
+
+> II. RELATED WORK
+
+Unmodeled transient (“burst”) searches based on time-frequency excess power have a long history in gravitational-wave data analysis, beginning with the excess-power statistic of Anderson et al. [5] and extended through coherent time-frequency clustering methods such as Q-scan and coherent WaveBurst [6, 7], which were developed specifically to reduce sensitivity to loud, non-Gaussian instrumental glitches relative to a simple power sum. The graph-based local-coherence statistic used here for Stage 1 is a graph-spectral generalization in this same family, with an explicit, empirically calibrated detectabil-ity threshold rather than a fixed analytic significance model. Machine-learning approaches to compact-binary detec-tion and parameter estimation on real LIGO data are well established [8], and autoencoder-based anomaly detec-tion has been applied directly to LIGO glitch populations [9]. Closest in spirit to this project’s originally aban-doned framing, GW-Whisper [4] applies a pretrained au-dio transformer, fine-tuned with lightweight adapters, to gravitational-wave detection and glitch classification on real O3b data, and reports that the model’s native log-mel front end outperformed a GW-specific Q-scan vari-ant for glitch classification — directly relevant to, and part of the motivation for, this project’s decision not to reintroduce a pretrained-audio-transformer compo-nent. Machine-learning parametrization of post-merger waveforms via conditional variational autoencoders has also been explored [10], and CNN-based post-merger detection/frequency-extraction methods have been devel-oped independently and concurrently with this work [11]. This project’s contribution is not the general idea of time-frequency-structure-based transient detection, nor the general idea of a pretrained-model feature extrac-tor for gravitational-wave data — both have substan-tial prior art, cited above. The contribution is aspecific combination: a spiked-matrix/random-matrix-theory-motivated graph-spectral detectability statistic, calibrated empirically on real LIGO noise and validated through power-comparison and tile-shuffling tests, to-gether with a matched-filter SNR convention separately checked using a synthetic Gaussian-noise control, feeding an interpretable Stage-2 damping-time estimator whose thresholds are frozen before a single held-out evaluation.   
+
+> III. METHODOLOGY A. Phenomenological Signal Model
+
+We model the post-merger transient as a single-mode damped sinusoid, 
+
+h(t) = A e −t/τ sin(2 πf peak t + ϕ), (1) where fpeak is drawn uniformly from [1500 , 4000] Hz and 
+
+τ is the effective damping time. Equation 1 should be read as a controlled injection family, not as a physically complete post-merger waveform model. It is a deliber-ately minimal phenomenological proxy, not a surrogate for numerical-relativity post-merger waveforms, which exhibit multiple oscillation modes, a time-dependent in-stantaneous frequency, and amplitude modulation tied to the evolving structure and rotation of the remnant [2, 10]. The constant-frequency assumption is used specifically to isolate the effects of damping time and time-frequency localization under real-noise calibration, and is not in-tended to describe the early dynamical evolution of a real merger remnant, where frequency drift, mode cou-pling, amplitude modulation, and possible collapse to a black hole may all be important. Consequently, the per-formance reported below is validated only for this simpli-fied proxy family: in a realistically drifting signal, mis-match with the constant-frequency least-squares model used in Stage 2 (Sec. III E) could bias the recovered ef-fective damping time toward shorter values, an effect not tested here and treated as a specific, mechanistic limita-tion in Sec. V rather than a settled question. Standard-damping injections use τ ∈ { 5, 10 , 20 , 40 } ms; anomalous injections use τ ∈ { 1, 3} ms. 3 
+
+> B. Data, PSD Estimation, and Whitening
+
+Real strain data are fetched from the LIGO Livingston (L1) detector via the Gravitational Wave Open Sci-ence Center [3], using its data-quality timeline to lo-cate valid observing segments rather than assuming an arbitrary offset from a reference GPS time is science-quality data — detector duty cycles are well below unity and hour-scale non-observing gaps are common. Four non-overlapping segments are used, with fixed roles: PSD estimation, Stage-1 null calibration, Stage-2 train-ing/calibration, and a final held-out evaluation segment untouched until Sec. III F. Table I summarizes the role of each segment and exactly which downstream compu-tations each one contributes to, since the credibility of the held-out evaluation in Sec. IV depends entirely on this split discipline being followed without exception. The operational power spectral density (PSD) is es-timated as an envelope (element-wise maximum) of independent per-segment estimates across the PSD-estimation, calibration, and training segments (the held-out evaluation segment is deliberately excluded from this envelope). Each per-segment estimate combines a bias-corrected median (an accurate baseline away from spec-tral lines) with a percentile-based intermittency detector: bins whose 99th-percentile-across-Welch-segments value substantially exceeds the typical ratio for stationary noise are flagged and inflated to a conservative multiple of their own observed peak value. This combination was nec-essary because narrow instrumental lines (violin-mode harmonics and their overtones) drift in frequency and amplitude over time scales shorter than a single PSD-estimation segment, so a single-snapshot median estimate — even a correctly bias-corrected one — can substan-tially underestimate a line’s true peak amplitude in a different segment. Whitening is performed in the frequency domain, hard-band-limited to [20 , 6000] Hz (data outside this range is never divided by a PSD estimate, since PSD estimates near DC and Nyquist are unreliable). Each long data seg-ment is whitened once, as a whole, and edge-trimmed be-fore being sliced into 100 ms analysis windows; whitening a bare 100 ms window in isolation was found to reintro-duce a circular-convolution edge artifact and is avoided throughout.  
+
+> C. Matched-Filter SNR and Injection
+
+Injected signal-to-noise ratio is defined via the stan-dard matched-filter integral, 
+
+ρ2 = 4 
+
+Z ∞
+
+> 0
+
+|˜h(f )|2
+
+Sn(f ) df, (2) discretized consistently with the whitening convention above. We validated this definition in two stages, which we report because the distinction is central to this project’s approach to null calibration. First, we generated synthetic Gaussian noise colored to exactly match the assumed PSD and FFT convention, and con-firmed that recovered matched-filter SNR follows the expected N (ρtarget , 1) distribution essentially exactly (mean/median/std/robust-std all within a few percent of the ideal values). Second, we repeated the identi-cal recovery test on real L1 noise and found a substan-tially broader, non-Gaussian distribution (robust stan-dard deviation an order of magnitude larger than the ideal case, with pronounced asymmetric tails). Since the first test confirms the SNR formula’s normalization is correct, the second result is not a bug: it is direct evi-dence that real detector noise, in this frequency band and window length, does not satisfy the stationary-Gaussian assumption a closed-form detection threshold would re-quire. This is the direct motivation for the empirical, real-noise-calibrated approach used throughout Stage 1 and Stage 2. Injections are constructed by drawing a padded local noise segment from the target block’s own noise pool, injecting the scaled waveform at the window center, whitening the padded segment as a whole (for the same edge-artifact reason as Sec. III B), and cropping back to the 100 ms analysis window.  
+
+> D. Stage 1: Graph-Spectral Detectability
+
+Each candidate window’s whitened time series is con-verted to a Constant-Q Transform (CQT) magnitude map, restricted to the post-merger band of interest (1500–4000 Hz), yielding a small set of frequency bins by a modest number of time frames. Every tile’s mag-nitude is normalized against an empirical null built from many real noise-only windows: Z = (log(1 + CQT) −
+
+median) /MAD, floored at zero, so that only excess above the empirically observed noise level for that specific time-frequency bin contributes. We build a sparse graph over the normalized tile map, connecting each tile to others within a small local time-frequency neighborhood, with edge weight equal to the product of the two tiles’ (already null-normalized) val-ues — a local “bright-neighbors-of-bright-tiles” coher-ence proxy. The Stage-1 detectability statistic is the leading eigenvalue of this graph’s adjacency matrix. This construction is motivated by, but is not a literal imple-mentation of, the detectability-transition logic developed for spiked random matrices [12] and, in a related but dis-tinct setting, for community detection in the stochastic block model [13, 14]: a planted low-rank structure is in-visible in a matrix’s leading eigenvalue until its strength crosses a threshold, a logic we exploit as a design motiva-tion and validate empirically rather than assume. We re-fer to this statistic throughout as “Moore/BBP-inspired graph-spectral detectability,” never as an implementa-tion of stochastic-block-model community detection. We validated that this statistic is not merely a restate-4
+
+TABLE I. Data-split discipline. The Stage-2 calibration/validation halves are two non-overlapping subsegments of the single training segment referenced in the main text, split after PSD estimation (Sec. III B) had already used the training segment as a whole; both halves therefore carry a “yes” for the PSD envelope, footnoted below. test block is excluded from every fitting step without exception, including the PSD envelope. 
+
+Segment Dur. Role PSD env.? Threshold/model fit? Final eval.? 
+
+psd block 2048 s PSD estimation Yes No No 
+
+calib block 1024 s Stage-1 null calibra-tion Yes Yes (Stage-1 threshold) No Training segment, calib. half a
+
+508 s Stage-2 threshold / classifier fitting Yes a Yes (Stage-2 thresholds, power classifier) No Training segment, valid. half a
+
+508 s Held-out Stage-2 validation Yes a No (eval. only, no refitting) No 
+
+test block 1024 s Final evaluation No No Yes, once, after freeze 
+
+> a
+
+Both halves were part of the single training segment used, as a whole, in the PSD envelope (Sec. III B); the split into calibration/validation halves was performed afterward, specifically for the Stage-2 held-out validation described in Sec. III F. 40 30 20 10 0 10 20 30 40 Recovered matched-filter SNR 0.0 0.1 0.2 0.3 0.4 0.5 Density         
+
+> Synthetic Gaussian vs. real noise
+> Test A: synthetic Gaussian Test B: real L1 noise target SNR
+> 40 30 20 10 010 20 30 40 Recovered matched-filter SNR 10 0
+> 10 1
+> Count (log scale)
+> Test B full distribution (log y)
+
+FIG. 1. Matched-filter SNR recovery validation. Left: recovered SNR from a fixed injected target of ρ = 12, comparing synthetic Gaussian noise built to exactly match the assumed PSD convention (tight peak at the target) against real L1 noise (broad, asymmetric spread). The synthetic case alone confirms the SNR formula’s normalization is correct; the real-noise deviation is therefore direct evidence about the noise itself, not a normalization error. Right: the same real-noise distribution on a log scale, showing the extended, non-Gaussian tails. 0 20 40 60 80 100 Time (ms) 1000 2000 3000 4000 5000 6000 Frequency (Hz)           
+
+> Pure noise
+> 020 40 60 80 100 Time (ms)
+> Standard injection (tau=15ms)
+> 020 40 60 80 100 Time (ms)
+> Anomalous injection (tau=1ms)
+
+FIG. 2. Example whitened Constant-Q representations shown over a wider visual frequency range for illustration; the Stage-1 graph statistic itself is computed only on the 1500–4000 Hz band (Sec. III D). Left: pure real L1 noise. Center: a standard-damping injection ( τ = 15 ms). Right: an anomalous-damping injection ( τ = 1 ms), visibly more localized in time than the standard case at comparable amplitude. 5ment of total time-frequency power in two independent ways. First, across a mixed sample of noise-only and in-jected windows spanning several damping times, total in-band power and the graph statistic showed a low pooled correlation ( r ≈ 0.17), and a controlled comparison at fixed matched-filter SNR (pooling across damping time) gave a correlation consistent with zero ( r ≈ 0.01–0 .08 across several SNR values) — at matched injected en-ergy, total power carries essentially no information about the graph statistic. Second, and more directly, we per-formed a tile-position shuffle test: keeping every CQT tile’s value fixed (hence total power exactly unchanged) while randomizing tile positions before rebuilding the graph produces large, highly significant reductions in the leading eigenvalue for every category tested ( p < 10 −10 ,Wilcoxon signed-rank), and the reduction is largest for the shortest, most compact injected transients ( τ = 1 ms: 86–87% reduction) and smallest, though still substantial, for pure noise (54–64% reduction). The correct, con-servative statement supported by this evidence is that the graph statistic captures local organization of time-frequency excess beyond total integrated power; it does not, by itself, establish that the statistic measures phys-ical post-merger coherence, ridge structure, or any other specific physical mechanism, since compact transient lo-calization and connected high-energy clustering remain observationally indistinguishable candidate explanations. We adopt this conservative interpretation throughout. The Stage-1 null distribution is calibrated empirically from several thousand real noise-only windows, at a cho-sen false-alarm rate α = 0 .01; the calibration sample size was chosen so that the expected number of exceedances at this threshold is large enough for the resulting quan-tile estimate to be reasonably stable, following the same reasoning used to size the calibration sample throughout this work.  
+
+> E. Stage 2: Damping-Time Estimation
+
+Stage 2 is evaluated only for candidates that pass the Stage-1 gate. We use two independent estimators of an effective damping time ˆ τ :
+
+Primary — nonlinear least-squares fit. A direct fit of Eq. 1 to the whitened time-domain window via nonlinear least squares, using the in-band dominant frequency as an initial guess for fpeak .
+
+Secondary — ridge/energy-decay fit. An interpretable, time-frequency-native alternative: the in-band CQT power per time frame traces the signal envelope, and since h(t)2 ∼ e−2t/τ , a linear fit of log(power) against time (starting from the frame of peak power) recovers ˆ τ
+
+from the fitted slope. The fit window is truncated adap-tively once frame power drops into a noise-floor reference calibrated on real noise, rather than using a fixed-length window; an earlier fixed 29 ms window was found to pro-duce severe overestimation of ˆ τ for short-duration sig-nals, since most of the fitted region was flat noise floor rather than genuine decay for any τ shorter than a few milliseconds. Both estimators’ anomaly thresholds are calibrated as the first percentile of their own ˆτ distribution on standard-damping ( τ = 5–40 ms) Stage-1-passing can-didates, drawn from an independent calibration subset; a candidate is flagged anomalous if ˆ τ falls below this threshold. Neither estimator’s internal parameters were tuned after this calibration was fixed. 
+
+Baseline — total power. As a baseline discrimi-nator not aware of any temporal structure, we fit a single-feature logistic regression on total in-band power alone, on the same calibration subset, and calibrate its own operating threshold (at the 99th percentile of pre-dicted probabilities on the calibration subset’s standard-damping candidates) to target a comparable low false-positive rate to the ˆ τ -based methods — a fair operating-point comparison, since a classifier’s default decision-probability threshold does not, in general, correspond to any particular target false-positive rate.  
+
+> F. Held-Out Validation and Final Evaluation
+
+Before any evaluation on the final held-out segment, we validated Stage 2 on an independent split within the training data: all thresholds and the power baseline’s classifier were fit on one half of the training noise pool and evaluated, without refitting, on the other half. Results were consistent with the in-sample development numbers to within sampling noise for every metric reported, indi-cating no meaningful overfitting to the training data. The complete design — Stage-1 statistic and thresh-old, both Stage-2 estimators and their thresholds, and the power baseline’s classifier and operating threshold — was then frozen and recorded in a machine-readable configuration file. The held-out evaluation segment, un-touched by any prior step in this work, was loaded for the first time only after this freeze, used exclusively for the evaluation reported in Sec. IV, and did not influence any threshold, model, or hyperparameter.  
+
+> IV. RESULTS
+
+Table II summarizes the final held-out evaluation. The least-squares estimator is the strongest Stage-2 discrimi-nator, both by ranking quality (AUC = 0 .943) and, more importantly for a practical screening threshold, by re-call at the calibrated low-false-positive operating point (TPR = 0 .879 at FPR = 0 .012). The ridge/energy-decay estimator provides strong ranking-level separation (AUC = 0 .930) but substantially lower recall at the same operating-point standard (TPR = 0 .486); we report both together throughout, since AUC alone does not convey this gap — LSQ gives the strongest low-FPR operating-point recall of the two. The calibrated power baseline 6300000 320000 340000 360000 380000 400000 total_power_raw 2468raw_lambda1 1e6     
+
+> Raw: power vs. lambda_1 Pearson r=0.173, Spearman r=0.230 (all categories combined)
+> noise tau=40ms tau=10ms tau=3ms tau=1ms
+> 1000 1200 1400 1600 1800 total_power_norm 50 100 150 200 250 norm_lambda1
+> Normalized: power vs. lambda_1 Pearson r=0.139, Spearman r=0.132 (all categories combined)
+> noise tau=40ms tau=10ms tau=3ms tau=1ms
+
+FIG. 3. Total in-band power versus the graph-spectral statistic, raw (left) and null-normalized (right), across noise-only windows and four damping times. The low pooled correlation in both panels ( r = 0 .17 raw, r = 0 .14 normalized) shows the two statistics are not redundant; note the categorical vertical separation by τ at fixed power, which the shuffle test (main text) further confirms is driven by spatial organization rather than total energy. 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 raw_lambda1 1e6 012341e 6 Null distribution: raw_lambda1     
+
+> alpha=0.01: 1072361.19 alpha=0.001 (diagnostic): 1201248.95
+> 20 30 40 50 60 norm_lambda1 0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08
+> Null distribution: norm_lambda1
+> alpha=0.01: 54.98 alpha=0.001 (diagnostic): 59.27
+
+FIG. 4. Empirical Stage-1 null distributions on real L1 noise, raw (left) and null-normalized (right) graph statistic, from an earlier exploratory calibration pass (threshold ≈ 54 .98 for the normalized statistic) shown here for illustration of the calibration procedure. The final frozen threshold used for the test block evaluation in Sec. IV is 55 .6439, calibrated with a larger sample under the same procedure; the two values agree to within the calibration sample’s expected precision. The α = 0 .001 line is shown for reference only; the calibration sample size used here is not adequate for a trustworthy 0 .1%-tail estimate (Sec. III D) and α = 0 .001 is never used for any reported result. 
+
+contains moderate, direction-sensitive ranking informa-tion (AUC = 0 .726 in its correct orientation) but per-forms poorly at the strict operating point relevant for screening (TPR = 0 .054) — a moderate ranking-quality AUC is fully compatible with near-zero recall at a strict threshold when the underlying class distributions over-lap substantially in their bulk, and this comparison is, in our view, the most direct evidence that a temporal-structure-aware estimator is necessary for this screening task. Table III breaks these results down by damping time. The Stage-1 pass rate itself is strongly, and asymmet-rically, tau-dependent: among standard-damping candi-dates, the pass rate falls monotonically from 97 .3% at 
+
+τ = 5 ms to 66 .3% at τ = 40 ms, while both anoma-lous damping times pass at ≈ 99%. This is consistent with, and plausibly explained by, the graph statistic’s sensitivity to spatially compact time-frequency struc-ture (Sec. III D): a longer-duration signal spreads the same matched-filter-normalized energy across more time frames, lowering the local brightness the statistic is built to reward. We regard this as both a limitation — roughly a third of genuine long-duration standard signals are re-jected before Stage 2 ever evaluates them, which affects the end-to-end numbers in Table II — and a favorable, unengineered property for this application, since it hap-pens to preferentially retain exactly the short-duration signals this screening task is designed to flag. At the level of Stage-2 discrimination itself, the least-squares es-timator’s advantage over the ridge estimator is concen-75 10 15 20 25 30 Matched-filter SNR 13510 20 40 tau (ms)                                                                                                                                                                             
+
+> 0.03 0.03 0.00 0.05 0.07 0.17 0.30 0.55 0.80 0.82 0.03 0.10 0.00 0.15 0.17 0.30 0.60 0.65 0.90 0.95 0.00 0.07 0.05 0.10 0.28 0.42 0.65 0.82 0.88 1.00 0.00 0.12 0.10 0.17 0.38 0.72 0.75 0.88 0.97 1.00 0.03 0.07 0.12 0.35 0.55 0.82 0.93 1.00 1.00 0.97 0.03 0.03 0.28 0.28 0.68 0.85 1.00 1.00 1.00 1.00
+> Total excess power (raw) (threshold=351678.61)
+> 510 15 20 25 30 Matched-filter SNR
+> 0.07 0.40 0.72 0.93 1.00 1.00 1.00 1.00 1.00 1.00 0.23 0.42 0.97 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.07 0.50 0.93 0.95 1.00 1.00 1.00 1.00 1.00 1.00 0.07 0.38 0.72 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.03 0.07 0.57 0.82 1.00 1.00 1.00 1.00 1.00 1.00 0.00 0.10 0.30 0.65 0.88 0.93 1.00 1.00 1.00 1.00
+> Raw lambda_1 (threshold=1072361.19)
+> 510 15 20 25 30 Matched-filter SNR
+> 0.17 0.53 0.93 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.30 0.47 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.07 0.60 0.95 0.97 1.00 1.00 1.00 1.00 1.00 1.00 0.05 0.40 0.72 1.00 1.00 1.00 1.00 1.00 1.00 1.00 0.05 0.12 0.57 0.72 1.00 1.00 1.00 1.00 1.00 1.00 0.00 0.07 0.28 0.47 0.88 0.90 1.00 1.00 1.00 1.00
+> Normalized lambda_1 (threshold=54.98)
+> 0.0 0.2 0.4 0.6 0.8 1.0 P(statistic > alpha=0.01 threshold)
+> Detection probability, alpha=0.01, train_block noise, 40 samples/cell
+
+FIG. 5. Detection probability at α = 0 .01 over a (SNR , τ ) grid, comparing total excess power (left), the raw graph statistic (center), and the null-normalized graph statistic (right). This is an earlier, exploratory training-data pass (threshold ≈ 54 .98 for the normalized statistic, before the calibration sample was enlarged for the final frozen threshold of 55 .6439 used in Sec. IV), shown to illustrate the qualitative sensitivity gap motivating Stage 1’s design; it is distinct from, and should not be read as, the final held-out evaluation. At τ = 1 ms, total power never reaches Pdet = 0 .9 within the tested SNR range, while both graph-statistic variants reach it by SNR ≈ 8–10 — the same gap that motivates preferring a structure-sensitive statistic over a power baseline for Stage 1. TABLE II. Final test block evaluation (held out until design freeze; evaluated once). TPR/FPR are reported with Wilson 95% confidence intervals; AUC is defined only on the Stage-1-passing (conditional) set. See Sec. III E for method defini-tions. Ridge/energy-decay is a TF-native, interpretable, secondary Stage-2 method; nonlinear LSQ is the strongest Stage-2 discriminator (primary); the calibrated power baseline is a weaker, direction-sensitive baseline with AUC(power)= 0 .274, AUC( −power)= 0 .726. 
+
+Method Mode TPR [95% CI] FPR [95% CI] AUC 
+
+Ridge/energy-decay Conditional 0.486 [0.446, 0.526] 0.016 [0.010, 0.025] 0.930 Ridge/energy-decay End-to-end 0.482 [0.442, 0.522] 0.013 [0.008, 0.022] – Nonlinear LSQ Conditional 0.879 [0.850, 0.903] 0.012 [0.007, 0.020] 0.943 Nonlinear LSQ End-to-end 0.872 [0.843, 0.896] 0.010 [0.006, 0.017] – Power (calibrated logistic) Conditional 0.054 [0.038, 0.075] 0.010 [0.005, 0.018] 0.726 Power (calibrated logistic) End-to-end 0.053 [0.038, 0.074] 0.008 [0.005, 0.015] – 
+
+trated specifically at the harder τ = 3 ms case (flag rate 0.826 versus 0 .237), while both perform comparably at the easier τ = 1 ms case (0 .932 versus 0 .736); the least-squares estimator’s false-flag rate on standard-damping candidates is exactly zero for τ ∈ { 10 , 20 , 40 } ms. Held-out evaluation on the final segment was con-sistent with, and on most metrics marginally better than, the earlier within-training-data validation split (Sec. III F); no threshold or parameter was adjusted after this evaluation. 
+
+V. LIMITATIONS 
+
+• Signal model. The injected waveform (Eq. 1) is a single-mode phenomenological proxy, not a physically complete post-merger waveform; it does not capture multi-mode structure, frequency drift, or amplitude modulation present in numerical-relativity post-merger signals [2, 10]. A particu-larly important omitted effect is frequency evolu-tion. If a real post-merger signal drifts in frequency while the Stage-2 least-squares estimator assumes a constant frequency, accumulated phase mismatch could be absorbed by the fit as apparent ampli-tude decay, biasing the recovered effective damp-ing time toward shorter values – the same direc-tion as the anomaly this pipeline is designed to flag. The present work therefore does not establish ro-bustness of the Stage-2 damping score to realistic frequency-drifting post-merger waveforms; testing this directly, with chirped and numerical-relativity-informed injections, is future work (Sec. VI). 
+
+• Single detector. All results use LIGO Livingston (L1) data only; no multi-detector coincidence or network-level significance is computed or claimed. 
+
+• Stage-1 interpretation. The Stage-1 statistic is validated as sensitive to local time-frequency orga-nization beyond total power (Sec. III D); it is not 8
+
+TABLE III. Per-τ breakdown on test block : Stage-1 pass rate and Stage-2 conditional flag rate for each method. For anomalous τ , the flag rate is a recall (higher is better); for standard τ , it is a false-flag rate (lower is better). 
+
+τ (ms) Class Stage-1 pass rate LSQ flag rate Ridge flag rate Power flag rate 
+
+1 Anomalous 0.987 [0.966, 0.995] 0.932 [0.898, 0.956] 0.736 [0.684, 0.783] 0.054 [0.034, 0.086] 3 Anomalous 0.997 [0.981, 0.999] 0.826 [0.779, 0.865] 0.237 [0.193, 0.289] 0.054 [0.033, 0.085] 5 Standard 0.973 [0.948, 0.986] 0.041 [0.024, 0.070] 0.024 [0.012, 0.049] 0.021 [0.009, 0.044] 10 Standard 0.937 [0.903, 0.959] 0.000 [0.000, 0.013] 0.014 [0.006, 0.036] 0.011 [0.004, 0.031] 20 Standard 0.853 [0.809, 0.889] 0.000 [0.000, 0.015] 0.008 [0.002, 0.028] 0.004 [0.001, 0.022] 40 Standard 0.663 [0.608, 0.714] 0.000 [0.000, 0.019] 0.015 [0.005, 0.043] 0.000 [0.000, 0.019] 0.0 0.2 0.4 0.6 0.8 1.0 False positive rate 0.0 0.2 0.4 0.6 0.8 1.0 True positive rate 
+
+> FINAL test_block discrimination (frozen thresholds)
+> ridge (tau_hat, inverted) (AUC=0.930) lsq (tau_hat, inverted) (AUC=0.943) power (logistic; AUC=0.726) chance
+
+FIG. 6. Final test block ROC comparison, frozen thresh-olds, evaluated once after the design freeze. LSQ (AUC= 0.943) and ridge (AUC= 0 .930) both substantially outper-form the calibrated power baseline (AUC= 0 .726) in ranking quality; Table II shows the operating-point recall gap is far larger still. 
+
+validated as a measure of physical post-merger co-herence specifically, and the shuffle test shows real detector noise itself already has non-trivial local structure, so any physical interpretation must re-main comparative rather than absolute. 
+
+• ˆτ is a ranking score, not a validated point estimate. As Fig. 7 shows directly, both Stage-2 estimators exhibit substantial scatter above the perfect-recovery line, especially at low SNR. The evidence in this work supports ˆ τ as an anomaly-ranking score (Sec. IV) — it discriminates standard from anomalous damping effectively — but does not support treating a single ˆ τ value as an accurate point estimate of the true physical damping time. 
+
+• Reported false-positive rates are finite-sample, not production search rates. The FPR values in Tables II and III are finite-sample false-flag rates on constructed injection/noise win-dows, not production gravitational-wave search false-alarm rates estimated over months or years of detector background. We do not claim production search sensitivity or coherent-WaveBurst/PyCBC-level false-alarm-rate calibration. 
+
+• Calibration sample sizes. Several calibrated quantities (in particular the Stage-1 null threshold and both Stage-2 anomaly thresholds) rely on per-centile estimates whose precision is limited by cali-bration sample size; we report this explicitly rather than presenting point thresholds as exact. 
+
+• No learned-classifier baseline. Neither a sim-ple convolutional neural network nor the frozen-audio-transformer approach explored in an ear-lier version of this project is included as a base-line here; both are out of scope for this version and would require their own independently fair training/validation/held-out-test protocol if added in future work. 
+
+• No dark matter or dark-sector detection claim. This study establishes a statistically defen-sible screening methodology for a phenomenolog-ical damping-time anomaly on synthetic, injected signals; it does not claim, and should not be read as claiming, evidence for dark matter, dark-sector physics, or any specific non-standard energy-loss mechanism. 
+
+VI. CONCLUSION 
+
+We have presented a two-stage, detectability-aware screening framework for anomalous post-merger damp-ing signatures, validated end-to-end on real LIGO L1 noise with an empirically calibrated null distribution, a synthetic-Gaussian-noise formula check, a structure-versus-power ablation, and a held-out final evaluation performed only after the full design was frozen. The central, conservatively stated result is two-fold and de-liberately separates the two stages’ roles: the graph-spectral Stage-1 statistic substantially outperforms to-tal power as a detectability gate for compact, short-damping injections. Conditional on this gate, damping-time-based Stage-2 scores, especially the nonlinear least-90 10 20 30 40 true tau (ms) 0100 200 300 400 tau_hat (ms)     
+
+> Ridge/energy-decay tau_hat
+> perfect recovery
+> 010 20 30 40 true tau (ms) 0100 200 300 400 500 tau_hat (ms)
+> Nonlinear LSQ tau_hat
+> perfect recovery
+> 810 12 14 16 18 20 SNR
+> 810 12 14 16 18 20 SNR
+
+FIG. 7. Recovered ˆ τ versus true τ on standard-damping candidates, ridge (left) and LSQ (right), colored by SNR, from a training-data validation pass. Both estimators show substantial scatter above the perfect-recovery line, especially at low SNR, supporting this section’s point that ˆ τ is validated as an anomaly-ranking score (Sec. IV), not as a precise point estimate of the true damping time. 
+
+squares estimator, distinguish anomalously short damp-ing proxies from the standard damping manifold far more effectively than a calibrated power-only baseline. Future work includes extending the signal model to-ward numerical-relativity-informed post-merger wave-forms, multi-detector coincidence, and a fair, separately validated comparison against learned time-frequency classifiers. 
+
+Appendix A: Reproducibility Details 
+
+The values below are transcribed directly from 
+
+frozen config.json , the machine-readable file govern-ing every threshold, model, and hyperparameter used in the final evaluation (Sec. III F and Sec. IV); that file, released alongside this manuscript’s code repository (Sec. A 10), is authoritative if it and this appendix ever disagree. All data-processing, calibration, and evaluation notebooks referenced throughout this work are released in the same repository; each is self-contained and docu-ments its own dependencies on earlier stages. 
+
+1. Stage 1 
+
+Score: norm lambda1 (Sec. III D). Threshold: 55 .6439, at α = 0 .01, calibrated on calib block . This thresh-old value was confirmed identical across two independent re-derivations of the calibration procedure (once during Stage-2 development, once during the final evaluation), which is why Figs. 4 and 5 — generated from an ear-lier, smaller-sample calibration pass showing 54 .98 — are noted there as exploratory rather than the exact frozen value. 
+
+2. Stage 2, primary — nonlinear LSQ 
+
+Nonlinear damped-sinusoid least-squares fit (scipy.optimize.curve fit ) on the whitened time-domain window. Anomaly threshold: ˆτ < 3.472 ms. Fit/calibration pool: the Stage-2 calibration half of the training segment ( stage2 calib , Table I). 
+
+3. Stage 2, secondary — ridge/energy-decay 
+
+Anomaly threshold: ˆτ < 4.365 ms, fit on the same 
+
+stage2 calib pool. Estimator parameters (frozen as of the held-out validation stage, Sec. III F; not tuned there-after): maximum fit window 60 frames; minimum frames required for a fit, 4; noise-floor “patience” (consecutive below-floor frames required to truncate the fit), 2; noise floor set at the 90th percentile of calib block frame-power samples, value 274565 .08 (arbitrary CQT power units, Sec. III D). 
+
+4. Power baseline 
+
+Single-feature logistic regression on total power raw (in-band CQT power, 1500–4000 Hz), fit on 
+
+stage2 calib . Operating threshold: predicted 
+
+P (anomalous) > 0.3656. Regression coefficients are not persisted as raw numbers in the frozen configuration; they are re-derived deterministically from stage2 calib 
+
+in the evaluation notebook, and the resulting operating threshold is asserted to match the value above before any evaluation proceeds (Sec. III F). 10  
+
+> 5. Time-frequency representation and graph construction
+
+CQT: fmin = 500 Hz, 48 bins, 12 bins per octave, hop length 8 samples, restricted to the 1500–4000 Hz band for the Stage-1 statistic (Sec. III D; cf. Fig. 2’s wider visual range). Graph: each time-frequency tile is connected to others within a local neighborhood of radius 2 bins in frequency and 2 frames in time.  
+
+> 6. Whitening
+
+Frequency-domain whitening band-limited to [20 , 6000] Hz; sample rate 16384 Hz; analysis win-dow duration 100 ms; edge trim 4 .0 s (Sec. III B).  
+
+> 7. Evaluation grid
+
+τ ∈ { 1, 3, 5, 10 , 20 , 40 } ms, with {5, 10 , 20 , 40 } ms des-ignated standard and {1, 3} ms designated anomalous; matched-filter SNR ∈ { 8, 10 , 12 , 15 , 20 }. 
+
+> 8. Explicitly excluded from this version
+
+A simple convolutional neural network and the frozen-audio-transformer (AST/Mahalanobis) approach from an earlier version of this project are both excluded from the frozen design (Sec. V).  
+
+> 9. Non-load-bearing diagnostic
+
+The band-leakage diagnostic (raw/full-passband power ratio across τ ) was inconclusive and is recorded in the frozen configuration explicitly as not to be used to justify, adjust, or interpret any threshold above.  
+
+> 10. Governing rules
+
+Recorded verbatim in frozen config.json and en-forced in the final evaluation notebook: (i) test block 
+
+may only be loaded in the final evaluation notebook; (ii) no threshold, model, hyperparameter, or preprocessing choice may be changed based on test block results; (iii) no further tuning of the ridge estimator is permitted; (iv) if test block performance is worse than the held-out validation split, that is reported as-is, not tuned away. 
+
+> DATA AND CODE AVAILABILITY
+
+The data, code, and computational environment configurations used in this study, including the frozen configuration file, all analysis notebooks, fixed ran-dom seeds, and instructions for reproducing every figure and table in this manuscript, are hosted on GitHub at https://github.com/ruslanalas/ gw-postmerger-detectability . To guarantee long-term access, a tagged release of the repository is archived on Zenodo under DOI: 10.5281/zenodo.21993621. Public strain data from the LIGO Livingston detector were fetched via the Gravitational Wave Open Science Center. 
+
+> ACKNOWLEDGMENTS
+
+This research has made use of data, software, and/or web tools obtained from the Gravitational Wave Open Science Center ( https://www.gw-openscience.org ), a service of LIGO Laboratory, the LIGO Scientific Collab-oration, and the Virgo Collaboration.                                              
+
+> [1] B. P. Abbott et al. (LIGO Scientific and Virgo Collab-orations), “Search for Post-merger Gravitational Waves from the Remnant of the Binary Neutron Star Merger GW170817,” The Astrophysical Journal Letters 851 , L16 (2017). [2] A. Bauswein, N. Stergioulas, and H.-T. Janka, “Explor-ing properties of high-density matter through remnants of neutron-star mergers,” European Physical Journal A
+> 52 , 56 (2016). [3] R. Abbott et al. (LIGO Scientific and Virgo Collabo-rations), “Open data from the first and second observ-ing runs of Advanced LIGO and Advanced Virgo,” Soft-wareX 13 , 100658 (2021). [4] C. Chatterjee, A. Petulante, Y. Hu, R. Lau, S. Desh-mukh, H. Fu, T. Hoang, S. C. Zhao, J. Spencer-Smith, and K. Jani, “Pre-trained Audio Transformer as a Foundational AI Tool for Gravitational Waves,” arXiv:2412.20789v2 [gr-qc] (2025). [5] W. G. Anderson, P. R. Brady, J. D. E. Creighton, and E. E. Flanagan, “Excess power statistic for detection of burst sources of gravitational radiation,” Physical Review D63 , 042003 (2001). [6] S. Klimenko and G. Mitselmakher, “A wavelet method for detection of gravitational wave bursts,” Classical and Quantum Gravity 21 , S1819 (2004). [7] S. Chatterji, L. Blackburn, G. Martin, and E. Kat-savounidis, “Multiresolution techniques for the detec-tion of gravitational-wave bursts,” Classical and Quan-tum Gravity 21 , S1809 (2004). [8] D. George and E. A. Huerta, “Deep neural networks to enable real-time multimessenger astrophysics,” Physical Review D 97 , 044039 (2018). [9] P. Laguarta et al. ,“Detection of anomalies amongst LIGO’s glitch populations with autoencoders,” Classical
+
+11 
+
+and Quantum Gravity 41 , 055004 (2024). [10] T. Whittaker, W. E. East, S. R. Green, L. Lehner, and H. Yang, “Using machine learning to parametrize post-merger signals from binary neutron stars,” Physical Re-view D 105 , 124021 (2022). [11] R. Weerasinghe, “Real-Time Multi-Mode Post-Merger Gravitational Wave Detection using Convolutional Neu-ral Networks: Methodology Development for Third-Generation Detectors,” arXiv:2601.00985 [astro-ph.IM] (2026). [12] J. Baik, G. Ben Arous, and S. P´ ech´ e, “Phase transition of the largest eigenvalue for nonnull complex sample covari-ance matrices,” Annals of Probability 33 , 1643 (2005). [13] R. R. Nadakuditi and M. E. J. Newman, “Graph spec-tra and the detectability of community structure in net-works,” Physical Review Letters 108 , 188701 (2012). [14] A. Decelle, F. Krzakala, C. Moore, and L. Zdeborov´ a, “Asymptotic analysis of the stochastic block model for modular networks and its algorithmic applications,” 
+
+Physical Review E 84 , 066106 (2011).
