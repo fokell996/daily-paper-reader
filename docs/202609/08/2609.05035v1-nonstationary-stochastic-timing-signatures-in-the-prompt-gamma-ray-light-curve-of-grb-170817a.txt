@@ -1,0 +1,464 @@
+Title: Nonstationary Stochastic Timing Signatures in the Prompt Gamma-Ray Light Curve of GRB 170817A
+
+URL Source: https://arxiv.org/pdf/2609.05035v1
+
+Published Time: Mon, 07 Sep 2026 00:53:08 GMT
+
+Number of Pages: 29
+
+Markdown Content:
+# Nonstationary Stochastic Timing Signatures in the Prompt Gamma-Ray Light Curve of GRB 170817A 
+
+Lin Xie a, Dahai Yan a, ∗
+
+> aSchool of Physics and Astronomy, Yunnan University, Kunming, Yunnan, China
+
+Abstract 
+
+We investigate time-dependent stochastic structure in the weak prompt gamma-ray emission of gamma-ray burst (GRB) 170817A using change-point and deep-kernel Gaussian-process (GP) models. The analysis is based on the 10–300 keV light curve observed by the Fermi Gamma-ray Burst Moni-tor (GBM) with 0.10 s time resolution. Two change-point configurations identify numerically similar covariance transitions at 0.269 and 0.237 s af-ter the gravitational-wave merger, with fitted 10–90% transition widths of 0.441 and 0.393 s, respectively. At the representative gate-defined bound-ary of ttr = 0 .27 s, all four tested fixed-split assignments yield positive ev-idence gains over the full-exposure stationary Matérn-3/2 reference. The largest gain is ∆ ln Zsplit = 5 .72 ± 0.16 for the Matérn-3/2 →Matérn-3/2 as-signment, while the gate-matched damped random walk (DRW) →Matérn-3/2 assignment gives ∆ ln Zsplit = 5 .50 ± 0.16 . The fixed-split comparison therefore supports segment-specific covariance evolution without requiring a change of covariance family. The deep-kernel models recover localized time-deformation features peaking at 1.65 and 1.75 s after the merger for DRW and Matérn-3/2 base kernels, respectively. Their offsets from the adopted gamma-ray onset at 1.74 s are −0.09 and +0 .01 s, both within the 0.10 s sampling resolution. The full-band timing features remain stable when the bin width is changed from 0.10 to 0.12 s, whereas energy subdivision pro-duces substantially larger shifts in the gate locations than in the warp peaks. Residual diagnostics show that the models reproduce the dominant temporal structure, although localized residual dependence remains. We interpret the gate-defined covariance transition and the localized time-deformation feature   
+
+> ∗Corresponding author
+> Email address: yandahai@ynu.edu.cn (Dahai Yan) arXiv:2609.05035v1 [astro-ph.HE] 4 Sep 2026
+
+as model-dependent phenomenological timing diagnostics. Further simula-tion calibration and count-level modelling are needed to assess the statistical robustness and physical origin of the recovered nonstationary structure. 
+
+Keywords: gamma-ray bursts: individual (GRB 170817A), gravitational waves, methods: data analysis, methods: statistical, time series analysis 
+
+1. Introduction 
+
+The binary neutron-star merger GW170817 and its associated short gamma-ray burst (GRB) 170817A established the first direct connection between gravitational-wave (GW) emission and prompt high-energy radiation from a compact-binary merger (Abbott et al., 2017b,a; Goldstein et al., 2017; Savchenko et al., 2017). This event has provided a unique reference for inves-tigating the formation of relativistic outflows, the geometry of short-gamma-ray-burst jets, and the physical origin of prompt and afterglow emission. Its low apparent luminosity and unusual temporal and spectral properties have motivated interpretations involving structured or off-axis relativistic jets (Lazzati et al., 2018; Mooley et al., 2018; Ghirlanda et al., 2019), as well as cocoon and shock-breakout emission (Kasliwal et al., 2017; Gottlieb et al., 2018). Previous studies of the prompt emission of GRB 170817A have mainly focused on its delay relative to the merger, duration, spectral evolution, en-ergetics, and pulse morphology (Goldstein et al., 2017; Savchenko et al., 2017; Abbott et al., 2017a). These observables provide important constraints on the launching and propagation of the outflow. In particular, the GW– gamma-ray delay can contain contributions from central-engine activity and jet propagation through the merger ejecta (Geng et al., 2019; Zhang, 2019). The light curve can, however, also be regarded as a realization of an un-derlying stochastic process. From this perspective, its covariance structure characterizes the amplitude, correlation timescale, and temporal regularity of the variability, providing information complementary to conventional flux-and spectrum-based analyses. Time-domain studies of high-energy variable sources commonly seek char-acteristic variability timescales and quasi-periodic oscillations (QPOs), but the significance of such features can be difficult to assess in the presence of stochastic red-noise variability. Gaussian processes (GPs) provide a flexible probabilistic framework for modelling correlated astronomical time series and 2for separating stochastic variability from more coherent temporal structure (Rasmussen and Williams, 2006; Aigrain and Foreman-Mackey, 2023). Yang et al. (2021) used GP stochastic-process models to reassess re-ported gamma-ray QPO candidates, showing that most variability could be explained by red noise, with only a limited number of QPO candidates re-maining plausible. A complementary study by Zhang et al. (2021) identified a ∼ 1.1 yr QPO in PKS 0521–36 using GP modelling together with Lomb– Scargle, wavelet, and REDFIT analyses. These studies demonstrated the utility of GPs for distinguishing coherent temporal structure from stochastic red-noise variability. Subsequent work extended GP modelling from QPO searches to the char-acterization of stochastic variability itself. Zhang et al. (2022) used DRW and SHO processes to infer characteristic variability timescales in relativistic-jet sources, while Zhang et al. (2023) applied the approach to multiwavelength variability. Zhang et al. (2025) further showed that individual extreme flares can favour overdamped SHO or Matérn-3/2 covariance structures over a sim-ple DRW description. Most of these analyses, however, assume stationary covariance kernels within each analysed interval. This assumption can become restrictive for rapidly evolving transients whose variability amplitude or correlation struc-ture changes on comparable timescales. Zhang et al. (2026) found that sta-tionary DRW, SHO, and Matérn-3/2 models can describe restricted flare intervals but may become inadequate when a larger fraction of the flare evo-lution is included, motivating change-point descriptions of evolving stochastic states. More generally, time-invariant covariance models may be insufficient for intrinsically nonstationary variability (Paciorek and Schervish, 2004). A departure from stationarity may indicate that different intervals of the light curve are characterized by different stochastic variability regimes, motivating GP constructions that allow covariance structure to vary across change points or more general change surfaces (Herlands et al., 2016; Han et al., 2019). Such a change need not coincide with an obvious discontinuity in the observed flux and may therefore be missed by analyses based only on pulse decomposition or time-resolved spectra (Scargle et al., 2013). In this work, we characterize possible departures from stationary stochas-tic variability in the prompt gamma-ray emission of GRB 170817A. We use stationary GP models as reference descriptions and analyse the light curve with two complementary nonstationary constructions: a change-point model that represents an evolving covariance structure and a deep-kernel model 3that represents nonstationarity through a learned time deformation. We use these models to extract phenomenological timing signatures and evaluate their stability under changes in temporal binning and energy selection. For the gate-defined transition, we additionally perform a restricted Bayesian evidence comparison conditional on a fixed boundary inherited from the rep-resentative gate fit. The paper is organized as follows. Section 2 describes the gamma-ray data and timing conventions. Section 3 introduces the stationary and non-stationary GP models and the model-comparison procedure. The results are presented in Section 4. Their possible astrophysical implications and the limitations of the analysis are discussed in Section 5, and our conclusions are summarized in Section 6. 
+
+2. Data and light-curve construction 
+
+We use publicly available time-tagged event (TTE) data from the Fermi 
+
+Gamma-ray Burst Monitor (GBM) (Meegan et al., 2009) for GRB 170817A (Goldstein et al., 2017). Events recorded by the NaI n1, n2, and n5 detectors are combined over the 10–300 keV energy range and binned at a uniform time resolution of ∆t = 0 .10 s. The input time coordinate is already expressed in seconds relative to the GW170817 merger epoch. Throughout this work, 
+
+t = 0 corresponds to TGW , negative values of t precede the merger, and positive values follow it. The background is estimated by fitting the count-rate evolution in off-source intervals and evaluating the resulting model over the analysis interval. The background-subtracted count rate in the ith bin is then 
+
+yi = Robs (ti) − Rbg (ti). (1) Assuming Poisson counting statistics, the rate uncertainty is approximated as 
+
+σi ≃
+
+pCobs (ti)∆t , (2) where Cobs (ti) is the total observed count in the corresponding time bin. Equation (2) does not separately propagate the uncertainty associated with the fitted background model. The GP analysis uses the resulting time–rate–uncertainty array, {ti, y i, σ i},where ti is the input time in seconds relative to the GW170817 merger epoch. 4For numerical stability, the input relative-time coordinate is additionally shifted according to 
+
+eti = ti − tmin , tmin = min  
+
+> i
+
+(ti). (3) The shifted coordinate et is used only internally during model evaluation. It does not redefine the physical time origin. 
+
+3. GP methodology 
+
+3.1. GP likelihood 
+
+GP regression models the observed light curve as a random function with a specified mean function and covariance structure. For the binned count-rate measurements, the shifted model-time coordinate et defined in Equation (3) is further standardized as 
+
+xi = eti − ¯tst
+
+, (4) where ¯t and st are the mean and standard deviation of the shifted time samples, respectively. The standardized coordinate x is used for the internal GP covariance calculations. The observed data vector is modelled as 
+
+y ∼ N (μ, K) , (5) where μ is the mean function and K is the covariance matrix evaluated at the model coordinates. In this work, we adopt a constant mean function, 
+
+μ(x) = μ0, (6) and construct the covariance matrix as 
+
+Kij = k(xi, x j ) +  σ2 
+
+> i
+
++ j2
+
+> i
+
+ δij , (7) where k denotes the adopted covariance function, σi is the measurement uncertainty of the ith binned count-rate measurement, ji denotes an addi-tional white-noise (jitter) amplitude, and δij is the Kronecker delta. For the stationary and deep-kernel models, the additional jitter is constant in time, 
+
+ji = j. For the change-point models, it is allowed to evolve with the same fitted gate. The GP likelihood is then written as 
+
+ln L = −12(y − μ)TK−1(y − μ) − 12 ln |K| − N
+
+2 ln(2 π), (8) where N is the number of time bins. The likelihood provides the basis for all stationary and nonstationary GP models considered below. 53.2. Stationary covariance models 
+
+We use the DRW covariance function, equivalent to the Ornstein–Uhlenbeck (OU) covariance (Rasmussen and Williams, 2006; Aigrain and Foreman-Mackey, 2023), 
+
+kDRW (z, z ′) = σ2DRW exp 
+
+
+
+−|z − z′|
+
+τDRW 
+
+
+
+, (9) and the Matérn-3/2 covariance function, hereafter denoted M32 in model labels and parameter or kernel subscripts, 
+
+kM32 (z, z ′) = σ2M32 1 + 
+
+√3|z − z′|
+
+ℓM32 
+
+!
+
+× exp −√3|z − z′|
+
+ℓM32 
+
+!
+
+.
+
+(10) Here z denotes either the standardized model time x or the learned deep-kernel coordinate u. The parameters σDRW and σM32 determine the variability amplitudes, while τDRW and ℓM32 characterize the correlation scales. The Matérn-3/2 process is smoother at short time separations than the DRW process. These kernels are used as phenomenological descriptions of temporal correlation. The covariance parameters and additional white-noise amplitude are held constant in time. These models provide the full-exposure stationary reference descriptions against which the nonstationary alternatives are evaluated. Because the kernels are fitted in the standardized coordinate, their phys-ical correlation scales are 
+
+τphys = st τDRW , ℓphys = st ℓM32 . (11) 
+
+3.3. Change-point GP models 
+
+To represent a transition between two covariance regimes, we refer to Saatçi et al. (2010) and define a time-dependent gate 
+
+q(x) = [1 + exp {− s(x − c) − δϕ(x)}]−1 . (12) The parameter c specifies the centre of the analytic sigmoid component and 
+
+s > 0 controls its sharpness. The correction δϕ(x) is generated by a two-layer feed-forward network with Swish activations and is bounded according to 
+
+δϕ(x) = δmax tanh [ gϕ(x)] , δmax = 0 .10 . (13) 6The bounded neural correction allows modest local departures from a per-fectly symmetric sigmoid, while the transition centre and overall sharpness remain controlled primarily by the parametric gate. The parametric gate centre in physical time is 
+
+tc = tmin + ¯ t + stc. (14) When the gate is expressed on the physical-time coordinate, we write q(t) ≡
+
+q[x(t)] . For the analytic sigmoid component alone, tc corresponds exactly to the midpoint of the transition, i.e. q(tc) = 0 .5. The bounded neural correction in Equation (13) allows only small local deviations from the ana-lytic sigmoid and may therefore introduce a slight offset between tc and the numerical midpoint t50 of the complete fitted gate. In the present fits, this correction is small and the difference between tc and t50 is negligible for the timing interpretation. For completeness, the transition boundaries are determined from the com-plete sampled gate, including the neural correction. After fitting, we linearly interpolate between adjacent sampled points to obtain the physical times 
+
+t10 , t50 , and t90 at which q(t) = 0 .1, 0.5, and 0.9, respectively. The reported transition width is 
+
+∆t10 −90 = t90 − t10 . (15) We use tc as the representative transition centre throughout the paper, while 
+
+t10 and t90 characterize the extent of the complete fitted transition profile. The covariance structure before and after the transition is described by independent zero-mean GP components with covariance functions kpre and 
+
+kpost , respectively. The gate function q(x) smoothly interpolates between the two covariance regimes. The resulting covariance is 
+
+kcp (x, x ′) = [1 − q(x)] [1 − q(x′)] kpre (x, x ′)+ q(x)q(x′)kpost (x, x ′). (16) We consider both DRW-to-Matérn-3/2 and Matérn-3/2-to-DRW transitions, with independent amplitudes and correlation scales for the two regimes. The gate construction is used here as a phenomenological interpolation between these covariance descriptions. In a closely related recent astrophysical appli-cation, a gated Matérn-3/2-to-DRW covariance transition was used to local-ize the evolution of stochastic variability within a continuous X-ray exposure (Dong and Yan, 2026). 7The additional white-noise amplitude is allowed to evolve consistently with the same gate: 
+
+j(x) = [1 − q(x)] jpre + q(x)jpost . (17) 
+
+3.4. Deep-kernel GP models 
+
+We adopt a deep-kernel covariance model in which a stationary base ker-nel is evaluated in a learned monotonic temporal coordinate (Wilson et al., 2016), 
+
+kdeep (x, x ′) = k0 [u(x), u (x′); θ] , (18) where x is the standardized model-time coordinate defined in Equation (4), 
+
+u(x) is a deterministic monotonic transformation of that coordinate, k0 de-notes the stationary base covariance kernel, and θ contains its covariance hyperparameters. We consider both the DRW and Matérn-3/2 kernels de-fined in Section 3.2 as choices for k0.The base covariance is stationary with respect to separations in the warped coordinate u, whereas the corresponding covariance expressed in the original time coordinate is generally nonstationary because equal intervals in x need not map to equal intervals in u. Thus, the transformation allows a station-ary covariance family to represent a smoothly varying effective correlation timescale in the observed time domain. This construction follows the gen-eral deep-kernel principle of learning an input representation jointly with the GP covariance (Wilson et al., 2016) and is closely related to input-warping approaches for nonstationary GP (Snoek et al., 2014). The warped coordinate is constructed from the ordered standardized model-time samples {xi}. Only the input time coordinate is transformed; the observed count rates and their measurement uncertainties remain those defined in Sections 2 and 3.1. We first use a two-layer feed-forward neural network with 32 hidden units per layer and Swish activations to define a strictly positive auxiliary rate field, 
+
+rϕ(x) = softplus [ gϕ(x)] + ϵr, ϵr > 0, (19) where gϕ(x) denotes the neural-network output, ϕ contains the trainable network parameters, and ϵr is a small positive constant that prevents the rate from vanishing. The positive rate field is integrated to form a monotonic cumulative com-ponent, 
+
+I(x) = 
+
+Z xxmin 
+
+rϕ(ξ) d ξ, (20) 8which is evaluated numerically on the ordered input samples using the trape-zoidal rule. The resulting values are standardized to zero mean and unit variance, 
+
+eI(xi) = I(xi) − ⟨ I⟩
+
+std( I) . (21) An intermediate warped coordinate is then constructed as 
+
+v(xi) = αx i + λu eI(xi), α > 0, λu > 0, (22) and is standardized once more to define the coordinate supplied to the co-variance kernel, 
+
+u(xi) = v(xi) − ⟨ v⟩
+
+std( v) . (23) Because rϕ(x) > 0, its cumulative integral is monotonic in x. Together with the positivity constraints α > 0 and λu > 0, this ensures that v(x)
+
+is monotonic. The final affine standardization in Equation (23) preserves this ordering. Consequently, the learned transformation can modify the lo-cal spacing of the time coordinate seen by the stationary base kernel without reversing the temporal ordering of the observations. The linear term pro-vides a global monotonic baseline, whereas the integrated neural component introduces smooth local departures from a uniform temporal scale. The transformation is deterministic conditional on the network param-eters and is optimized jointly with the GP covariance hyperparameters. It therefore provides a learned input representation for the covariance function rather than an additional latent Gaussian process. To quantify the local deformation of the learned coordinate, we define 
+
+ρ(x) = du
+
+dx. (24) Here, ρ(x) is the local stretching rate of the final warped coordinate and should be distinguished from the auxiliary neural rate rϕ(x) in Equation (19). If the warp varies slowly over a local correlation scale, a characteristic scale τu
+
+defined in the warped coordinate corresponds approximately to the physical-time scale 
+
+τeff (t) ≃ τu
+
+st
+
+ρ[x(t)] , (25) where st is the time-standardization factor introduced in Equation (4). The same conversion is applied to the Matérn-3/2 correlation scale. Thus, larger 9values of ρ imply a shorter effective correlation scale in physical time, whereas smaller values imply a longer one. For post-fit diagnostics, the deformation rate is converted to the physical-time coordinate according to 
+
+di ≡ du
+
+dt ti
+
+= 1
+
+st
+
+du
+
+dx xi
+
+= ρ(xi)
+
+st
+
+. (26) The sequence {di} therefore provides a physical-time diagnostic of the local temporal deformation inferred by the deep-kernel model. 
+
+3.5. Optimization and regularization 
+
+For the nonstationary models, the GP covariance hyperparameters and the parameters governing the corresponding nonstationary components are optimized jointly. In the change-point models, these include the parameters of the transition gate, whereas in the deep-kernel models the neural-network parameters defining the learned time transformation are optimized together with the base-kernel hyperparameters. The GP calculations are implemented with tinygp (Foreman-Mackey et al., 2024) using the JAX framework (Brad-bury et al., 2018), and all trainable parameters are optimized using the Adam algorithm (Kingma and Ba, 2015). The optimization minimizes a regularized negative GP log-likelihood, 
+
+J (Θ) = − ln L(Θ) + R(Θ), (27) where Θ denotes the complete set of trainable parameters and R contains weak regularization terms applied to the nonstationary components. Because the objective is non-convex, each nonstationary model configuration is opti-mized from three independent random initializations. Model comparison is based on the unregularized negative log-likelihood evaluated after optimiza-tion. The regularization is intended to suppress poorly constrained or numeri-cally unstable nonstationary solutions without fixing the form of the inferred evolution. For the deep-kernel models, the monotonic construction described in Section 3.4 is supplemented by weak penalties that discourage local rever-sals, excessively rapid variations in the deformation rate, and unnecessarily large nonlinear departures from a near-uniform time coordinate. For the 10 change-point models, the gate centre and sharpness are bounded to physi-cally admissible ranges, with additional weak penalties discouraging transi-tions close to the boundaries of the observed interval and excessively sharp or irregular gate profiles. 
+
+3.6. Model assessment and residual diagnostics 
+
+After optimization, the unregularized negative log-likelihood is evaluated for each completed run, 
+
+NLL r = − ln p(y | Θ∗ 
+
+> r
+
+) , (28) where Θ∗ 
+
+> r
+
+denotes the optimized parameter vector obtained from the rth random initialization. For each model configuration, the mean NLL over the three runs is reported in Table 1 as the summary fit statistic. The run with an NLL closest to this mean is adopted as the representative fit for subsequent analysis. At the observed times, we evaluate the conditional GP mean byi and the conditional latent variance Vi. The total variance used to normalize the residuals is 
+
+S2 
+
+> i
+
+= Vi + σ2 
+
+> i
+
++ j2 
+
+> i
+
+, (29) and the standardized residuals are 
+
+ei = yi − byi
+
+Si
+
+. (30) We examine the autocorrelation functions (ACFs) of both ei and e2 
+
+> i
+
+to diag-nose remaining temporal correlation and residual conditional-variance struc-ture, respectively (McLeod and Li, 1983). We additionally summarize these residual dependencies using Ljung–Box (LB) portmanteau tests over the adopted lag range (Ljung and Box, 1978). Because the LB statistic com-bines information across multiple lags, its interpretation is combined with the individual ACF coefficients in the assessment of residual model adequacy. As a restricted conditional check of the covariance structure at the gate-defined boundary, we additionally perform a separately refitted fixed-split Bayesian evidence analysis. The split boundary is inherited from the rep-resentative gate fit and is held fixed throughout this comparison; it is not re-optimized within the fixed-split analysis. The resulting evidence com-parison is therefore conditional on the gate-defined boundary and does not constitute an independent search for a change point. 11 Stationary DRW and M32 covariance models are fitted independently on the two sides of the fixed boundary. With these two candidate covariance families, the fixed-split analysis therefore considers four segment-wise assign-ments: DRW →DRW, DRW →M32, M32 →DRW, and M32 →M32. The same stationary candidates are also fitted to the full exposure to provide the ref-erence evidence. This construction tests whether allowing the covariance description to vary between the two temporal segments is supported relative to a stationary full-exposure description. For all stationary fits used in the fixed-split comparison, the GP amplitude and characteristic correlation scale are sampled in logarithmic coordinates. Uniform priors are adopted for ln σ and for the logarithm of the corresponding correlation-scale parameter, equivalent to log-uniform priors on the physical parameters. We use 
+
+σ ∈ [0 .1, 200] counts s −1, τ, ℓ ∈ [0 .01 , 150] s , (31) with identical prior ranges for the two sub-intervals and the full-exposure ref-erence fits. The additional white-noise jitter term j is fixed to zero in these nested-sampling fits and is not included as a sampled parameter. The GP mean is fixed to the full-exposure sample mean for all compared fits, provid-ing a common mean prescription so that the evidence comparison primarily reflects differences in the covariance structure. The Bayesian evidences used in the fixed-split analysis are computed with 
+
+dynesty , a dynamic nested-sampling algorithm designed for Bayesian pos-terior exploration and marginal-likelihood estimation (Speagle, 2020). For each stationary fit, dynesty provides an estimate of the Bayesian evidence 
+
+Z, which is used here to compare the segmented and full-exposure covariance descriptions. For a specified pair of stationary covariance models, Kpre and Kpost , fitted on the two sides of the fixed boundary, we define the fixed-split evidence gain as 
+
+∆ ln Zsplit = ln Zpre (Kpre ) + ln Zpost (Kpost ) − ln Zfull , (32) where ln Zfull denotes the Bayesian evidence of the preferred stationary model fitted to the full exposure. A positive ∆ ln Zsplit indicates that, conditional on the adopted fixed boundary, the segmented covariance description is favoured over the stationary full-exposure reference. The uncertainty reported for ∆ ln Zsplit is obtained by propagating the evidence-sampling uncertainties returned by dynesty for the pre-transition, 12 post-transition, and full-exposure fits. These nested-sampling runs are treated as independent in the uncertainty propagation. 
+
+4. Results 
+
+4.1. Overall performance of the nonstationary models 
+
+We first apply the four nonstationary GP models to the fiducial 10– 300 keV full-band analysis with 0.10 s time bins. The models comprise two change-point configurations, corresponding to DRW-to-Matérn-3/2 and Matérn-3/2-to-DRW covariance transitions, together with two deep-kernel models constructed from DRW and Matérn-3/2 base covariances. These models provide complementary descriptions of nonstationarity, either through an explicit transition between two covariance regimes or through a continuous deformation of the time coordinate. Figure 1 shows the DRW-to-Matérn-3/2 change-point model as a repre-sentative example. The fitted GP reproduces the main temporal structure of the prompt emission across the full exposure, while the standardized residuals remain distributed around zero without broad systematic departures. The residual autocorrelation functions further show that most of the temporal correlation present in the original light curve has been absorbed by the fitted covariance model. Most individual ACF coefficients lie within the approx-imate zero-correlation intervals, although some localized residual structure remains, most noticeably in the squared-residual ACF around lag 4. The corresponding fit statistics and residual diagnostics for all four non-stationary models are summarized in Table 1. Overall, each model provides a viable description of the dominant temporal variability in the baseline light curve. The change-point models achieve somewhat better in-sample likelihoods, whereas the deep-kernel models generally leave weaker correla-tions in the squared residuals. The residual diagnostics therefore indicate modest differences in how the two classes of models capture the remaining short-timescale structure, rather than a qualitative failure of any individual model. The likelihood and residual diagnostics show that both forms of nonsta-tionary GP model capture the principal temporal correlations of the prompt-emission light curve. The following sections therefore focus on the nonstation-ary features inferred by these models, in particular the timing and stability of the change-point and deep-kernel signatures. 13 6 4 2 0 2 4 6
+
+Time (s) 
+
+2000 2250 2500 2750 3000 3250 3500 3750 4000 
+
+> counts/s
+
+Model fit Model 1 interval 
+
+tc = 0.27s 
+
+TGW 
+
+Data 6 4 2 0 2 4 6
+
+Time (s) 
+
+4
+
+3
+
+2
+
+1
+
+01234
+
+> Standardized Residuals
+> model residuals ±2
+> ±3
+
+0.00 0.05 0.10 0.15 0.20 0.25 0.30 
+
+Density 2.5 5.0 7.5 10.0 12.5 15.0 17.5 20.0        
+
+> Lag
+> 0.20
+> 0.15
+> 0.10
+> 0.05
+> 0.00 0.05 0.10 0.15 0.20
+> ACF of standardized residuals 2.5 5.0 7.5 10.0 12.5 15.0 17.5 20.0
+> Lag
+> 0.2
+> 0.1
+> 0.0 0.1 0.2 0.3 0.4
+> ACF of squared standardized residuals
+
+Figure 1: Representative fit and residual diagnostics for the DRW →Matérn-3/2 change-point model. The top panel shows the GP fit and its 1σ model interval; the solid and dashed vertical lines mark TGW = 0 and the fitted gate centre, respectively. The middle panel shows the standardized residuals and their marginal distribution. The lower panels show the autocorrelation functions of the standardized residuals and their squares, with shaded regions indicating the approximate zero-correlation intervals. 
+
+14 Table 1: Summary diagnostics for the four nonstationary models. Reported NLL values are averaged over three completed random initializations and rounded to the nearest integer. The Ljung–Box (LB) p-values are calculated for the representative run whose NLL is closest to the corresponding three-run mean (Ljung and Box, 1978).                         
+
+> Class Scenario NLL LB residual pLB squared-residual p
+> warp DRW warp 803 0.086 0.440 warp Matérn-3/2 warp 804 0.035 0.387 gate DRW →Matérn-3/2 gate 797 0.044 0.006 gate Matérn-3/2 →DRW gate 798 0.069 3.43 ×10 −4
+
+4.2. Covariance transition close to the merger epoch 
+
+Both change-point configurations identify an early covariance transition in the fiducial 10–300 keV full-band analysis with 0.10 s time bins. For temporal comparison with the prompt emission, we adopt the reported GW– gamma-ray delay as the gamma-ray onset reference, tγ, onset = 1 .74 s after 
+
+TGW (Abbott et al., 2017b). Figure 2 shows the sampled gate function q(t) for the representative DRW →Matérn-3/2 configuration. The gate evolves smoothly from the pre-transition to the post-transition covariance regime close to the merger epoch. The numerically determined q(t) = 0 .1–0.9 interval characterizes the effec-tive extent of the transition and shows that the main covariance evolution occurs well before the adopted gamma-ray onset reference. 6 4 2 0 2 4 6    
+
+> Time (s)
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> q(t)
+> q(t)
+> tc= 0.27s
+> t10 90 = 0.44s
+> TGW
+> t, onset
+
+Figure 2: Sampled gate function for the representative DRW →Matérn-3/2 change-point model. The dashed line marks the parametric gate centre tc, and the shaded interval extends from the numerically interpolated q(t) = 0 .1 crossing to the q(t) = 0 .9 crossing. The solid black and dotted green lines mark TGW and tγ, onset , respectively. 
+
+15 The gate timing quantities for both change-point configurations are sum-marized in Table 2. Despite the opposite ordering of their covariance compo-nents, the DRW →Matérn-3/2 and Matérn-3/2 →DRW models recover closely similar transition epochs and extents. In both cases, the inferred covariance evolution occurs within the early post-merger interval and is largely com-pleted before the adopted gamma-ray onset reference. 
+
+Table 2: Gate timing quantities for the two change-point configurations. Times are seconds relative to TGW . The gate centre tc is the parametric centre of the analytic sigmoid component. The boundaries t10 and t90 are determined by linear interpolation of the sampled fitted gate curve at q(t) = 0 .1 and q(t) = 0 .9, respectively, and ∆t10 −90 = t90 −t10 .No analytic width derived from the fitted sharpness s is used.                
+
+> Scenario tct10 t90 ∆t10 −90 s
+> DRW →Matérn-3/2 gate 0.269 0.053 0.494 0.441 37.10 Matérn-3/2 →DRW gate 0.237 0.043 0.435 0.393 37.82
+
+We next perform the restricted fixed-split analysis at ttr = 0 .27 s , cor-responding to the representative DRW →Matérn-3/2 gate centre. The split boundary is held fixed throughout this comparison. Stationary DRW and Matérn-3/2 covariance models are then fitted independently to the data be-fore and after the boundary, together with stationary fits to the full exposure. Figure 3 shows the DRW →Matérn-3/2 assignment as the representative fixed-split configuration. This choice directly corresponds to the covariance ordering of the gate model from which the adopted boundary is obtained. The figure compares the independently refitted stationary models on the two temporal segments with the stationary full-exposure Matérn-3/2 reference. The Bayesian evidences of the stationary models fitted to the two seg-ments and to the full exposure are summarized in Table 3. Among the full-exposure stationary reference models, the Matérn-3/2 model has the higher Bayesian evidence and is therefore used as ln Zfull in Equation (32). 
+
+Table 3: Bayesian log evidences of the stationary covariance models fitted to the intervals defined by the fixed boundary ttr = 0 .27 s and to the full exposure. DRW and M32 denote the damped random walk and Matérn-3/2 covariance models, respectively.                       
+
+> Interval ln ZDRW ln ZM32
+> Pre-transition −409 ±0.060 −409 ±0.061
+> Post-transition −397 ±0.103 −396 ±0.107
+> Full exposure −812 ±0.099 −811 ±0.101
+
+16 -6 -4 -2 0 2 4 6   
+
+> Time (s)
+> 2000 2250 2500 2750 3000 3250 3500 3750 4000
+> counts/s
+> ttr = 0.27 s \n Δln Zsplit = 5.50 ± 0.16
+> Data Pre-transition: DRW Post-transition: Matérn-3/2 Full exposure: Matérn-3/2 Transition time
+
+Figure 3: Representative fixed-split diagnostic at the gate-defined boundary ttr = 0 .27 s .The pre-transition and post-transition curves show the independently refitted stationary DRW and Matérn-3/2 GPs for the representative DRW →Matérn-3/2 assignment. The stationary full-exposure Matérn-3/2 fit is shown for comparison, and the vertical dot-dashed line marks the fixed boundary. 
+
+All four segment-wise assignments defined in Section 3.6 yield positive 
+
+∆ ln Zsplit at this fixed boundary. The largest evidence gain is obtained for the Matérn-3/2 →Matérn-3/2 assignment, with ∆ ln Zsplit = 5 .72 ±0.16 . The fact that the largest gain is obtained without changing the covariance family shows that the conditional fixed-split evidence does not require a transition between different covariance families: allowing the covariance parameters to vary between the two temporal segments is itself sufficient to improve the description relative to the full-exposure stationary reference. For direct correspondence with the gate model from which the adopted boundary is obtained, we use the DRW →Matérn-3/2 assignment as the representative fixed-split configuration. This assignment gives ∆ ln Zsplit =5.50 ± 0.16 , close to the maximum obtained for the Matérn-3/2 →Matérn-
+
+3/2 case. Conditional on the gate-defined boundary, the fixed-split compar-ison therefore supports segment-specific covariance structure, but does not uniquely identify a transition between different covariance families. 
+
+4.3. Localized time deformation near the γ-ray onset 
+
+We characterize the deep-kernel timing structure using the physical-time deformation rate du/ dt defined in Section 3.4. Because its absolute amplitude 17 is model dependent, the location and descriptive extent of the dominant localized feature are used as the primary timing diagnostics. The dominant feature is identified as the largest local maximum of the sampled du/ dt curve over the analysed interval, with the surrounding contiguous rising and falling portions defining tstart and tend , respectively. Figure 4 shows the representative DRW deep-kernel diagnostics. The learned deformation rate exhibits a localized enhancement near the adopted gamma-ray onset reference. The corresponding effective correlation time, 
+
+τeff (t), decreases over the same interval, illustrating the local change in tem-poral correlation scale associated with the learned time deformation. The maximum of du/ dt provides the representative warp-based timing marker. The timing quantities and fitted warp parameters for both deep-kernel configurations are summarized in Table 4. Both the DRW and Matérn-3/2 base-kernel models recover a localized deformation feature near the gamma-ray onset, with closely spaced peak locations despite their different underlying covariance families. In both cases, the peak offset from tγ, onset is within the 0.10 s temporal sampling resolution. Neither the model optimization nor the post-fit feature-selection proce-dure uses tγ, onset as an input. The proximity between the recovered defor-mation peaks and the gamma-ray onset is therefore treated as a post-fit empirical correspondence. The reported tstart –tpeak –tend ranges characterize the descriptive extent of the localized deformation and are not statistical confidence or credible intervals. 
+
+Table 4: Warp timing quantities and fitted parameters for the full-band 10–300 keV light curve with 0.10 s time bins. The times tstart , tpeak , and tend are given in seconds relative to TGW , and the onset offset is tpeak − tγ, onset with tγ, onset = 1 .74 s . The reported start– end ranges describe the extent of the selected deformation feature and are not statistical uncertainty intervals.                              
+
+> Scenario tstart tpeak tend tpeak −tγ, onset ∆t−∆t+(d u/ dt)peak αλu
+> DRW warp 1.35 1.65 2.05 -0.09 0.30 0.40 6.113 0.649 0.475 Matérn-3/2 warp 1.45 1.75 2.05 0.01 0.30 0.30 2.727 1.308 0.163
+
+Note. Here ∆t− = tpeak − tstart and ∆t+ = tend − tpeak . The fitted coefficients α and 
+
+λu are reported as model parameters but are not interpreted as independently calibrated physical quantities. 
+
+18 6 4 2 0 2 4 6        
+
+> Time (s)
+> 0123456
+> du/d t
+> du/d tt, onset 6420246
+> Time (s)
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4 1.6
+> eff (t) (s)
+> eff (t)
+> t, onset
+
+Figure 4: Deep-kernel timing diagnostics for the representative DRW warp model fitted to the 10–300 keV light curve with 0.10 s time bins. The upper panel shows the learned physical-time deformation rate du/ dt, and the lower panel shows the corresponding DRW effective correlation time τeff (t). The dotted vertical line marks tγ, onset . The localized maximum of du/dt corresponds to a temporary reduction in τeff (t).
+
+19 4.4. Stability under energy selection and time binning 
+
+We repeat the change-point and deep-kernel timing analyses for the 10– 50 and 50–300 keV sub-bands and for an alternative time resolution of ∆t =0.12 s. These calculations provide stability tests under changes in energy selection and temporal binning. The 10–300 keV full-band analysis with 0.10 s time bins remains the fiducial configuration. Figure 5 provides an overview of the recovered gate and warp timings across the tested analysis configurations. The full-band timing results are stable to the modest change in temporal binning. At ∆t = 0 .12 s, the DRW →Matérn-3/2 and Matérn-3/2 →DRW gate configurations give parametric centres of 0.274 and 0.262 s after TGW ,with numerical 10–90% transition intervals of 0.060–0.491 and 0.066–0.469 s, respectively. These values are close to the corresponding 0.10 s full-band centres of 0.269 and 0.237 s. The full-band warp timing is similarly stable: at 0.12 s resolution, both deep-kernel models recover deformation peaks at 1.74 s after TGW , compared with 1.65 and 1.75 s for the fiducial 0.10 s DRW and Matérn-3/2 fits. The corresponding 0.12 s start–end feature extents are 1.50–1.98 and 1.50–2.10 s. A substantially larger variation is found when the data are divided into energy sub-bands, particularly for the gate diagnostic. In the 10–50 keV band, the inferred gate locations vary strongly with both model configuration and time binning: the 0.10 s fits have broad transition intervals, while the two 0.12 s configurations place one gate centre before TGW and the other close to the observed gamma-ray onset. In the 50–300 keV band, by contrast, the two gate configurations place their centres near the onset reference. The sub-band gate results are therefore substantially less consistent than the corresponding full-band rebinning results. Two effects may contribute to this behaviour. First, dividing the full-band data into narrower energy intervals changes the signal-to-noise ratio. The reduced statistical information available to each sub-band fit may alter which covariance structure is most strongly constrained and consequently shift the inferred gate location. Second, the observed differences may con-tain a genuine energy-dependent component if the temporal variability or relative contribution of emission structures changes with photon energy. The present analysis does not distinguish between these statistical and physical contributions. The warp feature shows a smaller variation under the same tests. Across the tested sub-bands and time resolutions, the deformation peaks remain 20 [10-300] keV 0.1 s [10-300] keV 0.12 s [10-50] keV 0.1 s [10-50] keV 0.12 s [50-300] keV 0.1 s [50-300] keV 0.12 s 
+
+Energy band    
+
+> 0.5
+> 0.0 0.5 1.0 1.5 2.0
+> Time relative to  TGW  (s)
+> DRW Matérn-3/2
+> Matérn-3/2 DRW
+> [10-300] keV [10-50] keV [50-300] keV
+> TGW
+> t, onset [10-300] keV 0.1 s [10-300] keV 0.12 s [10-50] keV 0.1 s [10-50] keV 0.12 s [50-300] keV 0.1 s [50-300] keV 0.12 s
+
+Energy band   
+
+> 0.4
+> 0.2
+> 0.0 0.2 0.4
+> Time relative to  t , onset  (s)
+> warp-Matérn-3/2 warp-DRW [10-300] keV [10-50] keV [50-300] keV t, onset
+
+Figure 5: Stability of the fitted timing diagnostics under changes in energy selection and time binning. Upper: gate timing relative to TGW . Circular and square markers show the parametric gate centres tc for the DRW →Matérn-3/2 and Matérn-3/2 →DRW configurations, respectively, with vertical segments spanning the numerically determined 
+
+q(t) = 0 .1–0.9 transition extents. Lower: warp timing relative to the adopted gamma-ray onset, showing tpeak − tγ, onset and the corresponding start–end deformation extents. Colours identify the energy bands consistently between the two panels. All vertical extents are descriptive fitted feature ranges rather than statistical confidence or credible intervals. 
+
+21 within approximately 1.55–1.75 s after TGW . The soft-band solutions tend to occur somewhat earlier than tγ, onset , whereas the full-band and hard-band solutions remain more closely concentrated around the onset reference. The warp timing shows a smaller cross-band variation than the gate timing under the tested energy selections. The remaining shifts nevertheless show that the recovered warp feature is not strictly invariant with energy selection. 
+
+5. Discussion 
+
+5.1. Two phenomenological timing signatures 
+
+The fiducial analysis reveals two distinct phenomenological timing sig-natures in the stochastic structure of the GRB 170817A light curve. The change-point models recover an early covariance transition within the first few tenths of a second after TGW , while the deep-kernel models identify a later maximum in the learned time-deformation rate near the observed gamma-ray onset. These features arise from different nonstationary constructions and should therefore be regarded as complementary diagnostics rather than estimates of the same transition time. The early feature is recovered for both DRW →Matérn-3/2 and Matérn-3/2 →DRW orderings, indicating that its timing is not set by a particular covariance assignment. The deep-kernel feature is also recovered with both DRW and Matérn-3/2 base kernels, with deformation maxima at 1.65 and 1.75 s after TGW , respectively, close to the adopted gamma-ray onset at 
+
+tγ, onset = 1 .74 s. This correspondence emerges only after model fitting and post-fit feature extraction. Neither feature can be uniquely associated with a specific radiation mech-anism or dynamical stage. Instead they provide phenomenological timing constraints on the evolution of the stochastic covariance structure that can be compared with physical scenarios for the prompt-emission epoch (Gottlieb et al., 2018; Duffell et al., 2018; Geng et al., 2019). 
+
+5.2. Fit diagnostics and robustness 
+
+All four nonstationary models reproduce the dominant structure of the fiducial light curve. The change-point models provide the smaller mean in-sample negative log-likelihoods across the completed random initializations, whereas the deep-kernel models show more favourable squared-residual di-agnostics. The fixed-split comparison at 0.27 s provides an additional con-ditional check of the covariance structure at the gate-defined boundary. All 22 four segment-wise assignments yield positive evidence gains relative to the full-exposure Matérn-3/2 reference, with ∆ ln Zsplit spanning approximately 
+
+4.54 –5.72 . The largest gain is obtained for the Matérn-3/2 →Matérn-3/2 assignment ( 5.72 ± 0.16 ), while the gate-matched DRW →Matérn-3/2 assign-ment gives 5.50 ± 0.16 . Conditional on the adopted gate-defined boundary, the fixed-split result therefore favours segment-specific covariance structure without uniquely identifying a change of covariance family. The residual diagnostics nevertheless show that some localized time-dependent variance remains unresolved, particularly in the squared residuals of the change-point fits. This residual structure indicates that the fitted covariance evolution does not capture every component of the prompt-emission variabil-ity, while the principal gate and warp timing features remain localized within their respective model constructions. The stability analysis shows different responses to temporal binning and energy selection. In the full 10–300 keV band, both timing diagnostics remain stable when the bin width is changed from 0.10 to 0.12 s. Energy subdivi-sion produces substantially larger variation in the gate locations, while the warp peaks remain within the narrower range of approximately 1.55–1.75 s after TGW . The larger cross-band variation of the gate timing may reflect both the changed photon statistics and signal-to-noise ratio of the sub-band light curves and genuine energy-dependent temporal structure; the present analysis does not separate these contributions. The full-band gate result is therefore retained as the primary early timing measurement, while the later warp feature shows greater stability across the tested analysis configurations. 
+
+5.3. Limitations 
+
+The present analysis adopts a Gaussian likelihood for the background-subtracted, binned count-rate light curve. The Gaussian approximation may become less accurate in intervals with limited photon counts. A joint count-level treatment of source and background events could provide a more com-plete statistical description. A more extensive calibration using stationary and nonstationary simula-tions is required to quantify false-positive rates, timing bias, and parameter-recovery accuracy. The correspondence of the recovered timing features with 
+
+TGW and tγ, onset is therefore treated as empirical within the present data set rather than as a calibrated statistical significance. In particular, the early gate-defined boundary precedes the observed gamma-ray onset, and the 23 present analysis cannot establish whether this feature originates from intrin-sic source variability, the measurement and background process, or model dependence. In addition, the change-point and deep-kernel constructions are analysed separately in this work; future joint modelling could examine whether discrete covariance evolution and continuous time deformation can be represented simultaneously, although such an extension would require ad-ditional validation. 
+
+6. Conclusions 
+
+We have used change-point and deep-kernel GP models in the fiducial 10–300 keV full-band analysis with 0.10 s time bins to characterize time-dependent stochastic variability in GRB 170817A. The two nonstationary constructions describe complementary forms of covariance evolution. The change-point models represent a localized transition between covariance de-scriptions, whereas the deep-kernel models describe continuous changes in the effective temporal correlation structure through a learned time deformation. The change-point models place an early covariance transition at 0.269 and 0.237 s after TGW , with the corresponding 10–90% transition extents largely confined to the first ∼ 0.5 s. Conditional on the representative gate-defined boundary at ttr = 0 .27 s, all four fixed-split covariance assignments give positive evidence gains over the stationary full-exposure reference. The largest gain is obtained for the Matérn-3/2 →Matérn-3/2 assignment. The fixed-split analysis therefore supports segment-specific covariance structure without requiring a uniquely identified change of covariance family. The deep-kernel models recover a later localized time-deformation feature with peaks at 1.65 and 1.75 s after TGW , close to the adopted gamma-ray onset at tγ, onset = 1 .74 s. The corresponding deformation represents a local-ized change in the effective temporal correlation scale. The full-band gate and warp timings remain stable when the bin width is changed from 0.10 to 0.12 s. Energy subdivision produces substantially larger shifts in the gate locations, whereas the warp peaks remain confined to a narrower late-time range. Several aspects of the validation motivate a cautious interpretation. Lo-calized residual dependence remains, particularly in the squared residuals of the change-point fits, and the inferred gate locations are less stable under energy subdivision. The fixed-split evidence is conditional on a boundary obtained from the gate model, and the recovered timing features have not 24 yet been calibrated using large ensembles of stationary and nonstationary simulations. In particular, because the early gate-defined feature precedes the observed gamma-ray onset, the present analysis does not establish that it represents a physical source-state transition. We therefore regard the early gate boundary and the later warp feature as model-dependent phenomenological stochastic timing diagnostics rather than calibrated physical transition times. Their recovery with two complementary nonstationary constructions demonstrates the potential of nonstationary GP modelling for identifying temporal structure that is not captured by a glob-ally time-invariant covariance description. Further count-level modelling and simulation-based calibration will be required to determine the statistical ro-bustness and physical origin of these features. 
+
+Acknowledgments 
+
+D.Y. acknowledges support from the National Natural Science Foun-dation of China (grant No. 12393852) and the Yunnan Provincial Science and Technology Department Foundation (grant No. 202601AT070175). We acknowledge the public Fermi /GBM archive and the Laser Interferome-ter Gravitational-Wave Observatory (LIGO)–Virgo Collaboration for making GW170817-related data products publicly available. 
+
+References 
+
+Abbott, B.P., et al., 2017a. Gravitational waves and gamma-rays from a binary neutron star merger: Gw170817 and grb 170817a. The As-trophysical Journal Letters 848, L13. doi:10.3847/2041-8213/aa920c, 
+
+arXiv:1710.05834 .Abbott, B.P., et al., 2017b. Gw170817: Observation of gravitational waves from a binary neutron star inspiral. Physical Review Letters 119, 161101. doi:10.1103/PhysRevLett.119.161101. Aigrain, S., Foreman-Mackey, D., 2023. Gaussian process regression for as-tronomical time series. Annual Review of Astronomy and Astrophysics 61, 329–371. doi:10.1146/annurev-astro-052920-103508, arXiv:2209.08940 .Bradbury, J., Frostig, R., Hawkins, P., Johnson, M.J., Leary, C., Maclaurin, D., Necula, G., Paszke, A., VanderPlas, J., Wanderman-Milne, S., Zhang, 25 Q., 2018. JAX: Composable transformations of python+numpy programs. Software. Dong, L., Yan, D., 2026. Gaussian-process evidence for a stochastic-variability transition in the recovering corona of 1es 1927+654. 
+
+arXiv:2607.10167 . arXiv preprint. Duffell, P.C., Quataert, E., Kasen, D., Klion, H., 2018. Jet dynamics in com-pact object mergers: Gw170817 likely had a successful jet. The Astrophys-ical Journal 866, 3. doi:10.3847/1538-4357/aae084, arXiv:1806.10616 .Foreman-Mackey, D., et al., 2024. tinygp: The tiniest of gaussian process libraries. doi:10.5281/zenodo.10463641. software, version 0.3.0. Geng, J.J., Zhang, B., Kölligan, A., Kuiper, R., Huang, Y.F., 2019. Propaga-tion of a short grb jet in the ejecta: Jet launching delay time, jet structure, and gw170817/grb 170817a. The Astrophysical Journal Letters 877, L40. doi:10.3847/2041-8213/ab224b, arXiv:1904.02326 .Ghirlanda, G., et al., 2019. Compact radio emission indicates a structured jet was produced by a binary neutron star merger. Science 363, 968–971. doi:10.1126/science.aau8815, arXiv:1808.00469 .Goldstein, A., Veres, P., Burns, E., Briggs, M.S., Hamburg, R., Kocevski, D., Wilson-Hodge, C.A., Preece, R.D., Poolakkil, S., Roberts, O.J., et al., 2017. An ordinary short gamma-ray burst with extraordinary implications: Fermi-gbm detection of grb 170817a. The Astrophysical Journal Letters 848, L14. doi:10.3847/2041-8213/aa8f41, arXiv:1710.05446 .Gottlieb, O., Nakar, E., Piran, T., Hotokezaka, K., 2018. A cocoon shock breakout as the origin of the gamma-ray emission in gw170817. Monthly Notices of the Royal Astronomical Society 479, 588–600. doi:10.1093/mnras/sty1462. Han, J., Lee, K., Tong, A., Choi, J., 2019. Confirmatory bayesian online change point detection in the covariance structure of gaussian processes, in: Proceedings of the Twenty-Eighth International Joint Conference on Artificial Intelligence, International Joint Conferences on Artificial Intelli-gence Organization. pp. 2449–2455. doi:10.24963/ijcai.2019/340. 26 Herlands, W., Wilson, A.G., Nickisch, H., Flaxman, S., Neill, D.B., Van Panhuis, W., Xing, E.P., 2016. Scalable gaussian processes for character-izing multidimensional change surfaces, in: Proceedings of the 19th Inter-national Conference on Artificial Intelligence and Statistics, PMLR. pp. 1013–1021. Kasliwal, M.M., et al., 2017. Illuminating gravitational waves: A concordant picture of photons from a neutron star merger. Science 358, 1559–1565. doi:10.1126/science.aap9455, arXiv:1710.05436 .Kingma, D.P., Ba, J., 2015. Adam: A method for stochastic optimization. 
+
+arXiv:1412.6980 . international Conference on Learning Representations (ICLR). Lazzati, D., Perna, R., Morsony, B.J., López-Cámara, D., Cantiello, M., Ciolfi, R., Giacomazzo, B., Workman, J.C., 2018. Late time afterglow observations reveal a collimated relativistic jet in the ejecta of the binary neutron star merger GW170817. Physical Review Letters 120, 241103. doi:10.1103/PhysRevLett.120.241103, arXiv:1712.03237 .Ljung, G.M., Box, G.E.P., 1978. On a measure of lack of fit in time series models. Biometrika 65, 297–303. doi:10.1093/biomet/65.2.297. McLeod, A.I., Li, W.K., 1983. Diagnostic checking arma time series models using squared-residual autocorrelations. Journal of Time Series Analysis 4, 269–273. doi:10.1111/j.1467-9892.1983.tb00373.x. Meegan, C., Lichti, G., Bhat, P.N., Bissaldi, E., Briggs, M.S., Connaughton, V., Diehl, R., Fishman, G., Greiner, J., Hoover, A.S., et al., 2009. The fermi gamma-ray burst monitor. The Astrophysical Journal 702, 791–804. doi:10.1088/0004-637X/702/1/791. Mooley, K.P., Deller, A.T., Gottlieb, O., Nakar, E., Hallinan, G., Bourke, S., Frail, D.A., Horesh, A., Corsi, A., Hotokezaka, K., 2018. Superluminal motion of a relativistic jet in the neutron-star merger GW170817. Nature 561, 355–359. doi:10.1038/s41586-018-0486-3, arXiv:1806.09693 .Paciorek, C.J., Schervish, M.J., 2004. Nonstationary covariance functions for gaussian process regression, in: Advances in Neural Information Processing Systems 16, MIT Press. pp. 273–280. 27 Rasmussen, C.E., Williams, C.K.I., 2006. Gaussian Processes for Machine Learning. MIT Press. Saatçi, Y., Turner, R.D., Rasmussen, C.E., 2010. Gaussian process change point models, in: Proceedings of the 27th International Conference on Machine Learning (ICML), Omnipress, Haifa, Israel. pp. 927–934. URL: 
+
+https://icml.cc/Conferences/2010/papers/170.pdf .Savchenko, V., Ferrigno, C., Kuulkers, E., Bazzano, A., Bozzo, E., Brandt, S., Chenevez, J., Courvoisier, T.J.L., Diehl, R., Domingo, A., et al., 2017. Integral detection of the first prompt gamma-ray signal coincident with the gravitational-wave event gw170817. The Astrophysical Journal Letters 848, L15. doi:10.3847/2041-8213/aa8f94, arXiv:1710.05449 .Scargle, J.D., Norris, J.P., Jackson, B., Chiang, J., 2013. Stud-ies in astronomical time series analysis. vi. bayesian block rep-resentations. The Astrophysical Journal 764, 167. URL: 
+
+https://doi.org/10.1088/0004-637X/764/2/167 , doi:10.1088/0004-637X/764/2/167. Snoek, J., Swersky, K., Zemel, R., Adams, R.P., 2014. Input warping for bayesian optimization of non-stationary functions, in: Proceedings of the 31st International Conference on Machine Learning, PMLR. pp. 1674– 1682. Speagle, J.S., 2020. dynesty: A dynamic nested sampling package for estimating bayesian posteriors and evidences. Monthly Notices of the Royal Astronomical Society 493, 3132–3158. doi:10.1093/mnras/staa278, 
+
+arXiv:1904.02180 .Wilson, A.G., Hu, Z., Salakhutdinov, R., Xing, E.P., 2016. Deep kernel learning, in: Proceedings of the 19th International Conference on Artificial Intelligence and Statistics, pp. 370–378. arXiv:1511.02222 .Yang, S., Yan, D., Zhang, P., Dai, B., Zhang, L., 2021. Gaussian process modeling Fermi-LAT gamma-ray blazar variability: A sample of blazars with gamma-ray quasi-periodicities. The Astrophysical Journal 907, 105. doi:10.3847/1538-4357/abcbff, arXiv:2011.10186 .28 Zhang, B., 2019. The delay time of gravitational wave–gamma-ray burst associations. Frontiers of Physics 14, 64402. doi:10.1007/s11467-019-0913-4, arXiv:1905.00781 .Zhang, H., Yan, D., Dong, L., Zhang, P., Tang, R., Zhou, J., Tao, L., Zhang, L., Tang, N., 2026. Patterns of X-Ray and γ-Ray Flares: From Blazar to Magnetar and Sun. The Astrophysical Journal 999, 246. doi:10.3847/1538-4357/ae2859, arXiv:2505.06962 .Zhang, H., Yan, D., Zhang, L., 2022. Characterizing the gamma-ray variability of active galactic nuclei with the stochastic process method. The Astrophysical Journal 930, 157. doi:10.3847/1538-4357/ac679e, 
+
+arXiv:2204.09987 .Zhang, H., Yan, D., Zhang, L., 2023. Gaussian process modeling blazar mul-tiwavelength variability: Indirectly resolving jet structure. The Astrophys-ical Journal 944, 103. doi:10.3847/1538-4357/acafe5, arXiv:2301.01025 .Zhang, H., Yan, D., Zhang, P., Yang, S., Zhang, L., 2021. A Quasi-periodic Oscillation in the γ-Ray Emission from the Non-blazar Active Galac-tic Nucleus PKS 0521-36. apj 919, 58. doi:10.3847/1538-4357/ac0cf0, 
+
+arXiv:2106.10040 .Zhang, H., Yan, D., Zhou, J., Zhang, L., Tang, N., 2025. Pattern and origin for the extreme gamma-ray flares of 3c 454.3 and 3c 279: An astrophysical critical damper? Monthly Notices of the Royal Astronomical Society 540, 3790–3797. doi:10.1093/mnras/staf944, arXiv:2502.20867 .29
