@@ -1,0 +1,817 @@
+Title: Hierarchical Inference of the Supermassive Black Hole Binary Merger Rates from Joint Searches using Pulsar Timing Arrays
+
+URL Source: https://arxiv.org/pdf/2609.09086v1
+
+Published Time: Wed, 09 Sep 2026 04:12:43 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Hierarchical Inference of the Supermassive Black Hole Binary Merger Rates from Joint Searches using Pulsar Timing Arrays 
+
+Sharon Mary Tomson ,∗ Rutger van Haasteren , and Boris Goncharov 
+
+Max Planck Institute for Gravitational Physics (Albert Einstein Institute), 30167 Hannover, Germany Leibniz Universit¨ at Hannover, 30167 Hannover, Germany 
+
+(Dated: September 9, 2026) Gravitational-wave searches do more than identify individual sources - they provide a way to infer the underlying astrophysical populations that produce them. Currently, Pulsar Timing Arrays (PTAs) constrain the supermassive black-hole binary (SMBHB) merger-rate density through both the stochastic gravitational-wave background (SGWB) and searches for individual SMBHB signals. The latter implies converting source upper limits into rate upper limits using detection efficiencies estimated empirically. We instead develop a hierarchical Bayesian framework that places the SMBHB merger-rate density model directly inside the PTA likelihood. The unknown catalog of individual SMBHB merger signals is modeled as a Poisson point process on source-parameter space, so that the number of merger signals is inferred from the data rather than imposed by a detection threshold. We describe two computational routes: a catalog-marginal likelihood based on analyses with fixed numbers of candidate sources, and an explicit transdimensional sampling approach that jointly samples population hyperparameters, latent merger signals, and noise. We validate the method with a toy merger-only population model and then apply it to an astrophysical SMBHB merger-rate density model that jointly predicts the SGWB amplitude and the expected merger-catalog size. In simulations, an individual merger signal adds complementary information to the SGWB and can tighten constraints on the merger-rate population. 
+
+> Keywords: gravitational waves — pulsars: general — methods: data analysis
+
+I. INTRODUCTION 
+
+Pulsar timing arrays (PTAs) [1] transform an ensemble of precisely timed millisecond pulsars into a Galactic-scale detector for nanohertz gravitational waves. The idea of a PTA, first proposed in the late 1970s [2, 3], has recently entered an exciting observational era. Multi-ple PTA collaborations have now reported evidence for Hellings-Downs correlations [4] of a low-frequency stochas-tic gravitational-wave background (SGWB) [5–11]. If the expected origin of the SGWB is confirmed [12], gravitational waves in PTA data will reveal information about the astrophysical populations that generate them. A stochastic background sourced by SMBHBs encodes the integrated contribution of binaries across cosmic time, and therefore carries information about galaxy mergers, black-hole–host-galaxy relations, binary hardening mechanisms, environmental coupling, eccentricity, and the timescale between galaxy pairing and black-hole coalescence [13– 16]. The central challenge is to extract this population information in a way that is statistically consistent with the source searches. Current PTA constraints on SMBHB populations are obtained through three related routes. First, measure-ments of the SGWB can be interpreted using astrophysical SMBHB population models to constrain the population properties that determine the background [15–18]. In simpler implementations, the population is mapped to a small number of summary properties of the SGWB,  
+
+> ∗sharon.mary.tomson@aei.mpg.de
+
+such as its amplitude and spectral shape. Because these quantities describe the integrated contribution of the SMBHB population, different combinations of merger rate, chirp-mass distribution, redshift evolution, and binary astrophysics can produce similar backgrounds. More detailed approaches retain substantially more of the frequency-dependent information in the SGWB. Tay-lor et al. [19] used population-synthesis simulations and Gaussian-process emulation to predict astrophysically mo-tivated SGWB spectra, allowing deviations from a simple power law produced by stellar environmental coupling and orbital eccentricity to be incorporated directly into Bayesian PTA inference. More recently, Laal et al. [20] developed a normalizing-flow emulator for the multivari-ate distribution of SGWB spectra, retaining correlations between frequency bins and non-Gaussian features of the population predictions. Second, deterministic searches constrain individually resolvable continuous gravitational waves from SMBHBs residing in the PTA band [21–23]. Third, more recent approaches jointly model the SGWB and individual continuous-wave sources through shared population-level parameters [12]. Contemporary CGW analyses report the merger-rate density of SMBHBs, inferring it indirectly from the local number density of binaries evaluated as 
+
+n95 c = − ln(1 − C)
+
+Vc
+
+, (1.1) where C = 0 .95 is the confidence level used to define the upper limit, and Vc is the comoving volume out to the distance limit. It is based on the expected number of detectable binaries, N det exp = ncVc. For zero detections, assuming Poisson statistics, P (0 | N det exp ) = exp[ −N det exp ]. arXiv:2609.09086v1 [astro-ph.HE] 8 Sep 2026 2To convert a CGW number-density constraint to a merger-rate constraint, one uses the residence time of binaries in the PTA frequency band. If R is the local merger-rate density and ∆ T (fi) is the time a binary spends in frequency bin i, then the expected number of detected CGW sources can be written as 
+
+N det exp = R X
+
+> i
+
+ϵdet Vi ∆T (fi), (1.2) where Vi is the sensitive volume in the i-th frequency bin and ϵdet is the detection efficiency. In the PPTA DR3 CGW analysis, Zhao et al. [21], following Zhu et al. [24], this efficiency is set to ϵdet = 0 .95. The corresponding 95% upper limit on the merger rate is 
+
+R95 = − ln(1 − 0.95) 
+
+P 
+
+> i
+
+ϵdet Vi ∆T (fi) . (1.3) Thus, constrains on merger-rate density from CGW searches require an additional detection efficiency cal-culation. Although this construction provides a way to trans-late CGW search results into constraints on the SMBHB merger rate, the merger rate is not inferred directly from the PTA data. Instead, the analysis first constrains the number of binaries residing in the PTA band and then converts this number-density constraint into a merger-rate constraint using the binary residence time and the sen-sitive volume. This separation introduces several limita-tions. First, current CGW-based merger-rate calculations typically provide an upper limit rather than a posterior on the underlying merger-rate population. Second, it is indirect, as most of the metric perturbations produced by gravitational waves in the PTA band at Earth do not sig-nificantly evolve in frequency over decades of observations, and thus do not exhibit SMBHB mergers. Third, the re-sulting rate constraint depends on how the sensitivity of the CGW search is characterized. A threshold-based search requires a detection threshold defined relative to a background, or null, distribution of the search statis-tic. In PTA analyses this distribution depends on the assumed pulsar-noise model, the timing-model fit, and any common processes included in the likelihood. Recent work has emphasized that PTA analyses cannot gener-ate fully empirical samples from the true null hypothesis without making modeling assumptions, so background estimates based on scrambling or related procedures are not completely model-independent [25]. The correspond-ing detection efficiency must then be calibrated, typically through signal injections, and consequently depends on the assumed source population, waveform model, noise realization, and recovery criterion. These large injection studies to derive the threshold can be computationally expensive. These complications motivate inferring the SMBHB merger-rate population directly within the PTA likelihood rather than converting deterministic-search outputs into rate constraints as a separate post-processing step. In this work, we model the unknown catalog of SMBHB merger signals as a Poisson point process (PPP) whose intensity is determined by the astrophysical merger-rate popula-tion. The number of merger signals, their source parame-ters, the population hyperparameters, and the PTA noise parameters can therefore be inferred within a common hierarchical model. Weak merger signals and nondetec-tions contribute through the likelihood without requiring a separate detection threshold or detection-efficiency cor-rection. This formulation also provides a natural connection between individual merger signals and the SGWB. The unresolved SGWB and individual SMBHB mergers are different observables of the same underlying astrophys-ical population. Changes in the merger-rate normaliza-tion, chirp-mass distribution, or redshift evolution affect both the accumulated background and the expected num-ber and properties of individual merger signals. Conse-quently, the two observables can provide complementary constraints on the same merger-rate population. For sim-plicity, we approximate SMBHB mergers by only their dominant gravitational wave memory contribution (bursts with memory) to reduce the computational cost [26]. How-ever, the formalism we present can be extended to a full signal from SMBHB mergers, including also the inspiral, the merger, and the ringdown [27]. Section II defines the hierarchical population model, in-cluding the source-frame merger-rate density, its mapping to PTA observables, the Poisson point-process catalog prior, and the PTA likelihood implementations. Sec-tion III describes the simulated PTA datasets and the inference settings used for the catalog-marginalized and transdimensional analyses. Section IV A validates the unknown-catalog inference on a toy merger-only popu-lation, and Sec. IV B applies the framework to a joint SGWB+merger population analysis. Section V discusses limitations and future extensions, and Sec. VI summarizes the main results.  
+
+> II. HIERARCHICAL POPULATION MODEL
+
+Hierarchical Bayesian inference is standard in gravitational-wave astronomy: event-level likelihoods con-strain source parameters, while a population model de-scribes the distribution from which sources are drawn. At the lowest level, the data constrain source or signal parameters. At the population level, those parameters are assumed to be drawn from a distribution controlled by hyperparameters. Schematically, if s denotes source-level parameters and Λ denotes population hyperparameters, a single-event hierarchical likelihood marginalized over event parameters has the form 
+
+p(d | Λ) = 
+
+Z
+
+p(d | s) p(s | Λ) d s, (2.1) where d is data. When the event count is also informative, the population is naturally modeled as an inhomogeneous 3Poisson process. Let R(s | Λ) be the differential event-rate density in source-parameter space. This may be decomposed into an overall rate and a population shape, for example R(s | Λ) = ˙n0 p(s | Λ). For a threshold-selected catalog of detected events, selection effects enter through the detection probability pdet (s), giving the ex-pected number of detected events 
+
+λdet (Λ) = Tobs 
+
+Z
+
+pdet (s) R(s | Λ) d s. (2.2) The corresponding population likelihood can be written schematically as 
+
+p({dj } | Λ) ∝ e−λdet (Λ) 
+
+> Nobs
+
+Y
+
+> j=1
+
+Z
+
+p(dj | s) R(s | Λ) d s. 
+
+(2.3) This is the structure used in ground-based gravitational-wave population analyses to infer compact-binary merger rates and population hyperparameters while accounting for selection effects [28–32]. Recent PTA analyses have also used hierarchical meth-ods to model ensemble-level properties of pulsars, for example by describing the distribution of intrinsic pulsar red-noise amplitudes and spectral indices with shared hy-perparameters [33, 34]. These applications differ from the merger-rate problem considered here, but they illustrate the same statistical point that PTA data can contain population-level information that should be modeled hi-erarchically. The PTA merger problem considered here is different from a threshold-selected catalog of detected events. We do not first identify a set of detected merger signals and then correct the population likelihood using a separate detection probability pdet (s). Instead, the un-known merger catalog is treated as a latent variable inside the PTA likelihood. The probability of zero, one, or more merger signals is inferred directly from the data through the Poisson point-process prior and the PTA likelihood. In this formulation, the analog of selection is encoded by the likelihood itself where the population models that would produce signals inconsistent with the data receive low likelihood, while weak signals and nondetections con-tribute through posterior support. We construct a hierarchical SMBHB merger-rate pop-ulation model for PTAs, summarized in Figure 1. The hierarchy has four conceptual steps: 1. A merger-rate density R specifies the astrophysical population through hyperparameters Λ pop .2. This density is mapped to two PTA-frame observ-ables: a merger-catalog intensity μ(s | Λpop ), which gives the expected number density of merger signals in source parameter space, and the amplitude of the unresolved SGWB Agwb .3. The unknown catalog of individual SMBHB mergers is modeled as a Poisson point process. 4. The PTA likelihood compares the data to a model containing the deterministic merger catalog, the SGWB, and the pulsar noise models. For each merger i, we distinguish the source parameters that are controlled by the astrophysical population model from the additional parameters required to construct its PTA waveform. We denote the population-dependent source parameters by si = (log 10 Mi, z i) where Mi is the source-frame chirp mass and zi is the redshift. For the assumed cosmology, the luminosity distance DL,i is determined by zi. The remaining source and waveform parameters are denoted collectively by ϑi. These include the observer-frame merger time t0,i , sky location θ, ϕ ,polarization angle ψ, and any other waveform parame-ters whose priors are independent of Λ pop . In the wave-form implementation, it is convenient to evaluate the population-dependent part of the source model using (DL,i , log 10 Mi), with t0,i included separately among the waveform parameters. PTA noise parameters are denoted by n. 
+
+> A. Source-frame merger-rate model
+
+We use the phenomenological SMBHB merger-rate model introduced by Middleton et al. [15]. The model was designed to capture the broad mass and redshift dependence expected for cosmological SMBHB merger populations without assuming a particular galaxy- or black-hole-assembly history. Its chirp-mass dependence is Schechter-like, consisting of a power law with an expo-nential suppression above a characteristic mass M∗, while the redshift dependence is described by a power law in 1+ z with an exponential suppression on the characteristic scale z0. This form is sufficiently flexible to reproduce the qualitative behavior of merger rates obtained from merger-tree models and cosmological simulations [15]. We define the corresponding source-frame merger-rate density as 
+
+R(log 10 M, z | Λpop )[Mpc −3 Gyr −1 log 10 M⊙−1],
+
+that is, the merger rate per comoving volume, per source-frame time, and per logarithmic chirp-mass interval. The model is 
+
+R(log 10 M, z | Λpop ) = ˙ n0
+
+ M
+
+10 7M⊙
+
+−α
+
+exp 
+
+
+
+− M
+
+M∗
+
+
+
+× (1 + z)β exp 
+
+
+
+− zz0
+
+
+
+.
+
+(2.4) The population hyperparameters are Λpop = (log 10 ˙n0, α, β, z 0, log 10 M∗) . (2.5) Here ˙ n0 [Mpc −3 Gyr −1 log 10 M⊙−1] is the source-frame merger-rate density normalization having the same units 4
+
+FIG. 1: Schematic of the hierarchical population model. A source-frame merger-rate density model defines the population hyperparameters. This rate is mapped to PTA-frame observables: the expected number and distribution of merger signals, and the SGWB. as R. The parameters α and M∗ control the chirp-mass dependence and high-mass turnover, while β and z0 con-trol the redshift evolution and high-redshift evolution turnover. In the present proof-of-concept model, the mass-ratio dependence is not sampled; we assume equal-mass SMBHBs. This differs in notation from Eq. (2) of Middleton et al. 
+
+[15], where the corresponding distribution is written per unit redshift and therefore contains an additional factor 
+
+|dt R/dz |. Here we define R directly per unit source-frame time; the time–redshift conversion is introduced explicitly when mapping the rate density to PTA observables below.  
+
+> B. From astrophysical rate density to PTA observables
+
+The same source-frame merger-rate density determines two PTA observables: individual SMBHB merger signals and the unresolved SGWB. For the individual-merger channel, the merger-rate population determines both the properties of each deterministic merger signal and the expected number and distribution of such signals in the PTA dataset. For the SGWB channel, the same pop-ulation determines the accumulated unresolved inspiral signal from binaries radiating in the PTA band. These two observables are therefore generated by the same un-derlying merger-rate density R, but through physically distinct mappings.  
+
+> 1. Individual SMBHB Mergers : signal model
+
+PTAs do not observe SMBHB mergers in the same way as ground-based detectors. The high-frequency merger and ringdown signals occur on timescales much shorter than the cadence of pulsar timing observations. What re-mains as an observable in PTA data is the non-oscillatory gravitational-wave memory - a permanent change in the metric that appears as a step function in strain and, after integration, as a ramp in timing residuals [26, 35]. This “memory burst” approximation is well motivated when the memory growth time is shorter than the sampling interval of the PTA data [26]. 5In the present work we use this standard burst-with-memory approximation for the deterministic merger signal. The Earth-term strain is modeled as a step, 
+
+h+(t) = hmem Θ( t − t0) (2.6) where hmem is the memory amplitude and t0 is the merger time. For one pulsar, the induced timing residual is 
+
+ri(t) = Fi( ˆΩ, ψ ) hmem (t − t0)Θ( t − t0) (2.7) where Fi is the pulsar antenna response, depending on the pulsar sky position, the GW propagation direction ˆΩ, and the polarization angle ψ.For a binary merger, we relate the step amplitude to the source parameters using the approximate accumulated memory amplitude 
+
+hmem = G
+
+24 c2
+
+ηM Dc
+
+sin 2 ι  17 + cos 2 ι  ∆Erad 
+
+ηM c 2
+
+
+
+, (2.8) where M is the total mass, η is the symmetric mass ratio, Dc is the comoving distance to the source, ι is the inclination, and ∆ Erad is the radiated energy [36]. In the current astrophysical implementation, we assume an equal-mass binary with η = 0 .25, fix the inclination to ι = π/ 3, and take ∆ Erad /ηM c 2 = 1 − √8/3. Using 
+
+M = η3/5M , so that ηM = η2/5M, and Dc = DL/1 + z,Eq. (2.8) reduces to 
+
+hmem ≃ 8.47 × 10 −16 (1 + z)
+
+ M
+
+10 9 M⊙
+
+  1 Gpc 
+
+DL
+
+
+
+. (2.9) This signal model is intentionally simple. It captures the leading PTA signature of memory as a coherent ramp across the array, but it does not model the gradual build-up of memory during the late inspiral and merger, nor the oscillatory inspiral–merger–ringdown part of the signal. More complete waveform models now include both the oscillatory SMBHB waveform and the nonlinear memory contribution, and show that the step-function approx-imation can bias the recovered amplitude and source parameters for sufficiently strong nearby systems [37]. In this paper, we use the step-memory model as a controlled first implementation of the hierarchical population model. It may be of interest to replace it with the full merger waveform in future work.  
+
+> 2. Individual SMBHB mergers: catalog intensity and poisson point process
+
+For the present proof-of-concept analysis, we restrict the explicitly modeled merger catalog to a nearby, high-mass region. We introduce the fixed source hyperpa-rameters Mmin , Mmax , DL,min , and DL,max . Because the population intensity is written in the coordinates 
+
+s = (log 10 M, z ), the corresponding catalog domain is 
+
+Dm = Mmin ≤ M ≤ M max , z (DL,min ) ≤ z ≤ z(DL,max ). Merger events outside Dm, particularly lower-amplitude or more distant systems, are not included as explicit de-terministic sources in the present analysis. A population of unresolved merger-memory signals can in principle generate a stochastic gravitational-wave memory back-ground [38]. This contribution is expected to be subdomi-nant to the SGWB from a population of inspiralling SMB-HBs and hence is neglected here. The bounds defining 
+
+Dm apply only to the explicitly modeled merger catalog and do not restrict the SGWB integration domain. Within this catalog domain, the source-frame merger-rate density is converted to an observer-frame catalog intensity by accounting for cosmological volume and time dilation. Integrated over an observing duration Tobs , the intensity in the population coordinates s = (log 10 M, z )is 
+
+μ(log 10 M, z | Λpop ) = 10 −9Tobs R(log 10 M, z | Λpop )
+
+× dVc
+
+dz
+
+11 + z .
+
+(2.10) It is defined such that μ(s | Λpop ) d s is the expected number of merger signals within the infinitesimal source-parameter volume d s during the observing interval. Here 
+
+Tobs is expressed in years, and the factor 10 −9 Gyr yr −1
+
+converts the source-frame rate from Gyr −1 to yr −1. The factor (1 + z)−1 accounts for cosmological time dilation. Consequently, [ μ(log 10 M, z | Λpop )] = [log 10 M⊙−1]. The expected number of merger signals in the PTA dataset is therefore 
+
+λ(Λ pop ) = 
+
+Z
+
+> Dm
+
+μ(s | Λpop ) d s. (2.11) Thus λ(Λ pop ) is dimensionless and is derived from the source-frame merger-rate density rather than sampled as an independent population parameter. Conditional on a merger occurring within the explicit catalog domain, the normalized density of its population-dependent source parameters is 
+
+p(s | Λpop ) = μ(s | Λpop )
+
+λ(Λ pop ) , s ∈ D m. (2.12) The quantities λ(Λ pop ) and p(s | Λpop ) describe the expected catalog size and source-parameter distribution, but the actual catalog present in a particular PTA dataset remains unknown. We model this latent catalog as a Poisson point process (PPP) [39, 40]. A Poisson point process is a probability model for a set of points scattered through a parameter space, where the number of points is a random variable, and the density of points is controlled by an intensity function μ(s). In this construction, the catalog is generated in two steps: first, the number of merger signals k is drawn from a Poisson distribution with mean λ(Λ pop ); second, conditional on k, the source parameters s1, . . . , s k are drawn independently from p(s |
+
+Λpop ). 6For a catalog C = {s1, . . . , s k}, the catalog prior is 
+
+p(C | Λpop ) = e−λ(Λ pop ) 1
+
+k!
+
+> k
+
+Y
+
+> i=1
+
+μ(si | Λpop ). (2.13) When the catalog dimension is truncated at Kmax , the count prior is renormalized on the allowed range, 
+
+p(k | λ(Λ pop ), K max ) = Poisson[ k | λ(Λ pop )] 
+
+PKmax  
+
+> j=0
+
+Poisson[ j | λ(Λ pop )] .
+
+(2.14) This truncation is a computational approximation and is safe when P (k > K max | λ) is negligible over the posterior support. In the waveform implementation, we use luminosity dis-tance rather than redshift as the radial source coordinate. The normalized population density transforms as 
+
+p(log 10 M, D L | Λpop ) = p(log 10 M, z (DL) | Λpop )
+
+× dz
+
+dDL
+
+.
+
+(2.15) The merger time t0 remains part of ϑ and is assigned a uniform prior over the observing window. This completes the probabilistic construction of the merger catalog. We next consider the SGWB predicted by the same source-frame merger-rate population.  
+
+> 3. Stochastic gravitational wave background
+
+This merger-rate density model also predicts the unre-solved SGWB. The SGWB comes from the accumulated inspiral signal of binaries radiating in the PTA band before merger. For circular binaries evolving only through gravitational radiation, the characteristic strain of the SGWB is [15, 41] 
+
+h2 
+
+> c
+
+(f ) = 4G5/3
+
+3π1/3c2 f −4/3
+
+Z
+
+d log 10 M
+
+Z
+
+dz (1 + z)−1/3M5/3
+
+× d3N
+
+dVc dz d log 10 M .
+
+(2.16) The SGWB calculation includes the broader SMBHB population rather than being restricted to the explicit merger-catalog domain Dm. In the present analysis, we evaluate the SGWB integral over 10 6 M⊙ ≤ M ≤ 10 11 M⊙, 0 ≤ z ≤ 5.
+
+These are fixed integration bounds rather than sampled population hyperparameters. They encompass a broader mass and redshift range than the domain in which indi-vidual merger/memory signals are modeled explicitly. Since R(log 10 M, z | Λpop ) is defined per unit source-frame time, we use 
+
+dtR
+
+dz = 1(1 + z)H(z)to convert the source-frame merger rate to the merger density entering the SGWB calculation. Equation (2.16) can therefore be written directly in terms of the source-frame merger-rate density as 
+
+h2 
+
+> c
+
+(f | Λpop ) = 4G5/3
+
+3π1/3c2 f −4/3
+
+×
+
+Z
+
+d log 10 M
+
+Z
+
+dz M5/3R(log 10 M, z | Λpop )(1 + z)4/3H(z) .
+
+(2.17) Here the factor (1 + z)−4/3 combines the cosmological time-dilation factor with the redshift dependence of the emitted inspiral energy spectrum. We define the SGWB amplitude at the standard PTA reference frequency fyr = 1 yr −1 as 
+
+Agwb (Λ pop ) ≡ hc(fyr | Λpop ). (2.18) For the circular, GW-driven population assumed here, 
+
+hc(f ) ∝ f −2/3, corresponding to γgwb = 13 /3. The SGWB is included in the PTA likelihood as an isotropic Hellings–Downs-correlated common red process [4], with timing-residual power spectral density 
+
+P (f | Λpop ) = A2gwb (Λ pop )12 π2 f γgwb −3yr f −γgwb , (2.19) where γgwb = 13 3 .Thus, the same population hyperparam-eters determine both the expected merger-catalog size 
+
+λ(Λ pop ) and the SGWB amplitude Agwb (Λ pop ).  
+
+> C. PTA likelihood implementations
+
+We can use two computational routes to implement the hierarchical likelihood. Both use the same population model, the same merger intensity μ, and the same PPP catalog prior. They differ only in how the unknown catalog is handled.  
+
+> 1. Catalog-marginalized likelihood
+
+The catalog-marginalized implementation performs sep-arate PTA analyses with fixed numbers of candidate merger sources. Related fixed-dimension constructions have been used to recover model-marginalized posteriors by performing separate analyses at each allowed model dimension and combining them using their Bayesian evi-dences and prior model probabilities [42]. Here we apply the same basic evidence-marginalization logic to the un-known merger-catalog size, with an additional population-prior reweighting step described below. This method has two stages. 7
+
+a. Step 1: Fixed-k nested-sampling analyses. For each integer k = 0 , 1, . . . , K max , we perform a nested-sampling analysis containing exactly k deterministic merger signals. Let p0(si) denote a reference prior for the population-dependent source parameters si, chosen independently of Λ pop , and let p(ϑi) denote the prior on the remaining waveform and geometric parameters. We use the compact notation s1: k ≡ (s1, . . . , s k) and 
+
+ϑ1: k ≡ (ϑ1, . . . , ϑ k) for the parameters of all k merger sig-nals. Similarly, d s1: k ≡ Qki=1 dsi and d ϑ1: k ≡ Qki=1 dϑi.The reference-prior evidence for the fixed-k model is 
+
+Zk(d | p0) = 
+
+Z
+
+pk(d | s1: k, ϑ 1: k, n ) π(n)
+
+×
+
+> k
+
+Y
+
+> i=1
+
+p0(si) p(ϑi)
+
+× ds1: k dϑ1: k dn. 
+
+(2.20) Here pk(d | s1: k, ϑ 1: k, n ) is the PTA likelihood conditional on exactly k merger signals, with source and waveform parameters s1: k and ϑ1: k, respectively, and n denotes the PTA noise parameters. The corresponding fixed-k
+
+reference posterior is 
+
+p0(s1: k, ϑ 1: k, n | d, k )= pk(d | s1: k, ϑ 1: k, n )π(n) Qki=1 p0(si)p(ϑi)
+
+Zk(d | p0) . (2.21) We denote its marginal distribution over the population-dependent source parameters by 
+
+p0(s1: k | d, k ) = 
+
+Z
+
+p0(s1: k, ϑ 1: k, n | d, k )d ϑ1: kdn (2.22) 
+
+b. Step 2: Population-prior reweighting. For pop-ulation hyperparameters Λ pop , the normalized source-parameter density p(s | Λpop ) is given by Eq. (2.12). In the merger-only analysis, the PTA likelihood at fixed source and noise parameters is independent of Λ pop .The evidence under the population prior can therefore be obtained from the reference analysis using posterior recycling: 
+
+Zk(d | Λpop ) = Zk(d | p0)
+
+* kY
+
+> i=1
+
+p(si | Λpop )
+
+p0(si)
+
++ 
+
+> p0(s1: k|d,k )
+
+.
+
+(2.23) The ratio inside the expectation changes the reference source prior into the population prior. This posterior-recycling step requires sufficient overlap between the ref-erence and population priors. In particular, p0(s) must be nonzero wherever p(s | Λpop ) has support relevant to the likelihood. If the population prior places substantial prob-ability in regions that are poorly represented by the refer-ence posterior, the importance weights p(s | Λpop )/p 0(s)can become highly unequal, reducing the effective num-ber of samples contributing to the reweighted likelihood and increasing its Monte Carlo uncertainty. We therefore choose the reference source prior to cover the source-parameter support of the population models considered in the analysis. Numerically, the expectation is evalu-ated using the weighted posterior representation returned by the nested sampler. Nested sampling is particularly convenient for this fixed-k construction because a single analysis provides both the Bayesian evidence Zk(d | p0)and the weighted reference-posterior samples required for the subsequent population-prior reweighting. The likelihood marginalized over the unknown catalog size is 
+
+p(d | Λpop ) = 
+
+> Kmax
+
+X
+
+> k=0
+
+p(k | λ(Λ pop ), K max )Zk(d | Λpop ).
+
+(2.24) For k = 0, no source-prior reweighting is required, so that 
+
+Z0(d | Λpop ) = Z0(d | p0) in the merger-only model. The population posterior is therefore 
+
+p(Λ pop | d) ∝ p(d | Λpop ) π(Λ pop ). (2.25) The approach becomes less efficient as the allowed cat-alog size and the dimensionality of the source model in-crease. A separate nested-sampling analysis is required for every value of k, and the higher-k models contain progres-sively more source parameters. Related transdimensional studies have noted that such a fixed-dimension strat-egy can become inefficient because substantial computa-tional effort is spent on model dimensions that are weakly supported by the data [42]. Moreover, the posterior-reweighing identity in Eq. (2.23) requires that the PTA likelihood, conditional on the source and noise parame-ters, be independent of Λ pop . This condition holds for the merger-only implementation. In the joint SGWB+merger model, however, the population-dependent SGWB covari-ance enters the PTA likelihood directly. The dependence on Λ pop therefore cannot be represented solely by chang-ing the source prior, and the simple fixed-k reweighting identity does not apply. For the joint analysis we conse-quently use the transdimensional implementation.  
+
+> 2. Transdimensional likelihood
+
+The second implementation samples the merger cata-log explicitly using reversible-jump Markov-chain Monte Carlo. The sampler moves between models with different numbers of active merger sources and jointly samples the population hyperparameters, source parameters, wave-form nuisance parameters, and PTA noise parameters. The RJMCMC sampler uses the same truncated count prior defined in Eq. (2.14). Conditional on k, each source is drawn from the normalized source prior p(s | Λpop )defined in Eq. (2.12). Thus the sampler implements the same PPP catalog prior as Eq. (2.13), restricted to k =0, . . . , K max .For the joint SGWB+merger analysis, the deterministic merger catalog enters the mean timing-residual model, 8while the unresolved SGWB enters the covariance. The likelihood can be written schematically as 
+
+p(d | s1: k, ϑ 1: k, Λpop , n ) = N
+
+h
+
+d − hm(s1: k, ϑ 1: k), C noise (n)+ CSGWB (Λ pop )
+
+i
+
+.
+
+(2.26) Here hm is the summed deterministic merger/memory waveform contribution, and CSGWB (Λ pop ) is the Hellings– Downs-correlated covariance implied by the SGWB am-plitude derived from the same merger-rate model. The full joint posterior sampled by RJMCMC is 
+
+p(Λ pop , n, k, s 1: k, ϑ 1: k | d)
+
+∝ p(d | s1: k, ϑ 1: k, Λpop , n ) p(k | λ(Λ pop ), K max )
+
+×
+
+> k
+
+Y
+
+> i=1
+
+p(si | Λpop ) p(ϑi) π(n) π(Λ pop ).
+
+(2.27) The transdimensional construction is closely related to product-space sampling, which has been widely used for PTA model selection [43, 44]. In a standard product-space analysis, the competing models are embedded in a fixed-dimensional super-model and an additional model-index parameter determines which model contributes to the likelihood. Here the discrete catalog size k similarly iden-tifies the active source model, but we sample changes in 
+
+k explicitly using reversible-jump birth and death moves, so that the number of active merger-source parameters changes with the catalog dimension. Related transdimen-sional approaches have also been developed using nested sampling. Di Marco et al. [45], for example, introduce binary indicator variables that switch individual PTA noise processes on and off, while parameters associated with inactive processes are treated as “ghost” parame-ters and excluded from the likelihood evaluation. This allows the nested sampler to explore the different effective model dimensions within a single inference run, provid-ing both parameter posteriors and model probabilities without requiring separate fixed-model analyses.  
+
+> III. SIMULATION AND INFERENCE
+
+We test the hierarchical framework in two stages. First, we validate the Poisson point-process catalog machinery with a toy merger-rate model in a merger-only simulation. This stage tests whether we can consistently recover both the unknown number of merger signals and the popula-tion parameters from the PTA data. Second, we apply the astrophysical merger-rate model to simulations that include a population-dependent SGWB, with and without an individual merger signal.  
+
+> A. Toy merger-only validation
+
+Here we use only a PTA-frame population model rather than the source-frame astrophysical rate density of Eq. (2.4). The toy catalog intensity is 
+
+μtoy (s | λ, Λtoy ) = λ p (s | Λtoy ) (3.1) where R p(s | Λtoy ) d s = 1, λ is the expected number of merger signals in the PTA dataset, and Λtoy = ( α, β, κ ) (3.2) controls the shape of the source distribution. We write the toy source coordinates of a merger i as 
+
+si = ( t0,i , D L,i , M⟩, q i), (3.3) where t0 is the merger time, DL is luminosity distance, 
+
+M is chirp mass, and q is the mass-ratio. The normalized source distribution factorizes as 
+
+p(s | Λtoy ) = p(t0) p(DL | κ)
+
+× p(M | α) p(q | β). (3.4) The merger time is uniform over the observing window. The chirp-mass and mass-ratio distributions are normal-ized power laws, 
+
+p(M | α) = M−α
+
+R Mmax  
+
+> Mmin
+
+M−α dM (3.5) and 
+
+p(q | β) = q−β
+
+R qmax  
+
+> qmin
+
+q−β dq . (3.6) The luminosity-distance distribution is proportional to comoving volume with an additional redshift-evolution factor, 
+
+p(DL | κ) =  
+
+> dVc
+> dDL
+
+[1 + z(DL)] κ
+
+R DL,max 
+
+> DL,min
+> dVc
+> dD′
+> L
+
+[1 + z(D′
+
+> L
+
+)] κ dD′
+
+> L
+
+. (3.7) The bounds that define the support of the toy source distributions are treated as fixed source hyperparame-ters. Specifically, DL, min , DL, max , Mmin , Mmax , and 
+
+qmin , qmax define the source-parameter domain over which the corresponding distributions are normalized. These quantities are held fixed during the inference. In con-trast, the individual quantities ( DL,i , Mi, q i) are source parameters associated with each merger signal i, and are drawn from these distributions. The toy-population priors, fixed source hyperparameters, additional source-parameter priors, and analysis settings are summarized in Table I. For the toy model validation, we simulate a PTA with 25 pulsars distributed uniformly on the sky. The observing span is 53000 ≤ MJD ≤ 58600, corresponding to about 9TABLE I: Population priors, fixed source hyperparameters, and analysis settings used in the toy merger-only validation.                                             
+
+> Parameter Prior / Value Description Toy population hyperparameters
+> λU(0 .01 ,3) Expected number of merger signals
+> αU(0 ,3) Chirp-mass slope
+> βU(0 ,3) Mass-ratio slope
+> κU(−4,4) Redshift-evolution parameter
+> Fixed source hyperparameters
+> DL, min , D L, max [Mpc] 100 ,1000 Luminosity-distance bounds
+> Mmin ,Mmax [M⊙]10 8,10 10 Chirp-mass bounds
+> qmin , q max 1,7Mass-ratio bounds
+> Additional source-parameter priors
+> t0[MJD] U(53000 ,58600) Merger Time cos θU(−1,1) Cosine of Polar angle
+> ϕU(0 ,2π)Azimuthal angle
+> ψU(0 , π )Polarization
+> Catalog and noise settings
+> Maximum allowed merger signals 6Catalog-size truncation EFAC U(0 .01 ,10) Error FACtor (white noise)
+
+13 years of data. Each pulsar has 1000 times of arrival (TOA), with cadence ranging from a few days to roughly two weeks. The white-noise level is set by EFAC = 1, and a timing precision of 100 ns. The simulated signal is a random catalog of merger events drawn from the toy PTA-frame population model. We analyze the toy simulations using both implemen-tations of the hierarchical likelihood. In the catalog-marginalized implementation, we perform separate PTA analyses containing k = 0 , 1, . . . , 6 merger signals. The 
+
+k = 0 analysis provides the noise-only evidence, while the 
+
+k ≥ 1 evidences are computed with dynesty [46], using 1000 live points and a stopping criterion d log Z = 0 .01. These fixed-k outputs are then used to construct the population-level likelihood. For each proposed set of pop-ulation hyperparameters, the source posterior samples are importance-reweighted from the reference source prior to the corresponding population prior using Eq. (2.23). The resulting population-dependent fixed-k evidences are com-bined over catalog size through Eq. (2.24). We sample the resulting population posterior with PTMCMCSampler 
+
+[47]. This construction allows the population likelihood to be evaluated without rerunning the full PTA likelihood at each point in population-parameter space. Nested sampling is well suited for evidence calculation and mul-timodal posteriors, but the cost of sampling generally increases with dimensions. For higher-dimensional source models, a practical extension would be to estimate the fixed-k evidences using generalized stepping-stone, which has been proposed for gravitational-wave evidence calcu-lations and recently applied in PTA analyses [48]. We also analyze the same toy simulations with the transdimensional implementation using Eryn [49]. In this case, the sampler explores the catalog size, the merger-source parameters, the toy population parameters, and the noise parameters simultaneously. As in the catalog-marginalized calculation, we allow at most six merger signals. A closely related transdimensional inference problem arises in searches for instrumental glitches in LISA data. Muratore et al. [50] use Eryn to jointly in-fer an unknown number of transient glitch components, instrumental noise, and an astrophysical massive-black-hole-binary signal, combining reversible-jump proposals with parallel tempering and several complementary in-model proposal mechanisms. Although the physical sig-nals are different, the sampling problem is analogous to the unknown-merger-catalog problem considered here: ef-ficient exploration requires both continuous parameter updates and transitions between different numbers of transient components. Motivated by the same general strategy, we use a mix-ture of proposal types. Group-stretch proposals update the parameters of the currently active merger signals using nearby states of the sampler ensemble, while adap-tive Gaussian proposals update the source, population-hyperparameter, and noise parameters using covariance estimates accumulated during burn-in. Reversible-jump birth and death proposals add or remove merger signals. Most birth proposals are drawn from the broad source prior, while a smaller fraction are drawn from an empirical proposal that is updated during sampling to place new sources in regions already supported by the likelihood. Parallel tempering is used to improve exploration of mul-timodal posterior structure. These proposals are essential 10 because the complex transdimensional PTA likelihoods can otherwise become trapped in local modes or remain stuck at a fixed source count.  
+
+> B. Astrophysical SGWB+merger analysis
+
+For the astrophysical joint SGWB+merger analysis, we use the phenomenological source-frame merger-rate den-sity of Eq. (2.4), with population hyperparameters Λ pop 
+
+defined in Eq. (2.5). The same Λ pop determines two de-rived observables: the expected size of the explicitly mod-eled merger catalog, λ(Λ pop ), and the SGWB amplitude, 
+
+Agwb (Λ pop ). As described in Sec. II B, these observables are derived from the same merger-rate density but use different source domains. The SGWB is included in the PTA likelihood as a Hellings–Downs-correlated common red process with fixed spectral index γgwb = 13 /3. For the explicitly modeled merger/memory catalog, we use 10 8 M⊙ ≤ M ≤ 10 10 M⊙ and 50 Mpc ≤ DL ≤ 500 Mpc. These bounds are treated as fixed merger-catalog source hyperparameters. Specifically, Mmin , Mmax , DL,min ,and DL,max define the source-parameter domain Dm over which the merger-catalog intensity is evaluated and nor-malized. These quantities are held fixed throughout the inference. In contrast, the individual values ( Mi, D L,i )are source parameters associated with each merger sig-nal and are inferred from the PTA data. The SGWB integration domain is specified separately in Sec. II B 3. We additionally restrict the astrophysical population models used in this analysis to their predicted SGWB amplitude range −16 ≤ log 10 Agwb (Λ pop ) ≤ − 14 .3. This range selects population models whose predicted back-ground amplitudes lie in the regime currently probed by PTA observations. The restriction is applied to the SGWB amplitude derived from Λ pop ; Agwb is not sam-pled as an independent population parameter. A separate restriction is placed on the expected merger-catalog size. We require λ(Λ pop ) ≤ 2, which keeps this analysis in a low-count merger regime. This condition acts on the expected catalog size and is not the maximum number of merger signals allowed in an individual transdimensional state. For computational tractability, the joint SGWB+merger recovery allows at most three merger signals, so that the sampled catalog size is k = 0 , 1, 2, 3. The Poisson count prior is renormalized over these allowed catalog sizes as in Eq. (2.14). The joint-analysis simulations use a different PTA setup from the toy validation. We simulate 25 pulsars with 10 ns white-noise precision over the observing span 52000 ≤ MJD ≤ 60000, corresponding to about 22 years of data. We construct two datasets from the same under-lying population model. The first contains white noise and an SGWB with amplitude derived from the simulated Λpop . The second contains the corresponding SGWB to-gether with an individual merger drawn from the merger-catalog intensity implied by the same Λ pop . This setup allows us to quantify how much an individual merger signal improves constraints on the merger-rate population beyond the information already provided by the back-ground. The population hyperpriors, fixed mass–redshift support, and analysis settings used in the recovery are summarized in Table II.   
+
+> IV. RESULTS A. Toy merger-only population
+
+We first present the results of the toy merger-only vali-dation described in Sec. III A. Figure 2 shows a recovery using the transdimensional likelihood for one simulation. The simulated population for this realization has λ = 1 .86, 
+
+α = 0 .55, β = 1 .49, and κ = 0 .96, and the simulated cat-alog contains ktrue = 2 merger signals. The simulated source parameters for this realization are given in Ap-pendix A. Figures 2a and 2b show the inferred marginal catalog intensity distributions as functions of chirp mass and luminosity distance. The red dashed curves show the underlying true PTA-frame merger rate population, while the blue curves and shaded regions show the poste-rior median and credible bands. The black dotted curves mark the lower and upper envelopes implied by the pop-ulation priors and fixed source hyperparameters. These panels test whether the population shape is recovered after marginalizing over the unknown catalog. Fig. 2c shows the posterior distribution for the number of merg-ers in the dataset. The dashed vertical line marks the simulated source count. The same toy setup was also validated with the catalog-marginalized fixed-k implementation. In that case, the fixed-source-number evidences computed with nested sam-pling were combined through the finite catalog sum, rather than sampling the catalog dimension directly. The two implementations give consistent recovery of the toy popu-lation parameters, providing a useful cross-check that the catalog marginalization and the transdimensional sampler are implementing the same hierarchical model. Additional diagnostics for this representative toy real-ization, including the population-hyperparameter poste-rior, the source-parameter recovery, and a convergence diagnostic for the population parameters and catalog size, are shown in Appendix A. We next test whether the population inference is statis-tically consistent over an ensemble of simulations using probability–probability (PP) plots. For each simulation and each population hyperparameter, we evaluate the posterior cumulative distribution function (CDF) at the simulated parameter value. This gives the posterior quan-tile of the simulated value. We then construct the em-pirical cumulative distribution function (ECDF) of these posterior quantiles across the ensemble of simulations. If the inference is calibrated, the posterior quantiles are uni-formly distributed between 0 and 1, so the ECDF follows the diagonal. Systematic deviations from the diagonal indicate undercoverage or overcoverage. 11 TABLE II: Population hyperpriors, fixed merger-catalog source hyperparameters, derived-observable constraints, and fixed analysis settings used for the joint SGWB+merger analysis. The SGWB amplitude Agwb (Λ pop ) and expected merger-catalog size λ(Λ pop ) are derived from the population hyperparameters and are not sampled independently. 
+
+Parameter Prior / value Description Merger-rate hyperparameters 
+
+log 10 ˙n0 [Mpc −3 Gyr −1 dex −1] U(−10 , 1) Rate normalization 
+
+α U(−2, 2) Chirp-mass slope 
+
+β U(−1, 5) Redshift-evolution slope 
+
+z0 U(0 .5, 3) Redshift-evolution turnover log 10 M∗ [M⊙] U(8 , 9) High-mass turnover 
+
+Fixed merger-catalog source hyperparameters 
+
+Mmin , Mmax [M⊙] 10 8, 10 10 Merger-catalog chirp-mass bounds 
+
+DL,min , D L,max [Mpc] 50 , 500 Merger-catalog luminosity-distance bounds 
+
+Simulation-selection criteria 
+
+log 10 Agwb ,min , log 10 Agwb ,max −16 , −14 .3 SGWB-amplitude bounds 
+
+λmax 2 Maximum expected merger-catalog size 
+
+Catalog and PTA settings 
+
+Maximum allowed merger signals 3 Catalog-size truncation 
+
+γgwb 13 /3 SGWB spectral index EFAC 1 Error FACtor (white noise) 10 9 10 10   
+
+> M[M]
+> 10 −13
+> 10 −11
+> 10 −9
+> μ(M)
+> Prior bounds Truth
+
+(a) 100 200 300 400 500   
+
+> DL[Mpc]
+> 0.000 0.005 0.010 0.015
+> μ(DL)
+> Prior bounds Truth
+
+(b) 0 1 2 3 4 5 6  
+
+> k(number of mergers)
+> 0.0 0.1 0.2 0.3
+> P (k)
+> true k
+
+(c) 
+
+FIG. 2: Toy merger-only validation of the Poisson point-process population model. Panels (a) and (b) show the recovered marginal PTA-frame merger-rate distributions (catalog intensities) in chirp mass and luminosity distance, respectively. The blue solid curve denotes the posterior median, the blue shaded regions show the 68%, 95%, and 99.7% posterior credible bands, the black dotted curves mark the lower and upper envelopes implied by the hyperprior bounds, and the red dashed curve shows the true simulated population. Panel (c) shows the posterior probability mass 
+
+P(k) for the catalog size k, with the dashed vertical line marking the simulated number of mergers in the data. Figure 3 shows the resulting calibration test for 200 simulations. Each panel corresponds to one population hyperparameter. The horizontal axis shows the posterior CDF value of the simulated parameter, while the vertical axis shows the ECDF of those values over the simula-tion ensemble. The red curve is the measured ECDF, the black diagonal is the expectation for calibrated infer-ence, and the gray bands show the expected finite-sample fluctuations. 
+
+B. Merger-rate inference from the joint SGWB and merger analysis 
+
+After validating the toy population model, we apply the framework to the phenomenological source-frame merger-rate model of Eq. (2.4). We compare the SGWB-only and SGWB+merger datasets described in Sec. III B. Both datasets are generated from the same underlying merger-rate population, so that their comparison isolates the additional population information carried by an individual merger signal. As discussed in Sec. III B, we restrict the astrophysi-12 0.0 0.2 0.4 0.6 0.8 1.0
+
+CDF 
+
+> 0.00.20.40.60.81.0
+> ECDF
+
+λ     
+
+> 0.00.20.40.60.81.0
+
+CDF 
+
+> 0.00.20.40.60.81.0
+> ECDF
+
+α     
+
+> 0.00.20.40.60.81.0
+
+CDF 
+
+> 0.00.20.40.60.81.0
+> ECDF
+
+β     
+
+> 0.00.20.40.60.81.0
+
+CDF 
+
+> 0.00.20.40.60.81.0
+> ECDF
+
+κ
+
+Ideal ECDF (N = 200) 
+
+FIG. 3: PP-plot calibration test for the toy merger-only population inference using 200 simulations. For each population hyperparameter, the horizontal axis shows the posterior CDF evaluated at the simulated value, and the vertical axis shows the ECDF of these values across the simulation ensemble. The black diagonal denotes the expectation for calibrated inference, the red curve is the measured ECDF, and the gray regions show the expected 1-, 2-, and 3-σ
+
+finite-simulation bands. cal population models to a range of SGWB amplitudes relevant to current PTA observations. Because the same population hyperparameters determine both the SGWB amplitude and the merger rate, populations in this regime generally predict a small number of individual mergers within the finite PTA observing span and the explic-itly modeled merger-catalog domain. Individual merger events are therefore rare in this PTA-frame catalog. To study the population information available when such an event is present, we condition the realization used here to contain exactly one merger signal. For the selected realization, the injected population predicts an expected merger-catalog size of λ(Λ pop ) = 0 .0193. The simulated background has log 10 Agwb = −14 .352, corresponding to Agwb ≃ 4.45 × 10 −15 , with fixed γgwb = 13 /3. For this value of λ, an exactly one-merger catalog is a rare outcome, with probability approximately 1 .9% under the truncated count model used here. The selected realization 13 -1.5 0.0 1.5  
+
+> α
+> 0.0 2.0 4.0
+> β
+> 0.8 1.6 2.4
+> z0
+> -6.0 -3.0 0.0
+
+log 10 ˙n0  
+
+> 8.1 8.4 8.7 9.0
+> log 10  M∗
+> -1.5 0.0 1.5
+
+α  
+
+> 0.0 2.0 4.0
+
+β
+
+> 0.8 1.6 2.4
+
+z0
+
+> 8.1 8.4 8.7 9.0
+
+log 10 M∗
+
+> SGWB only SGWB + 1 Merger Prior Simulated truth
+
+FIG. 4: Population-hyperparameter posteriors for the SGWB-only and SGWB+merger analyses of the represen-tative realization conditioned to contain one merger signal. Orange contours show the SGWB-only recovery, blue con-tours show the SGWB+merger recovery, and red dashed lines mark the simulated merger-rate hyperparameters. Both datasets are generated from the same underlying population, so the comparison isolates the additional pop-ulation information contributed by the merger signal. is therefore deliberately atypical rather than a represen-tative unconditional draw. It provides a controlled test of the additional population information obtained when an individual merger is present. Figure 4 shows the resulting population-hyperparameter posteriors. The orange contours show the SGWB-only recovery, while the blue contours show the recovery from the SGWB+merger dataset generated from the same underlying population. The red dashed lines mark the simulated merger-rate hyperparam-eters. The SGWB-only posterior remains broad because different combinations of the merger-rate normalization, mass dependence, and redshift evolution can produce similar values of Agwb . Conditioning on the presence of one merger and including its measured source properties substantially changes several of these degeneracies. For this realization, the one-merger analysis favors larger values of the rate normalization and α. More generally, the additional information provided by the merger reduces the range of population models consistent with the data and leads to tighter constraints on several of the population-level hyperparameters. The SGWB and individual merger signal consequently constrain different projections of the same merger-rate population: the SGWB constrains the population-integrated unresolved inspiral signal, whereas the merger signal directly probes the rare, nearby, high-mass part of the population. We next test whether the astrophysical population infer-ence is statistically consistent when an individual merger is present. For this calibration test, we use an ensemble of simulations containing exactly one merger signal and an-alyze each realization with the corresponding one-merger model. Figure 5 shows the PP plots for the five merger-rate hyperparameters log 10 ˙n0, α, β, z0, and log 10 M∗.The empirical curves remain consistent with the diagonal within the expected finite-simulation fluctuations, indi-cating statistically consistent recovery of the population hyperparameters in the conditioned one-merger analysis.  
+
+> V. DISCUSSION
+
+The main purpose of this work is to show that PTA merger-rate inference can be formulated directly as a hi-erarchical population problem. In this framework, the SGWB, individual mergers, weak candidates, and non-detections are not separate statistical products to be interpreted afterward. They are different pieces of infor-mation about the same underlying SMBHB merger-rate population. The Poisson point-process construction pro-vides a natural way to include the unknown source catalog in the likelihood, so that the number of merger signals is inferred from the data rather than fixed by a detection threshold. The two likelihood implementations have different com-putational advantages. The catalog-marginalized method provides a useful validation route because the fixed-source-count analyses can be performed independently and sub-sequently combined with the population prior. However, its computational cost grows as more catalog sizes and higher-dimensional source models must be analyzed, and the population-prior reweighting is applicable only when the fixed-source PTA likelihood is independent of the pop-ulation hyperparameters. This condition fails in the joint SGWB+merger problem because the SGWB covariance depends directly on Λ pop .For this reason, the transdimensional likelihood is the more direct route for the joint SGWB-plus-merger prob-lem. It samples the population hyperparameters, the source count, the active merger catalog, and the noise parameters simultaneously, while the SGWB amplitude is recomputed from the same population model. This approach is more flexible, but it introduces the usual challenges of transdimensional inference. Because the merger signal can be weak, several low-amplitude source components can sometimes mimic one louder merger, or one merger signal can be partially represented by multiple sources. Without careful proposal design and sufficient prior penalty for unnecessary catalog complexity, the sampler can become trapped in local modes or spend too much time in incorrect source dimensions. This is analogous to the source-confusion and model-dimension challenges that appear in LISA global-fit problems. We therefore do not rely on a single ensemble proposal to 14 0.0 0.2 0.4 0.6 0.8 1.0 
+
+CDF       
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> ECDF
+> log 10 n0
+> 0.0 0.2 0.4 0.6 0.8 1.0
+
+CDF      
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> ECDF
+> 0.0 0.2 0.4 0.6 0.8 1.0
+
+CDF      
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> ECDF
+> z
+> 0.0 0.2 0.4 0.6 0.8 1.0
+
+CDF      
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> ECDF
+> z0
+> 0.0 0.2 0.4 0.6 0.8 1.0
+
+CDF   
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> ECDF
+> log 10 M*
+
+Ideal ECDF (N = 200) 
+
+FIG. 5: PP-plot calibration test for the five merger-rate hyperparameters in the conditioned one-merger analysis. Each simulated realization contains exactly one merger signal and is analyzed with the corresponding one-merger model. The black diagonal denotes ideal statistical calibration, the red curve is the measured ECDF, and the gray regions show the 1 −, 2−, and 3 − σ credible regions. Curves consistent with the diagonal indicate correct posterior coverage for the merger-rate hyperparameters. explore this posterior. Within a fixed catalog dimension, we use a mixture of proposal mechanisms: the group-stretch move updates individual merger-source blocks, while adaptive Gaussian proposals provide complemen-tary local and multivariate updates for the source and population parameters. Changes in catalog dimension are explored separately through reversible-jump birth– death proposals, using both broad prior-based births and an empirical birth distribution adapted during sampling. Parallel tempering provides an additional mechanism for moving between separated posterior modes. This mixture of complementary proposals is important for robust ex-ploration of the transdimensional posterior. In particular, the group-stretch proposal is applied blockwise to the six-dimensional parameter vector of an individual merger signal rather than to the full joint parameter space. For the present proof-of-concept joint analysis, we restrict the transdimensional catalog to at most three merger signals. This computational truncation is adequate for the low-count realization studied here, but analyses of populations supporting larger merger counts will require a correspondingly larger allowed catalog. The present implementation is intentionally a proof of concept. For the individual merger channel, we use a simplified burst-with-memory model in which the memory appears as a step in strain and a ramp in timing residuals. For future work the complete accurate signal model needs to be used from Ref. [37]. The SGWB treatment is also simplified. In the current implementation, the source-frame merger-rate model is mapped to a single SGWB amplitude Agwb (Λ pop ) with fixed spectral index. This is sufficient for testing whether the same population hyperparameters can control both the SGWB amplitude and the expected merger catalog, 15 but it does not use all of the spectral information available in PTA data. Future versions of the framework could instead use a free-spectrum or piecewise spectral repre-sentation, so that the full frequency dependence of the SGWB contributes to the population likelihood. This will become increasingly important as PTA measurements improve, because the detailed spectral shape can help dis-tinguish SMBHB astrophysics from other possible origins of the nanohertz background [17]. The astrophysical population model can also be made more informative. The phenomenological merger-rate density used here is useful for validating the hierarchical machinery, but it compresses the astrophysics into a small number of mass and redshift parameters. More physical models connect the SGWB and merger-rate population to galaxy stellar mass functions, galaxy pair fractions, merger timescales, black-hole–host-galaxy relations, bi-nary hardening, environmental coupling, and eccentricity [16]. Such models can be inserted into the same frame-work by replacing the simple R(Λ pop ) used here with a more physical merger-rate population. This framework also points toward a unified treatment of the SGWB, continuous waves, and merger events. PTAs have now entered an era in which multiple datasets show evidence for the SGWB, and targeted searches for in-dividually resolvable SMBHB continuous waves are be-coming increasingly important. If bright continuous-wave sources begin to appear together with the unresolved background, the separation between “resolved” and “un-resolved” sources will itself become part of the population-inference problem. One possible extension is to adapt the resolved/unresolved population-splitting logic used in re-cent global-fit work: the unresolved background is treated as the collective contribution of subthreshold sources, while the brightest sources are modeled explicitly as part of the same population [51, 52]. In a PTA application, this would amount to modeling the SGWB as the unresolved part of a Poissonian SMBHB population, while intro-ducing a population-dependent resolvability boundary in continuous-wave parameter space. Machine-learning emu-lators may provide a practical way to make this extension computationally feasible. Recent LISA work has shown how simulated source catalogs and reconstructed fore-ground spectra can be used to train a neural posterior es-timator for population hyperparameters [51]. In the PTA context, Laal et al. [20] demonstrated that a normalizing-flow emulator can learn the population-dependent distri-bution of SGWB spectra from simulated SMBHB popula-tions. Building on this approach, an extension would be to emulate the joint mapping from SMBHB population parameters to both the unresolved SGWB spectrum and the distribution of resolvable continuous-wave sources. A particularly useful alternative has recently been de-veloped by Goncharov et al. [12]. Rather than sampling an unknown catalog of continuous-wave sources, their con-struction treats the brightest SMBHB as the source most likely to become individually resolvable and marginalizes the remaining binaries into the unresolved background. Crucially, the continuous-wave source and the SGWB are not assigned independent phenomenological priors: the probability distribution of the brightest source and that of the remaining background are derived from the same un-derlying Poisson SMBHB population. The method there-fore retains the population coupling between resolved and unresolved sources without requiring a transdimensional search over an arbitrary number of continuous-wave sig-nals. This provides a particularly useful route for extend-ing the framework developed here. The brightest source carries much of the information associated with the high-strain tail of the SMBHB population and is also the source most likely to become individually resolvable. Modeling this source explicitly, while statistically marginalizing the much larger population of weaker binaries into the SGWB, therefore captures the leading additional population in-formation available from continuous waves. At the same time, the calculation can be implemented within the stan-dard fixed-dimensional PTA likelihood, with the connec-tion between the SGWB and the continuous-wave source entering through their common hierarchical population prior [12]. This is considerably simpler than introducing a reversible-jump sampler for an unknown number of re-solvable binaries. The more general resolved/unresolved population-splitting and emulator-based approaches dis-cussed above remain valuable if future PTA datasets contain several comparably informative resolvable sources or require substantially more complicated source popula-tions.  
+
+> VI. CONCLUSIONS
+
+We have developed a hierarchical Bayesian framework for inferring the SMBHB merger-rate population directly from PTA data. Instead of treating deterministic-search upper limits and SGWB measurements as separate prod-ucts to be interpreted after the fact, the framework places the source-frame merger-rate model inside the PTA likeli-hood. The unknown catalog of individual SMBHB merger signals is modeled as a Poisson point process, so that the number of merger signals is inferred from the data rather than fixed by a detection threshold. We presented two computational implementations of this hierarchical idea. The first marginalizes over the un-known catalog by combining fixed-source-count evidences with the Poisson catalog prior. This catalog-marginalized route is useful for merger-only validation problems, where the population hyperparameters change the source prior but not the fixed-source PTA likelihood. The second implementation samples the catalog explicitly with RJM-CMC, jointly exploring the population hyperparameters, source count, source parameters, and PTA noise param-eters. This transdimensional route is the more direct implementation for the joint SGWB-plus-merger prob-lem, because the SGWB covariance depends on the same population hyperparameters. We validated the Poisson point-process machinery us-16 ing a toy merger-only population. The toy study shows that the framework can recover both the marginal source distributions and the unknown merger count. Probability– probability tests over an ensemble of simulations show that the inferred population hyperparameters have the ex-pected coverage. This validates the basic unknown-catalog inference before applying the method to an astrophysical merger-rate model. We then applied the framework to a phenomenologi-cal astrophysical merger-rate density in which the same population hyperparameters determine both the SGWB amplitude and the expected merger catalog. In controlled simulations, adding an individual merger signal to the SGWB analysis changes the population posterior and can improve constraints on the merger-rate hyperparame-ters. This demonstrates the central point of the analysis: the SGWB and individual merger/memory signals carry complementary information about the same underlying SMBHB population. The present implementation is a proof of concept. The merger signal is modeled with a simplified burst-with-memory waveform, and the SGWB is compressed to a power-law amplitude with fixed spectral index. Fu-ture work will replace the burst approximation with a complete SMBHB merger waveform, use more of the frequency-dependent SGWB information, and extend the same hierarchical population model to include resolvable continuous-wave sources. This would lead to a unified PTA population framework in which the SGWB, individ-ual continuous waves, merger/memory events, and non-detections all constrain the same astrophysical SMBHB merger-rate population. 
+
+> ACKNOWLEDGMENTS
+
+We thank Martina Muratore for insightful scientific dis-cussions and for guidance on the Eryn transdimensional sampler, including proposal design, sampler settings, and convergence diagnostics. This work is supported by the Max Planck Gesellschaft (MPG) and the ATLAS cluster computing team at AEI Hannover. We made use of the following code. For simulating pul-sar timing datasets with realistic observation spans, noise properties, and cadence, we use the pta replicator at github.com/bencebecsy/pta replicator with an extension to include our SMBHB merger with memory parameters. The Bayesian analysis is performed using the enter-prise framework [53], the core data analysis software for pulsar timing arrays for computing likelihoods and posteri-ors. For the catalog-marginalized implementation, we use 
+
+dynesty github.com/joshspeagle/dynesty.git to compute the fixed-k nested-sampling evidences, and PTMCMC-Sampler github.com/nanograv/PTMCMCSampler.git for the population-level reweighting and hyperparameter sampling. For the transdimensional implementation, we use Eryn github.com/lisa-analysis-tools/Eryn.git, which provides ensemble and reversible-jump MCMC tools for 0.6 1.2 1.8 2.4 
+
+> α
+> 0.6 1.2 1.8 2.4
+> β
+> 0.6 1.2 1.8 2.4
+
+λ
+
+> −1.6
+> −0.8 0.0 0.8 1.6
+> κ
+> 0.6 1.2 1.8 2.4
+
+α
+
+> 0.6 1.2 1.8 2.4
+
+β
+
+> −1.6
+> −0.8 0.0 0.8 1.6
+
+κ
+
+Posterior Simulated Prior 
+
+FIG. 6: Posterior on the toy population hyperparameters (λ, α, β, κ ) for the representative validation realization. The blue contours and one-dimensional marginals show the recovered posterior, while the red dashed lines mark the simulated values. This figure shows the full joint re-covery of the toy population model for a single realization. sampling across different catalog dimensions. 
+
+> Appendix A: Toy-population validation details
+
+This appendix provides additional diagnostics for the representative toy merger-only realization discussed in Sec. IV A. The toy population is the PTA-frame model defined in Eq. (3.1). The simulated population hyperpa-rameters for this realization are 
+
+λ = 1 .85847 , α = 0 .54793 , β = 1 .49214 , κ = 0 .96077 .
+
+The simulated catalog contains two merger signals. Their simulated parameters are listed in Table III. Additional figures below show the recovery of the population hyper-parameters and source parameters, together with conver-gence diagnostics for the transdimensional sampler. Figure 6 shows the posterior on the four toy population hyperparameters for this realization. We next examine the source-level posterior for the same realization. To visualize how the transdimensional sam-pler recovers the simulated merger events, Fig. 7 compares posterior samples for the inferred merger signals with the simulated source. The blue points show the recovered source parameters for all merger signals supported by the posterior, including samples with different inferred numbers of sources, and the orange star markers show the simulated events. 17 TABLE III: Simulated merger signals for the representative toy validation realization shown in Fig. 2. The parameters are the simulated values used to generate the PTA dataset. 
+
+Event t0 [MJD] DL [Mpc] M [M⊙] q θ ϕ ψ hmem 
+
+1 54388.419 427.761 5.965 × 10 9 5.386 1.723 6.018 2.506 1.015 × 10 −14 
+
+2 57820.904 341.978 2.234 × 10 9 1.251 1.196 5.455 2.984 6.010 × 10 −15 53000 54000 55000 56000 57000 58000 
+
+t0 [MJD]      
+
+> 8.8 9.0 9.2 9.4 9.6 9.8 10.0
+> log 10  M [M ]
+> Transdimensional samples Injected events
+> 53000 54000 55000 56000 57000 58000
+
+t0 [MJD] 
+
+> 100 200 300 400 500
+> DL [Mpc]
+> Transdimensional samples Injected events
+
+FIG. 7: Source-level recovery for the representative toy transdimensional analysis. The blue points show posterior samples for merger signals from states with different catalog sizes, while the orange stars mark the two simulated events. The left panel shows merger time t0 versus chirp mass log 10 M, and the right panel shows t0 versus luminosity distance DL.Figure 8 shows the joint distributions of the source parameters for the merger signals sampled by the transdi-mensional analysis. Because the catalog size varies during the RJMCMC, these distributions pool source samples from posterior states containing different numbers of ac-tive merger signals. The figure therefore summarizes the overall source-parameter structure supported by the data rather than assigning a separate posterior to each simulated event. Figure 9 shows a convergence diagnostic for the repre-sentative toy transdimensional analysis using the rank-normalized Gelman–Rubin statistic bR. We evaluate the diagnostic for the four toy-population hyperparameters (λ, α, β, κ ) and for the sampled catalog size k. The hor-izontal dotted line at bR − 1 = 10 −2 corresponds to the reference value bR = 1 .01. All quantities shown lie below this reference threshold, providing an additional check that the population parameters and catalog-size sampling have converged for this run. 
+
+[1] R. S. Foster and D. C. Backer, in Bulletin of the American Astronomical Society , Vol. 22 (1990) p. 1341. [2] M. V. Sazhin, Soviet Astronomy 22 , 36 (1978). [3] S. Detweiler, Astrophys. J. 234 , 1100 (1979). [4] R. W. Hellings and G. S. Downs, Astrophysical Journal Letters 265 , L39 (1983). [5] G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzou-manian, P. T. Baker, B. B´ ecsy, L. Blecha, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Burnette, R. Case, M. Charisi, S. Chatterjee, K. Chatziioannou, B. D. Cheese-boro, S. Chen, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, C. J. Cutler, M. E. Decesar, D. Degan, P. B. Demorest, H. Deng, and D. et al. , Astrophysical Journal Letters 951 , L8 (2023), arXiv:2306.16213 [astro-ph.HE]. [6] EPTA Collaboration, InPTA Collaboration, J. Antoniadis, P. Arumugam, S. Arumugam, S. Babak, M. Bagchi, A. S. Bak Nielsen, C. G. Bassa, A. Bathula, A. Berthereau, M. Bonetti, E. Bortolas, P. R. Brook, M. Burgay, R. N. Caballero, A. Chalumeau, D. J. Champion, S. Chanlar-idis, S. Chen, I. Cognard, S. Dandapat, D. Deb, S. Desai, G. Desvignes, N. Dhanda-Batra, C. Dwivedi, M. Falxa, R. D. Ferdman, A. Franchini, J. R. Gair, and t. Gon-charov, Astronomy & Astrophysics 678 , A50 (2023), arXiv:2306.16214 [astro-ph.HE]. [7] D. J. Reardon, A. Zic, R. M. Shannon, G. B. Hobbs, M. Bailes, V. Di Marco, A. Kapur, A. F. Rogers, E. Thrane, J. Askew, N. D. R. Bhat, A. Cameron, 18 100 200 300 400 
+
+> DL [Mpc]
+> 8.7 9.0 9.3 9.6 9.9
+> log 10  M
+> 1.5 3.0 4.5 6.0
+> q
+> −0.8
+> −0.4 0.0 0.4 0.8
+> cos  θ
+> 1.5 3.0 4.5 6.0
+> φ
+> 54000 55000 56000 57000
+
+## t0 [MJD] 
+
+> 0.8 1.6 2.4
+> ψ
+> 100 200 300 400
+
+## DL [Mpc] 
+
+> 8.7 9.0 9.3 9.6 9.9
+
+## log 10 M
+
+> 1.5 3.0 4.5 6.0
+
+## q
+
+> −0.8
+> −0.4 0.0 0.4 0.8
+
+## cos θ
+
+> 1.5 3.0 4.5 6.0
+
+## φ
+
+> 0.8 1.6 2.4
+
+## ψ
+
+## Posterior Simulated Prior 
+
+FIG. 8: Posterior samples for the source parameters of the inferred merger signals in the representative toy RJMCMC run. Because the catalog size is not fixed, the distributions combine source samples from posterior states containing different numbers of merger signals. The blue contours show the inferred posterior samples for all merger signals, and the red dashed lines mark the simulated source parameters. 
+
+M. Curylo, W. A. Coles, S. Dai, B. Goncharov, M. Kerr, A. Kulkarni, Y. Levin, M. E. Lower, R. N. Manchester, R. Mandow, M. T. Miles, R. S. Nathan, S. Oslowski, C. J. Russell, R. Spiewak, S. Zhang, and X.-J. Zhu, Astrophys-ical Journal Letters 951 , L6 (2023), arXiv:2306.16215 [astro-ph.HE]. [8] H. Xu, S. Chen, Y. Guo, J. Jiang, B. Wang, J. Xu, Z. Xue, R. N. Caballero, J. Yuan, Y. Xu, J. Wang, L. Hao, J. Luo, K. Lee, J. Han, P. Jiang, Z. Shen, M. Wang, N. Wang, R. Xu, X. Wu, R. Manchester, L. Qian, X. Guan, M. Huang, C. Sun, and Y. Zhu, Research in Astronomy and Astrophysics 23 , 075024 (2023), arXiv:2306.16216 [astro-ph.HE]. [9] M. T. Miles, R. M. Shannon, D. J. Reardon, M. Bailes, D. J. Champion, M. Geyer, P. Gitika, K. Grunthal, M. J. Keith, M. Kramer, A. D. Kulkarni, R. S. Nathan, A. Parthasarathy, J. Singha, G. Theureau, E. Thrane, F. Abbate, S. Buchner, A. D. Cameron, F. Camilo, B. E. Moreschi, G. Shaifullah, M. Shamohammadi, A. Possenti, and V. V. Krishnan, Monthly Notices of the Royal As-tronomical Society 536 , 1489 (2025), arXiv:2412.01153 [astro-ph.HE]. [10] J. Antoniadis, Z. Arzoumanian, S. Babak, M. Bailes, A. S. Bak Nielsen, P. T. Baker, C. G. Bassa, B. B´ ecsy, 19 λαβκ 
+
+> k10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> 10 −1̂
+> R − 1̂
+> R
+
+= 1.01 
+
+FIG. 9: Convergence diagnostic for the representative toy transdimensional analysis. The vertical lines show bR − 1for the four toy-population hyperparameters ( λ, α, β, κ )and the sampled catalog size k. The horizontal dotted line at bR−1 = 10 −2 marks the reference value. Values closer to zero indicate closer agreement among the sampled chains. All quantities shown lie below the bR = 1 .01 reference threshold. 
+
+A. Berthereau, M. Bonetti, A. Brazier, P. R. Brook, M. Burgay, S. Burke-Spolaor, R. N. Caballero, J. A. Casey-Clyde, A. Chalumeau, D. J. Champion, M. Charisi, S. Chatterjee, S. Chen, I. Cognard, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, S. Dai, M. E. DeCesar, P. B. Demorest, G. Desvignes, T. Dolch, B. Drachler, M. Falxa, E. C. Ferrara, W. Fiore, E. Fonseca, J. R. Gair, N. Garver-Daniels, and B. t. Gon-charov, Monthly Notices of the Royal Astronomical Soci-ety 510 , 4873 (2022), arXiv:2201.03980 [astro-ph.HE]. [11] W.-W. Yu and B. Allen, arXiv e-prints , arXiv:2512.08666 (2025), arXiv:2512.08666 [astro-ph.CO]. [12] B. Goncharov, G. Sato-Polito, X. Bi, and M. Zal-darriaga, arXiv e-prints , arXiv:2606.18241 (2026), arXiv:2606.18241 [astro-ph.HE]. [13] A. Sesana, A. Vecchio, and C. N. Colacino, Monthly Notices of the Royal Astronomical Society 390 , 192 (2008), arXiv:0804.4476 [astro-ph]. [14] A. Sesana, Classical and Quantum Gravity 30 , 224014 (2013), arXiv:1307.2600 [astro-ph.CO]. [15] H. Middleton, W. Del Pozzo, W. M. Farr, A. Sesana, and A. Vecchio, Monthly Notices of the Royal Astronomical Society 455 , L72 (2016), arXiv:1507.00992 [astro-ph.CO]. [16] S. Chen, A. Sesana, and C. J. Conselice, Monthly No-tices of the Royal Astronomical Society 488 , 401 (2019), arXiv:1810.04184 [astro-ph.GA]. [17] G. Agazie, A. Anumarlapudi, A. M. Archibald, P. T. Baker, B. B´ ecsy, L. Blecha, A. Bonilla, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Burnette, R. Case, J. A. Casey-Clyde, M. Charisi, S. Chatterjee, K. Chatziioan-nou, B. D. Cheeseboro, S. Chen, and Nanograv Collab-oration, Astrophysical Journal Letters 952 , L37 (2023), arXiv:2306.16220 [astro-ph.HE]. [18] B. Goncharov, S. Sardana, A. Sesana, S. M. Tomson, J. Antoniadis, A. Chalumeau, D. Champion, S. Chen, E. F. Keane, K. Liu, G. Shaifullah, L. Speri, and S. Valtolina, Nature Communications 16 , 9692 (2025), arXiv:2409.03627 [astro-ph.HE]. [19] S. R. Taylor, J. Simon, and L. Sampson, Phys. Rev. Lett. 
+
+118 , 181102 (2017), arXiv:1612.02817 [astro-ph.GA]. [20] N. Laal, S. R. Taylor, L. Z. Kelley, J. Simon, K. G¨ ultekin, D. Wright, B. B´ ecsy, J. A. Casey-Clyde, S. Chen, A. Cin-goranelli, D. J. D’Orazio, E. C. Gardiner, W. G. Lamb, C. Matt, M. S. Siwek, and J. M. Wachter, Astrophys. J. 
+
+982 , 55 (2025), arXiv:2411.10519 [astro-ph.IM]. [21] S.-Y. Zhao, Z.-C. Chen, J. Cardinal Tremblay, B. Gon-charov, X.-J. Zhu, N. D. R. Bhat, M. Curylo, S. Dai, V. Di Marco, H. Ding, G. Hobbs, A. Kapur, W. Ling, T. Liu, R. Mandow, S. Mishra, D. J. Reardon, C. J. Russell, R. M. Shannon, S. Wang, L. Zhang, and A. Zic, Astrophys. J. 
+
+992 , 181 (2025), arXiv:2508.13944 [gr-qc]. [22] G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzou-manian, P. T. Baker, B. B´ ecsy, L. Blecha, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Case, J. A. Casey-Clyde, M. Charisi, S. Chatterjee, T. Cohen, J. M. Cordes, N. J. Cornish, et al. , and Nanograv Collaboration, Astrophys-ical Journal Letters 951 , L50 (2023), arXiv:2306.16222 [astro-ph.HE]. [23] EPTA Collaboration, InPTA Collaboration, J. Antoniadis, P. Arumugam, S. Arumugam, S. Babak, M. Bagchi, A.-S. Bak Nielsen, C. G. Bassa, A. Bathula, A. Berthereau, M. Bonetti, E. Bortolas, P. R. Brook, M. Burgay, R. N. Caballero, A. Chalumeau, D. J. Champion, S. Chanlaridis, S. Chen, I. Cognard, S. Dandapat, and et al. , Astron-omy & Astrophysics 690 , A118 (2024), arXiv:2306.16226 [astro-ph.HE]. [24] X.-J. Zhu, G. Hobbs, L. Wen, W. A. Coles, J.-B. Wang, R. M. Shannon, R. N. Manchester, M. Bailes, N. D. R. Bhat, S. Burke-Spolaor, S. Dai, M. J. Keith, M. Kerr, Y. Levin, D. R. Madison, S. Oslowski, V. Ravi, L. Toomey, and W. van Straten, Monthly Notices of the Royal As-tronomical Society 444 , 3709 (2014), arXiv:1408.5129 [astro-ph.GA]. [25] R. van Haasteren, Phys. Rev. D 112 , 103009 (2025), arXiv:2506.10811 [astro-ph.IM]. [26] R. van Haasteren and Y. Levin, Monthly Notices of the Royal Astronomical Society 401 , 2372 (2010), arXiv:0909.0954 [astro-ph.IM]. [27] S. M. Tomson, B. Goncharov, R. van Haasteren, R. Srini-vasan, E. Barausse, Y. Wen, J. Wang, J. Antoniadis, N. D. R. Bhat, Z.-C. Chen, I. Cognard, V. Di Marco, H. Hu, G. H. Janssen, M. Kramer, W. Ling, K. Liu, S. Mishra, D. Perrodin, A. Possenti, C. J. Russell, R. M. Shannon, G. Theureau, and S. Wang, Astrophysical Jour-nal Letters 996 , L9 (2026), arXiv:2512.14650 [gr-qc]. [28] E. Thrane and C. Talbot, Publ. Astron. Soc. Australia 
+
+36 , e010 (2019), arXiv:1809.02293 [astro-ph.IM]. [29] I. Mandel, W. M. Farr, and J. R. Gair, Monthly No-tices of the Royal Astronomical Society 486 , 1086 (2019), arXiv:1809.02063 [physics.data-an]. [30] R. Abbott, T. D. Abbott, F. Acernese, K. Ackley, C. Adams, N. Adhikari, R. X. Adhikari, V. B. Adya, C. Af-feldt, D. Agarwal, M. Agathos, K. Agatsuma, N. Aggar-wal, O. D. Aguiar, L. Aiello, A. Ain, P. Ajith, T. Akutsu, P. F. de Alarc´ on, S. Akcay, S. Albanesi, A. Allocca, P. A. Altin, A. Amato, C. Anand, S. Anand, A. Ananyeva, S. B. Anderson, W. G. Anderson, M. Ando, T. Andrade, N. An-dres, T. Andri´ c, S. V. Angelova, S. Ansoldi, J. M. An-telis, S. Antier, F. Antonini, S. Appert, K. Arai, K. Arai, and Y. t. Arai, Physical Review X 13 , 011048 (2023), arXiv:2111.03634 [astro-ph.HE]. [31] S. R. Taylor and D. Gerosa, Phys. Rev. D 98 , 083017 20 
+
+(2018), arXiv:1806.08365 [astro-ph.HE]. [32] S. Vitale, D. Gerosa, W. M. Farr, and S. R. Taylor, in 
+
+Handbook of Gravitational Wave Astronomy , edited by C. Bambi, S. Katsanevas, and K. D. Kokkotas (2022) p. 45. [33] R. van Haasteren, Astrophys. J. Suppl. 273 , 23 (2024), arXiv:2406.05081 [astro-ph.IM]. [34] B. Goncharov and S. Sardana, Monthly Notices of the Royal Astronomical Society 537 , 3470 (2025), arXiv:2409.03661 [astro-ph.HE]. [35] M. Favata, Classical and Quantum Gravity 27 , 084036 (2010), arXiv:1003.3486 [gr-qc]. [36] K. Aggarwal, Z. Arzoumanian, P. T. Baker, A. Bra-zier, P. R. Brook, S. Burke-Spolaor, S. Chatterjee, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, M. DeCesar, P. B. Demorest, T. Dolch, J. A. Ellis, R. D. Ferdman, E. C. Ferrara, E. Fonseca, N. Garver-Daniels, P. Gentile, D. Good, J. S. Hazboun, A. M. Holgado, E. A. Huerta, K. Islo, R. Jennings, G. Jones, M. L. Jones, D. L. Kaplan, L. Z. Kelley, J. S. Key, M. T. Lam, T. J. W. Lazio, L. Levin, D. R. Lorimer, J. Luo, R. S. Lynch, D. R. Madison, M. A. McLaughlin, S. T. McWilliams, C. M. F. Mingarelli, C. Ng, D. J. Nice, T. T. Pennucci, N. S. Pol, S. M. Ransom, P. S. Ray, X. Siemens, J. Simon, R. Spiewak, I. H. Stairs, D. R. Stinebring, K. Stovall, J. K. Swiggum, S. R. Taylor, M. Vallisneri, R. van Haasteren, S. J. Vigeland, C. A. Witt, and W. W. Zhu, Astrophys. J. 889 , 38 (2020), arXiv:1911.08488 [astro-ph.HE]. [37] S. M. Tomson, B. Goncharov, and R. van Haasteren, Phys. Rev. D 113 , 124027 (2026), arXiv:2510.04537 [astro-ph.HE]. [38] Z.-C. Zhao and Z. Cao, Science China Physics, Mechanics, and Astronomy 65 , 119511 (2022), arXiv:2111.13883 [gr-qc]. [39] J. F. C. Kingman, Poisson Processes: Oxford Studies In Probability. 3 (Oxford University Press, 1992). [40] D. J. Daley and D. Vere-Jones, An Introduction to the Theory of Point Processes , 2nd ed. (Springer, 2003). [41] E. S. Phinney, arXiv e-prints , astro-ph/0108028 (2001), arXiv:astro-ph/0108028 [astro-ph]. [42] H. Tong, N. Guttman, T. A. Clarke, P. D. Lasky, E. Thrane, E. Payne, R. Nathan, B. Farr, M. Fishbach, G. Ashton, and V. D. Marco, Astrophys. J. Suppl. 276 ,50 (2025), arXiv:2404.04460 [gr-qc]. [43] Z. Arzoumanian, P. T. Baker, A. Brazier, S. Burke-Spolaor, S. J. Chamberlin, S. Chatterjee, B. Christy, J. M. Cordes, N. J. Cornish, F. Crawford, H. Thankful Cromartie, K. Crowter, M. DeCesar, P. B. Demorest, T. Dolch, J. A. Ellis, R. D. Ferdman, E. Ferrara, W. M. Folkner, E. Fonseca, N. Garver-Daniels, P. A. Gentile, R. Haas, J. S. Hazboun, et al. , and NANOGrav Collab-oration, Astrophys. J. 859 , 47 (2018), arXiv:1801.02617 [astro-ph.HE]. [44] S. R. Taylor, R. van Haasteren, and A. Sesana, Phys. Rev. D 102 , 084039 (2020), arXiv:2006.04810 [astro-ph.IM]. [45] V. D. Marco, N. Guttman, M. T. Miles, A. Zic, R. M. Shannon, and E. Thrane, A transdimensional sampling framework for pulsar timing noise modelling (2026), arXiv:2603.23817 [astro-ph.IM]. [46] S. Koposov, J. Speagle, K. Barbary, G. Ashton, E. Ben-nett, J. Buchner, C. Scheffler, C. Talbot, B. Cook, J. Guil-lochon, P. Cubillos, A. A. Ramos, M. Dartiailh, Ilya, E. Tollerud, D. Lang, B. Johnson, jtmendel, E. Higson, T. Vandal, T. Daylan, R. Angus, patelR, P. Cargile, P. Sheehan, M. Pitkin, M. Kirk, L. Xu, J. Leja, and joezuntz, joshspeagle/dynesty: v3.0.0 (2025). [47] J. Ellis and R. van Haasteren, PTMCMCSampler: Parallel tempering MCMC sampler package written in Python, Astrophysics Source Code Library, record ascl:1912.017 (2019), ascl:1912.017. [48] E. M. Zahraoui, P. Maturana-Russel, W. van Straten, R. Meyer, and S. Gulyaev, Monthly Notices of the Royal Astronomical Society 540 , 3818 (2025), arXiv:2411.14736 [astro-ph.IM]. [49] N. Karnesis, M. L. Katz, N. Korsakova, J. R. Gair, and N. Stergioulas, Monthly Notices of the Royal Astronomical Society 526 , 4814 (2023), arXiv:2303.02164 [astro-ph.IM]. [50] M. Muratore, J. Gair, O. Hartwig, M. L. Katz, and A. Toubiana, in Journal of Physics Conference Series ,Journal of Physics Conference Series, Vol. 3177 (IOP, 2026) p. 012112. [51] A. Toubiana and J. Gair, arXiv e-prints , arXiv:2601.04168 (2026), arXiv:2601.04168 [gr-qc]. [52] A. W. Criswell, S. Banagiri, V. Delfavero, M. J. Bustamante-Rosell, S. R. Taylor, and R. Rosati, arXiv e-prints , arXiv:2604.03390 (2026), arXiv:2604.03390 [astro-ph.IM]. [53] J. A. Ellis, M. Vallisneri, S. R. Taylor, and P. T. Baker, ENTERPRISE: Enhanced Numerical Toolbox Enabling a Robust PulsaR Inference SuitE (2020).

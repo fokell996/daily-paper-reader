@@ -1,0 +1,1396 @@
+Title: Approximating the statistics of a gravitational wave background
+
+URL Source: https://arxiv.org/pdf/2609.07686v1
+
+Published Time: Wed, 09 Sep 2026 02:33:30 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+## Approximating the statistics of a gravitational wave background 
+
+Mikel Falxa ∗
+
+Donostia International Physics Center (DIPC), Paseo Manuel de Lardizabal 4, 20018 Donostia-San Sebastian, Spain 
+
+The astrophysical origin of the gravitational wave background (GWB) reported by pulsar timing array (PTA) collaborations has yet to be confirmed. A GWB signal made of the sum of individual gravitational wave (GW) from the population of supermassive black hole binaries (SMBHB) would show the imprint of a discrete Poissonian statistics in its spectral properties. In this work, we propose a tool based on the saddlepoint approximation method to estimate the distribution of characteristic strain for any given population model. This tool can be used for Bayesian inference or for a quick visualization of the statistics of the GWB from the output of more realistic semi-analytical models. We introduce the general family of variance mixture Gaussian distributions that models heavy-tailed behavior distributions that is expected for a non-Gaussian GWB signal. We show that setting the correct hierarchical priors to a Gaussian free spectrum PTA likelihood is effectively equivalent to a non-Gaussian likelihood. Using ideal simulations, we compare the performance of the saddlepoint approximation with a log-Normal distribution to infer the parameters of the astrophysical model from the statistics of the GWB and show that correctly modeling higher order moments is essential. Future PTA analyses should include the statistics of the GWB in their pipelines. 
+
+I. INTRODUCTION 
+
+A gravitational wave background (GWB) is a stochas-tic signal that emerges from the superposition of many individual gravitational wave (GW) signals [1]. The sources of these GWs are often compact object binary systems that produce the loudest GWs in the Universe. These sources are usually part of a population that fol-low statistical properties which carry interesting astro-physical information about their formation and distribu-tion. Logically, the population dictates the amplitude and spectral properties of the stochastic GWB [2]. Thus, it should be possible to infer some of the astrophysi-cal population parameters through the measurement of a GWB signal. In Pulsar timing arrays (PTA), the GWB is ananohertz red noise showing up in the precision timing of pulsars [3, 4], produced by the population of super-massive black holes binaries (SMBHBs) in the Universe that are formed through galaxy merger [5, 6]. Evidence for such a signal in PTA data was reported some years ago [7–11]. The distribution of SMBHBs in mass, redshift and frequency is governed by galaxy dynamics and super-massive black hole (SMBH) growth history [12]. It is then natural to consider a hierarchical framework where the properties of the measured GWB are modeled by more fundamental astrophysical parameters. This approach was already adopted in previous studies [13–15] where the authors evaluate the expected statistics of a GWB sig-nal to connect it to the PTA statistical framework. This statistics depends heavily on the number and properties of the GW sources making up the GWB. Specifically, the discreteness of the population induces non-Gaussian  
+
+> ∗mikel.falxa@dipc.org
+
+behaviors that contain some information about the dis-tribution of sources. When a few loud sources dominate the signal, the central limit theorem does not apply and the GWB shows strong signs of non-Gaussianity. This is what is expected for a realistic population of SMBHBs. The non-Gaussianity of the signal has been extensively discussed and investigated in recent works. It was already discussed in [15] where the authors developped a frame-work based on compound poisson processes to model the GWB signal. In [16], a similar approach is used to es-timate and infer the spectral distribution the GWB to infer parameters. In [17] an analytical expression for the statistics of the GWB is proposed. More recently, [18] investigated the heavy tail behavior of the GWB statis-tics, and [13] proposes a way to split the GWB and sin-gle loudest source statistics in a joint hierarchical frame-work. Additionally, the non-Gaussian statistics of the GWB might be hard to detect in a purely agnostic way, as explained in [19], due to the very broad response of PTAs to GWs. Other studies propose to detect them with higher order statistics using the four point correla-tor [20], or setting the correct non-Gaussian priors on the Fourier decomposition of the signal in Bayesian analysis [21, 22]. In this work, we propose a method based on the sad-dlepoint approximation to estimate the statistics of the GWB spectrum. This method is already discussed in the appendix of [13]. Here, we propose a code available at 
+
+https://github.com/mfalxa/zamari that has the pur-pose of being flexible in terms of astrophysical modeling. It is designed to accept any distribution of sources in chirp mass and redshift as well as binary frequency evo-lution. It could be paired with outputs of semi-analytical models to estimate the expected statistics of the GWB. The saddlepoint method offers a reasonable approxima-tion to the distribution of characteristic strain without requiring heavy training on numerous simulations. Still, arXiv:2609.07686v1 [astro-ph.IM] 7 Sep 2026 2machine learning methods as developped in [23, 24] can present advantages, specifically to account for the eccen-tricity of the binaries, that is discarded in this work and must be accounted for in future works. This article is organized as follows. In the first section, we review the approximations that lead to the common expression of the GWB statistics in the Gaussian ensem-ble approximation. In the next section, we present the family of heavy tailed scale mixture distributions that can be constructed from Gaussian distributions. Then, we present the saddlepoint approximation method and how we can use it for the GWB, after what we introduce the phenomenological model and the Bayesian framework used in this work. Finally, we share the results that are obtained for high mass and low mass binary populations, comparing the performance of the saddlepoint approxi-mation with a log-normal distribution. 
+
+II. GRAVITATIONAL WAVE BACKGROUND 
+
+The timing residuals δt a measured in pulsar a for a GWB signal consist of the sum of Ns individual GW signals with amplitude Aj , frequency fj , and phase Φ j
+
+as [18, 25] 
+
+δt a =
+
+> NS
+
+X
+
+> j=1
+
+Aj
+
+4πif j
+
+Rj,a ei2πf j t+ϕj + c.c., (1) where Ra,j is the response of pulsar a to the GW signal emitted by source j, given by 
+
+Rj,a =
+
+h
+
+1 − e−2iπf j La(1+ ˆΩj · ˆpa)i
+
+×
+
+ 1 + cos 2 ιj
+
+2 F + 
+
+> a
+
+− i cos ιj F ×
+
+> a
+
+
+
+,
+
+(2) with La the distance Earth-pulsar a, ιj the inclination of source j, ˆΩj the unit vector pointing to the sky location of source j and F + 
+
+> a
+
+, F × 
+
+> a
+
+the antenna pattern response for pulsar a corresponding to polarization modes + and ×
+
+of the GW, defined as 
+
+F Aa ( ˆΩj , ψ j ) = 12ˆpαa ˆpβa
+
+1 + ˆΩj · ˆpa
+
+ϵAαβ ( ˆΩj , ψ j ), (3) where ϵAαβ is the polarization tensor that can be rotated along the polarization basis by an angle 2 ψ as 
+
+ϵ+
+
+> αβ
+
+ϵ×
+
+> αβ
+
+
+
+→
+
+cos(2 ψ) − sin(2 ψ)sin(2 ψ) cos(2 ψ)
+
+  ϵ+
+
+> αβ
+
+ϵ×
+
+> αβ
+
+
+
+. (4) The timing residuals expressed in Fourier domain are given by 
+
+δ˜ta(f ) = 
+
+> NS
+
+X
+
+> j=1
+
+Aj
+
+4πif j
+
+Rj,a eiϕ j w+ 
+
+> j
+
+(f ) − R∗
+
+> j,a
+
+e−iϕ j w− 
+
+> j
+
+(f ) .
+
+(5) The finite total time of observation T produces spectral leakage modelled by the functions w± 
+
+> j
+
+(f, f s) [18, 25, 26]. In all rigor, because of the unevenly sampled nature of PTA data, pulsars can have different total time Ta and effective cadence of observation, so these functions are not exactly the same and should wear an index a. But in PTA data analysis, this effect is usually neglected and we use the approximation w± 
+
+> j
+
+(f, f s) ≈ δ(f ± fs). It is important to note that the latter can have consequences on the inference [26, 27]. We can replace the discrete sum by an integral weighted by the amplitude map A( ˆΩ, f s, ψ, ι ) as 
+
+δ˜ta(f ) ≡
+
+Z
+
+df s
+
+Z d ˆΩ4π
+
+Z dψ π
+
+Z d cos ι
+
+2
+
+A( ˆΩ, f s, ψ, ι )4πif s
+
+×
+
+h
+
+Ra( ˆΩ, f s, ψ, ι )eiΦ( ˆΩ,f s)w+(f, f s)
+
+−R∗
+
+> a
+
+( ˆΩ, f s, ψ, ι )e−iΦ( ˆΩ,f s)w−(f, f s)
+
+i
+
+.
+
+(6) Since individual binaries are independent and their phase uniformly distributed, we have the expected value ⟨ei(Φ( ˆΩ,f s)−Φ( ˆΩ,f s)) ⟩ = δ( ˆΩ − ˆΩ′)δ(fs − f ′
+
+> s
+
+) and 
+
+⟨eiΦ( ˆΩ,f s)⟩ = 0 where ⟨.⟩ denotes the ensemble average. This gives the cross correlated timing residuals 
+
+⟨δ˜t∗
+
+> a
+
+(f )δ˜tb(f )⟩ =
+
+Z
+
+df s
+
+Z d ˆΩ4π
+
+⟨A2( ˆΩ, f s)⟩
+
+16 π2f 2
+
+> s
+
+⟨R∗
+
+> a
+
+( ˆΩ) Rb( ˆΩ) ⟩ψ,ι 
+
+× (w+)2(f, f s) + ( w−)2(f, f s) .
+
+(7) In this last step, we assumed that polarization and in-clination are uniformly distributed for all sources by set-ting A( ˆΩ, f s, ψ, ι ) ≡ A( ˆΩ, f s), yielding the polarization and inclination averaged cross response ⟨R∗
+
+> a
+
+( ˆΩ) Rb( ˆΩ) ⟩ψ,ι .Note that we also dropped the frequency dependence of the response function, which is a reasonable approxima-tion in the long detector arm limit (see Appendix A). The squared amplitude map A2( ˆΩ, f s) can be de-composed into spherical harmonics as A2( ˆΩ, f s) =
+
+P 
+
+> lm
+
+clm (fs)Ylm ( ˆΩ) to model the anisotropic power dis-tribution of the GWB [28]. In the large number of source limit, the main contributor is the monopole c00 
+
+and the background is considered isotropic, meaning that 
+
+A2( ˆΩ, f s) ≈ A2(fs) = c00 (fs)1. This approximation is no longer valid when single binaries dominate the signal, as      
+
+> 1There is a nuance here. Technically, if one considers statisti-cal isotropy, then the average Universe across many realizations is isotropic, and c00 is the only remaining term. However, for
+
+3it is expected when measuring one realization of the Uni-verse. A single binary dominated signal would also break the assumption of unpolarized GWB. Defining Γ00 ,ab =
+
+Z d ˆΩ4π ⟨R∗
+
+> a
+
+( ˆΩ) Rb( ˆΩ) ⟩ψ,ι = 23 HD( ζab ),cW 
+
+> 00
+
+(f )8π2f 2 =
+
+Z
+
+df s
+
+c00 (fs)16 π2f 2
+
+> s
+
+(w+)2(f, f s) + ( w−)2(f, f s) ,
+
+(8) with HD( ζab ) the Hellings-Downs correlations [29] be-tween pulsars a and b (see Appendix A), and cW 
+
+> 00
+
+the convoluted amplitude with w± 
+
+> j
+
+(f, f s), proportional to the one-sided power spectral density (PSD). Finally, we get a simple expression for the cross correlated timing residuals between pulsars a and b
+
+⟨δ˜t∗
+
+> a
+
+(f )δ˜tb(f )⟩ = ⟨cW 
+
+> 00
+
+(f )⟩
+
+12 π2f 2 HD( ζab ). (9) In the Gaussian ensemble approximation, δ⃗t ∼N (0 , C ab ) with Cab that is defined by the pair corre-lations ⟨δ˜t∗
+
+> a
+
+(f )δ˜tb(f )⟩. This approximation appears to have limited consequences on the inference of astrophysi-cal parameters, as shown in [15, 18], when accounting for the fluctuation of the number of sources. We dedicate a more in-depth discussion related to this approximation in Appendix B. Then, defining X, Y ∼ N (0 , HD( ζab )), we have 2
+
+δ˜ta(f ) ∼
+
+s
+
+cW 
+
+> 00
+
+(f )12 π2f 2 × X + iY 
+
+√2 , (10) 
+
+⟨δ˜t∗
+
+> a
+
+(f )δ˜tb(f )⟩ = ⟨cW 
+
+> 00
+
+(f )⟩
+
+12 π2f 2 HD( ζab ), (11) 
+
+⟨(δ˜t∗
+
+> a
+
+(f )δ˜tb(f )) 2⟩ = ⟨(cW 
+
+> 00
+
+(f )) 2⟩
+
+72 π4f 4 HD 2(ζab ), (12) so higher order moments depend on the statistics of cW 
+
+> 00
+
+.When considering one realization of the Universe, c00 
+
+is fixed. However, accounting for the source population statistics (i.e. the cosmic variance) requires that c00 fol-lows a certain probability distribution given by the as-trophysical population parameters. Therefore, even in                   
+
+> higher order moments, the clm with l > 0 do not vanish, be-cause fluctuations at smaller angular scale are present due to the discreteness of the population. This is why anisotropies and non-Gaussian statistics are closely related.
+> 2Using ⟨X2+Y2⟩=2HD( ζab ) and ⟨X4+Y4+ 2 X2Y2⟩=8HD( ζab )2
+
+the assumption of Gaussian distributed timing residuals, the full distribution is in fact non-Gaussian, of the form 
+
+δt ∼ √V × N (0 , 1) where V ∼ gv . This type of distribu-tion belongs to the family of heavy tailed distributions, the Normal variance-mean mixture distributions. 
+
+III. NORMAL VARIANCE-MEAN MIXTURE DISTRIBUTIONS 
+
+In its general form, a normal variance-mean mixture (NVM) random variable is defined as [30, 31] 
+
+X = α + βV + √V Z, (13) where V ∼ g(v) is a probability distribution function of parameters λ and Z ∼ N (0 , 1) with a distribution defined as 
+
+f (x) = 
+
+Z ∞
+
+> 0
+
+dv 1
+
+√2πv exp 
+
+
+
+− (x − α − βv )2
+
+2v
+
+
+
+g(v). (14) In the symmetric and centered case, α, β = 0. 
+
+f (x) = 
+
+Z ∞
+
+> 0
+
+dv 1
+
+√2πv exp 
+
+
+
+− x2
+
+2v
+
+
+
+g(v)
+
+≡
+
+Z ∞
+
+> 0
+
+dvϕ (x|v)g(v),
+
+(15) which can be interpreted as the continuous equivalent of a Gaussian mixture model [21] (the integral replaces the sum) or, in Bayesian terms, the marginal distribution of 
+
+ϕ(x|v)g(v) where g(v) is the prior on the variance of the Gaussian distribution. For the symmetric case X = √V Z , the mean and skewness are zero while the variance σ2 
+
+> X
+
+and excess kur-tosis κX are given by 
+
+σ2 
+
+> X
+
+= ⟨V ⟩⟨ Z2⟩ = μV , (16) 
+
+κX =  ⟨V 2⟩ − ⟨ V ⟩2 ⟨Z4⟩ = 3 σ2 
+
+> V
+
+. (17) This result can be easily generalized to multivariate distributions considering that Z is a multivariate nor-mal and using Isserlis’s theorem to find higher order mo-ments, as we show in section VI A. Thus, we can con-struct families of non-Gaussian distributions for different 
+
+g(v) and control the first two non zero cumulants σ2 
+
+> X
+
+and 
+
+κX by matching the mean μV and variance σ2 
+
+> V
+
+of V to the parameters of the distribution. Here we list some examples for which the matching is possible analytically. 
+
+• Log-normal distribution, 
+
+g(v|μV , σ V ) = 1
+
+vσ √2π exp 
+
+
+
+− (ln v − μ)2
+
+2σ2
+
+
+
+, (18) 4with μ = ln 
+
+ μ2
+
+> V
+
+√μ2 
+
+> V+σ2
+> V
+
+
+
+and σ =
+
+r
+
+ln 
+
+
+
+1 + σ2
+
+> V
+> μ2
+> V
+
+
+
+,which we use in this work. 
+
+• Inverse Gaussian distribution, 
+
+g(v|μV , σ V ) = 
+
+r λ
+
+2πv 3 exp 
+
+
+
+− λ(v − μ)2μ2v
+
+
+
+, (19) with μ = μV and λ = μ3 
+
+> V
+
+/σ 2 
+
+> V
+
+. The NVM ob-tained from the generalized inverse Gaussian dis-tribution produces generalized hyperbolic distribu-tions as used in [32]. 
+
+• Gamma distribution, 
+
+g(v|μV , σ V ) = 1Γ( α)θα vα−1 exp 
+
+n
+
+− vθ
+
+o
+
+, (20) with α = μ2 
+
+> V
+
+/σ 2 
+
+> V
+
+and θ = σ2 
+
+> V
+
+/μ V , giving a Normal-Gamma distribution. Note that when σ2 
+
+> V
+
+→ 0 we have κX → 0, which gives g(v|μV , σ V ) → δ(v − μV ), and reduces the symmet-ric NVM to a Gaussian distribution with variance μV .Then, these functions can be used to probe deviations from Gaussianity in the Fourier coefficients of any noise process. In this work, we want a distribution g(v|Λ) that de-scribes the statistics of the GWB spectrum, accounting for the Poisson shot noise and the properties of sources parametrized by astrophysical parameters Λ. 
+
+IV. SADDLEPOINT APPROXIMATION FOR ASTROPHYSICAL POPULATION 
+
+The average total power emitted by the population of GW sources can be written as the sum of all individual GW contributions [6]. In characteristic strain units, it is given by 
+
+h2 
+
+> c
+
+(f ) = 
+
+Z
+
+dz 
+
+Z
+
+d log M d3Ndzd log Md ln fr
+
+h2(fr ), (21) given individual source contributions h2(f ) averaged over polarization and inclination 
+
+h2(f ) = 
+
+ 25
+
+ "
+
+4
+
+ GM
+
+c2
+
+5/3 (1 + z)2/3
+
+dM
+
+ πf c
+
+2/3#2
+
+,
+
+(22) with M the chirp mass, z the redshift, dM the comoving distance to the binary and fr = (1 + z)f the rest-frame frequency of the binary. The actual distribution of h2 
+
+> c
+
+(f ) is represented by a compound Poisson process where the number of sources contributing to each bin of the parameter space is an integer random variable following a Poisson distribution 
+
+P(N ) [2, 15]. This accounts for the shot noise due to the discreteness of the population. The discretized sum over zI and log MJ per log-frequency bin ∆ ln f = ∆ f /f 
+
+gives 
+
+h2 
+
+> c
+
+(f ) = X
+
+> IJ
+
+P { N (zI , log MJ , f )} h2(zI , log MJ , f r )∆f /f ,
+
+(23) with the characteristic number of sources per bin 
+
+N (zI , log MJ , f ) = ∆z∆ log M∆ ln f d3Ndzd log Md ln fr ∝
+
+f −11 /3 for GW-driven circular binaries. In this work, the sum over IJ is performed on a 50 ×50 log-spaced grid of log 10 zI and log 10 (MJ /M ⊙) respectively between [−2, 0.6] and [7 , 11]. Using the fact that the mean and variance of a Pois-son distribution P(N ) are respectively N and N , we can easily find the mean μh2 
+
+> c
+
+and variance σ2
+
+> h2
+> c
+
+of h2 
+
+> c
+
+as 
+
+μh2 
+
+> c
+
+= X
+
+> IJ
+
+N (zI , log MJ , f )h2(zI , log MJ , f r ) f
+
+∆f , (24) 
+
+σ2 
+
+> h2
+> c
+
+= X
+
+> IJ
+
+N (zI , log MJ , f )
+
+
+
+h2(zI , log MJ , f r ) f
+
+∆f
+
+2
+
+.
+
+(25) The latter can be used directly to perform moment matching with the distributions and parametrization given in section III. In reference [15], they use the definition of the cumu-lant generating function (CGF) for the compound Pois-son process h2 
+
+> c
+
+(f ) that is given by 
+
+K(is ) = X
+
+> IJ
+
+N (zI , log MJ , f )
+
+h
+
+eish 2(zI ,log MJ ,f ) f 
+
+> ∆f
+
+− 1
+
+i
+
+,
+
+(26) and is related to the characteristic function φ(s), i.e. the Fourier transform of the probability density p(h2 
+
+> c
+
+)through φ(s) = eK(is ).We can find the distribution of h2 
+
+> c
+
+by taking the inverse Fourier transform of the characteristic function [14, 15] 
+
+p(h2 
+
+> c
+
+) = 
+
+Z
+
+dse K(is )+ ish 2 
+
+> c
+
+≈ eK(ˆ s)−ˆsh 2
+
+> c
+
+p2πK ′′ (ˆ s) , (27) and this integral can be approximated using Laplace’s method around the stationary point ˆ s defined by the equation K′(ˆ s) = h2 
+
+> c
+
+. This is referred to as the sad-dlepoint approximation method [33]. We can solve nu-merically for any h2 
+
+> c
+
+the equation log K′(ˆ s) = log h2 
+
+> c
+
+in log-scale using Newton’s method since we know all ana-lytical derivatives of the CGF. The advantage of this method is that it gives a rela-tively quick approximation of the real distribution from 50 5 10 15 20 25 30 Frequency [nHz] 10 15  
+
+> 10 14
+> hc
+> High mass Low mass Ensemble average
+
+FIG. 1. Saddlepoint approximation for the characteristic strain hc of the high mass and low mass population of Ta-ble I. Both models produce the same average hc. The high mass population hc fluctuates significantly more than the low mass. 
+
+the CGF without requiring heavy training or precompu-tation. It only requires a model of the distribution of sources in chirp mass and redshift. The bottleneck is having to solve the equation K′(ˆ s) = h2 
+
+> c
+
+for each h2 
+
+> c
+
+.10 31 10 30 10 29        
+
+> h2
+> c
+> 012345pdf 1e29 Lin scale
+> Monte carlo Saddlepoint 10 31 10 30 10 29
+> h2
+> c
+> 10 27
+> 10 28
+> 10 29
+> 10 30
+> 10 31 Log scale
+> Monte carlo Saddlepoint
+
+FIG. 2. Compound poisson Monte Carlo versus saddlepoint approximation probability distribution. Most of the bulk dis-tribution is correctly modeled, but we see in log scale that the approximation does not perfectly capture the tail behavior. 
+
+In Figure 1 we show the distribution of hc obtained for the models presented in Table I and the next section. The violin plots show the cosmic variance given a population, and one realization of the GWB corresponds to a ran-dom draw from the violin plots at each frequency (equiv-alent to random draw from Equation 23). In Figure 2, we overplot this distribution evaluated at f = 1 /(yr ) for the high mass model with a histogram generated from random draws of Equation 23. We can see that the sad-dlepoint approximation catches most of the bulk distri-bution shape, but the log-scale plot highlights the slight difference at the high h2 
+
+> c
+
+tail. We evaluate the goodness of the saddlepoint approximation with respect to the ran-dom draws from Equation 23 by computing the Hellinger distance between the two distributions in Appendix C. 
+
+V. MODEL AND LIKELIHOOD A. Model 
+
+To construct an astrophysical model we need to de-fine d3Ndzd log 10 Md ln f that gives the distribution in redshift, chirp mass and frequency of the sources. More elaborate models might include mass ratio or eccentricity but we do not take into account these effects here [23, 24]. We define the number of sources per unit redshift z, chirp mass M and frequency f as 
+
+d3Ndzd log 10 Md ln f = d2ndzd log 10 M
+
+dV c
+
+dz dz dt r
+
+dt r
+
+d ln fr
+
+, (28) with 
+
+dV c
+
+dz dz dt r
+
+= (1 + z)4 πcd 2 
+
+> M
+
+, (29) that is given by cosmology and accounts for how the co-moving volume Vc changes with redshift. The frequency evolution term is given by the binary evolution due to GW emission. In this work, we only focus on circular GW driven binaries where 
+
+dt r
+
+d ln fr
+
+= 596 
+
+ c3
+
+GM
+
+5/3
+
+(πf r )−8/3. (30) Still, accounting for more complex environmental ef-fects is made possible in the code and the users are free to parametrize the frequency dependence as they wish. In essence, it would require a different frequency depen-dence than f −8/3 [18, 24, 34]. For the comoving number density of sources per unit volume, chirp mass and redshift, we use the phenomeno-logical model used in [18, 34–36] 
+
+d2ndzd log 10 M = ˙ n0
+
+dt r
+
+dz 
+
+ M
+
+10 7M⊙
+
+−α
+
+e−M /M0 (1+ z)β e−z/z 0 ,
+
+(31) where ˙ n0 is the comoving merger rate that is assumed to be constant. This model is used as default for this work, but the code available at https://github.com/mfalxa/zamari 
+
+can take any distribution and compute the associated statistics of the spectrum. It can be paired with outputs of semi-analytical models that provide more physically motivated population distributions [12]. 6 
+
+> B. Likelihood
+
+In PTA data analysis, we assume that the timing resid-uals are Gaussian and use a multivariate Gaussian like-lihood that is constructed from the concatenated tim-ing residuals of individual pulsars δt = ∪aδt a. In this work specifically, we consider a simplified model with only white noise and a GWB. For a Fourier decompo-sition of the GWB signal on a discrete Fourier basis F
+
+with coefficients ⃗a (see [37] or the appendix of [21] for more mathematical details), the Gaussian likelihood is 
+
+L(δt |ρ, σ ) = 
+
+Z ∞−∞ 
+
+d⃗ aL(δt − F⃗ a|σ)ϕ(⃗a|ρ)= exp − 12 δt ⊤C−1δt 
+
+p|2πC | ,
+
+(32) where ϕ(⃗a|ρ) is the Gaussian prior with variance ρ enforc-ing that the Fourier coefficients are Gaussian distributed and the covariance matrix is given by 
+
+C = (M ϵM ⊤)a + σ2
+
+> a,i
+
+δij 
+
+ δab + HD( ζab )CGWB , (33) with ( M ϵM ⊤)a the timing model block obtained from the marginalization over first order errors of pulsar a timing model [38, 39] that removes power at low frequencies, 
+
+σ2 
+
+> a,i
+
+the white noise level (measurement errors) for the 
+
+ith measurement of pulsar a and CGW B the covariance matrix associated to the GWB signal. CGW B is described as a low frequency red noise with a covariance matrix that is the low rank approximation of the Wiener Khinchin integral at frequencies fk [40] 
+
+CGWB (ti − tj ) = X
+
+> k
+
+ρk cos (2 πf k|ti − tj |) , (34) where ρk is defined by the PSD and characteristic strain using f S h(f ) = h2 
+
+> c
+
+(f ) [41] which gives 3
+
+ρk = Sδt (fk)∆ f = h2 
+
+> c
+
+(fk)12 π2f 3T , (35) where Sδt (f ) is the one-sided PSD in timing residuals unit, Sh(f ) is the one-sided PSD in strain unit and we use ∆ f = 1 /T for equally spaced frequencies fk where T
+
+is the total time of observation. In the previous section, we presented the symmetric NVM distribution that allows to construct non-Gaussian priors by setting the correct hierarchical prior on ρ. Thus,          
+
+> 3In Equation 9, we have by definition of the expected value of the squared Fourier coefficients per unit frequency ⟨cW
+> 00 ⟩/(12 π2f2) =
+> Sδt (f) and cW
+> 00 =Sh(f).
+
+for an NVM distribution parametrized by parameters Λ, using Equation 32 and Equation 15, we have 
+
+L(δt |Λ, ρ, σ ) = 
+
+Z ∞−∞ 
+
+d⃗ aL(δt − F⃗ a|σ)ϕ(⃗a|ρ)g(ρ|Λ) = L(δt |ρ, σ )g(ρ|Λ) ,
+
+(36) which effectively corresponds to a non-Gaussian likeli-hood, targeting the free spectrum coefficients ρ as the non-Gaussian components. When g(ρ|Λ) → δ(ρ − ρ0), the likelihood reduces to the Gaussian case with free spectrum bins ρ0. Sampling both ρ and Λ is equiva-lent to numerically performing the integral over ρ as in Equation 15. The posterior distribution is constructed from the product of the likelihood and prior probability distribu-tions 
+
+p(ρ, Λ, σ |δt ) ∝ L (δt |ρ, σ )g(ρ|Λ) π(Λ) π(σ), (37) where g(ρ|Λ) is given by the model and saddlepoint ap-proximation defined in the previous section, π(Λ) the prior probability on hyperparamters Λ and π(σ) the prior probability on all other noise parameters of the model σ.Therefore, we can directly target the non-Gaussianity of any noise component from the Gaussian Likelihood by setting the appropriate hyperprior on the free spectrum parameters ρ. This is, in essence, equivalent to what [15] proposes as the Gaussian convolution, if we marginal-ize over the parameters ρ. In [42, 43], a procedure to fit Λ from the marginalized distribution of ρ obtained from the Gaussian likelihood is presented. The previ-ous expression for the posterior probability distribution marginalized over ρ can be rearranged as 
+
+p(⃗ Λ|δt ) ∝
+
+> Nf
+
+Y
+
+> k=1
+
+Z
+
+dρ kp(ρk|δt )g(ρk|⃗ Λ) π(⃗Λ) , (38) assuming that frequencies fk are uncorrelated. This new expression of the likelihood is easily parallelizable, com-putationally less demanding and was already used in nu-merous publications. This is the one we use to produce results in section VI B. The priors on parameters Λ are given in Table II.  
+
+> VI. RESULTS
+
+We divide this section into two parts. First, we show how moment-matched distributions can be used to pa-rameterize deviations from Gaussianity. We then com-pare the performance of the saddlepoint approximation and the moment-matched distribution in inferring the as-trophysical parameters of the phenomenological model introduced section V A. 7
+
+A. Parametrized non-Gaussianity 
+
+We simulate an ideal PTA with Np = 60 pulsars uni-formly distributed in the sky with a white noise level of 
+
+σa = 10 −7s and a total time of observation T = 20 years. We inject a common HD correlated red noise to all pul-sars on a grid of 30 equally spaced frequencies fk = k/T 
+
+with k an integer between 1 and 30. The vector of corre-lated Fourier coefficients for each pulsar ⃗a at f k are drawn from a multivariate Gaussian distribution N (⃗ 0, ρ kχab )with χab the Np × Np matrix containing HD correlation coefficients and ρk is drawn from g(ρ|μρ, σ ρ) an inverse Gaussian distribution 4. Following the moment matching procedure in Equation 17 and Equation 19, the mean μρ
+
+and standard deviation σρ of g(ρk|μρ, σ ρ) are chosen so that the auto-correlated PSD S(f ) = μρ and excess kur-tosis κ(f ) = 3 σ2 
+
+> ρ
+
+of the injected signal in one pulsar are parametrized as 
+
+S(f ) = Af −γ ,κ(f ) = 3 S2(f )
+
+ ff∗
+
+11 /3
+
+, (39) with A the amplitude, γ the spectral index, and f∗ acharacteristic frequency where non-Gaussianities become stronger, mimicking an astrophysical GWB with decreas-ing number of sources at higher frequencies. The cross PSD and excess kurtosis can be found using Isserli’s theorem 
+
+Sab (f ) = Af −γ χab ,κabcd (f ) = ( χab χcd + χac χbd + χad χbc ) S2
+
+> aa
+
+(f )
+
+ ff∗
+
+11 /3
+
+,
+
+(40) which reduces to the auto-correlated case for a = b = c =
+
+d.We sample the posterior probability distribution of Equation 37 using the sampler numpyro [44] and the li-brary discovery [45] to compute the Gaussian free spec-trum likelihood L(δt |ρ, σ ). We set an inverse Gaussian hyperprior on ρk at each frequency fk as g(ρk|A, γ, f ∗) to control non-Gaussianties. The priors on hyperparameters are uniform with bounds log 10 A = [ −18 , −11], γ = [0 , 7] and log 10 f∗ = [ −9, −7]. In Figure 3, we show the posterior distributions ob-tained for an injected signal with parameters log 10 A =
+
+−14 .8, γ = 13 /3 and log 10 (f∗/Hz) = −8, showing that the correct parameters are recovered. This is in essence similar to the powerlaw spectrum GWB searches that have been performed by PTA collaborations [7–11], ex-cept here, deviations from Gaussianity are allowed and             
+
+> 4The probability density f(a)=R∞
+> 0dρϕ (a|ρ)g(ρ)is then aNormal-Inverse Gaussian distribution and has a well studied closed-form expression.
+
+parameterized through the parameter f∗ that controls the excess kurtosis. Still, the spectrum of a realistic GWB does not follow an inverse Gaussian distribution and require more elaborate calculations [14, 15]. In the following subsection, we compare the saddlepoint approx-imation versus a log-Normal distribution with mean and variance matched to the expected theoretical predictions. 3.0 3.5 4.0 4.5    
+
+> 15.0
+> 14.7
+> 14.4
+> 14.1
+> log 10 A
+> 8.4
+> 8.2
+> 8.0
+> 7.8
+> log 10  f *
+> 3.0 3.5 4.0 4.5
+> 8.4
+> 8.2
+> 8.0
+> 7.8
+> log 10 f*
+
+FIG. 3. Posterior distribution for the simplistic GWB model that is used as an example. The injected signal had parame-ters log 10 A = −14 .8, γ = 13 /3 and log 10 (f∗/Hz) = −8. 
+
+B. Astrophysical background 
+
+We simulate an ideal PTA with 60 pulsars uniformly distributed in the sky with a white noise level of σa =10 −7s with 20 years of observation. We inject an HD correlated GWB with a spectrum drawn for the Poisson process defined in Equation 23. We study two kinds of population (i) a massive population with lower merger rate, inducing stronger spectral variance (ii) a lighter population with higher merger rate inducing weaker spec-tral variance. We compare each case with a moment matched log-normal distribution. The two populations are built to have the same average characteristic strain of hc(f ) = 3 × 10 −15 (f /f yr )−2/3 (with fyr = 1 /(1 yr )) as in Figure 1 and are generated using the parameters shown in Table I. 
+
+1. High mass population 
+
+The high mass population has a characteristic mass of log 10 M0 = 9 .3. Then, some individual binaries are 8
+
+High mass Low mass log 10 ˙n0 -2.9 -1.74 
+
+α 0.5 0.5 log 10 M0 9.3 8.3 
+
+β 0.5 0.5 
+
+z0 1 1TABLE I. Parameters used for the high mass and low mass populations. They both give a GWB with an average charac-teristic strain hc = 3 × 10 −15 (f /f yr )−2/3 but different higher order moments. log 10 ˙n0 [-5, 0] 
+
+α [0, 3] log 10 M0 [7, 10] 
+
+β [0, 3] 
+
+z0 [0.1, 3] TABLE II. Uniform prior ranges used for the population pa-rameters. 
+
+quite bright and few binaries are required to produce a signal with amplitude hc(f ) = 3 × 10 −15 (f /f yr )−2/3.This tends to increase the spectral variance and boost the non-Gaussian nature of the signal. 0.6 1.2 1.8 2.4   
+
+> 8.4 8.8 9.2 9.6
+> log 10  0
+> 0.6 1.2 1.8 2.4
+> 4
+> 3
+> 2
+> 1
+> log 10 n0
+> 0.6 1.2 1.8 2.4
+> z0
+> 0.6 1.2 1.8 2.4
+> 8.4 8.8 9.2 9.6
+> log 10 0
+> 0.6 1.2 1.8 2.4
+> 0.6 1.2 1.8 2.4
+> z0
+> Log-Normal Saddlepoint
+
+FIG. 4. Posterior distributions of population hyperparame-ters for both log-Normal prior and saddlepoint approximation prior in the high mass population case. 
+
+From the corner plot in Figure 4, we see that the sad-dlepoint distribution performs better than the moment matched log-normal distribution. Specifically for the pa-rameters characterizing the mass function. This is be-cause matching only the first two moments (mean and variance) does not ensure that higher order moments will accurately capture the higher h2 
+
+> c
+
+tails of the distribution. Even though the saddlepoint method is an approxima-tion, it still captures most of the bulk features and tail of the distribution that are crucial for precise inference. Still, even in a very ideal configuration of PTA, the poste-rior uncertainties on the parameters remain large. Specif-ically for β and z0 parameters that seem unconstrained. 
+
+2. Low mass population 
+
+The low mass population has a characteristic mass of log 10 M0 = 8 .3. Then, the individual binaries are less bright and many binaries are required to produce a sig-nal with amplitude hc(f ) = 3 × 10 −15 (f /f yr )−2/3. This tends to Gaussianize the signal and reduce the spectral variance. 0.6 1.2 1.8 2.4   
+
+> 7.2 7.8 8.4 9.0 9.6
+> log 10  0
+> 0.6 1.2 1.8 2.4
+> 4
+> 3
+> 2
+> 1
+> log 10 n0
+> 0.6 1.2 1.8 2.4
+> z0
+> 0.6 1.2 1.8 2.4
+> 7.2 7.8 8.4 9.0 9.6
+> log 10 0
+> 0.6 1.2 1.8 2.4
+> 0.6 1.2 1.8 2.4
+> z0
+> Log-Normal Saddlepoint
+
+FIG. 5. Posterior distributions of population hyperparame-ters for both log-Normal prior and saddlepoint approximation prior in the high mass population case. 
+
+In Figure 5, the moment matched log-normal and sad-dlepoint approximation perform equally within posterior uncertainties, because in this case, the spectral variance is small, hence the log-normal and saddlepoint distribu-tions are more similar in shape. Not modeling the higher order moments and high h2 
+
+> c
+
+tails has a lesser impact since the GWB is nearly Gaussian. 
+
+VII. CONCLUSION 
+
+We have presented a flexible method to include non-Gaussian behaviors in the PTA likelihood and approxi-mate the statistics of a GWB for any given population 9model. The method is based on the saddlepoint approxi-mation that was first presented in [33] and also mentioned recently in the context of PTA in [13]. The main goal of this work is to provide a ready-to-use tool that gives quick estimates of the distribution of characteristic strain 
+
+hc for any given model. This enables Bayesian parame-ter inference or simply more realistic representations of the expected signal for other scientific publications that usually only plot the expected mean characteristic strain 
+
+hc. Knowing the distribution of hc allows to model the non-Gaussian statistics of the GWB through Gaussian scale mixture distributions. We have shown that the approximation closely fol-lows the true expected distribution that is obtained by sampling a compound Poisson process and computing the Hellinger distance between the two distributions. It seems that the saddlepoint approximation method per-forms equally as previously introduced machine learn-ing based density estimators using normalizing flows [23]. That said, machine learning techniques could still allow more complex modeling (including eccentricity for exam-ple). Their real bottleneck lies in the number of simula-tions required for an accurate prediction of the distribu-tion. We test the parameter inference of a specific phe-nomenological model by performing simulations of ideal PTA datasets and Bayesian recovery of the posterior dis-tributions. The saddlepoint method is compared to a moment-matched log-normal distribution for which the mean and variance are exactly those expected analyti-cally from the population. However, an incorrect model-ing of higher order moments leads to errors in the infer-ence that can bias the recovery. We compare the results between a low mass and high mass population, that are, respectively, strongly non-Gaussian and more Gaussian (i.e. less spectral fluctuations), and show that high mass populations give more information about the SMBHB mass function through stronger spectral fluctuations. Including the real statistics of the GWB in PTA anal-yses is essential to capture the astrophysical nature of the signal. Accessing deeper information about the mass function or number of SMBHB is what can enable proper astrophysical population studies with GWs and enable multi-messenger investigations. In future works, the in-clusion of eccentricity will be become crucial. These fea-tures are usually not accounted for in standard PTA in-ference, but they might carry very interesting informa-tion about the demographics of SMBHBs. 
+
+> ACKNOWLEDGEMENTS
+
+MF thanks Silvia Bonoli, Chiara Cecchini, Gabriela Sato-Polito, Xiao Xue, David Izquierdo-Villalba, Mauro Pieroni, Hippolyte Quelquejay Leclere, Alberto Sesana and everyone at the GGI Listening to the Cosmos: New Frontiers in Gravitational Wave Physics 2026 for sharing their code, knowledge and interesting discussions. The jaxification of the code was performed with the help of Claude code. MF acknowledges support from the Span-ish Ministerio de Ciencia e Innovaci´ on through project PID2024-159201NB-C21. 
+
+> Appendix A: Overlap reduction function
+
+The fully developed expression for the cross response between pulsars a and b is 
+
+R∗
+
+> a
+
+( ˆΩ, f s)Rb( ˆΩ, f s)=
+
+h
+
+1 − e2iπf sLa(1+ ˆΩ· ˆpa) − e−2iπf sLb(1+ ˆΩ· ˆpb)
+
++e2iπf s(La(1+ ˆΩ· ˆpa)−Lb(1+ ˆΩ· ˆpb)) i
+
+×
+
+ 1 + cos 2 ι
+
+2 F + 
+
+> a
+
+− i cos ιF ×
+
+> a
+
+
+
+×
+
+ 1 + cos 2 ι
+
+2 F + 
+
+> b
+
++ i cos ιF ×
+
+> b
+
+
+
+,
+
+(A1) In [41, 46] it is shown that in the long arm limit 
+
+fsL >> 1, the first rapidly oscillating frequency depen-dent term gets damped when integrated over the sky, because integrating the exponential yields a term ∼ f L 
+
+in the denominator. Therefore, it is a reasonable approx-imation to consider it to be ≈ 1 and the response to be frequency independent, except when a = b, because the last exponential term is also 1, which accounts for the pulsar term present in the timing residuals. Therefore we have 
+
+Z d ˆΩ4π R∗
+
+> a
+
+( ˆΩ, f s)Rb( ˆΩ, f s) ≈ (1 + δab )
+
+Z d ˆΩ4π R∗
+
+> a
+
+( ˆΩ) Rb( ˆΩ) ,
+
+(A2) where δab is accounting for the autocorrelated pulsar term. We can calculate the polarization and inclination av-eraged response as 
+
+⟨R∗
+
+> a
+
+( ˆΩ) Rb( ˆΩ) ⟩ψ,ι 
+
+=
+
+Z d cos ι
+
+2
+
+dψ π
+
+" 1 + cos 2 ι
+
+2
+
+2
+
+[( F + 
+
+> a
+
+F + 
+
+> b
+
+cos 2 2ψ
+
++ F × 
+
+> a
+
+F × 
+
+> b
+
+sin 2 2ψ − cos 2 ψ sin 2 ψ(F + 
+
+> a
+
+F × 
+
+> b
+
++ F × 
+
+> a
+
+F + 
+
+> b
+
+)] + (cos ι)2 [F + 
+
+> a
+
+F + 
+
+> b
+
+sin 2 2ψ + F × 
+
+> a
+
+F × 
+
+> b
+
+cos 2 2ψ
+
++ cos 2 ψ sin 2 ψ(F + 
+
+> a
+
+F × 
+
+> b
+
++ F × 
+
+> a
+
+F + 
+
+> b
+
+)+i
+
+ 1 + cos 2 ι
+
+2
+
+
+
+(cos ι) ( −F + 
+
+> a
+
+F × 
+
+> b
+
++ F × 
+
+> a
+
+F + 
+
+> b
+
+)] 
+
+
+
+= 25
+
+F + 
+
+> a
+
+F + 
+
+> b
+
++ F × 
+
+> a
+
+F ×
+
+> b
+
+ .
+
+(A3) The imaginary part is an odd function of inclination that vanishes with the integration, as a consequence of as-suming a smooth and uniform distribution of inclination 10 and polarization. The prefactor 2 /5 goes into the defi-nition of the polarization and inclination averaged strain amplitude in Equation 22 Then, combining the previous and omitting the 2/5 factor, we find Γ00 ,ab ≡ (1 + δab )
+
+Z d ˆΩ4π
+
+h
+
+F + 
+
+> a
+
+( ˆΩ) F + 
+
+> b
+
+( ˆΩ) + F × 
+
+> a
+
+( ˆΩ) F × 
+
+> b
+
+( ˆΩ) 
+
+i
+
+= 23 HD( ζab ).
+
+(A4) which by definition is the Hellings-Down correlation pat-tern HD( ζab ) for an unpolarized and isotropic GWB, with ζab the angle between pulsar a and b in the sky. The factor 2 /3 comes from the overlap integral R (d ˆΩ/4π)[( F + 
+
+> a
+
+)2 + ( F × 
+
+> a
+
+)2] = 1 /3 when a = b (as cal-culated in cite refs) giving Γ 00 ,aa = 2 /3 and defining HD(0) = 1. 
+
+> Appendix B: Gaussian approximation
+
+We build a toy model of a compound Poisson process 
+
+S that is made of N single jumps hi. Each jump corre-sponds to a sine wave with fixed frequency f , a random phase Φ i uniform between 0 and 2 π and random am-plitude √h2 that is given by the astrophysical model of sources. We have 
+
+S =
+
+> N
+
+X
+
+> i=1
+
+hi, (B1) with N ∼ P ( ¯N ) a Poisson distributed variable, ¯N being the average number of sources contributing at frequencies 
+
+f , obtained by integrating d3N/dzd log 10 Md ln f with respect to z and d log 10 M, and 
+
+hi = Xi
+
+√h2. (B2) The important difference here is that the sum is per-formed in hi, thus accounting for the phase of each jump and considering interference between sources [15], con-trary to the sum performed in h2 
+
+> i
+
+that omits this effect. We want to compare two cases where Xi is a single ran-dom phasor (real case) and Xi is a single Gaussian jump, representing the Gaussian approximation. In essence, this corresponds to a Brownian motion that is the sum of individual Gaussian jumps for which the total sum S
+
+is also Gaussian [27]. We focus on the real part of the signal and define 
+
+• Xi,A = Re {eiΦi } ∼ Arcsine( −1, 1) ,
+
+• Xi,G ∼ N (0 , 1/√2) ,
+
+ensuring that both individual jumps have a variance of 1/2. We define the amplitude distribution h2 by using the fact that p(h2) ∝ dN/dh 2 which itself can be obtained through a change of variable between M and h2 [14] using Equation 22 
+
+dN dh 2d ln f =
+
+Z
+
+dz d3Ndzd Md ln f M dM
+
+dh 2 , (B3) and integrating numerically over z and numerically normalized. This quantity is proportional to the prob-ability distribution of the amplitude of a single source randomly drawn from the population. For a compound Poisson process as defined in Equa-tion B1, the characteristic function ΦS (s), i.e. the Fourier transform of the probability density function of the sum S, is given by ΦS (s) = exp 
+
+
+
+¯N
+
+Z 
+
+dh 2p(h2)Φ X
+
+
+
+s√h2
+
+
+
+− 1
+
+ 
+
+,
+
+(B4) where Φ X (s) is the characteristic function of the individ-ual jump Xi for each case 
+
+• Arcsine Φ X,A (s) = J0(s), the Bessel function of the first kind 
+
+• Gaussian Φ X,G (s) = exp {− s2/4},
+
+yielding the associated compound Poisson characteristic functions Φ S,A and Φ S,G .The two individual jump characteristic functions ΦX,A (s) and Φ X,G (s) obviously have very different be-haviors. They are quite similar around the bulk s = 0 but the Bessel function strongly oscillates and slowly de-cays at higher s while the Gaussian quickly decays with-out oscillating. This difference in asymptotic behavior can induce significant differences at the tails of the dis-tributions. We identify two sources of randomness (i) the Poisson fluctuation of the number of sources (ii) the astrophysical source amplitude variability. We want to quantify how both random contributions actually wash out most of the differences between the Gaussian and the Arcsine jump cases in Φ S (s), hence validating the Gaussian ensemble approximation. We compute the Euclidean distance between pA(S)and pG(S), respectively, the probability distribution of S
+
+for the phasor jump and the Gaussian jump. Noting that ΦS,A − ΦS,G is the Fourier transform of pA(S) − pG(S), Parseval’s identity gives 
+
+Z
+
+dS |pA(S) − pG(S)|2 = 12π
+
+Z
+
+ds |Φh,A − Φh,G |2. (B5) Finally, we define the relative difference with respect to pG(S) as 11 (∆ p)2 =
+
+R ds |ΦS,A − ΦS,G |2
+
+R ds |ΦS,G |2 . (B6) 10 8    
+
+> Frequency [Hz] 0.00 0.02 0.04 0.06 0.08
+> | p|
+> log 10 0= 9.3
+> log 10 0= 8.3
+> FIG. 6. Relative difference between the arcsine and Gaussian jump models for two astrophysical populations (massive and light). The black dashed line shows the frequency of 1/(1yr).
+
+In Figure 6, we show values of ∆ p evaluated at differ-ent frequencies f for two models, one with high charac-teristic mass log 10 M0 = 9 .3 and low characteristic mass log 10 M0 = 8 .3. For the high mass case, the difference between the Gaussian and arcsine models can go up to 8% after f = 1 /(yr ) whereas for low masses only around 2%. The high mass population will have a higher chance to produce resolved individual binaries for which the Gaus-sian approximation is no longer valid. This is what pro-duces high amplitude tails in p(S) that cannot be fully accounted for by the Gaussian approximation. Still, the difference is significantly suppressed by the introduction of Poisson fluctuations and amplitude variations. At low ¯N , the p(h2) weighted integral of individual jumps damps the oscillations of the Bessel function, while at high ¯N ,the central limit theorem becomes valid. The combina-tion of these two effects tend to reduce the difference between the models. Nevertheless, this toy model assumes an unpolarized GWB and does not account for the GW response accross pulsars. Morevoer, the pulsar term is omitted, which might introduce additional interference between sources [15]. That said, it still provides a simple picture to un-derstand why the Gaussian ensemble approximation can still be valid, as long as the Poisson and amplitude fluc-tuations are accounted for. 
+
+> Appendix C: Hellinger distance
+
+We compute the Hellinger distance between a kernel density estimate (KDE) obtained with 5000 draws from the compound Poisson process of Equation 23 and the saddlepoint approximation obtained from Equation 27. The squared Hellinger distance defined as 
+
+H2(f, g ) = 12
+
+Z
+
+dx 
+
+p f (x) − pg(x)
+
+2
+
+, (C1) gives a measure of the difference between two probability distributions. We compute H(f, g ) for 1000 different parameter val-ues from the priors in Table II and focus on the distribu-tion of h2 
+
+> c
+
+at f = 1 yr −1 where we expected a significant high h2 
+
+> c
+
+tail in the distribution. 0.00 0.05 0.10 0.15 0.20 0.25 0.30 Hellinger distance 0510 15 20 pdf  
+
+> FIG. 7. Hellinger distance between a KDE of compound pois-son Monte Carlo draws against the saddlepoint approximation of the p(h2).
+
+In Figure 7 we show the difference between the true distribution and the approximation. The saddlepoint ap-proximation seems to perform as well as normalizing flow techniques [23] without requiring heavy training, which gives it a considerable advantage. However, the imple-mentation of effects like eccentricity will require further development, as it is for now only accounted for thanks to machine learning techniques [24].               
+
+> [1] E. S. Phinney, A practical theorem on gravitational wave backgrounds (2001), arXiv:astro-ph/0108028 [astro-ph]. [2] G. Agazie et al. ,The NANOGrav 15 yr Data Set: Constraints on Supermassive Black Hole Binaries from the Gravitational-wave Background, The Astrophysi-cal Journal Letters 952 , L37 (2023), arXiv:2306.16220
+
+12 
+
+[astro-ph.HE]. [3] M. V. Sazhin, Opportunities for detecting ultralong grav-itational waves, Soviet Astronomy 22 , 36 (1978). [4] S. Detweiler, Pulsar timing measurements and the search for gravitational waves, The Astrophysical Journal 234 ,1100 (1979). [5] A. Sesana et al. , Gravitational waves from resolvable massive black hole binary systems and observations with Pulsar Timing Arrays, Monthly Notices of the Royal As-tronomical Society 394 , 2255 (2009), arXiv:0809.3412 [astro-ph]. [6] A. Sesana et al. , The stochastic gravitational-wave back-ground from massive black hole binary systems: implica-tions for observations with pulsar timing arrays, Monthly Notices of the Royal Astronomical Society 390 , 192–209 (2008). [7] J. Antoniadis et al. , The second data release from the european pulsar timing array: Iii. search for gravita-tional wave signals, Astronomy &; Astrophysics 678 , A50 (2023). [8] G. Agazie et al. , The nanograv 15 yr data set: Evidence for a gravitational-wave background, The Astrophysical Journal Letters 951 , L8 (2023). [9] H. Xu et al. , Searching for the nano-hertz stochastic grav-itational wave background with the chinese pulsar timing array data release i, Research in Astronomy and Astro-physics 23 , 075024 (2023). [10] D. J. Reardon et al. , Search for an isotropic gravitational-wave background with the parkes pulsar timing array, The Astrophysical Journal Letters 951 , L6 (2023). [11] M. T. Miles et al. , The meerkat pulsar timing array: the first search for gravitational waves with the meerkat ra-dio telescope, Monthly Notices of the Royal Astronomical Society 536 , 1489–1500 (2024). [12] S. Bonoli, D. Izquierdo-Villalba, D. Spinoso, M. Colpi, A. Sesana, M. Polkas, and V. Springel, Constraints on the early growth of massive black holes from pta and jwst with l-galaxiesbh (2025), arXiv:2509.12325 [astro-ph.GA]. [13] B. Goncharov, G. Sato-Polito, X. Bi, and M. Zaldar-riaga, A joint optimal search for gravitational waves from resolved and unresolved supermassive binary black holes with pulsar timing arrays (2026), arXiv:2606.18241 [astro-ph.HE]. [14] G. Sato-Polito, M. Zaldarriaga, and E. Quataert, Where are the supermassive black holes measured by ptas?, Phys. Rev. D 110 , 063020 (2024). [15] X. Xue, Z. Pan, and L. Dai, Non-gaussian statis-tics of nanohertz stochastic gravitational waves (2025), arXiv:2409.19516 [astro-ph.CO]. [16] G. Sato-Polito and M. Zaldarriaga, Distribution of the gravitational-wave background from supermassive black holes, Phys. Rev. D 111 , 023043 (2025). [17] Y. Ali-Ha¨ ımoud, A practical theorem on gravitational-wave background statistics (2026), arXiv:2604.19701 [astro-ph.CO]. [18] J. Raidal, J. Urrutia, V. Vaskonen, and H. Veerm¨ ae, The heavy tailed non-gaussianity of the supermas-sive black hole gravitational wave background (2026), arXiv:2604.08506 [astro-ph.CO]. [19] C. Cecchini, J. E. Gammal, G. Franciolini, and M. Pieroni, Are pta measurements sensitive to gravita-tional wave non-gaussianities? (2026), arXiv:2605.05157 [astro-ph.CO]. [20] A. Kuntz, C. Smarra, and M. Vaglio, Looking for non-gaussianity in pulsar timing arrays through the four point correlator (2026), arXiv:2603.12311 [gr-qc]. [21] M. Falxa and A. Sesana, Modeling non-gaussianities in pulsar timing array data analysis using gaussian mixture models, Phys. Rev. D 113 , 043047 (2026). [22] A. Gundersen, R. van Haasteren, N. J. Cornish, M. Val-lisneri, and P. M. Meyers, A new framework for lightning-fast gravitational wave analysis of pulsar timing data (2026), arXiv:2607.06834 [gr-qc]. [23] N. Laal, S. R. Taylor, L. Z. Kelley, J. Simon, K. Gul-tekin, D. Wright, B. Becsy, J. A. Casey-Clyde, S. Chen, A. Cingoranelli, D. J. D’Orazio, E. C. Gardiner, W. G. Lamb, C. Matt, M. S. Siwek, and J. M. Wachter, Deep neural emulation of the supermassive black-hole binary population (2024), arXiv:2411.10519 [astro-ph.IM]. [24] M. Bonetti, A. Franchini, B. G. Galuzzi, and A. Sesana, Neural networks unveiling the properties of gravitational wave background from supermassive black hole binaries, Astronomy &; Astrophysics 687 , A42 (2024). [25] W. G. Lamb, J. M. Wachter, A. Mitridate, S. C. Sardesai, B. B´ ecsy, E. L. Hagen, S. R. Taylor, and L. Z. Kelley, Finite populations and finite time: The non-gaussianity of a gravitational wave background, Physical Review D 
+
+113 , 10.1103/96zk-qtck (2026). [26] M. Crisostomi et al. , Beyond diagonal approximations: improved covariance modeling for pulsar timing array data analysis (2025), arXiv:2506.13866 [astro-ph.IM]. [27] H. Quelquejay Leclere, K. Li, M. Volonteri, S. Babak, R. S. Beckmann, Y. Dubois, C. Laigle, and N. A. Webb, The multi-messenger view of pulsar timing array black holes with the horizon-agn simulation, Astronomy &; As-trophysics 705 , A56 (2026). [28] S. R. Taylor, R. van Haasteren, and A. Sesana, From bright binaries to bumpy backgrounds: Mapping realistic gravitational wave skies with pulsar-timing arrays, Phys-ical Review D 102 , 10.1103/physrevd.102.084039 (2020). [29] R. W. Hellings and G. S. Downs, Upper limits on the isotropic gravitational radiation background from pulsar timing analysis., The Astrophysical Journal Letters 265 ,L39 (1983). [30] O. Barndorff-Nielsen, J. Kent, and M. Sørensen, Nor-mal variance-mean mixtures and z-distributions, Inter-national Statistical Review 50 , 145 (1982). [31] Y. Yu, On normal variance-mean mixtures (2011), arXiv:1106.2333 [math.ST]. [32] N. Karnesis, A. Sasli, R. Buscicchio, and N. Stergioulas, Characterization of non-gaussian stochastic signals with heavier-tailed likelihoods, Phys. Rev. D 111 , 022005 (2025). [33] H. E. Daniels, Saddlepoint Approximations in Statistics, The Annals of Mathematical Statistics 25 , 631 (1954). [34] G. Sato-Polito and M. Kamionkowski, Exploring the spectrum of stochastic gravitational-wave anisotropies with pulsar timing arrays (2025), arXiv:2305.05690 [astro-ph.CO]. [35] H. Middleton, W. Del Pozzo, W. M. Farr, A. Sesana, and A. Vecchio, Astrophysical constraints on massive black hole binary evolution from pulsar timing arrays, Monthly Notices of the Royal Astronomical Society: Letters 455 ,L72–L76 (2015). [36] H. Quelquejay Leclere, Probing past mergers of super-massive black holes with pulsar timing arrays: The role of pulsar terms, Physical Review D 114 , 10.1103/9wq2-13 
+
+gqkh (2026). [37] R. van Haasteren and M. Vallisneri, New advances in the gaussian-process approach to pulsar-timing data analy-sis, Physical Review D 90 , 10.1103/physrevd.90.104012 (2014). [38] R. van Haasteren and Y. Levin, Understanding and analysing time-correlated stochastic signals in pulsar tim-ing, Monthly Notices of the Royal Astronomical Society 
+
+428 , 1147–1159 (2012). [39] J. Antoniadis et al. , The second data release from the european pulsar timing array: I. the dataset and timing analysis, Astronomy &; Astrophysics 678 , A48 (2023). [40] R. van Haasteren and M. Vallisneri, Low-rank approxi-mations for large stationary covariance matrices, as used in the bayesian and generalized-least-squares analysis of pulsar-timing data, Monthly Notices of the Royal Astro-nomical Society 446 , 1170–1174 (2014). [41] J. D. Romano and N. J. Cornish, Detection meth-ods for stochastic gravitational-wave backgrounds: aunified treatment, Living Reviews in Relativity 20 ,10.1007/s41114-017-0004-1 (2017). [42] H. Quelquejay Leclere et al. , Practical approaches to ana-lyzing pta data: Cosmic strings with six pulsars, Physical Review D 108 , 10.1103/physrevd.108.123527 (2023). [43] W. G. Lamb et al. , Rapid refitting techniques for bayesian spectral characterization of the gravitational wave background using pulsar timing arrays, Physical Review D 108 , 10.1103/physrevd.108.103019 (2023). [44] D. Phan, N. Pradhan, and M. Jankowiak, Compos-able effects for flexible and accelerated probabilistic pro-gramming in numpyro, arXiv preprint arXiv:1912.11554 (2019). [45] M. Vallisneri, P. M. Meyers, D. Wright, A. D. Johnson, J. G. Baier, and R. van Haasteren, nanograv/discovery: 0.5.1 (2025). [46] M. Anholm, S. Ballmer, J. D. E. Creighton, L. R. Price, and X. Siemens, Optimal strategies for gravitational wave stochastic background searches in pulsar timing data, Physical Review D 79 , 10.1103/physrevd.79.084030 (2009).
