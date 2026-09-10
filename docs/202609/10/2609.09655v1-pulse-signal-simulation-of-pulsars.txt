@@ -1,0 +1,889 @@
+Title: Pulse Signal Simulation of Pulsars
+
+URL Source: https://arxiv.org/pdf/2609.09655v1
+
+Published Time: Thu, 10 Sep 2026 00:41:15 GMT
+
+Number of Pages: 66
+
+Markdown Content:
+# PULSE SIGNAL SIMULATION OF PULSARS 
+
+A THESIS 
+
+submitted in partial fulfillment of the requirements for the award of the dual degree of 
+
+## Bachelor of Science - Master of Science 
+
+in 
+
+## PHYSICS 
+
+by 
+
+## JALORMI BRAHMACHARI 
+
+(21127) 
+
+DEPARTMENT OF PHYSICS INDIAN INSTITUTE OF SCIENCE EDUCATION AND RESEARCH BHOPAL BHOPAL - 462066 April 2026 arXiv:2609.09655v1 [astro-ph.HE] 9 Sep 2026 CERTIFICATE 
+
+This is to certify that Jalormi Brahmachari , BS-MS (Dual Degreee) student in Department of Physics, has completed bonafide work on the thesis entitled 
+
+‘Pulse Signal Simulation of Pulsars’ under my supervision and guidance. 
+
+April 2026 Dr Mayuresh Surnis IISER Bhopal (IISER Bhopal) Committee Member Signature Date 
+
+Member 1 Member 2 Member 3 ii 
+
+# ACADEMIC INTEGRITY AND COPYRIGHT DISCLAIMER 
+
+I hereby declare that this project report is my own work and due acknowl-edgement has been made wherever the work described is based on the findings of other investigators. This report has not been accepted for the award of any other degree or diploma at IISER Bhopal or any other educational institution. I also declare that I have adhered to all principles of academic honesty and integrity and have not misrepresented or fabricated or falsified any idea/data/fact/source in my submission. I certify that all copyrighted material incorporated into this document is in compliance with the Indian Copyright (Amendment) Act (2012) and that I have received written permission from the copyright owners for my use of their work, which is beyond the scope of the law. I agree to indemnify and safeguard IISER Bhopal from any claims that may arise from any copyright violation. 
+
+April 2026 Jalormi Brahmachari IISER Bhopal iii 
+
+# ACKNOWLEDGEMENT 
+
+Firstly, I would like to express my gratitude towards my thesis supervisor, Dr. Mayuresh Surnis , for his constant support and motivation throughout this entire duration. His wonderful ideas for this thesis and constant words of wisdom have helped me complete this work successfully. He has been my mentor since I was in the second year and I would not have been so inclined towards Astrophysics if it were not for him. He introduced me to this beautiful realm of physics which continues to amaze me and keeps me inspired to pursue a career in no other field. I want to thank my parents for their immense love and for sticking by me in the times I lost my self-confidence and was afraid to follow my dreams. This would not have been possible without their belief in me and their constant advice which has kept me on the right path of life. I would also like to thank all my grandparents, especially my Nana, my Kaka, and my cousin, Kshitish Bhai for always supporting and motivating me. I would also like to thank the PhDs in our lab Hemanga Bhaiya, Kunjal didi, Kaustubh, Priyanshi and especially Abhinandan Bhaiya , for being a con-stant source of support and guidance. I am grateful for the cheerful environment that is always present in the lab because of these people who made working fun. Without them, it would have been a difficult task to achieve this. Lastly, I would like to thank all my dear friends whom I met in this institute. The family that I made here, Maitree, Akshi, and Harshal, the people who have been my constant all these years and have always been there for me, no matter what. I would like to thank my roommate, Gargi for all the amazing time we shared. As much as I would like to name all the wonderful people I have met here, I would mention a few names, Omkar, Ishika, Ishan Thoke, Hemant, Avantika, Niharika, Mazia, Revati, Saurav. Special thanks to all my society friends, as well who have been with me since my childhood. 
+
+Jalormi Brahmachari iv 
+
+# ABSTRACT 
+
+The present thesis is a work in progress on improving the simulation of integrated pulse profiles of pulsars. Pulsars, highly magnetized rotating neutron stars, serve as precise cosmic clocks useful for studying gravity and the interstellar medium. Although periodic pulses from many pulsars are observed and modeled at differ-ent radio frequencies, a robust realistic simulation of their profiles utilizing their parameters remain underdeveloped. The present study focuses on developing a physically consistent model to reproduce observed pulse shapes across multiple frequencies. This study will be useful in coherently understanding the various as-pects of the pulsar emission mechanism. These integrated pulse profiles are the time-averaged properties of pulsar emission and are obtained after averaging indi-vidual pulses over a few thousand rotations. Observed to be highly stable, these are indicative of the global properties of the pulsar magnetosphere. By refining simulation techniques and incorporating the propagation effects of the interstellar medium, this work will prove to be helpful in generating synthetic, yet realistic models. The results are expected to contribute to the interpretation of observa-tional data and to the development of improved timing and emission models for pulsars. v
+
+# LIST OF SYMBOLS OR ABBREVIATIONS 
+
+PSR Pulsating Radio Source 
+
+MSP Millisecond Pulsar 
+
+GW Gravitational Waves 
+
+SNR Supernova Remnant 
+
+S/N Signal to Noise Ratio 
+
+TOA Time of Arrival 
+
+PsrSigSim Pulsar Signal Simulation 
+
+ISM Interstellar Medium LIST OF FIGURES 
+
+1.1 P- ˙P diagram for distribution of known neutron stars . . . . . . . . 22.1 A toy model given by Lorimer & Kramer (2004) for the neutron star rotating and its magnetosphere . . . . . . . . . . . . . . . . . . 11 2.2 Geometry of pulsar emission beam (Radhakrishnan & Cooke, 1969) 12 3.1 Data obtained from InPTA dataset . . . . . . . . . . . . . . . . . . 18 3.2 EPN database example data . . . . . . . . . . . . . . . . . . . . . . 19 3.3 RMS and Reduced chi square for number of components selection for PSR J2145+0750 . . . . . . . . . . . . . . . . . . . . . . . . . . 23 3.4 Fitting for PSR J2145-0750 . . . . . . . . . . . . . . . . . . . . . . 24 3.5 Residual (Data-Model) : Random behavior around 1 indicates that the model is statistically correct . . . . . . . . . . . . . . . . . . . . 24 5.1 freq+ plot for PSR J2145-0750. . . . . . . . . . . . . . . . . . . . . 36 5.2 freq+ plot for PSR J0437-4715. . . . . . . . . . . . . . . . . . . . . 36 5.3 freq+ plot for PSR J0751+1807. . . . . . . . . . . . . . . . . . . . 37 5.4 freq+ plot for PSR J0740+6620. . . . . . . . . . . . . . . . . . . . 38 5.5 Simulated profiles of PSR J1939+2134 in the frequency range of 550 to 1450 MHz to understand the effect of scattering. The tail broadening in (b) is due to the time delay in the arrival of pulses because of scattering . . . . . . . . 39 5.6 Simulated profiles of PSR J1939+2134 in the frequency range of 550 to 1450 MHz to understand the effect of DM smearing. The slight tilting of the luminous regions in (b) is due to the smearing time delay at lower frequencies. . . . . . 39 5.7 Comparison between data and model for Band 3 data . . . . . . . . 41 5.8 Comparison between data and model for Band 5 data . . . . . . . . 44 5.9 Residual width (component width of the simulated profile - com-ponent width of the data) of PSR J2145-0750 in Band 3 and Band 5 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45 5.10 Residual width of PSR J0740+6620 in Band 3 and Band 5 . . . . . 46 5.11 Residual width of PSR J0751+1807 in Band 3 and Band 5 . . . . . 46 LIST OF FIGURES vii 
+
+5.12 Residual width of PSR J1939+2134 in Band 3 and Band 5 . . . . . 47 .13 Class diagram of a portion of the PSRCHIVE library. The storage and access methods, as well as methods loading an dunloading data are described. The combined use of composition and inheritance enables complex structures and behaviours to be constructed using modular components Hotan et al. (2004). . . . . . . . . . . . . . . . 51 .14 Standard Applications included with PSRCHIVE . . . . . . . . . . . . 52 CONTENTS 
+
+Certificate . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . i
+
+Academic Integrity and Copyright Disclaimer . . . . . . . . . . . . . ii 
+
+Acknowledgement . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . iii 
+
+Abstract . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . iv 
+
+List of Symbols or Abbreviations . . . . . . . . . . . . . . . . . . . . . v
+
+List of Figures . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . vii 
+
+1. INTRODUCTION . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11.1 Neutron Stars . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11.2 Classification of Neutron Stars . . . . . . . . . . . . . . . . . . . . . 11.3 History of discovery of Pulsars . . . . . . . . . . . . . . . . . . . . . 31.4 Pulsars as Tools for Probing Fundamental Physics . . . . . . . . . . 41.5 Motivation and Objective . . . . . . . . . . . . . . . . . . . . . . . 4
+
+2. Canonical Pulsars and Millisecond Pulsars . . . . . . . . . . . . . 72.1 Observational Properties of Radio Pulsars . . . . . . . . . . . . . . 72.1.1 Coordinates of observation . . . . . . . . . . . . . . . . . . . 82.1.2 Pulse period and period derivative . . . . . . . . . . . . . . 82.1.3 Integrated Pulse Profile . . . . . . . . . . . . . . . . . . . . 92.1.4 Interstellar Medium Propagation effects . . . . . . . . . . . . 92.1.5 Pulsar Magnetosphere . . . . . . . . . . . . . . . . . . . . . 10 2.2 Theoretical Models . . . . . . . . . . . . . . . . . . . . . . . . . . . 11 2.2.1 Hollow-Cone emission model . . . . . . . . . . . . . . . . . . 11 2.2.2 Core-Conal Emission Model . . . . . . . . . . . . . . . . . . 12 
+
+3. Observational data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15 3.1 Pulsar timing . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15 Contents ix 
+
+3.2 InPTA dataset . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16 3.2.1 Data Release 2 Observation . . . . . . . . . . . . . . . . . . 16 3.2.2 Data Processing Overview . . . . . . . . . . . . . . . . . . . 17 3.3 EPN Database . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18 3.4 Profile Parameter Extraction . . . . . . . . . . . . . . . . . . . . . . 19 3.4.1 Data Preparation . . . . . . . . . . . . . . . . . . . . . . . . 19 3.4.2 Baseline and noise estimation . . . . . . . . . . . . . . . . . 20 3.4.3 Multi-component Gaussian model . . . . . . . . . . . . . . . 21 3.4.4 Iterative Fitting and Model Selection . . . . . . . . . . . . . 21 3.4.5 Parameter Extraction for Simulation . . . . . . . . . . . . . 23 
+
+4. Pulse Profile Simulator . . . . . . . . . . . . . . . . . . . . . . . . . . 25 4.1 Simulation Design and Modular Architecture . . . . . . . . . . . . . 25 4.2 Simulation Workflow and Initialization . . . . . . . . . . . . . . . . 26 4.2.1 Configuration and Ephemeris Parsing . . . . . . . . . . . . . 26 4.2.2 Input File simpulse input.txt . . . . . . . . . . . . . . . . 27 4.3 Temporal Modelling . . . . . . . . . . . . . . . . . . . . . . . . . . 28 4.4 Synthesis of Integrated Profile . . . . . . . . . . . . . . . . . . . . . 29 4.4.1 Intrinsic Pulse Construction . . . . . . . . . . . . . . . . . . 29 4.4.2 Frequency Scaling and Flux Calibration . . . . . . . . . . . 30 4.5 Modeling ISM effects . . . . . . . . . . . . . . . . . . . . . . . . . . 30 4.5.1 Dispersion delay . . . . . . . . . . . . . . . . . . . . . . . . 30 4.5.2 Scatter Broadening . . . . . . . . . . . . . . . . . . . . . . . 31 4.5.3 DM smearing . . . . . . . . . . . . . . . . . . . . . . . . . . 32 4.5.4 Application . . . . . . . . . . . . . . . . . . . . . . . . . . . 33 4.6 Noise Injection and Output Generation . . . . . . . . . . . . . . . . 33 4.6.1 System Noise and Bandshape . . . . . . . . . . . . . . . . . 33 4.6.2 Interface with psrchive . . . . . . . . . . . . . . . . . . . . 34 
+
+5. Results and Discussion . . . . . . . . . . . . . . . . . . . . . . . . . . 35 5.1 Integrated profile analysis . . . . . . . . . . . . . . . . . . . . . . . 35 5.2 Impact of ISM . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 37 5.2.1 Effects of DM delay without dedispersion . . . . . . . . . . . 37 5.2.2 Scatter Broadening and DM smear . . . . . . . . . . . . . . 39 5.3 Residual Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . 40 5.3.1 Data and simulation comparison . . . . . . . . . . . . . . . . 40 5.3.2 Residual width . . . . . . . . . . . . . . . . . . . . . . . . . 44 5.3.3 χ2 
+
+> red
+
+Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . 47 Contents x
+
+5.3.4 Limitations . . . . . . . . . . . . . . . . . . . . . . . . . . . 48 5.4 Conclusion . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48 
+
+Appendices . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 50 I PSRCHIVE . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51 
+
+Bibliography . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 55 1. INTRODUCTION 
+
+# 1.1 Neutron Stars 
+
+Neutron star is formed when a massive star runs out of fuel and collapses. This results in a supernova explosion of the massive star combined with gravitational collapse that compresses the core. The very central region of the star– core– collapses crushing together every proton and electron into a neutron. ’If the core of the collapsing star is between about 1 and 3 solar masses, these newly created neutrons can stop the collapse and a neutron star is formed. Stars with higher masses continue to collapse into stellar-mass black hole.’ A neutron star is one of the densest observable astrophysical objects with masses of 1 to 2 solar masses compressed to approximately 20 km in diame-ter. Since neutron stars began their existence as stars, they are found scattered throughout the galaxy and as stars they can be found by themselves or in a binary system with a companion. Neutron stars spin down over time, gradually losing their extreme rotational energy, primarily due to magnetic braking (magnetic dipole radiation and particle winds) and the emission of electromagnetic radiation. They are born spinning hundreds of times per second owing to the conservation of angular momentum during the collapse of the massive star’s core but eventually slow down as their powerful magnetic fields interact with the surrounding environment, reducing their rotation rate. 
+
+# 1.2 Classification of Neutron Stars 
+
+There are distinct observational classes of neutron stars. The emission spans the electromagnetic spectrum, and the radiative properties span a huge fraction of conceivable phase space. The great diversity of these neutron stars is based on the varied observational manifestations with their classification being recognized and summarized by Kaspi (2010) until now as : 1. INTRODUCTION 2
+
+Fig. 1.1: P- ˙P (spin period vs. period derivative) diagram for distribution of known neutron stars. Radio pulsars are shown as grey dots, magnetars as red circles, high-magnetic-field pulsars (HBP) as purple diamonds, X-ray isolated neutron stars (XINS) as orange pentagons, and compact central objects (CCOs) as blue squares. Sources associated with supernova remnants (SNRs) are indicated by green circles, while binary systems are marked with blue outlines. Lines of constant characteristic age (orange), surface magnetic field strength (blue), and spin-down luminosity (purple) are overlaid for reference. The critical magnetic field is also indicated. 
+
+1. Radio Pulsars (PSRs) : Young rotation-powered neutron stars that emit regular pulses, primarily observed in the radio band, with periods ranging from tens of milliseconds to seconds. 2. Millisecond Pulsars (MSPs) : Old neutron stars that have been spun up through accretion in binary systems, resulting in very short periods (1–30 ms) and weak magnetic fields. 3. Rotating Radio Transients (RRATs) : Sources that emit sporadic, short-duration radio bursts with an underlying periodicity. 4. Isolated Neutron Stars (INSs) : They have quasi-thermal x-ray emission with relatively low x-ray luminosity, great proximity, lack of radio counterpart, and relatively long periodicities as defining properties. 5. Magnetars : Neutron stars with extremely strong magnetic fields ( ∼ 10 14 –10 15 
+
+G), exhibiting high-energy bursts in X-rays and gamma rays. 6. Compact Central Objects (CCOs) : These are bright x-ray objects, a 1. INTRODUCTION 3
+
+heterogeneous class. Named because of their central location in supernova remnants (SNRs). 
+
+# 1.3 History of discovery of Pulsars 
+
+Pulsars were first identified in 1967 at Cambridge University by graduate student Jocelyn Bell Burnell working with her supervisor Antony Hewish. While examin-ing data from a newly built radio telescope, Bell noticed an unusual feature in the recordings, which she informally called a “bit of scruff.” At first, the regularity of the signal raised the possibility that it might originate from an artificial source, even prompting speculation about extraterrestrial communication. However, fur-ther investigation showed that the signal was natural in origin. Their discovery of the first pulsar was formally reported in February 1968. Bell’s research project, supervised by Hewish, focused on studying quasars using the technique of interplanetary scintillation. Since quasars exhibit stronger scintillation than most radio sources, Hewish proposed this method as an effective way to investigate them and designed a dedicated radio telescope for this purpose. Not long after the operations began, Bell detected an unusual pattern that did not resemble known scintillating sources or human-made noise. The signal ap-peared repeatedly from the same position in the sky and showed remarkable reg-ularity. Bell and Hewish systematically eliminated possible sources such as radar echoes, satellites, television transmissions, and local structures near the telescope, but none could account for the phenomenon. The emission consisted of narrow pulses separated by about 1.3 seconds, far too rapid to be associated with ordinary stars. As a joke, the team temporarily labeled the source “LGM-1” for “Little Green Men.” The extraterrestrial expla-nation was soon dismissed when Bell discovered additional pulsed sources from different regions of the sky, each with similar periodic behavior. By the end of 1967, four such objects had been identified. In January 1968, Bell and Hewish submitted their results to Nature, and shortly before publication Hewish presented the findings in a seminar at Cambridge, even though the physical nature of the sources was still unknown. Within a year, many more pulsars had been found. Soon afterward, Thomas Gold proposed that pulsars are rapidly rotating neutron stars. Although neutron stars had been theoretically predicted in 1933, they were only confirmed observationally through the discovery of pulsars (American Physical Society). 1. INTRODUCTION 4
+
+# 1.4 Pulsars as Tools for Probing Fundamental Physics 
+
+Pulsars provide a wealth of information about neutron star physics, general rel-ativity, the Galactic gravitational potential and magnetic field, the interstellar medium, celestial mechanics, planetary physics and even cosmology. Neutron stars are accessible to observation as pulsars and thus provide our only means of probing the most extreme states of matter in the present-day Universe, which in turn will enable a vast range of transforming science goals to be addressed, as mentioned in Cordes et al. (2004) are : 
+
+• Strong-field tests of gravity and the no-hair theorem of black holes (BHs). 
+
+• Detection of a cosmological gravitational wave background. 
+
+• Mapping the complete structure of the Milky Way and revealing properties of the Galactic Center. 
+
+• Probing the intergalactic medium in new ways. 
+
+• Identifying the equation of state of superdense matter. 
+
+• Quantifying the role of magnetic fields and turbulence in core-collapse physics. 
+
+• Understanding the superfluid interiors and relativistic magnetospheres of neu-tron stars. 
+
+• Unraveling the evolutionary and dynamical histories and properties of all Galactic globular clusters. 
+
+• Discoveries of extra-solar planets. Given their remarkable rotational stability and diverse emission properties, pulsars–particularly millisecond pulsars–serve as powerful tools for precision as-trophysics. In order to utilize these objects effectively, high-quality observational data and robust analysis techniques are essential. 
+
+# 1.5 Motivation and Objective 
+
+The Python repository, PsrSigSim , developed by the NANOGrav collaboration, 
+
+> 1
+
+provides a flexible framework for simulating realistic pulsar signals. However, it    
+
+> 1https://psrsigsim.readthedocs.io/en/latest/readme.html 1. INTRODUCTION 5
+
+has several limitations when modeling the frequency evolution of pulse profiles, particularly for known pulsars with complex and frequency-dependent structures. Historically, it has been observed that the profiles of pulsars change with fre-quency over a broadband range. Their component separation, width, and am-plitude change from low frequency to high frequency observations. This has been confirmed through multiple studies and different theoretical models have been pro-posed. This motivates the need to model and simulate these effects to understand the best possible mechanism for the observed evolution. Normal pulsars are known to follow specific trends because of their regular emission, whereas for millisecond pulsars, the typical profile evolution has been hardly observed and shows very little evolution of pulse width and component separation with frequency (Kramer et al., 1999). In this work, rather than attempting a fully self-consistent modeling of fre-quency evolution–which remains challenging, particularly for millisecond pulsars– we adopt a data-driven approach. Integrated pulse profiles are decomposed into Gaussian components, and the resulting parameters are used to construct a li-brary of profile descriptors reference at a standard frequency of 1 GHz. To the best of our knowledge, such a systematic library of Gaussian component parame-ters derived directly from observational data is not currently available in existing simulation frameworks, including PsrSigSim. This represents a key contribution of the present work. The resulting parameter library provides an empirical foundation for generat-ing realistic pulse profiles within simulation environments. By anchoring simula-tions to observed profile characteristics, this approach enables the reproduction of source-specific pulse morphologies, while still allowing controlled exploration of propagation and instrumental effects. Such modeling offers insight into emission geometry, including emission al-titudes and magnetospheric plasma properties, and their relation to observable quantities. The pulse profile plays a central role in determining the structure of the emission beam and the location of radio emission within the pulsar magneto-sphere (Mitra et al., 2016; Rankin, 1993). Furthermore, the parameter library enables the generation of realistic synthetic datasets for testing pulsar timing pipelines. These simulations facilitate the iden-tification and quantification of time-of-arrival (TOA) uncertainties arising from instrumental and propagation effects. In cases where observational data are lim-ited or incomplete, such synthetic profiles provide a robust alternative to validate analysis techniques. 1. INTRODUCTION 6
+
+Overall, this work establishes a framework that bridges observational data and simulation by providing empirically grounded pulse profile models, thereby con-tributing to improved interpretation of pulsar observations and the development of more realistic timing and emission studies. This work is divided into four other chapters. Chapter 2 introduces canonical pulsars and millisecond pulsars (subcategories of radio pulsars) in detail with their observational properties and existing theoretical models. Chapter 3 provides de-tailed information on the datasets used and the formation of the profile parameter library of the dataset used in this work. Chapter 4 deals with the design, work-flow, and application of the pulse signal simulator. Finally, chapter 5 presents relevant data analysis and the results, which suggests both the success and a few shortcomings of the thesis. 2. CANONICAL PULSARS AND MILLISECOND PULSARS 
+
+Radio pulsars are rapidly rotating, highly magnetized neutron stars that emit beams of electromagnetic radiation from their magnetic poles. These beams sweep across the sky as the star rotates and, when aligned with the observer’s line of sight, are detected as periodic pulses. This phenomenon is commonly described by the 
+
+lighthouse model (Lorimer & Kramer, 2004). Pulsars typically have rotation periods ranging from milliseconds to a few sec-onds and possess strong magnetic fields of the order 10 8 − 10 14 G. Despite having masses comparable to the Sun, they are extremely compact objects with radii of only about 10–20 km. The observed pulsed emission is powered by the loss of rotational energy, as the neutron star gradually spins down due to electromagnetic torque. Canonical or normal pulsars are young radio pulsars with periods ranging from tens of milliseconds to seconds. They have very strong magnetic fields (10 11 − 10 13 
+
+G) and thus have spin down rates ( ˙P = dP/dt ) in the range of 10 −13 − 10 −16 s/s. Millisecond pulsars (MSPs) form a distinct subclass of radio pulsars with much shorter periods ( P ∼ 1–30 ms) and weaker magnetic fields. They are believed to have been spun up through accretion in binary systems, resulting in highly stable rotation. This exceptional stability makes MSPs ideal tools for high-precision timing experiments. 
+
+# 2.1 Observational Properties of Radio Pulsars 
+
+The various properties of the observed emission from pulsars are explained such that the observed radiation is produced by the acceleration of charged particles along the field lines of highly magnetized rotating neutron stars (Gold (1968); Pacini (1968)). 2. Canonical Pulsars and Millisecond Pulsars 8
+
+## 2.1.1 Coordinates of observation 
+
+Pulsars are generally found along the Galactic plane. Their observation coordi-nates are typically given in the equatorial coordinate system that is Right As-cension (RA) and Declination (Dec), because it remains nearly constant despite Earth’s rotation. RA is analogous to longitude and is measured eastward along the celestial equator. It is traditionally measured in hours, minutes and seconds, where 24 hours is equivalent to 360 degrees. Dec is the celestial equivalent of latitude, measured in degrees North (+) and South (-) of the celestial equator. Some observations of pulsars are also made in the ecliptic coordinate system. This is based on the ecliptic plane, plane of Earth’s orbit around the Sun. Eclip-tic longitude (ELONG) is measured along the ecliptic eastward from the vernal equinox. The Sun crosses the celestial equator twice in a year, once moving north-ward along the ecliptic and later moving to the south. The point of intersection is called the vernal equinox and the autumnal equinox, respectively. Ecliptic latitude (ELAT) is measured perpendicular to the ecliptic plane. Because of a phenomenon called precession–a slow wobble of Earth’s rotation axis caused by gravitational interactions with the Sun and Moon–the positions of the celestial equator and the vernal equinox shift slowly over time. To account for this shift, a reference date or an epoch must be specified when listing co-ordinates. J2000 is the standard epoch used for astronomical catalogs, referring to the position of celestial objects at noon in Greenwich, England, on January 1, 2000. The ‘J’ stands for the Julian epoch. In this work, J2000 coordinates are the standard input for defining the pulsar’s position (Lorimer & Kramer, 2004). 
+
+## 2.1.2 Pulse period and period derivative 
+
+Pulsars are characterized by their spin period. The rotation periods ranging from milliseconds to a few seconds suggest their origins. The short-period ‘millisecond pulsars’ form a separate (older) population with different evolutionary histories from the long-period ‘normal pulsars’. But this period is not fixed. Astronomers observed that the pulsars are slowing down and usually at a very consistent rate. This ‘spin-down’ is thought to be due to braking caused by rotating pulsar’s magnetic field (Swinburne University of Technology). This information is also used to determine the characteristic age of the pulsar which is defined as : 
+
+τ = P
+
+2 ˙P = P
+
+2dP/dt (2.1) 2. Canonical Pulsars and Millisecond Pulsars 9
+
+where, P is the pulsar’s period and ˙P represents the period derivative (the rate at which the pulsar is slowing). 
+
+## 2.1.3 Integrated Pulse Profile 
+
+Because pulsars are intrinsically weak radio sources, only from the strongest sources individual pulses can be discernible above the noise. To improve the signal-to-noise ratio, individual pulses are time-averaged over a few thousand rotations through 
+
+folding and are coherently added, producing an integrated pulse profile . Al-though individual pulses may vary in shape, the integrated profile is remarkably stable at a given frequency, acting like a ‘ fingerprint of the neutron star’s emission beam’ as termed in (Lorimer & Kramer, 2004). 
+
+## 2.1.4 Interstellar Medium Propagation effects 
+
+1. Dispersion : Pulses observed at higher frequencies arrive earlier at the tele-scope than their lower frequency counterparts. Hewish et al. (1968) - this effect is due to the frequency dependence of the group velocity of radio waves as they propagate through the ionized component of the ISM. Delay in pulse time arrival is inversely proportional to the observing frequency. The constant of proportionality, known as the dispersion measure (DM), is the integrated column density of free electrons along the line of sight. 
+
+DM =
+
+Z d
+
+> 0
+
+nedl 
+
+where, d is the distance between the pulsar and Earth. 2. Scintillation : ISM is also highly turbulent and inhomogeneous, in addition to being magnetized and ionized. These irregularities produce phase modu-lations on the propagating pulsar signal that cause the observed intensity to fluctuate on a variety of bandwidths and timescales. This interstellar scintilla-tion, first observed by Lyne & Rickett (1968) is similar to optical ’twinkling’ of stars caused by atmosphere of the Earth. Scheuer (1968) modeled the turbulent ISM as a thin screen of irregularities midway between the Earth and the pulsar. By considering the phase perturbations produced by such a screen, he demonstrated that the intensity fluctuations should be correlated over a characteristic scintillation bandwidth ∆ f ∝ f 4, where f is the observing frequency. Scintillation bandwidth is the frequency scale over which pulsar signals remain correlated before scattering destroys coherence. 2. Canonical Pulsars and Millisecond Pulsars 10 
+
+3. Pulse Scattering : Due to the ionized interstellar medium (ISM), the scat-tered rays undergo a delay in their arrival, which combines to broaden an intrinsically sharp pulse profile. Scattering time decreases when the pulsar is observed at higher frequencies. The thin-screen model describes how the ISM affects the signal by treating the medium as an infinitely extended, very thin screen. The time delay follows inverse relation with the bandwidth as 
+
+τs ∝ 1/∆f ∝ f −4. As explained in Lorimer & Kramer (2004), this model can predict the broadening as the convolution of the true pulse shape with a one-sided exponential with a 1/e time constant known as the scattering time ,
+
+τsc . Measurements of τsc for a large sample of pulsars show that it is corre-lated strongly with DM. More distant pulsars with larger DMs are more likely to be scattered. Undesirable effect when searching for pulsars since the scat-tering effectively stretches the true pulse shape which results in a reduction in the S/N ratio. Scattering time decreases when the pulsar is observed at higher frequencies. From the thin-screen model, τs ∝ 1/∆f ∝ f −4. Strong inverse frequency dependence of scattering favors searches carried out at high frequencies. Scaling comes from the theory of Kolmogorov turbulence in the ISM. 
+
+## 2.1.5 Pulsar Magnetosphere 
+
+In the beginning of pulsar magnetosphere research, (Gunn & Ostriker, 1970) con-sidered magnetic dipole at the centre of the the star. The rotating dipole emits magnetic dipole radiation in the form of electromagnetic waves, which carries en-ergy and momentum. Since neutron stars are perfect conductors, this induces an electric field (Ω ×r) × B, here Ω is the rotation rate of the pulsar Ω = 2 π/P with P as its period. The electric field is balanced by the distribution of charge, which gives E a force-free condition inside the star. 
+
+E + 1
+
+c (Ω × r) × B) (2.2) Due to the enormous electric force, charged particles on the surface will be stripped from it, move along the magnetic field line, and fill the magnetosphere. This procedure will create a plasma-filled magnetosphere and the plasma will co-rotate with the star. However, this co-rotation is maintained up to a certain distance which is known as the light cylinder . This is because at this point the speed of plasma reaches the speed of light and it splits the magnetic field line into two regions: (a) closed field lines : that are within the light cylinder, enclosed 2. Canonical Pulsars and Millisecond Pulsars 11 
+
+by the light cylinder and (b) open field lines : that are outside the light cylinder. The last open field line is responsible for the emission cone and the region from where these lines emanate is the polar cap region of the pulsar. 
+
+Fig. 2.1: A toy model given by Lorimer & Kramer (2004) for the neutron star rotating and its magnetosphere 
+
+# 2.2 Theoretical Models 
+
+## 2.2.1 Hollow-Cone emission model 
+
+The hollow cone model proposed by (Radhakrishnan & Cooke, 1969), an empirical theory that explains the radiation beam of the pulsar that emanates from the magnetic poles. The radiation is not emitted uniformly from the poles, but forms a cone. Its structure can be understood to be ‘hollow’, as there is no radiation at the magnetic pole. This is an important component of the rotating lighthouse model. As the pulsar rotates, this cone sweeps past the line of sight and the characteristic periodic, rapid pulses are observed. The observed pulse width is dependent on where the sight line of the observer cuts the emission beam cone. The geometrical structure of the pulsar’s beam is defined by conical beam. The half-opening angle ( ρ) of this cone is dependent on the extent of the open magnetic field region at the point of emission. This emission cone, which possesses an angular radius of ρ, is centered upon the magnetic axis. The magnetic axis is tilted relative to the rotation axis by an angle α. Due to the rotation of the pulsar, an observer’s view sweeps along a curved trajectory through 2. Canonical Pulsars and Millisecond Pulsars 12 
+
+Fig. 2.2: Geometry of pulsar emission beam (Radhakrishnan & Cooke, 1969) the radiation beam. The segment of emission intercepted along this trajectory constitutes the observed pulse profile, and the length of that path as the pulse width. Furthermore, the minimum separation between observer’s line of sight and the magnetic axis is quantified by the angle β.
+
+## 2.2.2 Core-Conal Emission Model 
+
+The emission cone is theorized to be segregated into multiple, perhaps two, sep-arate quasi-annular zones by (Rankin, 1983b). Spectral differences exist between these zones: the conal emission has a comparatively flatter spectrum than the core radiation. Consequently, the core components primarily shape the pulse pro-file at lower observing frequencies, while the conal components become dominant at higher frequencies. The particular form of the profile is contingent upon how the observer’s line of sight intersects the emission cone. (Rankin, 1983b)’s classi-fication of the profiles: 
+
+Single Profile 
+
+This is also divided into two categories based on the height of the emission : (1) conal single, and (2) core single profiles. Conal single profiles ( Sd), is attributed to a highly non-central trajectory. At lower frequencies, these profiles broaden and eventually bifurcate as the emission cone becomes larger. (Rankin, 1983a) depicts that at higher frequency, pulse widths follow a clean power law f ∼− 0.25 . However, towards meter wavelengths, there is a broad narrowing, attributed to absorption feature. For frequencies lower than this, the profile width returns to its high fre-quency extrapolation. 2. Canonical Pulsars and Millisecond Pulsars 13 
+
+Core single profiles ( St) exhibit much more central line of sight trajectory. (Rankin, 1983a) presents that the spectral evolution of pulse width for core single is virtually identical to that of the conal single including the absorption feature overlaid on the power-law dependence. As the observing frequency increases, pulse profiles evolve towards tripartite structure; at still higher frequencies, conal emis-sion can become predominant, leading to a well-resolved double profile. 
+
+Tripartite Profile (T) 
+
+The central component, resulting from nearly central cuts of the observer’s line of sight across the polar cap, displays characteristics typical of a core-type single profile. The outer components correspond to relatively inner traverses through the hollow conal emission region. As described in (Rankin, 1983b) T profiles can appear either as broad, well resolved or as narrower and partially blended features. These evolve to double structures at high frequencies, while at low frequencies they resemble core-single profiles. The separation between conal components follow a frequency dependence of approximately f ∼− 0.25 . In certain cases the core compo-nent may appear slightly offset and can merge with, or even coincide with, one of the outer components. 
+
+Double Profile (D) 
+
+Double profiles are distinguished by strong conal components accompanied by broad, low-intensity, emission ‘bridge’ in which weak core radiation may be present. When a clear signature of core emission is visible, they appear as ‘triple’ profile (Rankin, 1983b). The separation between the unresolved conal components gen-erally decreases with increasing observing frequency—showing a gradual decline above 1 GHz and a steeper trend at lower frequencies—although certain sources deviate from this overall pattern (Gunn & Ostriker, 1970) ((Rankin, 1983a)). They portray shallow absorption features. Their widths have more in common with the conal single whereas, well-resolved double profile represent highly central trajec-tories. With decrease in frequency, the widths broaden and it closely follows the variation seen in component spacing measurements. 
+
+Multiple Profile (M) 
+
+Multiple profiles consists of five distinct components, incorporating both a central core component and contributions from inner and outer conal emission zones. The prominence of core feature varies from source to source, though it appears to be 2. Canonical Pulsars and Millisecond Pulsars 14 
+
+a common characteristic, likely resulting from the line of sight passing very near to the magnetic axis. With decreasing frequencies, M profiles generally evolve to broader triples (separating as f ∼− 0.25 ) and may further simplify into core-single profiles(Rankin, 1983b). 3. OBSERVATIONAL DATA 
+
+Due to its extremely stable rotation over long periods, pulsars act as natural cosmic clocks. In particular, millisecond pulsars (MSPs) discovered by Backer et al. (1982) are found in binary systems, attain their rapid rotation through the transfer of orbital angular momentum from a companion star (Radhakrishnan & Srinivasan, 1982). Since MSPs are old pulsars that have been spun up by accretion, their earlier magnetic fields have been buried producing low magnetic field pulsars and spin down very slowly (Alpar et al., 1982). This stability allows them to serve as precise cosmic clocks through the technique of pulsar timing (Lorimer & Kramer, 2004). 
+
+# 3.1 Pulsar timing 
+
+Pulsar timing involves the precise measurement of the times of arrival (ToAs) of pulses emitted by a pulsar (Lorimer & Kramer, 2004). These ToAs are compared against a predictive timing model to study variations in the pulsar’s rotation and propagation effects. Due to their precise timing, MSPs are used to search for gravitational waves (GWs), which are light-speed ripples in the curvature of space-time that are caused by the extremely energetic processes of massive, accelerating objects in the universe like the merging of compact objects like Neutron Stars (NSs) or Black Holes (BHs) ((Sathyaprakash & Schutz, 2009)). Laser Interferometer Gravitational-Wave Observatory (LIGO) observed GWs for the first time. While ground-based detectors like LIGO are sensitive to high-frequency GWs, an array of precisely timed MSPs can be used to detect low-frequency (nanohertz) gravitational waves. This technique treats individual MSPs as arms of the interferometer with respect to the Earth. This nanohertz detector, called the Pulsar Timing Array (PTA), relies on measuring minute changes in the times of arrival (ToA) of the radio pulses from the individual MSPs at the earth, as the passing GWs perturb the space-time between the pulsar and the earth (Rana et al., 2025). To further support the efforts of pulsar timing arrays, a realistic simulator 3. Observational data 16 
+
+for the pulse profiles of millisecond pulsars (MSPs) is essential. Such simulations require accurate input in the form of a well-defined library of pulse profile pa-rameters, including component widths, amplitudes, and separations. However, currently there is no comprehensive, publicly available library of these parame-ters, which presents a significant gap for realistic simulation efforts. This work addresses this gap by constructing a dedicated library of profile parameters using the InPTA DR2 dataset, supplemented by profiles from the EPN database where necessary. This library is then used as input for generating realistic simulated pulse profiles. 
+
+# 3.2 InPTA dataset 
+
+The data used in this thesis are obtained from the Indian Pulsar Timing Array (InPTA: (Joshi et al., 2018; arafdar et al., 2022)) Data Release 2 (Rana et al., 2025). InPTA observations are carried out using the upgraded Giant Metrewave Radio Telescope (uGMRT), an interferometer with 30 antennas, each with a di-ameter of 45 m spread out over a 25 km area, the largest telescope at this lower frequency range. Fourteen of these antennas are located in a central square, while the remaining twelve antennas are distributed along three arms in a ‘Y’ shape. The uGMRT provides four observing bands: band 2 (120-250 MHz), band 3 (250-500 MHz), band 4 (550-850 MHz), and band 5 (1050-1450 MHz). The InPTA obser-vations are carried out by splitting the uGMRT antennas into multiple subarrays, observing the same source in different frequency bands simultaneously, with 100 MHz or 200 MHz bandwidth in each band depending on the observing epoch (Rana et al., 2025). 
+
+## 3.2.1 Data Release 2 Observation 
+
+The InPTA DR2 includes 28 MSPs with observing time spanning 7.5 years cov-ering the period between 2016-2024. In observation cycle 45, used in this work, InPTA has followed a hybrid observing strategy where alternate observing ses-sions are held in band 3-only (only one subarray) or band 3 + band 5 (two sub-arrays) configurations with 200 MHz bandwidth in each band. This adjustment allowed to include more pulsars in the band 3-only observation mode in this period (2022-2024) by utilizing more uGMRT antennas in a single subarray, and hence significantly increasing sensitivity and enabling pulsar detection within shorter observation periods (Rana et al., 2025). 3. Observational data 17 
+
+The data includes the following pulsars: J0030+0451, J0034-0534, J0437-4715, J0610-2100, J0613-0200, J0614-3329, J0740+6620, J0751+1807, J0900-3144, J1012+5307, J1022+1001, J1125+7819, J1545-4550, J1600-3053, J1643-1224, J1705-1903, J1713+0740, J1730-2304, J1744+0740, J1745+1017, J1857+0943, J1909-3744, J1910+1256, J1939+2134, J1944+0907, J2124-3358, J2145-0750, J2302+4442. 
+
+Tab. 3.1: Summary of observing parameters for InPTA data.                    
+
+> Obs. No. MJD MJD Band Frequency Band (MHz) Channels Sampling ( μs) Cycle PSRs Start End
+> 45 28 60245 60399 3300–500 128 5.12 51260–1460 1024 40.96
+
+## 3.2.2 Data Processing Overview 
+
+The uGMRT data are converted into a standard pulsar archive format within the InPTA processing pipeline. The uGMRT beamformed data are initially recorded in filterbank format and processed within the InPTA pulsar data analysis pipeline. The processing includes radio frequency interference (RFI) mitigation, de-dispersion to correct for interstellar dispersion, and folding using known pulsar ephemerides to generate integrated pulse profiles. RFI mitigation and data format conversion are performed using RFIClean ,preserving intrinsic signal characteristics (Maan, 2021). The processed data are stored in the standard FITS (Flexible Image Transport System)-based format for pulsar data files, PSRFITS format (Hotan et al., 2004). De-dispersion and folding are carried out using tools such as dspsr (van Straten & Bailes, 2011). The final outputs are integrated pulse profiles (e.g., rficlean.fits ), which are used for further analysis. Since this study focuses on pulse profile analysis and parameter extraction, all subsequent analysis is performed directly on these processed PSRFITS files provided by the InPTA collaboration. 3. Observational data 18 
+
+Fig. 3.1: Data obtained from InPTA dataset 
+
+# 3.3 EPN Database 
+
+The European Pulsar Network (EPN) Database of Pulsar Profiles, provided by the University of Manchester, is a comprehensive collection of pulsar profiles presented in a standardized format. It includes profiles for over 1000 pulsars obtained from a variety of observational campaigns, along with the corresponding raw data in both ASCII and EPN formats (EPN resources). These observations were conducted using the Parkes Observatory (Murriyang), a 64-m radio telescope operated as part of CSIRO’s Australian Telescope National Facility (ATNF). Its large collecting area allows for high-sensitivity observations, making it well-suited for detailed pulse profile studies. For a subset of MSPs in this work, where the InPTA data were not suitable for reliable parameter extraction, pulse profile data in PSRFITS format were ob-tained from the EPN database. In particular, profiles from the multifrequency polarization study of MSPs by Dai et al. (2015) were used. The EPN data utilized in this work were that have been both time- and frequency-scrunched, resulting in integrated pulse profiles. These were directly used for parameter extraction, ensuring consistency in analysis methodology with the InPTA data. 3. Observational data 19 
+
+Fig. 3.2: EPN database example data 
+
+# 3.4 Profile Parameter Extraction 
+
+To generate a library of the profile parameters of the InPTA’s 28 millisecond pulsars (MSPs), an original python-based analytical pipeline designed to automate the extraction of the gaussian parameters was developed. J1705-1903 had a very low S/N and thus is not utilized for the generation of this parameter library. For the rest 27 MSPs, iterative least-square minimization technique and statistical model selection is carried out to provide accurate inputs for a realistic pulse profile simulator. The analysis involves a structured pipeline developed to initially process the data, estimate noise, and optimize the multi-component gaussian fitting. Gaussian components can be considered a flexible model to interpret the phys-ical properties of the pulsars. They have been commonly applied to model the different emission components of pulsars due to the distinct regions of the magne-tosphere. This model can be effectively applied to compare the complex profiles with a few parameters. 
+
+## 3.4.1 Data Preparation 
+
+The initial stage of the pipeline involves preparing the pulsar integrated profile for fitting. Pulse profiles are loaded in PSRFITS format. A preprocessing step is first performed to ensure compatibility with the downstream analysis. The TELESCOP 
+
+header name is modified to ‘GM’ (GMRT convention) while preserving the original data. For InPTA, Band 5 data has been utilized, as at higher frequencies there are minimum interstellar medium effects to alter the intrinsic profile properties. Hence, 3. Observational data 20 
+
+it is ideal as an input. This is complemented with the profiles from EPN database at 1369 MHz. Where InPTA profile data have low signal-to-noise ratio and produce inadequate fitting, the EPN database has been used to fulfill the purpose, as we require realistic input for our simulator. The preliminary data processing and reduction for the profiles are conducted using psrchive , an open source C++ development library for the analysis of pulsar astronomical data. Described by Hotan et al. (2004), the library provides a robust suite of algorithms for tasks such as pulsar timing, scintillation studies, and RFI mitigation. In this analysis, psrchive is used to interface with pulsar data stored in the PSRFITS format. The analysis pipeline utilizes specific PSRCHIVE methods to integrate the raw observation data into a high signal-to-noise ratio profile. This includes ‘scrunching’ multi-dimensional data by : 1. tscrunch() : integrating all time sub-integrations into a single profile. 2. fscrunch() : summing all frequency channels to provide a frequency-integrated profile. 3. pscrunch() : summing the polarization information to produce a total in-tensity profile. This produces a single one-dimensional pulse profile. ar.get data , a psrchive 
+
+command is then used to generate a 4D array [subint, pol, chan, bin] which selects the actual pulse profile array over the bins. 
+
+## 3.4.2 Baseline and noise estimation 
+
+To ensure that the fitting algorithm is numerically stable, a rough centering of the profile is performed by identifying the peak bin and rolling the profile so that the primary peak is centered at phase 0 (with the phase going from -0.5 to +0.5). A robust definition of the baseline and noise level ( σnoise ) is essential for accu-rate parameter estimation. The off-pulse region is defined from the outer 25% of the profile (which may be adjusted depending on the profile morphology, partic-ularly at the edges). The baseline is calculated as the median of this region as it picks the middle value which is robust against the outliers. Baseline estimates the system level when the pulsar is not emitting and it is typically understood as the background intensity of the profile. σnoise is estimated using a robust statistical 3. Observational data 21 
+
+approach, Median Absolute Deviation (MAD) :MAD = median( |xi − median( x)|)
+
+σnoise = 1 .4826 × MAD =⇒ σnoise = 1 .4286 × median( |prof original [of f ] − baseline |)where, prof original [of f ] is the off-pulse region of the profile defined and the baseline is the median of this off-pulse region as defined above. This scaling as-certains that the normally distributed noise, the estimate remains consistent with the standard deviation Berendsen (2011). The profile is then baseline-subtracted to obtain a zero-level corrected signal : 
+
+prof ile = prof original − baseline 
+
+The pulse window is then defined to restrict the fitting region. A threshold of 1-8% of the peak amplitude is used depending on the amplitude of the small-est component of the profile. The corresponding phase range defines the region containing significant emission. This avoids fitting noise-dominated regions. 
+
+## 3.4.3 Multi-component Gaussian model 
+
+The integrated profile is modeled as a summation of N circular Gaussian compo-nents to account for the periodic nature of the pulsar phase. Each component is defined by its amplitude ( A), mean phase ( μ), and width ( σ) (not to confuse with noise σnoise ) : 
+
+gi(x) = Ai exp 
+
+
+
+−∆x2
+
+2σ2
+
+> i
+
+
+
+I(x) = 
+
+> N
+
+X
+
+> i=1
+
+gi(x)where ∆ x is the minimum distance between the phase x and the mean μ,accounting for wrap-around at the phase boundaries. 
+
+## 3.4.4 Iterative Fitting and Model Selection 
+
+A critical challenge in profile modeling is determining the optimal number of Gaus-sian components (N). The pipeline performs a scan across N (typically from 1 to 10). For each N, a nonlinear least-squares minimization is performed using lmfit 3. Observational data 22 
+
+package to minimize the sum of squared differences (residuals) between the data (yi) and the multi-component model F (xi): 
+
+Residuals = yi − F (xi)
+
+σnoise 
+
+χ20 = min 
+
+> n
+
+X
+
+> i=1
+
+|| yi − F (xi)|| 2
+
+σ2
+
+> noise
+
+!
+
+where weighted least square minimization of the residuals has been carried out. To determine the ‘best’ N (the number of Gaussian components that accurately describe the physical emission without capturing stochastic noise), the pipeline evaluates models ranging from N=1 to N=10 using two primary metrics : 1. RMS Residuals : A measure of the average deviation of the fit from the observed data (Berendsen, 2011). In the analytical pipeline, it is calculated as : 
+
+RM S =
+
+vuut 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+(yi − F (xi)) 2
+
+While a decreasing RMS typically indicates a better fit, it does not inherently account for the ‘cost’ of adding parameters, which can lead to overfitting. 2. Reduced χ2 (χ2
+
+> red
+
+) : This provides a more statistically robust criterion by weighting the squared deviations by the estimated noise levels ( σnoise ) and normalizing by the degrees of freedom ( ν) (Berendsen, 2011). 
+
+χ2 
+
+> red
+
+= χ20
+
+ν
+
+• Degrees of freedom ( ν) : This is defined as ν = n − m, where n is the number of data points and m is the number of adjustable parameters. For a fit with N Gaussian parameters, each component contributes three parameters (amplitude, mean, and width), making m=3N. 
+
+• Selection Logic : The pipeline identifies the best ‘N’ by minimizing the absolute difference between χ2 
+
+> red
+
+and 1. 
+
+– χ2 
+
+> red
+
+∼ 1 : Indicates that the residuals are consistent with the random noise level of the data, signifying a statistically justified fit. 
+
+– χ2 
+
+> red
+
+≫ 1 : Suggests that the model is under-fitted; the Gaussian components are insufficient to capture all significant emission features. 3. Observational data 23 
+
+– χ2 
+
+> red
+
+≪ 1 : Suggests that the model is over-fitted or that the noise level ( σ) was overestimated. In this case, the model may be treating random fluctuations as physical components. 
+
+Fig. 3.3: RMS and Reduced chi square for number of components selection for PSR J2145+0750 
+
+## 3.4.5 Parameter Extraction for Simulation 
+
+Once the optimal nbest is determined, a final least-square minimization is performed to extract the analytical parameters required for the pulsar simulator. 1. Amplitude (A) 
+
+The amplitude represents the peak flux intensity of an individual Gaussian component. In the multi-component model, the total flux at any phase is the summation of these individual peaks weighted by their respective Gaussian distributions. 2. Phase ( μ): Centering and Alignment 
+
+The mean phase position ( μ) of each component is extracted and re-aligned to the original data’s phase space. This involves a two-step process: 
+
+• Initial Centering : To improve fitting stability, the raw profile is rolled so that the primary peak is at phase 0, creating a phase shift .
+
+• After fitting, the simulated phase is corrected by subtracting the initial shift and applying a modulo operation: phase sim = ( mu −phase shif t )%1 .0. This ensures the simulation accurately reflects the observed rotational phase of the pulsar. The phase is defined from 0 to 1 in the simulator, so this correction is required for that as well. 3. Observational data 24 
+
+3. Full Width at Half Maximum ( w50 ) : 
+
+While the fitting algorithm optimizes the Gaussian standard deviation ( σ), the simulator requires the FWHM, denoted as w50 . This is the width of the pulse at half of its peak amplitude. For a Gaussian distribution, w50 is derived using the constant: w50 = 2 .355 × σ   
+
+> (a) Final Fitting (centered) (b) Profile Parameters (center shifted)
+
+Fig. 3.4: Fitting for PSR J2145-0750 Though the application of the Gaussian model is quite effective to interpret the profiles of the pulsars, the application of the model is not unique. Moreover, the identification of the components of the millisecond pulsars with complex and blended emission profiles might be ambiguous. However, the application of the statistical model selection criterion is quite effective to overcome the limitations of the model. 
+
+Fig. 3.5: Residual (Data-Model) : Random behavior around 1 indicates that the model is statistically correct 4. PULSE PROFILE SIMULATOR 
+
+This chapter presents the primary contribution of this work that was to develop a simulation framework for generating realistic integrated profiles of pulsars. This software has been developed on a monolithic python code written by MA Kr-ishnakumar , Reader-F at Radio Astronomy Centre (RAC-TIFR), Ooty. This is carried out by designing a modular python package pulsar sim to simulate pulsar observations with high physical fidelity. The simulator serves as a bridge between analytical models–such as the Gaussian parameters extracted and syn-thetic data archives that can be processed using standard pulsar analysis software like psrchive .The motivation for constructing a pipeline like this arises from the need to com-prehensively study pulse profile evolution under controllable conditions, mainly in the presence of interstellar medium (ISM) effects, such as scattering and dispersion. Although the observational data (detailed in 3) provide real measurements, they do not provide independent control over physical parameters such as disper-sion measure (DM) fluctuations and scattering strength in time and do not allow us to understand the properties of these profiles in the frequency range that is not yet currently observable accurately. By leveraging the psrchive library, the simulator produces standardized PSRFITS outputs, ensuring full compatibility with existing astronomical analysis pipelines. 
+
+# 4.1 Simulation Design and Modular Architecture 
+
+The simulation was designed with the following principles: 
+
+• Modularity : Each physical process (DM variation, scattering, intrinsic pro-file generation) is implemented independently. 
+
+• Configurability : All parameters are externally controlled by command-line arguments and input configuration files. 4. Pulse Profile Simulator 26 
+
+• Physical realism : Frequency scaling laws and stochastic processes are in-corporated. 
+
+• Compatibility : Output conforms to PSRFITS standards using the psrchive 
+
+library. Initially implemented as a monolithic script, the pipeline was later refactored into separate modules forming a structured software package. The specialized modules handle distinct physical or data-handling tasks : 1. cli : Handles the command-line interface and configuration parsing 2. io : Interfaces with pulsar ephemeris (.par) files to retrieve positional and timing metadata. 3. dm series and scat series : Generate temporal stochastic realization of ISM-induced variations. 4. profiles : The core mathematical engine for profile synthesis and signal degradation 5. profiles : An interface with the psrchive library to populate FITS data structure. 6. utils : High-performance utilities applying Fast Fourier Transforms (FFTs) for circular convolution and power-law time series generation. 
+
+# 4.2 Simulation Workflow and Initialization 
+
+The simulation flow begins with the main() function, which controls the data pipeline. 
+
+## 4.2.1 Configuration and Ephemeris Parsing 
+
+The simulator initializes by parsing terminal arguments through the parse arguments() 
+
+module. Key parameters include the MJD range, that is the observation time span (mjd start to mjd finish ), frequency range, number of subintegrations, number of channels ( nchan ), phase bins ( nbin ), and number of simulated epochs. The other parameters passed are the input file consisting of the fitting parameters, spectral index of the pulsar, flux density, peak signal-to-noise ratio (S/N) of each channel, and switches to control ISM effects. 4. Pulse Profile Simulator 27 
+
+The simulator then calls readparfile() to load a pulsar ephemeris file con-taining the information about the observation of that pulsar. This module extracts :
+
+• PSRJ : Pulsar name 
+
+• RAJ/DECJ : Celestial coordinates of the pulsar. If only ecliptic coordinates (ELONG, ELAT) are present, the simulator utilizes the astropy library to transform them into the standard J2000 frame. 
+
+• DM : The reference Dispersion Measure. 
+
+## 4.2.2 Input File simpulse input.txt 
+
+The simpulse input.txt file is the key input of this simulator, as it provides the number of components and their parameters for each specific pulsar. It defines the ‘intrinsic’ pulse by listing the Gaussian and Lorentzian components, scattering characteristics, and dispersion variations, referenced to 1 GHz observing frequency. The previously extracted Gaussian parameters , mean phases, amplitudes, and widths are utilized here. Along with this, this file also provides the means to provide the frequency evolution parameters. Since it has been observed throughout these years by astronomers that MSPs show very little intrinsic frequency evolution in their profiles and do not follow a specific trend, these parameters have been set to 0.0. For normal pulsars, these parameters can be provided to simulate the evolution. The next function is the scattering time reference and variability scat .It defines the multi-path scattering effects of the ISM as the pulsar signal passes through it. The scattering time ( τsc ) of the pulsars, also referred to as scatter-ing timescale or pulse broadening time, represents the exponential tail added to a pulse profile by interstellar radio wave scattering. This value is highly frequency-dependent, generally following a power-law relation τsc ∝ ναDM β , with the scat-tering index α usually around -4.4 and the default value for β is -2.0, consistent with the Kolmogorov spectrum of the ISM. τsc (tscat) varies for each pulsar as it highly depends on its DM and position in the sky. Therefore, YMW16 1 energy-density model Yao et al. (2017) is used to estimate τsc for each object. PyGEDM 2,a python interface for the various electron-density model provides a web appli-cation, which was used for this purpose. The RA/DEC and DM for each pulsar     
+
+> 1https://www.atnf.csiro.au/research/pulsar/ymw16/
+> 2https://github.com/FRBs/pygedm 4. Pulse Profile Simulator 28
+
+were obtained from ATNF Pulsar Catalogue 3 to find the value of τsc (usually in nanoseconds for MSPs). The default value of α is -4.4 but it may vary with each pulsar and this code also gives the option to pass the value if known as an argument. Options for different modes are available that govern how scattering evolves with different observing epochs. To simulate realistic temporal variations in the pulsar’s dispersion measure (DM) across different MJDs, the DM spectral model dmsp defines a power-law spectral model defined by amplitude and spectral index ( spidx ). The simulator utlilizes the value: amplitude set to 1 ×10 6 as default and spidx of each pulsar obtained from the ATNF Pulsar Catalogue 3.The simulator also supports the injection of discrete, non-stochastic ISM events, such as an exponential dip and recovery . It is dependent on the epoch (MJD at which the event occurs), amplitude (magnitude of variation), recovery time (the time constant for the signal to return to its baseline), and the gaussian parameter of the specific component being affected. 
+
+# 4.3 Temporal Modelling 
+
+Before synthesizing individual profiles, the simulator generates a time series for parameter evolution across multiple epochs. 
+
+## DM time series 
+
+DM is modeled as a speculative process with a power-law spectrum: 
+
+P (f ) ∝ f β
+
+where beta is the spectral index of the pulsar. This is implemented by generating a Fourier-domain spectrum and transforming into a time series. DM variations are produced by make dmseries module, which then calls the make timeseries 
+
+function to perform inverse FFT to produce a continuous, correlated series in the time domain. The amplitude and the spectral index are configurable in the input file for a realistic simulation of the pulsar.    
+
+> 3https://www.atnf.csiro.au/research/pulsar/psrcat/ 4. Pulse Profile Simulator 29
+
+## Discrete ISM events 
+
+The simulator also allows for discrete ISM events or ‘dips’ due to localized ISM per-turbations through the function make dips . They are modeled using exponential or Gaussian recoveries, characterized by specific epoch, amplitude, and recovery time constant. 
+
+## Scattering series 
+
+The scattering timescale, modeled as: τsc ∝ ναDM β , defines how the scattering time evolves. There are four distinct modes that are supported in this module 
+
+make scatseries :1. stable: Constant scattering for all epochs. 2. dm: Scattering variations that scale identically to the Dispersion Measure (DM) time series. 3. random: Scattering parameters vary stochastically based on the provided rms (root mean square) value. 4. powerlaw: Uses the given spectral index to generate a scattering time series from a power spectrum. 
+
+params can be used to specify which variable tscat/alpha is targeted by the selected variability mode. 
+
+# 4.4 Synthesis of Integrated Profile 
+
+The core of the simulation occurs in the make fits , which calls make profile for every frequency channel and sub-integration. While make profile is responsible for mathematically constructing the pulse signal for a single frequency channel at a specific epoch, make fits orchestrates the entire observing system, integrating these profiles into a standardized astronomical data format. 
+
+## 4.4.1 Intrinsic Pulse Construction 
+
+The noise-free profile is built by summing individual mathematical components. 4. Pulse Profile Simulator 30 
+
+• Gaussian Components: Synthesized using: 
+
+g(x; A, μ, σ ) = A × exp 
+
+
+
+−(x − μ)2
+
+2σ2
+
+
+
+where σ is calculated from the input w50 (Full Width at Half Maximum) as 
+
+σ = w50 /2.35482. 
+
+• Lorentzian Components: Defined for broader emission wings: 
+
+L(x; A, μ, σ ) = A × γ2
+
+γ2 + ( x − x20)In this work, only Gaussian parameters have been extracted and are being used in the simulation but can be extended to Lorentzian and exponential dips in the profile. 
+
+## 4.4.2 Frequency Scaling and Flux Calibration 
+
+The simulator applies physical scaling laws to ensure that the profile evolves real-istically with frequency: 
+
+• Spectral index: Flux density is scaled relative to a 1400 MHz reference using the spectral index β:
+
+Sf req = S1400 (f req/ 1400) β
+
+• Width Scaling: Component widths are adjusted according to the power law frequency dependence defined in the input file. 
+
+# 4.5 Modeling ISM effects 
+
+As the signal passes from the pulsar to Earth, it is affected in a number of ways (explained in 3) through the interstellar medium. This is taken care of in this modeling for dispersion, DM delay, scattering, and DM smearing. 
+
+## 4.5.1 Dispersion delay 
+
+Electromagnetic radiation from pulsar experiences a frequency-dependent index of refraction as they propagate through the ISM, a cold, ionised plasma. The 4. Pulse Profile Simulator 31 
+
+refractive index is approximately given by (Lorimer & Kramer, 2004): 
+
+μ =
+
+s
+
+1 −
+
+fp
+
+f
+
+2
+
+(4.1) where f is the observing (wave) frequency and fp is the plasma frequency 
+
+fp =
+
+s
+
+e2ne
+
+πm e
+
+(4.2) where, ne is the electron number density, e and me are the charge and mass of an electron respectively. A wave will not propagate if f < f p.From 4.1, μ < 1 which suggests that the group velocity of a propagating wave 
+
+vg = cμ is less than the speed of light. As a result, the propagation of a radio signal along a path of length d from pulsar to Earth will be delayed in time with respect to a signal of infinite frequency with an amount dependent of f −2. The magnitude of this effect is quantified by Dispersion Measure (DM), representing the integrated column density of free electrons along the line of sight: 
+
+DM =
+
+Z d
+
+> 0
+
+nedl (4.3) Lower frequency radio waves travel slower than the higher frequency waves through the ionised medium. The relative time delay (∆ t) between two frequencies 
+
+f1 and f2 (in GHz) is, ∆t = 4 .15 × 10 6 ms × (f −21 − f −22 ) × DM (4.4) which has also been incorporated in the simulator. 
+
+## 4.5.2 Scatter Broadening 
+
+The multi-path propagation of the radio signal due to the inhomogeneities and turbulence in the ISM plasma, scattering, is responsible for the same pulse taking slightly different paths to the observer. These paths have different lengths, leading to a geometric delay in the arrival of parts of the signal. This effect of scattering is modeled as the convolution of the intrinsic pulse profile with a Pulse Broadening Function (PBF) . A scattering exponential decay tail on the pulse at lower frequencies is apparent as a result of the FFT-based cirular convolution of profile with a PBF. Depending on the physical environment 4. Pulse Profile Simulator 32 
+
+of ISM, four distinct Williamson (1972) and Geyer et al. (2017) approximations are implemented in the simulator: 1. PBF1 (Thin screen): A standard exponential decay, 
+
+P BF (x) = exp (−x/τ sc )2. PBF2 (Thick screen): Models scattering in an extended medium using: 
+
+P BF 2(x) = 
+
+rπτ sc 
+
+4x3 exp 
+
+
+
+−π2τsc 
+
+16 x
+
+
+
+3. PBF3 (Truncated screen): A specialized approximation that averages early bins to avoid numerical ‘zero bin’ artifacts common in scattering simu-lations. 4. PBF4 (Continuous media): Models scattering in a uniform turbulent medium: 
+
+P BF 4(x) = 
+
+rπ5τ 3
+
+> sc
+
+8x5 exp 
+
+
+
+−π2τsc 
+
+4x
+
+
+
+## 4.5.3 DM smearing 
+
+The amount of delay in the pulse depends on the frequency and DM. The amount of dispersion measure smearing τDM across a finite bandwidth (∆ f ) MHz at a central frequency ν GHz is proportional to DM is given by: 
+
+τDM = 8 .3 × ∆fν3 × DM μs (4.5) Within B, the arrival times vary across the channel, causing the pulse to appear broadened or ‘smeared’. The simulator accounts for this by applying symmet-ric boxcar convolution . This ensures that the pulse width of the component increases, preserving the position of the peak. The implementation follows the following steps: 1. Bin Conversion: The calculated smear time is converted into phase bin units: 
+
+bins = ∆tsec 
+
+P eriod sec 
+
+× nbins 
+
+2. Kernel Construction: A kernel is created as a 1D array of ones with a length equal to smear bins . This kernel is that the total power (sum of the kernel) remains unity. 4. Pulse Profile Simulator 33 
+
+3. Convolution: The pulse profile is convolved with this normalized boxcar kernel with mode=‘same’ parameter to ensure that the broadening is applied symmetrically, keeping the pulse centered while realistically degrading the resolution. 
+
+## 4.5.4 Application 
+
+This simulator also allows the analysis of the profile by switching on/off these ISM effects of scattering and DM smearing. These switches are passed as arguments in the cli module to compare how the profile appears when: 1. Only scattering 2. Only DM smearing 3. Both scattering and DM smearing 4. No broadening are distinctly applied. Thus, the observed pulse profile is: 
+
+P (t) = Pi(t) ∗ s(t) ∗ D(t) ∗ I(t) (4.6) where, Pi(t) is the intrinsic pulse shape, s(t) is the pulse scatter broadening due to propagation effects of ISM, D(t) is the dispersion smear across the narrow spectral channel and I(t) is the instrumental impulse response with * being the convolution function. 
+
+# 4.6 Noise Injection and Output Generation 
+
+The final stage of the pipeline introduces observational artifacts to imitate real data. 
+
+## 4.6.1 System Noise and Bandshape 
+
+1. Radiometer noise: Random gaussian noise is added based on the target signal-to-noise ratio (snr). 2. Bandshape: A bandshape utility simulates the non-flat frequency response of a receiver by convolving a square band with a Gaussian and adding low-level normal noise. 4. Pulse Profile Simulator 34 
+
+## 4.6.2 Interface with psrchive 
+
+The make fits module creates a psrchive.Archive object. It populates the metadata (coordinates, telescope name, epoch, DM) and loads the synthesized data into the archive’s sub-integrations. Finally, it calls the unload() method to save the simulation as a standard PSRFITS file, ready for timing analysis. 5. RESULTS AND DISCUSSION 
+
+We have carried out the Gaussian fitting to get the profile parameters for all the 28 MSPs in the InPTA Cycle 45 data. A library of these parameters is made to then be used in the simulator to generate realistic simulations and is also a check of the accuracy of the model used and/or created by us. The primary check for the simulation pipeline is conducted through the psrchive 
+
+software, utilizing its visualization and data reduction tools. By processing the simulated PSRFITS files, we can evaluate the accuracy of the synthetic profiles against observational expectations. 
+
+# 5.1 Integrated profile analysis 
+
+The PSRFITS archives are frequency scrunched, that is, all the frequency chan-nels are integrated together to get a profile with high signal-to-noise ratio. The standard freq+ plot provides a multi-dimensional view of the pulsar signal. 5.1 shows three critical panels to study the profile of the pulsar. The top panel (Flux vs Phase) shows the integrated profile after frequency scrunching. The profile of PSR J2145-0750 shows a complex structure with a primary peak and a distinct trailing component, reconstructed accurately from the multi-component Gaussian inputs and simulation. The bottom panel displays the pulse luminosity distributed across the observing band. It allows for the visual inspection of the signal’s persistence across all frequency channels. This is for the case where the signal has not been de-dispersed and the time delay due to its DM across the frequency band is visible. To check that this is accurate, a test is performed which is discussed in the next section. 5. Results and Discussion 36 
+
+Fig. 5.1: freq+ plot which gives flux as a function of phase (top panel), luminosity of the pulse across the frequency range as a function of phase (bottom panel) and frequency vs signal strength (right panel) for the simulated profile of PSR J2145-0750. 
+
+The right panel shows the signal strength (power) as a function of frequency. It allows us to verify the application of the spectral index and the bandshape convolution applied to the profile (implemented in the utils module). 
+
+Fig. 5.2: freq+ plot which gives flux as a function of phase (top panel), luminosity of the pulse across the frequency range as a function of phase (bottom panel) and frequency vs signal strength (right panel) for the simulated profile of PSR J0437-4715. 5. Results and Discussion 37 
+
+Fig. 5.3: freq+ plot which gives flux as a function of phase (top panel), luminosity of the pulse across the frequency range as a function of phase (bottom panel) and frequency vs signal strength (right panel) for the simulated profile of PSR J0751+1807. 
+
+# 5.2 Impact of ISM 
+
+## 5.2.1 Effects of DM delay without dedispersion 
+
+When the simulated data is viewed without dedispersion, as is seen in the bottom panel of the figure 5.1 and 5.2, the characteristic quadratic sweep of the signal across the frequency-phase plane becomes evident. The pulse arrives earlier at higher frequencies than at the lower frequencies. This delay is directly due to : ∆t = 4 .15 × 10 6 ms × DM × (ν−2 
+
+> low
+
+− ν−2
+
+> high
+
+) (5.1) where νlow and νhigh are the frequencies in GHz. The simulator correctly im-plements this time delay by populating the sub-integrations according to the frequency-dependent arrival times. This is checked by calculating the ∆ t for these pulsars by taking the DM from ATNF Pulsar Catalogue and νlow and νhigh as 1.15 GHz and 1.45 GHz respectively, as the frequency range in which the simulation was carried out. The luminous regions of the f vs phase plots is the indicator of the pulse. The number of those regions would provide us with the number of periods passed due to the time delay. Therefore, time delay divided by the time period of that pulsar gives the delay as multiples of the time period which should be equal to the number of bright regions (periods) of the pulsar. The time period p0 of the 5. Results and Discussion 38 
+
+pulsar is also obtained from the ATNF Pulsar Catalogue For example, for PSR J0740+6620 in the range of 1.15 to 1.45 GHz with DM=14.96: ∆t = 4 .15 × 10 6 × 14 .96 × (1 .15 −2 − 1.45 −2) ms = 17 .42 ms ∆t/p 0 = 17 .42 /2.8 = 6 .22 
+
+Fig. 5.4: freq+ plot which gives flux as a function of phase (top panel), luminosity of the pulse across the frequency range as a function of phase (bottom panel) and frequency vs signal strength (right panel) for the simulated profile of PSR J0740+6620. 
+
+which gives the number of periods matching the simulation that is 6. Similarly, it can be seen for PSR J0751+1807 in 5.3, PSR J2145-0750 validating the correct implementation of the DM delay in the simulation. 1. PSR J0751+1807: DM = 30.24, p0 = 3.48 ms ∆t = 4 .15 × 10 6 × 30 .24 × (1 .15 −2 − 1.45 −2) ms = 35 .20 ms ∆t/p 0 = 35 .20 /3.48 = 10 .11 2. PSR J2145-0750: DM = 9.01, p0 = 16.05 ms ∆t = 4 .15 × 10 6 × 9.01 × (1 .15 −2 − 1.45 −2) ms = 0 .65 ms ∆t < p 0 = ⇒ 1 period 5. Results and Discussion 39 
+
+## 5.2.2 Scatter Broadening and DM smear 
+
+Scatter broadening is evident with tail broadening of the profile at low frequencies as τsc ∝ να where α is usually -4.4. By switching off DM smear and simulating in the frequency range of 300 to 500 MHz, only the effect of scattering is apparent: 
+
+(a) Intrinsic simulated profile with no scatter-ing and no DM smearing 
+
+(b) Simulated profile with only scattering ef-fects and no DM smearing 
+
+Fig. 5.5: Simulated profiles of PSR J1939+2134 in the frequency range of 550 to 1450 MHz to understand the effect of scattering. The tail broadening in (b) is due to the time delay in the arrival of pulses because of scattering 
+
+Subsequently, switching off scattering and just viewing the effect of smearing (∆ τDM ∝ ν−3 × DM ), gives the symmetrical increase in width of the profile. It is more prominent when taken over a larger frequency range. A slight tilting on the left side of the bright pulse region at lower frequencies is observed due to the smearing effect. 
+
+(a) Intrinsic profile with no scattering and no DM smearing 
+
+(b) Profile with only DM smearing, and no scattering effect 
+
+Fig. 5.6: Simulated profiles of PSR J1939+2134 in the frequency range of 550 to 1450 MHz to understand the effect of DM smearing. The slight tilting of the luminous regions in (b) is due to the smearing time delay at lower frequencies. 5. Results and Discussion 40 
+
+# 5.3 Residual Analysis 
+
+## 5.3.1 Data and simulation comparison 
+
+To quantify the success of the simulation, we perform a Residual Analysis ( ϵi =
+
+yi − f i ). Physically, they represent the portion of the data that the model fails to explain. For the comparison, the phase bins of the simulated profiles are made equal to the observed data (typically nbin=1024) and aligned precisely using a circular roll to ensure maximum overlap of the primary peaks. In a successful model, residuals should behave as independent random samples from a probability distribution (typically a normal distribution) with a mean of zero. A plot of residuals against the independent variable is physically important because it reveals systematic deviations. If the residuals show a visible pattern or trend rather than random noise, it indicates that the functional form of the model is incorrect or that an external physical factor has been neglected. Residual analysis helps confirm that the experimental uncertainties are indeed random fluctuations, such as thermal noise, rather than avoidable mistakes or systematic instrumental bias (Berendsen, 2011). As illustrated, the residual panel (bottom) shows random noise with no sig-nificant remaining structural features. This indicates that the multi-component Gaussian model effectively captures the physical emission. Of the 28 MSPs, there were 10 objects whose Band 5 data were neither available in the InPTA dataset nor in the EPN database. For those sources, InPTA Band 3 data were utilized. PSR J1705-1903 had a very low signal to noise ratio of 5 and hence has not been used. All pulse profiles are baseline-subtracted and linearly scaled for comparison; the term ‘normalized intensity’ is used in this relative sense rather than strict peak or flux normalization. 1. Band 3 results:    
+
+> (a) PSR J1125+7819 (b) PSR J0614-3329
+
+5. Results and Discussion 41 
+
+(c) PSR 0030+0451 (d) PSR 0034-0534 
+
+(e) PSR 0610-2100 (f ) PSR 1545-4550 
+
+(g) PSR J1745+1017 (h) PSR 1910+1256 
+
+(i) PSR J2302+4442 
+
+Fig. 5.7: Comparison between data and model for Band 3 data 5. Results and Discussion 42 
+
+2. Band 5 results: 
+
+(a) PSR J1857+0943 (b) PSR J1744-1134 
+
+(c) PSR J2145-0750 (d) PSR J1643-1224 
+
+(e) PSR J0437-4715 (f ) PSR J0613-0200 5. Results and Discussion 43 
+
+(g) PSR J0740+6620 (h) PSR J0752+1807 
+
+(i) PSR J0900-3144 (j) PSR J1600-3053 
+
+(k) PSR J1012+5307 (l) PSR J1713+0740 
+
+(m) PSR J1730-2304 (n) PSR J1909-3744 5. Results and Discussion 44       
+
+> (o) PSR J1944+0907 (p) PSR J1939+2134
+> (q) PSR J1022+1001 (r) PSR J2124-3358
+
+Fig. 5.8: Comparison between data and model for Band 5 data 
+
+## 5.3.2 Residual width 
+
+It is known through years of observation of millisecond pulsars and normal pul-sars that the latter evolves with frequency in terms of their number of profile components and intrinsic widths. Whereas, widths of MSP profiles are essentially independent of frequency suggests that the emission in these pulsars originates from the same height at multiple frequencies (Lorimer & Kramer, 2004; Kramer et al., 1999). This is expected as the radius of the light cylinder and, hence, the size of the magnetosphere is much smaller for MSPs. This does not leave much space for the active emission to spread out. Comparison of profiles by simulation in bands 3 and 5, no major changes in the component widths and separation were observed. The effect was only due to the ISM and no major intrinsic frequency evolution can be concluded. To further confirm the observation, the residual widths 
+
+res width = wd − wm 5. Results and Discussion 45 
+
+where wd is the component width of the profile from the data and wm is that of the simulated profile. These were calculated separately for each bands 5 and 3 and were compared by combining them on a single plot as a function of frequency. 
+
+Fig. 5.9: Residual width (component width of the simulated profile - component width of the data) of PSR J2145-0750 in Band 3 and Band 5 But for PSR J2145-0750 (Figure 5.9), the residual of the width in band 3 (low frequency) is more than the residual of the width in band 5 (higher frequency) which provides us with the evidence of frequency evolution of the widths of the components. The component width of the data cannot be more than the compo-nent width of the model (simulated profile), as all the effects of ISM have been taken into account that can increase the width (scattering scaled as ν−4.4 and DM smear). On the other hand, for other pulsars such as PSR J0740+6620, PSR J0751+1807 in Figures 5.10 and 5.11, it is the other way around, where the residual width of band 3 is smaller and is, in fact, negative. This shows that the component width of the data is less than that of the model in band 3 implying that the effect of ISM is shallower than what is utilized in the model. 5. Results and Discussion 46 
+
+Fig. 5.10: Residual width of PSR J0740+6620 in Band 3 and Band 5 Since all the other pulsars show the same trend, it proves that the anomaly in PSR J2145-0750 is not due to the external effects as all of them have been taken care of, but due to the intrinsic frequency evolution. As in the simulation input file, the only parameters not included are the width, height and phase scaling with frequency. This correctly matches with the already existing literature Kramer et al. (1999). 
+
+Fig. 5.11: Residual width of PSR J0751+1807 in Band 3 and Band 5 5. Results and Discussion 47 
+
+Fig. 5.12: Residual width of PSR J1939+2134 in Band 3 and Band 5 The model is user-driven, and the propagation parameters can be varied to make the simulations more in accordance with the data. This is the utility of this software that allows us to model the ISM effects accurately along with other properties of the pulsar itself. 
+
+## 5.3.3 χ2 
+
+> red
+
+## Analysis 
+
+After checking the randomness of the residuals and accepting the functional choices of the model, we can proceed to the next step, that is, the chi-squared test. χ2
+
+is the weighted sum of squared deviations, where each term is normalized by the variance ( σ2), σ obtained in this work as the mean absolute deviation (MAD) of the off-pulse region: 
+
+χ2 =
+
+> n
+
+X
+
+> i=1
+
+(yi − fi)2
+
+σ2
+
+> i
+
+The value of reduced chi square, χ2 
+
+> red
+
+is this sum divided by the number of degrees of freedom ( ν = n − m), where n is the number of data points and m is the number of parameters. χ2 
+
+> red
+
+∼ 1 indicates that the residuals are entirely consistent with the estimated noise level of the experiment. It suggests that the model is a statistically justified representation of the physical process. Higher value χ2 
+
+> red
+
+>> 1 (under-fitting) suggests that the data deviate significantly from the function, meaning the model is insufficient to describe the physical reality or that the experimental errors were underestimated. Whereas χ2 
+
+> red
+
+<< 1, value much lower than 1 (over-fitting), means that the model has too many parameters and is fitting the noise, rather than the underlying physics. 5. Results and Discussion 48 
+
+## 5.3.4 Limitations 
+
+The primary limitation of this thesis is that the effect of scintillation has not been included in the model. This work was carried out first only for the sources utilized in pulsar timing by the InPTA. This can be further extended to include other pulsars (MSP and canonical both) with specific profile evolution parameters scaling with frequency. Although gaussian fitting gives a good approximation for the profiles, other methods like Lorentzian, Profile Component Analysis (PCA), where profile can be broken into multiple basis function can be used to give better approximations for the parameters. 
+
+# 5.4 Conclusion 
+
+This simulator is highly useful for Pulsar Timing Array (PTA) research. By pro-ducing realistic PSRFITS files that include stochastic DM variations and discrete ISM events, researchers can test the robustness of timing pipelines against sim-ulated ‘noise’ and ISM-induced delays. The ability to simulate stable templates with known parameters allows for the precise measurement of Time of Arrivals (TOAs) and the evaluation of jitter noise. Out of the 9 pulsars simulated in Band 3, 7 show good results with random residuals and χ2 
+
+> red
+
+∼ 1. And for Band 5, out of the 18 sources, simulated profiles of 15 pulsars show strong alignment with the observed profiles. The success of multi-component Gaussian fitting in this analysis supports the theory that pulsar emission is composed of several discrete, potentially overlap-ping, emission cones or patches Rankin (1983b). Beyond its utility in modeling known interstellar medium (ISM) effects, this simulator is uniquely positioned to address recent fundamental discoveries regarding the pulsar emission mechanism. A striking discovery in the MSP population is that 39% of these sources exhibit ‘disjoint’ components—emission peaks separated by regions completely lacking in flux—compared to only 3% of slow pulsars. Recent analysis surmises that these features represent radio emission produced far from the stellar surface, beyond the light cylinder. The multi-component Gaussian synthesis engine developed in this work is ide-ally suited to model this phenomenon. By utilizing the simulation input file config-uration, researchers can precisely define these disjoint components as independent Gaussian peaks at wide phase separations. Because the simulator treats each com-ponent as a distinct physical entity with its own frequency-dependent scaling laws for height and width, it can recreate the complex Class D (disjoint) profiles now 5. Results and Discussion 49 
+
+recognized as a hallmark of MSP emission. By generating synthetic epochs with stochastic DM and scattering variations, one can isolate and quantify how these recently discovered LC components contribute to the overall timing residuals of Pulsar Timing Array (PTA) sources. Thus, this work will be useful for precise pulsar timing and will be a tool for the Indian Pulsar Timing Array (InPTA) and also aid the researchers in modeling the interstellar medium effects for each pulsar in a synthetic, yet realistic environment. Appendices 
+
+> 50 51
+
+# I PSRCHIVE 
+
+PSRCHIVE 1 is an open source C++ development library for the analysis of pulsar astronomical data. It implements an extensive range of algorithms for use in pul-sar timing, polarimetric calibration, RFI mitigation, etc. These tools are utilized by a powerful suite of user-end programs that come with the library. The software is described in detail by Hotan et al. (2004). These deal transparently and simul-taneously with multiple data storage formats and enhances data portability and facilitates the adoption of the PSRFITS file format, a standard data storage format for pulsars. 
+
+PSRCHIVE and PSRFITS were designed to form an object-oriented framework into which existing algorithms and data structure could be transplanted. different telescopes and instruments require the storage of different types of information, including configuration parameters, observatory and instrumental status informa-tion, and other site-specific data. There is no way of knowing exactly what future systems might include, both PSRCHIVE and PSRFITS were implemented a by having generalised scheme for incorporating arbitrarily complex data extensions. 
+
+Fig. .13: Class diagram of a portion of the PSRCHIVE library. The storage and access methods, as well as methods loading an dunloading data are described. The combined use of composition and inheritance enables complex structures and behaviours to be constructed using modular components Hotan et al. (2004).  
+
+> 1https://psrchive.sourceforge.net 52
+
+PSRCHIVE provides with different applications, a few of them have been men-tioned in the figure below, with their brief description that were included at the time of publication of Hotan et al. (2004). 
+
+Fig. .14: Standard Applications included with PSRCHIVE 
+
+The combination of PSRCHIVE and PSRFITS provided a powerful, ready-to-use archive and reduction system for pulsar data, which was efficiently used in this thesis. REFERENCES 
+
+Alpar, M. A., Cheng, A. F., Ruderman, M. A., & Shaham, J. (1982). A new class of radio pulsars. Nature , 300 , 728–730. doi: 10.1038/300728a0 arafdar, P., Joshi, B. C., Krishnakumar, M. A., Bagchi, M., Susobhanan, A., Singh, A., . . . Perera, B. B. P. (2022). The indian pulsar timing array: Current status and future prospects. Publications of the Astronomical Society of Australia , 39 ,e053. doi: 10.1017/pasa.2022.50 Backer, D. C., Kulkarni, S. R., Heiles, C., Davis, M. M., & Goss, W. M. (1982). A millisecond pulsar. Nature , 300 (5893), 615–618. doi: 10.1038/300615a0 Berendsen, H. J. C. (2011). A student’s guide to data and error analysis . Cam-bridge: Cambridge University Press. doi: 10.1017/CBO9780511921247 Cordes, J. M., Kramer, M., Lazio, T. J. W., Stappers, B. W., Backer, D. C., & Johnston, S. (2004). Pulsars as tools for fundamental physics and astrophysics. 
+
+New Astronomy Reviews , 48 (11–12), 1413–1438. doi: 10.1016/j.newar.2004.09 .040 Dai, S., Hobbs, G., Manchester, R. N., Kerr, M., Shannon, R. M., van Straten, W., . . . Zhu, X.-J. (2015). A study of multi-frequency polarization pulse profiles of millisecond pulsars. Monthly Notices of the Royal Astronomical Society , 449 (3), 3223–3243. doi: 10.1093/mnras/stv508 Geyer, M., Karastergiou, A., Kondratiev, V. I., Kramer, M., & Stappers, B. W. (2017). Pulse broadening measurements from lofar observations of pulsars. 
+
+Monthly Notices of the Royal Astronomical Society , 470 (3), 2659–2679. doi: 10.1093/mnras/stx1446 Gold, T. (1968). Rotating neutron stars as the origin of the pulsating radio sources. 
+
+Nature , 218 , 731–732. doi: 10.1038/218731a0 Gunn, J. E., & Ostriker, J. P. (1970). On the nature of pulsars. iii. analysis of observations. Astrophysical Journal , 160 , 979–1002. doi: 10.1086/150481 REFERENCES 54 
+
+Hewish, A., Bell, S. J., Pilkington, J. D. H., Scott, P. F., & Collins, R. A. (1968). Observation of a rapidly pulsating radio source. Nature , 217 (5130), 709–713. doi: 10.1038/217709a0 Hotan, A. W., van Straten, W., & Manchester, R. N. (2004). Psrfits: A stan-dard format for storing pulsar data. Publications of the Astronomical Society of Australia , 21 (3), 302–309. doi: 10.1071/AS04022 Joshi, B. C., Gupta, Y., Krishnakumar, M. A., Manoharan, P. K., Naidu, A., Raghunathan, A., . . . Sridhar, N. (2018). The indian pulsar timing array: First results. Journal of Astrophysics and Astronomy , 39 (2), 1–15. doi: 10.1007/ s12036-018-9523-6 Kaspi, V. M. (2010). Grand unification of neutron stars. Proceedings of the National Academy of Sciences , 107 (16), 7147–7152. doi: 10.1073/pnas .1000812107 Kramer, M., Lange, C., Lorimer, D. R., Backer, D. C., Xilouris, K. M., Jessner, A., & Wielebinski, R. (1999). The characteristics of millisecond pulsar emission iii: From low to high frequencies. The Astrophysical Journal , 526 , 957–970. Lorimer, D. R., & Kramer, M. (2004). Handbook of pulsar astronomy (Vol. 4). Cambridge: Cambridge University Press. doi: 10.1017/CBO9780511549924 Lyne, A. G., & Rickett, B. J. (1968). Pulsar observations and the nature of interstellar scintillation. Nature , 218 , 326–327. doi: 10.1038/218326a0 Maan, Y. (2021). Rficlean: Radio frequency interference mitigation tool. https:// ascl.net/2106.013 . (Astrophysics Source Code Library, ascl:2106.013) Mitra, D., Basu, R., Maciesiak, K., Skrzypczak, A., Melikidze, G. I., Szary, A., & Krzeszowski, K. (2016). Meterwavelength single-pulse polarimetric emission survey. The Astrophysical Journal , 833 (1), 28–45. doi: 10.3847/1538-4357/833/ 1/28 Pacini, F. (1968). Rotating neutron stars, pulsars and supernova remnants. Na-ture , 219 , 145–146. doi: 10.1038/219145a0 Radhakrishnan, V., & Cooke, D. J. (1969). Magnetic poles and the polarization structure of pulsar radiation. Astrophysical Letters , 3 , 225–229. Radhakrishnan, V., & Srinivasan, G. (1982). On the origin of the recently discov-ered ultra-rapid pulsar. Current Science , 51 , 1096–1099. REFERENCES 55 
+
+Rana, P., Joshi, B. C., McLaughlin, M. A., Kerr, M., Bagchi, M., Krishnakumar, M. A., . . . Gupta, Y. (2025). The indian pulsar timing array data release 2: I. dataset and timing analysis. arXiv preprint . Retrieved from https://doi.org/ 10.48550/arXiv.2506.16769 doi: 10.48550/arXiv.2506.16769 Rankin, J. M. (1983a). Toward an empirical theory of pulsar emission. ii. on the spectral behaviour of the conal and core components. The Astrophysical Journal , 274 , 359–378. Rankin, J. M. (1983b). Toward an empirical theory of pulsar emission. i. morpho-logical characteristics of polarized emission profiles. The Astrophysical Journal ,
+
+274 , 333–358. Rankin, J. M. (1993). Toward an empirical theory of pulsar emission. vi. the geometry of the conal emission region of pulsars. The Astrophysical Journal ,
+
+405 , 285–297. Sathyaprakash, B. S., & Schutz, B. F. (2009). Physics, astrophysics and cosmology with gravitational waves. Living Reviews in Relativity , 12 (1), 2. Retrieved from 
+
+https://doi.org/10.12942/lrr-2009-2 doi: 10.12942/lrr-2009-2 Scheuer, P. A. G. (1968). Amplitude modulation of radio signals by scattering in the interstellar medium. Nature , 218 , 920–922. doi: 10.1038/218920a0 van Straten, W., & Bailes, M. (2011). Dspsr: Digital signal processing software for pulsar astronomy. Publications of the Astronomical Society of Australia , 28 (1), 1–14. doi: 10.1071/AS10021 Williamson, I. P. (1972). Pulse broadening due to multiple scattering in the interstellar medium. Monthly Notices of the Royal Astronomical Society , 157 ,55–64. Yao, J. M., Manchester, R. N., & Wang, N. (2017). A new electron-density model for estimation of pulsar and frb distances. The Astrophysical Journal , 835 (1), 29. doi: 10.3847/1538-4357/835/1/29

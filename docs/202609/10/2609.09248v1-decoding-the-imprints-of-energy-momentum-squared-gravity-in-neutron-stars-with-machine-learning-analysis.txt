@@ -1,0 +1,826 @@
+Title: Decoding the Imprints of Energy-Momentum Squared Gravity in Neutron Stars with Machine Learning Analysis
+
+URL Source: https://arxiv.org/pdf/2609.09248v1
+
+Published Time: Thu, 10 Sep 2026 00:08:17 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+## Decoding the Imprints of Energy-Momentum Squared Gravity in Neutron Stars with Machine Learning Analysis 
+
+Sayantan Ghosh ,1, ∗ Premachand Mahapatra ,2, † and Dipti Deb 3, ‡
+
+> 1
+
+Department of Physics and Astronomy, National Institute of Technology, Rourkela 769008, India 
+
+> 2
+
+Department of Physics, Birla Institute of Technology and Science - Pilani, K. K. Birla Goa Campus, NH-17B, Zuarinagar, Sancoale, Goa-403726, India 
+
+> 3
+
+Department of Computer Science and Engineering, National Institute of Technology, Rourkela 769008, India 
+
+(Dated: September 10, 2026) Neutron stars (NSs) provide a unique laboratory for testing gravity in the strong-field regime and for searching for deviations from General Relativity (GR). In this work, we investigate the effects of Energy-Momentum Squared Gravity (EMSG) on NS structure and examine whether its signatures can be identified from observable stellar properties using supervised machine learning (ML). We solve the modified Tolman-Oppenheimer-Volkoff equations for approximately 10 4 nuclear equations of state (EOSs) for EMSG coupling parameters α = {− 5.01 , −2.50 , 0, +2 .50 , +5 .01 } × 10 −38 erg −1cm 3,and calculate the gravitational mass M , radius R, dimensionless tidal deformability Λ, and fundamental f -mode oscillation frequency for each stellar configuration. The free parameter α has a significant effect on M , R, Λ and f -mode frequency. Imposing observational constraints on M , R,and Λ, we split our datasets into train and test sets, and we employ Random Forest (RF), K-Nearest Neighbors (KNN), Support Vector Machine (SVM), Logistic Regression (LR), and Gaussian Naive Bayes (GNB) to classify the representative sectors α = {− 5.01 , 0, +5 .01 } × 10 −38 erg −1cm 3 using (M, R, Λ, f ). The RF classifier performs best, achieving an accuracy of approximately 99 .85% with precision, recall, and F1-scores exceeding 99 .8%, while KNN also achieves accuracy above 99%. The nearly diagonal confusion matrices demonstrate that the observationally viable NS configurations associated with different EMSG sectors remain highly separable in the multidimensional observable space. Our results show that NS observables retain robust signatures of EMSG even after observational filtering, establishing ML-assisted NS observations as a promising complementary approach for probing modified gravity with current and future multi-messenger observations. 
+
+Keywords: Neutron Stars (NS); Energy-Momentum Squared Gravity (EMSG); Equation of State (EOS); Machine Learning (ML); Classifications; Confusion Matrix. 
+
+I. INTRODUCTION 
+
+Neutron stars (NSs) are extremely compact objects characterized by high density and strong curvature, mak-ing them an excellent probe to test gravity in extreme environments [1–5]. The typical central densities inside the NS exceed nuclear saturation and gravitational po-tentials, which helps us to probe the strong-field, high-curvature domain far beyond solar-system tests [6]. In recent years, multi-messenger observations [7–13], the NICER X-ray telescope’s pulse profiles from PSR J0030+0451 [14] and the LIGO/Virgo detection of GW170817 – the first binary NS merger – which con-strained the binary tidal deformability and common NS radius through the gravitational-wave phasing [10, 15, 16] provide us with well-structured constraints on NS struc-ture. Combined with precise pulsar mass measurements, these observations yield tight constraints on the NS equa-tion of state (EOS). At the same time, they give us free hand to test gravity itself: NSs and their mergers are sen-sitive probes of any deviations from General Relativity (GR) in the strong-field regime [14, 17–19].    
+
+> ∗sayantanghosh1999@gmail.com
+> †p20210039@goa.bits-pilani.ac.in
+> ‡ddiptideb5@gmail.com
+
+Despite the many successes, GR [20] is expected to break down at some scale (e.g., due to dark mat-ter/energy puzzles or singularities) [21–26], therefore, the alternative theories of gravity are actively explored [27–36]. Unresolved issues, such as the cosmological constant problem and singularities in gravitational col-lapse, motivate modifications of the Einstein-Hilbert ac-tion [19, 37, 38]. Many extensions introduce new curva-ture terms (e.g., f (R) gravity [34, 39, 40]) or couplings between matter and geometry (e.g., f (R, T ) [41–43] or f (R, T μν T μν ) [44, 45] theories). Energy-Momentum Squared Gravity (EMSG), in which the action contains an extra term proportional to the quadratic contraction 
+
+Tαβ T αβ of the energy-momentum tensor [45–47]. In this theory, the field equations coincide with GR in vacuum, but acquire extra, density-dependent terms inside mat-ter [45]. Early studies showed that EMSG can avoid the big-bang singularity (giving a cosmic bounce) and yields a viable cosmological history [45, 48]. Importantly, since deviations from GR arise only when Tμν ̸ = 0, EMSG effects are expected to be most pronounced in the high-curvature cores of compact objects [47, 48]. Thus, NSs (and black holes (BHs)) are ideal environments to search for EMSG signatures. There are many works have been carried out on EMSG for compact stars. Nari and Roshan [48] de-rived the modified Tolman-Oppenheimer-Volkoff (TOV) arXiv:2609.09248v1 [astro-ph.HE] 8 Sep 2026 2equations in EMSG and solved them for a simple poly-tropic EOS. They found that the NS mass-radius rela-tion can change substantially. Akarsu et al. [49] solved the hydrostatic equations for realistic EOS and showed that EMSG-induced corrections become “pronounced in the high-density cores of neutron stars”. Using ob-served mass–radius measurements, they constrained the EMSG coupling parameter to be extremely small (typ-ically |α| ≲ 10 −37 in appropriate units) and discussed implications for the hyperon puzzle and early-universe cosmology [49]. Alam et al. [38] performed an extensive survey of NS models in EMSG using a wide range of nu-clear EOS. Tidal deformability, compactness, oscillation properties, universal relations, and curvature invariants in EMSG inside the NSs have been explored by Ghosh et al. [19, 50, 51]. Since in all studies we are dealing with a huge amount of data and different model parameters, we need some methods which can handle it easily. Machine learning (ML) methods have become essen-tial in our modern data-driven world, where finding exact models is often very difficult. ML also has a lot of appli-cations in fundamental physics research. In astrophysics, it has been used to identify signatures of NSs or rem-nants from various gravitational wave signals [52] and su-pernovae [53], reconstruct gamma-ray burst (GRB) light curves [54], recognize universal relations among NS prop-erties [55], detect potential dark matter signatures in neu-tron stars [56], analyze the speed of sound in neutron stars [57] and classify NS EoSs [58]. Due to the complex-ity of nuclear and particle physics, ML holds significant implications for both theoretical modelling and experi-mental studies [59]. The potential of ML tools in nuclear physics has been extensively studied and reviewed in re-cent work [60, 61]. In this study, we have taken 10,000 EOSs and calcu-lated the macroscopic properties of NSs, such as mass, ra-dius, tidal deformability and f -mode frequency, by vary-ing the EMSG free parameter α. Then, by setting the target values using the observational constraints on mass, radius and tidal deformability, we rearrange the data. After that, we applied different classifiers to classify the data and note down their performance. This is the first study where we have used ML classification techniques to decode the imprints of EMSG in NSs. This paper is organized as follows: Sec. II presents the theoretical formalism. The methodology of applying ML techniques is mentioned in Sec. III. Sec. IV contains our results and discussion. We solve the modified TOV equa-tions for each EOS, compute mass-radius relations, etc. and highlight how the EMSG effects depend on the cou-pling parameter and EOS stiffness. We conclude our dis-cussion in Sec. V. Throughout this work, we use a metric signature ( −, +, +, +) and adopt geometrized units with 
+
+G = c = ℏ = 1.   
+
+> II. FORMALISM A. Energy-Momentum Squared Gravity (EMSG)
+
+In Energy-Momentum Squared Gravity (EMSG), the gravitational action is modified by an extra term quadratic in the matter fields. The action can be written as [37]: 
+
+S =
+
+Z  12κ R + f (Lm, g μν T μν , T μν T μν ) + Lm
+
+ √−g d4x, 
+
+(1) where, f denotes any analytic function of matter-related scalars, such as the matter Lagrangian ( Lm) [62], the trace ( gμν T μν ) [63], or the contraction ( Tμν T μν ) [44, 45, 64, 65]. The Ricci scalar is denoted by R, with gravita-tional coupling κ = 8 π. The strength of the EMSG cor-rection is governed by the term Tμν T μν , which is scaled by a real constant parameter α.The energy-momentum tensor ( Tμν ) in terms of Lm, is defined as [38, 49] 
+
+Tμν = − 2
+
+√−gδ(√−gLm)
+
+δg μν = gμν Lm − 2 ∂Lm
+
+∂g μν , (2) which depends only on the metric tensor components. Now we can write the total matter Lagrangian part as [37], 
+
+Ltot  
+
+> m
+
+= Lm + f. (3) Putting it in Eq. (2), we get the total Tμν as 
+
+T tot μν = − 2
+
+√−gδ(√−gLtot  
+
+> m
+
+)
+
+δg μν 
+
+= − 2
+
+√−gδ(√−gLm)
+
+δg μν − 2
+
+√−gδ(√−gf )
+
+δg μν .
+
+(4) Accordingly, we can write 
+
+T tot μν = Tμν + T mod μν , (5) where 
+
+T mod μν = − 2
+
+√−gδ(√−gf )
+
+δg μν . (6) Similar to Eq. (2), we can express Eq. (6) as [37], 
+
+T mod μν = − 2
+
+√−gδ(√−gf )
+
+δg μν = f g μν − 2fT 2 θμν , (7) where 
+
+fT 2 = ∂f ∂(Tρσ T ρσ ) , θμν = δ(Tρσ T ρσ )
+
+δg μν . (8) In this study, we consider the function f as 
+
+f (Lm, g μν T μν , T μν T μν ) = αT μν T μν , (9) 3which is the form of EMSG considered in [19, 38, 44, 45, 49, 64, 65]. Then, Eq. (7) takes the following form 
+
+T mod μν = αT ρσ T ρσ gμν − 2αθ μν . (10) Now, by using Eq. (5), we can write Einstein’s field equa-tions as 
+
+Gμν = κT μν + κT mod μν , (11) where Gμν = Rμν − 12 gμν R is the Einstein tensor. The ideal fluid form of Tμν is given by 
+
+Tμν = ( E + P )uμuν + P g μν , (12) where E and P are the energy density and pressure re-spectively. uμ is the four-velocity satisfying the con-ditions uμuμ = −1, ∇ν uμuμ = 0. Substituting into Eq. (11), the modified Einstein field equations in EMSG take the form 
+
+Gμν = κT μν + κα (gμν Tσϵ T σϵ − 2θμν ) , (13) where the new tensor θμν is defined as 
+
+θμν = T σϵ δT σϵ 
+
+δg μν + Tσϵ 
+
+δT σϵ 
+
+δg μν 
+
+= − 2Lm
+
+
+
+Tμν − 12 gμν T
+
+
+
+− T T μν 
+
++ 2 T γμ Tνγ − 4T σϵ ∂2Lm
+
+∂g μν ∂g σϵ .
+
+(14) Here, T = gμν Tμν is the trace of Tμν . The final term of (14) involves two derivatives of Lm, unlike Eq. (2). For our cases of interest, this term is identically zero (see below); hence, we omit it from further analysis. A similar approach was adopted in [37]. Taking Lm = P [66, 67], we get the covariant divergence of Eq. (13) as 
+
+∇μTμν = −αg μν ∇μ(Tσϵ T σϵ ) + 2 α∇μθμν . (15) The local conservation of Tμν holds only in the limit α =0. Substituting Eq. (12) into Eq. (14), and then inserting the result into Eq. (13), one gets 
+
+Gμν = κE
+
+ 
+
+1 + P
+
+E
+
+
+
+uμuν + P
+
+E gμν 
+
+
+
++ακ E2
+
+
+
+2
+
+
+
+1 + 4P
+
+E + 3P 2
+
+E2
+
+
+
+uμuν +
+
+
+
+1 + 3P 2
+
+E2
+
+
+
+gμν 
+
+
+
+.
+
+(16) Now we can restore the Einstein field equation by redefin-ing the above equation as 
+
+Gμν = κT μν  
+
+> eff
+
+, (17) where T μν  
+
+> eff
+
+= ( Eeff + Peff )uμuν + Peff gμν , is the effective energy-momentum tensor. For an ideal fluid, Eeff is the effective energy density defined as 
+
+Eeff = E + αE2 1 + 8P
+
+E + 3P 2
+
+E2
+
+!
+
+, (18) and Peff is the effective pressure defined as 
+
+Peff = P + αE2 1 + 3P 2
+
+E2
+
+!
+
+. (19) As noted in [49], the parameter |α| ∼ E−1, and we know that for NSs, E ∼ 10 37 erg cm −3 [2]. Consequently, EMSG corrections are expected to become important for compact objects such as NSs when the order of α is ap-proximately |α| ∼ 10 −37 erg −1 cm 3.
+
+B. Modified TOV equations in EMSG 
+
+Solving the modified Einstein equations in the EMSG framework leads to the modified TOV equations, given by [19, 38, 50, 51] dm
+
+dr = 4 πr 2E
+
+
+
+1 + αE
+
+
+
+1 + 8P
+
+E + 3P 2
+
+E2
+
+ 
+
+, (20) dP
+
+dr = − mE
+
+r2
+
+
+
+1 + P
+
+E
+
+  
+
+1 − 2mr
+
+−1
+
+×
+
+
+
+1 + 4πr 3Pm + α 4πr 3E2
+
+m
+
+
+
+1 + 3P 2
+
+E2
+
+ 
+
+×
+
+
+
+1 + 2 αE
+
+
+
+1 + 3P
+
+E
+
+  
+
+1 + 2 αE
+
+
+
+c−2 
+
+> s
+
++ 3P
+
+E
+
+ −1
+
+.
+
+(21) We solved the TOV equations by integrating Eqs. (20)-(21) from r = 0, where m(r = 0) = 0 and P (r = 0) = Pc
+
+(the central pressure), upto the stellar surface r = R,where m(r = R) = M and P (r = R) = 0, by specifying a central energy density E(r = 0) = Ec at the center. This integration was performed for all six EOSs ( P (E)) by varying the parameter α from negative to positive values to get the mass-radius profile. 
+
+C. f -mode Oscillations 
+
+NSs oscillate when they go through external or internal perturbations, and they emit different mode frequencies [68]. In this study, we use the Cowling approximation [69] to solve the fundamental ( f )-mode nonradial oscillations of spherically symmetric NSs. The Lagrangian displacement vector of the fluid is given by 
+
+ξi = 1
+
+r2
+
+
+
+e−λ(r)W (r), −V (r)∂θ , − V (r)sin 2 θ ∂ϕ
+
+
+
+eiωt Ylm (θ, ϕ ),
+
+(22) where Ylm (θ, ϕ ) represents the spherical harmonics, ω is the frequency. To determine ω, we have to solve the following system of ordinary differential equations [70], 4which are modified by the effective energy density and pressure in EMSG, represented as [19, 71], 
+
+dW (r)
+
+dr = dEeff 
+
+dP eff 
+
+
+
+ω2r2eλ(r)−2ν(r)V (r) + dν (r)
+
+dr W (r)
+
+
+
+−l(l + 1) eλ(r)V (r)
+
+dV (r)
+
+dr = 2 dν (r)
+
+dr V (r) − 1
+
+r2 eλ(r)W (r), (23) where ν(r) and λ(r) represent metric functions. In the close vicinity of the origin, the solution to Eq. (23) exhibits the following behaviour: 
+
+W (r) = Br l+1 , V (r) = − Bl rl, (24) where B is an arbitrary constant. To ensure that the perturbation pressure becomes zero at the outer bound-ary of the star’s surface, we need to apply the following additional boundary condition, 
+
+ω2eλ(R)−2ν(R)V (R) + 1
+
+R2
+
+dν (r)
+
+dr r=R
+
+W (R) = 0 . (25) Utilizing the boundary conditions outlined in Eq. (24) and Eq. (25), we can successfully solve Eq. (23) and determine the eigenfrequencies of the PNSs.  
+
+> D. Tidal Deformability Parameters
+
+In a binary NS system, one NS experience the external field ( ϵij ) created by its companion star; it acquires a quadrupole moment ( Qij ). The magnitude of the quadrupole moment is linearly proportional to the tidal field and is given by [72, 73] 
+
+Qij = −λϵ ij , (26) where λ is the tidal deformability of a star. λ can be defined in terms of tidal Love number k2 as α = 23 k2R5.The dimensionless tidal deformability of the star is de-fined as Λ = λ/M 5 = 23 k2C−5. The GW170817 [15] event constrains Λ 1.4 to be 190 +390 
+
+> −120
+
+, while GW190814 [74] put a limit of Λ 1.4 = 616 +273  
+
+> −158
+
+(in the NS-BH scenario).  
+
+> E. Equation of State of Nuclear Matter
+
+In this section we summarize the theoretical framework used to construct the nuclear equation of state (EOS) employed in this work. The EOS is obtained within a relativistic mean-field description of nuclear matter, and the associated model parameters are constrained through a Bayesian inference procedure.  
+
+> 1. Relativistic mean-field description
+
+The properties of dense nuclear matter are described using the relativistic mean-field (RMF) model, where nu-cleons interact through the exchange of mesonic fields. In this framework the scalar σ meson generates an at-tractive component of the nuclear interaction, while the vector ω meson produces a short-range repulsive force. The isovector ϱ meson accounts for the neutron–proton asymmetry of the system. The effective Lagrangian density for the nucleon field Ψ interacting with these mesons can be written as 
+
+L = ¯Ψ
+
+h
+
+γμ 
+
+i∂ μ − Γω A(ω) 
+
+> μ
+
+− Γϱτ · A(ϱ)
+
+> μ
+
+
+
+− (m − Γσ ϕ)
+
+i
+
+Ψ + 12
+
+ ∂μϕ∂ μϕ − m2 
+
+> σ
+
+ϕ2
+
+− 14 F (ω) 
+
+> μν
+
+F (ω)μν + 12 m2 
+
+> ω
+
+A(ω) 
+
+> μ
+
+A(ω)μ
+
+− 14 F (ϱ) 
+
+> μν
+
+· F (ϱ)μν + 12 m2
+
+> ϱ
+
+A(ϱ) 
+
+> μ
+
+· A(ϱ)μ,
+
+(27) where γμ denotes the Dirac matrices and τ are the Pauli matrices in isospin space. The meson field tensors are de-fined as F (ω,ϱ )μν = ∂μA(ω,ϱ )ν − ∂ν A(ω,ϱ )μ. The couplings Γσ , Γ ω , and Γ ϱ characterize the interaction strengths be-tween nucleons and the corresponding meson fields. In density-dependent hadronic (DDH) models these couplings vary with the baryon density ρ and are parametrized as ΓM (ρ) = Γ M, 0 hM (x), x = ρ/ρ 0, (28) where ρ0 is the nuclear saturation density. For the isoscalar sector we adopt 
+
+hM (x) = exp[ −(xaM − 1)] , (29) while the isovector coupling follows 
+
+hϱ(x) = exp[ −aϱ(x − 1)] , (30) as described in Ref. [75]. These density de-pendencies reproduce the trends obtained in Dirac–Br¨ uckner–Hartree–Fock calculations at densi-ties relevant for NS interiors [75–77]. Assuming uniform matter and employing the mean-field approximation, the meson fields are replaced by their expectation values. The corresponding field equa-tions become 
+
+m2 
+
+> σ
+
+σ = Γ σ ¯ψψ, (31) 
+
+m2 
+
+> ω
+
+ω0 = Γ ω ¯ψγ 0ψ, (32) 
+
+m2
+
+> ϱ
+
+ϱ03 = 12 Γϱ ¯ψγ 0τ3ψ. (33) At zero temperature the baryon number density and 5scalar density are given by 
+
+ρ = γ
+
+2π2
+
+X
+
+> B=p,n
+
+Z kFB
+
+> 0
+
+k2dk, (34) 
+
+ρs = γ
+
+2π2
+
+X
+
+> B=p,n
+
+Z kFB
+
+> 0
+
+m∗k2
+
+√k2 + m∗2 dk, (35) where kFB denotes the Fermi momentum of nucleon species B, γ is the spin degeneracy factor, and the ef-fective nucleon mass is m∗ = m − Γσ σ.The density dependence of the couplings generates an additional rearrangement contribution Σ r , which guaran-tees thermodynamic consistency of the model [75]. The total energy density of NS matter can then be written as 
+
+ε = 1
+
+π2
+
+X
+
+> B=n,p
+
+Z kFB
+
+> 0
+
+k2pk2 + m∗2 dk 
+
++ 12 m2 
+
+> σ
+
+σ2 + 12 m2 
+
+> ω
+
+ω20 + 12 m2
+
+> ϱ
+
+(ϱ03)2 + εlep , (36) where εlep represents the leptonic contribution. The pres-sure follows from the thermodynamic relation 
+
+P = X
+
+> i=n,p,e,μ
+
+μiρi − ε. (37) The matter inside NS cores is assumed to satisfy β
+
+equilibrium through the weak interaction processes 
+
+n ↔ p + e− + ¯ ν, (38) 
+
+n + ν ↔ p + e−, (39) and the equilibrium conditions 
+
+μn = μp + μe, μe = μμ. (40) Charge neutrality further requires 
+
+ρp = ρe + ρμ. (41) To obtain a complete NS EOS, the core EOS is matched to the crust description. The outer crust is described by the BPS EOS, while the inner crust is ap-proximated by a polytropic relation p(ε) = a1 + a2εγ
+
+with γ = 4 /3 [78]. The uncertainties associated with this matching procedure have been discussed in Refs. [79–82]. The EOS of asymmetric nuclear matter can be ex-panded around the symmetric limit as 
+
+ϵ(ρ, δ ) ≃ ϵ(ρ, 0) + S(ρ)δ2, (42) where δ = ( ρn − ρp)/ρ denotes the isospin asymmetry. Expanding around the saturation density ρ0 introduces bulk nuclear matter parameters such as the incompress-ibility K0, skewness Q0, and higher-order derivatives that characterize the density dependence of symmetric matter and the symmetry energy.  
+
+> 2. Bayesian inference of model parameters
+
+The parameters of the RMF model are constrained us-ing Bayesian statistical inference, which provides a sys-tematic framework for updating parameter probabilities in light of available data [83–86]. Bayes’ theorem relates the posterior probability distribution of the parameter vector θ to the prior information and the likelihood func-tion, 
+
+P (θ|D) = L(D|θ)P (θ)
+
+Z , (43) where D represents the dataset, P (θ) denotes the prior distribution, and Z is the Bayesian evidence. Assuming Gaussian errors, the likelihood function takes the form 
+
+L(D|θ) = Y
+
+> j
+
+1
+
+q
+
+2πσ 2
+
+> j
+
+exp 
+
+"
+
+− 12
+
+ dj − mj (θ)
+
+σj
+
+2#
+
+, (44) where dj and mj (θ) denote the observed data and corre-sponding model predictions, respectively. Posterior distributions for individual parameters are obtained by marginalizing over the remaining parame-ters, 
+
+P (θi|D) = 
+
+Z
+
+P (θ|D) Y 
+
+> k̸=i
+
+dθ k. (45) To sample the posterior distribution we employ nested sampling algorithms [87]. In particular, we use the Bilby 
+
+inference framework [85] with the PyMultiNest [88] and 
+
+Dynesty [89] samplers to efficiently explore the multi-dimensional parameter space and evaluate the Bayesian evidence.   
+
+> III. METHODOLOGY A. Overview of the EMSG–Machine Learning Framework
+
+In this work, we develop a physics-informed machine learning (ML) framework to investigate whether macro-scopic NS observables can encode signatures of modified gravity within the Energy–Momentum Squared Gravity (EMSG) theory. In EMSG, the coupling parameter α in-troduces additional matter-dependent corrections to the stellar structure equations, thereby modifying the inter-nal pressure support and global NS properties. The complete workflow, consistent with Fig. 1 and the Results section, consists of two stages: 1. Identification of observationally viable NS configu-rations 2. Classification of the underlying EMSG coupling pa-rameter α
+
+This two-step strategy ensures that the ML analysis remains grounded in physically realistic NS models. 6 
+
+> B. Dataset Generation and Feature Space
+
+The dataset is constructed by solving the modi-fied Tolman–Oppenheimer–Volkoff (TOV) equations in EMSG for approximately 10 4 nuclear equations of state (EOSs). For each EOS, stellar configurations are gener-ated over a wide range of central energy densities and for different values of the coupling parameter: 
+
+α = {− 5.01 , −2.50 , 0, +2 .50 , +5 .01 } × 10 −38 erg −1 cm 3.
+
+(46) For every equilibrium configuration, we compute the following macroscopic observables: 
+
+x = ( M, R, Λ, f ), (47) where each quantity has direct physical significance: 
+
+• M, R : global structural properties governed by hy-drostatic equilibrium 
+
+• Λ: tidal response sensitive to stellar compactness 
+
+• f : oscillation frequency determined by average den-sity These features collectively capture the modifications induced by the EMSG parameter α on NS structure.   
+
+> C. Feature Selection and Physical Labeling
+> 1. Stage I: Observational Viability Filtering
+
+The first stage of the ML pipeline consists of iden-tifying NS configurations that are consistent with cur-rent astrophysical observations. Instead of using only the mass–radius relation, we impose a set of physically moti-vated constraints involving multiple observables [90–98]: 
+
+M > 2 M⊙, R > 12 km , Λ > 580 . (48) These conditions are motivated by: 
+
+• Massive pulsar measurements ( M ≳ 2 M⊙) [90– 92]. 
+
+• NICER radius constraints ( R ∼ 12–13 km) [93–96]. 
+
+• Gravitational-wave bounds on tidal deformability (GW170817) [97, 98]. Based on these criteria, each configuration is assigned a binary label: 
+
+y =
+
+(
+
+1, observationally viable neutron star ,
+
+0, excluded by observations . (49) This step is crucial, as it removes physically unrealistic models and restricts the analysis to the observationally allowed region of the parameter space.  
+
+> 2. Stage II: Classification of EMSG Coupling Parameter
+
+After filtering, only the configurations satisfying y = 1 are retained. The second stage of the ML framework aims to determine whether the remaining macroscopic observ-ables retain sufficient information to distinguish the un-derlying EMSG coupling parameter α.We therefore perform a supervised multi-class classifi-cation using three representative sectors: 
+
+α = +5 .01 × 10 −38 , 0, −5.01 × 10 −38 erg −1 cm 3.
+
+(50) The ML task is thus defined as: 
+
+x → α, (51) where the input features correspond to observationally viable NS properties. This formulation directly tests whether EMSG-induced modifications to stellar structure produce sep-arable signatures in the multidimensional observable space.  
+
+> 3. Stage III: Data Preprocessing: Scaling and Splitting
+
+Before training the machine learning classifiers, the generated NS dataset is subjected to a sequence of pre-processing steps to ensure that the input data are suitable for classification. The main steps are: 
+
+• Data cleaning: The dataset is examined for miss-ing, non-finite, or otherwise unsuitable entries in the NS observables. Only physically meaningful configurations are retained for the subsequent anal-ysis. 
+
+• Feature scaling: The input observables (M, R, Λ, f ) have different numerical ranges and units. Therefore, the features are scaled before applying the machine learning algorithms so that variables with larger numerical values do not artificially dominate the classification. 
+
+• Class balancing: For the first-stage viability clas-sification, the imbalance between observationally viable and non-viable NS configurations is miti-gated to prevent the classifier from being biased toward the majority class. 
+
+• Train–test split: The processed dataset is divided into training and testing subsets. A stratified split is used so that the relative representation of the EMSG classes is preserved in both subsets.  
+
+> D. Classification Models
+
+We employ five supervised machine learning algo-rithms to classify NS configurations: 7
+
+• Random Forest (RF): Captures non-linear cor-relations among observables and is highly effective in detecting EMSG-induced structural variations [99]. 
+
+• k-Nearest Neighbours (KNN): Classifies configurations based on proximity in feature space, naturally identifying clustering patterns in (M, R, Λ) [100]. 
+
+• Support Vector Machine (SVM): Constructs optimal separating boundaries in high-dimensional space, useful for subtle differences induced by α
+
+[101]. 
+
+• Logistic Regression (LR): Provides a baseline linear classifier, useful for assessing the degree of separability in the dataset [102]. 
+
+• Gaussian Naive Bayes (GNB): A probabilis-tic model assuming Gaussian-distributed features, serving as a simple benchmark [103, 104].  
+
+> 1. Model Training and Evaluation
+
+Each classifier is trained using the training subset and subsequently evaluated on the independent test subset, which contains configurations not used during model training. The classification performance is assessed using four standard metrics: accuracy, precision, recall, and F1-score. These metrics provide complementary mea-sures of how reliably the models distinguish NS configu-rations belonging to the three EMSG coupling sectors. For a given EMSG sector, the accuracy measures the fraction of all test configurations that are assigned to the correct class, Accuracy = T P + T N T P + T N + F P + F N (52) where T P and T N denote the numbers of correctly clas-sified positive and negative samples, known as True Pos-itive and True Negative, while F P and F N denote the corresponding misclassified samples, known as False Posi-tive and False Negatively respectively. Since our problem involves three EMSG sectors, the accuracy is calculated over all classes in the multi-class test set. The precision measures the reliability of the predicted class labels and is defined as Precision = T P T P + F P (53) where a high precision indicates that configurations pre-dicted to belong to a particular EMSG sector are rarely assigned to that sector incorrectly. The recall measures the ability of the classifier to correctly identify configu-rations that truly belong to a given EMSG sector, Recall = T P T P + F N (54)       
+
+> Load Neutron Star Dataset Extract Features
+> M, R, Λ, f
+> Train/Test Split Train Classifiers RF, KNN, SVM, LR, GNB Compute Metrics Accuracy, Precision, Recall, F1 Confusion Matrix Predict EMSG Sector
+> α={+5 .01 ,0,−5.01 } × 10 −38
+> FIG. 1. Flowchart summarizing the machine learning pipeline used to classify neutron stars in Energy–Momentum Squared Gravity (EMSG).
+
+Thus, a high recall indicates that only a small fraction of configurations belonging to that EMSG sector are missed by the classifier. The F1-score combines precision and recall through their harmonic mean, F1 score = 2 ×
+
+ Precision × Recall Precision + Recall 
+
+
+
+(55) and therefore provides a single measure of the balance between correct class assignment and the identification of all configurations belonging to each EMSG sector. For the multi-class classification considered here, these quantities are evaluated for each EMSG sector and sum-marized together with the overall accuracy. In addition, we use the confusion matrix to examine the class-wise predictions in greater detail. Each element of the confu-sion matrix represents the number of test configurations belonging to a true EMSG sector that are assigned to a 810 2 10 3                                 
+
+> E(MeV ·fm −3)10 0
+> 10 1
+> 10 2
+> 10 3
+> P (MeV  · fm −3)
+> Annala 2020
+> α= +5 .01 ×10 −38 erg −1cm 3
+> α= +2 .50 ×10 −38 erg −1cm 3
+> α(GR) = 0
+> α=−2.50 ×10 −38 erg −1cm 3
+> α=−5.01 ×10 −38 erg −1cm 38910 11 12 13 14 15 16
+
+R (km)                                 
+
+> 0.51.01.52.02.5
+> M (M ) Miller et .al .2019(NICER) Riley et .al .2019(NICER) Miller et .al .2021 (NICER&XMM −Newton) Riley et .al .2021 (NICER&XMM −Newton) GW170817
+> α= +5 .01 ×10 −38 erg −1cm 3
+> α= +2 .50 ×10 −38 erg −1cm 3
+> α(GR) = 0
+> α=−2.50 ×10 −38 erg −1cm 3
+> α=−5.01 ×10 −38 erg −1cm 3
+> PSR J0030 + 0451 PSR J0030 + 0451 PSR J0740 + 6620 PSR J0740 + 6620 PSR J0437 −4715 HESS
+
+FIG. 2. The left panel shows the pressure ( P ) as a function of energy density ( E) for the representative EOS together with the modifications introduced by different values of the EMSG coupling parameter, α. The shaded region (or black band) represents the observationally constrained EOS from Annala (2020). The right panel presents the corresponding NS mass-radius ( M –R)relation. The figure demonstrates that EMSG can produce NS configurations consistent with current astrophysical observations while exhibiting measurable deviations from the predictions of General Relativity. The solid and dotted lines are for the 90% and 50% intervals, respectively. 
+
+predicted sector. Correct classifications appear along the diagonal, whereas off-diagonal elements represent mis-classifications between different EMSG coupling sectors. Consequently, a nearly diagonal confusion matrix indi-cates that the macroscopic observables ( M, R, Λ, f ) pro-vide a well-separated feature space for distinguishing the considered EMSG sectors. The combination of these evaluation measures allows us to assess not only the overall predictive performance of each classifier, but also whether the observed separability is maintained for each individual EMSG coupling sector. The resulting accuracy, precision, recall, F1-score, and confusion matrices are presented and discussed in Sec. IV. 
+
+IV. RESULTS AND DISCUSSION 
+
+In this section, we present our comprehensive analysis of this work. 
+
+A. Neutron Stars properties in Energy-Momentum Squared Gravity 
+
+To investigate the effects of Energy-Momentum Squared Gravity (EMSG) on NS observables, we gen-erated a comprehensive dataset by solving the modified Tolman-Oppenheimer-Volkoff (TOV) equations for ap-proximately 10 , 000 nuclear equations of state (EOSs). For each EOS, equilibrium stellar configurations were computed over a wide range of central energy densities for different values of the EMSG coupling parameter, 
+
+α = {− 5.01 , −2.50 , 0, +2 .50 , +5 .01 } × 10 −38 erg −1 cm 3.The corresponding macroscopic observables, namely the gravitational mass ( M ), radius ( R), tidal deformability (Λ), and the fundamental ( f )-mode oscillation frequency, were calculated for every stellar configuration. Fig. 2 presents the pressure-energy density relation to-gether with the corresponding mass-radius relation for different values of the EMSG coupling parameter. The quadratic matter corrections introduced in EMSG mod-ify the effective energy density and pressure, thereby changing the stellar hydrostatic equilibrium. Positive values of α provide additional pressure support inside the stellar core, enabling NSs to sustain larger maximum masses with relatively larger radii compared to General Relativity (GR). Conversely, negative values of α reduce the effective pressure support, producing more compact stellar configurations with smaller maximum masses. The predicted mass–radius relations are compared with observational constraints obtained from NICER mea-surements of PSR J0030+0451 and PSR J0740+6620 together with the gravitational-wave constraints from GW170817. Several EMSG models, particularly those corresponding to positive values of α, satisfy these ob-servational limits while exhibiting measurable deviations from GR. These results indicate that EMSG remains compatible with present astrophysical observations over an appropriate range of the coupling parameter. 
+
+B. Tidal deformability, oscillation frequency 
+
+The modifications introduced by EMSG also affect sev-eral secondary NS observables. Fig. 3 shows the variation of the fundamental ( f )-mode oscillation frequency and 91.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 
+
+f (kHz)                                                 
+
+> 0.51.01.52.02.5
+> M (M )
+> α= +5 .01 ×10 −38 erg −1cm 3
+> α= +2 .50 ×10 −38 erg −1cm 3
+> α(GR) = 0
+> α=−2.50 ×10 −38 erg −1cm 3
+> α=−5.01 ×10 −38 erg −1cm 3
+> GW170817 GW190814 10 110 210 310 410 5
+> Λ
+> 0.51.01.52.02.5
+> M (M )
+> α= +5 .01 ×10 −38 erg −1cm 3
+> α= +2 .50 ×10 −38 erg −1cm 3
+> α(GR) = 0
+> α=−2.50 ×10 −38 erg −1cm 3
+> α=−5.01 ×10 −38 erg −1cm 3
+> GW170817 GW190814
+
+FIG. 3. The left panel represents the f -mode frequency variation with mass, and the right panel shows the tidal deformability variation with mass. The solid and dotted lines are for the 90% and 50% intervals, respectively. TABLE I. Accuracy, Precision, Recall and F1-Score values are presented for different classifier for different values of α.Accuracy Precision Recall F1-Score 
+
+α(10 −38 ) = +5 .01 0 −5.01 +5 .01 0 −5.01 +5 .01 0 −5.01 +5 .01 0 −5.01 RF 0.998525 0.998754 0.999081 0.999686 0.999911 0.999953 0.997363 0.997596 0.998209 0.998523 0.998752 0.999080 KNN 0.992156 0.994680 0.994555 0.988900 0.992291 0.992627 0.995486 0.997106 0.996511 0.992182 0.994693 0.994566 SVM 0.968669 0.969327 0.972823 0.956072 0.954712 0.956197 0.982480 0.985398 0.991043 0.969096 0.969812 0.973308 LR 0.967418 0.966011 0.970442 0.956124 0.952338 0.953138 0.979798 0.981125 0.989534 0.967816 0.966517 0.970995 GNB 0.918276 0.926969 0.935109 0.860984 0.874590 0.887257 0.997631 0.996884 0.996889 0.924284 0.931741 0.938883 
+
+the dimensionless tidal deformability with stellar mass for different values of the coupling parameter. Since the f -mode frequency primarily depends on the average density and compactness of the star, changes in the internal matter distribution produced by EMSG nat-urally modify the oscillation spectrum. Positive values of α generally shift the oscillation frequencies relative to the GR prediction through their influence on stellar compactness, while negative values produce the oppo-site behaviour. Such deviations may become observable through future gravitational-wave observations of oscil-lating neutron stars. The tidal deformability exhibits a similarly systematic dependence on the coupling parameter. Because Λ ∝
+
+C−5, even modest changes in compactness produce sig-nificant differences in tidal deformability. Positive values of α generally increase Λ, whereas negative values de-crease it. The resulting sequences remain consistent with the constraints obtained from GW170817 and GW190814 over the considered parameter range, suggesting that tidal deformability provides an efficient probe of EMSG corrections. 
+
+C. Machine learning classification of observationally viable neutron stars 
+
+To investigate whether the macroscopic NS observables contain sufficient information to identify the underly-ing EMSG coupling, we adopted a two-stage supervised machine-learning framework. In the first stage, every NS model generated from the ap-proximately 10 , 000 EOSs was compared with the avail-able observational constraints in the mass–radius plane. Each configuration was assigned a binary label accord-ing to whether its mass–radius pair satisfies the current astrophysical observations. Models consistent with the observational constraints were assigned the label y = 1, whereas the remaining models were assigned y = 0. Since the original dataset exhibited class imbalance, the sam-ples were balanced prior to training to prevent the clas-sifiers from favouring the majority class. Only the NS configurations classified as observationally viable ( y = 1) were retained for the second stage of the analysis. This filtering procedure removes physically ex-cluded models and ensures that the subsequent classifica-tion focuses exclusively on neutron stars compatible with 10 RF KNN SVM LR GNB Model 0.86 0.88 0.90 0.92 0.94 0.96 0.98 1.00 Score                  
+
+> α= +5 .01 ×10 −38 erg −1cm 3
+> Accuracy Precision Recall F1 −Score RF KNN SVM LR GNB Model 0.86 0.88 0.90 0.92 0.94 0.96 0.98 1.00 Score
+> α(GR) = 0 Accuracy Precision Recall F1 −Score RF KNN SVM LR GNB Model 0.86 0.88 0.90 0.92 0.94 0.96 0.98 1.00 Score
+> α=−5.01 ×10 −38 erg −1cm 3
+> Accuracy Precision Recall F1 −Score
+
+FIG. 4. Scores of different classifiers are represented, where different colour bars represent Accuracy, Precision, Recall and F1-Score values. 
+
+FIG. 5. Confusion matrix for different classifiers with α = +5 
+
+current observations. The filtered dataset was subsequently used to per-form a three-label classification corresponding to the three representative EMSG coupling sectors, α =+5 .01 × 10 −38 , 0, −5.01 × 10 −38 erg −1 cm 3. The in-put features consisted of the macroscopic observables (M, R, Λ, f ), while the target labels correspond to the three values of the EMSG coupling parameter ( α). Five supervised machine-learning algorithms, namely Ran-dom Forest (RF), K-Nearest Neighbours (KNN), Sup-port Vector Machine (SVM), Logistic Regression (LR), and Gaussian Naive Bayes (GNB), were trained and eval-uated using the dataset. The classification performance is summarized in Table I and Fig. 4. Among all the considered algorithms, the Random Forest classifier achieved the highest predictive performance, yielding an overall accuracy of approxi-mately 99 .85%, together with precision, recall, and F 1-score values exceeding 99 .8% for all three EMSG sec-tors. The KNN classifier also performed remarkably well, achieving accuracies above 99%, indicating that observa-tionally allowed NS configurations corresponding to dif-ferent EMSG sectors occupy well-separated regions in the multidimensional feature space. Support Vector Machine and Logistic Regression pro-duced accuracies close to 97%, demonstrating that the EMSG classes remain distinguishable even with com-paratively simple decision boundaries. Although Gaus-sian Naive Bayes exhibited relatively lower accuracy, it nevertheless correctly classified the majority of NS models. The comparatively lower performance is ex-pected because the NS observables are strongly corre-lated through the stellar structure equations, partially violating the conditional independence assumption un-11   
+
+> FIG. 6. Same as Fig. 5 but for α= 0
+
+derlying the Gaussian Naive Bayes algorithm. Overall, these results demonstrate that once observa-tional constraints are imposed, the macroscopic NS ob-servables retain sufficient information to distinguish dif-ferent EMSG coupling strengths with exceptionally high confidence. The excellent classification performance fur-ther indicates that EMSG introduces systematic modi-fications to NS structure that are readily captured by modern supervised learning techniques.  
+
+> D. Confusion matrix analysis
+
+To further evaluate the robustness of the machine-learning models, we analysed the confusion matrices corresponding to the binary classification, as shown in Figs. 5, 6, 7. The confusion matrices provide detailed in-formation regarding correctly classified samples and the misclassification rates between different EMSG sectors. The Random Forest classifier exhibits an almost perfectly diagonal confusion matrix, indicating that nearly all ob-servationally viable NS models are assigned to their cor-rect EMSG class. The numbers of false positives and false negatives remain extremely small, explaining the excel-lent values of accuracy, precision, recall, and F 1-score obtained by the classifier. The KNN model displays a similarly strong diagonal structure, confirming that the EMSG sectors occupy distinct regions in the multidimen-sional feature space. SVM and Logistic Regression show slightly larger off-diagonal components, corresponding to a modest increase in confusion between neighbouring EMSG sectors. Gaus-sian Naive Bayes exhibits the largest off-diagonal entries among the five classifiers, consistent with its compara-tively lower performance metrics. Overall, the confusion-matrix analysis confirms that the combination of NS mass, radius, tidal deformability, mo-ment of inertia, binding energy, and oscillation frequency provides a highly discriminative feature space for identi-fying the underlying EMSG coupling parameter. The ex-tremely low misclassification rates obtained by the Ran-dom Forest classifier demonstrate that machine learning offers a reliable framework for distinguishing modified-gravity signatures using observable NS properties.  
+
+> V. CONCLUSIONS
+
+We have investigated whether the macroscopic struc-ture of NS can retain identifiable signatures of Energy-Momentum Squared Gravity (EMSG) after imposing astrophysically motivated constraints. By solving the modified Tolman–Oppenheimer–Volkoff equations over a large set of 10 , 000 nuclear equations of state, we find that the EMSG coupling produces systematic changes in NS structure. In particular, positive values of α enhance the effective pressure support and allow larger maximum masses and radii, whereas negative values lead to more compact configurations with reduced maximum masses. The corresponding changes in compactness are also re-flected in the tidal deformability and fundamental f -mode frequency. Importantly, these effects are not con-fined to models already excluded by observations: a sub-set of EMSG configurations remains compatible with the 12    
+
+> FIG. 7. Same as Fig. 5 but for α=−5
+
+observational constraints considered in this work while retaining measurable departures from the GR predic-tions. This indicates that observational consistency alone does not necessarily rule out modified-gravity signatures in NS observables. The ML analysis provides a complementary result. After restricting the dataset to observationally viable configurations, the multidimensional set of observables (M, R, Λ, f ) remains sufficiently structured to distin-guish the three representative EMSG sectors, α =
+
+{− 5.01 , 0, +5 .01 }× 10 −38 erg −1cm 3. Among the five clas-sifiers considered, Random Forest gives the strongest performance, with an overall accuracy of approximately 99 .85% and precision, recall, and F1-scores above 99 .8% for the individual sectors, while K-Nearest Neighbours also exceeds 99% accuracy. The nearly diagonal confu-sion matrices show that the excellent performance is not simply a consequence of the overall class statistics; con-figurations associated with the different coupling sectors occupy distinct regions of the observable space. The main implication is therefore not that ML has re-placed the physical modelling of NS, but that it can ex-pose structure in the observable parameter space that is difficult to characterize using a single stellar rela-tion. Once the observationally excluded configurations are removed, the remaining variations in mass, radius, tidal deformability, and oscillation frequency still carry information about the underlying EMSG sector. The result provides evidence that the imprint of the mat-ter–gravity coupling can survive astrophysical filtering and may therefore be relevant for future multi-messenger tests of gravity. Several limitations should, however, be kept in mind. First, the present analysis is a classification study per-formed for three discrete and representative values of α
+
+rather than a continuous inference of the EMSG cou-pling. Consequently, the reported classification accuracy should not be interpreted as a direct measurement of α
+
+from observational data. Second, the training and test-ing data are generated from theoretical NS models, and the present analysis does not yet incorporate observa-tional uncertainties and correlated measurement errors in ( M, R, Λ, f ). Third, using a large EOS ensemble re-duces sensitivity to any single nuclear model, but the EOS space considered here does not exhaust the full the-oretical uncertainty in the high-density equation of state. Finally, the fundamental f -mode frequency is calculated within the Cowling approximation, in which metric per-turbations are neglected; this introduces an additional modelling limitation when connecting the predicted oscil-lation frequencies to future gravitational-wave measure-ments. These limitations motivate several natural extensions. A particularly important next step is to replace the dis-crete classification of α by a regression or Bayesian in-ference framework capable of recovering a posterior dis-tribution for the coupling parameter while propagating uncertainties in the EOS and in the measured NS ob-servables. The present observable set can also be aug-mented, where appropriate, by additional quantities such as the moment of inertia and binding-energy-related ob-servables, allowing us to test whether they provide inde-pendent information on the EMSG coupling rather than simply correlated information. A further extension will 13 be to include realistic observational uncertainties and synthetic measurement errors in the training and test-ing samples, thereby testing whether the high separa-bility found in the idealized theoretical dataset survives under realistic data quality. The inclusion of more gen-eral EMSG couplings, a continuous range of α, and al-ternative modified-gravity theories would then allow the framework to address model discrimination rather than classification within a single theory. Overall, the results establish a proof of principle that NS observables can retain distinguishable signatures of EMSG even within an observationally viable region of the parameter space. The combination of relativistic stellar modelling, nuclear-EOS uncertainty, and data-driven in-ference therefore offers a useful route toward testing grav-ity with neutron stars. As measurements of masses, radii, tidal properties, and NS oscillations become increasingly precise, such a framework can be developed from a clas-sification tool into a statistically controlled method for constraining deviations from General Relativity. 
+
+ACKNOWLEDGEMENT 
+
+S.G. and D.D. acknowledge the National Institute of Technology Rourkela for fellowship support. P.M would like to thank BITS Pilani, K K Birla Goa campus for the fellowship support; Subhadip Sau and Ayush Hazarika for the fruitful discussions on Machine Learning analysis. 
+
+[1] N. K. Glendenning, Compact Stars (Springer, 1997). [2] S. L. Shapiro and S. A. Teukolsky, Black holes, white dwarfs and neutron stars (1983). [3] K. Y. Ek¸ si, C. G¨ ung¨ or, and M. M. T¨ urko˘ glu, Physical Review D 89 (2014), 10.1103/physrevd.89.063003. [4] H. Das, A. Kumar, B. Kumar, S. Biswal, and S. Patra, Journal of Cosmology and Astroparticle Physics 2021 ,007 (2021). [5] H. C. Das, J. A. Pattnaik, and S. K. Patra, Phys. Rev. D 107 , 083007 (2023). [6] S. Kopeikin, Frontiers in Relativistic Celestial Mechan-ics , Vol. 2 (Walter de Gruyter, Berlin, Boston, 2014) provided by the SAO/NASA Astrophysics Data System. [7] B. P. Abbott, R. Abbott, and T. D. Abbott, The As-trophysical Journal Letters 848 , L12 (2017). [8] D. A. Coulter et al. , Science 358 , 1556 (2017), https://www.science.org/doi/pdf/10.1126/science.aap9811. [9] B. P. Abbott, The Astrophysical Journal Letters 892 ,L3 (2020). [10] B. P. Abbott (LIGO Scientific Collaboration and Virgo Collaboration), Phys. Rev. X 9, 011001 (2019). [11] G. Fragione, The Astrophysical Journal Letters 923 , L2 (2021). [12] P. D’Avanzo, Journal of High Energy Astrophysics 7,73 (2015), swift 10 Years of Discovery, a novel approach to Time Domain Astronomy. [13] N. Jordana-Mitjans, C. G. Mundell, C. Guidorzi, R. J. Smith, E. Ram´ ırez-Ruiz, B. D. Metzger, S. Kobayashi, A. Gomboc, I. A. Steele, M. Shrestha, M. Marongiu, A. Rossi, and B. Rothberg, The Astrophysical Journal 
+
+939 , 106 (2022). [14] M. C. Miller et al. , The Astrophysical Journal Letters 
+
+887 , L24 (2019). [15] B. P. Abbott, R. Abbott, and A. et al. (LIGO Scien-tific Collaboration and Virgo Collaboration), Phys. Rev. Lett. 119 , 161101 (2017). [16] S. De, D. Finstad, J. M. Lattimer, D. A. Brown, E. Berger, and C. M. Biwer, Phys. Rev. Lett. 121 ,091102 (2018). [17] T. G. F. Li et al. , J. Phys. Conf. Ser. 363 , 012028 (2012), arXiv:1111.5274 [gr-qc]. [18] M. Kramer et al. , Phys. Rev. X 11 , 041050 (2021). [19] S. Ghosh, General Relativity and Gravitation 57 , 70 (2025). [20] A. Einstein, Sitzungsberichte der K¨ oniglich Preussis-chen Akademie der Wissenschaften , 831 (1915), pro-vided by the SAO/NASA Astrophysics Data System. [21] E. J. COPELAND, M. SAMI, and S. TSUJIKAWA, International Journal of Modern Physics D 15 , 1753 (2006), https://doi.org/10.1142/S021827180600942X. [22] A. Riess et al. , The Astronomical Journal 116 , 1009 (1998). [23] S. Perlmutter et al. , The Astrophysical Journal 517 , 565 (1999). [24] P. Mahapatra, C. Singha, A. Hazarika, and P. K. Das, Astrophys. J. 985 , 74 (2025), arXiv:2408.14020 [astro-ph.CO]. [25] X.-Z. Liu, P. Mahapatra, C. Huang, A. Hazarika, C. Singha, and P. K. Das, Phys. Rev. D 112 , 083032 (2025), arXiv:2506.08376 [astro-ph.HE]. [26] P. Mahapatra, A. L. Miller, and P. K. Das, (2026), arXiv:2606.05082 [astro-ph.CO]. [27] S. Capozziello and M. De Laurentis, Physics Reports 
+
+509 , 167 (2011). [28] G. J. Olmo, D. Rubiera-Garcia, and A. Wojnar, Physics Reports 876 , 1 (2020), stellar structure models in mod-ified theories of gravity: Lessons and challenges. [29] S. Nojiri and S. D. Odintsov, Physics Reports 505 , 59 (2011). [30] S. Nojiri, S. Odintsov, and V. Oikonomou, Physics Re-ports 692 , 1 (2017), modified Gravity Theories on a Nutshell: Inflation, Bounce and Late-time Evolution. [31] S. CAPOZZIELLO, International Jour-nal of Modern Physics D 11 , 483 (2002), https://doi.org/10.1142/S0218271802002025. [32] S. NOJIRI and S. D. ODINTSOV, International Jour-nal of Geometric Methods in Modern Physics 04 , 115 (2007), https://doi.org/10.1142/S0219887807001928. [33] F. S. N. Lobo, “The dark side of gravity: Modified the-ories of gravity,” (2008), arXiv:0807.1640 [gr-qc]. [34] T. P. Sotiriou and V. Faraoni, Rev. Mod. Phys. 82 , 451 (2010). [35] G. J. OLMO, International Journal of Modern Physics D 20 , 413 (2011), https://doi.org/10.1142/S0218271811018925. 14 
+
+[36] T. Clifton, P. G. Ferreira, A. Padilla, and C. Skordis, Physics Reports 513 , 1–189 (2012). [37] O. Akarsu, M. Bouhmadi-L´ opez, N. Katırc ı, E. Nazari, M. Roshan, and N. M. Uzun, Phys. Rev. D 109 , 104055 (2024). [38] N. Alam, S. Pal, A. Rahmansyah, and A. Sulaksono, Phys. Rev. D 109 , 083007 (2024). [39] A. V. Astashenok, S. Capozziello, and S. D. Odintsov, Journal of Cosmology and Astroparticle Physics 2015 ,001 (2015). [40] S. Capozziello, M. De Laurentis, R. Farinelli, and S. D. Odintsov, Phys. Rev. D 93 , 023501 (2016). [41] T. Harko, F. S. N. Lobo, S. Nojiri, and S. D. Odintsov, Phys. Rev. D 84 , 024020 (2011). [42] E. Barrientos, F. S. N. Lobo, S. Mendoza, G. J. Olmo, and D. Rubiera-Garcia, Phys. Rev. D 97 , 104041 (2018). [43] P. Mahapatra and P. K. Das, Int. J. Mod. Phys. D 35 ,2650005 (2026), arXiv:2401.01321 [astro-ph.CO]. [44] N. Katirci and M. Kavuk, The European Physical Jour-nal Plus 129 , 163 (2014). [45] M. Roshan and F. Shojai, Phys. Rev. D 94 , 044002 (2016). [46] ¨Ozg¨ ur Akarsu, A. K. C ¸ amlıbel, N. Katırcı, ˙Ibrahim Semiz, and N. M. Uzun, Physics of the Dark Universe 
+
+42 , 101305 (2023). [47] R. A. C. Cipriano, N. Ganiyeva, T. Harko, F. S. N. Lobo, M. A. S. Pinto, and J. L. Rosa, Universe 10 
+
+(2024), 10.3390/universe10090339. [48] N. Nari and M. Roshan, Phys. Rev. D 98 , 024031 (2018). [49] ¨Ozg¨ ur Akarsu et.al., Phys. Rev. D 97 , 124017 (2018). [50] S. Ghosh, Journal of High Energy Astrophysics 53 ,100615 (2026). [51] S. Ghosh, B. Kumar, and S. Mahapatra, Phys. Rev. D 
+
+113 , 024070 (2026). [52] D. Chatterjee, S. Ghosh, P. R. Brady, S. J. Kapadia, A. L. Miller, S. Nissanke, and F. Pannarale, The As-trophysical Journal 896 , 54 (2020). [53] Y. S. Abylkairov, M. C. Edwards, D. Orel, A. Mitra, B. Shukirgaliyev, and E. Abdikamalov, Machine Learn-ing: Science and Technology 5, 045077 (2025). [54] M. G. Dainotti, B. D. Simone, A. Narendra, and A. Pollo, “The machine learning to reconstruct grb lightcurves,” (2025), arXiv:2501.13102 [astro-ph.CO]. [55] G. Papigkiotis, G. Vardakas, A. Likas, and N. Ster-gioulas, Phys. Rev. D 111 , 083056 (2025). [56] P. Thakur, T. Malik, and T. K. Jha, Particles 7, 80 (2024). [57] S. Chatterjee, H. Sudhakaran, and R. Mallick, Eur. Phys. J. C 84 , 1291 (2024), arXiv:2302.13648 [astro-ph.HE]. [58] G. Gon¸ calves, M. Ferreira, J. Aveiro, A. Onofre, F. F. Freitas, C. Providˆ encia, and J. A. Font, Journal of Cos-mology and Astroparticle Physics 2023 , 001 (2023). [59] P. W. Hatfield, J. A. Gaffney, G. J. Anderson, S. Ali, L. Antonelli, S. Ba¸ se˘ gmez du Pree, J. Citrin, M. Fa-jardo, P. Knapp, B. Kettle, B. Kustowski, M. J. Mac-Donald, D. Mariscal, M. E. Martin, T. Nagayama, C. A. J. Palmer, J. L. Peterson, S. Rose, J. J. Ruby, C. Shneider, M. J. V. Streeter, W. Trickey, and B. Williams, Nature 593 , 351–361 (2021). [60] A. Venneti, C. Mondal, S. M. A. Imam, S. Banik, and B. K. Agrawal, “Nucleiml: A machine learning frame-work of ground-state properties of finite nuclei for accel-erated bayesian exploration,” (2026), arXiv:2504.03333 [nucl-th]. [61] W. G. Jiang, C. Forss´ en, T. Dj¨ arv, and G. Hagen, Phys. Rev. C 109 , 064314 (2024). [62] T. Harko and F. S. N. Lobo, The European Physical Journal C 70 , 373 (2010). [63] T. Harko, F. S. N. Lobo, S. Nojiri, and S. D. Odintsov, Phys. Rev. D 84 , 024020 (2011). [64] O. Akarsu, N. Katırc ı, and S. Kumar, Phys. Rev. D 
+
+97 , 024011 (2018). [65] C. V. R. Board and J. D. Barrow, Phys. Rev. D 96 ,123517 (2017). [66] V. Faraoni, Phys. Rev. D 80 , 124040 (2009). [67] O. Akarsu, M. Bouhmadi-L´ opez, N. Katırc ı, E. Nazari, M. Roshan, and N. M. Uzun, Phys. Rev. D 109 , 104055 (2024). [68] N. Andersson, G. L. Comer, and D. Langlois, Phys. Rev. D 66 , 104002 (2002). [69] T. G. Cowling, Monthly Notices of the Royal Astronomical Society 101 , 367 (1941), https://academic.oup.com/mnras/article-pdf/101/8/367/8071901/mnras101-0367.pdf. [70] H. Sotani, N. Yasutake, T. Maruyama, and T. Tatsumi, Phys. Rev. D 83 , 024014 (2011). [71] S. Ghosh, S. Shaikh, P. J. Kalita, P. Routaray, B. Ku-mar, and B. Agrawal, Nuclear Physics B 1008 , 116697 (2024). [72] T. Hinderer, The Astrophysical Journal 677 , 1216 (2008). [73] T. Hinderer, The Astrophysical Journal 697 , 964 (2009). [74] R. Abbott, T. D. Abbott, L. S. Collaboration, et al. ,The Astrophysical Journal Letters 896 , L44 (2020). [75] S. Typel and H. H. Wolter, Nucl. Phys. A 656 , 331 (1999). [76] B. Ter Haar and R. Malfliet, Phys. Rept. 149 , 207 (1987). [77] R. Brockmann and R. Machleidt, Phys. Rev. C 42 , 1965 (1990). [78] J. Carriere, C. J. Horowitz, and J. Piekarewicz, Astro-phys. J. 593 , 463 (2003), arXiv:nucl-th/0211015. [79] M. Fortin, C. Providencia, A. R. Raduta, F. Gulminelli, J. L. Zdunik, P. Haensel, and M. Bejger, Phys. Rev. C 
+
+94 , 035804 (2016), arXiv:1604.01944 [astro-ph.SR]. [80] H. Pais and C. Providˆ encia, Phys. Rev. C 94 , 015808 (2016), arXiv:1607.05899 [nucl-th]. [81] L. L. Lopes, EPL 134 , 52001 (2021), arXiv:2012.05277 [hep-ph]. [82] I. A. Rather, A. A. Usmani, and S. K. Patra, Nucl. Phys. A 1010 , 122189 (2021), arXiv:2009.12613 [nucl-th]. [83] S. Wesolowski, N. Klco, R. J. Furnstahl, D. R. Phillips, and A. Thapaliya, J. Phys. G 43 , 074001 (2016), arXiv:1511.03618 [nucl-th]. [84] R. J. Furnstahl, N. Klco, D. R. Phillips, and S. Wesolowski, Phys. Rev. C 92 , 024005 (2015), arXiv:1506.01343 [nucl-th]. [85] G. Ashton et al. , Astrophys. J. Suppl. 241 , 27 (2019), arXiv:1811.02042 [astro-ph.IM]. [86] P. Landry, R. Essick, and K. Chatziioannou, Phys. Rev. D 101 , 123007 (2020), arXiv:2003.04880 [astro-ph.HE]. [87] G. Ashton et al. , Nature 2 (2022), 10.1038/s43586-022-00121-x, arXiv:2205.15570 [stat.CO]. 15 
+
+[88] J. Buchner, Statistics Surveys 17 (2023), 10.1214/23-ss144. [89] J. S. Speagle, Monthly Notices of the Royal Astronom-ical Society 493 , 3132–3158 (2020). [90] J. Antoniadis et al. , Science 340 , 6131 (2013), arXiv:1304.6875 [astro-ph.HE]. [91] E. Fonseca et al. , Astrophys. J. Lett. 915 , L12 (2021), arXiv:2104.00880 [astro-ph.HE]. [92] R. W. Romani, D. Kandel, A. V. Filippenko, T. G. Brink, and W. Zheng, Astrophys. J. Lett. 934 , L17 (2022), arXiv:2207.05124 [astro-ph.HE]. [93] M. C. Miller et al. , Astrophys. J. Lett. 887 , L24 (2019), arXiv:1912.05705 [astro-ph.HE]. [94] T. E. Riley et al. , Astrophys. J. Lett. 887 , L21 (2019). [95] M. C. Miller et al. , Astrophys. J. Lett. 918 , L28 (2021), arXiv:2105.06979 [astro-ph.HE]. [96] T. E. Riley et al. , Astrophys. J. Lett. 918 , L27 (2021), arXiv:2105.06980 [astro-ph.HE]. [97] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 119 , 161101 (2017), arXiv:1710.05832 [gr-qc]. [98] B. P. Abbott et al. (LIGO Scientific, Virgo), Phys. Rev. Lett. 121 , 161101 (2018), arXiv:1805.11581 [gr-qc]. [99] A. Verma and X. Dong, Journal of Biomedical Science and Engineering 9, 285 (2016). [100] T. M. Cover and P. E. Hart, IEEE Trans. Inf. Theory 
+
+13 , 21 (1967). [101] C. Cortes and V. N. Vapnik, Machine Learning 20 , 273 (1995). [102] D. J. Foster, S. Kale, H. Luo, M. Mohri, and K. Srid-haran, in Annual Conference Computational Learning Theory (2018). [103] S. Raschka, ArXiv abs/1410.5329 (2014). [104] R. Islam, M. K. Devnath, M. D. Samad, and S. M. J. A. Kadry, Veh. Commun. 33 , 100442 (2021).
