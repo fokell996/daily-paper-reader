@@ -1,0 +1,649 @@
+Title: Enabling new sampling strategies for continuous-wave analyses by integrating Bilby into PyFstat
+
+URL Source: https://arxiv.org/pdf/2609.08801v2
+
+Published Time: Thu, 10 Sep 2026 01:12:53 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# Enabling new sampling strategies for continuous-wave analyses by integrating BILBY into PyFstat 
+
+Maria-Antonia Ferrer-Martinez 1, 2, ∗ and David Keitel 1, †
+
+> 1
+
+IAC3, Universitat de les Illes Balears, Cra. de Valldemossa km 7.5, 07122 Palma, Spain 
+
+> 2
+
+Universit` a di Milano and INFN, sezione di Milano, Via Celoria 16, 20133 Milano, Italy 
+
+(Dated: September 9, 2026) Continuous-wave searches for rotating neutron stars usually cover wide parameter spaces and produce a large number of candidate signals. Stochastic sampling methods therefore play an im-portant role in candidate follow-up and parameter estimation. We present the integration of the Bayesian inference library BILBY into the open-source continuous-wave analysis package PyFstat ,enabling access to the broad range of stochastic samplers available through BILBY while preserving the existing PyFstat analysis infrastructure. The implementation is validated through injection studies in Gaussian noise for two representative single-stage follow-up configurations: candidates from a directed search and candidates from an all-sky search. Using the nested sampler DYNESTY ,we obtain detection efficiencies consistent with the theoretical sensitivity predictions. In this setup, 
+
+DYNESTY performs comparably to the existing PTEMCEE -based implementation of PyFstat for the directed case, and also provides an effective single-stage approach for the all-sky candidate follow-up considered here, where we did not identify a PTEMCEE setup with similar recovery performance. Percentile-percentile tests for DYNESTY further show well-calibrated credible intervals, demonstrat-ing reliable parameter estimation. While a full exploration of DYNESTY settings, multi-stage setups, and other samplers is left for future work, these results demonstrate that this flexible and publicly available framework opens useful new possibilities for Bayesian continuous-wave analyses. 
+
+I. INTRODUCTION 
+
+Gravitational waves (GWs) are expected to be emitted by non-axisymmetric rotating neutron stars (NSs) in the form of long-lasting, almost monochromatic continuous waves (CWs) [1]. Although these signals have not yet been detected, they remain a key target for current and future GW observatories such as LIGO–Virgo–KAGRA (LVK), Einstein Telescope, and Cosmic Explorer [2–6]. Their detection would provide unique information on the internal structure and dynamics of NSs, offering a direct probe of matter under extreme physical conditions [7–9]. CW searches are computationally demanding, since they require the analysis of months to years of data over large parameter spaces. The most sensitive strategy is a fully coherent matched-filter search, in which the com-plete dataset is compared against a bank of signal wave-form templates. However, the computational cost of co-herent searches grows rapidly with both observation time and parameter-space volume, making them infeasible for broad all-sky surveys, which must cover unknown source parameters [10, 11]. Most CW searches therefore employ hierarchical strategies [12]. Initial search stages use semicoherent methods, in which the data are divided into shorter seg-ments that are analyzed coherently and then combined incoherently. This reduces the computational cost at the expense of some sensitivity. Candidates identified in these wide-parameter-space searches are subsequently 
+
+> ∗Electronic address: maria-antonia.ferrer@uib.cat
+> †Electronic address: david.keitel@uib.cat
+
+followed up with increasingly coherent analyses over pro-gressively smaller parameter-space regions [13–18]. Overall, the parameter space can be explored using ei-ther deterministic template grids or stochastic sampling techniques. Grid-based methods evaluate the detection statistic on a predefined template bank and are the stan-dard approach for the initial stages of wide searches. Stochastic methods instead explore the parameter space adaptively, concentrating computational effort in regions favored by the data. They are particularly well suited to constrained parameter spaces. This includes follow-up analyses of candidates identified in wide-parameter-space searches [14–18], as well as targeted and narrow-band searches for pulsars known from electromagnetic observations [19–24]. In this work, we present the integration of the Bayesian inference library BILBY [25] into the open-source CW analysis package PyFstat [26, 27]. PyFstat already provides both grid-based and stochastic search capabil-ities, but its stochastic analyses have so far relied ex-clusively on the parallel-tempered Markov chain Monte Carlo (MCMC) sampler PTEMCEE [28, 29]. Through this integration, PyFstat gains access to the broad range of stochastic samplers provided by the BILBY frame-work, including nested-sampling and MCMC packages such as DYNESTY [30], NESSAI [31–33], and EMCEE [28, 34], among others, while retaining the existing signal model, detection-statistic implementation, and data-analysis in-frastructure provided by PyFstat . Similar frameworks for F-statistic-based analyses using BILBY have recently been proposed [16, 18, 21] and have been used in open-data analyses outside the LVK collaboration [19, 35–38], but these implementations are not publicly available. By integrating directly into PyFstat , this work makes these arXiv:2609.08801v2 [astro-ph.HE] 9 Sep 2026 2capabilities openly available to the broader CW commu-nity and enables new flexible strategies for following up candidates from the wide variety of searches performed on LVK data, including Refs. [22, 24, 39–42]. The remainder of this paper is organized as follows. In Sec. II, we introduce the CW signal model, the F-statistic formalism, and the main approaches used to explore the search parameter space. Sec. III reviews the stochastic sampling algorithms considered in this work. The im-plementation of BILBY within PyFstat is described in Sec. IV. Validation studies in terms of candidate recov-ery and sampler convergence are presented in Sec. V. Sec. VI presents the parameter-estimation results. Fi-nally, Sec. VII summarizes our conclusions.   
+
+> II. BACKGROUND A. Continuous-wave signal model
+
+The CW signal is typically modeled as a nearly monochromatic signal with a very slowly varying fre-quency [1, 43]. The strain measured at a detector can be written as 
+
+h(t) = F+(t)h+(t) + F×(t)h×(t)= h0 [A+ cos Φ( t) + A× sin Φ( t)] , (1) where F+(t) and F×(t) are the detector antenna-pattern functions for the two GW polarizations, h0 is the intrinsic amplitude of the signal, A+ and A× are the amplitudes of the two polarizations, and Φ( t) is the phase evolution of the signal as seen at time t at the detector. Separating the amplitude parameters from those for the phase evolution, we can write the signal as [43] 
+
+h(t, A, λ ) = 
+
+> 4
+
+X
+
+> μ=1
+
+Aμhμ(t, λ ). (2) The amplitude parameters are A = {h0, cos ι, ψ, ϕ 0},where ι is the inclination angle between the source’s ro-tation axis and the line of sight, ψ is the polarization angle, and ϕ0 is the initial phase. For an isolated NS, the phase-evolution parameters are 
+
+λ = {f, ˙f , ¨f , ..., α, δ }, which include the GW frequency and its time derivatives, all evaluated at a fiducial refer-ence time τref , as well as the source sky position given by its right ascension and declination. The intrinsic frequency of the signal can be written as a Taylor expansion around the reference time, τref ,
+
+f (τ ) = 
+
+
+
+f + ˙f (τ − τref ) + 12 ¨f (τ − τref )2 + ... 
+
+
+
+, (3) where τ denotes the signal emission time in the source frame. As generally assumed in the field, we do not ex-plicitly consider proper motion between the source and the Solar System Barycenter (SSB) [44]. To account for the varying light-travel time between the detector and the SSB, the timing model includes the Rømer delay to-gether with relativistic corrections due to time dilation (the Einstein delay) and gravitational propagation (the Shapiro delay). For sources in binary systems, λ additionally includes the orbital parameters. The relation between the intrin-sic source frequency and the frequency measured at the detector then includes an additional Doppler modulation arising from the orbital motion of the source.  
+
+> B. F-statistic formalism
+
+The standard approach in CW searches is to compare the detector data x(t)1 to a bank of signal templates through a detection statistic. In this framework, the data are described under two competing assumptions: the noise hypothesis, HN, in which the data consist of noise only; and the signal hypothesis, HS, in which the data contain both noise and a CW signal, h(t, λ, A): 
+
+HN : x(t) = n(t),
+
+HS : x(t) = n(t) + h(t, λ, A). (4) The corresponding likelihood ratio of the data under these two hypotheses is given by 
+
+L(x; A, λ ) = p(x|H S, A, λ )
+
+p(x|H N) , (5) where p(x|H S, A, λ ) is the likelihood of the data under the signal hypothesis and p(x|H N) is the likelihood of the data under the noise hypothesis. Since HS is a com-posite hypothesis, the likelihood ratio depends on the signal parameters A and λ. The amplitude parameters 
+
+A can be handled by either maximization or marginal-ization [45], while the phase-evolution parameters λ are generally searched over, except in fully targeted searches where they can be constrained by electromagnetic obser-vations. In the frequentist approach, the F-statistic [46, 47] is computed by maximizing the likelihood ratio over the amplitude parameters: 
+
+F(x, λ ) = max  
+
+> A
+
+log L(x; A, λ ). (6) Although originally derived as a maximum-likelihood statistic, the F-statistic also admits a Bayesian interpre-tation. For a particular choice of prior on the amplitude parameters, the F-statistic is proportional to the loga-rithm of the Bayes factor between the signal and noise hypotheses after marginalization over the amplitude pa-rameters [45]. This connection motivates the use of the  
+
+> 1x(t) can refer to either single-detector data or, if available, to a multi-detector vector.
+
+3
+
+F-statistic as a detection statistic in both frequentist and Bayesian analyses. Under ideal Gaussian-noise assumptions, the statis-tical distribution of the F-statistic is known analyti-cally. In the absence of a signal, the detection statis-tic 2 F follows a central χ2 distribution with four de-grees of freedom, 2 F ∼ χ24. In the presence of a signal whose phase-evolution parameters match the searched template, the distribution becomes a non-central χ2 dis-tribution, 2 F ∼ χ24(ρ2), where ρ2 is the optimal signal-to-noise ratio squared. See Appendix B for a more detailed definition of ρ2 and other related quantities.  
+
+> III. STOCHASTIC SAMPLING METHODS FOR CW SEARCHES
+
+One of the main applications of PyFstat [26] is the follow-up of candidates within hierarchical searches us-ing stochastic sampling. These candidates may originate from a directed search, for which the sky position can re-main fixed during the follow-up, or from an all-sky search, which additionally requires exploring an uncertainty re-gion in sky position. Ashton and Prix [14] originally developed the package and demonstrated a hierarchical multistage MCMC follow-up scheme in which the coher-ence time is increased between stages. This approach was first applied to candidates from an all-sky search by Covas and Sintes [48]. It was subsequently used to follow-up candidates identified in LIGO data by Tenorio et al. [15], as well as in various LVK results papers from the O3 and O4 observing runs [49–56]. More recently, Mira-sola and Tenorio [17] optimized the sampler settings and the hierarchical scheme for more efficient follow-ups of candidates from broad blind searches. In general, most stochastic sampling methods used in GW astronomy fall into two broad categories: MCMC [57] and nested sampling [58, 59]. MCMC methods pro-duce samples from the posterior distribution, 
+
+p(θ|x) ∝ L (x|θ)π(θ), (7) where θ are the parameters of interest, x are the data, 
+
+L(x|θ) is the likelihood function, and π(θ) is the prior distribution. Nested sampling, by contrast, was primarily developed to compute the Bayesian evidence, 
+
+Z =
+
+Z
+
+L(x|θ)π(θ) dθ, (8) while also producing posterior samples. Instead of sam-pling directly from the posterior distribution, nested sam-pling begins by drawing samples from the prior and pro-gressively restricts the explored region to higher likeli-hood values. As the corresponding prior volume shrinks, both the Bayesian evidence and the posterior distribution can be estimated. Several stochastic samplers are available through the 
+
+BILBY inference library [25], widely used in GW astron-omy. It provides a common interface that separates the likelihood implementation from the sampling algorithm. This design allows the same likelihood function to be ex-plored using different stochastic samplers without mod-ifying the existing analysis pipeline. The integration presented in this work extends the stochastic inference capabilities of PyFstat , which were previously limited to the PTEMCEE MCMC sampler, by making the broad range of MCMC and nested-sampling algorithms sup-ported by BILBY available within the existing PyFstat 
+
+analysis framework. The following subsections briefly summarize the two samplers considered as examples in this work, PTEMCEE 
+
+and DYNESTY .   
+
+> A. The PTEMCEE sampler
+
+The PTEMCEE sampler [29] is built on top of the affine-invariant ensemble MCMC sampler EMCEE [28] and com-bines it with parallel tempering to improve the explo-ration of complex posterior distributions. Affine invariance makes the sampler insensitive to lin-ear rescalings, rotations, and translations of the parame-ter space. As a result, its performance is less sensitive to strong parameter correlations or widely different param-eter scales. Parallel tempering evolves multiple ensembles at dif-ferent temperatures. Each ensemble samples a tempered posterior, 
+
+pT (θ|x) ∝ L (x|θ)1/T π(θ), (9) where T = 1 corresponds to the target posterior, whereas higher temperatures flatten the likelihood surface and permit broader exploration of the parameter space. Oc-casional exchanges between temperatures help the sam-pler escape local maxima and improve convergence. The principal tuning parameters of PTEMCEE are the number of walkers, the number and spacing of tempera-tures, and the number of sampling steps. Their optimal values depend on the dimensionality and complexity of the parameter space and have been discussed extensively in Ref. [17]. The configuration used in this work is de-scribed in Sec. V.    
+
+> B. The DYNESTY sampler
+
+DYNESTY [30] is an implementation of the nested sam-pling algorithm for computing the Bayesian evidence and producing posterior samples. Nested sampling maintains a set of live points, which collectively define the region of parameter space currently being explored. During the run, the lowest-likelihood live point is repeatedly replaced by a new sample with higher likelihood, progressively 4concentrating the live points towards regions of increas-ing likelihood. Optionally, DYNESTY also allows for a dy-namic nested sampling mode that extends this procedure by adapting the number of live points throughout the run to allocate computational effort more efficiently; this fea-ture, however, is not used in the present work. The principal tuning parameter of DYNESTY is the num-ber of live points, which controls the resolution with which the constrained prior is explored. Additional tun-ing parameters include the sampling strategy used to generate new live points within the constrained prior, the method used to bound the sampled region, and the stopping criterion for the evidence calculation. See Ref. [59] for an accessible overview of these parameters and their impact on the sampling performance. The spe-cific choices adopted in this work are described in Sec. V.      
+
+> IV. INTEGRATION OF BILBY INTO PYFSTAT
+> A. Software interface
+
+The integration 2 of BILBY into PyFstat builds on the existing PyFstat MCMC classes [26, 27]. A new 
+
+run bilby method is introduced in the MCMCSearch class, providing an alternative entry point for running an oth-erwise standard PyFstat analysis. The signal model, in-put data, sampled and fixed parameters, and detection-statistic computation are handled through PyFstat ,while stochastic sampling is delegated to BILBY . Prior distributions specified via PyFstat are converted into a 
+
+BILBY prior dictionary, although priors defined directly through BILBY may also be provided. The selected sam-pler and its configuration are then passed to the stan-dard bilby.run sampler interface. Consequently, any sampler supported by BILBY can be used while preserv-ing the existing PyFstat classes, F-statistic calculations, and post-processing tools. To connect the two packages, we introduce the 
+
+PyFstatBilbyLikelihood class, which implements the likelihood interface expected by BILBY while delegat-ing the detection-statistic calculation to PyFstat . This design allows the BILBY integration to be used with classes derived from MCMCSearch without requiring sepa-rate likelihood implementations. Such classes in PyFstat 
+
+currently include, e.g., fully coherent, semicoherent, glitch-robust [60], and transient searches [61]. For each parameter-space point proposed by the sampler, the wrapper translates the sampled parameters into the or-dering expected by the corresponding PyFstat class and delegates the F-statistic evaluation to the existing search implementation.    
+
+> 2This implementation is not yet available in released versions or on the PyFstat master branch, but is already publicly available while undergoing code review before merging.
+
+Once bilby.run sampler completes the sampling run, the returned posterior samples and likelihood values are mapped onto the standard PyFstat result structures while retaining the original BILBY result object. This allows users to combine both the BILBY result-analysis tools and the existing PyFstat post-processing function-ality, including sample export, posterior plots, search summaries, and loudest-candidate generation. The current implementation places the run bilby 
+
+method within the existing MCMCSearch class to pre-serve compatibility with the current PyFstat architec-ture. Since BILBY supports both MCMC and nested-sampling methods, the class name is not fully represen-tative of the available sampling methods. In future devel-opments, the class structure may be refactored to better reflect the broader scope of the BILBY integration.  
+
+> B. Likelihood formulation
+
+The likelihood supplied to BILBY is evaluated at each set of phase-evolution parameters sampled by the cor-responding PyFstat search class. For each such point, 
+
+PyFstat computes the F-statistic, which analytically maximizes the likelihood over the amplitude parameters (see Sec. II). Following the Bayesian interpretation of the 
+
+F-statistic presented in Ref. [45], marginalization over the amplitude parameters under the canonical amplitude prior yields a signal-to-noise Bayes factor that can be ex-pressed directly in terms of the F-statistic. The corre-sponding signal log-likelihood used by BILBY is therefore written as log LS(x, λ ) = F(x, λ ) + log 
+
+ 70 ˆρ4max 
+
+
+
++ log LN(x), (10) where ˆρmax denotes the upper cutoff on the signal-strength prior introduced in Ref. [45]. Here, LN is the Gaussian-noise likelihood, 
+
+LN(x) = P (x|H N) = κ exp 
+
+
+
+− 12 (x|x)
+
+
+
+, (11) where ( x|x) denotes the noise-weighted inner product of the data x with themselves and κ is a normalization con-stant. The full explicit form of LN is derived in Ap-pendix A. For a fixed dataset, both log LN and log(70 /ˆρ4max ) are independent of λ and therefore contribute only additive constants to the signal likelihood in Eq. 10. Conse-quently, for a fixed dataset, the posterior distribution over the sampled parameters is 
+
+p(λ|x, HS) ∝ exp [ F(x, λ )] π(λ|H S), (12) where π(λ|H S) denotes the prior on the sampled phase-evolution parameters. Previous stochastic sampling implementations in 
+
+PyFstat also followed the Bayesian interpretation of the 5
+
+F-statistic described in Ref. [45], including the normal-ization term log(70 /ˆρ4max ) arising from the canonical am-plitude prior, but omitted the Gaussian-noise likelihood. In the present implementation, this term is addition-ally retained to provide a consistently normalized like-lihood necessary for the evidence calculations performed by BILBY and, in particular, for evaluating Bayes factors between the signal and Gaussian-noise hypotheses.  
+
+> V. TESTING THE NEW FRAMEWORK
+
+To validate the new implementation, we choose the 
+
+DYNESTY sampler as an example, since it is widely used for Bayesian inference across GW astronomy [62, 63], in-cluding in CW analyses [16, 18, 20]. We then perform a set of controlled injection studies in simulated Gaus-sian noise. The primary goal is to verify that the mea-sured sensitivity is consistent with the expected behavior of fully coherent CW analyses, rather than to optimize sampler configurations for specific realistic applications. We characterize the sensitivity through the detection probability, pdet , at fixed false-alarm probability, pfa , for signal populations spanning a range of amplitudes, fol-lowing the methodology of previous CW sensitivity stud-ies [14, 64]. The signal amplitude relative to the detector noise level is expressed in terms of the sensitivity depth, 
+
+D [11, 65, 66], defined as 
+
+D =
+
+√Sn
+
+h0
+
+, (13) where Sn is the one-sided noise power spectral density and h0 is the intrinsic GW strain amplitude. We additionally compare the performance of our refer-ence DYNESTY sampler with that of the existing PTEMCEE 
+
+implementation in PyFstat . This comparison provides a reference for assessing both the sensitivity and the com-putational cost of the new implementation.  
+
+> A. Setup
+
+We assess the performance of the BILBY -based inte-gration of DYNESTY within PyFstat in two representa-tive CW follow-up scenarios: the follow-up of candidates from a directed search and from an all-sky search. For the directed search follow-up, the sky position of the source is assumed to be known, and the analysis is per-formed only over frequency and spin-down parameters (see Sec. V C 1). For the all-sky search follow-up, the sky position is also included among the sampled parameters (see Sec. V C 2). ¨f and higher-order spin-down terms are held fixed in the analyses presented here, although the interface also supports searches over these parameters 3
+
+and, for sources in binary systems, over the relevant or-bital parameters. For both follow-up configurations, we analyze contigu-ous 100-day datasets (similar to the benchmark used in Ref. [14]) consisting of independent realizations of Gaus-sian noise characterized by a fixed power spectral den-sity. Injected signals have f = 30 .0 Hz and ˙f = −1.0 ×
+
+10 −10 Hz s −1. The sky position is drawn from isotropic distributions with α ∼ U (0 , 2π) and sin δ ∼ U (−1, 1). The source orientation parameters are also sam-pled isotropically, with cos ι ∼ U(−1, 1) and ψ ∼U(−π/ 4, π/ 4), while the initial phase is fixed to ϕ0 = 0. The noise amplitude spectral density is set to √Sn =10 −23 Hz −1/2 and the signal amplitude is determined by the chosen sensitivity depth D.For the directed search follow-up, uniform priors are placed on f and ˙f with full widths ∆ f = 2 × 10 −5 Hz and ∆ ˙f = 1 .8 × 10 −10 Hz s −1 centered on the injected signal parameters. For the all-sky follow-up, the search additionally includes the sky-position parameters, using uniform priors with widths ∆ α = ∆ δ = 0 .05 rad. We base our search setup on the configuration used by Ashton and Prix [14], adopting the same 100-day obser-vation span, frequency and sky prior widths. We depart from that configuration in two respects. First, we use a spin-down width of a factor of ten broader than the width adopted in Ref. [14]. Second, whereas that study consid-ers data from a single detector, we use a two-detector LIGO network, as commonly employed in CW searches. Our configuration is therefore not a direct reproduction of that study, but a more demanding test with a larger prior volume and a multi-detector likelihood. For the two different follow-up scenarios, we cover ranges of sensitivity depths with sets of simulated sig-nal injections (generated with the Writer class from 
+
+PyFstat , which wraps lalpulsar Makefakedata v5 )[67, 68]. The number of injections per depth ranges from 30 to 120, chosen to ensure a well-constrained detection efficiency curve. Each injection is then analyzed over the prior widths described above. The detection statistic for each injec-tion is taken to be the largest value of the fully coher-ent 2 F-statistic encountered during the nested-sampling exploration. For consistency with standard CW sensitiv-ity studies, detection efficiencies are evaluated using this maximum 2 F value rather than the Bayesian evidence. To determine whether a signal is recovered, we first es-timate the distribution of this statistic from a set of noise-only realizations. For pfa = 0 .01, the threshold 2 Fth is defined as the 99th percentile of this noise-only distribu-tion. An injection is considered detected if the maximum sampled value satisfies 2 Fmax > 2Fth , and missed other-     
+
+> 3Full support for ...
+> fand higher-order spin-downs is available is available in the latest PyFstat release 2.4.0.
+
+6wise. The detection efficiency at a given sensitivity depth 
+
+D is then defined as the fraction of injections recovered according to this criterion. Unless otherwise stated, the analyses use the DYNESTY 
+
+nested sampler with the rwalk sampling scheme. The directed follow-up employs 450 live points, while the all-sky follow-up uses 1500 live points to account for the increased dimensionality of the search space. The choice of the number of live points is discussed in Appendix C 1. Parameter-space bounds are constructed using the live 
+
+method, and the stopping criterion is set by an evidence tolerance of dlogz =0.1; see Ref. [30] for more details on these options. To quantify the relative sizes of the two parameter spaces, we compute the metric-based effective number of templates that would be required to cover the param-eter space at a mismatch of unity, N ∗, following Eq. (24) of Ref. [14]. Following that work, we evaluate N ∗ for an equatorial sky patch centered at δ = 0, which maximizes the solid angle subtended by fixed widths ∆ α and ∆ δ,while we choose α = 0 as a reproducible reference point. Using the 100-day observation span and the prior widths given above, we obtain N ∗ ≈ 9.9 × 10 5 for the directed follow-up and N ∗ ≈ 2.3 × 10 10 for the all-sky follow-up, corresponding to an increase in effective parameter-space size by a factor of approximately 2 .3 × 10 4. This illus-trates the substantially larger effective parameter-space volume of the all-sky follow-up, consistent with the in-creased sampling difficulty observed in the following sec-tions. In addition to the analyses of the contiguous 100-day datasets presented in this section, we repeat the vali-dation study using O4a-timestamp datasets, constructed from detector timestamps from the first part of the fourth LVK observing run (O4a). These datasets provide a more realistic observing schedule including gaps in the data. The corresponding results are presented for comparison in Appendix C 3.  
+
+> B. Theoretical sensitivity estimates
+
+The injection studies provide an empirical estimate of the recovery fraction as a function of sensitivity depth. To interpret these results, we compare the measured effi-ciencies with theoretical predictions for an ideal fully co-herent search. This comparison allows us to distinguish between missed detections caused by the signal being too weak relative to the noise to exceed the detection thresh-old and those arising because the stochastic sampler does not identify the highest likelihood region. The theoreti-cal predictions describe the first effect, while deviations of the measured efficiencies from these curves can indi-cate losses due to the sampler or other limitations of the adopted analysis configuration. We consider two theoretical sensitivity estimates. Both are based on the known distribution of the F-statistic in Gaussian noise, but differ in how the distribution of signal-to-noise ratios is modeled across the source population. The first is a simplified semi-analytic es-timate [14, 69] that uses population-averaged antenna-pattern factors while retaining the explicit dependence on source inclination. The second is computed with the open-source package cows3 [17], which implements the sensitivity-estimation framework of Ref. [66] and per-forms a more complete averaging over source and detec-tor parameters than the first semi-analytic estimate. Both estimates use the same detection threshold ob-tained from the corresponding noise-only simulations. Details of these calculations are given in Appendix B.  
+
+> C. Results
+
+This section presents the results of the injection stud-ies introduced in Sec. V A. We first consider the directed search follow-up and then the all-sky follow-up, compar-ing the measured detection efficiencies with the theoret-ical sensitivity estimates and, in the directed case, with the existing PTEMCEE implementation.  
+
+> 1. Follow-up of candidates from a directed search
+
+In the directed case, the follow-up is restricted to fre-quency and spin-down parameters, using the priors and the injected parameters described in Sec. V A. To determine the detection threshold, we analyze 1000 noise-only realizations for both DYNESTY and PTEMCEE 
+
+and estimate the distribution of the maximum 2 F statis-tic. For pfa = 0 .01, this yields approximately the same threshold for both samplers, 2 Fth ≈ 47 .4, which is used to classify each injection as detected or missed. Because the theoretical sensitivity curves depend on the sampler only through this threshold, the theoretical curves for the two samplers are identical. Fig. 1 shows the measured detection efficiency as a function of sensitivity depth for the directed search follow-up, together with the semi-analytic prediction and the cows3 sensitivity estimate. The detection efficien-cies obtained with DYNESTY (nlive =450) closely follow both predictions over the full range of depths explored. Thus, within the statistical uncertainties of the injection study, the nested-sampling implementation recovers the expected fully coherent sensitivity. The corresponding detection efficiencies obtained with 
+
+PTEMCEE are statistically consistent with the DYNESTY re-sults. For this comparison, we used 300 walkers, 3 tem-peratures, 1000 burn-in steps, and 1000 production steps. This configuration is more expensive than those adopted in Refs. [14, 17], while cheaper configurations tested here did not achieve comparable performance. A key differ-ence explaining this is that our analysis performs the fully coherent follow-up in a single stage, whereas the ap-proaches in those references use hierarchical multi-stage follow-ups to progressively refine the parameter space. 7100 200 300 400 500 
+
+Sensitivity depth D [Hz ¡1=2]
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> Detection efficiency  Semianalytical estimation cows3 estimation dynesty ptemcee
+
+Figure 1: Detection efficiency as a function of sensitivity depth for the directed follow-up. Markers show the measured efficiencies obtained with DYNESTY 
+
+and PTEMCEE using the sampler settings described in the text; the overlapping solid and dashed curves show the theoretical sensitivity estimates. The agreement with both the theoretical predictions and the existing PTEMCEE validates the BILBY -based im-plementation for follow-ups of candidates from directed searches. The results also demonstrate that a single-stage fully coherent follow-up is feasible for this scenario using 
+
+DYNESTY with a relatively low number of live points.  
+
+> 2. Follow-up of candidates from an all-sky search
+
+In the all-sky follow-up, the analysis is performed over frequency, spin-down, right ascension, and declination, using the injected parameters and priors as described in Sec. V A. To characterize the noise background, we again analyze 1000 noise-only realizations and estimate the distribution of the maximum 2 F statistic. For pfa = 0 .01, this yields 2Fth ≈ 63 .4. This threshold is higher than that obtained for the fixed-sky follow-up, as expected from the larger parameter space and the corresponding increase in the effective trials factor. The corresponding detection-efficiency results for the all-sky follow-up are shown in Fig. 2. The measured ef-ficiencies remain consistent with both the semi-analytic prediction and the cows3 sensitivity estimate over the full range of depths explored, showing that the expected fully coherent sensitivity is recovered despite the substantially larger parameter space. However, recovering the theoretical sensitivity in the larger parameter space requires a larger number of live points ( nlive =1500) than in the directed search follow-up, reflecting the increased complexity of the parameter space. The choice of nlive is motivated in Appendix C 1, where the dependence of the recovery efficiency on the number of live points is investigated. 100 200 300 400 
+
+Sensitivity depth D [Hz ¡1=2]
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> Detection efficiency  Semianalytical estimation cows3 estimation dynesty
+
+Figure 2: Detection efficiency as a function of sensitivity depth for the all-sky follow-up. Markers show the measured efficiencies obtained with DYNESTY 
+
+using nlive =1500; the overlapping solid and dashed curves show the theoretical sensitivity estimates. In contrast to the directed search follow-up, we did not identify a single-stage PTEMCEE configuration that pro-vided similarly robust performance for the all-sky follow-up considered here. This does not imply that no such configuration exists. In particular, previous work has shown that PTEMCEE can be successfully applied in hier-archical multistage follow-up schemes, where the param-eter space is progressively narrowed [14, 15, 17]. The present comparison is instead restricted to a single-stage search over the initial prior volume. These results indicate that nested sampling can be suc-cessfully applied to a single-stage fully coherent follow-up of candidates from all-sky searches, recovering the expected sensitivity while requiring comparatively little sampler-specific tuning for the configurations considered here. However, it is significantly more computationally expensive (see Sec. V E) than the optimized hierarchical multi-stage follow-up approach from Ref. [17].  
+
+> D. Convergence studies
+
+Assessing convergence in nested sampling is less straightforward than for MCMC methods, since the algorithm terminates according to an evidence-based stopping criterion rather than fixed iteration counts, correlation-length estimates, or similar diagnostics com-monly used for MCMC methods. Although this stopping criterion indicates that the evidence estimate has sta-bilized, it does not by itself guarantee that all relevant high-likelihood regions have been explored. We therefore assess convergence empirically by means of a repeatabil-ity study of the reference directed search follow-up con-figuration adopted in this work. For this, we fix one set of physical signal parameters, including the phase parameters, sky position, source ori-8entation, and sensitivity depth D = 145 Hz −1/2, and in-ject this same signal into 50 independent Gaussian-noise realizations. Each dataset is then analyzed five times, changing only the DYNESTY random seed. Within each five-run group, both the injected signal and the noise re-alization are identical, so any differences between the re-covered results isolate the stochastic variation introduced by the sampler. Across the 50 groups, we test whether this behavior is robust to the particular noise realization. For 49 of the 50 noise realizations, all five searches yield the same binary detection decision at the thresh-old 2 Fth ≈ 47 .4, meaning that the five values are either all above or all below the threshold; the values them-selves need not be identical. To quantify the numerical agreement, we compute, for each dataset, the difference between the largest and smallest recovered 2 Fmax values across its five sampler repeats. The median of this differ-ence over the 50 datasets, including the anomalous case described below, is only 0 .004, demonstrating that the recovered detection statistic is highly reproducible. Among the 250 analyses, a single sampler realization fails to recover the high-likelihood region associated with the injected signal. For one of the 50 noise realizations, four runs recover a 2 Fmax ≈ 49 .3, whereas the remain-ing run returns 2 Fmax ≈ 35 .8. Its natural-log evidence, ln Z, is also lower by approximately 4 .8 natural-log units relative to the median of the other four runs. Since the injected signal and noise realization are identical in all five repeats, this discrepancy can only be attributed to the stochastic behavior of the sampler. We next examine the repeatability of the Bayesian evidence estimates. Let ln Zij and σln Z,ij denote the natural-log evidence estimate and its reported uncer-tainty for repeat j of dataset i, and si(ln Z) be the sample standard deviation of the five recovered evidence esti-mates for dataset i. We quantify the agreement between the observed scatter and the reported uncertainty using 
+
+RZ,i = si(ln Z)
+
+> 15
+
+P5 
+
+> j=1
+
+σln Z,ij 
+
+. (14) For a set of five independent Gaussian estimates, the the-oretical median of the measured standard deviation is approximately 0 .92 times the underlying standard devi-ation [70, Theorem 5.3.1(c)]. Individual values of RZ,i 
+
+fluctuate considerably because each is based on only five repeats. We therefore consider their distribution across the 50 noise realizations rather than interpreting individ-ual values. We obtain median i(RZ,i ) = 0 .94, close to the finite-sample reference value of 0 .92. Aside from the sin-gle failed sampler realization discussed above, we find no evidence that the uncertainties reported by DYNESTY sys-tematically underestimate the observed run-to-run vari-ation. Overall, these tests show that the adopted directed search follow-up configuration is highly reproducible, while also illustrating a limitation of nested sampling: successful termination of an individual run does not by itself guarantee that all relevant high-likelihood regions have been explored. In this study, one such failure was observed among the 250 runs. These repeatability tests complement the preliminary 
+
+nlive study presented in Appendix C 1, whose primary purpose was to motivate the choice of the reference nested-sampling configurations adopted in this work. For the directed configuration, the observed stability of the recovered detection thresholds and efficiencies over the tested range of nlive values, together with the repeata-bility demonstrated here and the posterior calibration tests presented in Sec. VI, provides complementary em-pirical validation that the adopted nested-sampling con-figuration is sufficiently converged for this search setup. We have not performed a similar repeatability study for the all-sky follow-up due to its larger computational cost and because more detailed optimization for that sce-nario remains for future work, likely including a hierar-chical setup.  
+
+> E. Computational performance
+
+The computational cost of stochastic CW analyses de-pends primarily on the dimensionality of the parameter space and the sampler configuration. For the setups con-sidered here, we find no significant dependence of the runtime on the injected signal strength. The following comparisons therefore focus on the effects of the analysis configuration and sampler choice. For the directed follow-up, the reference DYNESTY con-figuration adopted in this work is computationally more expensive than the existing PTEMCEE implementation. The median wall-clock runtimes on the OSG/IGWN computing infrastructure [71] are 2 .1 × 10 3 s ( ∼ 35 min) for DYNESTY and 8 .6 × 10 2 s ( ∼ 14 min) for PTEMCEE ,such that the DYNESTY runs are approximately 2.4 times longer. To investigate this difference, we additionally compare the number of likelihood evaluations. For the reference 
+
+DYNESTY configuration, the median number of likelihood evaluations is 2 .2 × 10 6. For the PTEMCEE setup, with 3 temperatures, 300 walkers, and 1000 burn-in plus 1000 production steps, the nominal number of proposal likeli-hood evaluations is 3 × 300 × (1000 + 1000) = 1 .8 × 10 6;at each iteration, one proposal is generated for every walker at every temperature, regardless of whether the proposal is subsequently accepted. The number of like-lihood evaluations for DYNESTY is therefore only a factor of approximately 1.2 larger than for PTEMCEE , while its runtime is a factor of approximately 2.4 larger. The dif-ference in runtime is therefore not explained by the num-ber of likelihood evaluations alone. The median time per evaluation is 9 .6 × 10 −4 s for DYNESTY , compared with 4.8 × 10 −4 s for PTEMCEE , indicating additional sampler-and implementation-specific overhead in the first. Extending the analysis to include sky-position pri-ors requires a larger number of live points to recover the expected theoretical sensitivity and is therefore con-9siderably more computationally demanding. The me-dian wall-clock runtime for the all-sky follow-up DYNESTY 
+
+runs is 5 .1 × 10 4 s ( ∼ 14 h), compared with 2 .1 × 10 3 s(∼ 35 min) for the directed follow-up runs, correspond-ing to an increase by a factor of approximately 24. The all-sky follow-up runtimes also show greater variation. The median number of likelihood evaluations using 
+
+DYNESTY increases from 2 .2 × 10 6 for the runs in the di-rected configuration to 1 .8×10 7 for the runs in the all-sky configuration, corresponding to a factor of approximately 8.1. Thus, the increase in the number of likelihood eval-uations accounts for a substantial fraction, but not all, of the increase in runtime. These timing comparisons should not be interpreted as hardware-independent sampler benchmarks. The analy-ses were performed on the heterogeneous OSG/IGWN computing infrastructure and were not benchmarked on identical compute nodes. Differences in the runtime per likelihood evaluation may therefore reflect both sampler-specific overhead and differences between the hardware used by individual jobs. Despite the increased computational cost, the refer-ence DYNESTY configuration recovers the expected sen-sitivity for the all-sky follow-up. Among the single-stage PTEMCEE configurations explored in this work, none achieved comparable recovery efficiency. Moreover, the most computationally demanding PTEMCEE configura-tions tested for the all-sky case were already slower than the reference DYNESTY configuration, while still recover-ing fewer signals. For both samplers, we expect hierar-chical setups to be more efficient especially in this all-sky follow-up scenario. The reference DYNESTY configuration adopted through-out this work was chosen to prioritize robust recovery ef-ficiency over computational performance. Although Ap-pendix C 2 shows that alternative sampler settings can substantially reduce the runtime while maintaining com-parable recovery efficiencies, a systematic optimization of the nested-sampling configuration is beyond the scope of the present work and is left for future investigation, along with an exploration of hierarchical multi-stage ap-proaches.  
+
+> VI. PARAMETER ESTIMATION AND POSTERIOR VALIDATION
+
+In addition to testing candidate signals at increased co-herence time, the stochastic samplers available through 
+
+BILBY provide posterior samples for the searched pa-rameters, enabling Bayesian parameter estimation (PE) and thus the astrophysical characterization of potential sources for candidate CW signals. It is therefore im-portant to verify the performance of the implemented framework in terms of PE precision and accuracy. Previous work on stochastic sampling follow-ups of CW candidates has mostly focused on developing effi-cient strategies for achieving sufficient signal recovery to exclude candidates or to pass them on to subsequent stages [14, 15, 17], rather than on ensuring accurate pa-rameter estimates in the final stage. Exceptions include the CWInPy pipeline, whose PE results have been exten-sively tested for the known pulsar case [72], but which has not been used for more general follow-ups of candidates from directed or all-sky searches with the recent excep-tion of the G347.3 −0.5 candidate follow-up [73]. Further-more, Ref. [16] demonstrated a comparison of DYNESTY 
+
+and PTEMCEE for a LIGO hardware injection, and Ref. [18] provided a percentile–percentile (PP) test (see below) for an all-sky follow-up setup with DYNESTY .We focus here on a well-established test of PE accu-racy, namely that the resulting posterior distributions are well calibrated. To this end, we perform a PP test [74], computing, for each injection, the percentile rank of the true value of each parameter within its recovered poste-rior. For well-calibrated posteriors, these percentile ranks should be uniformly distributed. Equivalently, across re-peated injections, the fraction of true parameter values contained within a given credible interval should match its nominal credible level. As seen in Fig. 3, the PP tests show no statistically significant deviations from the expected uniform distri-bution for either the directed or the all-sky follow-up con-figuration with DYNESTY . For each parameter, we quan-tify the agreement with the expected uniform distribu-tion using a one-sample Kolmogorov–Smirnov test [75] on the recovered percentile ranks. We then combine the parameter-level p-values using Fisher’s method [76], which maps the individual p-values to a χ2 distribution to evaluate their joint significance. This yields final Fisher-combined p-values of 0.47 for the directed search follow-up and 0.82 for the all-sky follow-up. These values indi-cate that the observed deviations from the diagonal are consistent with the statistical fluctuations expected for well-calibrated posteriors. We therefore find no evidence that the recovered credible intervals are miscalibrated in either configuration. By contrast, the fixed-sky PP plot obtained with the 
+
+PTEMCEE configuration considered here shows systematic deviations from the expected uniform distribution, as can be seen in Fig. 4. The Fisher-combined p-value for the plotted parameters is 1 .6×10 −12 , indicating that its pos-terior credible intervals are not well calibrated under the conditions of this study. This also demonstrates that achieving the expected theoretical detection efficiency alone is not a sufficient criterion for a setup that will also provide reliable PE. Together with the detection-efficiency results of Sec. V C, these tests show that the integration of BILBY 
+
+with PyFstat can enable both candidate recovery and PE. In addition, the tested DYNESTY configurations, al-beit expensive, provide both the expected detection per-formance and well-calibrated PE. Since 90% credible intervals are commonly reported for PE results in GW astronomy, we also show centered-offset diagnostics for the 90% credible intervals in Ap-10 0.0 0.2 0.4 0.6 0.8 1.0 
+
+C.L.          
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> fraction inside C.L.
+> uniform F0: p= 0.5 F1: p= 0.34 0.0 0.2 0.4 0.6 0.8 1.0
+
+C.L.         
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> fraction inside C.L.
+> uniform F0: p= 0.078 F1: p= 0.86 Alpha: p= 0.19 Delta: p= 0.78
+
+Figure 3: PP plots obtained from 100 injections at depth D = 125 using the DYNESTY sampler for the directed follow-up (left) and the all-sky follow-up (right). The shaded regions show the expected 1-, 2- and 3-σ statistical fluctuations for perfectly calibrated posteriors. The Fisher-combined p-values over the plotted parameters are 0.47 for the directed follow-up and 0.82 for the all-sky follow-up. 0.0 0.2 0.4 0.6 0.8 1.0 
+
+C.L.         
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> fraction inside C.L.
+> uniform F0: p= 3 :2£10 ¡8
+> F1: p= 1 :6£10 ¡6
+
+Figure 4: PP plot obtained from 100 injections at depth 
+
+D = 100 using the PTEMCEE sampler for the directed follow-up. The shaded regions show the expected 1-, 2-and 3-σ statistical fluctuations for perfectly calibrated posteriors. The Fisher-combined p-value is 1 .6 × 10 −12 .pendix D.  
+
+> VII. CONCLUSIONS
+
+We have presented the integration of the BILBY in-ference library [25] into PyFstat [26, 27], enabling the use of the wide variety of samplers available through 
+
+BILBY within the existing PyFstat search infrastructure for CW analyses. The integration preserves the ex-isting search classes, signal-model implementation, and detection-statistic calculations while replacing only the stochastic sampling engine. In terms of functionality, the interface presented here is comparable to other recently proposed frameworks that combine F-statistic-based analyses with the sam-plers available through BILBY [16, 18]. Unlike those frameworks, which are not publicly available, the present implementation is integrated directly into the open-source PyFstat codebase, making these capabilities read-ily accessible to the broader CW community. We also provide the first systematic validation of parameter-estimation performance with PyFstat , complementing previous studies that focused primarily on candidate re-covery and detection performance. The proposed framework has been validated using in-jection studies in single-stage fully coherent directed and all-sky follow-up configurations. In both cases, the mea-sured detection efficiencies are consistent with the the-oretical sensitivity predictions, demonstrating that the expected detection performance is recovered. Further-more, PP tests show no evidence of posterior miscalibra-tion, indicating that the inferred credible intervals pro-vide statistically consistent uncertainty estimates for the recovered source parameters. As expected, allowing the sky position to vary increases both the computational cost and the detection threshold through the larger parameter space. Nevertheless, the reference DYNESTY nested-sampling configuration consid-ered here continues to recover the predicted sensitivity. Among the single-stage PTEMCEE configurations explored in this work, we did not identify one that achieved com-11 parable recovery performance for the all-sky follow-up considered here. While this does not preclude alterna-tive MCMC strategies, including hierarchical multistage follow-up schemes [14, 15, 17], these results demonstrate that nested sampling can be used for single-stage coher-ent follow-up analyses in higher-dimensional parameter spaces. The interface supports two complementary applica-tions: PE and coherent candidate follow-up. While PE analyses require well-converged posterior distributions and well-calibrated credible intervals, follow-up analy-ses primarily require robust candidate recovery and lo-calization. These objectives place different demands on the stochastic sampler, suggesting that sampler config-urations should ultimately be chosen according to the intended application rather than relying on a single de-fault setup. A systematic exploration of such application-specific tuning, however, lies beyond the scope of the present work. Accordingly, the sampler settings adopted in this work were selected to provide reliable performance across the follow-up configurations considered, rather than to opti-mize computational efficiency for a particular applica-tion. Future work will investigate application-specific nested-sampling strategies, including alternative stop-ping criteria and sampling methods, with the aim of reducing the computational cost while maintaining the performance required for PE and candidate follow-up. Overall, these results demonstrate that the integration presented here provides a reliable and flexible Bayesian framework for coherent CW searches while extending the open-source package PyFstat with access to a broad range of modern stochastic samplers through BILBY . 
+
+> VIII. ACKNOWLEDGEMENTS
+
+We thank Greg Ashton for helpful comments on the manuscript and Lorenzo Mirasola for useful discussions on the cows3 sensitivity-estimation framework. This work was supported by the yearly plan of the Tourist Stay Tax for 2023 (ITS2023-086 - Pro-grama de Fomento de la Investigaci´ on), the Universi-tat de les Illes Balears (UIB) with funds from the Pro-grama de Foment de la Recerca i la Innovaci´ o de la UIB 2024-2026 (supported by the yearly plan of the Tourist Stay Tax ITS2023-086); the Spanish Agencia Estatal de Investigaci´ on grants PID2022-138626NB-I00, RED2024-153978-E, RED2024-153735-E, funded by MI-CIU/AEI/10.13039/501100011033 and the ERDF/EU; and the Comunitat Aut` onoma de les Illes Balears through an “Ajut per a projectes de recerca cient´ ıfica i tecnol` ogica” (PRD2025 100) and through the Con-selleria d’Educaci´ o i Universitats with funds from the ERDF (SINCO2022/18146 - Plataforma HiTech-IAC3-BIO); and by COST action SCALES CA24139, sup-ported by COST (European Cooperation in Science and Technology). This material is based upon work sup-ported by NSF’s LIGO Laboratory, which is a major facility fully funded by the National Science Founda-tion. The authors are grateful for computational re-sources provided by the LIGO Laboratory and supported by National Science Foundation Grants PHY-0757058 and PHY-0823459. This document has been assigned LIGO document number P2600436. 
+
+> Appendix A: Noise likelihood derivation
+
+This appendix derives the Gaussian-noise likelihood entering Eq. (10). As discussed in Sec. IV, this term provides the data-dependent normalization required for Bayesian evidence calculations. Under the Gaussian-noise hypothesis, HN, the likeli-hood of the data x is 
+
+LN(x) = P (x|H N) = κ exp 
+
+
+
+− 12 (x|x)
+
+
+
+, (A1) where ( x|x) denotes the standard noise-weighted inner product and κ is the normalization constant. Following the Gaussian-noise formalism described in Ref. [77], the inner product can be written as (x|x) = 4 Re 
+
+Z ∞
+
+> 0
+
+X
+
+> X,Y
+
+exX∗(f ) S−1(f ) 
+
+> XY
+
+exY (f ) df. 
+
+(A2) For uncorrelated detector noise, the cross-spectral-density matrix SXY (f ) is diagonal, which gives (x|x) = 
+
+> NDet
+
+X
+
+> X=1
+
+(xX |xX ) = 4 
+
+> NDet
+
+X
+
+> X=1
+
+Z ∞
+
+> 0
+
+|exX (f )|2
+
+SX (f ) df, (A3) where NDet is the number of detectors and SX (f ) is the one-sided noise power spectral density of detector 
+
+X. In practice, this quantity is not known a priori 
+
+and must be estimated from the data. In the im-plementation presented here, we estimate SX (f ) using the standard running-median procedure implemented in 
+
+LALSuite [67, 68]. We denote the resulting estimate for detector X, short Fourier transform (SFT) α, and fre-quency bin k by bSXαk .Discretizing Eq. (A3) and substituting SX (f ) by its estimate bSXαk gives (x|x) ≃ 4 X
+
+> X,α,k
+
+|exXαk |2∆f
+
+bSXαk 
+
+= 4
+
+TSFT 
+
+X
+
+> X,α,k
+
+|exXαk |2
+
+bSXαk 
+
+, (A4) where ∆ f = 1 /T SFT is the SFT frequency resolution, 
+
+TSFT is the duration of each short Fourier transform, α
+
+labels the SFTs, and k labels the frequency bins. To determine the normalization constant, κ, we con-sider the statistical distribution of the SFT Fourier co-efficients. Under the Gaussian-noise hypothesis, each positive-frequency SFT coefficient can be written as 
+
+exXαk = aXαk + i b Xαk , (A5) 12 where aXαk and bXαk are independent zero-mean Gaussian random variables with equal variance, 
+
+ σXαk 
+
+2 = Var( aXαk ) = Var( bXαk ) = TSFT 
+
+4 bSXαk . (A6) The joint normalization of the corresponding two-dimensional Gaussian distribution is therefore 1/(2 π  σXαk 
+
+2). Since the positive-frequency SFT Fourier coefficients are assumed to be statistically independent, the normalization constant factorizes into the product 
+
+κ = Y
+
+> X,α,k
+
+12π  σXαk 
+
+2 = Y
+
+> X,α,k
+
+2
+
+πT SFT bSXαk 
+
+. (A7) Substituting the expressions for κ and (x|x) into Eq. (11) yields the final expression for the Gaussian-noise likelihood, 
+
+LN = Y
+
+> X,α,k
+
+2
+
+πT SFT bSXαk 
+
+exp 
+
+"
+
+− 2|exXαk |2
+
+TSFT bSXαk 
+
+#
+
+. (A8) 
+
+> Appendix B: Theoretical sensitivity estimates
+
+This appendix describes the two theoretical sensitiv-ity estimates used to predict the detection efficiency of the coherent follow-ups of the main text. Both calcu-lations are based on the non-central χ2 distribution of the F-statistic, but differ in how they average the signal-to-noise ratio over the source population and detector response. Under the signal hypothesis, the coherent detection statistic 2 F follows a non-central χ2 distribution with four degrees of freedom and non-centrality parameter ρ2.The detection probability for a fixed threshold 2 Fth is therefore 
+
+pdet = P  2F > 2Fth ; ρ2 , (B1) which is evaluated using the survival function of the non-central χ24(ρ2) distribution. Because 2 F varies between noise realizations, a signal can remain below the thresh-old even when the search identifies the correct signal mode. This statistical loss is included in the theoretical efficiency curves; a measured efficiency below these pre-dictions can therefore reveal additional losses introduced by the search procedure.  
+
+> 1. Semi-analytic estimate
+
+The semi-analytic calculation follows Ref. [69]. Esti-mating a representative value of ρ2 for the full injection set to then evaluate B1 requires averaging over the detec-tor response, which depends on the source sky position and orientation. For fixed source parameters, the squared signal-to-noise ratio of a signal with amplitude h0 observed for a time Ts in noise with one-sided power spectral density 
+
+Sn is given by 
+
+ρ2(ι, α, δ, ψ ) = h20Ts
+
+Sn
+
+a2+(ι) F 2+ t + a2
+
+> ×
+
+(ι) F 2 
+
+> ×t
+
+ ,
+
+(B2) as shown in Ref. [69]. In Eq. B2, the angle brack-ets denote an average over the observation time for fixed sky position and polarization angle. The functions 
+
+F+(t; α, δ, ψ ) and F×(t; α, δ, ψ ) are the detector antenna pattern functions, and a+ and a× are the amplitude mod-ulation coefficients, which depend only on cos ι and are given by 
+
+a+(ι) = 12 (1 + cos 2 ι), a×(ι) = cos ι. (B3) To obtain a simple analytic prediction, we replace the antenna-pattern functions by their averages over sky po-sition, polarization angle, and observation time for inter-ferometers with orthogonal arms (see also Ref. [77]): 
+
+F 2+ α, sin δ,ψ,t = F 2   
+
+> ×α, sin δ,ψ,t
+
+= 15 . (B4) This approximation averages the detector response over sky position, polarization, and time, but keeps the inclination dependence explicit through a+(ι) and a×(ι). It is therefore not a full population average over all an-gular variables. For an isotropically oriented source population, we as-sume cos ι ∼ U (−1, 1). The population-averaged detec-tion efficiency is then obtained by averaging the detection probability over the inclination distribution, 
+
+⟨pdet ⟩ =
+
+Z 1
+
+> −1
+
+pdet 
+
+ρ2(cos ι) d(cos ι)2 , (B5) where ρ2(cos ι) is computed from Eq. B2. Because the detection probability depends nonlinearly on the signal-to-noise ratio, the inclination average must be performed over pdet itself rather than over ρ2. The integral is eval-uated numerically by Monte Carlo sampling of cos ι.This semi-analytic approximation provides a simple and computationally inexpensive prediction for the de-tection efficiency while retaining the dominant depen-dence on the source inclination. It serves as a reference against which the measured detection efficiencies from the injection studies can be compared.    
+
+> 2. The cows3 estimate
+
+The second estimate is obtained with the open-source package cows3 [17], which implements the sensitivity-estimation framework of [66]. Rather than replacing the antenna-pattern factors with their population averages, 
+
+cows3 samples the source and detector parameters to construct the distribution of ρ2 across the source pop-ulation. The detection probability is evaluated for the 13 sampled values of ρ2 and then averaged numerically, pro-viding a more complete treatment of the source popula-tion and detector response. 
+
+> Appendix C: Tests of injection recovery with different configurations
+
+This appendix collects additional explorations of the injection-recovery performance. We assess the robustness of the results to the number of live points, the nested-sampling walk strategy, and the use of a realistic observ-ing schedule.    
+
+> 1. Preliminary exploration of nlive values
+
+The number of live points is one of the main parame-ters controlling the performance of nested-sampling algo-rithms, affecting both the computational cost and the ac-curacy with which the parameter space is explored. This subsection describes the preliminary studies used to se-lect the reference values of nlive adopted in the main text. Although these studies were primarily performed to determine suitable nested-sampling configurations, they also provide an empirical assessment of the stability of the recovered results with respect to the number of live points. For simplicity, these studies were performed using con-tiguous 100-day datasets with fixed-orientation injec-tions, with cos ι = 0 , Ψ = 0. Since the source ori-entation mainly affects the absolute detection efficiency rather than the behavior of the nested sampler, the qual-itative dependence on nlive is expected to be similar for the isotropic-orientation studies presented in the main text. Fig. 5 compares the measured detection efficiencies ob-tained with nlive = 450, 1000, and 1500 for the directed and all-sky follow-up configurations. The semi-analytic and cows3 estimates differ slightly in this comparison. The cows3 result should be regarded as the more ac-curate prediction because it explicitly samples the rele-vant source and detector parameters, whereas the semi-analytic calculation uses population-averaged antenna-pattern factors. For the fixed-sky configuration, all tested values of 
+
+nlive yield statistically consistent detection efficiencies that agree with the theoretical sensitivity estimates. Increasing nlive does not produce a measurable im-provement, indicating that nlive =450 provides sufficient parameter-space exploration in this case. The analysis with sky-position priors exhibits astronger dependence on nlive . In contrast to the fixed-sky case, the configurations with nlive = 450 and 
+
+nlive = 1000 do not recover the theoretical detection efficiency over the transition region of the curve, indicat-ing that the higher-dimensional parameter space is not explored sufficiently with these settings. Increasing the number of live points improves the recovery efficiency, with nlive = 1500 providing the first tested configura-tion consistent with the theoretical sensitivity estimates. These results motivate the choice of nlive = 1500 as the reference configuration for the all-sky analyses presented in the main text.    
+
+> 2. Additional DYNESTY configurations
+
+To assess the impact of the nested-sampling walk strat-egy on the search performance, we performed a series of additional fixed-sky injection studies using contiguous 100-day datasets with isotropic orientation. The compar-ison focuses on the DYNESTY walk strategies, while keep-ing the remaining sampler settings fixed. Fig. 6 compares the detection efficiency and runtime obtained with the acceptance-walk , act-walk , and 
+
+rwalk sampling methods of DYNESTY for the fixed-sky configuration. All configurations use nlive =450, an ev-idence tolerance of dlogz =0.1, and the live bound-ing method. For the walk-specific settings, rwalk uses 
+
+walks =100, act-walk uses nact =1 and maxmcmc =100, and acceptance-walk uses naccept =20, walks =100, and maxmcmc =5000. The walk strategy is only one of several parameters that affect the performance of DYNESTY . Therefore, the results presented here do not constitute an exhaustive optimization of the sampler. The act-walk and rwalk configurations recover detec-tion efficiencies consistent with the theoretical sensitivity estimates within the statistical uncertainties of the injec-tion study. The acceptance-walk configuration, how-ever, shows a modest reduction in recovery efficiency over part of the transition region, while also requiring substantially longer runtimes. Consequently, fewer injec-tions were performed for this configuration than for the others. The principal distinction between the remaining well-performing strategies is their computational cost: 
+
+act-walk achieves the shortest median runtime, while 
+
+rwalk is consistently slower but still recovers the ex-pected detection efficiency. The main analyses presented in this paper were carried out using the rwalk strategy, since they were completed before this comparison of walk strategies was performed. Given the relatively modest runtime reduction obtained with act-walk , these analyses were not repeated.  
+
+> 3. Results using O4a-timestamp datasets
+
+To assess the robustness of the results with respect to the observing schedule, we repeated the preliminary 
+
+nlive studies using Gaussian-noise datasets constructed from detector timestamps from the first part of the fourth LVK observing run (O4a) [78]. As in Appendix C 1, these exploratory studies use fixed-orientation injections. 14 50 100 150 200 250 
+
+Sensitivity depth D [Hz ¡1=2]   
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> Detection efficiency  Semianalytical estimation cows3 estimation dynesty, nlive=450 dynesty, nlive=1000 dynesty, nlive=1500 50 100 150 200
+
+Sensitivity depth D [Hz ¡1=2]
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> Detection efficiency  Semianalytical estimation cows3 estimation dynesty, nlive=450 dynesty, nlive=1000 dynesty, nlive=1500
+
+Figure 5: Detection efficiency as a function of sensitivity depth for different values of nlive for the directed follow-up (left) and the all-sky follow-up (right). Markers indicate the measured recovery fractions from fixed-orientation injection studies, with error bars showing the binomial statistical uncertainty. The curves show the corresponding semi-analytic and cows3 sensitivity estimates for each configuration. This comparison is used to select the reference nlive values adopted in the main text. 100 200 300 400 500 
+
+Sensitivity depth D [Hz ¡1=2]   
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> Detection efficiency  Semianalytical estimation cows3 estimation dynesty rwalk dynesty act-walk dynesty acceptance-walk 100 200 300 400
+
+Sensitivity depth D [Hz ¡1=2]
+
+> 10 1
+> 10 2
+> Median runtime [min]
+> rwalk act-walk acceptance-walk
+
+Figure 6: Comparison of different DYNESTY walk strategies for the directed follow-up. Left: detection efficiency as a function of sensitivity depth for the acceptance-walk , act-walk , and rwalk sampling methods. Right: median runtime as a function of sensitivity depth for the same configurations. Error bars show the full range of measured runtimes at each depth, from the fastest to the slowest completed run. The act-walk and rwalk configurations recover detection efficiencies consistent with the theoretical predictions, while acceptance-walk shows a modest reduction in recovery efficiency. The injected parameter values and the centers of the search priors are the same as in the contiguous 100-day fixed-orientation study. The frequency and spin-down priors are uniform, centered on the corresponding in-jected values, with widths ∆ f = 2 × 10 −5 Hz and ∆ ˙f =2 × 10 −12 Hz s −1. For the all-sky follow-ups, the sky-position priors are uniform and centered on the injected sky position and have widths ∆ α = ∆ δ = 0 .05 rad. Thus, relative to the contiguous 100-day datasets, the frequency and sky-position widths are unchanged, while the spin-down width is narrower than the ∆ ˙f = 1 .8×10 −10 Hz s −1
+
+used there. The tested values of nlive and all other 
+
+DYNESTY settings are the same as in the contiguous 100-day study. Fig. 7 compares the detection efficiencies obtained with different values of nlive for the directed search follow-up and for the all-sky search follow-up. For the directed configuration, all tested values of 
+
+nlive recover detection efficiencies consistent with the theoretical sensitivity estimates, confirming the behavior observed for the contiguous 100-day datasets. As be-fore, nlive =450 is sufficient to recover the expected sen-sitivity, with no measurable improvement obtained by increasing the number of live points. The all-sky follow-up configuration again exhibits a stronger dependence on nlive . Increasing the number of live points improves the agreement with the theoreti-cal sensitivity estimates, as found for the contiguous 100-15 100 200 300 
+
+Sensitivity depth D [Hz ¡1=2]  
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> Detection efficiency  Semianalytical estimation cows3 estimation dynesty, nlive=450 dynesty, nlive=1000 dynesty, nlive=1500 100 200 300
+
+Sensitivity depth D [Hz ¡1=2]
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> Detection efficiency  Semianalytical estimation cows3 estimation dynesty, nlive=450 dynesty, nlive=1000 dynesty, nlive=1500
+
+Figure 7: Detection efficiency as a function of sensitivity depth for the O4a-timestamp Gaussian-noise datasets, for the fixed-sky (left) and all-sky (right) follow-ups. Markers indicate the measured detection efficiencies for 
+
+nlive = 450, 1000, and 1500, while the solid and dashed curves show the corresponding semi-analytic and cows3 
+
+sensitivity estimates, respectively. day datasets. However, even the largest value considered here, nlive =1500, greater deviations from the theoret-ical predictions than for the corresponding contiguous 100-day datasets. This suggests that the more irregular O4a observing schedule may require a more thorough ex-ploration of the higher-dimensional parameter space, po-tentially motivating additional sampler tuning or larger values of nlive .Overall, these results reproduce the qualitative trends observed for the contiguous 100-day datasets, although the all-sky follow-up appears to require a more demand-ing sampler configuration. 
+
+> Appendix D: Additional posterior-calibration diagnostics
+
+As an additional check of the PE results discussed in Sec. VI, we examine the position of each injected value within the corresponding 90% credible interval. We use equal-tailed intervals, bounded by the 5th and 95th pos-terior percentiles, q5 and q95 , respectively, and define the normalized centered offset 
+
+z90 = (q95 + q5)/2 − θinj 
+
+(q95 − q5)/2 , (D1) where θinj is the injected value of the parameter of in-terest. Thus, z90 = 0 means that the injected value co-incides with the midpoint of the credible interval, while 
+
+|z90 | ≤ 1 means that the injected value lies inside that in-terval. For well-calibrated posteriors, these distributions should show no systematic displacement from zero and approximately 90% of the injections should lie between 
+
+−1 and 1. Figs. 8 and 9 show these diagnostics for the sampled sensitivity depth with measured detection efficiency clos-est to 90% in each configuration: D = 145 for the di-¡2 0 2
+
+offset / 90% half-width   
+
+> 050
+> injections  f
+> ¡202
+
+offset / 90% half-width 
+
+> _f
+
+Figure 8: Normalized centered offsets, as defined in Eq. (D1), for the DYNESTY directed follow-up at 
+
+D = 145. The redsolid vertical lines mark zero, the gray dashed lines mark the bounds z90 = ±1, and the blak dotted lines mark the median offsets. The empirical coverages of the nominal 90% credible intervals are 0.87 for f and 0.86 for ˙f .rected follow-up and D = 120 for the all-sky follow-up. For the directed follow-up, the empirical coverages of the nominal 90% credible intervals are 0.87 for f and 0.86 for ˙f . For the all-sky follow-up, the corresponding cover-ages are 0.90 for f , 0.93 for ˙f , 0.93 for α, and 0.92 for δ.The coverage fractions are therefore close to their nom-inal value, and the offset distributions are centered near zero, consistent with the PP tests in Sec. VI. We also find that the coverage remains broadly con-sistent with 90% across the range of sampled depths in both configurations. 16 010    
+
+> injections
+> f_f
+> ¡101
+
+offset / 90% half-width   
+
+> 010
+> injections
+> ®
+> ¡101
+
+offset / 90% half-width 
+
+> ±
+
+Figure 9: Normalized centered offsets, as defined in Eq. (D1), for the DYNESTY all-sky follow-up at D = 120. The red solid vertical lines mark zero, the gray dashed lines mark the bounds z90 = ±1, and the blackdotted lines mark the median offsets. The empirical coverages of the nominal 90% credible intervals are 0.90 for f ,0.93 for ˙f , 0.93 for α, and 0.92 for δ.17 
+
+[1] K. Riles, Living Reviews in Relativity 26 , 3 (2023), ISSN 1433-8351. [2] J. Aasi et al. (LIGO Scientific Collaboration), Classical and Quantum Gravity 32 , 074001 (2015), ISSN 0264-9381, 1361-6382, 1411.4547. [3] F. Acernese, M. Agathos, K. Agatsuma, D. Aisa, N. Alle-mandou, A. Allocca, J. Amarni, P. Astone, G. Balestri, G. Ballardin, et al., Classical and Quantum Gravity 32 ,024001 (2015), ISSN 0264-9381, 1361-6382. [4] T. Akutsu, M. Ando, K. Arai, Y. Arai, S. Araki, A. Araya, N. Aritomi, Y. Aso, S. Bae, Y. Bae, et al., Progress of Theoretical and Experimental Physics 2021 ,05A101 (2021), ISSN 2050-3911. [5] A. Abac, R. Abramo, S. Albanesi, A. Albertini, A. Agapito, M. Agathos, C. Albertus, N. Andersson, T. Andrade, I. Andreoni, et al., The Science of the Ein-stein Telescope (2025), 2503.12263. [6] M. Evans, R. X. Adhikari, C. Afle, S. W. Ballmer, S. Bis-coveanu, S. Borhanian, D. A. Brown, Y. Chen, R. Eisen-stein, A. Gruson, et al., A Horizon Study for Cosmic Ex-plorer: Science, Observatories, and Community (2021), 2109.09882. [7] D. I. Jones and K. Riles, Classical and Quantum Gravity 
+
+42 , 033001 (2025), ISSN 0264-9381, 1361-6382. [8] B. J. Owen and B. Rajbhandari, Multi-messenger de-tectability of continuous gravitational waves from the near future to next generation detectors (2026), 2512.22938. [9] B. J. Owen, Rev. Mod. Phys. 98 , 011002 (2026), 2512.22945. [10] R. Tenorio, D. Keitel, and A. M. Sintes, Universe 7, 474 (2021), ISSN 2218-1997, 2111.12575. [11] K. Wette, Astroparticle Physics 153 , 102880 (2023), ISSN 09276505, 2305.07106. [12] P. R. Brady and T. Creighton, Physical Review D
+
+61 , 082001 (2000), ISSN 0556-2821, 1089-4918, gr-qc/9812014. [13] M. A. Papa, H.-B. Eggenstein, S. Walsh, I. D. Palma, B. Allen, P. Astone, O. Bock, T. D. Creighton, D. Keitel, B. Machenschalk, et al., Physical Review D 94 , 122006 (2016), ISSN 2470-0010, 2470-0029, 1608.08928. [14] G. Ashton and R. Prix, Physical Review D 97 , 103020 (2018), ISSN 2470-0010, 2470-0029, 1802.05450. [15] R. Tenorio, D. Keitel, and A. M. Sintes, Physical Re-view D 104 , 084012 (2021), ISSN 2470-0010, 2470-0029, 2105.13860. [16] P. B. Covas, R. Prix, and J. Martins, A new framework to follow up candidates from continuous gravitational-wave searches (2024), 2404.18608. [17] L. Mirasola and R. Tenorio, Toward a computationally-efficient follow-up pipeline for blind continuous gravitational-wave searches (2025), 2405.18934. [18] J. Martins, M. A. Papa, B. Steltner, R. Prix, and P. B. Vidal, A Bayesian Framework to Follow-up Continu-ous Gravitational Wave Candidates from Deep Surveys 
+
+(2025), 2508.18204. [19] A. Ashok, B. Beheshtipour, M. A. Papa, P. C. C. Freire, B. Steltner, B. Machenschalk, O. Behnke, B. Allen, and R. Prix, The Astrophysical Journal 923 , 85 (2021), ISSN 0004-637X, 1538-4357, 2107.09727. [20] M. Pitkin, Journal of Open Source Software 7, 4568 (2022), ISSN 2475-9066. [21] A. Ashok, P. B. Covas, R. Prix, and M. A. Papa, Physical Review D 109 , 104002 (2024), ISSN 2470-0010, 2470-0029. [22] A. G. Abac, R. Abbott, I. Abouelfettouh, F. Acernese, K. Ackley, S. Adhicary, N. Adhikari, R. X. Adhikari, V. K. Adkins, D. Agarwal, et al. (LIGO Scientific Collab-oration, Virgo Collaboration, KAGRA Collaboration), The Astrophysical Journal 983 , 99 (2025), ISSN 0004-637X, 1538-4357, 2501.01495. [23] L. D’Onofrio, F. Muciaccia, L. Mirasola, M. Pitkin, C. Palomba, P. Leaci, F. S. Tehrani, F. Amicucci, L. Sil-vestri, and L. Pierini, Py5vec: A modular Python package for the 5-vector method to search for continuous gravita-tional waves (2026), 2603.15703. [24] A. G. Abac, I. Abouelfettouh, F. Acernese, K. Ackley, A. Adam, C. Adamcewicz, S. Adhicary, D. Adhikari, N. Adhikari, R. X. Adhikari, et al. (LIGO Scientific Collaboration, Virgo Collaboration, KAGRA Collabora-tion), The Astrophysical Journal 1005 , 221 (2026), ISSN 0004-637X, 1538-4357, 2603.25938. [25] G. Ashton, M. Huebner, P. D. Lasky, C. Talbot, K. Ack-ley, S. Biscoveanu, Q. Chu, A. Divarkala, P. J. Easter, B. Goncharov, et al., The Astrophysical Journal Supple-ment Series 241 , 27 (2019), ISSN 0067-0049, 1538-4365, 1811.02042. [26] D. Keitel, R. Tenorio, G. Ashton, and R. Prix, Journal of Open Source Software 6, 3000 (2021), ISSN 2475-9066. [27] G. Ashton, D. Keitel, R. Prix, R. Tenorio, and M.-A. Ferrer, PyFstat/PyFstat: V2.3.0 , Zenodo (2025). [28] D. Foreman-Mackey, D. W. Hogg, D. Lang, and J. Good-man, Publications of the Astronomical Society of the Pacific 125 , 306 (2013), ISSN 00046280, 15383873, 1202.3665. [29] W. Vousden, W. M. Farr, and I. Mandel, Monthly No-tices of the Royal Astronomical Society 455 , 1919 (2016), ISSN 0035-8711, 1365-2966, 1501.05823. [30] J. S. Speagle, Monthly Notices of the Royal Astronomical Society 493 , 3132 (2020), ISSN 0035-8711, 1365-2966, 1904.02180. [31] M. J. Williams, J. Veitch, and C. Messenger, Physical Review D 103 , 103006 (2021), ISSN 2470-0010, 2470-0029. [32] M. J. Williams, J. Veitch, and C. Messenger, Machine Learning: Science and Technology 4, 035011 (2023), ISSN 2632-2153. [33] M. J. Williams, J. Veitch, and Christian Chapman-Bird, 
+
+Mj-will/nessai: V0.15.2 , Zenodo (2026). [34] Emcee — emcee , Online documentation. [35] B. McGloughlin, J. Martins, B. Steltner, M. A. Papa, H.-B. Eggenstein, B. Machenschalk, R. Prix, and M. Ben-sch, Einstein@Home all-sky ”bucket” search for continu-ous gravitational waves in LIGO O3 public data (2025), 2508.16423. [36] J. Ming, M. A. Papa, H.-B. Eggenstein, B. Machen-schalk, J. Martins, B. Steltner, B. McGloughlin, V. Der-gachev, R. Prix, and M. Bensch, The Astrophysical Journal 1004 , 65 (2026), ISSN 0004-637X, 1538-4357, 2512.15672. [37] P. B. Covas, M. A. Papa, and R. Prix, Astrophys. J. 985 ,192 (2025), 2409.16196. [38] P. B. Covas, M. A. Papa, and R. Prix (2026), 2605.14728. 18 
+
+[39] A. G. Abac, I. Abouelfettouh, F. Acernese, K. Ackley, C. Adamcewicz, S. Adhicary, D. Adhikari, N. Adhikari, R. X. Adhikari, V. K. Adkins, et al. (LIGO Scientific Collaboration, Virgo Collaboration, KAGRA Collabo-ration), All-sky search for continuous gravitational-wave signals from unknown neutron stars in binary systems in the first part of the fourth LIGO-Virgo-KAGRA observ-ing run (2025), 2511.16863. [40] A. G. Abac, I. Abouelfettouh, F. Acernese, K. Ackley, A. Adam, C. Adamcewicz, S. Adhicary, D. Adhikari, N. Adhikari, R. X. Adhikari, et al. (LIGO Scientific Collaboration, Virgo Collaboration, KAGRA Collabo-ration), All-sky Searches for Continuous Gravitational Waves from Isolated Neutron Stars in the Data from the First Part of the Fourth LIGO-Virgo-KAGRA Observing Run (2026), 2603.14168. [41] A. G. Abac, I. Abouelfettouh, F. Acernese, K. Ackley, C. Adamcewicz, S. Adhicary, D. Adhikari, N. Adhikari, R. X. Adhikari, V. K. Adkins, et al. (LIGO Scientific Collaboration, Virgo Collaboration, KAGRA Collabora-tion), The Astrophysical Journal 1004 , 204 (2026), ISSN 0004-637X, 1538-4357, 2603.25808. [42] A. G. Abac, I. Abouelfettouh, F. Acernese, K. Ackley, A. Adam, C. Adamcewicz, S. Adhicary, D. Adhikari, N. Adhikari, R. X. Adhikari, et al. (LIGO Scientific Col-laboration, Virgo Collaboration, KAGRA Collaboration, Precision Ephemerides for Gravitational-Wave Searches Project), Sub-Torque-Balance Upper Limits on Contin-uous Gravitational Waves from Scorpius X-1 (2026), 2607.07765. [43] P. Jaranowski, A. Kr´ olak, and B. F. Schutz, Physical Review D 58 , 063001 (1998), ISSN 0556-2821, 1089-4918, gr-qc/9804014. [44] P. B. Covas, Monthly Notices of the Royal Astronomical Society 500 , 5167–5176 (2020), ISSN 1365-2966. [45] R. Prix and B. Krishnan, Targeted search for contin-uous gravitational waves: Bayesian versus maximum-likelihood statistics (2009), 0907.2569. [46] P. Jaranowski, A. Kr´ olak, and B. F. Schutz, Physical Review D 58 , 063001 (1998), ISSN 0556-2821, 1089-4918, gr-qc/9804014. [47] C. Cutler and B. F. Schutz, Physical Review D 72 ,063006 (2005), ISSN 1550-7998, 1550-2368. [48] P. B. Covas and A. M. Sintes, Phys. Rev. Lett. 124 ,191102 (2020), 2001.08411. [49] R. Abbott et al. (LIGO, Virgo, KAGRA), Phys. Rev. D 
+
+105 , 022002 (2022), 2109.09255. [50] R. Abbott et al. (LIGO, KAGRA, Virgo), Astrophys. J. 
+
+932 , 133 (2022), 2112.10990. [51] R. Abbott et al. (KAGRA, LIGO, Virgo), Phys. Rev. D 
+
+106 , 042003 (2022), 2204.04523. [52] R. Abbott et al. (LIGO, KAGRA, Virgo), Astrophys. J. Lett. 941 , L30 (2022), 2209.02863. [53] J. T. Whelan et al., Astrophys. J. 949 , 117 (2023), 2302.10338. [54] A. G. Abac et al. (LIGO, Virgo, KAGRA) (2025), 2511.16863. [55] A. G. Abac et al. (LIGO, Virgo, KAGRA) (2026), 2603.14168. [56] A. G. Abac et al. (LIGO, Virgo, KAGRA) (2026), 2607.07765. [57] W. K. Hastings, Biometrika 57 , 97 (1970), ISSN 1464-3510, 0006-3444. [58] J. Skilling, Bayesian Analysis 1, 833 (2006), ISSN 1936-0975, 1931-6690. [59] G. Ashton, N. Bernstein, J. Buchner, X. Chen, G. Cs´ anyi, A. Fowlie, F. Feroz, M. Griffiths, W. Handley, M. Habeck, et al., Nature Reviews Methods Primers 2,39 (2022), ISSN 2662-8449, 2205.15570. [60] G. Ashton, R. Prix, and I. Jones, Physical Review D 98 ,063011 (2018), ISSN 2470-0010, 2470-0029, 1805.03314. [61] D. Keitel and G. Ashton, Classical and Quantum Gravity 
+
+35 , 205003 (2018), ISSN 0264-9381, 1361-6382. [62] I. M. Romero-Shaw, C. Talbot, S. Biscoveanu, V. D’Emilio, G. Ashton, C. P. L. Berry, S. Coughlin, S. Galaudage, C. Hoy, M. H¨ ubner, et al., Monthly No-tices of the Royal Astronomical Society 499 , 3295 (2020), ISSN 0035-8711, 2006.00714. [63] A. G. Abac et al. (LIGO, Virgo, KAGRA) (2026), 2605.27224. [64] M. Shaltev and R. Prix, Physical Review D 87 , 084057 (2013), ISSN 1550-7998, 1550-2368, 1303.2471. [65] B. Behnke, M. A. Papa, and R. Prix, Physical Re-view D 91 , 064007 (2015), ISSN 1550-7998, 1550-2368, 1410.5997. [66] C. Dreissigacker, R. Prix, and K. Wette, Physical Re-view D 98 , 084058 (2018), ISSN 2470-0010, 2470-0029, 1808.02459. [67] LIGO, Virgo, and KAGRA, LVK algorithm library – LALSuite , Free software (GPL) (2018). [68] K. Wette, SoftwareX 12 , 100634 (2020). [69] K. Wette, Physical Review D 85 , 042003 (2012), ISSN 1550-7998, 1550-2368, 1111.5650. [70] G. Casella and R. L. Berger, Statistical Inference 
+
+(Duxbury, Pacific Grove, CA, 2002), 2nd ed. [71] S. Bagnasco (LIGO, Virgo), EPJ Web Conf. 295 , 04047 (2024), 2311.12559. [72] M. Pitkin, Journal of Open Source Software 7, 4568 (2022). [73] L. Mirasola et al. (2026), 2608.07662. [74] S. R. Cook, A. Gelman, and D. B. Rubin, J. Comp. Graph. Stat. 15 , 675 (2006). [75] F. J. Massey, Journal of the American Statistical Asso-ciation 46 , 68 (1951). [76] R. A. Fisher, in Breakthroughs in Statistics , edited by S. Kotz and N. L. Johnson (Springer New York, New York, NY, 1992), pp. 66–70, ISBN 978-0-387-94039-7 978-1-4612-4380-9. [77] R. Prix, Tech. Rep. LIGO-T0900149-v6, LIGO Scientific Collaboration (2018). [78] A. G. Abac et al. (LIGO, Virgo, KAGRA), Astrophys. J. 
+
+1004 , 232 (2026), 2508.18079.

@@ -1,0 +1,907 @@
+Title: The CHIME/FRB Outriggers: Commissioning the Hat Creek Outrigger and an Updated Calibration Scheme for Mitigating RFI
+
+URL Source: https://arxiv.org/pdf/2609.10686v1
+
+Published Time: Fri, 11 Sep 2026 00:06:52 GMT
+
+Number of Pages: 29
+
+Markdown Content:
+Draft version September 11, 2026 
+
+Typeset using L ATEX twocolumn style in AASTeX631 
+
+THE CHIME/FRB OUTRIGGERS: COMMISSIONING THE HAT CREEK OUTRIGGER AND AN UPDATED CALIBRATION SCHEME FOR MITIGATING RFI 
+
+Mattias Lazda ,1, 2 Nina V. Gusinskaia ,3, 4 Gurman Sachdeva ,1, 2 Shion Andrew ,5, 6 
+
+Juan Mena-Parra ,1, 2 Mandana Amiri ,7 Bridget C. Andersen ,8 Alyssa Atkinson ,1, 2 
+
+Kevin Bandura ,9, 10 Alice P. Curtin ,11, 12, 4 Matt Dobbs ,11, 12 Ian Hendricksen ,11, 12 
+
+Jason W.T. Hessels ,11, 12, 3, 4 Dant´ e M. Hewitt ,4 Victoria M. Kaspi ,11, 12 Kholoud Khairy ,9, 10 
+
+Afrokk Khan ,11, 12 Ronniy C. Joseph ,13 Adam E. Lanman ,5, 6 Calvin Leung ,14, 15 Kiyoshi W. Masui ,5, 6 
+
+Aaron B. Pearlman ,5, 11, 12, ∗ Alexander W. Pollak ,16 Vishwangi Shah ,11, 12 Kaitlyn Shin ,17 
+
+Seth R. Siegel ,18, 19, 11, 12 Haochen Wang ,5, 6 and Tarik J Zegmott 11, 12 
+
+> 1
+
+Dunlap Institute for Astronomy and Astrophysics, 50 St. George Street, University of Toronto, ON M5S 3H4, Canada 
+
+> 2
+
+David A. Dunlap Department of Astronomy and Astrophysics, 50 St. George Street, University of Toronto, ON M5S 3H4, Canada 
+
+> 3
+
+ASTRON, Netherlands Institute for Radio Astronomy, Oude Hoogeveensedijk 4, 7991 PD Dwingeloo, The Netherlands 
+
+> 4
+
+Anton Pannekoek Institute for Astronomy, University of Amsterdam, Science Park 904, 1098 XH Amsterdam, The Netherlands 
+
+> 5
+
+MIT Kavli Institute for Astrophysics and Space Research, Massachusetts Institute of Technology, 77 Massachusetts Ave, Cambridge, MA 02139, USA 
+
+> 6
+
+Department of Physics, Massachusetts Institute of Technology, 77 Massachusetts Ave, Cambridge, MA 02139, USA 
+
+> 7
+
+Department of Physics and Astronomy, University of British Columbia, 6224 Agricultural Road, Vancouver, BC V6T 1Z1 Canada 
+
+> 8
+
+Department of Astronomy and Astrophysics, University of California Santa Cruz, 1156 High Street, Santa Cruz, CA 95060, USA 
+
+> 9
+
+Lane Department of Computer Science and Electrical Engineering, 1220 Evansdale Drive, PO Box 6109, Morgantown, WV 26506, USA 
+
+> 10
+
+Center for Gravitational Waves and Cosmology, West Virginia University, Chestnut Ridge Research Building, Morgantown, WV 26505, USA 
+
+> 11
+
+Department of Physics, McGill University, 3600 rue University, Montr´ eal, QC H3A 2T8, Canada 
+
+> 12
+
+Trottier Space Institute, McGill University, 3550 rue University, Montr´ eal, QC H3A 2A7, Canada 
+
+> 13
+
+S[&]T Netherlands, Olof Palmestraat 14, 2616 LR Delft, The Netherlands 
+
+> 14
+
+Miller Institute for Basic Research, Stanley Hall, Room 206B, Berkeley, CA 94720 
+
+> 15
+
+Department of Astronomy, University of California, Berkeley, CA 94720, United States 
+
+> 16
+
+SETI Institute, 339 Bernardo Ave, Suite 200 Mountain View, CA 94043, USA 
+
+> 17
+
+Cahill Center for Astronomy and Astrophysics, MC 249-17 California Institute of Technology, Pasadena CA 91125, USA 
+
+> 18
+
+SKA Observatory, 26 Dick Perry Avenue, Kensington, WA 6151, Australia 
+
+> 19
+
+Perimeter Institute for Theoretical Physics, 31 Caroline Street N, Waterloo, ON N25 2YL, Canada 
+
+ABSTRACT This work presents commissioning of the Hat Creek Outrigger (HCO), a dual-polarization 256-element radio interferometer that is part of the Canadian Hydrogen Intensity Mapping Experiment Fast Radio Burst (CHIME/FRB) Outrigger project. Driven by a complex radio-frequency interference (RFI) environment that consistently contaminates ∼ 40% of HCO’s usable bandwidth, we implement an improved calibration scheme using Gaussian Process Regression to recover complex gain solutions over RFI contaminated channels. To validate our method, we test the performance of the array using known transients and continuum sources over relevant timescales used for fast-transient research ( ≲
+
+seconds). We find that our updated calibration scheme results in a ∼ 1.69 × to 1 .87 × improvement in the array’s point-source sensitivity, while simultaneously maintaining noise properties consistent with thermal statistics. As a result, we find that the array performs consistently within theoretical expec-tations across ≳ 80% of HCO’s bandpass. We further observe an improvement in the interferometric performance after applying recently developed spatial filtering techniques for RFI mitigation, which rely on accurate calibration solutions for effective removal of unwanted interference. We conclude that our approach provides a valid framework for improving calibration solutions over RFI contaminated 
+
+mattias.lazda@mail.utoronto.ca arXiv:2609.10686v1 [astro-ph.IM] 9 Sep 2026 2 Lazda et al. 
+
+channels for large-N interferometric arrays more broadly. Our work motivates future development of more sophisticated techniques to recover astrophysical information in RFI-contaminated channels, departing from the historical practice of discarding them outright. 
+
+Keywords: radio instrumentation, radio astronomy, fast radio bursts, very long baseline interferometry  
+
+> 1.
+
+INTRODUCTION Radio astronomy has entered an era in which an ever growing fraction of observing bandwidth has become contaminated with radio frequency interference (RFI). As a consequence, the historical preference of simply re-moving contaminated bands is rapidly becoming infea-sible as greater amounts of bandwidth become contami-nated. This has spurred recent development in algorith-mic approaches aimed not only at identifying and excis-ing RFI on shorter timescales (e.g., Deller 2010; Rafiei-Ravandi & Smith 2023; Marshman et al. 2026; Schmid et al. 2026) but also actively recovering astrophysical information within these contaminated channels (e.g., van der Veen et al. 2004; Finlay et al. 2023; Zhang et al. 2024; Andrew et al. 2026; Kuiper et al. 2026). Recently, the sub-domain of transient radio astron-omy has seen growth in algorithmic development aimed to recover frequency information. Work by Andrew et al. (2026) has shown that filtering algorithms based on the Karhunen–Lo` eve transform (KLT) can spatially null dominant RFI sources and maximize sensitivity in the direction of the transient, recovering signal in even heavily contaminated channels where the signal was pre-viously buried in RFI and noise. Kuiper et al. (2026) im-plemented the use of “flat-fielding” for tied-array beam observations, in which each beam is divided by an av-eraged reference derived from other beams in the point-ing, suppressing red noise and broad-band RFI. Applied to transient astronomical data, the technique resulted in a reduction of false positives while performing low frequency observations of PSR J0250+5854. Both ex-amples showcase how novel algorithmic techniques can lead to successful recovery of a significant quantity of astrophysical information, enabling future transient dis-coveries despite the inevitable increase in complexity of RFI environments. Wide-field radio interferometers have proven particu-larly successful for detecting new radio transients. These interferometers adopt designs which maximize sensitiv-ity over large fractions of observable sky to enable rapid survey speeds, typically within the context of 21 cm cos- 
+
+> ∗NASA Hubble Fellow
+
+mological surveys (DeBoer et al. 2017; CHIME Collab-oration et al. 2022). However, such a design has also been found to be ideally suited for detecting bright, ra-dio transient events (CHIME/FRB Collaboration et al. 2018). Within the field of fast radio bursts (FRBs), the Canadian Hydrogen Intensity Mapping Experiment (CHIME) telescope is one such telescope, boasting an in-stantaneous field of view of ∼ 200 deg 2. FRBs are short (μs to ms), energetic bursts of radio emission whose ori-gins, on a population level, are poorly understood (see Xiao et al. 2021; Petroff et al. 2022 for a review). Since beginning operations, CHIME/FRB has dominated the global discovery rate of FRBs, accumulating over 4000 FRBs to-date compared to ≤ 500 bursts accumulated by traditional radio telescope designs (CHIME/FRB Collaboration et al. 2018, 2021, 2026). The success of CHIME/FRB, combined with the commercial avail-ability of hardware components enabling hundreds-to-thousands element interferometric arrays (i.e., large-N
+
+arrays), has spurred development in a number of tele-scope designs which aim to adopt similar survey strate-gies to maximize the number of detected transients. Ex-amples of such arrays currently under development in-clude CHORD (Vanderlinde et al. 2019; Collaboration et al. 2026), BURSTT (Lin et al. 2022), DSA (Hallinan et al. 2019), CHARTS (Cassanelli et al. 2025), CASM (Connor et al. 2026) and SKA-LOW (Timmerman et al. 2026). All of the aforementioned projects will share the com-mon challenge of mitigating increasingly oppressive RFI environments driven by modern-day technological ad-vancements (e.g., Di Vruno et al. 2023; Bassa et al. 2024). This is particularly true for the subset of designs that heavily rely on sky information in order to cali-brate individual antenna responses (e.g., CHIME Col-laboration et al. 2022). Such calibration is necessary in order to unlock the full sensitivity enabled by co-herently summing voltages across all elements in the array. This challenge is compounded by the fact that the modest to large field of views (FoVs) and near-field zones of ∼ hundreds of meters of compact interferome-ters result in increased sensitivity to the horizon, where RFI sources dominate and contaminate the spectrum of interest. As more of the spectrum becomes contami-HCO Commissioning Overview 3nated, this method of calibration will become increas-ingly strained. As such, updated calibration schemes are needed to recover solutions over (ever-growing) RFI contaminated bands. This is particularly necessary to maximize the benefits from techniques aimed at recov-ering astrophysical information in these contaminated channels which assume that individual interferometric elements are properly calibrated prior to filtering (e.g., Andrew et al. 2026). This work presents the commissioning results of one such large-N interferometer: the Hat Creek Outrigger (HCO) telescope. HCO is the third and final Out-rigger telescope part of the CHIME/FRB Outrigger array, a network of wide-field interferometers across North America designed to localize FRBs using very-long-baseline-interferometry (VLBI) (see CHIME/FRB Collaboration et al. 2025a for a review). In doing so, the CHIME/FRB Outrigger project seeks to establish the largest sample of FRBs localized to ∼ 50 mas to-date, necessary to disentangle various proposed progen-itor models as well as unlock FRBs as probes of the diffuse intergalactic baryons and cosmology (e.g., Zhou et al. 2014; Khrykin et al. 2024; Connor et al. 2025; Leung et al. 2025; CHIME/FRB Collaboration et al. 2025b; Shah et al. 2025; Eftekhari et al. 2025; Lanman et al. 2026; Curtin et al. 2026). Motivated by a complex RFI environment which con-taminates up to ∼ 45% of HCO’s allocated bandwidth between 400 − 800 MHz, we introduce an updated cal-ibration strategy to mitigate and recover astrophysi-cal information in channels previously contaminated by RFI. In particular, we focus on how our updated calibra-tion strategy results in significant improvement in sen-sitivity across HCO’s allocated bandwidth, and perfor-mance within the context of VLBI-localizing FRBs. Our work builds upon CHIME Collaboration et al. (2022); Lanman et al. (2024), Nimmo et al. in prep. (here-after referred to as Paper I, II and III, respectively) which focus on the interferometric performance of the CHIME, KKO and GBO telescopes, respectively, as well as CHIME/FRB Collaboration et al. (2018). The structure of this paper is organized as follows: In Section 2, we provide a brief overview of the design of the array. In Section 3, we introduce the updated calibration scheme to improve daily complex gain solu-tions. In Section 4, we introduce improvements in our feed position determination. In Section 5, we showcase how updating our calibration strategy enables HCO to achieve significant improvement in autocorrelation sensi-tivity, recovering astrophysical information in channels previously lost due to RFI. In Section 6, we showcase that the improvement in sensitivity in autocorrelation translates to increased performance in cross-correlation sensitivity in VLBI. Finally, we conclude and summarize our results in Section 7.  
+
+> 2.
+
+DESIGN OVERVIEW Given that HCO is the final cylinder in the CHIME/FRB Outrigger VLBI array, specifics regard-ing the signal chain, design, digital backend and have already been covered in extensive detail in Papers I, II, III and CHIME/FRB Collaboration et al. (2025a). In light of this, we provide only a brief summary here and refer the reader to these works for specifics regarding the design of the Outrigger systems. 2.1. Site 
+
+HCO is located at the Hat Creek Radio Observatory (HCRO) in northern California, which hosts both the Search for Extraterrestrial Intelligence (SETI) Institute 1
+
+and the Allen Telescope Array (Welch et al. 2009). The telescope is located within a valley, offering modest RFI shielding from nearby towns and within 18 km to the nearest town of Burney, California. The telescope as seen at night is pictured in Figure 1. In Table 1, we pro-vide specific details regarding the geographic location of the Outrigger. HCO forms a 955 .2-km line-of-sight baseline with CHIME. Located nearly directly south of CHIME, HCO is thus the keystone of the full array, pro-viding astrometric localization precision in the north-south direction (see, e.g., CHIME/FRB Collaboration et al. 2025a,b). This contrasts with the KKO and GBO baselines which are nearly collinear and constrain the East-West component of FRB localization ellipses (Pa-pers II, III). 2.2. Receiver Chain 
+
+HCO adopts a 20 m × 80 m cylindrical reflector design, marginally rolled by 1 .4 degrees and rotated 1 .22 degrees East of North to ensure an overlapping FoV with the CHIME, KKO and GBO telescopes. The cylinder is populated with 128 dual linearly polarized antennas along the inner 39 m of the focal line relative to the center of the cylinder. A pair of custom LNAs (Ban-dura et al. 2014; CHIME Collaboration et al. 2022) are attached directly to the two polarization outputs of each feed. Each polarization signal is independently ampli-fied and processed. 40-m low-attenuation coaxial cables carry the signals from the focal line to the local compute cluster housed in an RF shielded room within a ship-ping container. Custom filter amplifiers (FLAs) within  
+
+> 1www.seti.org
+
+4 Lazda et al.     
+
+> Table 1. Characteristics of HCO Parameter Value Geographic location 40 ◦49 ′3′′ .07N 121 ◦27 ′57 ′′ .66W Elevation 1019.34 m Baseline to CHIME
+
+a 955.2 km Cylinder width 20 m Cylinder length 80 m Instrumented cylinder length 39 m Cylinder roll 1.4 ◦
+
+> Cylinder rotation
+
+b 1.22 ◦   
+
+> Number of dual-polarization feeds 128 Observing band 400–800 MHz
+> aProjected baseline for the target at the CHIME zenith.
+> bEast of North.
+
+the RF shielded room amplify and band-pass filter the signals to 400–800 MHz before they are digitized by the digital backend (Section 2.3). 2.3. Digital Backend & Data Products 
+
+The amplified and filtered analog signals are digi-tized and channelized by a field-programmable gate ar-ray (FPGA)-centered F-engine. The HCO F-engine, as with other CHIME sites, is implemented using the ICE platform (Bandura et al. 2016). The analog signals are sampled by the ICE motherboards’ ADCs into 8 bits at 800 MSPS yielding a bandwidth of 400 MHz (Paper I). These data are hereafter referred to as “raw ADC” data, with a native time resolution of 1 .25 ns per sam-ple. While the full stream of raw ADC frames undergo further processing, a small subsample of raw ADC data (1 frame of 2048 samples for all 256 inputs) is recorded every 30 s. These data are primarily used for assessing input health via simple root-mean-square (RMS) diag-nostics and for assessing the overall RFI environment at HCO (see Section 2.5). One F-engine input is con-nected to the 10 MHz signal of a rubidium clock; the raw ADC frames of this input are saved at a cadence of 0 .2 s. These data will be used to perform high precision clock corrections within the context of VLBI localization of FRBs (Mena-Parra et al. 2022; CHIME/FRB Collabo-ration et al. 2025a). The digitized data from each input are then passed through a polyphase filter bank (PFB) that sepa-rates the bandwidth into 1024 frequency channels with 390 .625 kHz frequency resolution, 2 .56 μs time resolu-tion. They are then re-scaled using computed digital HCO      
+
+> CHIME KKO
+> GBO
+> 955.2 km
+> Figure 1. The HCO site. Top panel: An image of HCO, located at the SETI Institute in Northern California, a few hundred metres away from the Allen Telescope Array (Welch et al. 2009). Bottom panel: Geographic location of HCO relative to CHIME, KKO and GBO. HCO forms a 955 .2 km baseline with CHIME, primarily along the North-South axis, enabling 2D localizations of FRBs when combined with KKO and GBO.
+
+gains and then converted into 4 + 4 j bits. Channelized data from each input is then sent to a GPU-based X-engine. The X-engine produces two data products in real time: cross-correlation visibilities between each pair of antennas (“ N 2 data”) and a 40-second ring buffer that holds complex baseband data for each frequency. We summarize each of the saved data products post digiti-zation stage below.    
+
+> N2data —
+
+The first data product outputted by the X-engine are autocorrelation and cross-correlated visibil-ities across all N = 256 input pairs. The data have a time resolution of 40 s and frequency resolution of 390 .625 kHz. The data are recorded to disk in real-time in hdf5 file formats in 30 minute chunks. These data are saved continuously throughout the commissioning phase but will be compressed in the future by only saving data during calibrator transits. The coarser time resolution of 
+
+N 2 data results in the data primarily being used in anal-HCO Commissioning Overview 5yses which benefit from longer integration times. These analyses typically revolve around calibration and deter-mining feed positions (see Section 3).  
+
+> Baseband data —
+
+The second data product outputted by the X-engine is channelized voltage data with 2 .56 μstime resolution and 390 .625 kHz resolution, per input. Hereafter, we refer to these data as “channelized base-band” data, or simply “baseband” data 2. These data represent the primary data products used in the VLBI localizations of FRBs and are used to assess the overall performance of HCO as an interferometer (see Sections 5 and 6). 2.4. Data Flow & Transport 
+
+A summary of the digital system configuration post analog chain is visualized in Figure 2. The overall de-sign draws heavily from previous Outrigger system con-figurations (see Fig. 3 in Paper II) with two key dis-tinctions. First, services responsible for controlling key hardware components (e.g., the F - and X- engines), re-ceiving triggers responsible for capturing FRB data and merging monitoring metrics are consolidated to a single auxiliary node, rather than split over two nodes. Second, the Figure reflects how our updated calibration scheme (Section 3) is integrated into the broader digital system configuration. Following Figure 2, voltage data channelized into baseband data are continuously stored in a 40 second memory ring buffer. Upon detection of an FRB by the CHIME/FRB backend (CHIME/FRB Collaboration et al. 2018), a trigger is sent to each of the Outrigger sites. Upon receipt of the trigger, the baseband data are written to disk, saving up to a few hundred milliseconds of data surrounding the transient for offline processing. The baseband data are then automatically backed up to minoc , a cloud storage manager, via datatrail 3,an in-house built software package designed specifically for tracking, managing and archiving events triggered by CHIME/FRB. The HCO site is equipped with fibre-optic cable internet, allowing for transfer speeds up to 500 Mb s −1. Offline processing is carried out on canfar 
+
+> 4
+
+, with data from each site pulled locally via datatrail .Further process, including caliration, baseband localiza-tion, RFI filtering, and VLBI correlation, are performed at canfar (Leung et al. 2024). 2.5. RFI Environment & Monitoring    
+
+> 2We note that this convention is chosen to remain consistent with Papers I, II and III.
+> 3https://chimefrb.github.io/datatrail/
+> 4https://www.canfar.net/en/
+
+We wish to assess the overall RFI environment at HCO to identify dominant sources of RFI that contaminate HCO’s observing bandwidth from 400 − 800 MHz. Since beginning operations, both HCO and KKO (Paper II) have observed an increase in RFI activity, with both Outriggers recently identifying new unique sources of persistent RFI associated with broadening telecommu-nication bands. As a consequence, we monitor the RFI environment at HCO on a daily basis to be alerted of any significant changes in the radio spectrum between 400 to 800 MHz. We utilize the saved subsample of raw ADC data (Sec-tion 2.3), channelizing each frame of 2048 samples, per input, into complex voltage measurements with a time resolution of 2 .56 μs and 390 .625 kHz chunks via a Fast Fourier Transform (FFT). For each sample saved every 30 s across all inputs, we compute the autocorrelation power as a function of time. Finally, we collapse over the input axis by computing the median power across all powered inputs. In Figure 3, we plot the median autocorrelation power spectrum across all inputs over 24 hr as function of fre-quency. The Sun transit at 12:00 PT is clearly visible. The power, integrated over time, is indicated in the top panel. We construct a persistent RFI mask by comput-ing the statistics of the visibility eigenvectors over 24 hr timescales following the procedure detailed in section 3.2 in Paper II and plot the result in Figure 3. Briefly, we compute the 256-element vector a(t, ν ) = P 
+
+> i
+
+λieie∗ 
+
+> i
+
+,where ei are the eigenvectors and λi are the eigenval-ues of the visibility matrix (Section 3.1), i = 0 ... 3 and known (faulty) inputs are removed from the array prior to computing any statistics. We then compute N (ν) by computing the median absolute deviation (MAD) over time and summing over inputs. Finally, we flag any channels for which N (ν) > mean( a) + 4std( a) where the mean and standard deviation are computed over all axes. As of June 2026, our 24 hr measurement indicates that ∼ 38% of HCO’s allocated bandwidth is contam-inated by persistent RFI. Repeating this measurement over week- to month-long timescales indicates that this fraction remains broadly constant in time, with day-to-day variation resulting in fluctuations in masked frac-tions at the ∼ 1% level. However, a subset of RFI sources are intermittent (see, e.g., 700 −725 MHz in Fig-ure 3). Accounting for these transient RFI sources, the fraction of bandwidth contaminated by RFI increases to 
+
+∼ 45%. We discuss the implications of this RFI within the context of calibrating the array in the following sec-tion. 6 Lazda et al. F-Engine 
+
+> FPGA ADC PFB
+
+X-Engine aux c1 c2 Shared Mem calibration broker 
+
+complex gains 
+
+> outlier removal (1)
+> outlier removal (2)
+> phase unwrap
+> GPR
+
+Receive/ Merge data Transpose archived visibilities 
+
+> Baseband Buffer
+
+GPU  
+
+> Cross-Multiply 40 sec integration
+> Eigendecomposition
+> Visibilities, eigenmodes
+
+baseband receiver 
+
+baseband converter 
+
+raw baseband 
+
+HDF5 baseband  
+
+> FPGA controller
+> GNSS
+> Monitoring Metrics Configuration Controller Trigger Receiver From CHIME L4
+> IRIG-B times
+> To processing center (CANFAR, via Datatrail) interpolated gains static RFI mask
+> X 256
+> 10 MHz clock
+> on-disk in memory
+
+Figure 2. Updated digital system configuration for HCO post analog chain, adapted from the original from Fig. 3 in Paper II. Differences between system configuration for KKO (Paper II) and HCO are indicated by the dashed magenta borders. These changes include (i) consolidating controllers, receivers and monitoring metrics under a single auxiliary node and (ii) an upgraded calibration scheme to recover solutions originally lost from RFI (see Section 3 for details). Pink lines indicate controllers, while black lines indicate data flow. 3. COMPLEX GAIN CALIBRATION VLBI cross-correlation is done between CHIME and the Outriggers using beamformed baseband data: the voltages are summed across active 5 array elements with complex weights that maximize the response to a partic-ular direction. This is achievable provided that the ar-riving signals are aligned (in phase) at each input prior to summing. However, as incoming signals propagate through each of the independent receiver chains intro-duced in Section 2.2, systematic delays introduced along the signal chain result in misalignment of the phases be-tween inputs at the digitization stage. Additional mis-alignment is introduced if the assumed geometric posi-tion of each input is incorrect. Depending on the de-gree of phase-misalignment between each input, not ac-counting for these contributions can result in significant (and in some cases, complete) loss in sensitivity after  
+
+> 5
+
+Here, active inputs refers to all inputs powered on at the FLA stage. Those powered off represent inputs with known analog issues (e.g., faulty LNAs, loose cable connections, etc.) which result in abnormal voltage measurements. As of August 2026, the number of elements typically powered off is around ∼ 30 out of a total 256 inputs. 
+
+summing complex voltages. For this reason, we com-pute daily complex calibration solutions (also referred to as “complex point source gains” or simply “complex gains” 6) to remove systematic phase offsets present in recorded voltage data and assess the precision to which each feed’s geometric position is known. In Sections 3.1, 3.2 , 3.3 and 3.4, we discuss how these solutions are ob-tained and improved to mitigate the impacts of RFI. In Section 4, we describe the method used to determine and correct the geometric positions of each feed in the array. 3.1. The Calibration Broker 
+
+Obtaining and applying complex gain solutions to downstream voltage data serves two primary purposes: (i) to scale input fluxes from arbitrary correlator units to units of flux density, and (ii) to remove input-dependent instrumental phases. With the stated goal of localizing  
+
+> 6
+
+Note that complex gain calibration (Section 3) is not to be con-fused with digital gain calibration (Section 2.3). They differ in their ordering of application: the former is applied post digitiza-tion stage, whereas the latter is applied as part of the digitization stage. Improving complex gain calibration solutions is the focus of this work. HCO Commissioning Overview 7400 500 600 700 800 Frequency (MHz) 03:00 06:00 09:00 12:00 15:00 18:00 21:00 00:00 Local Time (US/Pacific) 10 7
+
+10 8
+
+10 9         
+
+> Power (arb.)
+> Figure 3. Median 24 hour raw ADC dynamic power spec-trum over all powered inputs between MJD 61161 and MJD 61162. Channels exhibiting persistent RFI are indicated by the shaded grey regions in the top panel and derived using the eigenvalues and eigenvectors of the N2visibility matri-ces. In total, the mask represents ∼38% of HCO’s allocated bandwidth. Accounting for channels with transient RFI over 24 hr timescales, the fraction of bandwidth contaminated by RFI increases to ∼45%. The Sun transit is clearly visible around 12:00 PT.
+
+FRBs, we are primarily interested in obtaining robust and stable phase calibration solutions. Specific details regarding the real-time processing of calibration solu-tions can be found in Section 2.5 of Paper I. Here, we summarize the key points on how the initial solutions are computed. Throughout daily operations, integrated N 2 visibility matrices (Section 2.3) are recorded continuously, fringe-stopped towards the known position of a calibrator as it passes through HCO’s FoV (e.g., Cygnus A or Cas-seiopeia A; abbreviated as Cyg-A and Cas-A hereafter) and spectrally decomposed into their first four eigen-modes using an iterative process (Renard et al. 2021). In the presence of a bright radio source and in the ab-sence of bright RFI, the matrices become dominated by the first two eigenmodes. These two eigenmodes corre-spond with each feed polarization. Since the visibilities have been fringe-stopped, the phase of the computed eigenvectors include only residual systematic contribu-tions. Further, by normalizing the eigenvectors by the known flux density of the source (Perley & Butler 2017), a conversion factor which scales the data from correlator units to Janskys is obtained. Thus, summing the first two (weighted) eigenvectors yields complex gain calibra-tion solutions of the form ˜ gi(ν) ≡ | gi(ν)|e−jϕ i(ν), where 
+
+|g| is the gain amplitude per input i as a function of frequency ν in units of [Jy /corr .] and ϕ is the input-dependent instrumental phase. The above process is automated through a calibration broker , a Python-based service that is provided schedule of calibrator transits and computes calibration solutions on a daily basis (Pa-per I). We note that given sensitivity limitations, HCO can only reliably obtain calibration solutions using Cyg-A and Cas-A; Taurus A or Virgo A are too faint to ro-bustly calibrate across the entire 400 MHz bandwidth as CHIME does. 3.2. Improving Calibration Solutions over RFI Contaminated Channels using Gaussian Process Regression 
+
+HCO suffers from an aggressive RFI environment with 
+
+∼ 45% of the bandwidth contaminated to some degree (Section 2.5, see Fig. 3). A significant fraction of this RFI is either contained to narrow frequency ranges, ex-hibiting brightness comparable to typical sky load, or intermittent. As an immediate consequence, a similar percentage of the raw solutions outputted by the cali-bration broker (Section 3.1) are also contaminated be-cause neither Cyg-A nor Cas-A is sufficiently bright in these channels to dominate the eigen spectra over the timescales ( ≳ 40 sec) that the calibration solutions are computed. As a result, the phases of the complex gains in these contaminated channels no longer accurately re-flect the true systematic instrumental phase contribu-tions, resulting in these channels becoming effectively unusable if left uncorrected. Fortunately, during the ∼milliseconds over which a FRB lasts and is detected by HCO, a large fraction of these frequency channels are not actively saturated by RFI. Consequently, these channels could be recovered if their calibration solutions can be improved. Improv-ing calibration solutions over RFI-contaminated chan-nels would also enable us to use the methods of Andrew et al. (2026) to suppress RFI. This new technique uses a KLT to spatially null dominant RFI sources in baseband data, maximizing sensitivity toward a transient target. This has been shown to significantly improve sensitiv-ity even in heavily-contaminated channels, but requires valid calibration solutions to work. This motivates our 8 Lazda et al. 
+
+decision to not simply throw away these channels and instead work to actively recover this information. While RFI is also present at the KKO and GBO Outriggers (Papers II, III), the impact of RFI on the calibration solutions is less severe. For example, only 
+
+≲ 20% − 30% of their calibration solutions are contam-inated by RFI, while HCO suffers losses up to ∼ 45%. Thus while KKO and GBO may also benefit from im-proving calibration solutions over their respective RFI contaminated channels, HCO has significantly more to gain, motivating our analysis. We further highlight that a pipeline designed for improving calibration so-lutions over RFI contaminated has already been devel-oped within the context of the CHIME cosmology ex-periment (CHIME Collaboration et al. 2022). However, the adopted scheme uses real-time input and RFI met-rics that are finely-tuned for the CHIME instrument to enable 21-cm science to flag RFI prior to interpolation. Since the requirements for transient science are typically less stringent than in a 21-cm cosmological context, we opted for an alternative approach. With the goal of sim-plifying the calibration process while simultaneously re-moving our dependence on real-time monitoring metrics, we adopted the strategy of deriving corrections directly from the raw solutions outputted by the calibration bro-ker. In the following sections, we discuss how this task is achieved. 3.2.1. Static and dynamic RFI flagging 
+
+With the goal of estimating calibration solutions over RFI contaminated channels, we require a framework for estimating which channels are corrupted. We first com-pute a static RFI mask (see Section 2.5) to remove per-sistent RFI. Throughout this analysis, we consider X-and Y - polarizations independently given that we find that the RFI response is marginally variable between both polarizations. While a static RFI mask removes the majority of RFI over persistently corrupted channels, it is unable to account for intermittent RFI. To account for these channels, we utilize the assumption that ˜ gi(ν) (as de-fined in Section 3.1) is expected to evolve smoothly over the bandwidth whereas RFI is expected to rapidly vary. Thus, by computing the derivatives of the gain phases, i.e. dArg(˜ gi)/dν , we identify sections of the bandwidth which are out of family with respect to the remainder of the bandwidth. Specifically, channels where 
+
+σdϕ (νk) > Median k(σdϕ (νk)) + η × MAD ν (σdϕ (νk)) (1) are flagged, where dϕ i(νk) = (Arg[˜ gi(νk)] −
+
+Arg[˜ gi(νk+1 )]), k indexes neighboring frequency bins, 
+
+σdϕ is the standard deviation of dϕ i(ν) over the input-axis (computed independently per channel), the median and MAD are computed over all frequencies which have not been flagged by the static RFI mask and η deter-mines the flagging threshold, which we set to 10 after empirical verification. 3.2.2. Phase un-wrapping and outlier detection 
+
+In some instances, the RFI mask defined by Eq. 1 fails to capture outliers where the phase derivatives are smoothly varying but the value extends beyond the gen-eral phase trend across the remainder of the band (e.g., jump discontinuities). Since such discontinuities are not expected nor physically motivated, we require that these points are removed prior to interpolation. Broadly, this requires (i) unwrapping the phases, (ii) flattening the phases, and (iii) identifying and removing outliers. Each of these steps is described in detail below. The first two steps are performed independently for each input in the array. A first-order approach to complete the first step is to perform an FFT to identify the dominant source of delay present in the complex gains. However, we found that these solutions were often biased by the remaining RFI channels which we wished to identify, resulting in many instances of the phase failing to be unwrapped. Instead, we fit a linear model to the gain phase of the form 
+
+ymodel ,i = 2 πντ i + ϕoffset ,i , (2) where τ is the bulk instrumental delay, ϕoffset is a con-stant phase offset and i indexes the input axis. We adopt an MCMC approach to sample the posterior distribu-tion to estimate τi and ϕoffset ,i . We assume a Gaussian log-likelihood of the form log Li ∝ − 12
+
+X
+
+> ν
+
+ Arg[˜ gi(ν) · e−j[ymodel ,i (ν)] ]
+
+σi(ν)
+
+2
+
+, (3) where σi(ν) = σi is the uncertainty on the gain phase which is assumed to be equal across all frequency bins. This decision is intentional to avoid biasing the fit by a small subset of RFI contaminated data points with sta-tistically small uncertainties. Note that this assumption only reasonably holds provided that the majority of the remaining data are RFI-free. This is true in our case since the majority of RFI contaminated channels have been removed via the static RFI mask and Equation 1. As for the priors, given that we expect instrumen-tal residual delays to contribute at most up to a few nanoseconds of delay per signal chain, we adopt a uni-form prior on τ between ±5 ns and a uniform prior on 
+
+ϕoffset between −π and π. Per input, we perform a 1000 step MCMC with 32 walkers using the emcee package to determine the best-fit phase model, discarding the HCO Commissioning Overview 9first 250 samples corresponding to the burn-in period. A typical chain has an acceptance fraction of 30%. To achieve the second step, after coarse unwrapping, we further flatten the phases by subtracting off a third-degree polynomial fit to the phases to remove residual curvature. The result is a set of phase residuals cen-tered around zero. We then flag any frequency channels where these residuals are more than two MADs from the median. We repeat the above process on the amplitudes of the gains, with the only differences being that we (i) skip the MCMC-based unwrapping and (ii) relax the MAD flagging to only exclude extreme outliers extending be-yond Median ± 5 MAD after empirical verification. The final RFI mask applied to our gains is thus the union of three masks: (i) the static RFI mask constructed in Section 2.5, (ii) a dynamic RFI mask based on the be-havior of the gain phases and (iii) a dynamic RFI mask based on the behavior of the gain amplitudes. 3.2.3. Interpolation via Gaussian Process Regression 
+
+With a final RFI mask established that is robust against both persistent and intermittent RFI, we apply the mask to the raw gains outputted by the calibra-tion broker. We hereafter refer to this (RFI cleaned) dataset as the “training” dataset. We interpolate over the real and imaginary components of the gains sepa-rately using gaussian process regression (GPR) with the 
+
+scikit-learn Python package (Pedregosa et al. 2011). GPR is a statistical technique, often employed within the context of supervised machine learning, which uses prior knowledge to predict outcomes with associated un-certainties (Wang 2020). Prior knowledge is encoded in a kernel which describes the correlation between two function values evaluated at any two inputs. The choice of kernel therefore depends on a priori knowledge about the correlations present in the dataset one wishes to in-terpolate. The choice to use GPR is motivated in sce-narios when a physical process is expected to drive corre-lations in the observed solutions. In the case of CHIME and the Outriggers, a 30 MHz ripple permeates through-out all calibration solutions (Paper I,II). This arises from the reflections in the cylinder with a focal line height of 5 m which impart a 30 MHz standing wave across the band. To reflect the known correlations in Outrigger calibra-tion solutions, we adopt a Mat´ ern kernel (Porcu et al. 2023), fixing the correlation length scale to l = 30 MHz and smoothing hyperparameter to s = 1.5. Fixing 
+
+s = 1 .5 assumes that the real and imaginary compo-nents of the complex gains are once differentiable (Pe-dregosa et al. 2011). We determine this to be a reason-able approximation upon inspection of their numerical derivatives over a clean component of the band. We test the sensitivity of the interpolation scheme to the choice of hyperparameter l and s in greater detail in Section 3.3. To model the underlying fluctuations in the complex gains and correctly scale the Mat´ ern kernel, we multiply the former by a constant kernel whose amplitude is a fitted hyperparameter. An initial guess of the constant value is set to the variance of the real and imaginary components training dataset combined: 
+
+σ2 
+
+> f
+
+= 12 (σ2Re + σ2Im ), (4) where σRe = 1 .4826 × MAD( yRe ) and σIm = 1 .4826 ×
+
+MAD( yIm ) and y represents the training dataset. Note that the pre-factor of 1 .4826 is included to achieve a robust estimate of the dispersion: the result is similar to computing the standard deviation with the benefit of being insensitive to spurious outliers (Equation 5.44; Ruppert 2011). We conservatively bound the allowable search range to σ2 ∈ [0 .01 σ2 
+
+> f
+
+, 100 σ2 
+
+> f
+
+]. For a typical gain solution, the solution favoring either bound of 0 .01 σ2 
+
+> f
+
+or 100 σ2 
+
+> f
+
+occurs less than ≤ 1% of the time. With an inde-pendent kernel constructed per input, we regress against the (mean subtracted) training dataset using GPR and predict the solutions over flagged channels. The mean of the original training dataset is re-added to the predicted solutions to recover the final interpolated gains. In Figure 4, we plot a representative reconstructed gain solution for a single input from a Cas-A transit on MJD 61161. The example emphasizes a number of key points. First, the original solutions are indeed heavily contaminated by RFI: the channels found to be contam-inated in Section 2.5 translate to significant degradation in the calibration solutions. We note that our flagging scheme results in some over-flagging (60% flagged vs. the expected ≲ 45% as determined in Section 2.5) due to our choice to aggressively flag phase outliers at twice the MAD of the median. However, the GPR reasonably recovers the solutions over channels lost due to over-flagging, with uncertainties increasing over larger sec-tions of bandwidth. Critically, our scheme ensures that effectively all dominant RFI is flagged and replaced with an interpolated solution. Second, the interpolator successfully recovers contin-uous solutions over the flagged channels and avoids in-troducing rapid variations in phase. However, when no anchor is available (e.g., between 730 − 770 MHz), the interpolation scheme struggles to recover the expected 30 MHz structure seen in uncontaminated parts of the band. Again, however, the uncertainties outputted by the GP interpolator reflect this uncertainty accordingly. 10 Lazda et al. 2
+
+02
+
+> Phase (rad)
+
+400 500 600 700 800 
+
+# Frequency (MHz) 
+
+10 1
+
+10 2
+
+10 3
+
+> Amp. (Jy/corr)
+
+# Input 205 Original Interpolated      
+
+> Figure 4. Comparison between an original (transparent grey points) gain solution obtained from a Cas-A transit on MJD 61161 and its reconstructed version (solid purple points) using the methods described in Section 3.2 for a rep-resentative input. The final RFI mask prior to interpolation is indicated by the grey shaded regions, representing 60% of HCO’s bandwidth. We plot the gain phase and gain ampli-tude in the top and bottom panel, respectively. Uncertainties on the interpolated values are included, most evident in the 500 −550 MHz and 725 −775 MHz range.
+
+Overall, the results in Figure 4 highlight our ability to recover smoothly evolving calibration solutions across the observing bandwidth. Whether the obtained cali-bration solutions are valid is tested in the following sec-tion and within the context of transient data in Section 5 and 6. The broad success also further validates our MCMC approach for unwrapping the phases (Section 3.2.2) which we adopt over a naive FFT-based approach. 3.3. Sensitivity to hyperparameter selection & comparison to alternative interpolation schemes 
+
+In this following section, we determine the impact of choosing to use a GP interpolation scheme with 
+
+l = 30 MHz and hyperparameter s = 1 .5 and compare the results to alternative choices of l and s. We also compare the performance of the GP interpolator to two other commonly adopted interpolation schemes: linear and cubic spline interpolators. Our chosen method to compare the performance of each interpolation scheme is discussed below. First, we begin by selecting all raw gain solution chan-nels from a single day between 650 −700 MHz as this cor-responds to the largest contiguous section of HCO’s ob-serving bandwidth free of RFI (Figure 3 and 4). Second, we remove channels in one of two ways: the first method randomly removes channels, the second method sym-metrically removes channels to both the left and right of 675 MHz (the mid-point of the clean band). Frequency channels are removed until all 50 MHz of data have been removed. This is done to emulate RFI which can either be randomly contained to narrow sections of bandwidth, or occupy larger contiguous sections. Each time a cer-tain amount of bandwidth is removed, we interpolate the real and imaginary components as follows. To compare the performance of our chosen GP pa-rameters versus alternative choices of l and s, we first fix l = 30 MHz and vary s = 0 .5, 1.5 and 2 .5 to test the sensitivity to our choice of hyperparameter. The range of s corresponds to commonly adopted values that de-pend on the numerical properties of the interpolant (Pe-dregosa et al. 2011). Then, fixing s = 1 .5, we vary the correlation length between l = 5 MHz and l = 55 MHz in intervals of 5 MHz. To compare the performance of our chosen GP in-terpolation scheme to commonly adopted interpolation schemes, we repeat the above process but replace GPR with linear and cubic spline interpolation. For any choice of interpolation scheme described above, we in-terpolate over the removed frequency channels and com-pute err Re = Median ν,i 
+
+"
+
+|Re( g† 
+
+> i
+
+(ν)) − Re( gi(ν)|)
+
+|gi(ν)|
+
+#
+
+, (5) err Im = Median ν,i 
+
+"
+
+|Im( g† 
+
+> i
+
+(ν)) − Im( gi(ν)) ||gi(ν)|
+
+#
+
+, (6) where g† represents the interpolated gain solutions, g
+
+are the raw calibration solutions and the median is com-puted over all inputs and interpolated channels. We plot the comparison in performance over all of the above configurations in Figure 5. While the results highlight only the error in the real component, we note that the imaginary component exhibits near identical behavior and removed to avoid redundancy. For fixed 
+
+l = 30 MHz, s = 1 .5 performs marginally better across both removal schemes and bandwidth removed in com-parison to s = 0 .5 and 2 .5. Additionally, fixing s = 1 .5, we find no strong dependence on the choice of l until small correlation lengths are considered, at which point the error can increase to 2 × the reference value. We conclude that our choice to fix l = 30 MHz and s = 1 .5over alternative choices of l and s is reasonable. Next, we compare the GP performance (fixed l =30 MHz , s = 1 .5) to both a standard linear interpola-tor and cubic spline interpolator (see Figure 5, bottom HCO Commissioning Overview 11 two rows). While the linear interpolator performs sys-tematically worse over nearly all trials, the cubic spline and GP achieve similar performance. However, the GP solutions have the additional benefit that they return associated uncertainties on the interpolated values (see, e.g., Figure 4). While our current version of the VLBI pipeline does not make use of these reported uncertain-ties, these weights could be useful for (1) optimizing fu-ture calibration algorithms which require an initial guess of the calibration solutions, (2) arrays interested in flux calibrating their arrays in the presence of RFI, or (3) op-timizing sensitivity at the beamforming stage. Since we aim to explore all three of these scenarios in the future, this motivates our decision to adopt the GP framework. We estimate the uncertainty on the phases of the gains via σϕ ≈   12 err 2Im + 12 err 2Re 
+
+1/2 ≈ err Re . Based on the results in Figure 5 we expect phase errors on the order of 
+
+σϕ ∼ 10 −3 rad − 0.3 rad and fractional amplitude vari-ations on the order of σ|g|/|g| ∼ 0.1% − 30%. However, this depends on the degree of bandwidth separation, as well as the assumption that the data surrounding the removed band are free of RFI. In the following section, we test whether the stability of our calibration solutions are dominated by interpolation uncertainties or instru-mental contributions. 3.4. Stability of Complex Gain Solutions 
+
+Motivated by Papers I and II, we expect gain solu-tions to remain largely stable over week to month-long timescales. We therefore test the stability of our gain reconstruction scheme (Section 3.2) to understand the impact of GPR on our ability to routinely recover ro-bust solutions. Following the method outlined in Sections 4.2.1 and 4.2.2 in Paper I, we estimate the variations in our ob-tained solutions over three weeks of interpolated calibra-tion solutions obtained between MJD 61161 and MJD 61182 using Cas-A. Selecting a reference gain, we com-pute the relative phase difference and fractional ampli-tude variation per input as a function of frequency for all gain solutions over the three week time period. We collapse over the time axis by computing the root-mean-square over time per input and frequency. Finally, we collapse over the input axis by calculating the median, 16th and 84th percentile to construct the 68% confidence interval over inputs. A summary of our results is visualized in Figure 6. Over subbands that are relatively free of RFI (e.g., 650 − 700 MHz), the median variation in phase differ-ences lies slightly above σδϕ = 0 .05 rad and fractional amplitude variations falling between 0 .5% − 1%. These values are broadly consistent with results obtained us--3 -2 -1 0log(err Re )
+
+> A: Random Removal
+
+-3 -2 -1 0log(err Re )       
+
+> A: Symmetric Removal
+> s= 0.5 (= 30 )
+> s= 1.5
+> s= 2.5 (= 30 )
+
+-3 -2 -1 0log(err Re )
+
+> B: Random Removal
+
+10 20 30 40 50 Bandwidth removed (MHz) 
+
+-3 -2 -1 0log(err Re ) 
+
+> B: Symmetric Removal
+> Linear Cubic spline GP ( =30 MHz, s=1.5)
+
+10 20 30 40 50 Correlation length (MHz)                       
+
+> Figure 5. Comparison in performance between various in-terpolation schemes. In every panel, we compute the er-ror in the real interpolated gain component following Equa-tion 5. The imaginary component is not plotted for visual clarity, but exhibits near-identical behavior. (A): We plot the performance of the GP interpolator for varying hyper-parameters ( s∈[0 .5,1.5,2.5] for fixed correlation length
+> l= 30 MHz). We also compare the performance for varying
+> l∈[5 ,55] for fixed s= 1 .5. (B): Performance compari-son between linear, cubic spline and GP interpolators. Ran-dom Removal: Frequency channels are randomly removed between 650 −700 MHz until all 50 MHz have been removed.
+> Symmetric Removal: Frequency channels are symmetrically removed about 675 MHz until all 50 MHz has been removed.
+
+12 Lazda et al. 0.0 0.1 0.2 0.3 0.4 0.5                  
+
+> (rad)
+> 650 675 700 0.05 0.10 0.15
+> 400 450 500 550 600 650 700 750 800
+> Frequency (MHz)
+> 0510 15
+> Frac. Amp. Var. ( ) (%)
+> 650 675 700 012
+> Figure 6. Variation in reconstructed Cas-A gain solutions over the course of three weeks between MJD 61161 and MJD 61182, referenced to a gain solution on MJD 61171. Top panel: We plot the median (solid, black line) standard devi-ation in phase difference across all inputs over three weeks, excluding inputs with known hardware failures. The orange shaded region represents the region bounded by the 16 th
+> and 84 th percentile computed over all inputs. Bottom panel:
+> Same as the top panel, but instead plotting the variation in fractional amplitude differences. In both panels, we plot zoom-in regions to showcase the behavior of the solutions over RFI-uncontaminated sections of the band.
+
+ing CHIME (see Fig. 23 & 24, Paper I), yielding (raw) phase variations up to σδϕ = 0 .03 rad and amplitude variations at the ∼ 1% level. Considering instead RFI contaminated bands, we find that both amplitude and phase variations begin to increase by up to an order-of-magnitude, with median phase variations extending to 0.3 rad and median fractional amplitude variations ris-ing to 1 − 10%. Bands which experience the largest vari-ation are associated with sections of bandwidth with ag-gressive RFI contamination (e.g., 500 − 550 MHz). This behavior is consistent with what was observed in Sec-tion 3.3. We therefore conclude that the primary source of variation over interpolated bands arises from uncer-tainty in the interpolation. Future improvements could in principle seek to reduce this variation, depending on the scientific requirements by using the outputted solu-tion as an initial estimate of the optimal complex gain solution. Coupled with more sophisticated calibration schemes (e.g., Wijnholds et al. 2010; Liu et al. 2010; Pascua et al. 2026), this may allow for more robust and stable solutions to be obtained. The results of Figure 6 have two immediate conse-quences relevant for routinely localizing FRBs. First, under the assumption that our reconstructed gain so-lutions are correct, the solutions are sufficiently sta-ble across our bandwidth to enable the Karhunen-Lo` eve RFI filter described in Andrew et al. (2026). Specifically, the filter is known to be robust to phase calibration and amplitude errors below σδϕ ≲ 1 rad and σ|g|/|g| ≲ 1, respectively, a specification which our reconstructed so-lutions meet (Figure 6). We empirically verify a poste-riori whether our assumption about gain correctness is valid in Section 5 and Section 6. Second, the stability also has an immediate implica-tion on day to day operations. While the intention is to obtain calibration solutions on a daily basis, there are a number of factors that prohibit HCO from being able to obtain robust calibration solutions every day of the year. These factors range in their severity, where in ex-treme cases, software failures during calibrator transits can result in missing calibration solutions over week-long timescales. Fortunately, the slow evolving solutions im-ply that we can use calibration solutions within a few weeks of an event and still successfully calibrate the ar-ray. The expected sensitivity loss after beamforming (S /N) BF ,loss from using a gain solution obtained within three weeks of an event can be estimated by computing (Andrew et al. 2026): (S /N) BF ,loss ≈ 1 −
+
+"
+
+e−σ2
+
++ 1 − e−σ2
+
+N
+
+#! 
+
+× 100% , (7) where N is the number of active array elements, and the equation is evaluated for both the variance ( σ2) in phase difference and fractional amplitude variation. Note that this equation assumes that RFI is not present, and that conventional beamforming methods are employed. How-ever, KLT filtering methods can significantly improve the sensitivity when RFI is present (Andrew et al. 2026). Based on the results of Figure 6, this implies an ex-pected sensitivity loss of ≲ 1% over non-interpolated channels and 1 − 10% over interpolated channels, re-spectively, due to phase and amplitude variations. As a result, we maximize the number of FRBs localizable by HCO even in the absence of same-day calibration solu-tions.  
+
+> 4.
+
+FEED POSITION DETERMINATION We motivated the necessity of complex gain calibra-tion because it enables the coherent sum of signals across inputs by removing per-input instrumental delays. How-ever, this is only true if the underlying geometric posi-tions of the feeds are known to sufficient accuracy and precision. If the feed positions are incorrect, coherently summing voltages towards a target sky position will re-sult in the pointing being systematically offset from the intended position. Depending on the degree of error in these positions, this can lead to degraded sensitiv-ity which can vary as a function of pointing. For this HCO Commissioning Overview 13 reason, we perform a test to validate and correct the ge-ometric positions of each individual input in the array. We note that our method described below deviates from the method introduced in Section 3.5.1 of Paper II. This method, which relied on inferring sky positions based on ratio of eigenmodes between Cyg-A and Cas-A, was unable to probe separation scales ≲ 10 cm, which was believed to be sufficient at the time of commissioning KKO. However, as we will discuss, the original strat-egy led to sub-optimal performance in the extremities of HCO’s beam. As such, we adapted our strategy to probe scales below this limit. To begin, an initial estimate of the input positions was obtained based on the structural design of the tele-scope. We estimated the relative ( x, y ) positions based on the roll and rotation of the cylinder (Table 1), as well as the separation of the antennas installed within their respective cassettes of 305 mm (Paper I, II). Al-though HCO feeds and cassette structures are identical to KKO/GBO and we followed the similar installation procedures, small inaccuracies in the positions of the an-tennas are expected/likely to arise. To verify and correct any systematic offset arising from the installation pro-cess, we use calibrated N 2 visibilities of astrophysical sources with known astrometric positions. We selected the brightest radio sources for this analysis: Cyg-A, Cas-A and the Sun, and track the position of each source during its transit across the primary beam of the tele-scope. The extreme brightness of the Sun allows it to be detected well beyond the primary beam and into the “sidelobes” (see, e.g., Fig. 9 in Paper II). As such, we continue to track the Sun up to ±60 ◦ into the sidelobes to achieve the statistical power necessary to also con-strain the rotation of the cylinder. For each native time bin of N 2 data (Section 2.3) we apply our updated per-input complex gain solutions (Section 3.2) and fringe-stop the visibilities to ( α0, δ )for δ ∈ [δ0 ± 1◦], where ( α0,δ0) is the known position of the source 7. We add X and Y polarizations to obtain Stokes-I flux, and average from 650 to 700 MHz, which is the largest contiguous uncontaminated section of the bandpass (see Figure 6). The result is a baseline-and-frequency averaged, one-dimensional image. Fitting a Gaussian to the image, we measure the observed dec-lination. We repeat this process across all images ob-      
+
+> 7The tied-array beam of the HCO cylinder station is ∼0.9 deg ×
+> 7 deg at 600 MHz, elongated in the direction perpendicular to the focal line. Since the HCO cylinder is orientated almost parallel to North - South line (rotated 1 .22 deg East of North), the tele-scope’s resolution in right ascension is poor. As a consequence, we perform the position checks using declination offsets only.
+
+tained during the transit and discard any measurements for which the fit failed to converge. Using transits of the Sun throughout the first year of commissioning, we increase our declination coverage to −17 ◦ ≤ δ0 ≤ 23 ◦.In Figure 7 (a) we plot the offset between the mea-sured and true effective source declination: e.g., ∆ δ =
+
+δmeas − δ0. The results of these measurements for each source are shown in different color track and are ob-tained assuming our original feed positions that are based solely on the site survey and design. The results clearly show that a systematic offset is present, scaling approximately linearly with the distance from the posi-tion of the gain calibrator (see circle points in the panel (c) of Figure 7). The linear relationship between offset and relative sky position is strongly suggestive of a constant offset in feed spacing which may physically be caused by uniform ther-mal expansion of the focal line or may have been intro-duced during the installation process. To test this, we introduced a constant horizontal feed offset to each input (fixed across all inputs) and empirically determined the value required to remove the observed linear relationship (see square points in panel (c) of Figure 7). Our best fit solution implies that feeds are ∼ 0.55% (or ∼ 1.7 mm per feed) closer together than predicted, accumulating to 22 cm error over entire focal line. The repeated dec-lination offset measurements post correction are plotted in the panel (b) of Figure 7. Using the updated feed po-sitions returned accurate source position measurements over large range of declinations (and gain calibrator – target separations). These measurements also highlight that source position stays broadly consistent over large hour-angles (we measure average slope of ∆ δ over HA to be 0 .00 ± 0.02, i.e. consistent with 0), indicating that the model of telescope rotation is sufficiently accurate. The residual structure in the source position tracks, par-ticularly prominent at low declinations, is driven by the beam response which is highly non-uniform. We note that we do not attempt to account for any effects of varying beam response and do not believe that it has any dramatic impact on our overall fit. Finally, we perform beam-mapping of the HCO tele-scope using the same dataset to confirm the accurate physical orientation of the telescope. In panel (d) of Figure 7 we plot the measured Stokes I of visibilities of the sources as a function of hour angle as they tran-sit through the telescope’s primary beam. We find that peak of brightness of each source aligns within 0 .07 ◦ and the HA of that peak is consistent with the longitude dif-ference of HCO and CHIME within 0 .03 ◦, confirming correct alignment of HCO and CHIME beams and con-14 Lazda et al. 60 40 20 0 20 40 60 
+
+> HA (deg)
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8
+> (deg)
+
+Original feed positions (a)        
+
+> 60 40 20 020 40 60
+> HA (deg)
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8
+> (deg)
+> slope =0.00 ±0.02
+
+Updated feed positions (b)         
+
+> 642024
+> HA (deg) Normalized power
+> HA 0= -1.82 ±0.07
+
+(d)      
+
+> 20 020 40 60
+> 0(deg)
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8
+> (deg)
+
+(c) Original feed positions Updated feed positions    
+
+> Cas A,
+> = 58.8
+> Cyg A,
+> = 40.7
+> Sun, Jun,
+> = 23.4
+> Sun, Aug,
+> = 12.6
+> Sun, Sep,
+> = 7.0
+> Sun, Oct,
+> =4.2
+> Sun, Oct,
+> =9.1
+> Sun, Jan,
+> =17.3
+
+Figure 7. Assessment of telescope orientation and feed position models using observations of bright radio sources (Cas-A, Cyg-A and the Sun). Panels (a) and (b) : show the measured declination offsets (∆ δ = δmeas − δ0) of Cyg-A, Cas-A and the Sun during their transits across the primary beam and side-lobes. Panel (a) shows the results for the original feed positions, and Panel (b) shows the results for the updated feed position model, in which the spacing between successive feeds is reduced by 1 .7 mm. Panel (c) : shows the measured ∆ δ for each source during its transit across the primary beam (average offset over 
+
+−4.34 ◦ ≤ HA ≤ 0.66 ◦). Circular markers correspond to the original feed positions, and square markers to the updated feed position model. The updated model provides accurate source positions over ∼ 80 ◦ declination range. Panel (d) : shows the visibility power profile (Stokes I) for each source during its primary-beam transit. The brightness peaks of all sources align within 0 .07 ◦, indicating accurate rotation (yaw) of the HCO cylinder. The average peak position ( ⟨HA ⟩ = −1.82 ◦) is also consistent with the longitude difference between HCO and CHIME, indicating accurate roll position of the HCO cylinder. 
+
+sequently confirming that the rotation and roll of the telescope is sufficiently accurate. In summary, using imaging of bright radio sources with N 2 visibilities, we confirmed that the orientation of the telescope is consistent with the designed values. Conversely, we found that the physical distance between the feeds is shorter than expected ( ∼ 1.7 mm per feed). This offset is largely believed to be the result of the feed installation procedure, which was designed to ensure that the gap between cassettes (which house the feeds) could not be larger than planned, but did not restrict how close they could be installed. Overall, however, we find that the updated feed position model improves ac-curacy of fringe-stopping and beamforming of the Out-rigger station data, especially for the sources with large separation from the gain calibrator. We highlight the impacts of correcting our feed positions in greater de-tail in Section 6.2. Finally, we note that since correc-tions detailed throughout this section are purely digital, physical repositioning of the feeds along the focal line is unnecessary. 
+
+5. IMPACT OF UPDATED CALIBRATION SCHEME ON INTERFEROMETRIC PERFORMANCE In the following section, we investigate the impact of our updated calibration and feed position determination scheme described in Section 3 and 4 on HCO’s overall interferometric performance. Specifically, we describe a series of tests performed on the array which allow us to confirm that our changes do indeed result in significant improvement in HCO’s overall performance. 5.1. System Equivalent Flux Density 
+
+The first test we perform seeks to assess whether the combined sensitivity of individual antennas and receiver chains are within theoretical expectation, given the mea-sured properties of the receiver chain (see Section 2.2). Following Section 3.4.1 of Paper II, we compute the sys-tem equivalent flux density (SEFD) for each input indi-vidually and for the beamformed response. The SEFD is the flux a point source at beam center would need to double system temperature (Thompson et al. 2017), HCO Commissioning Overview 15 and provides a useful metric to compare system noise to target brightness, and to identify malfunctioning inputs. For each individual receiver chain, we average 30 min-utes of autocorrelation N 2 data (Section 2.3) captured during the night-time while no dominant radio source is in the field. In doing so, we estimate the response of each individual input when the receiver chain is dominated by noise. By subsequently applying per-input gain calibra-tion solutions from a Cyg-A transit obtained from the same day (Section 3), we translate the amplitudes from correlator units to Janskys. This results in an estimate of the per-feed SEFD inp .We note that while our interpolation scheme results in continuous calibration solutions independently per in-put, it does not identify any outlier inputs with respect to the remainder of the array. Thus, to remove inputs that are out of family, we construct a simple mask which isolates and removes any inputs whose log-amplitudes deviate from the median amplitude across all inputs by 
+
+±5 MAD. Finally, to assess whether our improved cal-ibration scheme discussed in Section 3 leads to an im-provement in sensitivity across RFI-contaminated chan-nels, we compare the results of the test with the original and improved calibration solutions. Individual SEFD inp measurements per input are plot-ted in Figure 8, color-coded based on their polarization. First, for a given polarization, we observe that the indi-vidual SEFD measurements after applying the updated calibration solutions results in qualitatively smoother variations across the band. This is expected, given that our improved calibration scheme suppresses and smooths solutions over portions of the band that exhibit larger variation driven by RFI. Second, while the orig-inal calibration solutions result in median SEFD mea-surements in excess of ≳ 10 5 Jy over a significant portion of the band, applying the improved calibration solutions reduces the median SEFD over these same regions to 
+
+≲ 10 5 Jy, in-line with previous measurements performed by KKO (Paper II). This reinforces that our improved calibration scheme enables us to achieve close to the expected sensitivity. Finally, comparing the two polar-izations, we find that the median SEFD of North-South oriented polarization hands ( Y Y ) tend to, on average, perform better than the East-West oriented polarization hands ( XX ). This likely suggests that there exists some direction dependence to the observed RFI, or slight vari-ations in response between polarization, resulting in one hand being more susceptible to sensitivity losses despite similar analog designs. While the former test estimates the sensitivity of in-dividual receiver chains, we further wish to estimate the sensitivity of the array as a whole. That is, how sensitive is HCO when voltage measurements across all receiver chains are averaged together? Does our improved cal-ibration technique actually improve the full-array sen-sitivity? To answer these questions, we compute the 
+
+beamformed SEFD per polarization using a 1.4 second baseband capture. To each of the inputs, we apply our derived complex gain solutions to align each input in phase prior to averaging, again performing the test with and without the improved calibration solutions. In both instances, we assume the corrected feed positions to iso-late the improvement introduced by updating our cali-bration strategy. Beamforming to two distinct locations in the beam, we compute the beamformed SEFD follow-ing Equation 2 in Paper II: SEFD bf = Poff (ν) F (ν)
+
+Pon (ν) − Poff (ν) , (8) where Pon (ν) and Poff (ν) are the input-and-time-averaged power per frequency channel after beamform-ing towards Cyg-A and a dark patch of sky, respectively, and F (ν) is the known flux density of Cyg-A (Perley & Butler 2017). The results are plotted as dashed black lines in Figure 8. It becomes immediately clear that the improved cali-bration solutions result in improvements in sensitivity across both polarizations. In particular, we achieve more smoothly evolving beamformed SEFD measure-ments across the band, particularly noticeable in the 400 − 600 MHz band where significant RFI persists at HCO (Section 2.5). Additionally, we measure a decrease in median SEFD computed over non-flagged frequency channels from 990 Jy to 530 Jy in the XX polarization and a decrease from 660 Jy to 390 Jy in the YY polariza-tion. The improved beamformed SEFD measurements are approximately a factor of 2 × smaller than those of KKO, consistent with theoretical expectations based on the assumption that the beamformed SEFD scales with collecting area (Papers II). The values also fall within 5% (10%) of theoretical expectations for the Y (X) po-larization based on the the radiometer equation which states that SEFD bf = SEFD inp /p(N (N − 1)) where N
+
+is the number of inputs used during the beamforming stage. An alternative framing is to estimate the effective number of inputs recovered by updating our calibration scheme. Defining 
+
+Neff = 12
+
+s
+
+1 + 4 
+
+ SEFD inp 
+
+SEFD bf 
+
+2
+
++ 1 
+
+ , (9) to be the effective number of inputs contributing to the array, we fix SEFD inp and SEFD BF to the values before 16 Lazda et al. 10 2
+
+## 10 3
+
+## 10 4
+
+## 10 5
+
+## 10 6
+
+## 10 7
+
+> SEFD (Jy)
+
+# YY (pre RFI mitigation) 
+
+## 10 2
+
+## 10 3
+
+## 10 4
+
+## 10 5
+
+## 10 6
+
+## 10 7
+
+> SEFD (Jy)
+
+# YY (post RFI mitigation) 
+
+Per input Beamformed 
+
+## 10 2
+
+## 10 3
+
+## 10 4
+
+## 10 5
+
+## 10 6
+
+## 10 7
+
+> SEFD (Jy)
+
+# XX (pre RFI mitigation) 
+
+## 400 450 500 550 600 650 700 750 800 
+
+# Frequency (MHz) 
+
+## 10 2
+
+## 10 3
+
+## 10 4
+
+## 10 5
+
+## 10 6
+
+## 10 7
+
+> SEFD (Jy)
+
+# XX (post RFI mitigation) 
+
+## 0 50 100 150 200 250 Input Number 
+
+Figure 8. Comparison between per-input and beamformed SEFD measurements for varying calibration configurations. Per-input SEFD measurements (colored) are computed by averaging 30 min of autocorrelation N 2 during a night-time transit. Full-array baseband SEFD measurements are computed following Equation 8. We compare the measured SEFD before (pre RFI mitigation) and after (post RFI mitigation) applying our updated calibration solutions, highlighting the improvement in SEFD per polarization after updating our calibration solutions. The median baseband SEFD, reflecting the current instantaneous point-source sensitivity for a source located near the centre of HCO’s beam, improves from 990 Jy to 530 Jy and 660 Jy to 390 Jy in the XX and YY polarization, respectively, after applying our updated calibration strategy (Section 3). HCO Commissioning Overview 17 and after updating our calibration scheme. We measure an increase in Neff of 46 (51) inputs across the Y (X) po-larization over the baseline performance. We conclude that updating our calibration strategy effectively recov-ers the equivalent performance of ∼ 97 inputs ( ∼ 37%) across the entire array. Assuming that a detected source is unpolarized and is spectrally uniform across the band, these results imply that our improved calibration solutions yield a median instantaneous sensitivity increase of 1 .87 × (∼ 87%) and 1.69 × (∼ 69%) in the XX and Y Y polarization, respec-tively, in comparison to our original calibration strategy. We note that this improvement is primarily due to a the significant increase in usable bandwidth and recovery of previously contaminated channels which biased the median SEFD to larger values. However, some improve-ments also arise from the signal in each channel getting systematically brighter. We quantitatively explore this improvement within the context of detected a detected transient in Section 5.3. It is not entirely unexpected that by improving our complex gain calibration solutions, we achieve improved sensitivity across the majority of the band. Our results in Figure 8 confirm our hypothesis introduced in Section 3.2 that the majority of the RFI contamination is suffi-ciently low power to not completely saturate the base-band data over ≲ 1.4 s timescales. Instead, the previous loss in sensitivity was simply driven by corrupted cali-bration solutions. Thus, by applying a second-order cor-rection to align these inputs in phase across the band, we recover significant sensitivity over what were previously lost channels. These results further imply that we should expect sim-ilar sensitivity improvements with detected transients given that the timescales over which they occur ( ∼
+
+10 ms) are significantly shorter than the timescales over which the RFI begins to dominate the signal ( ∼ minutes to hours). We test and confirm that this assumption holds in Section 5.3. 5.2. Radiometer Test 
+
+Next, we wish to assess the noise properties of base-band data to confirm that the improvements in our cali-bration scheme result in voltage data that is governed by thermal statistics. First, we assume that the measured voltages are modeled by V = Ae −jϕ + ϵ where A and 
+
+ϕ encode the amplitude and phase information of the measured signal, respectively, and ϵ represents the noise added to the signal introduced by the receiving system. Second, we assume that ϵ is drawn from a circularly symmetric complex normal distribution. Our goal is to test whether these assumptions hold across the 400 MHz of bandwidth. Under the aforementioned assumptions, a given time-and-frequency averaged power measurement (⟨P ⟩ ∝|V |2) will have an uncertainty dictated by the radiome-ter equation (Thompson et al. 2017): pVar[ ⟨P ⟩] =
+
+⟨P ⟩/√τ ∆ν, where ∆ ν is the bandwidth and τ is the in-tegration time. The corresponding S /N of the measured signal therefore scales directly proportional to ∝ √∆ντ .Testing whether the radiometer equation holds over (i) our observing bandwidth and (ii) the timescales over which detected transients occur, is critical to ensure that we can achieve the expected improvements in sensitiv-ity obtained by averaging power measurements both in time and frequency. We perform the radiometer test using a 500 ms base-band capture obtained on MJD 61175, the chosen length consistent with the duration of baseband captures cur-rently used to localize FRBs (Andrew et al. in prep.). Having calibrated each input with our complex gain solutions, we beamform the array to a dark patch of sky to approximate the response of the array domi-nated solely by instrument noise. Additionally, we ap-ply the Karhunen–Lo` eve based filter described in An-drew et al. (2026) to test its impact on the noise prop-erties of the baseband data. We perform the test over ∆ν = 390 .625 kHz frequency bins (corresponding to the native frequency resolution of the baseband data prod-ucts outputted by the X-engine; see Section 2.3) and a timescale of τ = 10 ms (corresponding to a typical duration of a captured transient). In Figure 9, we plot the results of the radiometer test performed with HCO. Similar to Paper II, we re-cast the radiometer equation to an expected ratio based on the number of samples used to obtain our power measure-ments: 
+
+R ≡ ⟨P ⟩
+
+pVar[ ⟨P ⟩]1
+
+√∆ντ . (10) In practice, the 500 ms baseband capture is parti-tioned into 50 bins of 10 ms duration, complex conju-gate multiplied to form power, and averaged over each 10 ms chunk. The mean ⟨P ⟩ and standard deviation pVar[ ⟨P ⟩] are then computed over all n = 50 time-averaged power samples. Assuming Gaussian statistics, we expect R = 1 with fluctuations in R inversely pro-portional to the square root of number of samples used to average over the power (i.e., σ = 1 /√n ≈ 0.14 for 
+
+n = 50). We flag any data whose value extends beyond 
+
+R = μ ± 3σ, where μ = 1 and σ = 0 .14 to identify any channels which do not obey the radiometer equation. We find that over the majority of the band, the statis-tics of the power measurements are broadly consistent 18 Lazda et al. 0.5 1.0 1.5 
+
+> R
+
+# X pol Data: = 1.00 
+
+# = 0.15 
+
+# Theory: = 1 
+
+# = 0.14 
+
+# 400 450 500 550 600 650 700 750 800 
+
+# Frequency (MHz) 
+
+# 0.5 1.0 1.5 
+
+> R
+
+# Y pol Data: = 0.99 
+
+# = 0.16 
+
+# Theory: = 1 
+
+# = 0.14 
+
+Figure 9. Results of the full-array radiometer test performed, per polarization, using a 500 ms baseband capture using HCO. The baseband data are calibrated using our updated calibration solutions, filtered using the Karhunen–Lo` eve based transform (Andrew et al. 2026) and beamformed to a quiet patch of the sky. We compute the power and average over τ = 10 ms chunks (broadly consistent with typical duration of captured FRBs) per frequency bin of width ∆ ν = 390 .625 kHz. We scale and convert the values to a dimensionless quantity R following Equation 10. The expectation, assuming that the overall instrumental noise obeys thermal statistics, is highlighted by the dashed black line at R = 1. A histogram of the samples is provided per polarization hand, highlighting that both distributions are broadly consistent with theoretical expectations. Regions where the test fails (see text for failure criteria) are marked by the shaded gray regions and are not included in the histogram. The test succeeds over 83% (85%) of the band for the Y (X) polarization. 
+
+with thermal statistics, with mean values and standard deviations over non-flagged data consistent with theo-retical expectation. We find that ∼ 17% ( ∼ 15%) of data are flagged over the Y (X) polarization. The flag-ging is primarily concentrated to the 625 − 650 MHz band and 730 − 770 MHz band, two known dominant sources of RFI associated with broadband telecommu-nication services. These two particular RFI bands are of specific inter-est within the context of the KLT filter (Andrew et al. 2026). We observe some improvement over these bands after applying the KLT filter, which leads to the re-covery of a few channels in the 730 − 770 MHz band (showcased within the context of a detected transient in Section 5.3.1). The KLT filter also improves the statis-tics of a number of channels contaminated with narrow-band RFI present in Figure 3. However, the results in Figure 9 largely suggest that the noise properties of the telecommunication bands remain heavily governed by non-thermal statistics. This could imply that our gain solutions over these channels are incorrect, resulting in the filter being unable to adequately spatially suppress the RFI. Alternatively, it could also imply that the prop-erties of the RFI does not obey the assumptions outlined in Andrew et al. (2026) (e.g., if the data from these chan-nels are saturated at the 4+4 bit quantization level, or is not stationary on ∼ ms timescales). However, An-drew et al. (2026) has shown that the KLT filter is able to successfully recover transient signals within these two bands using the CHIME telescope. This suggests that the failure to recover these channels using HCO is likely site specific (e.g., incorrect gains, lack of East-West res-olution to constrain the direction of the RFI) and work is currently underway to investigate whether further im-provements can be made to recover information in these channels. Until then, however, we opt to flag these chan-nels throughout the remainder of our analysis. Overall, the results of Figure 9, coupled with the smooth-evolving beamformed SEFD in Figure 8, imply that HCO’s interferometric performance is broadly con-sistent with theoretical expectations (Paper I, II, III). We emphasize that this statement applies to the major-ity of HCO’s bandwidth, including channels recovered by our updated calibration scheme (Section 3). 5.3. Single-pulse Baseband Sensitivity HCO Commissioning Overview 19 Next, we assess HCO’s interferometric performance within the context of detecting radio transients. In the following section, we showcase (i) how our improved cal-ibration scheme recovers frequency information using a pulsar event (Section 5.3.1) and (ii) that the achieved sensitivity across our band is broadly consistent with theoretical expectations (Section 5.3.2). 5.3.1. Impact of Gaussian Process Interpolation & RFI Filtering on Baseband Sensitivity 
+
+We use single pulses from PSR B0329+54, a bright (≳ kJy, Manchester et al. 2005) pulsar within HCO’s FoV, to measure the performance improvement enabled by the changes described in Section 3 and 4. We ob-tained a full-array, 120 ms baseband capture of a PSR B0329+54 pulse on MJD 61074, originally detected by the CHIME/FRB backend (CHIME/FRB Collaboration et al. 2018) and subsequently triggered at HCO following the process described in Section 2.4. The corresponding baseband data containing the pulse was saved to disk and transferred to canfar for offline processing. A cor-responding dataset captured at CHIME were also saved and transferred to canfar for offline processing. We note that such triggers are routinely captured on an ap-proximately daily cadence at all Outrigger sites and used to diagnose the overall health of the Outrigger systems. For every data product considered in this section, we apply the KLT filter and updated feed positions to solely isolate impovements introduced by out updated calibra-tion scheme. Then, for each version of our calibration so-lutions (before/after interpolation), we beamform HCO to the known position of PSR B0329+54 accounting for the proper motion of the pulsar (Kumar et al. 2025), maximizing the sensitivity of the array in the direction of the transient. Lastly, we coherently dedisperse the baseband data using the known dispersion measure for B0329+54 of DM = 26 .76 (Manchester et al. 2005; Ku-mar et al. 2025), and compute the power per polariza-tion. To estimate the S/N of the detection as a function of frequency, we compute the autocorrelation S/N for each polarization following: S/Nauto (ν) = 
+
+|⟨V ∗
+
+> H,on
+
+(ν)VH,on (ν)⟩| − med g
+
+h
+
+|⟨V ∗ 
+
+> H,off
+
+(ν)VH,off (ν)⟩g |
+
+i
+
+MAD g
+
+h
+
+|⟨V ∗ 
+
+> H,off
+
+(ν)VH,off (ν)⟩g |
+
+i ,
+
+(11) where V is the measured voltage in each polarization as a function of frequency, the “H” subscript is short-hand for HCO, ⟨·⟩ denotes a time-average, ∗ denotes a con-jugate and “on” represents the duration over which the PSR B0329+54 pulse is active. To estimate the noise, the median and MAD are computed over independent “off” gates which contain no signal from PSR B0329+54, denoted by the g subscript, which are of equal duration to the “on” gate. Finally, we merge adjacent frequency channels in groups of eight, as this binning is typically done in the fringe search step of the VLBI pipeline. We determine which channels have signal by requiring that S /Nauto ,binned ≥ 3. We compare the results before and after updating our calibration strategy in Figure 10, with grey marks highlighting which channels lack asignificant detection (i.e., S /Nauto ,binned < 3). Adopting our original observing strategy, we measure that 71% (56%) of channels have measured signal above the specified threshold for the Y (X) polarization. Ap-plying our updated observing strategy, this improves to 86% (78%) for the Y (X) polarization, corresponding to a net relative increase of usable bandwidth of 21% (39%). The effect of our updated calibration scheme is most clearly observed at frequencies ≲ 620 MHz, where nearly all of the band is recovered. We note that the lack of detections at frequencies ≳ 770 MHz is most likely a combination of gradual degradation of sensitivity at the edges of the bandwidth, alongside the intrinsic source brightness decreasing at higher frequencies, rather than a failure of our calibration scheme. In addition to recovering a significant fraction of our bandwidth, we further observe an overall increase in per-channel S/N, with median (excluding RFI contami-nated channels) binned S/N increasing from 11 .5 → 17 .2(Y polarization, ∼ 50%) and 7 .0 → 12 .2 ( X polariza-tion, ∼ 74%). This is broadly consistent with the re-sults of our beamformed SEFD measurements in Section 5.1 which found similar instantaneous median sensitiv-ity improvements on the order of 60% (80%) for the Y
+
+(X) polarization. Overall, the results of Figure 10 provide a concrete ex-ample of how our updated calibration scheme success-fully recovers astrophysical transient information over channels previously discarded due to RFI contamina-tion. The results further emphasize the importance of valid gain solutions on the success of the KLT filter. Specifically, in the “before” panel when contaminated solutions are applied to the baseband data, the filter fails to improve the sensitivity in these channels, as ex-pected (Andrew et al. 2026). However, when the filter is applied in conjunction with valid calibration solutions, we find that HCO’s sensitivity is maximized. In the fol-lowing section, we quantify this improvement in greater detail. 20 Lazda et al. 30 60 90 
+
+# Time (ms) 
+
+# 400 450 500 550 600 650 700 750 800 
+
+> Frequency (MHz)
+
+# YY 
+
+## (before) 
+
+# 30 60 90 
+
+# Time (ms) YY 
+
+## (after) 
+
+# 30 60 90 
+
+# Time (ms) XX 
+
+## (before) 
+
+# 30 60 90 
+
+# Time (ms) XX 
+
+## (after) 
+
+Figure 10. Impact of updating our calibration strategy on our ability to recover astrophysical transient signal in previously RFI contaminated frequency channels. Each panel presents a dynamic spectrum of a PSR B0329+54 pulse, binned in time in 0.66 ms chunks for visual clarity and in frequency in 3 .125 MHz chunks. Subplots are grouped by polarization and before/after applying our updated calibration strategy. Binned frequencies with S /N < 3, computed following Equation 11, are indicated as black and cyan horizontal ticks, representing channels with no significant signal. Cyan ticks represent channels recovered after updating our calibration scheme. Before: Updated feed positions, KLT filter and original calibration solutions are applied to the baseband data. After: Updated feed positions, KLT filter and updated calibration solutions are applied to the baseband data, isolating improvements of our calibration scheme. 
+
+5.3.2. Autocorrelation S/N Test 
+
+While the results in Section 5.3.1 showcase an im-provement in overall sensitivity, in the following sec-tion we determine whether this improvement results in a performance that is in-line with theoretical expecta-tions. To test HCO’s interferometric performance on transients, we follow section 3.5.2 in Paper II. Briefly, the expected autocorrelation S/N of a transient detected by HCO that is unpolarized with flux density Sν , dura-tion τ and bandwidth ∆ ν, after beamforming the array to maximize sensitivity in the direction of the transient, is S/Nauto = Sν
+
+SEFD BF 
+
+√τ ∆ν (12) = Sν
+
+SEFD inp 
+
+pN (N − 1) √τ ∆ν, (13) where N is the number of independent array ele-ments measuring the arriving signal, and SEFD BF and SEFD inp are the baseband and per-input SEFD mea-surements described in 5.1, respectively. However, since the flux density of the source is not known a priori , and the SEFD is expected to vary as a function of beam po-sition, we make the simplifying assumption that HCO is approximately identical to CHIME in terms of its overall analog performance. Under this assumption, SEFD inp 
+
+of both arrays are assumed to be approximately identi-cal. As a consequence, the ratio of S/N autocorrelation measurements is expected to scale according to 
+
+RA,expected = (S /Nauto ,HCO )(S /Nauto ,CHIME ) (14) =
+
+s
+
+NHCO (NHCO − 1) 
+
+NCHIME (NCHIME − 1) . (15) Assuming identical performance and full-array partici-pation (e.g., NCHIME = 2048 and NHCO = 256), this implies an expected ratio of RA, expected ≈ 1/8. To test whether this ratio holds, we perform the test using the same 120 ms baseband capture of PSR B0329+54 shown in Figure 10. While not shown, an identical capture at CHIME was also acquired. Here, we consider only the after pulse (e.g., with improved calibration solutions, feed positions and KLT filter ap-plied to the baseband data) as this represents our cur-rent observing strategy. We compute the autocorrela-tion S/N at both HCO and CHIME following the steps described in Section 5.3.1. To ensure that the “on”-pulse and “off”-pulse gates are identical at both CHIME HCO Commissioning Overview 21 012
+
+> RA
+
+Y Pol          
+
+> median = 0.76
+> 400 450 500 550 600 650 700 750 800
+
+Frequency (MHz) 
+
+> 012
+> RA
+
+X Pol       
+
+> median = 0.82
+> Figure 11. Results of the autocorrelation S/N test (Equation 15) using the “after” PSR B0329+54 pulse plotted in Figure 10. Measurements of RAare color-coded based on polarization, and the theoretical expectation of RA= 1 is indicated as a horizontal, black dashed line. The median over non-RFI contaminated channels is indicated in the bottom right of each panel and colored, dash-dotted line. Regions removed due to residual RFI contamination are highlighted by grey shaded regions. Uncertainties are included, but are underestimated with respect to the underlying structure driven by reflections in the cylinders of CHIME and HCO that result in a 30-MHz standing wave across the band.
+
+and HCO, we align the burst arrival time across all frequency channels using PyFX (Leung et al. 2024). We then compute their ratio to measure RA, measured ,again merging channels in groups of eight. Defining 
+
+RA ≡ RA, measured /R A, expected , we plot the results in Figure 11. Here, we account for the fact that, when computing RA, expected , both CHIME and HCO have a subset of inputs not actively powered (225 and 51 inputs, respectively) due to known hardware failures. Overall, we measure a median across our band of RA
+
+of 0 .76 (0 .82) for the Y (X) polarization. When the KLT filter is not applied, the medians degrade by 11% (5%), suggesting that the KLT filter does result in over-all improved sensitivity. The clear structure in the ra-tio is expected and is driven by the 30 MHz standing wave present across both telescopes. Importantly, the results suggest that the performance across recovered frequency channels is in-line with surrounding uncon-taminated channels, further validating our updated cal-ibration strategy for this particular event. With both median values falling below 1, we inter-pret this as potential evidence that SEFD inp (or equiv-alently, the individual system temperature of HCO in-puts) are systematically larger than those of CHIME. However, given the number of simplifying assumptions that go into Equation 15, in addition to our results re-maining broadly consistent with similar measurements performed by KKO and GBO (Paper II and III), we con-clude that HCO is performing within expectation across uncontaminated and recovered frequency channels alike.  
+
+> 6.
+
+IMPACT OF UPDATED CALIBRATION SCHEME ON VLBI PERFORMANCE In the following section, we perform a final set of tests which assess HCO’s performance in cross-correlation with CHIME. Specifically, we test whether the measured S/N in cross-correlation with CHIME is within theoret-ical expectation (Section 6.1), the improvement in S/N extends to a variety of transient pulse profiles (Section 6.2), and the improvement in S/N extends to contin-uum calibrators (Section 6.3). In doing so, we deter-mine HCO’s current capabilities and limitations within the context of VLBI localizing FRBs. 6.1. Single-pulse cross-correlation test 
+
+In Section 5, we establish the baseline performance of HCO as a standalone interferometer. Here, we determine whether the improved sensitivity in auto-correlation translates to improved sensitivity in cross-correlation with CHIME. This would improve our local-ization precision for previously-detected bursts and in-creases the overall number of FRBs that can be localized on the CHIME-HCO baseline (CHIME/FRB Collabora-tion et al. 2025a). To test the performance in cross-correlation with CHIME, we follow Section 4.2 in Paper II. Using the same PSR B0329+54 pulse presented in Section 5.3.1, we compute the incoherent S/N in cross-correlation with CHIME, per polarization, following S/N×(ν) = 
+
+|⟨V C,on (ν)∗VH,on (ν)⟩| − med g
+
+h
+
+|⟨V C,off (ν)∗VH,off (ν)⟩g |
+
+i
+
+MAD g
+
+h
+
+|⟨V C,off (ν)∗VH,off (ν)⟩g |
+
+i .
+
+(16) 22 Lazda et al. 
+
+This is the same as Equation 11 except that each conju-gate product has one factor with subscript C instead of H to denote the cross-correlation between voltage data from HCO and CHIME. Note that the KLT filter is ap-plied to both HCO and CHIME baseband data prior to correlation. The correlation of the signals is per-formed using PyFX which accounts for and removes known sources of geometric delay. This ensures that the pulse at both sites is aligned to a timing resolution bet-ter than the native time resolution of the baseband data (≤ 2.56 μs), necessary for a robust incoherent S /N×
+
+measurement. To remove any dependence on the intrin-sic properties of the burst (e.g., the flux density), we normalize S /N× by the autocorrelation S/N at CHIME (defined by Equation 11, replacing H with C) and again merge adjacent frequency channels in groups of eight. The corresponding ratio is expected to scale according to (Masui et al. 2015; Mena-Parra et al. 2022) 
+
+RX, expected ≡ S/N×
+
+S/Nauto ,C
+
+=
+
+r
+
+2 NH
+
+NC
+
+, (17) where N represents the number of active feeds per sta-tion and the factor of √2 accounts for differences in noise statistics between auto- and cross-correlations. Defining 
+
+RX ≡ RX, measured /R X, expected , we compute RX, measured 
+
+and normalize by the expected ratio, RX, expected , ac-counting for feeds removed due to hardware failures. We plot the results in Figure 12. We measure a median across non-flagged channels of 1.07 (1 .06) across Y (X) polarization, broadly consistent with theoretical expectations. The 30 MHz structure in the results is again present and expected based on the reflections introduced by the cylindrical design of both arrays. More important than the absolute scaling of the result which is sensitive to simplifying assumptions, we find no clear difference in performance between channels recovered by our updated calibration scheme and those that are uncontaminated. A clear degradation in perfor-mance is observed at the upper end of the band in the X
+
+polarization. This is consistent with our remarks made in Section 5.3.1 and likely reflects degraded performance at the edge of the band in combination with the faint source brightness expected based on the pulse’s spectral behavior between 400 and 800 MHz (Manchester et al. 2005). We conclude that HCO’s performance in cross-correlation with CHIME is broadly consistent with ex-pectations. This confirms that our improvements in au-tocorrelation (Section 5) translate to improved perfor-mance in cross-correlation for this particular event. 6.2. Cross-correlation sensitivity improvement: pulsars 
+
+Next, we extend our analysis to a large sample of known pulsars. In doing so, we determine whether the improvements highlighted thus far using a single event translate to consistent performance improvements dur-ing day-to-day operations. Specifically, we aim to test whether the improvements continue to persist across bursts that are faint, narrowband or exhibit complex morphology. This contrasts with our tests thus far using only PSR B0329+54 which is one of the brightest pulse-emitting sources observable with HCO. While replicat-ing the tests performed in Sections 5.3.2 and 6.1 offers the most robust statistic of the system’s overall perfor-mance on a given day, extending these tests to a broad sample of pulsars is non-trivial. This is due to the tests requiring a sufficiently bright, narrow, broad-band pulse to robustly test the performance across the observing bandwidth. However, many of the pulsars in our sam-ple do not obey these assumptions (Manchester et al. 2005). For these reasons, we opt for a simpler metric to assess the overall performance as a VLBI transient detector: S/N× = X
+
+> ν
+
+S/N×(ν), (18) where S /N×(ν) is integrated only over channels with confirmed signal. This is done by constructing a dy-namic pulse gate both as a function of frequency and time which accurately masks the pulse profile using CHIME voltage data (Leung et al. 2021; Andrew et al. in prep.). Additionally, we modify Equation 16 by com-puting the median and MAD over off-lag frames to es-timate the properties of the noise in cross-correlation, rather than specifying temporal off-gates (Leung et al. 2021; Leung et al. 2024). To test the performance of HCO in cross-correlation, we construct a sample of 59 events from 14 unique pul-sars. These data were obtained using the CHIME/FRB backend (CHIME/FRB Collaboration et al. 2018), with baseband data captured between MJD 61161 and MJD 61191. Importantly, the month-long separation between events allows us to test the robustness of our calibration scheme over similar time periods. For each event, we follow a near-identical procedure outlined in Section 6.1 to correlate the events, beam-forming to the known position of each target. The only difference is that we opt to not apply the KLT filter across any events in order to isolate improvements driven by our improved calibration scheme and updated feed positions. At the end of this section, we investigate the impact of including the KLT filter. For each event, we compute Equation 18 and compare the results before and after applying out updated calibration scheme and feed positions described in Section 3 and Section 4. HCO Commissioning Overview 23 012
+
+> RX
+
+Y Pol          
+
+> median = 1.07
+> 400 450 500 550 600 650 700 750 800
+
+Frequency (MHz) 
+
+> 012
+> RX
+
+X Pol       
+
+> median = 1.06
+> Figure 12. Results of the cross-correlation S/N test (Equation 17) using the “after” B0329+54 pulse plotted in Figure 10. RX
+> measurements (binned by a factor of 8 in frequency to reduce noise) are color coded based on polarization, and the theoretical expectation of RX= 1 is indicated as a horizontal, black dashed line. The median over non-rfi contaminated channels is indicated in the bottom right of each panel and highlighted as a dash-dotted, colored line. Uncertainties are included, but are underestimated with respect to the underlying structure driven by reflections in the cylinders of CHIME and HCO. Regions excluded due to persistent RFI (post filter) are indicated by the shaded grey regions.
+
+A summary of our results is presented in Figure 13. Due to the fact that the sensitivity in the X polariza-tion is, on average, worse than the sensitivity in the Y
+
+polarization (Section 5.1), 8 events failed to correlate in the X polarization both before and after updating our calibration strategy. As such, our final sample con-sists of 59 (51) events across Y (X) polarizations. We find that, over the majority of pulsar events, we observe an increase in S /N× after applying our updated cali-bration scheme and feed positions. Importantly, the re-sults apply over a broad range of pulse brightnesses, with 3 ≤ S/N×,before ≤ 200. We measure a median fractional improvement in S /N× of 67% (52%) over the Y (X) po-larization. While our updated calibration scheme drives the overall performance improvement, the sample fur-ther showcases the impact of our updated feed position determination scheme described in Section 4. For ex-ample, PSR B1642 −03 is located at the extremities of HCO’s beam where the impact of incorrect feed posi-tions is most extreme. Correcting this resulted in an in-stantaneous improvement in S /N× for this pulsar rang-ing between 64% (S /N× of 5 .3 → 8.7) to 241% (S /N×
+
+of 21 .8 → 77 .1) over 5 events. We found that only 5 out of 59 events performed worse after applying our changes in the Y polarization and 4 out of 51 in the X polarization. However, whenever one polarization performed worse, equal or greater gains were observed in the opposing polarization hand, recov-ering the losses. We observed no instances in which both polarizations performed worse across all pulsar events. The reason for this behavior is not entirely understood, but suggest that it could be the result of flux moving between the two visibility eigenmodes. When losses did occur, the relative changes were minimal (e.g., at the 1 − 5% level) and typically associated with intrin-sically faint sources (S /N× ≤ 10). In this regime, we expect some results to degrade based solely on statisti-cal fluctuations alone. Consequently, we conclude that our updated calibration scheme and feed position deter-mination results in consistent sensitivity improvements in cross-correlation of transients on the CHIME-HCO baseline. Finally, we test to what extent the KLT filter de-scribed in Andrew et al. (2026) improves the overall sensitivity on transients in cross-correlation. Re-running the same analysis but applying the filter to both CHIME and HCO data prior to beamforming (in addition to up-dating the calibration solutions at HCO), we re-correlate the data and compute (S /N) × per event. Over the same events presented in Figure 13, we measure a median in-crease in S/N of ∼ 13% across both polarizations. Note that this increase is relative to the after data in Figure 13 (e.g., post updating our calibration strategy). We do find, however, that the KLT filter does result in some events performing worse in both polarizations. However, this behavior occurs in less than ≲ 10% of all events, suggesting that the majority of events benefit from em-ploying the KLT filter. While further investigation into site-specific requirements to optimize the performance of the KLT filter is underway, the above results suggest that the combination of improved calibration solutions and KLT filter represents the current best observational setup for maximizing the number of transients localiz-able by HCO. 24 Lazda et al. 10 1
+
+10 2
+
+> (S/N)  × after
+
+# YY 
+
+10 1 10 2
+
+(S/N) × before 
+
+10 1
+
+10 2
+
+> (S/N)  × after
+
+# XX 
+
+> B0136+57 B0329+54 B0355+54 B0450+55 B0531+21 B0823+26 B0919+06 B1541+09 B1642-03 B1917+00 B2016+28 B2021+51 B2154+40 B2310+42
+
+Figure 13. Comparison between the integrated incoherent cross-correlation S/N of pulsars (Equation 18) before and af-ter updating our observing strategy. Before: Default feed po-sitions and default calibration solutions are applied to HCO’s baseband data. After: Updated feed positions and updated calibration solutions are applied to HCO’s baseband data. In either scenario, we do not apply the KLT filter to any baseband data. Results are separated by polarization. The sample includes 59 pulses ( Y polarization) and 51 pulses ( X
+
+polarization) from 14 unique pulsars. The dashed diagonal line represents no change in performance, while points above and below represent positive and negative improvement, re-spectively. Pulsars are identified by their unique color and marker. 
+
+We note that by considering only the incoherent cross-correlated S/N, we are blind to the impact of our updated calibration scheme on the astrometric per-formance of the array. However, preliminary results 10 1
+
+10 2
+
+> (S/N)  × after
+
+# YY 
+
+10 1 10 2
+
+## (S/N) × before 
+
+10 1
+
+10 2
+
+> (S/N)  × after
+
+# XX 
+
+Integration time: 0.44 sec 
+
+Figure 14. Same as Figure 13, this time using continuum calibrators integrated over 440 ms. The sample includes 465 visibility pairs from 126 unique calibrators from the Radio Fundamental Catalog (Petrov & Kovalev 2025). 
+
+strongly suggest that our updated calibration strategy does not introduce a bias in the astrometry of observed sources at the level required for precision localization of FRBs. This analysis is beyond the scope of this pa-per and will be presented in detail in upcoming works (Andrew et al. in prep.). 6.3. Cross-correlation sensitivity improvement: continuum sources 
+
+As a final test, we wish to assess whether the perfor-mance increase observed in our pulsar sample further translates to improvement in (S /N) × when observing VLBI continuum calibrators (Petrov & Kovalev 2025). Here, continuum calibrators refer to radio sources (of-ten active galactic nuclei) that are bright ( ≳ 100 mJy), HCO Commissioning Overview 25 whose positions are known to ≲ 1 mas and that are located in proximity (sky-projected separation ≲ 10 ◦)to the FRB to calibrate direction dependent sources of delay. In the context of the CHIME/FRB Outrig-gers, the ionosphere is often the most dominant source of direction dependent delay on the very long baselines (CHIME/FRB Collaboration et al. 2025a; Andrew et al. 2025; Andrew et al. in prep.). However, since the po-sition of an FRB is not known a priori , it is often the case that the Outriggers must decide whether to pri-oritize a more nearby, faint calibrator versus a more distant, bright calibrator (CHIME/FRB Collaboration et al. 2025a; Andrew et al. in prep.). By improving HCO’s overall sensitivity, we increase the number of vi-able calibrators in HCO’s FoV, allowing for further op-timization of our VLBI calibration strategy. To test the HCO-CHIME baseline sensitivity on con-tinuum calibrators, we utilize a subset of the sample in Section 6.2 and follow a near identical strategy as when we carried out the test using pulsars. However, rather than beamform in the direction of the transient, we beamform both CHIME and HCO to all known cal-ibrators from the Radio Fundamental Catalog (Petrov & Kovalev 2025) within CHIME and HCO’s FoV. Note that in this case, we forego applying the KLT filter due to the large sample ( ≳ 400 pointings) and computational cost associated with running the filter. Per polarization, we correlate the signals using PyFX , with the second difference being that we average over the length of the baseband capture, rather than the duration of the tran-sient. For these events, the typical duration is around 440 ms. Finally, we compute Equation 18 and repeat this exercise to compare between our original and up-dated calibration strategy. Our final sample consists of 465 visibility pairs from 126 unique VLBI calibrators from the Radio Fundamen-tal Catalog (Petrov & Kovalev 2025). We plot the re-sults comparing the performance before and after updat-ing our calibration scheme in Figure 14. We measure a median increase in S /N× of 64% (44%) in the Y (X)polarization. In the low S/N regime, we observe larger scatter in S/N improvements in comparison to the high S/N regime. As a result of these improvements, cali-brators that were previously too weak (S /N× ≤ 4) are now strong enough to use for calibration (S /N× ≥ 15). Out of 465 visibility pairs, only 3%(7%) were found to have reduced S /N× across Y (X) polarization. Again, however, when sensitivity decreased in one polarization, the sensitivity was entirely recovered by the opposing polarization hand. A similar behavior was also seen in the pulsars observed in Section 6.2. Repeating a similar exercise but increasing the inte-gration time to 1 .4 s (corresponding to the current hard-ware limit of the CHIME/FRB Outrigger systems), we find similar improvements. In a sample of 104 visibility pairs from 53 unique sources integrated over 1 .4 seconds, we measure an equal median improvement of 32% across both polarization hands. While we still measure an over-all improvement in performance, the decrease in the median likely suggests that RFI is beginning to con-tribute more significantly to (but not dominate) the noise budget over longer timescales. This has important implications as the Outriggers team is actively develop-ing “tracking beams” (i.e., the ability to continuously readout tied-array voltage data at a specified point-ing) to increase the integration time of calibrators to tens of seconds (Pearlman 2024). In combination with the improvements highlighted throughout this work, the density and detection significance of calibrators within 
+
+≲ 10 ◦ of the target is expected to dramatically increase, enabling precise localizations of an even greater number of FRBs. Furthermore, improvements to the VLBI cali-brator search presented in Andrew et al. (2025), utilizing our updated calibration scheme and longer integration times, are currently underway will be presented in up-coming works (Atkinson et al. in prep.). Based on these results, we conclude that the improve-ments observed in interferometric performance further translate to improved sensitivity in cross-correlation of continuum calibrators. In comparison to our original calibration strategy, the CHIME-HCO baseline now has access to a larger sample of calibrators across HCO’s entire FoV, with particular emphasis on those at large zenith angles.  
+
+> 7.
+
+SUMMARY AND CONCLUSION This work presents the commissioning results of HCO, the third and final Outrigger station in the CHIME/FRB Outrigger array. Motivated by a complex RFI environment that consistently contaminates ∼ 40% of HCO’s observing bandwidth, we develop and imple-ment an updated calibration strategy to mitigate its im-pact. This relies on simple and conservative assumptions about the behavior of the complex gain solutions (e.g., that they are smoothly evolving across the band). We then use GPR to recover calibration solutions over RFI-corrupted channels. In doing so, we find that HCO’s performance is in line with theoretical expectation for 
+
+≳ 80% of its observing bandwidth over timescales rele-vant for transient research ( ≲ seconds). Our results have important implications for precisely localising a large sample of FRBs. First, by improving HCO’s beamformed SEFD by ≳ 60% (Section 5.1) while 26 Lazda et al. 
+
+maintaining thermal noise properties (Section 5.2), we increase the sensitivity of the array to fainter bursts by a factor of ∼ 60% in cross-correlation (Section 6.2). As a result, we increase the sample of FRBs that are detected with sufficient S/N to be localized by the full array. Second, while the astrometric performance of the ar-ray will be described in upcoming works (Andrew et al. in prep.), the improvement in sensitivity translates to improved astrometric precision given the increased S/N per event in cross-correlation with CHIME. Third, the improved sensitivity enables access to a wider sample of in-beam calibrators used to localize FRBs. This al-lows for direction-dependent effects to be more robustly constrained, resulting in improved localization accu-racy. Fourth, the sustained improvement over longer timescales has implications for ongoing hardware im-provements to enable 10 × longer integration times on calibrators. Our results suggest that HCO will con-tinue to benefit from our updated calibration strategy, resulting in dramatic improvements in calibrator density surrounding FRB events. Finally, when our calibration strategy is applied to all Outrigger sites, we expect the overall sensitivity of the array to also improve. Alto-gether, the results of this work enable HCO and the Outriggers to accelerate their ability to precisely local-ize FRBs. Within the broader context of large-N arrays, our RFI filtering and gain interpolation methods may be bene-ficial to several upcoming next-generation interferomet-ric arrays, including CHORD (Vanderlinde et al. 2019), BURSTT (Lin et al. 2022), DSA (Hallinan et al. 2019), CHARTS (Cassanelli et al. 2025), CASM (Connor et al. 2026) and SKA-LOW (Timmerman et al. 2026). Im-portantly, all of these arrays share a common strategy of utilizing sky information to calibrate individual antenna responses across the array. Simultaneously, all of these arrays are also interested in maximizing the number of detected and localized transients. However, each array must grapple with RFI environments that are unique to each individual site, and which vary in their complexity. In the case of HCO, we find that successful implementa-tion of simple algorithms leads to the recovery of ∼ 97 effective inputs worth of data, ∼ 37% of the total array. Our work emphasizes that even in an RFI environ-ment that contaminates nearly the majority of the sky-inferred complex solutions, significant sensitivity im-provements can be achieved by adopting simple algorith-mic techniques offline. We note that some degree of fine-tuning will be required to accommodate array- and site-specific requirements. However, our example adds to the growing body of literature (e.g., van der Veen et al. 2004; Finlay et al. 2023; Zhang et al. 2024; Andrew et al. 2026; Kuiper et al. 2026) motivating the development of tech-niques aimed at recovering astrophysical information in noise and RFI-contaminated data, departing from the standard practice of discarding contaminated data out-right. This is of particular importance in the current era where RFI will only continue to occupy larger fractions of allocated bandwidth (e.g., Di Vruno et al. 2023; Bassa et al. 2024) traditionally used for radio astronomical re-search. ACKNOWLEDGMENTS Funding for the CHIME/FRB Outrigger program is provided by a grant from the Gordon & Betty Moore Foundation. CHIME is funded by a grant from the Canada Foundation for Innovation (CFI) 2012 Lead-ing Edge Fund (Project 31170) and by contributions from the provinces of British Columbia, Qu´ ebec and On-tario. The CHIME/FRB Project, which enabled devel-opment in common with the CHIME/Pulsar instrument, is funded by a grant from the CFI 2015 Innovation Fund (Project 33213) and by contributions from the provinces of British Columbia and Qu´ ebec, and by the Dunlap Institute for Astronomy and Astrophysics at the Uni-versity of Toronto. Additional support was provided by the Canadian Institute for Advanced Research (CIFAR), McGill University and the McGill Space Institute thanks to the Trottier Family Foundation, and the University of British Columbia. The CHIME/Pulsar instrument hardware was funded by NSERC RTI-1 grant EQPEQ 458893-2014. This research was enabled in part by sup-port provided by the BC Digital Research Infrastructure Group and the Digital Research Alliance of Canada (al-liancecan.ca). M.L. acknowledges the support from the Natural Sci-ences and Engineering Research Council of Canada (NSERC-CGSD). J.M.P. acknowledges the support of an NSERC Discovery Grant (RGPIN-2023-05373). A.P.C. is a Canadian SKA Scientist and is funded by the Government of Canada / est financ´ e par le gouverne-ment du Canada. M.D. is supported by a CRC Chair, NSERC Discovery Grant, and CIFAR. V.M.K. holds the Lorne Trottier Chair in Astrophysics & Cosmology, a Distinguished James McGill Professorship, and re-ceives support from an NSERC Discovery grant (RGPIN 228738-13). C. L. acknowledges support from the Miller Institute for Basic Research at UC Berkeley. K.W.M. is supported by NSF Grant No. 2510771. A.B.P. ac-knowledges support by NASA through the NASA Hub-ble Fellowship grant HST-HF2-51584.001-A awarded by the Space Telescope Science Institute, which is oper-ated by the Association of Universities for Research in Astronomy, Inc., under NASA contract NAS5-26555. HCO Commissioning Overview 27 A.B.P. also acknowledges prior support from a Bant-ing Fellowship, a McGill Space Institute (MSI) Fellow-ship, and a Fonds de Recherche du Qu´ ebec – Nature et Technologies (FRQNT) Postdoctoral Fellowship. V.S. is supported by a Fonds de Recherche du Quebec—Nature et Technologies (FRQNT) Doctoral Research Award. The AstroFlash research group at McGill University, University of Amsterdam, ASTRON, and JIVE is sup-ported by: a Canada Excellence Research Chair in Tran-sient Astrophysics (CERC-2022-00009); an Advanced Grant from the European Research Council (ERC) un-der the European Union’s Horizon 2020 research and innovation programme (‘EuroFlash’; Grant agreement No. 101098079); an NWO-Vici grant (‘AstroFlash’; VI.C.192.045); an NSERC Discovery Grant (RGPIN-2025-06681); an ERC Starting Grant (‘EnviroFlash’; Grant agreement No. 101223057); and an NWO-Veni grant (VI.Veni.222.295). The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research ( canfar )Science Platform operated by the Canadian Astronomy Data Centre (CADC) and the Digital Research Alliance of Canada, with support from the National Research Council of Canada (NRC), the Canadian Space Agency (CSA), CANARIE, and the Canada Foundation for In-novation (CFI). 
+
+# Software: PyFX (Leung et al. 2024), kotekan (Re-nard et al. 2021), scikit-learn (Pedregosa et al. 2011), matplotlib (Hunter 2007), emcee (Foreman-Mackey et al. 2013), numpy (Harris et al. 2020) REFERENCES 
+
+Andrew, S., Leung, C., Li, A., et al. 2025, ApJ, 981, 39, doi: 10.3847/1538-4357/adaf8d Andrew, S., Mena-Parra, J., Wang, H., et al. 2026, A spatial filter for mitigating radio interference and its application to CHIME/FRB Outriggers, arXiv, doi: 10.48550/arXiv.2603.25833 Andrew, S., et al. in prep., in prep. Atkinson, A., et al. in prep., in prep. Bandura, K., Addison, G. E., Amiri, M., et al. 2014, in Ground-based and Airborne Telescopes V, ed. L. M. Stepp, R. Gilmozzi, & H. J. Hall, Vol. 9145 (SPIE), 914522, doi: 10.1117/12.2054950 Bandura, K., Bender, A. N., Cliche, J. F., et al. 2016, ICE: a scalable, low-cost FPGA-based telescope signal processing and networking system, arXiv, doi: 10.48550/arXiv.1608.06262 Bassa, C. G., Di Vruno, F., Winkel, B., et al. 2024, Astronomy and Astrophysics, 689, L10, doi: 10.1051/0004-6361/202451856 Cassanelli, T., Mena-Parra, J., Manosalva, S., et al. 2025, in 2025 19th European Conference on Antennas and Propagation (EuCAP), 1–5, doi: 10.23919/EuCAP63536.2025.10999353 CHIME Collaboration, Amiri, M., Bandura, K., et al. 2022, The Astrophysical Journal Supplement Series, 261, 29, doi: 10.3847/1538-4365/ac6fd9 CHIME/FRB Collaboration, Amiri, M., Bandura, K., et al. 2018, The Astrophysical Journal, 863, 48, doi: 10.3847/1538-4357/aad188 CHIME/FRB Collaboration, Amiri, M., Andersen, B. C., et al. 2021, The Astrophysical Journal Supplement Series, 257, 59, doi: 10.3847/1538-4365/ac33ab —. 2025a, CHIME/FRB Outriggers: Design Overview, arXiv, doi: 10.48550/arXiv.2504.05192 CHIME/FRB Collaboration, Abbott, T. C., Amouyal, D., et al. 2025b, FRB 20250316A: A Brilliant and Nearby One-Off Fast Radio Burst Localized to 13 parsec Precision, arXiv, doi: 10.48550/arXiv.2506.19006 CHIME/FRB Collaboration, Abbott, T., Andersen, B. C., et al. 2026, The Second CHIME/FRB Catalog of Fast Radio Bursts, arXiv, doi: 10.48550/arXiv.2601.09399 Collaboration, T. C., Bandura, K., Belostotski, L., et al. 2026, Overview of the Canadian Hydrogen Observatory and Radio Transient Detector (CHORD) Project. https://arxiv.org/abs/2607.09374 Connor, L., Ravi, V., Sharma, K., et al. 2025, Nature Astronomy, 9, 1226, doi: 10.1038/s41550-025-02566-y Connor, L., Ravi, V., Sanghavi, P., et al. 2026, The 256-antenna Coherent All-Sky Monitor, arXiv, doi: 10.48550/arXiv.2604.13903 Curtin, A. P., Andrew, S., Simha, S., et al. 2026, ApJ, 998, 97, doi: 10.3847/1538-4357/ae2ea0 DeBoer, D. R., Parsons, A. R., Aguirre, J. E., et al. 2017, Publications of the Astronomical Society of the Pacific, 129, 045001, doi: 10.1088/1538-3873/129/974/045001 Deller, A. 2010, in Proceedings of RFI mitigation workshop — PoS(RFI2010), Vol. 107 (SISSA Medialab), 035, doi: 10.22323/1.107.0035 Di Vruno, F., Winkel, B., Bassa, C. G., et al. 2023, Astronomy & Astrophysics, 676, A75, doi: 10.1051/0004-6361/202346374 Eftekhari, T., Dong, Y., Fong, W., et al. 2025, ApJL, 979, L22, doi: 10.3847/2041-8213/ad9de2 28 Lazda et al. 
+
+Finlay, C., Bassett, B. A., Kunz, M., & Oozeer, N. 2023, Monthly Notices of the Royal Astronomical Society, 524, 3231–3251, doi: 10.1093/mnras/stad1979 Foreman-Mackey, D., Hogg, D. W., Lang, D., & Goodman, J. 2013, PASP, 125, 306, doi: 10.1086/670067 Hallinan, G., Ravi, V., Weinreb, S., et al. 2019, in Bulletin of the American Astronomical Society, Vol. 51, 255, doi: 10.48550/arXiv.1907.07648 Harris, C. R., Millman, K. J., van der Walt, S. J., et al. 2020, Nature, 585, 357, doi: 10.1038/s41586-020-2649-2 Hunter, J. D. 2007, Computing in Science & Engineering, 9, 90, doi: 10.1109/MCSE.2007.55 Khrykin, I. S., Ata, M., Lee, K.-G., et al. 2024, ApJ, 973, 151, doi: 10.3847/1538-4357/ad6567 Kuiper, D., Bassa, C., Pleunis, Z., & Hessels, J. 2026, Tied-array beam flatfielding, arXiv, doi: 10.48550/arXiv.2603.12970 Kumar, A., Deller, A. T., Jain, P., & Mold´ on, J. 2025, Publications of the Astronomical Society of Australia, 42, e098, doi: 10.1017/pasa.2025.10063 Lanman, A. E., Andrew, S., Lazda, M., et al. 2024, CHIME/FRB Outriggers: KKO Station System and Commissioning Results, arXiv, doi: 10.48550/arXiv.2402.07898 Lanman, A. E., Simha, S., Masui, K. W., et al. 2026, The Astrophysical Journal, 1003, 5, doi: 10.3847/1538-4357/ae606e Leung, C., Mena-Parra, J., Masui, K., et al. 2021, AJ, 161, 81, doi: 10.3847/1538-3881/abd174 Leung, C., Andrew, S., Masui, K. W., et al. 2024. https://arxiv.org/abs/2403.05631 Leung, C., Simha, S., Medlock, I., et al. 2025, ApJL, 991, L25, doi: 10.3847/2041-8213/ae044d Lin, H.-H., Lin, K.-y., Li, C.-T., et al. 2022, Publications of the Astronomical Society of the Pacific, 134, 094106, doi: 10.1088/1538-3873/ac8f71 Liu, A., Tegmark, M., Morrison, S., Lutomirski, A., & Zaldarriaga, M. 2010, Monthly Notices of the Royal Astronomical Society, 408, 1029, doi: 10.1111/j.1365-2966.2010.17174.x Manchester, R. N., Hobbs, G. B., Teoh, A., & Hobbs, M. 2005, The Astronomical Journal, 129, 1993–2006, doi: 10.1086/428488 Marshman, T., Hobbs, G., Dawson, J. R., et al. 2026, Characterising and mitigating Bluetooth and WiFi radio frequency interference at the Parkes Observatory, arXiv, doi: 10.48550/arXiv.2605.30761 Masui, K., Amiri, M., Connor, L., et al. 2015, Astronomy and Computing, 12, 181, doi: 10.1016/j.ascom.2015.07.002 Mena-Parra, J., Leung, C., Cary, S., et al. 2022, The Astronomical Journal, 163, 48, doi: 10.3847/1538-3881/ac397a Nimmo, K., et al. in prep., in prep. Pascua, R., Sievers, J., & Liu, A. 2026, arXiv e-prints, arXiv:2602.06109, doi: 10.48550/arXiv.2602.06109 Pearlman, A. B. 2024, in 2024 United States National Committee of URSI National Radio Science Meeting (USNC-URSI NRSM, 1, doi: 10.23919/USNC-URSINRSM60317.2024.10465000 Pedregosa, F., Varoquaux, G., Gramfort, A., et al. 2011, Journal of Machine Learning Research, 12, 2825 Perley, R. A., & Butler, B. J. 2017, The Astrophysical Journal Supplement Series, 230, 7, doi: 10.3847/1538-4365/aa6df9 Petroff, E., Hessels, J. W. T., & Lorimer, D. R. 2022, The Astronomy and Astrophysics Review, 30, doi: 10.1007/s00159-022-00139-w Petrov, L. Y., & Kovalev, Y. Y. 2025, ApJS, 276, 38, doi: 10.3847/1538-4365/ad8c36 Porcu, E., Bevilacqua, M., Schaback, R., & Oates, C. J. 2023, The Mat´ ern Model: A Journey through Statistics, Numerical Analysis and Machine Learning. https://arxiv.org/abs/2303.02759 Rafiei-Ravandi, M., & Smith, K. M. 2023, The Astrophysical Journal Supplement Series, 265, 62, doi: 10.3847/1538-4365/acc252 Renard, A., Shaw, R., Ng, C., et al. 2021, Kotekan: A framework for high-performance radiometric data pipelines, 2021.11, Zenodo, doi: 10.5281/zenodo.5842660 Ruppert, D. 2011, Statistics and Data Analysis for Financial Engineering, 1st edn., Springer Texts in Statistics (New York, NY: Springer New York), XXII, 638, doi: 10.1007/978-1-4419-7787-8 Schmid, N. A., Katreddi, S., & Kweon, Y. 2026, Computer Vision Methods for Frequency Analysis of RFI in Radio Astronomy Data, arXiv, doi: 10.48550/arXiv.2605.05342 Shah, V., Shin, K., Leung, C., et al. 2025, ApJL, 979, L21, doi: 10.3847/2041-8213/ad9ddc Thompson, A. R., Moran, J. M., & Swenson, Jr., G. W. 2017, Interferometry and Synthesis in Radio Astronomy, 3rd Edition, doi: 10.1007/978-3-319-44431-4 Timmerman, R., Escott, E. L., Vernstrom, T., Morabito, L. K., & Reynolds, C. 2026, Low-frequency VLBI with the SKA-Low. https://arxiv.org/abs/2606.25017 van der Veen, A.-J., Leshem, A., & Boonstra, A.-J. 2004, in Processing Workshop Proceedings, 2004 Sensor Array and Multichannel Signal, 1–10, doi: 10.1109/SAM.2004.1502901 HCO Commissioning Overview 29 
+
+Vanderlinde, K., Bandura, K., Belostotski, L., et al. 2019, LRP 2020 Whitepaper: The Canadian Hydrogen Observatory and Radio-transient Detector (CHORD), Tech. rep., University of Toronto, doi: 10.5281/zenodo.3765414 Wang, J. 2020, arXiv e-prints, arXiv:2009.10862, doi: 10.48550/arXiv.2009.10862 Welch, J., Backer, D., Blitz, L., et al. 2009, Proceedings of the IEEE, 97, 1438, doi: 10.1109/JPROC.2009.2017103 Wijnholds, S., van der Tol, S., Nijboer, R., & van der Veen, A.-J. 2010, IEEE Signal Processing Magazine, 27, 30, doi: 10.1109/MSP.2009.934853 Xiao, D., Wang, F., & Dai, Z. 2021, Science China Physics, Mechanics, and Astronomy, 64, 249501, doi: 10.1007/s11433-020-1661-7 Zhang, X., Cognard, I., & Dobigeon, N. 2024, RFI-DRUnet: Restoring dynamic spectra corrupted by radio frequency interference – Application to pulsar observations. https://arxiv.org/abs/2402.13867 Zhou, B., Li, X., Wang, T., Fan, Y.-Z., & Wei, D.-M. 2014, Physical Review D, 89, doi: 10.1103/physrevd.89.107303
