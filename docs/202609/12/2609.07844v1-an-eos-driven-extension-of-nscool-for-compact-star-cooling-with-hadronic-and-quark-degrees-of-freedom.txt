@@ -1,0 +1,815 @@
+Title: An EOS-Driven Extension of NSCool for Compact Star Cooling with Hadronic and Quark Degrees of Freedom
+
+URL Source: https://arxiv.org/pdf/2609.07844v1
+
+Published Time: Wed, 09 Sep 2026 02:41:12 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+# An EOS-Driven Extension of NSCool for Compact Star Cooling with Hadronic and Quark Degrees of Freedom 
+
+## Federico Nola 1,2,3,* Fernando Arias-Aragón 4
+
+> 1
+
+Università degli Studi della Campania “Luigi Vanvitelli”, 
+
+## Viale Abramo Lincoln 5, 81100 Caserta, Italy 
+
+> 2
+
+## Istituto Nazionale di Fisica Nucleare, Sezione di Napoli, Strada Comunale Cinthia, 80126 Napoli, Italy 
+
+> 3
+
+## Istituto Nazionale di Fisica Nucleare, Laboratori Nazionali di Frascati, Via Enrico Fermi 54, 00044 Frascati (RM), Italy 
+
+> 4
+
+## Departamento de Geología, Física y Química Inorgánica, Universidad Rey Juan Carlos, Calle Tulipán s/n, 28933 Móstoles, Madrid, Spain 
+
+> *
+
+Corresponding author: federico.nola@unicampania.it 
+
+Abstract 
+
+We present an EOS-driven extension of the NSCool thermal evolution code that enables complete tabulated equations of state to be treated within a single composition-based input structure. The generalized NEW interface includes additional baryonic fractions, a bosonic composition variable, the hadronic volume fraction, and quark fractions, allowing nucleonic, hyperonic, resonant-baryonic, and hybrid hadron–quark configurations to be handled within the same workflow. The neutrino sector is extended accordingly, including updated nucleonic modified Urca and bremsstrahlung rates, additional baryonic direct Urca channels, hyperonic processes, baryonic pair breaking and formation, and quark direct Urca, modified Urca, bremsstrahlung, and PBF contributions. In mixed phases, emissivities and the corresponding core heat capacity contributions are evaluated from phase-local quantities and combined using the hadronic volume fraction. The implementation is validated against the original NSCool calculation for a controlled nucleonic benchmark and demonstrated with representative hadronic and quark-containing EOSs. These calcula-tions are intended as software validation tests of the generalized workflow rather than as observational fits or statistical EOS inference. 
+
+Keywords: NSCool; neutron stars; compact stars; hybrid stars; thermal evolution; equation of state; neutrino emission 
+
+# 1 Introduction 
+
+The thermal evolution of compact stars provides a direct probe of the microscopic degrees of freedom that populate matter at supranuclear density. After the early proto-neutron star stage, the cooling of an isolated neutron star is governed by its stellar structure, thermal profile and local microphysics, which together determine how energy is transported and lost. During the neutrino cooling era, weak processes in the core are especially sensitive to the particle content of dense matter, to the opening of fast direct Urca channels and to the suppression or enhancement induced by baryonic or quark pairing. Cooling calculations therefore provide a complementary tool to mass–radius measurements and tidal deformability constraints in the study of the dense matter equation of state (EOS) (Yakovlev and Pethick [2004], Page and Reddy [2006], Potekhin et al. [2015]). The connection between cooling and composition is especially important because the internal structure of compact stars is still uncertain. The simplest description assumes cold, catalyzed matter composed of neutrons, protons, electrons and muons in β equilibrium. At the densities reached in the inner core, however, additional degrees of freedom may become energetically favored, modifying both the EOS and the neutrino emissivity. 1arXiv:2609.07844v1 [nucl-th] 7 Sep 2026 Hyperons may open additional baryonic direct Urca channels, providing efficient cooling mechanisms even when the nucleonic direct Urca process is kinematically forbidden. Deconfined quarks can also contribute to rapid cooling through quark direct Urca, modified Urca, bremsstrahlung and, when paired, pair breaking and formation processes (Iwamoto [1980, 1982]). 
+
+NSCool is one of the standard public tools for simulating the thermal evolution of neutron stars (Page [2016]). It solves the general relativistic thermal evolution equations for a spherically symmetric star and provides modular interfaces for the stellar structure, EOS input, envelope model and microphysical processes. Among its EOS options, the NEW framework is particularly useful for tabulated, composition-dependent hadronic EOSs, since the local particle fractions and effective masses can be supplied directly by the input table. In the original implementation, however, quark-containing configurations are treated through a separate workflow, rather than as part of the same tabulated composition structure. This work develops an extension of the NEW framework in which complete tabulated EOSs containing hadronic and quark degrees of freedom can be handled within a unified input format 1. The extension preserves the EOS-driven logic of the original code, but enlarges the set of local quantities read from the EOS table by including additional baryonic fractions, a bosonic composition variable, the hadronic volume fraction and quark fractions. In this way, nucleonic, hyperonic, resonant-baryonic and hybrid configurations can be treated as different limits of the same composition-driven workflow. The neutrino emission sector is also updated and generalized consistently with this EOS-driven approach. For nucleonic matter, the modified Urca and nucleon–nucleon bremsstrahlung rates are implemented follow-ing modern reanalyses of the standard Friman and Maxwell [1979] framework (Bottaro et al. [2024]). The baryonic sector includes the implemented nucleonic channels, octet-hyperon channels and explicitly added 
+
+Ξ transitions, while the quark sector includes quark direct Urca, modified Urca, bremsstrahlung and pair breaking and formation contributions. The aim is not to derive new microscopic emissivities, but to embed established rates into a unified NSCool implementation in which the local composition of a complete EOS determines the active cooling channels. This paper is organized as follows. Secs. 2–4 describe the original NSCool treatment, the generalized EOS format and its implementation in the extended NEW workflow. Sec. 5 summarizes the neutrino emission channels included in the updated framework, and Sec. 6 discusses the scope and limitations of the imple-mentation. Numerical checks are separated from the methodological development: Appendix A documents the direct comparison with the original code, while Appendix B collects representative composition-driven EOS runs. 
+
+# 2 Original NSCool Treatment of Tabulated EOSs and Quark Matter 
+
+A central feature of NSCool is its modular structure, which separates the stellar model, microphysical inputs, boundary conditions and heating prescriptions into independent routines. This organization makes it possible to modify selected components of the microphysics without altering the full thermal evolution solver. Among the available EOS input options, the NEW format provides the most flexible interface for tabulated, composition-dependent hadronic EOSs. In the original NEW option, the EOS table supplies the thermodynamic quantities, lepton fractions, baryonic particle fractions and effective masses required by the cooling routines. These quantities are interpolated onto the stellar grid and used to activate the relevant hadronic neutrino processes according to the local composition, pairing inputs and kinematic thresholds. The particle content is therefore provided directly by the EOS table, rather than reconstructed from an analytic model. Quark matter, however, is not handled within the same NEW infrastructure. In the original code, quark-containing configurations are treated through a separate quark-specific branch, associated with the quark matter EOS option and with its own input quantities. While useful for dedicated quark star or quark core calculations, this separation prevents nucleonic, hyperonic and hybrid configurations from being treated as different limits of a single complete EOS-driven workflow. This becomes restrictive for complete EOS tables generated by modern microscopic or phenomenological models, where different particle species and phases may appear at different densities within the same stellar model. In such cases, the cooling calculation should follow the local composition continuously from a single EOS table, activating the appropriate hadronic or quark processes according to the local particle fractions and phase content. This is the main technical motivation for the generalized EOS-driven extension described in the following sections.   
+
+> 1A patch that implements the changes presented here to the public version of NSCool is available at Nola and Arias-Aragón [2026].
+
+23 Generalized EOS Format 
+
+The extension described in this work is based on a generalized tabulated EOS format designed to provide the cooling routines with the local thermodynamic and compositional information required for nucleonic, hyperonic, resonant-baryonic and hybrid hadron–quark matter. Starting from the original NEW structure, which includes thermodynamic variables, lepton fractions, selected baryonic fractions and baryonic effective masses, we add the quantities needed to describe complete EOS tables with deconfined quarks and extended mixed phases. The original input structure may be schematically written as 
+
+ρ, P, n B , Y e, Y μ, Y n, Y p, Y Λ, Y Σ− , Y Σ0 , Y Σ+ , m ∗
+
+> p
+
+, m ∗
+
+> n
+
+, m ∗
+
+> Λ
+
+, m ∗ 
+
+> Σ−
+
+, m ∗ 
+
+> Σ0
+
+, m ∗ 
+
+> Σ+
+
+,
+
+where ρ is the mass density, P is the pressure, nB is the baryon number density, Yi denotes the number fraction of particle species i, and m∗ 
+
+> i
+
+is the corresponding effective mass. The extended input table keeps these quantities and adds new columns describing further baryonic species, possible bosonic contributions, the local hadronic volume fraction and the quark composition. The generalized format used in the present work can be written schematically as 
+
+EOS ext =
+
+n
+
+ρ, P, n B , Y e, Y μ, Y B , m ∗ 
+
+> B
+
+, Y extra , m ∗
+
+> extra
+
+, f had , Y boson , Y u, Y d, Y s
+
+o
+
+,
+
+where YB and m∗ 
+
+> B
+
+denote the baryonic fractions and effective masses already present in the original NEW 
+
+format, while Yextra and m∗ 
+
+> extra
+
+denote the additional baryonic degrees of freedom introduced in the extended table. In the implementation considered here, these additional components include Ξ− and Ξ0 hyperons, the ∆−, ∆0, ∆+, and ∆++ resonances, the excited strange baryons Σ∗− , Σ∗0, Σ∗+, Ξ∗− , Ξ∗0 and the Ω−
+
+baryon. The quantity Yboson is the global bosonic contribution to the baryon number budget supplied by the EOS table, normalized to the total baryon density nB . The corresponding density used internally in the consistency control is nboson = Yboson nB . In the present implementation this variable contributes to the baryon number consistency check, but it is not assigned an electric charge term and does not by itself activate any neutrino emission channels. The last three entries, Yu, Yd, and Ys, describe the up, down and strange quark fractions. The extended table therefore contains more degrees of freedom than those for which explicit neutrino emission processes are currently implemented. In particular, the decuplet baryons are propagated as part of the EOS composition, but they are not treated as β decaying species in the present cooling implementation. Consequently, no processes involving ∆, Σ∗, Ξ∗, or Ω− states are added. The active baryonic weak channels are restricted to the octet baryon transitions listed in Sec. 5, supplemented by the explicitly included Ξ octet channels. The role of fhad is central in the treatment of hybrid configurations. It specifies the local fraction of the volume occupied by hadronic matter. Therefore, 
+
+0 ≤ fhad ≤ 1,
+
+with fhad = 1 corresponding to purely hadronic matter and fhad = 0 corresponding to purely quark mat-ter. Intermediate values describe a mixed hadron–quark region, as obtained for example in EOSs with an extended mixed phase. The quark volume fraction is consequently 
+
+fq = 1 − fhad .
+
+This prescription makes the format flexible enough to describe both sharp and continuous transitions. The particle fractions supplied by the EOS table are interpreted as global fractions normalized to the total baryon density nB . In mixed hadron–quark regions, however, the microscopic rates must be evaluated using densities reconstructed inside the phase in which the corresponding particles propagate. The explicit phase-local reconstruction used in the implementation is given in Sec. 4. The local densities obtained in this way determine the Fermi momenta entering the neutrino rates. For baryons and leptons, the convention used in the code is 
+
+kF,i =  3π2ni
+
+1/3 ,
+
+whereas for a quark flavor f = u, d, s the color degeneracy is included through 
+
+kF,f =
+
+
+
+π2nq
+
+> f
+
+1/3
+
+.
+
+Here the densities are the appropriate local densities in the corresponding phase. In practice, the imple-mentation enforces the limiting cases fhad = 1 for purely hadronic regions and fhad = 0 for purely quark regions, avoiding spurious divisions by zero. 3The quark fractions also determine the baryon number and electric charge carried by the quark compo-nent. Since each quark carries baryon number 1/3, the baryonic contribution of the quark sector is 
+
+Y q 
+
+> B
+
+= 13 (Yu + Yd + Ys) .
+
+Similarly, using the quark electric charges qu = 2 /3 and qd = qs = −1/3, the quark charge fraction is 
+
+Y q 
+
+> Q
+
+= 13 (2 Yu − Yd − Ys) .
+
+Here Yboson enters the baryon-number consistency condition as 
+
+X
+
+> B
+
+YB + Yu + Yd + Ys
+
+3 + Yboson = 1 . (3.1) These relations provide useful consistency checks for EOS tables containing quark matter. In particular, when the EOS is in beta equilibrium and charge neutral, the lepton fractions and the charged hadronic and quark fractions must combine to give vanishing total charge within the numerical accuracy of the table. A key feature of the generalized format is that nucleonic, hyperonic, resonant-baryonic and hybrid configurations are represented within the same table structure. Purely nucleonic matter is recovered by setting all additional baryonic, bosonic and quark entries to zero and imposing fhad = 1 . Hyperonic matter is described by nonzero hyperon fractions at fhad = 1 , while hybrid configurations are obtained by allowing nonzero quark fractions and assigning fhad according to the phase structure of the EOS. The local neutrino emissivity is then determined by the tabulated composition and phase content. Purely hadronic regions activate only hadronic channels, purely quark regions activate only quark channels and mixed regions are treated through the phase-weighting prescription described in Sec. 4. In this way, different classes of compact star matter are selected directly by the EOS table, without switching between independent cooling workflows. This construction also preserves the standard hadronic limit when the additional columns vanish. 
+
+# 4 Implementation in the Extended NEW Framework 
+
+The implementation follows the modular structure of NSCool and modifies the EOS composition interface together with selected core microphysics routines. The thermal evolution solver, stellar structure input, time integration and envelope treatment are left unchanged. The extended NEW workflow reads and inter-polates the additional composition variables, reconstructs phase-local densities where needed and supplies the resulting local quantities to the neutrino emissivity and specific-heat routines. In the extended implementation, the NEW reader is modified to read the additional composition and phase variables defined in Sec. 3 from the same tabulated EOS as the standard inputs. The full local composition can then be propagated consistently to the cooling routines without switching to a separate quark matter workflow. The interpolation strategy is kept close to the original NSCool prescription. At each radial point of the stellar model, the quantities read from the EOS table are interpolated between neighboring density points. If X denotes any thermodynamic or composition variable, one may write schematically 
+
+X(ri) = w1X(ρ1) + w2X(ρ2),
+
+where the weights are computed from the logarithmic density interval containing the local density ρ(ri).The same procedure is applied to all additional composition and phase variables introduced in the extended EOS format. After interpolation, the tabulated global fractions are converted into the densities entering the micro-scopic rates. In purely hadronic regions, fhad = 1 and the hadronic densities reduce to ni = YinB , while the quark contribution is absent. In purely quark regions, fhad = 0 and only quark processes are retained. In mixed regions, the EOS fractions are interpreted as global fractions normalized to the total baryon density, and the rates are evaluated using phase-local densities. Thus, for a hadronic species i one uses 
+
+nhad  
+
+> i
+
+(r) = Yi(r)nB (r)
+
+fhad (r) , fhad (r) > 0, (4.1) 4while for a quark flavor f = u, d, s one uses 
+
+nq 
+
+> f
+
+(r) = Yf (r)nB (r)1 − fhad (r) , fhad (r) < 1. (4.2) The corresponding Fermi momenta, kinematic thresholds, and pairing suppressions are then computed from these phase-local densities. The neutrino emission routines receive the interpolated local composition, effective masses, phase frac-tions and pairing inputs and activate the corresponding hadronic or quark channels according to the thresh-olds and suppression factors described in Sec. 5. Thus, nucleonic, hyperonic and quark contributions are handled within the same extended NEW workflow. Decuplet baryons included in the extended EOS table are treated as composition variables only. In the present implementation, the ∆, Σ∗, Ξ∗, and Ω− fractions do not activate additional direct Urca, modified Urca, bremsstrahlung or PBF channels. They can still affect the cooling indirectly by modifying the local composition, Fermi momenta, effective masses and threshold conditions of the active nucleonic and hyperonic processes. At each radial point, the code evaluates only the emissivities associated with the nonzero local particle fractions. A process is inactive if one of the required species has vanishing fraction, if the corresponding Fermi momentum is zero, or if the relevant kinematic threshold is not satisfied. The local hadronic and quark contributions are then combined according to 
+
+Qν (r, T ) = fhad (r)Qhad  
+
+> ν
+
+(r, T ) + [1 − fhad (r)] Qq 
+
+> ν
+
+(r, T ). (4.3) This expression applies to the local volume emissivity. The thermal solver then integrates the resulting emissivity over the stellar profile in the usual NSCool way. In the limit fhad = 1 , Eq. (4.3) reduces to the ordinary hadronic emissivity, whereas for fhad = 0 it reduces to the pure quark contribution; intermediate values describe mixed hadron–quark matter. The same volume fraction prescription is applied to the core heat capacity terms included in the implementation, with the nucleonic, Λ and Σ contributions weighted by 
+
+fhad and the quark contribution by 1 − fhad . No additional heat capacity terms for Ξ or decuplet baryons are included in the present release. Pairing effects are included through the same general mechanism used by NSCool : each emissivity kernel is multiplied by the appropriate reduction factor when one or more participating species are paired. For baryons, the existing singlet and triplet pairing controls are retained. The source contains singlet PBF kernels for Σ−, Σ+, Ξ0, and Ξ−, but this release does not provide critical temperature models for these four species; their corresponding Tc arrays therefore remain at the default floor unless source level gap profiles are supplied. For quarks, the rate and heat capacity routines retain explicit color resolved Tc arrays. The quark pairing input used by this release constructs one flavor dependent critical temperature for each of u, d,and s and assigns that value to all three color entries of the corresponding flavor. The direct Urca, modified Urca, bremsstrahlung and PBF quark rates are then suppressed or activated according to the local ratio 
+
+T /T c for the relevant flavor and color. This allows the same EOS to be evolved under different assumptions about quark superconductivity without modifying the EOS table itself. With this prescription, different stellar compositions are selected directly by the local EOS entries. The extended NEW workflow reduces to the standard hadronic limit for fhad = 1 , describes hyperonic matter when hyperon fractions are present, and activates quark emissivities locally wherever quark fractions and a nonzero quark volume fraction are supplied by the EOS table. 
+
+# 5 Neutrino Emission Rates 
+
+The generalized EOS format described above must be supplemented by a local emissivity library. In this work we do not derive new microscopic rates. Instead, we reorganize established neutrino emissivities into a single composition-driven structure that can be evaluated locally from the tabulated particle fractions, effective masses, Fermi momenta, pairing inputs and phase content. The local emissivity is decomposed into hadronic and quark contributions, 
+
+Qhad  
+
+> ν
+
+= QNν + QYν , Qqν = Qquark  
+
+> ν
+
+,
+
+where QNν denotes nucleonic processes, QYν denotes the implemented hyperonic and additional Ξ channels and Qqν denotes quark processes. The purpose of this section is to summarize the channels retained in the updated implementation and the minimal emissivity structure used by the code. More detailed derivations of the individual kernels can be found in the references cited below. 55.1 Nucleonic Modified Urca and Bremsstrahlung 
+
+For nucleonic matter, the slow neutrino emission sector contains modified Urca and nucleon–nucleon bremsstrahlung reactions. The modified Urca branches are 
+
+n + n → n + p + ℓ + ¯ νℓ, n + p + ℓ → n + n + νℓ,n + p → p + p + ℓ + ¯ νℓ, p + p + ℓ → n + p + νℓ,
+
+with ℓ = e, μ when the corresponding lepton branch is present and kinematically allowed. The bremsstrahlung channels are 
+
+n + n → n + n + ν + ¯ ν, n + p → n + p + ν + ¯ ν, p + p → p + p + ν + ¯ ν. 
+
+The unpaired modified Urca and bremsstrahlung kernels are updated following the Bottaro–Caputo–Fiorillo reanalysis of the Friman–Maxwell rates [Friman and Maxwell, 1979, Bottaro et al., 2024]. In our implemen-tation they are multiplied by the high density suppression factor used by Buschmann et al. [2022] and by the usual superfluid reduction factors: 
+
+Qimpl MU ,n = RSF MU ,n γ6 QBCF MU ,n ,Qimpl MU ,p = RSF MU ,p γ6 QBCF MU ,p ,Qimpl Br ,ij = RSF Br ,ij γ6 QBCF Br ,ij ,ij = nn, np, pp. 
+
+The suppression factor is 
+
+γ =
+
+
+
+1 + 13 m∗
+
+> np
+
+ kF,n 
+
+1.68 fm −1
+
+ −1
+
+, m∗ 
+
+> np
+
+= m∗ 
+
+> n
+
++ m∗
+
+> p
+
+2 .
+
+This prescription is applied only to the slow nucleonic modified Urca and bremsstrahlung channels. The nucleonic direct Urca process, when allowed by momentum conservation, remains part of the standard direct Urca sector. 
+
+## 5.2 Baryonic Direct Urca Processes 
+
+Fast cooling is possible when a direct Urca process satisfies the Fermi momentum triangle condition. For a generic baryonic transition, 
+
+B1 → B2 + ℓ + ¯ νℓ, B2 + ℓ → B1 + νℓ,
+
+the process is active only if 
+
+kF,B 1 ≤ kF,B 2 + kF,ℓ ,
+
+with the analogous inverse condition. The implemented baryonic direct Urca emissivity is written schemat-ically as 
+
+QB1B2 
+
+> DU
+
+= rB1B2
+
+ 4.24 × 10 27  m∗ 
+
+> B1
+
+m∗ 
+
+> B2
+
+T 69 LℓRB1B2 
+
+> DU
+
+,
+
+where rB1B2 contains the weak coupling coefficient, Lℓ is the lepton phase-space factor, and RB1B2 
+
+> DU
+
+is the pairing reduction factor. The standard implemented channels are 
+
+n → p, Λ → p, Σ− → n, Σ− → Λ, Σ− → Σ0.
+
+The updated implementation adds the octet Ξ transitions 
+
+Ξ− → Λ, Ξ− → Σ0, Ξ0 → Σ+, Ξ− → Ξ0.
+
+These channels are activated locally by the EOS composition and by the corresponding threshold condition. 65.3 Hyperonic Modified Urca and Bremsstrahlung 
+
+Hyperons also contribute to slow cooling through modified Urca-like and baryon–baryon bremsstrahlung reactions. The implemented hyperonic slow rates follow the structure of the Maxwell [1987] treatment of neutrino processes in hyperonic matter. A generic hyperonic modified Urca process has the form 
+
+B1 + B2 → B3 + B4 + ℓ + ¯ νℓ,
+
+whereas a generic hyperonic bremsstrahlung process is 
+
+B1 + B2 → B3 + B4 + ν + ¯ ν. 
+
+Both classes scale as T 8. In compact notation the implemented rates are 
+
+QY 
+
+> MU
+
+= X
+
+> a
+
+RMU  
+
+> a
+
+CMU  
+
+> a
+
+IMU  
+
+> a
+
+(kF, 1, k F, 2, k F, 3, k F, 4) T 8,QY 
+
+> Br
+
+= X
+
+> a
+
+RBr  
+
+> a
+
+CBr  
+
+> a
+
+IBr  
+
+> a
+
+(kF, 1, k F, 2, k F, 3, k F, 4) T 8.
+
+The implemented hyperonic modified Urca channels are 
+
+Σ−Σ− → Σ−Λ, Σ−Λ → ΛΛ , Σ−n → Σ−p, Σ−n → Λn, Σ−p → Λp, 
+
+with the charged lepton and antineutrino emitted in the weak vertex. The implemented hyperonic bremsstrahlung channels are 
+
+Σ−n → Σ−n, Σ−p → Σ−p, Σ−Λ → Σ−Λ, Σ−Σ− → Σ−Σ−, Σ−p → Λn, 
+
+with a neutrino–antineutrino pair in the final state. The channel coefficients and momentum-space integrals are those of the cited microscopic treatment. 
+
+## 5.4 Fast Exotic and Kaon 
+
+The fast exotic sector already present in the original code is retained. In particular, the kaon condensate emissivity is kept in the form 
+
+QK = 54 sin 2 θK sin 2 θC
+
+ 2.21 × 10 26  m∗
+
+> n
+
+m∗
+
+> p
+
+ μe
+
+100 MeV 
+
+
+
+(1 + 3 g2
+
+> A
+
+)T 69 ,
+
+and the phenomenological fast contribution is written as 
+
+Qexo = Cexo 
+
+ ρ
+
+2.8 × 10 14 g cm −3
+
+2/3
+
+T pexo  
+
+> 9
+
+, Qfast = QK + Qexo .
+
+The legacy kaon kernel remains in the source, but the generalized NEW reader initializes its kaon angle θK to zero and does not map Yboson onto that variable. Consequently, the new bosonic column does not activate kaon emission. No new kaonic, pionic, or boson-induced neutrino channel is introduced by Yboson .
+
+## 5.5 PBF Contributions 
+
+For baryonic pair breaking and formation, the updated implementation keeps the standard singlet and triplet nucleonic channels and contains singlet-state hyperonic PBF kernels for Σ−, Σ+, Ξ0, and Ξ−. As noted in Sec. 4, this release does not expose dedicated Tc models for these four species through the distributed pairing input, so these terms are inactive with the default floor values unless corresponding source-level gap profiles are supplied. The baryonic PBF contribution implemented at kernel level is summarized as 
+
+QB 
+
+> PBF
+
+= Qn 1S0 
+
+> PBF
+
++ Qp 1S0 
+
+> PBF
+
++ Qn 3P2 
+
+> PBF
+
++ X 
+
+> Y=Σ −,Σ+,Ξ0,Ξ−
+
+QY 1S0 
+
+> PBF
+
+.
+
+The PBF rate is multiplied by the corresponding high density factor as 
+
+QB, impl PBF = γ2 
+
+> B
+
+QB, 0PBF ,
+
+while vector-current corrections and the axial-dominated singlet-channel treatment follow the standard PBF literature [Yakovlev et al., 1999, Kaminker et al., 1999, Leinson and Perez, 2006]. 75.6 Quark Emission Channels 
+
+For deconfined quark matter, the direct Urca reactions are 
+
+d → u + ℓ + ¯ νℓ, s → u + ℓ + ¯ νℓ,
+
+together with the corresponding inverse reactions. The charged lepton is ℓ = e, μ when the relevant branch is present; there is no independent sum over three neutrino flavors in these charged-current processes. The direct Urca contribution is 
+
+Qq 
+
+> DU
+
+= Qud  
+
+> DU
+
++ Qus 
+
+> DU
+
+,
+
+with unpaired kernels of the Iwamoto type [Iwamoto, 1980, 1982]. Color-resolved pairing suppression is retained through three factors for each branch, 
+
+Qud  
+
+> DU
+
+=
+
+
+
+R(1)  
+
+> ud
+
++ R(2)  
+
+> ud
+
++ R(3) 
+
+> ud
+
+
+
+Qud 
+
+> DU ,0
+
+,Qus  
+
+> DU
+
+=
+
+
+
+R(1)  
+
+> us
+
++ R(2)  
+
+> us
+
++ R(3) 
+
+> us
+
+
+
+Qus 
+
+> DU ,0
+
+.
+
+Thus, in the unpaired limit the explicit color sum gives the factor three associated with quark color and no additional factor of three is applied to quark direct Urca. The quark modified Urca and bremsstrahlung kernels are implemented as compact Iwamoto-type parametrizations [Iwamoto, 1982]. In this release they are evaluated from the phase-local quark baryon density 
+
+nqB = nqu + nqd + nqs
+
+3 ,
+
+and take the form 
+
+Qq 
+
+> MU
+
+= Rq
+
+> MU
+
+
+
+2.83 × 10 19 α2
+
+> c
+
+ nqB
+
+0.16 fm −3
+
+
+
+T 89
+
+
+
+erg cm −3 s−1,Qq 
+
+> Br
+
+= Rq
+
+> Br
+
+
+
+2.98 × 10 19 
+
+ nqB
+
+0.16 fm −3
+
+
+
+T 89
+
+
+
+erg cm −3 s−1.
+
+The factors Rq 
+
+> MU
+
+and Rq 
+
+> Br
+
+are averages over the active ud and us branches and over the three color slots within each active branch; they approach unity in the unpaired limit, so no additional overall factor of three multiplies these two compact slow emission kernels. The quark PBF contribution is evaluated as an explicit sum over flavors and colors, 
+
+Qq 
+
+> PBF
+
+= X 
+
+> f=u,d,s
+> 3
+
+X
+
+> c=1
+
+Θ
+
+
+
+T (c) 
+
+> c,f
+
+− T
+
+
+
+Aq
+
+ kF,f 
+
+1.68 fm −1
+
+
+
+T 79 Fq
+
+
+
+v(c)
+
+> f
+
+
+
+,
+
+with Aq = 3 × 10 21 and v(c) 
+
+> f
+
+= ∆ (c) 
+
+> f
+
+(T )/T . This term should be understood as a phenomenological singlet-pairing PBF contribution motivated by studies of neutrino emission in paired quark matter [Jaikumar and Prakash, 2001, Jaikumar et al., 2006]. In the original code, several strange quark and color-superconducting contributions are grouped in a monolithic routine. In the updated implementation, the quark sector is reorganized as 
+
+Qqν = Qq 
+
+> DU
+
++ Qq 
+
+> MU
+
++ Qq 
+
+> Br
+
++ Qq
+
+> PBF
+
+,
+
+so that each term can be activated locally according to the quark fractions, phase content, Fermi momenta and critical temperatures supplied by the pairing input. In this release the three color entries of a given flavor receive the same flavor dependent Tc, while the rate formulas retain the explicit color sums. 
+
+## 5.7 Phase Weighting and Activation of Processes 
+
+At each radial point, the active neutrino channels are selected by the local EOS composition, the correspond-ing kinematic thresholds, and the pairing suppressions discussed above. In mixed hadron–quark regions, the hadronic and quark contributions are combined through the local phase fractions. The total local emissivity is written as 
+
+Qν (r, T ) = fhad (r) QB 
+
+> DU
+
++ QB 
+
+> MU
+
++ QB 
+
+> Br
+
++ QB 
+
+> PBF
+
++ Qfast 
+
+
+
++ [1 − fhad (r)] [ Qq 
+
+> DU
+
++ Qq 
+
+> MU
+
++ Qq 
+
+> Br
+
++ Qq
+
+> PBF
+
+] . (5.1) 8The baryonic contribution contains the implemented nucleonic channels, octet-hyperon channels and explic-itly added Ξ transitions, while the quark contribution is activated only where the EOS supplies nonzero quark fractions and a nonzero quark volume fraction. The microscopic rates entering Eq. (5.1) are evaluated using the phase-local densities reconstructed from the global EOS fractions, as defined in Eqs. (4.1)–(4.2). This prescription preserves the original hadronic limit and activates quark emission only in regions where a quark component is explicitly present in the EOS table. 
+
+# 6 Discussion and conclusions 
+
+This work introduces a composition-driven extension of the NSCool NEW workflow for complete tabulated EOSs. Nucleonic, octet-hyperonic and quark emissivities are selected from the local tabulated composition, while phase-local densities and a hadronic volume fraction allow hadronic, quark and mixed regions to be handled by one interface. The contribution is methodological: established emissivities are reorganized rather than rederived. The generalized table is intentionally broader than the present emissivity library. Decuplet baryons and possible bosonic components can be propagated as EOS variables, but they do not activate dedicated channels in this version. Their effect is indirect, through the stellar structure, particle fractions, Fermi momenta, effective masses and thresholds of the implemented nucleonic, octet-hyperonic, Ξ and quark processes. The phase-weighted prescription provides a consistent computational interpolation between the purely hadronic and purely quark limits when the EOS supplies an unambiguous local volume fraction. Its micro-scopic interpretation remains tied to the thermodynamic construction of the input EOS and to whether its tabulated fractions are global or phase local. The numerical validation of the updated implementation is presented in Appendices A and B. The former compares the original and updated codes under controlled nucleonic conditions, while the latter demonstrates the generalized workflow for representative hadronic and quark-containing EOS tables. These calculations are intended solely as software validation tests and not as observational fits or EOS inference. When the additional exotic and quark fractions vanish and fhad = 1 , the generalized implementation reduces to the standard hadronic case. The extended framework thus preserves backward compatibility while providing a flexible basis for future studies of composition dependent compact star cooling, including different pairing scenarios, quark critical temperatures and mixed phase prescriptions. 
+
+# Acknowledgments 
+
+The authors acknowledge the MUSES Collaboration and the developers of the MUSES Calculation Engine for providing the modular computational framework used to construct and process the representative dense matter EOSs employed in this work. 
+
+# Data and software availability 
+
+The original NSCool package is available from its official distribution site [Page, 2016]. The extension developed in this work is publicly available at https://doi.org/10.5281/zenodo.21938691 as the portable 
+
+NSCool Update 1.0.0 patch. The patch is designed to be applied to the compatible original distribution and provides the updated source files together with the tools and instructions required for installation and execution. The EOS tables distributed with the official NSCool package are automatically converted to a format compatible with the extended NEW interface when the patch is applied. The original NSCool package is not redistributed. The MUSES CE EOS tables used for the representative calculations in this work are available from the authors upon reasonable request and can also be independently reproduced using the publicly available MUSES Calculation Engine https://musesframework.io , following the same EOS construction workflow and model choices adopted here. The DS(CMF) EOS tables used in the analysis are publicly available through the CompOSE database. 9References 
+
+Fernando Arias-Aragón and Federico Nola. Core composition effects on the qcd axion mass limit from neutron star cooling. Phys. Rev. D , Aug 2026. doi: 10.1103/3frv-1wm7. Salvatore Bottaro, Andrea Caputo, and Damiano F. G. Fiorillo. Neutrino emission in cold neutron stars: Bremsstrahlung and modified urca rates reexamined. Journal of Cosmology and Astroparticle Physics ,2024(11):015, 2024. doi: 10.1088/1475-7516/2024/11/015. Malte Buschmann, Christopher Dessert, Joshua W. Foster, Andrew J. Long, and Benjamin R. Safdi. Upper limit on the qcd axion mass from isolated neutron star cooling. Physical Review Letters , 128:091102, 2022. doi: 10.1103/PhysRevLett.128.091102. V. Dexheimer. Tabulated neutron star equations of state modeled within the chiral mean field model. 
+
+Publications of the Astronomical Society of Australia , 34:e006, 2017. V. Dexheimer and S. Schramm. Proto-neutron and neutron stars in a chiral SU(3) model. Astrophysical Journal , 683:943–948, 2008. doi: 10.1086/589735. V. Dexheimer, R. O. Gomes, T. Klähn, S. Han, and M. Salinas. GW190814 as a massive rapidly rotating neutron star with exotic degrees of freedom. Physical Review C , 103(2):025808, 2021. doi: 10.1103/ PhysRevC.103.025808. V. A. Dexheimer and S. Schramm. A novel approach to model hybrid stars. Physical Review C , 81:045201, 2010. doi: 10.1103/PhysRevC.81.045201. B. L. Friman and O. V. Maxwell. Neutrino emissivities of neutron stars. The Astrophysical Journal , 232: 541–557, 1979. doi: 10.1086/157313. Naoki Iwamoto. Quark beta decay and the cooling of neutron stars. Physical Review Letters , 44:1637–1640, 1980. doi: 10.1103/PhysRevLett.44.1637. Naoki Iwamoto. Neutrino emissivities and mean free paths of degenerate quark matter. Annals of Physics ,141:1–49, 1982. doi: 10.1016/0003-4916(82)90271-8. Prashanth Jaikumar and Madappa Prakash. Neutrino pair emission from cooper pair breaking and recom-bination in superfluid quark matter. Physics Letters B , 516:345–352, 2001. doi: 10.1016/S0370-2693(01) 00945-4. Prashanth Jaikumar, Craig D. Roberts, and Armen Sedrakian. Direct urca neutrino rate in colour super-conducting quark matter. Physical Review C , 73:042801, 2006. doi: 10.1103/PhysRevC.73.042801. A. D. Kaminker, P. Haensel, and D. G. Yakovlev. Neutrino emission due to proton pairing in neutron stars. 
+
+Astronomy and Astrophysics , 345:L14–L16, 1999. L. B. Leinson and A. Perez. Vector current conservation and neutrino emission from singlet-paired baryons in neutron stars. Physics Letters B , 638:114–118, 2006. doi: 10.1016/j.physletb.2006.05.036. T. Andrew Manning. Muses calculation engine, 2 2025. URL https://musesframework.io .O. V. Maxwell. Neutrino emissivities of hyperon stars. The Astrophysical Journal , 316:691–707, 1987. doi: 10.1086/165234. Federico Nola and Fernando Arias-Aragón. Eos-driven extension for hadronic and quark compact star cooling: Nscool extension tool, August 2026. URL https://doi.org/10.5281/zenodo.21938691 .Dany Page. NSCool: Neutron star cooling code, 2016. URL https://www.astroscu.unam.mx/neutrones/ NSCool/ .Dany Page and Sanjay Reddy. Dense matter in compact stars: Theoretical developments and observational constraints. Annual Review of Nuclear and Particle Science , 56:327–374, 2006. doi: 10.1146/annurev. nucl.56.080805.140600. Mateus Pelicer, Veronica Dexheimer, and Joaquin Grefa. An overview of the muses calculation engine and how it can be used to describe neutron stars. 2025. 10 A. Y. Potekhin, J. A. Pons, and Dany Page. Neutron stars—cooling and transport. Space Science Reviews ,191:239–291, 2015. doi: 10.1007/s11214-015-0180-9. Mateus Reinke Pelicer, Nikolas Cruz-Camacho, Carlos Conde, David Friedenberg, Satyajit Roy, Ziyuan Zhang, T. Andrew Manning, Mark G. Alford, Alexander Clevinger, Joaquin Grefa, et al. Building neutron stars with the muses calculation engine. Physical Review D , 111:103037, 2025. doi: 10.1103/PhysRevD. 111.103037. D. G. Yakovlev and C. J. Pethick. Neutron star cooling. Annual Review of Astronomy and Astrophysics ,42:169–210, 2004. doi: 10.1146/annurev.astro.42.053102.134013. D. G. Yakovlev, A. D. Kaminker, and K. P. Levenfish. Neutrino emission due to cooper pairing of nucleons in cooling neutron stars. Astronomy and Astrophysics , 343:650–660, 1999. 11 A Numerical validation of NSCool Update 1.0.0 10 2       
+
+> Age t[yr]
+> 0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00 log 10  L
+> 1.2 M
+> 1.4 M
+> 1.6 M
+> 1.8 M
+> 2.0 M
+
+Figure A.1: Difference in photon luminosity between the updated and original NSCool implementations for the MUSES CE npeμ sequence. Large filled symbols indicate the maximum deviations within the rapid cooling transition. The 1.0 M⊙ sequence is omitted because its maximum occurs near the late-time cutoff. This appendix documents the numerical comparison of NSCool Update 1.0.0 with the original NSCool 
+
+implementation. The calculations are verification tests of the released computational update and are not used for observational likelihood analysis, population inference or EOS selection. All calculations use TOV profiles generated from the selected EOS, an iron envelope, vanishing pairing gaps, standard conductivity and no heating, magnetic field or accretion. PBF is therefore inactive in these runs and the cooling curves are deliberately unsuppressed software validation baselines rather than calibrated population models. 
+
+## A.1 Direct comparison with the original NSCool implementation 
+
+The controlled comparison uses the MUSES CE npeμ EOS and gravitational masses M = 1 .0, 1.2, 1.4, 1.6, 1.8
+
+and 2.0 M⊙. The EOS, stellar profiles and all auxiliary inputs are identical in the original and updated calculations. Exotic fractions vanish and fhad = 1 , so the hyperonic, resonant-baryonic and quark additions are inactive. The active physical difference is the simultaneous replacement of both nucleonic modified Urca branches and the nn , np and pp bremsstrahlung kernels by the prescriptions described in Sec. 5.1, including the γ6
+
+high density factor. Nucleonic direct Urca is unchanged, and PBF is absent because all gaps vanish. The comparison therefore tests the complete revised slow nucleonic sector, not modified Urca alone. To isolate the narrow transition displacement we use the code comparison diagnostic 
+
+∆ log 10 L∞ 
+
+> γ
+
+(t; M ) = log 10 
+
+" L∞
+
+> γ, updated
+
+(t; M )
+
+L∞
+
+> γ, original
+
+(t; M )
+
+#
+
+. (A.1) Positive values correspond to a larger photon luminosity in the updated run at the same age, while negative values correspond to a smaller luminosity. The largest deviations are concentrated in the narrow interval where the cooling curves cross the steep luminosity drop at slightly different ages. Because the curves are nearly vertical in this region on a log– log cooling diagram, a modest horizontal displacement can generate a large instantaneous luminosity ratio without implying a global renormalization of the cooling curve. The 1.0 M⊙ sequence is a special late-time case: its largest ratio occurs close to the final luminosity cutoff, where the small denominator amplifies a minor timing difference. Figure A.1 shows only the transition window for 1.2–2.0 M⊙. The 1.0 M⊙ maximum is excluded from the figure because it occurs at the final late-time cutoff, where the small denominator amplifies a minor timing difference. For 1.2–2.0 M⊙, the maximum ∆ log 10 L∞ 
+
+> γ
+
+ranges from 1.32 to 1.91 at ages decreasing from about 313 to 72 yr. Over the full common computed domains the most negative deviation is only 
+
+−5.2 × 10 −3. The update therefore shifts the rapid transition rather than globally rescaling the luminosity. 12 B Representative EOS workflow checks 10 28                                                 
+
+> 10 30
+> 10 32
+> 10 34
+> L [erg s  1]
+> (a) MUSES npe (Mmax = 2.021 M)(b) MUSES Octet (Mmax = 1.942 M)
+> 10 28
+> 10 30
+> 10 32
+> 10 34
+> L [erg s  1]
+> (c) MUSES Delta (Mmax = 2.020 M)(d) DSCMF7 (Mmax = 2.054 M)
+> 10 010 210 410 6
+> Age t[yr]
+> 10 28
+> 10 30
+> 10 32
+> 10 34
+> L [erg s  1]
+> (e) DSCMF7 Hybrid (Mmax = 2.004 M)
+> 10 010 210 410 6
+> Age t[yr]
+> (f) MUSES Quark (Mmax = 1.747 M)
+> 1.0 M1.2 M1.4 M1.6 M1.8 M2.0 M
+
+Figure B.1: Representative cooling sequences for six EOS tables using the same auxiliary inputs. Only stable configurations are shown. The panels illustrate the generalized workflow across hadronic and quark-containing compositions and are not intended as EOS fits or observational comparisons. This appendix illustrates the generalized composition-driven interface using representative EOS compo-sitions under the same auxiliary setup adopted for the numerical validation. The calculations are intended as functional tests of the workflow rather than as EOS comparisons or fits to the observed cooling population. The representative EOS set is taken from Ref. Arias-Aragón and Nola [2026]. The nucleonic, octet, delta and quark-containing MUSES CE models were generated with the MUSES Calculation Engine [Manning, 2025, Reinke Pelicer et al., 2025, Pelicer et al., 2025]; DSCMF7 and DSCMF7 Hybrid provide external DS(CMF) benchmarks [Dexheimer and Schramm, 2008, 2010, Dexheimer, 2017, Dexheimer et al., 2021]. The same interface is then exercised on the MUSES CE npeμ , Octet, Delta and Quark EOSs and the DSCMF7 and DSCMF7 Hybrid tables. Figure B.1 collects the representative stable lines retained from the validated calculations. The production maximum masses are shown in the panel titles; configurations above those maxima are not plotted. More massive MUSES npeμ , Octet and Delta configurations generally reach the rapid luminosity drop earlier because their cores sample higher densities and larger volumes of efficient emission. Delta states 13 affect these calculations only indirectly because the current library assigns them no dedicated weak channel. The DSCMF7 and DSCMF7 Hybrid panels remain close over much of the adopted baseline setup, while the most massive cases enter rapid cooling earlier. The MUSES Quark panel demonstrates local activation of quark emissivities from the same table structure. These curves establish functionality across different EOS compositions; a unique physical attribution would require radial activation volumes and process-by-process ablation runs. 14
