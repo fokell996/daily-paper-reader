@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-09-13 <!--dpr-date:20260913-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202609/13/2609.07774v1-search-for-long-transient-gravitational-waves-from-supernova-sn2023ixf-using-gfh-v2-pipeline" data-sidebar-item="{&quot;title&quot;: &quot;Search for Long-Transient Gravitational Waves from Supernova SN2023ixf using GFH-v2 Pipeline&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2609.07774v1-search-for-long-transient-gravitational-waves-from-supernova-sn2023ixf-using-gfh-v2-pipeline&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;pulsar-frb&quot;}], &quot;evidence&quot;: &quot;搜寻新生磁星遗迹的引力波&quot;}">Search for Long-Transient Gravitational Waves from Supernova SN2023ixf using GFH-v2 Pipeline</a>
   * 2026-09-12 <!--dpr-date:20260912-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202609/12/2609.10184v1-the-first-meerkat-s-band-globular-cluster-pulsar-survey" data-sidebar-item="{&quot;title&quot;: &quot;The first MeerKAT S-band globular cluster pulsar survey&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2609.10184v1-the-first-meerkat-s-band-globular-cluster-pulsar-survey&quot;, &quot;score&quot;: &quot;9.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;pulsar-frb&quot;}], &quot;evidence&quot;: &quot;球状星团脉冲星巡天，发现新毫秒脉冲星&quot;}">The first MeerKAT S-band globular cluster pulsar survey</a>
