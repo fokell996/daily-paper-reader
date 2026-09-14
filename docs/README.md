@@ -6,26 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-09-13
-- 运行时间：2026-09-13 21:57:29 UTC
+- 最新运行日期：2026-09-14
+- 运行时间：2026-09-14 22:46:04 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：0
+- 本次总论文数：2
+- 精读区：1
 - 速读区：1
 
 ### 今日简报（AI）
-今日速读1篇、精读0篇，焦点是《用GFH-v2 Pipeline搜寻超新星SN2023ixf的长瞬变引力波》。
-最值得看的是“超新星+长瞬变引力波”交叉方向，以及GFH-v2流水线在真实事件上的应用尝试。
-普通读者可先看摘要了解其搜索设置与结果，再关注SN2023ixf后续多信使观测是否更新。
-- 详情：[/202609/13/README](/202609/13/README)
+今日精读磁星壳层中子海洋自旋极化研究（8.0分），速读两颗蜘蛛脉冲星候选体的光学跟踪（6.0分）。最值得看磁星壳层中中子海洋自旋极化如何影响磁场演化，以及红背脉冲星与疑似双巨星冒名者的光学特征。普通读者可先读精读论文了解磁星内部物理，再关注速读中双星系统的后续观测。
+- 详情：[/202609/14/README](/202609/14/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Spin-polarization of the neutron ocean in magnetar crusts](/202609/14/2609.12539v1-spin-polarization-of-the-neutron-ocean-in-magnetar-crusts)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：磁星壳层结构关联巨耀发与快速射电暴
 
 ### 速读区论文标签
-1. [Search for Long-Transient Gravitational Waves from Supernova SN2023ixf using GFH-v2 Pipeline](/202609/13/2609.07774v1-search-for-long-transient-gravitational-waves-from-supernova-sn2023ixf-using-gfh-v2-pipeline)  
+1. [Optical Follow-Up of Two Spider Pulsar Candidates: An Irradiated Redback and a Possible Double Giant Impostor](/202609/14/2609.12618v1-optical-follow-up-of-two-spider-pulsar-candidates-an-irradiated-redback-and-a-possible-double-giant-impostor)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：搜寻新生磁星遗迹的引力波
+   evidence：蜘蛛脉冲星候选体的光学跟踪观测及性质判定
 
 
 <div class="dpr-home-promo-card">
