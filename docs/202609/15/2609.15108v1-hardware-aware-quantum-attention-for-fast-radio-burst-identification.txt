@@ -1,0 +1,1026 @@
+Hardware-aware quantum attention for fast radio burst
+identification
+Li He1*, Xuan Yang2 ∗, Feng Xiong1 ∗, Songbo Zhang2,††, Qiuhao Chen1,†‡, Yuchen He1, Yunxiang
+Yang1, Jun Lu1, Claudio Furtado3,4, Amilcar R. Queiroz5,4§, Xinping Deng6,7¶, Yang Wu6,7, Xuefeng
+Wu2,8||
+1Yangtze Delta Industrial Innovation Center of Quantum Science and Technology, Suzhou 215000,
+China
+2Purple Mountain Observatory, Chinese Academy of Sciences, Nanjing 210023, China
+3Departamento de F´ısica, Universidade Federal da Para´ıba, 58051-970, Jo˜ao Pessoa, PB, Brazil
+4CIQUANTA-PB (Centro Internacional de Computac¸˜ao Quˆantica), Estac¸˜ao Cabo Branco, Avenida
+Jo˜ao Cirillo da Silva, 58046-010, Jo˜ao Pessoa, PB, Brazil
+5Unidade Acadˆemica de F´ısica, Universidade Federal de Campina Grande, R. Apr´ıgio Veloso 882,
+Bairro Universit´ario, 58429-900, Campina Grande, PB, Brazil
+6The 54th Institute of China Electronics Technology Group Corporation, 498 Zhongshan W Rd,
+Shijiazhuang 050002, Hebei, China
+7China-Brazil Belt and Road Joint Laboratory on Radio Astronomy Technology, 498 Zhongshan
+W Rd, Shijiazhuang 050002, Hebei, China
+8School of Astronomy and Space Sciences, University of Science and Technology of China, Hefei
+230026, China
+Fast radio bursts (FRBs) are millisecond-duration extragalactic pulses whose discovery re-
+quires searches over large signal-parameter spaces and the rejection of candidate sets domi-
+nated by radio-frequency interference and noise. Integrating quantum processors into FRB
+searches requires a workflow connecting telescope data to hardware-compatible models.
+Here we develop a pipeline that converts raw search-mode PSRFITS data into dynamic-
+spectrum segments and identifies FRB-like signals using a hybrid Quantum Vision Trans-
+former (QViT). On labelled FAST data, the selected QViT achieves a mean accuracy of
+94.00% and recall of 98.30%, with similar performance to a compact classical Vision Trans-
+former. Recall reaches 97.11% on an FRB source excluded from training and model selection.
+Real-device execution on 82 segments yields a mean simulator–hardware Hellinger fidelity of
+0.9161±0.0074. The workflow connects raw telescope data to quantum-assisted identification
+and provides an experimental basis for assessing the measurement requirements that must
+be addressed before survey-scale deployment.
+*These authors contributed equally to this work.
+†Email: sbzhang@pmo.ac.cn
+‡Email: chenqiuhao@tgqs.net
+§Email: amilcarq@df.ufcg.edu.br
+¶Email: xinping.deng@foxmail.com
+||Email: xfwu@pmo.ac.cn
+1
+arXiv:2609.15108v1  [astro-ph.HE]  14 Sep 2026
+
+
+Fast radio bursts (FRBs) are bright, millisecond-duration radio transients of extragalactic
+origin 1–3. Their detection usually involves searching over dispersion measure, pulse width and ar-
+rival time, followed by the rejection of candidates dominated by radio-frequency interference (RFI)
+and noise 4–10. Machine-learning classifiers have reduced this inspection burden 11,12, and recent
+approaches identify bursts directly in non-dedispersed dynamic spectra 13. A model that exam-
+ines segments formed directly from telescope observations can identify FRB-like signals without
+requiring candidate-derived alignment.
+FRB identification is already tractable with classical artificial intelligence. Against this back-
+ground, we investigate quantum machine learning 14–17 as a complementary and exploratory route,
+rather than as a replacement for established classical approaches at this stage. Parameterized quan-
+tum circuits provide trainable feature maps with structures that differ from those of classical neural-
+network layers 18–20. Quantum-native subroutines may eventually offer different resource scaling
+for selected transformations or searches 21–24, but any practical benefit must be assessed together
+with data loading and state preparation, measurement and readout, fault-tolerance overheads, and
+classical–quantum data movement 25–29.
+Attention-based architectures are well suited to learning relationships among distributed fea-
+tures in a time–frequency representation 30. In a hybrid Quantum Vision Transformer (QViT),
+parameterized quantum circuits replace the learned linear projections that generate query, key and
+value representations, after which conventional scaled dot-product attention performs token-to-
+token mixing 31,32. Present quantum processors constrain the number of qubits, circuit depth,
+measurement budget and executable model size. We therefore co-design the attention dimensions
+and quantum circuits for real-device execution and compare them with a classical Vision Trans-
+former in the same low-dimensional regime. This approach uses current hardware to explore a
+complementary algorithmic route while making its practical constraints explicit.
+Here we develop a hardware-aware QViT for identifying FRB-like signals in dynamic-spectrum
+segments constructed from raw search-mode PSRFITS data 33. The identification workflow links
+data preparation, image construction and hybrid quantum–classical inference.
+Using labelled
+FAST observations 34 34 of two repeating FRBs 1 and one rotating radio transient (RRAT) 35, we
+compare QViT with a classical ViT, evaluate transfer to an FRB source excluded from training and
+model selection, and test a hardware-compatible configuration on a real quantum processor.
+Results
+The identification workflow constructs dynamic-spectrum images from selected intervals of PSR-
+FITS data and assigns an FRB-like probability to each segment (Figure 1). We evaluate the models
+on labelled FAST segments, followed by a source-held-out test and a comparison of simulator and
+real-device outputs. With the default preprocessing, blocks of 16 adjacent frequency channels and
+16 consecutive time samples are averaged before each image is resized to 288 × 288 pixels. Con-
+ventional single-pulse searches provide labels and identify the intervals used to construct positive
+examples; their candidate scores are not supplied to the model. This defines the inference path
+from raw telescope data to segment-level FRB identification.
+2
+
+
+The training sources comprise two repeating FRBs, FRB 20220529 10,36 (1243 pulses) and
+FRB 20201124A 9 (1093 pulses), and the rotating radio transient RRAT J1913+1330 37 (664
+pulses).
+These 3000 astrophysical pulses form the FRB-like class, and 3000 segments from
+single-pulse candidates that manual vetting rejected as RFI or other non-astrophysical signals
+form the negative class. The 3000 positive and 3000 negative segments are divided into training
+(2400+2400), validation (300+300) and test (300+300) partitions, and a separate source-held-out
+set of 114 + 114 segments from FRB 20220912A 38 forms an additional test set that is excluded
+from training and model selection and is used to validate both models on a source absent from
+training (Extended Data Table 1). Within each model family, candidate configurations are ranked
+on the validation partition; the test partition provides an independent evaluation of the selected
+models, and FRB 20220912A tests transfer to an unseen source. All reported evaluations use
+labelled segments drawn from FAST observations.
+Comparison with classical attention
+ViT and QViT were evaluated over the same predefined ranges for corresponding architectural
+parameters. Within each model family, we selected the configuration with the highest mean recall
+on the validation set across 10 independent seeds. The selected configurations were then evaluated
+on the test set, which was not used for model selection. Table 1 reports the selected configurations
+as the mean and standard deviation over 10 independent seeds.
+On the main test set, QViT achieves an accuracy of 94.00 ± 0.48% and a recall of 98.30 ±
+0.60%, compared with 93.83 ± 0.60% and 98.23 ± 0.22%, respectively, for ViT. QViT attains a
+precision of 90.52 ± 0.62% and an F2 score of 96.64 ± 0.50%; the corresponding ViT values are
+90.30 ± 1.02% and 96.54 ± 0.26%. The differences in mean accuracy, recall, precision and F2
+are 0.17, 0.07, 0.22 and 0.10 percentage points, respectively. The selected configurations therefore
+show similar observed performance on this dataset, with recall above 98% and precision close to
+90%. Because configurations were ranked on the validation partition and the decision threshold
+was fixed there, the test partition provides an independent evaluation of the selected models.
+We examined the dependence of recall on the signal-to-noise ratio (SNR) reported by the
+single-pulse search (see Methods for details), as weak signals are generally more challenging
+cases for transient identification 12. The provisional analysis divides the test data into low-SNR
+(SNR < 12) and high-SNR (SNR ≥12) subsets (Extended Data Table 2 and Extended Data
+Fig. 1). QViT attains a low-SNR recall of 96.62 ± 1.39%, compared with 95.88 ± 0.93% for ViT.
+The corresponding high-SNR recalls are 98.79 ± 0.53% and 98.92 ± 0.23%, respectively.
+Generalization to a source excluded from training
+The selected models were evaluated on FRB 20220912A using the trained weights and thresholds
+fixed with validation data. On this source-held-out dataset, QViT reaches an accuracy of 94.91 ±
+3
+
+
+0.72% and a recall of 97.11±1.31%, compared with 95.09±0.54% and 97.90±0.74%, respectively,
+for ViT (Table 1). QViT has a precision of 93.07±1.81% and an F2 score of 96.26±0.82%, whereas
+ViT achieves 92.69±0.51% and 96.80±0.64%. Both models retain high recall for a source absent
+from training. QViT has a slightly higher mean precision, while ViT has higher mean accuracy,
+recall and F2 on this dataset.
+Consistency between simulated and real-device outputs
+The trained quantum-attention circuits were executed on the Baihua quantum processor in a hybrid
+quantum–classical configuration. Only the Q/K/V projection circuits were submitted to the quan-
+tum processing unit (QPU). PSRFITS reading, frequency–time averaging and dynamic-spectrum
+image construction were performed on the CPU, whereas image preprocessing, tokenization, atten-
+tion weighting, normalization, feedforward processing and classification remained on conventional
+GPU-accelerated hardware. Real-device measurements were then passed through the remaining
+classical layers to assess their downstream effect on segment classification. Because misidentifi-
+cation is most likely for weak signals, and real-device execution is resource-limited, the hardware-
+validation subset was drawn from the low-SNR portion of the main test partition. It contains 82
+labelled segments, comprising 41 low-SNR FRB-like and 41 RFI segments. It uses a six-qubit
+configuration, 204 Q/K/V circuit evaluations per image and 20,000 shots per circuit (Fig. 2), cor-
+responding to 4.08×106 shots per image. This is a hardware-compatible configuration of the same
+QViT projection module; its register size, circuit depth and token count are set by what the device
+can execute rather than by the architecture sweep.
+We compared the real-device outputs with the corresponding simulator outputs at two levels:
+the measurement probability distributions and the Pauli-Z expectation-value vectors used as quan-
+tum features. The mean Hellinger fidelity between the simulated and measured distributions is
+0.9161 ± 0.0074 (Fig. 4). The mean cosine similarity between the simulated and measured feature
+vectors is 0.9853 ± 0.0022 (Extended Data Fig. 2). These measurements indicate agreement in the
+output distributions and in the direction of the feature vectors for the tested inputs, while allowing
+deviations in the final classification decisions.
+Table 2 provides a complementary comparison of the downstream classification outcomes
+for these same 82 images. Of the 41 FRB-like segments, 33 are correctly identified using simu-
+lated projections and 34 using real-device projections. Of the 41 RFI segments, 40 are correctly
+identified with simulated projections and 34 with real-device projections.
+Discussion
+This work connects raw telescope observations to quantum-assisted FRB identification within a
+single processing workflow. Designing the QViT around executable circuits makes the quantum
+projection module part of that workflow and allows its behaviour to be tested on a real processor.
+The resulting implementation provides a starting point for evaluating successive quantum mod-
+4
+
+
+els against a common observational task as hardware capabilities develop. The quantum circuits
+replace only the Q/K/V projections; attention mixing and the downstream transformer and classi-
+fication layers remain classical. Present limits on qubit number, circuit depth, token sequence and
+measurement throughput determine the compact model used here.
+The real-device results provide a component-level consistency test. The simulator and hard-
+ware produce broadly similar projection outputs, but the class-wise outcomes in Table 2 show that
+projection-level agreement does not guarantee identical final decisions. Given the limited valida-
+tion set, these results are a component-level consistency check rather than an accuracy or recall
+benchmark for the device. Repeated circuit evaluations, finite-shot measurement and classical–
+quantum communication remain the principal obstacles to scaling the present implementation.
+Larger qubit registers and more reliable circuits could support wider attention representa-
+tions and deeper trainable projections within the same workflow. Faster readout, efficient batching
+and reduced communication overhead would also be needed to translate these improvements into
+higher processing throughput. If model capacity and end-to-end speed improve together, quantum-
+assisted identification could become relevant to data-intensive projects such as SKA 39, FASTCA 40
+and to high-throughput coherent all-sky monitors such as CASM-256 41. The present implementa-
+tion provides a framework in which those developments can be tested against the requirements of
+astronomical searches.
+Methods
+Observational data and construction of labels
+The analysis uses raw search-mode intensity data stored in PSRFITS format from FAST observa-
+tions 34 of two repeating FRBs (FRB 20220529 10,36 and FRB 20201124A 9) and one rotating radio
+transient (RRAT J1913+1330 37). A separate FRB source, FRB 20220912A 38, is excluded from
+training and model selection and is used only for source-held-out evaluation. Here, “raw” denotes
+the channelized search-mode intensity array read from the PSRFITS file.
+The datasets were obtained with the FAST 19-beam L-band receiver over 1000–1500 MHz,
+split into 4096 frequency channels, digitized at 8-bit sampling with a ROACH2 backend and
+recorded at a sampling interval of 49.152 µs. Bursts were identified for label construction us-
+ing single-pulse pipelines based on PRESTO 42 and HEIMDALL 43, with trial DMs of around the
+source’s DM values. Events above an S/N threshold of 7 were retained and manually vetted.
+Conventional single-pulse searches are used only to assign supervised labels and to identify
+the raw-data intervals from which positive training segments are drawn. Search S/N, trial-DM
+curves and candidate rankings are not supplied as model inputs. Each constructed segment receives
+one of two labels. The positive class comprises astrophysical pulses from the two repeating FRBs
+and RRAT J1913+1330; the RRAT is included to broaden the training morphology of dispersed
+single pulses. The negative class comprises RFI and other non-astrophysical segments. All images
+related to the same physical pulse, neighbouring raw-data interval or observing unit are assigned
+5
+
+
+to a single data partition before augmentation.
+PSRFITS segmentation and dynamic-spectrum construction
+The preprocessing stage constructs a dynamic-spectrum image from each selected interval of a
+PSRFITS observation 33. The PSRFITS reader loads the channelized intensity array, which we de-
+note by I(c, s), where c indexes frequency channel and s indexes time sample. Each search-mode
+PSRFITS file corresponds to one beam of one observation and is processed independently; no
+combination across beams is performed. Total intensity is formed from the polarization channels
+stored in the SUBINT table according to POL TYPE: for Stokes data the Stokes-I channel is taken;
+for dual-polarization data (for example AABBCRCI) the two hands of polarization are averaged as
+1
+2(A+B); and for single-polarization data the single recorded channel is used unchanged. Narrow-
+band interference is removed after the block averaging described below: channels whose summed
+power or whose temporal standard deviation deviates from the corresponding robust estimate by
+more than 3σ are identified by iterative sigma clipping and replaced by the mean of the retained
+channels. Bad channels are therefore substituted rather than masked, so that no missing, flagged
+or undefined values enter the image.
+Within each file segment, the intensity array is block-averaged over Nf adjacent frequency
+channels and Nt consecutive time samples,
+¯I(i, j) =
+1
+NfNt
+Nf−1
+X
+p=0
+Nt−1
+X
+q=0
+I(iNf + p, jNt + q),
+where the default values are Nf = 16 channels and Nt = 16 samples. For the FAST setup
+with 4096 channels over 1000–1500 MHz and a raw sampling interval of 49.152 µs, these defaults
+produce 256 frequency bins with a channel width of approximately 1.953 MHz and a binned time
+resolution of approximately 0.786 ms.
+Each block-averaged segment is rendered as a two-dimensional dynamic-spectrum image
+with frequency and time along its two axes. The channel order is flipped where necessary so that
+the lowest frequency lies at the bottom of the image. The image is contrast-stretched by clipping
+the binned intensities of that segment to the interval [µ −3σ, µ + 3σ], where µ and σ are the mean
+and standard deviation of that segment’s own binned intensities, and mapping this interval linearly
+onto a single-channel greyscale ramp in which low values are white and high values are black;
+nearest-neighbour resampling is used, and the result is written as a PNG file. The image is then
+resized to 288×288 pixels before it is read by the model data loader. No de-dispersion or additional
+arrival-time alignment is applied before image construction, preserving the frequency-dependent
+pulse structure. Positive and negative segments are drawn from intervals identified by conventional
+searches and assigned labels through manual vetting. The model receives only the resulting image;
+search S/N, trial-DM curves and candidate rankings are not supplied as input features.
+6
+
+
+Parameterized quantum feature maps
+The image produced from each raw-data segment is loaded using the same resizing and normaliza-
+tion procedure used during training. QViT returns a two-class probability vector, and the segment
+is flagged when its FRB-like probability exceeds a threshold fixed using the validation data. QViT
+uses parameterized quantum circuits (PQCs) as trainable feature maps within the attention mod-
+ule. For a head-level input vector x ∈Rdh, an nq = dh qubit register is initialized in |0⟩⊗nq,
+transformed by a data-encoding unitary Uenc(x) and a trainable unitary U(θ), and measured in the
+Pauli-Z basis,
+|ψ(x; θ)⟩= U(θ)Uenc(x)|0⟩⊗nq,
+zm = ⟨ψ|Zm|ψ⟩.
+The measurement vector z = [z1, . . . , znq] is therefore a dimension-preserving real-valued trans-
+formation from Rdh to Rdh. The quantum circuit is not a stand-alone classifier; it replaces one
+projection layer inside an otherwise hybrid quantum–classical attention model.
+ViT baseline
+The classical ViT follows the same tokenization scheme and overall encoder framework as QViT,
+while using classical linear Q/K/V projections. For both model families, the corresponding ar-
+chitectural parameters were varied over the same predefined ranges, and each configuration was
+trained using the same optimization protocol. All evaluated configurations are reported, while
+the configuration with the highest observed test-set recall within each model family is highlighted
+for descriptive comparison. Because these peak-recall configurations were identified indepen-
+dently, their embedding dimensions, projection dimensions, and parameter counts may differ. It is
+deliberately constrained in a hardware-compatible manner: attention and embedding dimensions
+are matched to the quantum implementation, and parameter counts in the projection modules are
+matched where possible or reported explicitly where exact matching is not possible. The input
+dynamic spectrum is denoted by Z0 ∈R1×H×W, where (H, W) is the image resolution.
+Patch embedding and tokenization. The implementation uses two convolutional projections.
+The first projection has kernel and stride (h1, w1) and maps Z0 to a d-channel feature map Z1 ∈
+Rd×m1×n1, where m1 = H/h1 and n1 = W/w1. A second convolution with kernel and stride (k, k)
+merges each non-overlapping k × k neighbourhood and returns Z2 ∈Rd×m2×n2, with m2 = m1/k
+and n2 = n1/k. Flattening the spatial axes gives N0 = m2n2 image tokens Z3 ∈RN0×d. A
+learnable classification token tcls ∈Rd is prepended and a positional embedding Epos ∈RN×d is
+added,
+X0 = [tcls; Z3] + Epos,
+where N = N0 + 1. The resulting sequence is propagated through L transformer encoder blocks.
+Multi-head self-attention. Let Xℓ∈RN×d be the token sequence entering the ℓ-th encoder block.
+The classical transformer block is
+Yℓ= Xℓ+ MSA(Norm(Xℓ)),
+Xℓ+1 = Yℓ+ MLP(Norm(Yℓ)),
+7
+
+
+where Norm(·) is the RMS normalization used in the implementation and MLP(·) is a multi-layer
+perceptron with a GELU nonlinearity. Given U = Norm(Xℓ), multi-head self-attention forms
+query, key and value matrices by three learned linear projections,
+Q = UWQ,
+K = UWK,
+V = UWV ,
+with WQ, WK, WV ∈Rd×datt, datt = nhdh and nh the number of attention heads. These are split
+into nh heads, Q(i), K(i), V(i) ∈RN×dh, each computing scaled dot-product attention
+A(i) = Softmax
+Q(i)(K(i))⊤
+√dh
+
+V(i),
+and the concatenated head outputs are projected back to the embedding dimension via
+MSA(U) = AWO + bO,
+with A = [A(1), . . . , A(nh)] ∈RN×datt, WO ∈Rdatt×d, bO ∈Rd. The same encoder struc-
+ture and output projection WO are used by both models, so the only difference between the two
+architectures lies in the projection module.
+Classification head. The full model is p = Softmax(Classifier(ocls)), where ocls ∈Rd is the
+output of the classification token after the final block, and
+Classifier(ocls) = oclsWcls + bcls,
+with Wcls ∈Rd×Ccls, bcls ∈RCcls and p = [pc]c∈C. QViT and ViT use the same functional form for
+the classification head, with the input dimension matched to the embedding dimension d of each
+respective configuration and the same output dimension Ccls.
+Quantum multi-head self-attention
+Let U ∈RN×d denote the normalized token matrix entering QMSA(·). QViT keeps the usual
+multi-head organization, but replaces the learned linear maps that generate queries, keys and values
+with parameterized quantum circuits. The embedding dimension is split into nh heads, U =
+[U(1), . . . , U(nh)] with U(i) ∈RN×dh and d = nhdh. For the i-th head, three independent quantum
+projections generate the query, key and value representations,
+Q(i) = QProjQ(U(i)),
+K(i) = QProjK(U(i)),
+V(i) = QProjV (U(i)),
+each applied row by row. With angle encoding, a head-level token vector of length dh is encoded
+on nq = dh qubits and Pauli-Z measurements return one real number per qubit, so the quantum
+projection maps Rdh to Rdh. Because the circuit is dimension-preserving, the head outputs already
+have dimension d, and QViT uses the same output projection WO as the ViT baseline, so the two
+architectures differ only in the projection module.
+8
+
+
+Enhanced parameterized quantum circuit. The enhanced PQC adds a trainable enhancement
+block before data encoding, followed by repeated variational layers. Each circuit starts from |0⟩⊗nq.
+The enhancement unitary is
+Uenh = U (0)
+entU (0)
+rot,
+U (0)
+rot =
+nq
+O
+m=1
+RY (αm)RZ(βm),
+U (0)
+ent =
+nq−1
+Y
+m=1
+CZm,m+1,
+with trainable αm, βm, and CZm,m+1 a controlled-Z gate between adjacent qubits. The input
+encoding unitary is
+Uenc(xj) =
+nq
+O
+m=1
+RX(xj,m),
+and the variational layer is Ulayer = UentUrot with
+Urot =
+nq
+O
+m=1
+RY (ϕm)RZ(ψm),
+Uent =
+nq−1
+Y
+m=1
+CZm,m+1.
+For circuit depth Lq, the repeated variational unitary is UPQC = QLq
+ℓ=1 U (ℓ)
+layer, and the full circuit is
+PQC⋆(xj; θ⋆) = UPQCUenc(xj)Uenh|0⟩⊗nq,
+where operators act from right to left. After preparing |ψ⟩, each qubit is measured in the Pauli-Z
+basis, returning z = [z1, . . . , znq] ∈Rnq with zm = ⟨ψ|Zm|ψ⟩. Parameter-budget sweeps modify
+only the trainable gates inside PQC⋆(·); tokenization, attention-head structure and the classifier
+are unchanged.
+Evaluation metrics and hardware consistency
+Accuracy and recall: The model makes a signal/background decision per dynamic-spectrum seg-
+ment. With TP, TN, FP and FN the true/false positives and negatives,
+Acc =
+TP + TN
+TP + TN + FP + FN ,
+Recall =
+TP
+TP + FN .
+These quantities evaluate classification of labelled segments. They should not be interpreted as
+event-level search completeness or false-positive rate per observing hour, which require blind scan-
+ning of continuous observations.
+Hellinger fidelity: To compare ideal noiseless simulation with quantum hardware output distribu-
+tions we used the Hellinger fidelity,
+FH(p, q) =
+ X
+i
+√piqi
+!2
+,
+9
+
+
+where pi and qi are the probabilities of outcome i from simulation and hardware. FH ∈[0, 1], with
+values closer to 1 indicating closer agreement.
+Cosine similarity of measured quantum features: We also computed the cosine similarity be-
+tween simulated and real-device measurement vectors,
+Scos(s, r) =
+s · r
+∥s∥2∥r∥2
+,
+where s and r are the measured Pauli-Z expectation-value vectors from simulation and real-device
+execution; a value close to 1 indicates that the device returns a feature vector aligned with the
+simulator output.
+Statistical analysis
+Model performance is summarized over independent random initializations using the mean and
+standard deviation. QViT and ViT are evaluated on identical data partitions, with the decision
+threshold fixed using validation data. Because multiple segments may originate from the same
+pulse or observation, segment-level predictions are not assumed to be mutually independent. No
+confidence intervals or hypothesis tests are reported here; the reported standard deviations describe
+run-to-run variability across the 10 seeds.
+The QViT patch-embedding module uses a convolutional stem with total stride (48, 48) for
+the 288 × 288 input, producing a 6 × 6 patch grid, or 36 image tokens; after adding the CLS
+token the sequence length is N = 37. The number of attention heads was fixed at nh = 4. The
+training script uses a one-block encoder, learnable positional embeddings, RMS normalization,
+GELU activation in the MLP, an MLP expansion ratio 6.0 and linear dropout probability 0.1. Each
+configuration was repeated over 10 independent random seeds. Training used a batch size of 32
+and 120 epochs, with AdamW (learning rate 4 × 10−4, weight decay 10−2), an 8-epoch warm-up
+followed by cosine decay, Focal loss with γ = 2.0 and label smoothing 0.005, and best-checkpoint
+selection by validation-set FRB-class F2.
+For real-device validation, we used the separate hardware-compatible configuration shown
+in Figure 2: nq = dh = 6, nh = 4, N = 17 and Lq = 0. The three Q/K/V projections across the
+four heads therefore require 3 × 4 × 17 = 204 circuit evaluations per image. This configuration
+is distinct from the four-qubit, one-variational-layer, N = 37 model used for the comparison in
+Table 1.
+10
+
+
+1. Lorimer, D. R., Bailes, M., McLaughlin, M. A., Narkevic, D. J. & Crawford, F. A Bright
+Millisecond Radio Burst of Extragalactic Origin. Science 318, 777 (2007). 0709.4301.
+2. Thornton, D. et al. A Population of Fast Radio Bursts at Cosmological Distances. Science
+341, 53–56 (2013). 1307.1628.
+3. Spitler, L. et al. A Repeating Fast Radio Burst. Nature 531, 202 (2016). 1603.00581.
+4. Cordes, J. M. & McLaughlin, M. A. Searches for Fast Radio Transients. ApJ 596, 1142–1154
+(2003). astro-ph/0304364.
+5. Petroff, E., Hessels, J. W. T. & Lorimer, D. R. Fast radio bursts. A&A Rev. 27, 4 (2019).
+1904.07947.
+6. Zhang, S.-B. et al. Parkes Transient Events. I. Database of Single Pulses, Initial Results, and
+Missing Fast Radio Bursts. ApJS 249, 14 (2020). 2004.04601.
+7. Li, D. et al. A bimodal burst energy distribution of a repeating fast radio burst source. Nature
+598, 267–271 (2021). 2107.08205.
+8. Niu, C.-H. et al. CRAFTS for Fast Radio Bursts: Extending the Dispersion-Fluence Relation
+with New FRBs Detected by FAST. ApJ 909, L8 (2021). 2102.10546.
+9. Xu, H. et al. A fast radio burst source at a complex magnetized site in a barred galaxy. Nature
+609, 685–688 (2022). 2111.11764.
+10. Li, Y. et al. A sudden change and recovery in the magnetic environment around a repeating
+fast radio burst. Science 391, 280–284 (2026). 2503.04727.
+11. Agarwal, D., Aggarwal, K., Burke-Spolaor, S., Lorimer, D. R. & Garver-Daniels, N. FETCH:
+A deep-learning based classifier for fast transient classification. MNRAS 497, 1661–1674
+(2020). 1902.06343.
+12. Yang, X. et al. 81 New candidate fast radio bursts in Parkes archive. MNRAS 507, 3238–3245
+(2021). 2108.00609.
+13. Chen, Y. et al. SwinYNet: A Transformer-based Multitask Model for Accurate and Efficient
+Fast Radio Burst Searches. ApJS 283, 45 (2026). 2603.05958.
+14. Cerezo, M. et al. Variational quantum algorithms. Nature Reviews Physics 3, 625–644 (2021).
+2012.09265.
+15. Biamonte, J. et al. Quantum machine learning. Nature 549, 195–202 (2017). URL https:
+//doi.org/10.1038/nature23474.
+16. Du,
+Y. et al.
+A Gentle Introduction to Quantum Machine Learning (Springer
+Nature,
+Singapore,
+2025).
+URL
+https://link.springer.com/10.1007/
+978-981-95-1284-3.
+11
+
+
+17. Kordzanganeh, M., Utting, A. & Scaife, A. Quantum Machine Learning for Radio Astronomy.
+arXiv e-prints arXiv:2112.02655 (2021). 2112.02655.
+18. Schuld, M. & Killoran, N.
+Quantum machine learning in feature hilbert spaces.
+Phys.
+Rev. Lett. 122, 040504 (2019).
+URL https://link.aps.org/doi/10.1103/
+PhysRevLett.122.040504.
+19. Huang, H.-Y. et al. Power of data in quantum machine learning. Nature Communications 12,
+2631 (2021). URL https://doi.org/10.1038/s41467-021-22539-9.
+20. Yu, Z. et al.
+Non-asymptotic Approximation Error Bounds of Parameterized Quan-
+tum Circuits.
+In Globerson, A. et al. (eds.) Advances in Neural Information Pro-
+cessing Systems,
+vol. 37,
+99089–99127 (Curran Associates,
+Inc.,
+2024).
+URL
+https://proceedings.neurips.cc/paper_files/paper/2024/file/
+b360fd42ced877429882a2a68b4a4343-Paper-Conference.pdf.
+21. Grover, L. K. A fast quantum mechanical algorithm for database search. In Proceedings of
+the Twenty-Eighth Annual ACM Symposium on Theory of Computing, 212–219 (1996).
+22. Harrow, A. W., Hassidim, A. & Lloyd, S. Quantum algorithm for linear systems of equations.
+Phys. Rev. Lett. 103, 150502 (2009). URL https://link.aps.org/doi/10.1103/
+PhysRevLett.103.150502.
+23. Gily´en, A., Su, Y., Low, G. H. & Wiebe, N. Quantum singular value transformation and
+beyond: Exponential improvements for quantum matrix arithmetics. In Proceedings of the
+51st Annual ACM SIGACT Symposium on Theory of Computing (2019).
+24. Montanaro, A. Quantum algorithms: An overview. npj Quantum Information 2, 15023 (2016).
+25. Aaronson, S. Read the fine print. Nature Physics 11, 291–293 (2015).
+26. Cerezo, M., Verdon, G., Huang, H.-Y., Cincio, L. & Coles, P. J. Challenges and opportuni-
+ties in quantum machine learning. Nature Computational Science 2, 567–576 (2022). URL
+https://doi.org/10.1038/s43588-022-00311-3.
+27. Fowler, A. G., Mariantoni, M., Martinis, J. M. & Cleland, A. N. Surface codes: Towards
+practical large-scale quantum computation. Physical Review A 86, 032324 (2012).
+28. Hoefler, T., H¨aner, T. & Troyer, M. Disentangling hype from practicality: On realistically
+achieving quantum advantage. Communications of the ACM 66, 82–87 (2023).
+29. Zhang, X.-M. et al. From Bits to Qubits: The Theory and Practice of Quantum Data Encoding
+(2026). URL http://arxiv.org/abs/2609.08058. ArXiv:2609.08058 [quant-ph].
+30. Dosovitskiy, A. et al. An Image is Worth 16x16 Words: Transformers for Image Recognition
+at Scale. arXiv e-prints arXiv:2010.11929 (2020). 2010.11929.
+12
+
+
+31. Cherrat, E. A. et al. Quantum Vision Transformers. Quantum 8, 1265 (2024). 2209.08167.
+32. Zhang, H., Zhao, Q., Zhou, M. & Feng, L. HQViT: Hybrid Quantum Vision Transformer for
+Image Classification. arXiv e-prints arXiv:2504.02730 (2025). 2504.02730.
+33. Hotan, A. W., van Straten, W. & Manchester, R. N. PSRCHIVE and PSRFITS: An Open
+Approach to Radio Pulsar Data Storage and Analysis. Publications of the Astronomical Society
+of Australia 21, 302–309 (2004). astro-ph/0404549.
+34. Jiang, P. et al. The fundamental performance of FAST with 19-beam receiver at L band.
+Research in Astronomy and Astrophysics 20, 064 (2020). 2002.01786.
+35. McLaughlin, M. A. et al. Transient radio bursts from rotating neutron stars. Nature 439,
+817–820 (2006). astro-ph/0511587.
+36. Yang, X. et al. An invariant energy release hierarchy in a repeating fast radio burst. arXiv
+e-prints arXiv:2608.18455 (2026). 2608.18455.
+37. Zhang, S. B. et al. RRAT J1913+1330: an extremely variable and puzzling pulsar. arXiv
+e-prints arXiv:2306.02855 (2023). 2306.02855.
+38. Zhang, Y.-K. et al. FAST Observations of FRB 20220912A: Burst Properties and Polarization
+Characteristics. ApJ 955, 142 (2023). 2304.14665.
+39. Dewdney, P. E., Hall, P. J., Schilizzi, R. T. & Lazio, T. J. L. W. The Square Kilometre Array.
+IEEE Proceedings 97, 1482–1496 (2009).
+40. Jiang, P. et al. The FAST Core Array. Astronomical Techniques and Instruments 1, 84–94
+(2024). 2408.12826.
+41. Connor,
+L. et al.
+The 256-antenna Coherent All-Sky Monitor.
+arXiv e-prints
+arXiv:2604.13903 (2026). 2604.13903.
+42. Ransom, S. M. New search techniques for binary pulsars. Ph.D. thesis, Harvard University,
+Massachusetts (2001).
+43. Petroff, E. et al. A real-time fast radio burst: polarization detection and multiwavelength
+follow-up. MNRAS 447, 246–255 (2015). 1412.0342.
+13
+
+
+Table 1: Performance of the selected ViT and QViT configurations on the main test set and the
+source-held-out FRB 20220912A set. Each configuration was selected by the highest mean vali-
+dation recall within its model family, using common search ranges for corresponding architectural
+parameters. Values are mean ± standard deviation over 10 independent seeds.
+Model
+Dataset
+Accuracy (%)
+Recall (%)
+Precision (%)
+F2 (%)
+ViT
+test
+93.83 ± 0.60
+98.23 ± 0.22
+90.30 ± 1.02
+96.54 ± 0.26
+QViT
+test
+94.00 ± 0.48
+98.30 ± 0.60
+90.52 ± 0.62
+96.64 ± 0.50
+ViT
+FRB 20220912A
+95.09 ± 0.54
+97.90 ± 0.74
+92.69 ± 0.51
+96.80 ± 0.64
+QViT
+FRB 20220912A
+94.91 ± 0.72
+97.11 ± 1.31
+93.07 ± 1.81
+96.26 ± 0.82
+Table 2: Classification outcomes of QViT inference on the final balanced hardware-validation
+subset containing 41 FRB-like and 41 RFI segments.
+Model
+FRB-like Correct
+FRB-like Incorrect
+RFI Correct
+RFI Incorrect
+QViT (simulator)
+33
+8
+40
+1
+QViT (real device)
+34
+7
+34
+7
+Flatten and Linear Projection
+Cut
+1
+2
+4
+Quantum Encoder Block
+Norm
++
+Norm
+MLP
++
+MLP
+head
+Class
+FRB
+RFI
+Attention
+Score
++
+Weighted
+Value
+× 𝐿
+V-only Quantum mapping
+…
+…
+…
+Data Enc.
+Trainable Layer 1
+…
+…
+Trainable Layer 2
+…
+…
+…
+…
+…
+…
+Meas.
+K-only Quantum mapping
+…
+…
+…
+Data Enc.
+Trainable Layer 1
+…
+…
+Trainable Layer 2
+…
+…
+…
+…
+…
+…
+Meas.
+Q-only Quantum mapping
+…
+…
+…
+Data Enc.
+Trainable Layer 1
+…
+…
+Trainable Layer 2
+…
+…
+…
+…
+…
+…
+Meas.
+CLS Token 
+Concat
+Pos. Emb.
+0*
+3
+Figure 1: Architecture of the QViT identification model. Dynamic-spectrum images constructed
+from PSRFITS data are resized to 288 × 288 pixels, converted into tokens and passed to the hybrid
+transformer. Parameterized quantum circuits generate the query, key and value representations,
+while attention mixing and classification remain classical. The model returns an FRB-like proba-
+bility for each input segment.
+14
+
+
+Enhancement layer  Uenh
+Uenc(x)
+|0⟩
+q0
+|0⟩
+q1
+|0⟩
+q2
+|0⟩
+q3
+|0⟩
+q4
+|0⟩
+q5
+⟨Z0⟩
+⟨Z1⟩
+⟨Z2⟩
+⟨Z3⟩
+⟨Z4⟩
+⟨Z5⟩
+Measure all nq = 6 qubits
+Output row ∈ℝdh
+= (⟨Z0⟩, ⟨Z1⟩, … , ⟨Znq −1⟩)
+empty
+UPQC (L = 0)
+Input row xi ∈ℝdh
+encoded row by row onto RX
+Enhanced parameterized quantum circuit
+|ψ(x)⟩= UPQC Uenc(x) Uenh |0⟩⊗nq
+(nq = 6)
+Data flow: input (N, d) is split into nh = 4 heads as [nh, N, dh]; each [N, dh] (N = 17, dh = 6) is processed row by row: [N, dh] →[N, dh]
+(1)  The part before RX (RZ + RY + CZ) is the enhancement layer
+(2)  A single RX layer is the encoding layer
+(3)  No conventional variational layer after RX (L = 0)
+RZ
+RY
+RZ
+RY
+RZ
+RY
+RZ
+RY
+RZ
+RY
+RX
+RX
+RX
+RX
+RX
+RX
+Figure 2: Enhanced parameterized quantum circuit used for the Q/K/V projections and for real-
+device inference.
+15
+
+
+0
+100
+200
+1000
+2000
+3000
+Number of QKV parameters
+90
+91
+92
+93
+94
+95
+96
+Accuracy (%)
+a
+0
+100
+200
+1000
+2000
+3000
+Number of QKV parameters
+96.5
+97.0
+97.5
+98.0
+98.5
+99.0
+Recall (%)
+b
+QViT qubits=3
+ViT dim_head=3
+QViT qubits=4
+ViT dim_head=4
+QViT qubits=5
+ViT dim_head=5
+Figure 3: Performance comparison between QViT and classical ViT on the untouched test set.
+The horizontal axis denotes the number of trainable parameters in the Q/K/V projection module,
+computed as the total Q/K/V parameter count for each plotted configuration. (a) Classification
+accuracy. (b) Recall. Symbols indicate the mean over 10 independent seeds and error bars repre-
+sent one standard deviation. For the selected comparison used in the main text, QViT reaches an
+accuracy of 94.00 ± 0.48% and a recall of 98.30 ± 0.60%, compared with 93.83 ± 0.60% accuracy
+and 98.23 ± 0.22% recall for ViT.
+1
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+75
+80
+Sample index
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+Hellinger fidelity
+Real-hardware distribution fidelity
+Sample mean
+Lowest sample mean (#32: 0.8923)
+Figure 4: Hellinger fidelity between simulated and real-device measurement distributions for the
+real-hardware validation samples. For each segment, the fidelity is averaged over its 204 Q/K/V cir-
+cuit evaluations. Across 82 hardware-validation segments, each circuit was executed with 20,000
+shots, and the minimum segment-level mean fidelity is 0.8923.
+16
+
+
+Data availability
+Raw PSRFITS data are available from the FAST data center, http://fast.bao.ac.cn.
+The processed dynamic-spectrum segments, class labels are available are available at https:
+//github.com/euli0323/qvit-frb-code/tree/main.
+Code availability
+The dynamic spectrum plotting and QViT analysis code are available at https://github.
+com/euli0323/qvit-frb-code/tree/main.
+Acknowledgements
+We acknowledge the use of artificial intelligence tools for language editing and code optimization
+during the preparation of this manuscript. This work is supported by the National Natural Science
+Foundation of China (grant No. 12503058, 12573096, 12603086), the Postdoctoral Fellowship
+Program of CPSF (grant No. GZC20252100), the China Postdoctoral Science Foundation (grant
+No. 2025M773201), the Jiangsu Funding Program for Excellent Postdoctoral Talent, the National
+Key Research and Development Plan of the Ministry of Science and Technology of China (Grant
+No. 2025YFE0212600), and the Science and Technology Program of Hebei Province of China
+(Grant No. 26391701D). A.R.Q. and C.F. thank the Para´ıba State Research Foundation (FAPESQ-
+PB) and the Government of the State of Paraiba, Brazil. The work by C. F. is supported by the
+CNPq (project PQ Grant 1A No. 311781/2021-7). A.R.Q. acknowledges the financial support by
+CNPq under process number 306884/2026-7.
+Author Contributions
+L.H., X.Y. and S.B.Z. led data preparation and processing. S.B.Z., X.P.D. and X.F.W. initiated
+the hardware–algorithm co-design and coordinated regular project discussions. X.Y. and S.B.Z.
+developed the data processing pipeline prior to quantum integration, while L.H., Q.H.C., F.X. and
+A.R.Q. were responsible for the code quantization details and validation on the physical quantum
+hardware. All authors contributed to data analysis or interpretation and to the final version of the
+manuscript.
+Competing Interests
+The authors declare that they have no competing financial interests.
+17
+
+
+Correspondence
+Correspondence and requests for materials should be addressed to S.B Zhang, Q.H. Chen, A.R.
+Queiroz, X.P. Deng or X.F. Wu.
+18
+
+
+Extended Data Table 1: Composition of the training, validation and evaluation sets. (a) Astro-
+physical pulses used to construct the FRB-like class, grouped by training source. (b) Segments in
+each data partition. The negative class consists of segments from single-pulse candidates reported
+by the same search pipeline that manual vetting rejected as RFI or other non-astrophysical signals.
+FRB 20220912A is excluded from training and from model selection and is used only for source-
+held-out evaluation. All images related to the same physical pulse, neighbouring raw-data interval
+or observing unit are assigned to a single partition.
+(a) FRB-like class by training source
+Source
+Type
+Astrophysical pulses
+FRB 20220529
+Repeating FRB
+1243
+FRB 20201124A
+Repeating FRB
+1093
+RRAT J1913+1330
+RRAT
+664
+Total
+3000
+(b) Data partitions
+Partition
+FRB-like
+RFI
+Total
+Training
+2400
+2400
+4800
+Validation
+300
+300
+600
+Test
+300
+300
+600
+Total
+3000
+3000
+6000
+FRB 20220912A (source-held-out)
+114
+114
+228
+19
+
+
+Extended Data Table 2: Class composition of the test set after stratification by SNR = 12. (a)
+Number of FRB-like and RFI segments in each SNR subset. (b) Recall (per cent) of the selected
+ViT and QViT configurations, reported as mean ± standard deviation over 10 independent seeds.
+The hardware-validation subset is drawn from the low-SNR subset; because that subset contains
+68 FRB-like segments, a difference of one segment corresponds to 1.47 percentage points of recall.
+(a) Class composition
+Subset
+FRB-like
+RFI
+Total
+Low SNR (SNR < 12)
+68
+163
+231
+High SNR (SNR ≥12)
+232
+137
+369
+Total
+300
+300
+600
+(b) Recall (per cent)
+Model
+Low SNR (SNR < 12)
+High SNR (SNR ≥12)
+ViT
+95.88 ± 0.93
+98.92 ± 0.23
+QViT
+96.62 ± 1.39
+98.79 ± 0.53
+20
+
+
+0
+100
+200
+1000
+2000
+3000
+Number of QKV parameters
+93
+94
+95
+96
+97
+98
+Recall (%)
+a
+Low SNR (SNR < 12)
+0
+100
+200
+1000
+2000
+3000
+Number of QKV parameters
+97.5
+98.0
+98.5
+99.0
+99.5
+100.0
+Recall (%)
+b
+High SNR (SNR ≥12)
+QViT qubits=3
+ViT dim_head=3
+QViT qubits=4
+ViT dim_head=4
+QViT qubits=5
+ViT dim_head=5
+Extended Data Figure 1: Recall comparison between QViT and classical ViT after stratifying
+the test set by signal-to-noise ratio. (a) Low-SNR subset, defined as SNR < 12. (b) High-SNR
+subset, defined as SNR ≥12. The horizontal axis denotes the number of trainable parameters
+in the Q/K/V projection module. Symbols indicate the mean recall over 10 independent seeds
+and error bars represent one standard deviation. The SNR threshold is fixed independently of
+model performance and is applied to both FRB-like positive and negative segments using the SNR
+value encoded in each segment file name. For the selected comparison used in the main text,
+QViT reaches a low-SNR recall of 96.62 ± 1.39%, compared with 95.88 ± 0.93% for ViT. The
+corresponding high-SNR recalls are 98.79 ± 0.53% and 98.92 ± 0.23%, respectively.
+1
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+70
+75
+80
+Sample index
+0.95
+0.96
+0.97
+0.98
+0.99
+1.00
+1.01
+1.02
+Cosine similarity
+Real-hardware feature-vector similarity
+Sample mean
+Lowest sample mean (#25: 0.9786)
+Extended Data Figure 2: Cosine similarity between simulated and real-device quantum feature
+vectors for the real-hardware validation samples. For each segment, the cosine similarity is aver-
+aged over the expectation-value comparisons from its 204 Q/K/V circuit evaluations. Across 82
+validation segments, the minimum segment-level mean similarity is 0.9786.
+21
