@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-09-16 <!--dpr-date:20260916-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202609/16/2609.11068v1-evidence-for-the-binary-nature-of-the-long-period-radio-transient-askapdart-j1832-0911" data-sidebar-item="{&quot;title&quot;: &quot;Evidence for the binary nature of the long-period radio transient ASKAP/DART J1832-0911&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2609.11068v1-evidence-for-the-binary-nature-of-the-long-period-radio-transient-askapdart-j1832-0911&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;pulsar-frb&quot;}], &quot;evidence&quot;: &quot;由射电数据推断长周期射电暂现源的双星本质&quot;}">Evidence for the binary nature of the long-period radio transient ASKAP/DART J1832-0911</a>
   * 2026-09-15 <!--dpr-date:20260915-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202609/15/2609.09285v2-dispersion-measure-variability-in-fast-radio-bursts-from-photoionization" data-sidebar-item="{&quot;title&quot;: &quot;Dispersion Measure Variability in Fast Radio Bursts from Photoionization&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2609.09285v2-dispersion-measure-variability-in-fast-radio-bursts-from-photoionization&quot;, &quot;score&quot;: &quot;8.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;pulsar-frb&quot;}], &quot;evidence&quot;: &quot;磁星作为快速射电暴引擎与色散量演化&quot;}">Dispersion Measure Variability in Fast Radio Bursts from Photoionization</a>
