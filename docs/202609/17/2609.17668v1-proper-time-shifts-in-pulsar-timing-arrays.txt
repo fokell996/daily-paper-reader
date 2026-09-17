@@ -1,0 +1,1683 @@
+Title: Proper Time Shifts in Pulsar Timing Arrays
+
+URL Source: https://arxiv.org/pdf/2609.17668v1
+
+Published Time: Thu, 17 Sep 2026 00:05:14 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+N3AS-26-016 
+
+# Proper Time Shifts in Pulsar Timing Arrays 
+
+Vincent S. H. Lee 1, 2, ∗
+
+> 1
+
+Department of Physics, University of California, Berkeley, CA 94720, USA 
+
+> 2
+
+Department of Physics, University of California, San Diego, La Jolla, CA 92093, USA 
+
+Pulsar timing arrays are a powerful tool for probing low-frequency gravitational phenomena and physics beyond the Standard Model. We establish a general, gauge-invariant framework for the timing residual by identifying the measurable quantity as the proper time interval between consecutive pulse arrivals at Earth. In linearized general relativity, we derive a general expression for this proper time shift and show that it decomposes into Doppler, Shapiro, and Einstein delay contributions whose sum is gauge invariant, similar to frameworks that have been developed for other gravitational-wave detectors such as laser and atom interferometers. We also provide a recipe for computing the resulting timing residual for any specified perturbation, and we illustrate the method with several physically well-motivated sources, recovering known results where they exist in the literature. This recipe can be directly applied to search for new physics from real pulsar timing data using existing numerical software. 
+
+I. INTRODUCTION 
+
+Pulsar timing arrays (PTAs) have long served as a leading probe of low-frequency gravitational waves (GWs) with numerous active collaborations, e.g. NANOGrav [1], EPTA [2], PPTA [3], InPTA [4], CPTA [5], and MPTA [6]. By precisely measuring the times of arrival (TOAs) of pulses from millisecond pulsars and their deviations from expected arrival times, PTAs can probe extremely small perturbations in spacetime [7]. Beyond GWs, PTAs can also be used to probe gravitational e ff ects predicted by beyond-the-Standard-Model (BSM) physics, such as primordial black holes (PBHs) [8–11], dark matter (DM) substructure [12– 22], and ultralight dark matter (ULDM) [23–43]. For instance, NANOGrav reported compelling evidence for a stochastic gravitational-wave background (GWB) in their 15-year dataset [44], and, using the same dataset, also investigated whether the observed signal could arise from a broad class of BSM scenarios [45]. A numerical code, PTArcade , was later developed to read in user-provided signal templates from any BSM model of interest and perform Bayesian analyses on PTA data, yielding posterior distributions and upper limits on the corresponding model parameters [46]. While the power of PTAs to detect gravitational e ff ects from BSM physics is widely appreciated, the timing deviation observ-able, δt(t) 1, is usually only computed on a case-by-case basis in the literature. Existing works either restrict to GWs [47, 48], or treat each BSM source individually, frequently in a fixed gauge. For example, in the context of detecting DM with PTAs, the time shift due to ULDM have been derived in Refs. [33, 34], and for DM substructure in Ref. [11]. In these works the total time shift is broken into separate pieces, each attributed to a distinct way the metric perturbation influences the signal in the Newtonian gauge. While each such contribution is physically intuitive, it is not by itself a gauge-invariant quantity, and it is therefore unclear whether the sum represents a genuine physical observable. A general, source-agnostic expression for the residual is only derived recently in Ref. [42], which follows from integrating the redshift sourced by the linearized Riemann tensor Ri0 j0, giving a manifestly gauge-invariant quantity (see also Ref. [49] for the equivalence of the pulse arrival rate and the photon redshift). This curvature form, however, does not decompose the observable as a sum of physical e ff ects. To our best knowledge, for PTAs, there is currently no single formulation that simultaneously applies to an arbitrary hμν ,resolves the observable into its separate physical contributions, and is manifestly gauge invariant. However, such a formalism already exists for other forms of GW detectors as probes of BSM physics, such as laser interferometers [50] and atom inter-ferometers [51]. The idea is to identify the experimental observable as the proper time shift, as measured along worldlines of massive bodies that act as proxies for the observer, between two physical events. For laser interferometers, it is the proper time measured by the beamsplitter between when the laser first gets split into two interferometer arms and when it then gets recom-bined. For single-photon atom interferometers, it is the proper time experienced by the atom cloud between when it is first split by a laser into a superposition of two spatially separate paths and when it is recombined by a laser at the end of the sequence. A proper time quantity is, by design, gauge invariant. Moreover, in linearized GR, it has been shown that the proper time observ-able in both laser and atom interferometers can be written as the sum of three distinct contributions: the Doppler e ff ect, which accounts for the motion of the massive bodies in the experimental setup; the Shapiro delay, which accounts for the delay in the arrival time of the photons; and the Einstein delay, which is the gravitational redshift as measured by the massive bodies. This decomposition has been previously noted in the literature in the context of GWs [52], vacuum fluctuations in quantum gravity    
+
+> ∗vincentszehimlee@berkeley.edu
+> 1This is also known as the timing residual , up to degeneracy with the pulsar’s timing model, which will be discussed in detail in Sec. II C arXiv:2609.17668v1 [hep-ph] 15 Sep 2026
+
+2(geontropic fluctuations 2) [56], and DM [57, 58]. While each individual contribution takes a di ff erent value in each gauge, the sum is invariant under a gauge transformation. In this work, we argue that an analogous formalism also exists for PTAs. Specifically, we identify the proper time, as measured by an observer on Earth, between the arrivals of two consecutive pulses from a pulsar, as a gauge-invariant observable for a general metric perturbation hμν . This is illustrated in Fig. 1. In linearized gravity, we show that this observable can again be decomposed into three contributions: a Doppler term, accounting for the motion of the pulsar and Earth; a Shapiro delay term, accounting for the change in photon propagation time; and an Einstein delay term, accounting for the gravitational redshift of the clock. Beyond clarifying gauge-invariance, formulating the observable as a proper time and computing it by solving for the intersection of geodesics has an additional advantage, namely that the formalism could be generalized to modified theories of gravity, in which worldlines can instead follow modified geodesics, o ff ering a route to formally construct tests of these theories with PTAs [59, 60] (see, e.g. , Refs. [61–72] for theoretical and observational works on using PTAs to test massive gravity, or gravity with modified dispersion relations). We provide a recipe for computing this proper time shift as a time series, δt(t), for any specified hμν , independent of its source, which agrees with the result of Ref. [42] in terms of Ri0 j0. Readers interested in direct application can skip ahead to Eq. (14) and Eq. (16) where the expression for δt(t) is given. This can then be directly incorporated into numerical software such as PTArcade for data analysis with real PTA data. The structure of this paper is as follows. In Sec. II, we consider a general metric perturbation hμν and compute the resulting proper time shift δt(t), obtaining the general expressions in Eq. (14) and Eq. (16) by solving for the intersection of geodesics, which are directly useful for data analysis. In Sec. IV, we consider a few worked examples by applying these expressions to metric perturbations arising in several well-motivated scenarios, including plane GWs, a stochastic GWB, ULDM, and the gravitational memory e ff ect. We then compare our results with existing literature. Finally, we conclude in Sec. V. Throughout this paper, we work in the linearized GR regime, where the metric can be written as gμν = ημν + hμν , and we keep only terms to leading order in hμν . Here ημν = diag( −1, +1, +1, +1) is the Minkowski metric in the mostly positive convention. We also take c = ℏ = 1. 
+
+II. TIME-SHIFTS DUE TO A GENERAL METRIC PERTURBATION ON AN IDEAL PULSAR A. single, idealized pulsar 
+
+We begin our analysis by considering an ideal pulsar setup, in which we neglect the e ff ects of noise sources and spin-down in the pulsar. Let xE and xP denote the positions of Earth and the pulsar, respectively, and let ˆn be the unit vector pointing from Earth to the pulsar. The pulsar emits pulses at regular intervals P, which are subsequently detected by a telescope on Earth. Under a weak metric perturbation, hμν , the worldlines for the pulsar, Earth, and the photons traveling from the pulsar to the Earth will also be perturbed. This is illustrated in Fig. 1. We denote the pulsar and Earth worldlines as xμ
+
+> P
+
+(τ) and xμ 
+
+> E
+
+(τ), respectively, and the photon worldline for each pulse as xμγ, 0(λ), xμγ, 1(λ), · · · , where τ and λ are the pulsar /Earth proper times, and the pulse’s a ffi ne parameter, respectively. In the perturbed spacetime, the pulses are now emitted at regular proper time intervals, 
+
+i.e. each pulse is emitted when proper time of P has elapsed as measured by the pulsar’s worldline, denoted as τP,0, τP,1, · · · 3.The intervals of the time-of-arrivals of each pulse, as measured in the proper time of the detector’s worldline on Earth, however, will not be regular, as the entire pulsar-Earth system is perturbed by hμν . We denote these proper time-of-arrivals as τE,0, τE,1,
+
+· · · . The shifts in these quantities constitute the observable of the experiment on hμν , which, as we will later show, is invariant under a gauge transformation in hμν 4. We also denote the pulse’s a ffi ne parameter when it was emitted at the pulsar as λP,0, λP,1,
+
+· · · , and when it arrived at Earth as λE,0, λE,1, · · · .We now examine more closely how hμν aff ects the proper time pulse measurements. Throughout this section, “unperturbed” quantities are denoted by an overbar, while leading-order perturbations induced by hμν are denoted by δ. The unperturbed solution corresponds to Minkowski spacetime, in which the pulsar and Earth follow worldlines at fixed spatial positions and pulses are emitted and received at perfectly regular intervals, while the perturbed quantities describe small deviations from these values due to hμν . We label the first pulse, which marks the beginning of the measurement, with a 0 subscript, and define the measured proper-time shifts of subsequent pulses relative to this reference. As an illustration, we consider the n-th pulse, for which we can write                             
+
+> 2See Refs. [53–55] for references
+> 3Here we have neglected tidal deformation of the pulsar’s shape due to hμν , which, for a pulsar with mass Mand radius R, would lead to a fractional change in the spin period of order δP/P∼(R3/GM )f2h, where fis the characteristic frequency of variation of hμν at the pulsar, obtained by comparing the tidal acceleration across the star ∼R∂2hto the star’s self gravity ∼GM /R2.
+> 4Here we are working with a simplified setup where every single pulse is measured and used in the data analysis. In reality, each “pulse” in Fig. 1 should be understood as an epoch , where multiple pulses are measured and averaged over a duration of minutes to hours in order to obtain a single robust measurement of the TOA [73]. This distinction is not important to us as long as the typical frequency of the time dependence of hμν is much smaller than the inverse of the duration of pulse averaging, which is ≳10 −4Hz, and is thus always satisfied for a typical PTA observation with peak sensitivity at ∼ O (nHz)
+
+3τP, 0
+
+τP, 1
+
+τP, 2
+
+τP,n −1
+
+τP,n 
+
+τE, 0
+
+τE, 1
+
+τE, 2
+
+τE,n −1
+
+τE,n  
+
+> observable observable observable
+> xμγ, 0(λ)
+> xμγ, 1(λ)
+> xμγ, 2(λ)
+> xμγ,n −1(λ)
+> xμγ,n (λ)
+
+tz
+
+ˆnxμE (τ ) xμP (τ )
+
+L
+
+FIG. 1. Schematic spacetime diagram of the Earth–pulsar system. Here coordinate time t increases upward and the spatial coordinate z,aligned with the line of sight, to the right. Earth (left) and the pulsar (right) follow the timelike worldlines xμ 
+
+> E
+
+(τ) and xμ
+
+> P
+
+(τ), parametrized by their proper time τ and are curvy due to their deflection by the metric perturbation hμν . The two are separated by a distance L, and ˆn is the unit vector pointing from Earth to the pulsar. The pulsar emits pulses at successive proper times τP,0, τ P,1, . . . , τ P,n, spaced by a fixed proper interval P along its worldline. Each pulse propagates to Earth along a null worldline xμγ, n(λ) (red), with a ffi ne parameter λ, and is received at the Earth proper time τE,n. Because the entire system is perturbed by hμν , the arrival proper times are no longer evenly spaced. Their shifts 
+
+δτ E,n constitute the gauge-invariant observable derived in Sec. II ( cf. Eq. (14)). This figure was produced with assistance from Anthropic’s 
+
+Claude Opus 5 model. 
+
+τP,n = ¯τP,n
+
+τE,n = ¯τE,n + δτ E,n
+
+λP,n = ¯τP,n
+
+λE,n = ¯λE,n + δλ E,n . (1) As mentioned above, the parameters that mark the emission are not a ff ected by hμν and are thus simply given by the unperturbed quantities. The worldlines themselves, however, will be perturbed 
+
+xμ
+
+> P
+
+(τ) = ¯xμ
+
+> P
+
+(τ) + δxμ
+
+> P
+
+(τ)
+
+xμ 
+
+> E
+
+(τ) = ¯xμ 
+
+> E
+
+(τ) + δxμ 
+
+> E
+
+(τ)
+
+xμγ, n(λ) = ¯xμγ, n(λ) + δxμγ, n(λ) , (2) where the unperturbed worldlines are given by ¯xμ
+
+> P
+
+(τ) = (τ, xP)¯xμ 
+
+> E
+
+(τ) = (τ, xE )¯xμγ, n(λ) = (λ, −(λ − ¯λP,n) ˆn + xP) . (3) Our goal is to compute the proper TOAs, τE,n. To achieve this, we use Fig. 1 and write down the intersections of the worldlines at two instances: emission of pulse, and measurement of pulse. 
+
+xμ
+
+> P
+
+(τP,n) = xμγ, n(λP,n)
+
+xμ 
+
+> E
+
+(τE,n) = xμγ, n(λE,n) . (4) 4We then expand the worldlines in Eq. (4) to linear order in hμν and isolate the leading-order contribution: 
+
+xμ
+
+> P
+
+(τP,n) = ¯xμ
+
+> P
+
+(¯ τP,n) + δxμ
+
+> P
+
+(¯ τP,n)
+
+xμ 
+
+> E
+
+(τE,n) = ¯xμ 
+
+> E
+
+(¯ τE,n) + δxμ 
+
+> E
+
+(¯ τE,n) + δτ E,n ¯vμ 
+
+> E
+
+(¯ τE,n)
+
+xμγ, n(λP,n) = ¯xμγ, n(¯ λP,n) + δxμγ, n(¯ λP,n)
+
+xμγ, n(λE,n) = ¯xμγ, n(¯ λE,n) + δxμγ, n(¯ λE,n) + δλ E,n ¯vμγ, n(¯ λE,n) , (5) where we define the four-velocity of the pulsar and Earth as vμ 
+
+> P/E
+
+(τ) ≡ (d/dτ)xμ 
+
+> P/E
+
+(τ), and the a ffi ne tangent of the pulse as 
+
+vμγ, n(λ) ≡ (d/dλ)xμγ, n(λ). Solving Eq. (4) using the expansions above, the zeroth-order terms immediately yield ¯ τP,n = ¯λP,n and ¯τE,n = ¯λE,n. At linear order, we obtain the leading contribution to the proper-time shift of the n-th pulse as 
+
+δτ E,n = nμ
+
+hδxμ 
+
+> E
+
+(¯ τE,n) − δxμ
+
+> P
+
+(¯ τP,n)i − nμ
+
+hδxμγ, n(¯ λE,n) − δxμγ, n(¯ λP,n)i , (6) where we have defined the four-vector nμ = (1 , −ni), which satisfies nμ ¯vμ 
+
+> E
+
+(τ) = nμ ¯vμ
+
+> P
+
+(τ) = −1 and nμ ¯vμγ, n(λ) = 0, as apparent from Eq. (3). The proper time shift derived for the n-th observed pulse in Eq. (6) can also be applied to the first pulse that is observed by substituting n → 0. This allows us to easily compute the proper time shift relative to the first pulse, denoted by δτ n ≡ δτ E,n −δτ E,0,using Eq. (6), which can be suggestively written as a sum of three distinct terms 
+
+δτ n = δτ (E) 
+
+> n
+
++ δτ (D) 
+
+> n
+
++ δτ (S) 
+
+> n
+
+, (7) with the individual contributions defined by 
+
+δτ (D) 
+
+> n
+
+≡ − ni
+
+hδxiE (¯ τE,n) − δxiE (¯ τE,0)i + ni
+
+hδxiP(¯ τP,n) − δxiP(¯ τP,0)i
+
+δτ (S) 
+
+> n
+
+≡ − 
+
+Z ¯λE,n
+
+> ¯λP,n
+
+dλ nμδvμγ, n(λ) +
+
+Z ¯λE,0
+
+> ¯λP,0
+
+dλ nμδvμγ, 0(λ)
+
+δτ (E) 
+
+> n
+
+≡ − hδx0 
+
+> E
+
+(¯ τE,n) − δx0 
+
+> E
+
+(¯ τE,0)i + hδx0
+
+> P
+
+(¯ τP,n) − δx0
+
+> P
+
+(¯ τP,0)i . (8) Here, the three terms correspond to distinct physical e ff ects: δτ (D) 
+
+> n
+
+is the Doppler e ff ect due to the motion of the pulsar and Earth, δτ (S) 
+
+> n
+
+is the Shapiro e ff ect, which is the time delay in the pulse as it propagates from the pulsar to Earth in a fluctuating background, and δτ (E) 
+
+> n
+
+is the Einstein delay, accounting for the time dilation of the clocks at the pulsar and Earth. To further evaluate Eq. (7), we need to compute the perturbed worldlines. For massive bodies, including the pulsar and Earth, we consider the linear-order contribution to the geodesic equation 
+
+d2
+
+dτ2 δxρ 
+
+> P/E
+
+(τ) + Γ ρμν 
+
+d ¯xμ 
+
+> P/E
+
+(τ)
+
+dτ
+
+d ¯xν 
+
+> P/E
+
+(τ)
+
+dτ = 0 , (9) where we used the fact that Γρμν ∼ O (h). Substituting the unperturbed worldline expressions from Eq. (3) into Eq. (9), we find (d2/dτ2)δxμ 
+
+> P/E
+
+(τ) = −Γμ
+
+> 00
+
+, giving 
+
+d2
+
+dτ2 δx0 
+
+> P/E
+
+(τ) = 12 ∂0h00 
+
+d2
+
+dτ2 δxiP/E (τ) = 12 ∂ih00 − ∂0h0i . (10) To solve this di ff erential equation, we choose initial conditions, δxμ 
+
+> P/E
+
+(τ∗ 
+
+> P/E
+
+) = 0 and δviP/E (τ∗ 
+
+> P/E
+
+) = 0, at some reference proper times τ∗ 
+
+> P/E
+
+. Since the worldlines are parametrized by proper time, the normalization gμν vμvν = −1 fixes the temporal component to δv0 
+
+> P/E
+
+(τ∗ 
+
+> P/E
+
+) = 12 h00 (τ∗ 
+
+> P/E
+
+, xP/E ) at linear order. With these initial conditions, the solution to Eq. (10) is 
+
+δx0 
+
+> P/E
+
+(τ) = 12
+
+Z ττ∗
+
+> P/E
+
+dτ′ h00 (τ′, xP/E )
+
+δxiP/E (τ) = 12 ηi j 
+
+Z ττ∗
+
+> P/E
+
+dτ′
+
+Z τ′
+
+> τ∗
+> P/E
+
+dτ′′ ∂ jh00 (τ′′ , xP/E ) − ηi j 
+
+Z ττ∗
+
+> P/E
+
+dτ′ h0 j(τ′, xP/E ) + ηi j (τ − τ∗ 
+
+> P/E
+
+)h0 j(τ∗ 
+
+> P/E
+
+, xP/E ) . (11) 5For the photon trajectory, it is more convenient to work with the null geodesic condition, gμν vμγ, n(λ)vνγ, n(λ) = 0, which in linearized gravity simplifies to 
+
+nμδvμγ, n(λ) = − 12 hμν nμnν = − 12
+
+hh00 − 2h0ini + hi j nin ji 
+
+> (λ, −(λ−¯λP,n)ˆn+xP)
+
+. (12) The three contributions in the observable in Eq. (8) can then be written in terms of derivatives and integrals of hμν readily using Eqs. (11)–(12). Finally, we want to rewrite the observable in Eq. (8) in a way that is easy to use in a realistic data analysis pipeline such as 
+
+PTArcade . We first note that the proper times, τ, in the arguments of Eq. (8) can be replaced by just coordinate time, t, since they only di ff er in O(h) and they are arguments of quantities that are already O(h), making the error in replacing τ by t order O(h2). Accordingly, for a given pulse observed at proper time τE,n, we can identify it with the coordinate time t. Then the proper TOA shift at time t is written as δt(t) ≡ δτ n n=(t−t0)/P, where the symbol δt is used instead of δτ to align with the notation commonly used in the community, even though these are still proper time quantities. The relevant time quantities for this pulse are ¯τP,n = t − L
+
+¯τE,n = t
+
+¯λP,n = t − L
+
+¯λE,n = t , (13) where L is the pulsar-Earth distance, and the analogous quantities for the first pulse with n replaced by 0 are obtained by replacing 
+
+t with t0, the coordinate time of the first pulse measured. Using Eq. (13), we can rewrite everything in Eq. (7) and Eq. (8) in terms of coordinate time. The result can be neatly written as 
+
+δt(t) = δt(D) 
+
+> E
+
+(t) − δt(D) 
+
+> P
+
+(t) + δt(S)(t) + δt(E) 
+
+> E
+
+(t) − δt(E) 
+
+> P
+
+(t) , (14) where we have separated the Doppler and the Einstein term as the di ff erence between an Earth term and a pulsar term, and the individual terms are given by 
+
+δt(D) 
+
+> E
+
+(t) =
+
+− 12
+
+Z tt∗
+
+> E
+
+dt ′
+
+Z t′
+
+> t∗
+> E
+
+dt ′′ ni∂ih00 (t′′ , xE ) +
+
+Z tt∗
+
+> E
+
+dt ′ nih0i(t′, xE ) − (t − t∗ 
+
+> E
+
+)nih0i(t∗ 
+
+> E
+
+, xE )
+
+ − [t → t0]
+
+δt(D) 
+
+> P
+
+(t) =
+
+− 12
+
+Z t−Lt∗
+
+> P
+
+dt ′
+
+Z t′
+
+> t∗
+> P
+
+dt ′′ ni∂ih00 (t′′ , xP) +
+
+Z t−Lt∗
+
+> P
+
+dt ′ nih0i(t′, xP) − (t − L − t∗
+
+> P
+
+)nih0i(t∗
+
+> P
+
+, xP)
+
+ − [t → t0]
+
+δt(S)(t) =
+
+(
+
++ 12
+
+Z tt−L
+
+dt ′ hh00 − 2nih0i + nin jhi j 
+
+i (t′, xE − (t′ − t) ˆn)
+
+)
+
+− { t → t0}
+
+δt(E) 
+
+> E
+
+(t) =
+
+− 12
+
+Z tt∗
+
+> E
+
+dt ′ h00 (t′, xE )
+
+ − [t → t0]
+
+δt(E) 
+
+> P
+
+(t) =
+
+− 12
+
+Z t−Lt∗
+
+> P
+
+dt ′ h00 (t′, xP)
+
+ − [t → t0] , (15) where t∗ 
+
+> E
+
+and t∗ 
+
+> P
+
+are the reference coordinate times set by the initial conditions of Earth and the pulsar, δxμ 
+
+> E
+
+and δxμ 
+
+> P
+
+are set to zero at those reference times, and we used xP − L ˆn = xE .The time shift quantity in Eqs. (14)–(15) is the full observable under a general metric perturbation, hμν . It is, however, not written in the most convenient form. In particular, the expression depends on t∗ 
+
+> E
+
+, t∗ 
+
+> P
+
+and t0, and it might not be immediately clear what values to use in a realistic analysis. On the other hand, the measured value of the time shifts in a realistic experiment has contributions from other sources as well. As we will show in Sec. II C, the timing model also enters the measured time shifts to account for the intrinsic pulsar evolution that is unrelated to gravitational perturbations. The timing model generally includes a quadratic polynomial in t with coe ffi cients fitted to the data. Consequently, any contributions to Eqs. (14)–(15) that are at most quadratic in t are not observable: they are completely degenerate with the timing model and only shift its best-fit coe ffi cients without a ff ecting the likelihood or the timing residuals ( i.e. , the measured time shifts minus the fitted timing model). This has two implications for a realistic analysis. First, we observe from Eqs. (14)–(15) that t∗ 
+
+> E
+
+, t∗ 
+
+> P
+
+and t0 can only contribute to at most a linear function in t, and thus can be conveniently set to any arbitrary value. Second, any other terms (particularly those originating from the boundaries of the time integrals) can be neglected. With this in mind, Eq. (15) can be rewritten in a form 6convenient for analysis 
+
+δt(D) 
+
+> E
+
+(t) = − 12
+
+Z t
+
+dt ′
+
+Z t′
+
+dt ′′ ni∂ih00 (t′′ , xE ) +
+
+Z t
+
+dt ′ nih0i(t′, xE )
+
+δt(D) 
+
+> P
+
+(t) = − 12
+
+Z t−L
+
+dt ′
+
+Z t′
+
+dt ′′ ni∂ih00 (t′′ , xP) +
+
+Z t−L
+
+dt ′ nih0i(t′, xP)
+
+δt(S)(t) = + 12
+
+Z L
+
+> 0
+
+dz hh00 − 2nih0i + nin jhi j 
+
+i (t − z, xE + z ˆn)
+
+δt(E) 
+
+> E
+
+(t) = − 12
+
+Z t
+
+dt ′ h00 (t′, xE )
+
+δt(E) 
+
+> P
+
+(t) = − 12
+
+Z t−L
+
+dt ′ h00 (t′, xP) , (16) up to at most a linear polynomial in t, where any unspecified lower boundary of the integrals can be chosen arbitrarily, and we have redefined the integration variable using z ≡ t − t′ to parameterize the distance along the Earth–pulsar line-of-sight for the Shapiro term. This expression in Eq. (16), together with Eq. (14), constitutes our main result. 
+
+B. multiple pulsars 
+
+The above analysis only considers the time shifts observed from a single pulsar. In a pulsar timing array analysis, one has access to timing measurements on multiple pulsars. The proper time shift observable for the I-th pulsar, located at xP,I = xE +LI ˆnI
+
+where LI is the corresponding Earth-pulsar distance, can be written as 
+
+δtI (t) = δt(D) 
+
+> I,E
+
+(t) − δt(D) 
+
+> I,P
+
+(t) + δt(S) 
+
+> I
+
+(t) + δt(E) 
+
+> I,E
+
+(t) − δt(E)
+
+> I,P
+
+(t) , (17) where 
+
+δt(D) 
+
+> I,E
+
+(t) = − 12
+
+Z t
+
+dt ′
+
+Z t′
+
+dt ′′ niI ∂ih00 (t′′ , xE ) +
+
+Z t
+
+dt ′ niI h0i(t′, xE )
+
+δt(D) 
+
+> I,P
+
+(t) = − 12
+
+Z t−LI
+
+dt ′
+
+Z t′
+
+dt ′′ niI ∂ih00 (t′′ , xP,I ) +
+
+Z t−LI
+
+dt ′ niI h0i(t′, xP,I )
+
+δt(S) 
+
+> I
+
+(t) = + 12
+
+Z LI
+
+> 0
+
+dz hh00 − 2niI h0i + niI n jI hi j 
+
+i (t − z, xE + z ˆnI )
+
+δt(E) 
+
+> I,E
+
+(t) = − 12
+
+Z t
+
+dt ′ h00 (t′, xE )
+
+δt(E)
+
+> I,P
+
+(t) = − 12
+
+Z t−LI
+
+dt ′ h00 (t′, xP,I ) . (18) 
+
+C. additional contributions to timing residuals 
+
+For completeness, we briefly mention other e ff ects that can influence the measured TOAs independently of the metric pertur-bation considered above. In a realistic PTA observation, the observed TOAs and timing residuals are not determined solely by the gravitational perturbation derived in Sec. II A. Schematically, the observed timing residuals can be written as 
+
+δtobs  
+
+> I
+
+(t) = δtI (t; θ) + δttiming  
+
+> I
+
+(t; θtiming ) + δtnoise  
+
+> I
+
+(t; θnoise ) + δtGWB  
+
+> I
+
+(t; θGWB ) , (19) where δtI denotes the time shift induced by the metric perturbation given in Eq. (18), δttiming  
+
+> I
+
+represents the deterministic pulsar timing model, δtnoise  
+
+> I
+
+accounts for instrumental and intrinsic pulsar noise, and δtGWB  
+
+> I
+
+represents contributions from a potential stochastic GWB. The symbol θ denotes the parameters governing each contribution. The timing model accounts for deterministic astrophysical and instrumental e ff ects unrelated to the gravitational signal of in-terest, such as timing corrections back to the quasi-inertial reference frame of the Solar System Barycenter (SSB) and interstellar dispersion [7]. It also includes the pulsar’s intrinsic spin-down, which introduces a quadratic polynomial in t whose coe ffi cients are not known a priori and must be determined from the data [74–77]. Pulsars also exhibit rotational irregularities, generally 7referred to as timing noise, which can often be modeled as white or red noise [78–82]. Finally, if a stochastic GWB exists, as suggested by NANOGrav’s recent evidence [44], it also contributes to the observed time shifts. Both δtnoise  
+
+> I
+
+and δtGWB  
+
+> I
+
+are stochastic processes best described by their power spectral density. The timing model term δttiming  
+
+> I
+
+justifies dropping linear functions in t in Eq. (16) and Eq. (18). However, because the co-effi cients θtiming in δttiming  
+
+> I
+
+(t; θtiming ) are not known a priori and must be inferred from the data, partial degeneracies between 
+
+δttiming  
+
+> I
+
+and the signal shape δtI can further reduce the data’s sensitivity to the signal. This e ff ect is well known in, e.g. , searches for DM substructure [17, 18, 21, 22]. This degeneracy complicates analytic estimates of the signal-to-noise ratio. In practice, however, data analysis software such as enterprise [83, 84] or PTArcade [46] accounts for this degeneracy automatically by marginalizing over the timing-model parameters in the likelihood function and sampling the posterior distributions of the remaining model parameters. Consequently, one typically needs only to input the form of δtI derived from the relevant metric perturbation from Eqs. (17)–(18) and the other contributions in Eq. (19), without manually treating the degeneracy.  
+
+> III. EXPLICIT DEMONSTRATION OF GAUGE INVARIANCE
+
+The observable defined in Eq. (14) and Eq. (16) is a proper time quantity, and is thus automatically invariant under a general gauge transformation on the gravity field, defined as 
+
+hμν → h′ 
+
+> μν
+
+= hμν − ∂μξν − ∂νξμ , (20) for a general four-vector field ξμ. In this section, we demonstrate this gauge invariance explicitly by directly computing δt(t)in the new gauge for a single pulsar. Denoting the time shift quantities in the new gauge by a prime symbol, we compute the Doppler and Einstein contributions in Eq. (16) in the new gauge and find 
+
+δt(D)′ 
+
+> E
+
+(t) = δt(D) 
+
+> E
+
+(t) − niξi(t, xE )
+
+δt(D)′ 
+
+> P
+
+(t) = δt(D) 
+
+> P
+
+(t) − niξi(t − L, xP)
+
+δt(E)′ 
+
+> E
+
+(t) = δt(E) 
+
+> E
+
+(t) + ξ0(t, xE )
+
+δt(E)′ 
+
+> P
+
+(t) = δt(E) 
+
+> P
+
+(t) + ξ0(t − L, xP) . (21) The Shapiro term in the new gauge is slightly more complicated to evaluate, since the integrand has to be evaluated along the photon trajectory. It is more convenient to write the Shapiro term Eq. (16) as δt(S)(t) = (1 /2) R dλ hμν nμnν, and thus in the new gauge 
+
+δt(S)′(t) = δt(S )(t) −
+
+Z
+
+dλ (nμnν∂μξν) ¯xγ (λ) = δt(S )(t) −
+
+Z
+
+dλ ddλ (nμξμ) ¯xγ (λ)
+
+= δt(S)(t) − hξ0(t, xE ) − niξi(t, xE )i + hξ0(t − L, xP) − niξi(t − L, xP)i . (22) Combining Eqs. (21)–(22), we immediately see that the extra terms in the total proper time shift ( cf. Eq. (14)) in the new gauge exactly cancel with each other 
+
+δt′(t) = δt(t) , (23) which concludes our proof that the proper time shift observable is gauge-invariant. We note here that, throughout this exer-cise, the initial conditions are understood to transform consistently under the gauge transformation, so that the same physical worldlines are compared in both gauges. As an additional check, we di ff erentiate Eq. (14) twice with respect to t, substitute Eq. (16), and integrate by parts using 
+
+d/dz = −∂0 + ni∂i along the unperturbed photon trajectory. We obtain 
+
+d2
+
+dt 2 δt(t) = −
+
+Z L
+
+> 0
+
+dz n in jRi0 j0(t − z, xE + z ˆn) , (24) where 
+
+Ri0 j0 = − 12
+
+∂20hi j − ∂0∂ih0 j − ∂0∂ jh0i + ∂i∂ jh00 
+
+ , (25) is the relevant component of the linearized Riemann tensor. This expression is manifestly gauge invariant and agrees with Ref. [42]. 8 
+
+> IV. WORKED EXAMPLES
+
+In Sec. II, we have worked out the proper time shift observable, δt(t), for a general metric perturbation, hμν , in Eq. (14) and Eq. (16). To illustrate how to use the formula, we now compute the proper time shifts by metric perturbations from a few well-motivated physics sources. We note here that theoretical and data analytical works on these sources have been performed in the literature before, often in a di ff erent framework, without putting all contributions in Eq. (14) in a unified manner. For the purpose of this work, we derive the observables for these sources and comment on the similarity and di ff erence with the literature. Detailed analyses on the sources and implementation of searches in realistic datasets are beyond the scope of this work and are left for future investigations. The rest of the section is organized as follows. In Sec. IV A, we derive the proper time shift for a plane GW in two di ff erent gauges and confirm that they agree, and reproduce standard result from the literature. In addition, we compute the same ob-servable for a stochastic GWB formed by superposition of numerous individual sources using the same formalism. In Sec. IV B we consider the proper time shift due to a scalar ultralight dark matter field. Finally, in Sec. IV C, we derive the proper time observable for the gravitational memory e ff ect by considering two metrics arising from di ff erent configurations of an energetic null particle. We note that the proper time observable for dark matter substructure has been worked out in Ref. [22].  
+
+> A. gravitational waves
+
+Our first example is the benchmark scenario of a transient plane GW. Since GWs are the main focus for PTA experiments, the signal has already been worked out in a large number of works in the literature [7, 85–91]. We will show that the proper time shift expression produces the standard result in the literature, serving as a sanity check. The example of GW is unique in that it is commonly described in two di ff erent gauges: the transverse-traceless (TT) gauge [47] and the proper detector (PD) frame [92, 93] (also known as Fermi-normal coordinates). We will show that although the individual contributions in Eq. (16) di ff er in the two gauges, the total sum remains gauge-invariant. We assume that the gravitational wave is traveling in the ˆz direction with a frequency of fg, angular frequency of ωg ≡
+
+2π fg, phase ϕ0, and h+ and h× as its two polarizations. We also assume that the Earth–pulsar direction unit vector ˆn =
+
+(sin θ cos φ, sin θ sin φ, cos θ) has spherical angular coordinates of ( θ, φ ). We set Earth to be located at the origin without loss of generality, and thus the pulsar is located at xP = L ˆn. 
+
+> 1. plane GW in the transverse-traceless gauge
+
+In the TT-gauge, only the physical degrees of freedom are non-zero in the metric perturbation, which is written as [47] 
+
+hμν =
+
+
+
+0 0 0 00 h+ h× 00 h× −h+ 00 0 0 0
+
+
+
+cos hωg(t − z) + ϕ0
+
+i . (26) We immediately see that out of the three terms in Eq. (16), only the Shapiro term contributes. Using nin jhi j = sin 2 θ(h+ cos 2 φ +
+
+h× sin 2 φ) cos hωg(t − z) + ϕ0
+
+i, the proper time shift in Eq. (14) and Eq. (16) is computed to be 
+
+δt(t) = 2
+
+ωg
+
+sin 2
+
+ θ
+
+2
+
+
+
+(h+ cos 2 φ + h× sin 2 φ) sin 
+
+
+
+ωg L cos 2
+
+ θ
+
+2
+
+ 
+
+cos 
+
+
+
+ωg
+
+
+
+t − L cos 2
+
+ θ
+
+2
+
+ 
+
++ ϕ0
+
+
+
+. (27) This expression agrees with the results from the literature, which usually express the timing residual as a time integral of the redshift z(t) of the pulse arrival rate.  
+
+> 2. plane GW in the proper detector frame
+
+The PD frame describes the spacetime perturbation as measured by an inertial observer who is experiencing free fall [47, 94]. Typically, the metric perturbation in the PD frame is written as a local expansion of the metric around the observer’s worldline, and truncation of the expansion is valid for regions well within the typical wavelength of the perturbation [93, 95–98]. However, even beyond this region, the expansion series can be resummed into an analytic form, as derived in Ref. [99]. For algebraic simplicity, in the PD frame calculation, we will take a simplifying geometry by setting θ = π/ 2 and φ = 0, such that the Earth–pulsar line-of-sight is perpendicular to the direction of the GW propagation, and the entire Earth–pulsar system 9can be set at y = z = 0. In this geometry, it is clear from Eq. (16) that the only contributing components to the proper time shift are h00 , h0x, and hxx , which are given by [99] 
+
+h00 (t, x)
+
+> y=0,z=0
+
+= − 12 ω2
+
+> g
+
+h+ x2 cos( ωgt + ϕ0)
+
+h0x(t, x)
+
+> y=0,z=0
+
+= 0
+
+hxx (t, x)
+
+> y=0,z=0
+
+= 0 . (28) We see that, in the PD frame, the Doppler, Shapiro and Einstein contributions in Eq. (16) are all non-zero. Evaluating each contribution using Eq. (28), we find (dropping constants and terms linear in t)
+
+δt(D) 
+
+> E
+
+(t) = 0
+
+δt(D) 
+
+> P
+
+(t) = − 12 h+ L cos hωg(t − L) + ϕ0
+
+i
+
+δt(S)(t) = − 12 h+ L cos hωg(t − L) + ϕ0
+
+i + 14 h+ωg L2 sin hωg(t − L) + ϕ0
+
+i + 1
+
+ωg
+
+h+ sin ωg L
+
+2
+
+!
+
+cos 
+
+
+
+ωg
+
+
+
+t − L
+
+2
+
+
+
++ ϕ0
+
+
+
+δt(E) 
+
+> E
+
+(t) = 0
+
+δt(E) 
+
+> P
+
+(t) = 14 h+ωg L2 sin hωg(t − L) + ϕ0
+
+i , (29) and, from Eq. (14) 
+
+δt(t) = 1
+
+ωg
+
+h+ sin ωg L
+
+2
+
+!
+
+cos 
+
+
+
+ωg
+
+
+
+t − L
+
+2
+
+
+
++ ϕ0
+
+
+
+. (30) It is thus clear from comparing Eq. (27) and Eq. (30) that δt(t) in the PD frame gives the same answer as in the TT gauge in this simple geometry. 
+
+3. stochastic gravitational-wave background 
+
+Having verified that the proper time formalism reproduces the residual of a single plane GW in two gauges, we now consider a stochastic GWB formed by the superposition of many individual sources. The response of a pulsar timing array to such a background is a classical result that has been derived many times [7, 85–91, 100–103]. Here we compute the proper time observable for the stochastic GWB and show that it recovers results known in the standard literature. We work in the TT gauge, where only the Shapiro term of Eq. (18) contributes, as noted above, so that the entire GWB observable sits in a single line-of-sight integral. A general GW background can be expanded in plane waves as [47, 104, 105] 
+
+hi j (t, x) =
+
+X
+
+> A
+
+Z ∞−∞ 
+
+d f 
+
+Z 
+
+> S2
+
+d2 ˆΩ ˜hA( f, ˆΩ) eAi j ( ˆ Ω) e2πi f (t− ˆΩ·x) , (31) where ˆ Ω is the propagation direction, f is the frequency of each individual source, and eAi j ( ˆ Ω) with A = + , × are the transverse-traceless polarization tensors, normalized as eAi j eA′ i j = 2δAA ′ . Physically, ˜ hA( f, ˆΩ) is built from the incoherent sum of the individual waves emitted by a population of sources distributed across the sky. Setting Earth at the origin, xE = 0, we insert this expansion into the Shapiro term of Eq. (18) and find 
+
+δtI (t) =
+
+X
+
+> A
+
+Z ∞−∞ 
+
+d f 
+
+Z 
+
+> S2
+
+d2 ˆΩ ˜hA( f, ˆΩ) FAI ( ˆ Ω) 1 − e−2πi f L I (1+ ˆΩ· ˆnI )2πi f e2πi f t , (32) where we have defined the antenna pattern function 
+
+FAI ( ˆ Ω) ≡ niI n jI eAi j ( ˆ Ω)2 1 + ˆΩ · ˆnI
+
+ . (33) 10 The two terms in the numerator of Eq. (32) are known as the Earth and pulsar terms in standard PTA literature, since they arise from the GWB contribution to the Shapiro delay close to the Earth and the pulsar, respectively. In the standard treatment [7, 85, 86], this structure is derived by integrating the redshift of the pulse arrival rate along the null geodesic, whereas here it emerges directly from the Shapiro contribution to a manifestly gauge-invariant proper time observable. To connect with the literature, we define the redshift of the time shift measurement as zI (t) ≡ (d/dt ) δtI (t), whose Fourier transform is (using Eq. (32)) ˜zI ( f ) =
+
+X
+
+> A
+
+Z 
+
+> S2
+
+d2 ˆΩ ˜hA( f, ˆΩ) FAI ( ˆ Ω) h1 − e−2πi f L I (1+ ˆΩ· ˆnI )i . (34) The cross-correlation between the redshifts of pulsars I and J is then [7] 
+
+˜zI ( f ) ˜ z∗ 
+
+> J
+
+( f ′) =
+
+X
+
+> A
+
+X
+
+> A′
+
+Z 
+
+> S2
+
+Z 
+
+> S2′
+
+d2 ˆΩ d2 ˆΩ′ h1 − e−2πi f L I (1+ ˆΩ· ˆnI )i h 1 − e2πi f ′ LJ (1+ ˆΩ′· ˆnJ )i
+
+× D˜hA( f, ˆΩ) ˜ h∗ 
+
+> A′
+
+( f ′, ˆΩ′)E FAI ( ˆ Ω) FA′ 
+
+> J
+
+( ˆ Ω′) . (35) We emphasize that this expression is exact in f L I , since we have made no expansion in the GW wavelength relative to the Earth– pulsar distance. From this point the analysis is standard [7, 86, 101]. We specify a stationary, isotropic, unpolarized, Gaussian ensemble for ˜ hA( f, ˆΩ), and we work in the short-wavelength limit f L I ≫ 1 appropriate to the PTA band, where we assume that the separation between distinct pulsars is much larger than the GW wavelength, 1 / f ≃ 0.1 pc (100 nHz / f ). The pulsar terms then oscillate rapidly over the sky and are suppressed upon integration for I , J, while contributing a factor of two for I = J,up to corrections of order 1 /( f L I ) [90]. The remaining sky integral over the antenna patterns yields the one-sided cross-power spectral density of the proper time shifts. Writing 
+
+˜zI ( f ) ˜ z∗ 
+
+> J
+
+( f ′) = 12 δ   f − f ′ (2 π f )2 S IJ ( f ) . (36) The result is [7] 
+
+S IJ ( f ) = χIJ 
+
+h2 
+
+> c
+
+( f )12 π2 f 3 , χIJ = 32 xIJ ln xIJ − xIJ 
+
+4 + 12 + 12 δIJ , xIJ ≡ 1 − cos γIJ 
+
+2 , (37) where hc( f ) is the characteristic strain of the background, γIJ is the angular separation between pulsars I and J, and χIJ is the Hellings–Downs curve [101]. The δIJ term arises from the pulsar-term autocorrelation, which survives the sky integration only for I = J. This is the standard expression employed in PTA searches for a stochastic GWB. We have thus recovered the full cross-correlation statistics of the GWB from the Shapiro term of Eq. (18) alone. The antenna pattern, the Earth-term and pulsar-term structure, and the Hellings–Downs correlation all follow from a single contribution to the proper time observable, whereas in another gauge the same S IJ ( f ) would be distributed across nonvanishing Doppler, Shapiro, and Einstein terms.  
+
+> B. ultralight dark matter
+
+Ultralight dark matter with mass ≲ eV has high occupation number, and thus behaves like a coherent field [106]. There is a large body of work in the literature discussing the prospects of using PTA for ULDM detection as well as actual implementation in data analysis [23–41, 43]. The metric perturbation due to scalar ULDM, in Newtonian gauge, can be written as 
+
+ds 2 = −(1 + 2Φ)dt 2 + (1 − 2Ψ)dx idx i , (38) 11 where the potentials Φ and Ψ are stochastic quantities that depend on the value of the ULDM field. Putting this form of the metric perturbation into the proper time shift expression in Eq. (18), we find that the time shifts for the I-th pulsar are given by 
+
+δt(D) 
+
+> I,E
+
+(t) =
+
+Z t
+
+dt ′
+
+Z t′
+
+dt ′′ ˆnI · ∇ Φ(t′′ , xE )
+
+δt(D) 
+
+> I,P
+
+(t) =
+
+Z t−LI
+
+dt ′
+
+Z t′
+
+dt ′′ ˆnI · ∇ Φ(t′′ , xP,I )
+
+δt(S) 
+
+> I
+
+(t) = −
+
+Z LI
+
+> 0
+
+dz [Φ(t − z, xE + z ˆnI ) + Ψ (t − z, xE + z ˆnI )] 
+
+δt(E) 
+
+> I,E
+
+(t) =
+
+Z t
+
+dt ′ Φ(t′, xE )
+
+δt(E)
+
+> I,P
+
+(t) =
+
+Z t−LI
+
+dt ′ Φ(t′, xP,I ) . (39) To compare this to the literature, we can compute the fractional shift in frequency of the pulses, defined as δν I (t)/ν I ≡−(d/dt )δtI (t), and find the total as 
+
+δν I (t)
+
+νI
+
+= − ˆnI ·
+
+"Z t
+
+dt ′ ∇Φ(t′, xE ) −
+
+Z t−LI
+
+dt ′ ∇Φ(t′, xP,I )
+
+#
+
++
+
+Z LI
+
+> 0
+
+dz ˆnI · ∇ [Φ(t − z, xE + z ˆnI ) + Ψ (t − z, xE + z ˆnI )] 
+
++ Ψ(t, xE ) − Ψ(t − LI , xP,I ) . (40) This mostly agrees with the result from Ref. [33] up to relative signs between terms. One can now derive the time shifts by integrating Eq. (40) over time.    
+
+> C. gravitational shock wave /memory e ff ect
+
+Our final example is the gravitational memory e ff ect, which is the prediction of general relativity that a burst of gravita-tional radiation or of unbound matter-energy leaves freely falling test masses permanently displaced from their initial config-uration [107–114]. This can be due to, for example, mergers of supermassive black hole binaries [115–117], or supernova neutrinos [118–120]. Memory has close connection to the soft graviton theorem and the BMS supertranslation symmetry at null infinity [121, 122], so a detection could probe the vacuum structure of asymptotically flat gravity [123–125]. Works on detecting the memory e ff ect using LIGO and NANOGrav include Refs. [126–129] and Refs. [130–133], while there are proposals of using future laser interferometers such as LISA and Einstein Telescope [134–137], (for reviews, see Refs. [138, 139]). To date, the memory e ff ect has not been observed yet. It has long been understood that the null memory e ff ect is related to the metric perturbation sourced by highly energetic, null particles [118, 119]. For instance, the geometry created by a null particle is described by the Aichelburg–Sexl (AS) metric [140, 141], obtained originally as the ultrarelativistic boost of the Schwarzschild solution, which is flat everywhere except for a delta-function curvature concentrated on the null plane swept out by the particle. Its connection to the memory e ff ect was clarified in Ref. [142], which argued that the AS metric produces no displacement memory, as its only permanent imprint is a relative 
+
+velocity kick imparted to bodies crossing the null plane [142–144]. Instead, the mechanism for producing a displacement 
+
+memory in free-falling test bodies needs to include the production of the null particle itself, which can be modeled as a massive particle decaying into an energetic light particle and a heavy remnant. In this case, the original massive body can be understood as a merging massive black hole binary, where the null particle is the GW burst emitted. In this subsection, we apply our proper time shift formalism to verify this claim. We consider 1) the AS metric from an “eternal” null particle, as well as 2) the metric due to a massive body decaying into an energetic null particle and a heavy remnant, similar to a massive black hole merger. We compute the timing residual of a single Earth–pulsar pair for both metrics. We first consider the AS metric which arises from a single null particle that was created in the infinite past [140, 141] 
+
+ds 2 = −du dv + f (ρ) δ(u) du 2 + dx 2 + dy 2
+
+f (ρ) = −8GE ln ρ , (41) where u ≡ t − z and v ≡ t + z are the lightcone coordinates, assuming that the particle is moving along the ˆz direction, E is the energy of the particle, and ρ ≡ px2 + y2 the transverse distance from its trajectory, so that the curvature sits on the null plane u = 0. Reading the perturbation o ff the line element, we find h00 = f δ(u), h0z = − f δ(u), and hzz = f δ(u). Furthermore, we let Earth sit at transverse displacement bE ≡ bE ˆx from the shock axis, with components xE = (bE , 0, 0), and the pulsar at 
+
+xP = xE + L ˆn with transverse position bP = bE + Ln⊥, where n⊥ ≡ ˆn − ( ˆn · ˆz)ˆz and cos θ ≡ ˆn · ˆz. We denote bP ≡ | bP| to be the 12 transverse displacement of the pulsar. The wavefront crosses Earth at t = 0 and crosses the pulsar worldline at coordinate time 
+
+L cos θ.The evaluation of the five entries of Eq. (16) for this metric is elementary, and we collect them in App. A. Combining them, we find 
+
+δt(t) = − 4GE (1 + cos θ) ln 
+
+" ργ(t)
+
+bE
+
+#
+
+Θ(t) + 4GE n⊥ · bE
+
+b2
+
+> E
+
+t Θ(t)
+
++ 4GE (1 + cos θ) ln 
+
+" ργ(t)
+
+bP
+
+#
+
+Θ (t − tP) − 4GE n⊥ · bP
+
+b2
+
+> P
+
+(t − tP) Θ (t − tP) , (42) where ργ(t) ≡ | bE + z∗(t) n⊥| with z∗(t) = t/ (1 + cos θ) is the transverse distance from the shock axis of the point at which the wavefront intersects the line of sight at reception time t. Equation (42) represents instantaneous “kicks” at times t = 0 and 
+
+t = tP, at the Earth and pulsar locations, where the null plane produced by the energetic particle intersects with the Earth–pulsar system, generating the proper time shift. To understand whether this corresponds to the memory e ff ect, we take the t → ∞ limit in Eq. (42) to extract the late time behavior, and find 
+
+δt(t) → 4GE 
+
+ n⊥ · bE
+
+b2
+
+> E
+
+− n⊥ · bP
+
+b2
+
+> P
+
+ t , (43) where we drop a constant term that becomes subdominant for su ffi ciently large t. This is the structure of a velocity memory eff ect [142–144], where, long after the shock has passed, the Earth–pulsar system retains the memory of a velocity kick induced by the null particle, and continues to drift with a constant velocity. The first calculation thus realizes the statement of Ref. [142] about an “eternal” null particle leaving a velocity memory. In contrast, producing a displacement memory requires the consideration of the production of the null particle instead, which is absent in the above analysis. Conservation of four-momentum forbids creating null energy from nothing, so the elementary process is a particle of mass M at rest which, at time t0, emits a null particle of energy E along ˆz and recoils, and the metric is the retarded Lorenz-gauge solution of the linearized Einstein equation with this source. The corresponding form of the metric has been derived in Ref. [142], which consists of the sum of three terms: a static piece (I) from the mass before the emission, a boosted piece (II) from the recoiling mass after, and a piece (III) sourced by the null particle itself, 
+
+hμν = hI 
+
+> μν
+
++ hII  
+
+> μν
+
++ hIII 
+
+> μν
+
+hI 
+
+> μν
+
+= 2GM 
+
+q
+
+x2 + y2 + (z − t0)2
+
+ημν + 2tμtν
+
+ Θ(−U)
+
+hII  
+
+> μν
+
+= 2GM ′
+
+q
+
+x2 + y2 + (z′ − t0)2
+
+ημν + 2t′
+
+> μ
+
+t′
+
+> ν
+
+ Θ(U)
+
+hIII  
+
+> μν
+
+= 4GE t − z kμkν Θ(U) , (44) where tμ = (1 , 0, 0, 0) is the four-velocity of static observers in the global inertial frame and kμ = (1 , ˆz) is tangent to the null geodesic. The decay occurs at the event xμ 
+
+> d
+
+= (t0, 0, 0, t0). Four-momentum conservation fixes the rest mass, velocity, and Lorentz factor of the remnant, M′ = √M2 − 2ME , v = E/ (M − E), and γ = (M − E) /M′, so that its four-velocity is t′μ = γ (1 , 0, 0, −v), and z′ = t0 + γ [( z − t0) + v (t − t0)] is the longitudinal coordinate of its rest frame. Here U is the retarded time with respect to the decay, 
+
+U ≡ (t − t0) −
+
+q
+
+x2 + y2 + (z − t0)2 . (45) All three pieces in Eq. (44) are required, since they descend from a single conserved stress tensor, and only the sum is a solution to the linearized Einstein equation. It is recognized in Ref. [142] that the two metrics in Eq. (41) and Eq. (44) are limits of one another: sending t0 → −∞ in Eq. (44), the Riemann tensor becomes that of the AS metric of Eq. (41), where the information on the production of the null particle itself is forgotten. The two metrics therefore realize the two sides of the statement that memory is associated with the creation of null stress-energy and not with its passage. The proper time observable for this setup can be computed by putting the metric in Eq. (44) into Eq. (16). We carry out this calculation in App. A and find the approximate solution 
+
+δt(t) ≈ 12 cos (2 ψ) (1 − cos α) h0 [( t − tE ) Θ (t − tE ) − (t − tE − tP) Θ (t − tE − tP)] , (46) 13 remnant M ′
+
+M
+
+decaying mass 
+
+E, ˆz
+
+> null particle
+
+RθU = 0 
+
+Earth 
+
+pulsar 
+
+αL
+
+ˆn
+
+FIG. 2. Geometry of the created null particle and the Earth–pulsar pair. A particle of mass M at rest, the decaying mass, emits a null particle of energy E along ˆz and recoils as the remnant M′, conserving four-momentum. The pair lies at distance R from the emission event along the direction ˆR, with ˆR · ˆz = cos θ. We note that ˆz points along the particle’s trajectory while ˆR points toward the observer, and the two coincide only for emission directly at the observer. The blue curve is the creation wavefront U = 0, the future light cone of the emission event, expanding at the speed of light. Across the Earth–pulsar system it is plane up to corrections of O(L/R) and propagates along ˆR. The red wavy line is a pulse in flight from the pulsar to Earth: the snapshot shows the epoch after the front has crossed Earth and before the pulsar term arrives, during which pulses straddle the front and the residual of Eq. (46) ramps. The pulsar lies at distance L from Earth along ˆn. Separations are not to scale, L ≪ R. This figure was produced with assistance from Anthropic’s Claude Opus 5 model. 
+
+where cos α ≡ ˆR · ˆn and cos θ ≡ ˆR · ˆz, with ˆR the unit vector pointing from the decay toward Earth, ψ is the azimuth of ˆn about 
+
+ˆR measured from the sky projection of ˆz,cos ψ = ˆn · ˆz − cos θ cos α
+
+sin α sin θ , (47) 
+
+tE = t0 + R is the arrival time of the wavefront at Earth, tP = L (1 + cos α) is the delay of the pulsar term, and h0 is the amplitude given by 
+
+h0 = 2GE R
+
+1 + ˆR · ˆz . (48) Equation (46) is precisely the burst-with-memory template employed by NANOGrav in their searches [117, 133, 145]. This can be interpreted as the memory wavefront passing over the Earth–pulsar system, inducing a ramp in the proper time shift measured from all pulsars in an angular pattern given by Eqs. (46)–(47). Importantly, if we now take the limit t → ∞ , the proper time shift in Eq. (46) saturates at the constant 
+
+δt → 12 cos (2 ψ) (1 − cos α) h0 tP . (49) We thus see that the Earth–pulsar system is left permanently displaced and at relative rest (as opposed to the AS metric coming from an “eternal” null particle in Eq. (43)), which is the displacement memory. 14  
+
+> V. CONCLUSION
+
+We have derived the proper time shift measured by a PTA for an arbitrary metric perturbation, hμν , at linear order, in analogy with previous work on other GW detectors such as laser [50] and atom interferometers [51]. The response separates into Doppler, Shapiro, and Einstein contributions whose sum is gauge invariant. The expressions for the proper time shift, which can be used directly in software such as enterprise [83, 84] and PTArcade [46] to study BSM physics with PTAs, are collected in Eqs. (14) and (16). We illustrate the power of this formalism with physically motivated examples of hμν , including GWs, ULDM, and the memory e ff ect. 
+
+> ACKNOWLEDGMENTS
+
+The author thanks Kim V. Berghaus, Abhiram Cherukupalli, Qiuyue Liang, Andrea Mitridate, Kai Schmitz, and Kathryn M. Zurek for helpful discussions. The author is a member of the NANOGrav collaboration. The author is supported by the Network for Neutrinos, Nuclear Astrophysics and Symmetries (N3AS) through the National Science Foundation Physics Frontier Center, Grant No. PHY-2020275. The author acknowledges the use of Anthropic’s Claude Opus 5 model, accessed through Lawrence Berkeley National Laboratory’s CBorg AI platform, for text polishing, figure generation, and equation checking. This research used the CBorg AI platform and resources provided by the IT Division at the Lawrence Berkeley National Laboratory (Supported by the Director, O ffi ce of Science, O ffi ce of Basic Energy Sciences, of the U.S. Department of Energy under Contract No. DE-AC02-05CH11231). 
+
+> Appendix A: Evaluation of the Proper Time Shifts from a Null Particle
+
+In this appendix we evaluate the individual entries of Eq. (16) for the two metrics of the main text and combine them into the residuals quoted there: the AS metric produced by an “eternal” ( i.e. created in the infinite past) null particle, Eq. (41), leading to Eq. (42), and a null particle (with a massive remnant) created from the decay of a heavy parent, Eq. (44), leading to Eqs. (46)–(48).  
+
+> 1. the AS metric
+
+With the perturbation h00 = f δ(u), h0z = − f δ(u), hzz = f δ(u) of Eq. (41) and the geometry of the main text, the entries of Eq. (16) evaluate as follows. The Einstein entries integrate h00 once in time at fixed position, where δ(u) = δ(t) at Earth and 
+
+δ (t − L cos θ) at the pulsar, whose entries run to the emission time t − L, producing tP = L (1 + cos θ): 
+
+δt(E) 
+
+> E
+
+(t) = − 12 f (bE ) Θ(t)
+
+δt(E) 
+
+> P
+
+(t) = − 12 f (bP) Θ (t − tP) . (A1) The Doppler entries comprise a double time integral of ni∂ih00 = (n⊥ · ∇ ⊥ f ) δ(u) − cos θ f δ′(u) and a single time integral of 
+
+nih0i = − cos θ f δ(u), which evaluates to 
+
+δt(D) 
+
+> E
+
+(t) = − 12 (n⊥ · ∇ ⊥ f ) bE
+
+t Θ(t) − cos θ
+
+2 f (bE ) Θ(t)
+
+δt(D) 
+
+> P
+
+(t) = − 12 (n⊥ · ∇ ⊥ f ) bP
+
+(t − tP) Θ (t − tP) − cos θ
+
+2 f (bP) Θ (t − tP) . (A2) The Shapiro term is an integral over the combination h00 − 2nih0i + nin jhi j = f δ(u) (1 + cos θ)2 along the pulse path u =
+
+t − z (1 + cos θ), so the delta function selects the intersection z∗(t) = t/(1 + cos θ) of wavefront and line of sight 
+
+δt(S)(t) = 1 + cos θ
+
+2 f ργ(t) [Θ(t) − Θ (t − tP)] , (A3) where ργ(t) = |bE + z∗(t)n⊥|. Combining Eqs. (A1)–(A3) yields Eq. (42) of the main text. 15 
+
+2. null particle created from decay 
+
+We now turn our attention to evaluating the proper time shift for the second system, where an energetic particle with energy 
+
+E is produced at t = t0 by a heavy particle with mass M decaying and recoiling as a remnant with mass M′. As described in Sec. IV C, the metric has been derived in Ref. [142] as Eq. (44). To compute the proper time shift in Eq. (16), we first simplify the metric in Eq. (44) using two approximations: 1) small recoil ( E ≪ M), and 2) far field ( L ≪ R, where R is the vector pointing from the decaying mass to Earth and L ˆn is the vector pointing from Earth to the pulsar, see Fig. 2). In particular, denoting the spatial position of the decay by xd = (0 , 0, t0), so that R = xE − xd and |x − xd| ≈ R + ˆR · (x − xE ) to first order in L/R, we have 
+
+U ≡ t − t0 − | x − xd| ≈ (t − t0 − R) − ˆR · (x − xE ). Piece I becomes 
+
+hI 
+
+> μν
+
+= 2GM R
+
+ημν + 2tμtν
+
+ Θ (−U) . (A4) For piece II, to first order in E/M we have M′ ≈ M − E, v ≈ E/M, γ ≈ 1 + (E2/2M2) and t′ 
+
+> μ
+
+≈ tμ − (E/M) ˆzμ with ˆzμ = (0 , ˆz), so that ημν + 2t′
+
+> μ
+
+t′ 
+
+> ν
+
+≈ ημν + 2tμtν − (2 E/M) tμ ˆzν + tν ˆzμ
+
+, while z′ ≈ z + (E/M) ( t − t0) with t − t0 ≈ R behind the wavefront, so that the distance to the remnant is R 1 + (E/M) ˆR · ˆz. Multiplying the three factors and keeping terms of order E,
+
+hII  
+
+> μν
+
+=
+
+( 2GM R
+
+ημν + 2tμtν
+
+ − 2GE R
+
+h 1 + ˆR · ˆz  ημν + 2tμtν
+
+ + 2 tμ ˆzν + tν ˆzμ
+
+i )
+
+Θ (U) . (A5) For piece III, the denominator is t − z = (t − t0) − (z − t0) ≈ R 1 − ˆR · ˆz at the pair behind the wavefront, so that 
+
+hIII  
+
+> μν
+
+= 4GE R 1 − ˆR · ˆz kμkν Θ (U) . (A6) Collecting all terms, the two step-function pieces combine into a constant piece plus a step whose amplitude is linear in E,
+
+hμν = 2GM R diag(1 , 1, 1, 1) + ∆ hμν Θ t − tE − ˆR · (x − xE ) , (A7) where tE = t0 + R and we used the expressions ημν + 2tμtν = diag(1 , 1, 1, 1) and tμ ˆzν + tν ˆzμ
+
+ 
+
+> 0i
+
+= tμ ˆzν + tν ˆzμ
+
+ 
+
+> i0
+
+= −ˆzi, all other components vanishing, and 
+
+∆h00 = − 2GE R
+
+1 + ˆR · ˆz + 4GE R 1 − ˆR · ˆz
+
+∆h0i =
+
+
+
+4GE R − 4GE R 1 − ˆR · ˆz ˆzi
+
+∆hi j = − 2GE R
+
+1 + ˆR · ˆz δi j + 4GE R 1 − ˆR · ˆz ˆzi ˆz j . (A8) The advantage of writing the metric in the form of Eqs. (A7)–(A8) is that, since ∆hμν is approximately a constant tensor (its spatial gradient introduces extra suppression in 1 /R), the integrals in Eq. (15) can be readily evaluated. The result is 
+
+δt(E) 
+
+> E
+
+= −GM R t − ∆h00 
+
+2 (t − tE ) Θ (t − tE )
+
+δt(E) 
+
+> P
+
+= −GM R (t − L) − ∆h00 
+
+2 (t − tE − tP) Θ (t − tE − tP)
+
+δt(D) 
+
+> E
+
+=
+
+ cos α
+
+2 ∆h00 + ni∆h0i
+
+
+
+(t − tE ) Θ (t − tE )
+
+δt(D) 
+
+> P
+
+=
+
+ cos α
+
+2 ∆h00 + ni∆h0i
+
+
+
+(t − tE − tP) Θ (t − tE − tP)
+
+δt(S) = 2GML R + ∆h00 − 2ni∆h0i + nin j∆hi j 
+
+2 (1 + cos α) [( t − tE ) Θ (t − tE ) − (t − tE − tP) Θ (t − tE − tP)] , (A9) where cos α ≡ ˆR· ˆn, and tP = L (1 + cos α) corresponds to the delay of the pulsar term relative to the Earth term. The combination of Eq. (14) is 
+
+δt(t) = cos 2 α∆h00 + 2 cos αni∆h0i + nin j∆hi j 
+
+2 (1 + cos α) [( t − tE ) Θ (t − tE ) − (t − tE − tP) Θ (t − tE − tP)] , (A10) 16 where we dropped a constant piece of GML /R which is degenerate with the timing model. This recovers the time signature of the memory template written as Eq. (46) in Sec. IV C commonly employed in realistic searches with PTA data [133]. The angular structure and the amplitude in Eq. (47) and Eq. (48) can be readily derived by putting Eq. (A8) into Eq. (A10). 
+
+[1] M. A. McLaughlin, The North American Nanohertz Observatory for Gravitational Waves, Class. Quant. Grav. 30 , 224008 (2013), arXiv:1310.0758 [astro-ph.IM]. [2] R. D. Ferdman et al. , The European Pulsar Timing Array: current e ff orts and a LEAP toward the future, Class. Quant. Grav. 27 , 084014 (2010), arXiv:1003.3405 [astro-ph.HE]. [3] R. N. Manchester, G. Hobbs, M. Bailes, W. A. Coles, W. van Straten, M. J. Keith, R. M. Shannon, N. D. R. Bhat, A. Brown, S. G. Burke-Spolaor, D. J. Champion, A. Chaudhary, R. T. Edwards, G. Hampson, A. W. Hotan, A. Jameson, F. A. Jenet, M. J. Kesteven, J. Khoo, J. Kocz, K. Maciesiak, S. Oslowski, V. Ravi, J. R. Reynolds, J. M. Sarkissian, J. P. W. Verbiest, Z. L. Wen, W. E. Wilson, D. Yardley, W. M. Yan, and X. P. You, The Parkes Pulsar Timing Array Project, Publ. Astron. Soc. Aust. 30 , e017 (2013), arXiv:1210.6130 [astro-ph.IM]. [4] P. Tarafdar et al. , The Indian Pulsar Timing Array: First data release, Publ. Astron. Soc. Austral. 39 , e053 (2022), arXiv:2206.09289 [astro-ph.IM]. [5] H. Xu et al. , Searching for the Nano-Hertz Stochastic Gravitational Wave Background with the Chinese Pulsar Timing Array Data Release I, Res. Astron. Astrophys. 23 , 075024 (2023), arXiv:2306.16216 [astro-ph.HE]. [6] R. Spiewak et al. , The MeerTime Pulsar Timing Array: A census of emission properties and timing potential, Publ. Astron. Soc. Austral. 
+
+39 , e027 (2022), arXiv:2204.04115 [astro-ph.HE]. [7] S. R. Taylor, The Nanohertz Gravitational Wave Astronomer, (2021), arXiv:2105.13270 [astro-ph.HE]. [8] N. Seto and A. Cooray, Searching for primordial black hole dark matter with pulsar timing arrays, Astrophys. J. Lett. 659 , L33 (2007), arXiv:astro-ph /0702586. [9] K. Kashiyama and N. Seto, Enhanced exploration for primordial black holes using pulsar timing arrays, Mon. Not. R. Astron. Soc. 426 ,1369 (2012), arXiv:1208.4101 [astro-ph.CO]. [10] K. Schutz and A. Liu, Pulsar timing can constrain primordial black holes in the LIGO mass window, Phys. Rev. D 95 , 023002 (2017), arXiv:1610.04234 [astro-ph.CO]. [11] J. A. Dror, H. Ramani, T. Trickle, and K. M. Zurek, Pulsar Timing Probes of Primordial Black Holes and Subhalos, Phys. Rev. D 100 ,023003 (2019), arXiv:1901.04490 [astro-ph.CO]. [12] E. R. Siegel, M. P. Hertzberg, and J. N. Fry, Probing Dark Matter Substructure with Pulsar Timing, Mon. Not. Roy. Astron. Soc. 382 ,879 (2007), arXiv:astro-ph /0702546. [13] S. Baghram, N. Afshordi, and K. M. Zurek, Prospects for Detecting Dark Matter Halo Substructure with Pulsar Timing, Phys. Rev. D 
+
+84 , 043511 (2011), arXiv:1101.5487 [astro-ph.CO]. [14] H. A. Clark, G. F. Lewis, and P. Scott, Investigating dark matter substructure with pulsar timing – I. Constraints on ultracompact minihaloes, Mon. Not. Roy. Astron. Soc. 456 , 1394 (2016), [Erratum: Mon.Not.Roy.Astron.Soc. 464, 2468 (2017)], arXiv:1509.02938 [astro-ph.CO]. [15] H. A. Clark, G. F. Lewis, and P. Scott, Investigating dark matter substructure with pulsar timing – II. Improved limits on small-scale cos-mology, Mon. Not. Roy. Astron. Soc. 456 , 1402 (2016), [Erratum: Mon.Not.Roy.Astron.Soc. 464, 955–956 (2017)], arXiv:1509.02941 [astro-ph.CO]. [16] K. Kashiyama and M. Oguri, Detectability of Small-Scale Dark Matter Clumps with Pulsar Timing Arrays, (2018), arXiv:1801.07847 [astro-ph.CO]. [17] H. Ramani, T. Trickle, and K. M. Zurek, Observability of Dark Matter Substructure with Pulsar Timing Correlations, JCAP 12 , 033, arXiv:2005.03030 [astro-ph.CO]. [18] V. S. H. Lee, A. Mitridate, T. Trickle, and K. M. Zurek, Probing Small-Scale Power Spectra with Pulsar Timing Arrays, JHEP 06 , 028, arXiv:2012.09857 [astro-ph.CO]. [19] V. S. H. Lee, S. R. Taylor, T. Trickle, and K. M. Zurek, Bayesian Forecasts for Dark Matter Substructure Searches with Mock Pulsar Timing Data, JCAP 08 , 025, arXiv:2104.05717 [astro-ph.CO]. [20] K. V. Berghaus, Y. Du, V. S. H. Lee, A. Prabhu, R. Reischke, L. Connor, and K. M. Zurek, Physics beyond the Standard Model with the DSA-2000, JCAP 12 , 035, arXiv:2505.23892 [hep-ph]. [21] J. W. Foster, T. Trickle, and F. Vassallo, Projecting the ultimate pulsar timing sensitivity to dark matter substructure in a stochastic gravitational wave background, (2026), arXiv:2606.18329 [astro-ph.CO]. [22] A. Cherukupalli, V. S. H. Lee, K. Berghaus, and K. M. Zurek, Pulsar Timing Sensitivity to Dark Matter Substructure in the Presence of a Stochastic Gravitational-Wave Background, (2026), arXiv:2607.03533 [astro-ph.CO]. [23] A. Khmelnitsky and V. Rubakov, Pulsar timing signal from ultralight scalar dark matter, JCAP 02 , 019, arXiv:1309.5888 [astro-ph.CO]. [24] N. K. Porayko and K. A. Postnov, Constraints on ultralight scalar dark matter from pulsar timing, Phys. Rev. D 90 , 062008 (2014), arXiv:1408.4670 [astro-ph.CO]. [25] P. W. Graham, D. E. Kaplan, J. Mardon, S. Rajendran, and W. A. Terrano, Dark Matter Direct Detection with Accelerometers, Phys. Rev. D 93 , 075029 (2016), arXiv:1512.06165 [hep-ph]. [26] A. Aoki and J. Soda, Pulsar timing signal from ultralight axion in f (R) theory, Phys. Rev. D 93 , 083503 (2016), arXiv:1601.03904 [hep-ph]. 17 
+
+[27] I. De Martino, T. Broadhurst, S. H. Henry Tye, T. Chiueh, H.-Y. Schive, and R. Lazkoz, Recognizing Axionic Dark Matter by Compton and de Broglie Scale Modulation of Pulsar Timing, Phys. Rev. Lett. 119 , 221103 (2017), arXiv:1705.04367 [astro-ph.CO]. [28] N. K. Porayko et al. , Parkes Pulsar Timing Array constraints on ultralight scalar-field dark matter, Phys. Rev. D 98 , 102002 (2018), arXiv:1810.03227 [astro-ph.CO]. [29] R. Kato and J. Soda, Search for ultralight scalar dark matter with pulsar timing arrays, JCAP 09 , 036, arXiv:1904.09143 [astro-ph.HE]. [30] K. Nomura, A. Ito, and J. Soda, Pulsar timing residual induced by ultralight vector dark matter, Eur. Phys. J. C 80 , 419 (2020), arXiv:1912.10210 [gr-qc]. [31] D. E. Kaplan, A. Mitridate, and T. Trickle, Constraining fundamental constant variations from ultralight dark matter with pulsar timing arrays, Phys. Rev. D 106 , 035032 (2022), arXiv:2205.06817 [hep-ph]. [32] C. Unal, F. R. Urban, and E. D. Kovetz, Probing ultralight scalar, vector and tensor dark matter with pulsar timing arrays, Phys. Lett. B 
+
+855 , 138830 (2024), arXiv:2209.02741 [astro-ph.CO]. [33] H. Kim and A. Mitridate, Stochastic ultralight dark matter fluctuations in pulsar timing arrays, Phys. Rev. D 109 , 055017 (2024), arXiv:2312.12225 [hep-ph]. [34] A. Eberhardt, Q. Liang, and E. G. M. Ferreira, Simulations of Shapiro, Gravitational, and Doppler time delays in pulsar networks for ultralight dark matter, Phys. Rev. D 112 , 123036 (2025), arXiv:2411.18051 [astro-ph.CO]. [35] H. Kim, Gravitational interaction of ultralight dark matter with interferometers, JCAP 12 , 018, arXiv:2306.13348 [hep-ph]. [36] Z.-Q. Xia, T.-P. Tang, X. Huang, Q. Yuan, and Y.-Z. Fan, Constraining ultralight dark matter using the Fermi-LAT pulsar timing array, Phys. Rev. D 107 , L121302 (2023), arXiv:2303.17545 [astro-ph.HE]. [37] H. N. Luu, T. Liu, J. Ren, T. Broadhurst, R. Yang, J.-S. Wang, and Z. Xie, Stochastic Wave Dark Matter with Fermi-LAT γ-Ray Pulsar Timing Array, Astrophys. J. Lett. 963 , L46 (2024), arXiv:2304.04735 [astro-ph.HE]. [38] J.-c. Hwang, D. Jeong, H. Noh, and C. Smarra, Pulsar Timing Array signature from oscillating metric perturbations due to ultra-light axion, JCAP 02 , 014, arXiv:2311.00234 [astro-ph.CO]. [39] C. Smarra et al. (European Pulsar Timing Array), Second Data Release from the European Pulsar Timing Array: Challenging the Ultralight Dark Matter Paradigm, Phys. Rev. Lett. 131 , 171001 (2023), arXiv:2306.16228 [astro-ph.HE]. [40] K. K. Boddy, J. A. Dror, and A. Lam, Ultralight Dark Matter Statistics for Pulsar Timing Detection, Phys. Rev. Lett. 135 , 101001 (2025), arXiv:2502.15874 [hep-ph]. [41] X. Gan, H. Kim, and A. Mitridate, Probing Quadratically Coupled Ultralight Dark Matter with Pulsar Timing Arrays, (2025), arXiv:2510.13945 [hep-ph]. [42] J. A. Dror and Q. Wei, Pulsar timing detection of ultralight vector dark matter, Phys. Rev. D 112 , 075024 (2025), arXiv:2505.22719 [hep-ph]. [43] J. W. Foster, K. K. Boddy, J. A. Dror, V. S. H. Lee, A. Mitridate, T. L. Smith, K. Taylor, and T. Trickle, Correlated signals of ultralight scalar dark matter in pulsar timing, (2026), arXiv:2607.24912 [astro-ph.CO]. [44] G. Agazie et al. (NANOGrav), The NANOGrav 15 yr Data Set: Evidence for a Gravitational-wave Background, Astrophys. J. Lett. 951 ,L8 (2023), arXiv:2306.16213 [astro-ph.HE]. [45] A. Afzal et al. (NANOGrav), The NANOGrav 15 yr Data Set: Search for Signals from New Physics, Astrophys. J. Lett. 951 , L11 (2023), arXiv:2306.16219 [astro-ph.HE]. [46] A. Mitridate, D. Wright, R. von Eckardstein, T. Schr¨ oder, J. Nay, K. Olum, K. Schmitz, and T. Trickle, PTArcade, (2023), arXiv:2306.16377 [hep-ph]. [47] M. Maggiore, Gravitational Waves. Vol. 1: Theory and Experiments (Oxford University Press, 2007). [48] T. Creighton, F. A. Jenet, and R. H. Price, Pulsar timing and spacetime curvature, Astrophys. J. 693 , 1113 (2009), arXiv:0812.3941 [astro-ph]. [49] M. Magi and J. Yoo, Exact Equivalence of the Observed Redshift and the Pulsar Timing Modulation in the Infinitesimal-Pulse Limit, (2026), arXiv:2608.23684 [astro-ph.CO]. [50] V. S. H. Lee and K. M. Zurek, Proper time observables of general gravitational perturbations in laser interferometry-based gravitational wave detectors, Phys. Rev. D 111 , 124037 (2025), arXiv:2408.03363 [hep-ph]. [51] L. Badurina, Y. Du, V. S. H. Lee, Y. Wang, and K. M. Zurek, Signatures of linearized gravity in atom interferometers: A simplified computational framework, Phys. Rev. D 111 , 042002 (2025), arXiv:2409.03828 [gr-qc]. [52] M. Rakhmanov, Response of test masses to gravitational waves in the local Lorentz gauge, Phys. Rev. D 71 , 084003 (2005), arXiv:gr-qc /0406009. [53] E. P. Verlinde and K. M. Zurek, Observational signatures of quantum gravity in interferometers, Phys. Lett. B 822 , 136663 (2021), arXiv:1902.08207 [gr-qc]. [54] K. M. Zurek, On vacuum fluctuations in quantum gravity and interferometer arm fluctuations, Phys. Lett. B 826 , 136910 (2022), arXiv:2012.05870 [hep-th]. [55] K. M. Zurek, Snowmass 2021 White Paper: Observational Signatures of Quantum Gravity, (2022), arXiv:2205.01799 [gr-qc]. [56] D. Li, V. S. H. Lee, Y. Chen, and K. M. Zurek, Interferometer response to geontropic fluctuations, Phys. Rev. D 107 , 024002 (2023), arXiv:2209.07543 [gr-qc]. [57] Y. Du, V. S. H. Lee, Y. Wang, and K. M. Zurek, Macroscopic dark matter detection with gravitational wave experiments, Phys. Rev. D 
+
+108 , 122003 (2023), arXiv:2306.13122 [astro-ph.CO]. [58] L. Badurina, Y. Du, V. S. H. Lee, Y. Wang, and K. M. Zurek, Detecting gravitational signatures of dark matter with atom gradiometers, Phys. Rev. D 112 , 063014 (2025), arXiv:2505.00781 [hep-ph]. [59] Q. Liang and M. Trodden, Detecting the stochastic gravitational wave background from massive gravity with pulsar timing arrays, Phys. Rev. D 104 , 084052 (2021), arXiv:2108.05344 [astro-ph.CO]. [60] G. Dom` enech, S. Pi, and A. Wang, Observable Gravitational Wave Strain at Second Order, Phys. Rev. Lett. 136 , 221402 (2026), arXiv:2512.15704 [gr-qc]. 18 
+
+[61] K. Lee, F. A. Jenet, R. H. Price, N. Wex, and M. Kramer, Detecting massive gravitons using pulsar timing arrays, Astrophys. J. 722 ,1589 (2010), arXiv:1008.2561 [astro-ph.HE]. [62] C. de Rham, J. T. Deskins, A. J. Tolley, and S.-Y. Zhou, Graviton Mass Bounds, Rev. Mod. Phys. 89 , 025004 (2017), arXiv:1606.08462 [astro-ph.CO]. [63] W. Qin, K. K. Boddy, and M. Kamionkowski, Subluminal stochastic gravitational waves in pulsar-timing arrays and astrometry, Phys. Rev. D 103 , 024045 (2021), arXiv:2007.11009 [gr-qc]. [64] Y.-M. Wu, Z.-C. Chen, Y.-C. Bi, and Q.-G. Huang, Constraining the graviton mass with the NANOGrav 15 year data set, Class. Quant. Grav. 41 , 075002 (2024), arXiv:2310.07469 [astro-ph.CO]. [65] Y.-C. Bi, Y.-M. Wu, Z.-C. Chen, and Q.-G. Huang, Constraints on the velocity of gravitational waves from the NANOGrav 15-year data set, Phys. Rev. D 109 , L061101 (2024), arXiv:2310.08366 [astro-ph.CO]. [66] Y.-M. Wu, Z.-C. Chen, and Q.-G. Huang, Search for stochastic gravitational-wave background from massive gravity in the NANOGrav 12.5-year dataset, Phys. Rev. D 107 , 042003 (2023), arXiv:2302.00229 [gr-qc]. [67] Q. Liang, M.-X. Lin, and M. Trodden, A test of gravity with Pulsar Timing Arrays, JCAP 11 , 042, arXiv:2304.02640 [astro-ph.CO]. [68] Q. Liang, I. Obata, and M. Sasaki, Testing gravity with frequency-dependent overlap reduction function in Pulsar Timing Array, JCAP 
+
+10 , 097, arXiv:2405.11755 [astro-ph.CO]. [69] W. Hu, Q. Liang, M.-X. Lin, and M. Trodden, Testing gravity with realistic gravitational waveforms in Pulsar Timing Arrays, JCAP 12 ,054, arXiv:2408.11774 [astro-ph.CO]. [70] N. Cordes, A. Mitridate, K. Schmitz, T. Schr¨ oder, and K. Wassner, On the overlap reduction function of pulsar timing array searches for gravitational waves in modified gravity, Class. Quant. Grav. 42 , 015003 (2025), arXiv:2407.04464 [gr-qc]. [71] Q. Liang, K. Nomura, and H. Omiya, Detecting parity-violating gravitational wave backgrounds with pulsar polarization arrays, Phys. Rev. D 113 , 064003 (2026), arXiv:2511.07956 [gr-qc]. [72] J. Gr´ ee, Q. Liang, and E. G. M. Ferreira, Forecasting Sensitivity to Modified Dispersion E ff ects in Pulsar Timing Arrays, (2026), arXiv:2603.17563 [astro-ph.CO]. [73] D. J. Helfand, R. N. Manchester, and J. H. Taylor, Observations of pulsar radio emission. III. Stability of integrated profiles., Astrophys. J. 198 , 661 (1975). [74] G. Hobbs, R. Edwards, and R. Manchester, Tempo2, a new pulsar timing package. 1. overview, Mon. Not. Roy. Astron. Soc. 369 , 655 (2006), arXiv:astro-ph /0603381. [75] R. T. Edwards, G. B. Hobbs, and R. N. Manchester, Tempo2, a new pulsar timing package. 2. The timing model and precision estimates, Mon. Not. Roy. Astron. Soc. 372 , 1549 (2006), arXiv:astro-ph /0607664. [76] G. Hobbs, F. Jenet, K. J. Lee, J. P. W. Verbiest, D. Yardley, R. Manchester, A. Lommen, W. Coles, R. Edwards, and C. Shet-tigara, TEMPO2: a new pulsar timing package - III. Gravitational wave simulation, Mon. Not. R. Astron. Soc. 394 , 1945 (2009), arXiv:0901.0592 [astro-ph.SR]. [77] J. Luo, S. Ransom, P. Demorest, P. S. Ray, A. Archibald, M. Kerr, R. J. Jennings, M. Bachetti, R. van Haasteren, C. A. Champagne, J. Colen, C. Phillips, J. Zimmerman, K. Stovall, M. T. Lam, and F. A. Jenet, PINT: A Modern Software Package for Pulsar Timing, Astrophys. J. 911 , 45 (2021), arXiv:2012.00074 [astro-ph.IM]. [78] P. W. Anderson and N. Itoh, Pulsar glitches and restlessness as a hard superfluidity phenomenon, Nature 256 , 25 (1975). [79] A. Lyne, G. Hobbs, M. Kramer, I. Stairs, and B. Stappers, Switched Magnetospheric Regulation of Pulsar Spin-Down, Science 329 , 408 (2010), arXiv:1006.5184 [astro-ph.GA]. [80] G. Hobbs, A. G. Lyne, and M. Kramer, An analysis of the timing irregularities for 366 pulsars, Mon. Not. R. Astron. Soc. 402 , 1027 (2010), arXiv:0912.4537 [astro-ph.GA]. [81] R. M. Shannon and J. M. Cordes, Assessing the Role of Spin Noise in the Precision Timing of Millisecond Pulsars, Astrophys. J. 725 ,1607 (2010), arXiv:1010.4794 [astro-ph.SR]. [82] C. M. Espinoza, A. G. Lyne, B. W. Stappers, and M. Kramer, A study of 315 glitches in the rotation of 102 pulsars, Mon. Not. R. Astron. Soc. 414 , 1679 (2011), arXiv:1102.1743 [astro-ph.HE]. [83] J. A. Ellis, M. Vallisneri, S. R. Taylor, and P. T. Baker, ENTERPRISE: Enhanced Numerical Toolbox Enabling a Robust PulsaR Inference SuitE, Astrophysics Source Code Library, record ascl:1912.015 (2019), ascl:1912.015. [84] S. R. Taylor, P. T. Baker, J. S. Hazboun, J. Simon, and S. J. Vigeland, enterprise extensions (2021), v2.4.3. [85] S. L. Detweiler, Pulsar timing measurements and the search for gravitational waves, Astrophys. J. 234 , 1100 (1979). [86] M. Anholm, S. Ballmer, J. D. E. Creighton, L. R. Price, and X. Siemens, Optimal strategies for gravitational wave stochastic background searches in pulsar timing data, Phys. Rev. D 79 , 084030 (2009), arXiv:0809.0701 [gr-qc]. [87] C. M. F. Mingarelli, T. Sidery, I. Mandel, and A. Vecchio, Characterizing gravitational wave stochastic background anisotropy with pulsar timing arrays, Phys. Rev. D 88 , 062005 (2013), arXiv:1306.5394 [astro-ph.HE]. [88] J. Gair, J. D. Romano, S. Taylor, and C. M. F. Mingarelli, Mapping gravitational-wave backgrounds using methods from CMB analysis: Application to pulsar timing arrays, Phys. Rev. D 90 , 082001 (2014), arXiv:1406.4664 [gr-qc]. [89] F. A. Jenet and J. D. Romano, Understanding the gravitational-wave Hellings and Downs curve for pulsar timing arrays in terms of sound and electromagnetic waves, Am. J. Phys. 83 , 635 (2015), arXiv:1412.1142 [gr-qc]. [90] C. M. F. Mingarelli and T. Sidery, E ff ect of small interpulsar distances in stochastic gravitational wave background searches with pulsar timing arrays, Phys. Rev. D 90 , 062011 (2014), arXiv:1408.6840 [astro-ph.HE]. [91] M. Maggiore, Gravitational Waves. Vol. 2: Astrophysics and Cosmology (Oxford University Press, 2018). [92] E. Fermi, Sopra i fenomeni che avvengono in vicinanza di una linea oraria, Rend. Lincei 31 , 21 (1922). [93] F. K. Manasse and C. W. Misner, Fermi Normal Coordinates and Some Basic Concepts in Di ff erential Geometry, J. Math. Phys. 4, 735 (1963). [94] C. W. Misner, K. S. Thorne, and J. A. Wheeler, Gravitation (W. H. Freeman, San Francisco, 1973). 19 
+
+[95] W.-T. Ni and M. Zimmermann, Inertial and gravitational e ff ects in the proper reference frame of an accelerated, rotating observer, Phys. Rev. D 17 , 1473 (1978). [96] W.-Q. Li and W.-T. Ni, Coupled inertial and gravitational e ff ects in the proper reference frame of an accelerated rotating observer., Journal of Mathematical Physics 20 , 1473 (1979). [97] K.-P. Marzlin, Fermi coordinates for weak gravitational fields, Phys. Rev. D 50 , 888 (1994), arXiv:gr-qc /9403044. [98] M. Rakhmanov, Fermi-normal, optical, and wave-synchronous coordinates for spacetime with a plane gravitational wave, Class. Quant. Grav. 31 , 085006 (2014), arXiv:1409.4648 [gr-qc]. [99] A. Berlin, D. Blas, R. Tito D’Agnolo, S. A. R. Ellis, R. Harnik, Y. Kahn, and J. Sch¨ utte-Engel, Detecting high-frequency gravitational waves with microwave cavities, Phys. Rev. D 105 , 116011 (2022), arXiv:2112.11465 [hep-ph]. [100] M. V. Sazhin, Opportunities for detecting ultralong gravitational waves, Sov. Astron. 22 , 36 (1978). [101] R. w. Hellings and G. s. Downs, Upper Limits on the Isotropic Gravitational Radiation Background from Pulsar Timing Analysis, Astrophys. J. Lett. 265 , L39 (1983). [102] B. Allen, Variance of the Hellings-Downs correlation, Phys. Rev. D 107 , 043018 (2023), arXiv:2205.05637 [gr-qc]. [103] B. Allen and J. D. Romano, Hellings and Downs correlation of an arbitrary set of pulsars, Phys. Rev. D 108 , 043026 (2023), arXiv:2208.07230 [gr-qc]. [104] B. Allen and J. D. Romano, Detecting a stochastic background of gravitational radiation: Signal processing strategies and sensitivities, Phys. Rev. D 59 , 102001 (1999), arXiv:gr-qc /9710117. [105] J. D. Romano and N. J. Cornish, Detection methods for stochastic gravitational-wave backgrounds: a unified treatment, Living Rev. Rel. 
+
+20 , 2 (2017), arXiv:1608.06889 [gr-qc]. [106] D. Antypas et al. , New Horizons: Scalar and Vector Ultralight Dark Matter, (2022), arXiv:2203.14915 [hep-ex]. [107] Y. B. Zel’dovich and A. G. Polnarev, Radiation of gravitational waves by a cluster of superdense stars, Sov. Astron. 18 , 17 (1974). [108] V. B. Braginsky and L. P. Grishchuk, Kinematic Resonance and Memory E ff ect in Free Mass Gravitational Antennas, Sov. Phys. JETP 
+
+62 , 427 (1985). [109] V. B. Braginsky and K. S. Thorne, Gravitational-wave bursts with memory and experimental prospects, Nature 327 , 123 (1987). [110] D. Christodoulou, Nonlinear nature of gravitation and gravitational wave experiments, Phys. Rev. Lett. 67 , 1486 (1991). [111] A. G. Wiseman and C. M. Will, Christodoulou’s nonlinear gravitational wave memory: Evaluation in the quadrupole approximation, Phys. Rev. D 44 , R2945 (1991). [112] L. Blanchet and T. Damour, Hereditary e ff ects in gravitational radiation, Phys. Rev. D 46 , 4304 (1992). [113] K. S. Thorne, Gravitational-wave bursts with memory: The Christodoulou e ff ect, Phys. Rev. D 45 , 520 (1992). [114] L. Bieri and D. Garfinkle, Perturbative and gauge invariant treatment of gravitational wave memory, Phys. Rev. D 89 , 084039 (2014), arXiv:1312.6871 [gr-qc]. [115] M. Favata, Nonlinear gravitational-wave memory from binary black hole mergers, Astrophys. J. Lett. 696 , L159 (2009), arXiv:0902.3660 [astro-ph.SR]. [116] D. Pollney and C. Reisswig, Gravitational memory in binary black hole mergers, Astrophys. J. Lett. 732 , L13 (2011), arXiv:1004.4209 [gr-qc]. [117] D. R. Madison, J. M. Cordes, and S. Chatterjee, Assessing Pulsar Timing Array Sensitivity to Gravitational Wave Bursts with Memory, Astrophys. J. 788 , 141 (2014), arXiv:1404.5682 [astro-ph.HE]. [118] R. Epstein, The generation of gravitational radiation by escaping supernova neutrinos., Astrophys. J. 223 , 1037 (1978). [119] M. S. Turner, Gravitational Radiation from Supernova Neutrino Bursts, Nature 274 , 565 (1978). [120] A. Burrows and J. Hayes, Pulsar Recoil and Gravitational Radiation Due to Asymmetrical Stellar Collapse and Explosion, Phys. Rev. Lett. 76 , 352 (1996), arXiv:astro-ph /9511106 [astro-ph]. [121] A. Strominger and A. Zhiboedov, Gravitational Memory, BMS Supertranslations and Soft Theorems, JHEP 01 , 086, arXiv:1411.5745 [hep-th]. [122] A. Strominger, Lectures on the Infrared Structure of Gravity and Gauge Theory (Princeton University Press, 2018) arXiv:1703.05448 [hep-th]. [123] T. He, A.-M. Raclariu, and K. M. Zurek, From shockwaves to the gravitational memory e ff ect, JHEP 01 , 006, arXiv:2305.14411 [hep-th]. [124] E. Verlinde and K. M. Zurek, Modular fluctuations from shockwave geometries, Phys. Rev. D 106 , 106011 (2022), arXiv:2208.01059 [hep-th]. [125] T. He, A.-M. Raclariu, and K. M. Zurek, An infrared on-shell action and its implications for soft charge fluctuations in asymptotically flat spacetimes, J. Phys. A 58 , 165402 (2025), arXiv:2408.01485 [hep-th]. [126] J. B. Wang et al. , Searching for gravitational wave memory bursts with the Parkes Pulsar Timing Array, Mon. Not. Roy. Astron. Soc. 
+
+446 , 1657 (2015), arXiv:1410.3323 [astro-ph.GA]. [127] P. D. Lasky, E. Thrane, Y. Levin, J. Blackman, and Y. Chen, Detecting gravitational-wave memory with LIGO: implications of GW150914, Phys. Rev. Lett. 117 , 061102 (2016), arXiv:1605.01415 [astro-ph.HE]. [128] M. H¨ ubner, P. Lasky, and E. Thrane, Memory remains undetected: Updates from the second LIGO /Virgo gravitational-wave transient catalog, Phys. Rev. D 104 , 023004 (2021), arXiv:2105.02879 [gr-qc]. [129] S. Y. Cheung, P. D. Lasky, and E. Thrane, Does spacetime have memories? Searching for gravitational-wave memory in the third LIGO-Virgo-KAGRA gravitational-wave transient catalogue, Class. Quant. Grav. 41 , 115010 (2024), arXiv:2404.11919 [gr-qc]. [130] Z. Arzoumanian et al. (NANOGrav), NANOGrav Constraints on Gravitational Wave Bursts with Memory, Astrophys. J. 810 , 150 (2015), arXiv:1501.05343 [astro-ph.GA]. [131] K. Aggarwal et al. (NANOGrav), The NANOGrav 11 yr Data Set: Limits on Gravitational Wave Memory, Astrophys. J. 889 , 38 (2020), arXiv:1911.08488 [astro-ph.HE]. [132] G. Agazie et al. (NANOGrav), The NANOGrav 12.5 yr Data Set: Search for Gravitational Wave Memory, Astrophys. J. 963 , 61 (2024), arXiv:2307.13797 [gr-qc]. 20 
+
+[133] G. Agazie et al. , The NANOGrav 15 yr Data Set: Search for Gravitational-wave Memory, Astrophys. J. 987 , 5 (2025), arXiv:2502.18599 [gr-qc]. [134] K. Islo, J. Simon, S. Burke-Spolaor, and X. Siemens, Prospects for Memory Detection with Low-Frequency Gravitational Wave Detec-tors, (2019), arXiv:1906.11936 [astro-ph.HE]. [135] A. D. Johnson, S. J. Kapadia, A. Osborne, A. Hixon, and D. Kennefick, Prospects of detecting the nonlinear gravitational wave memory, Phys. Rev. D 99 , 044045 (2019), arXiv:1810.09563 [gr-qc]. [136] A. M. Grant and D. A. Nichols, Outlook for detecting the gravitational-wave displacement and spin memory e ff ects with current and future gravitational-wave detectors, Phys. Rev. D 107 , 064056 (2023), [Erratum: Phys.Rev.D 108, 029901 (2023)], arXiv:2210.16266 [gr-qc]. [137] H. Inchausp´ e, S. Gasparotto, D. Blas, L. Heisenberg, J. Zosso, and S. Tiwari, Measuring gravitational wave memory with LISA, Phys. Rev. D 111 , 044044 (2025), arXiv:2406.09228 [gr-qc]. [138] M. Favata, The gravitational-wave memory e ff ect, Class. Quant. Grav. 27 , 084036 (2010), arXiv:1003.3486 [gr-qc]. [139] K. Mitman et al. , A review of gravitational memory and BMS frame fixing in numerical relativity, Class. Quant. Grav. 41 , 223001 (2024), arXiv:2405.08868 [gr-qc]. [140] P. C. Aichelburg and R. U. Sexl, On the Gravitational field of a massless particle, Gen. Rel. Grav. 2, 303 (1971). [141] T. Dray and G. ’t Hooft, The Gravitational Shock Wave of a Massless Particle, Nucl. Phys. B 253 , 173 (1985). [142] A. Tolish and R. M. Wald, Retarded Fields of Null Particles and the Memory E ff ect, Phys. Rev. D 89 , 064008 (2014), arXiv:1401.5831 [gr-qc]. [143] P. M. Zhang, C. Duval, G. W. Gibbons, and P. A. Horvathy, The Memory E ff ect for Plane Gravitational Waves, Phys. Lett. B 772 , 743 (2017), arXiv:1704.05997 [gr-qc]. [144] P. M. Zhang, C. Duval, and P. A. Horvathy, Memory e ff ect for impulsive gravitational waves, Class. Quant. Grav. 35 , 065011 (2018), arXiv:1709.02299 [gr-qc]. [145] R. van Haasteren and Y. Levin, Gravitational-wave memory and pulsar timing arrays, Mon. Not. Roy. Astron. Soc. 401 , 2372 (2010), arXiv:0909.0954 [astro-ph.IM].
