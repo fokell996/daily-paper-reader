@@ -1,0 +1,801 @@
+Title: 1D PIC Simulations of Resonant Scattering-Driven Pair Cascades in Magnetar Magnetospheres
+
+URL Source: https://arxiv.org/pdf/2609.17661v1
+
+Published Time: Thu, 17 Sep 2026 00:05:06 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+> Draft version September 17, 2026
+> Typeset using L ATEX twocolumn style in AASTeX7.0.1
+
+1D PIC Simulations of Resonant Scattering–Driven Pair Cascades in Magnetar Magnetospheres 
+
+Jens F. Mahlmann ,1 Alexander A. Philippov ,2, 3 Adrien Soudais ,1 Andrei M. Beloborodov ,4, 5 and Lorenzo Sironi 6, 7 
+
+> 1Department of Physics & Astronomy, Wilder Laboratory, Dartmouth College, Hanover, NH 03755, USA
+> 2Department of Physics, University of Maryland, College Park, MD 20742, USA
+> 3Physics Department, Stanford University, Stanford, CA 94305, USA
+> 4Department of Physics, Pupin Hall, Columbia University, New York, NY 10027, USA
+> 5Max-Planck Institute for Astrophysics, Garching, 85741, Germany
+> 6Department of Astronomy and Columbia Astrophysics Laboratory, Columbia University, New York, NY 10027, USA
+> 7Center for Computational Astrophysics, Flatiron Institute, New York, NY 10010, USA
+
+ABSTRACT Hard X-rays in persistent magnetar emission originate from radiative processes in pair-loaded magne-tospheric plasma, yet self-consistent kinetic simulations of such radiation-rich systems remain limited. We perform 1D particle-in-cell simulations of pair creation mediated by resonant inverse Compton scattering (RICS) along isolated field lines in twisted magnetospheres, capturing particle acceleration and radiative drag from first principles. The drag force, which strongly depends on the particle Lorentz factor and location, plays a key role in the magnetospheric circuit. Strong RICS drag impedes the flow of electrons and positrons, particularly along extended field lines. Nevertheless, the plasma sustains the circuit by self-organizing into a single accelerating gap near the star in one hemisphere. The ac-celerated plasma flow from the gap becomes loaded with copious electron–positron pairs in extended RICS zones, and also carries ions extracted from the star and accelerated in the gap. When radia-tive drag stops the pair-loaded flow at the magnetic equator, the ion component transfers momentum through streaming instabilities, delivering a small lepton population into the opposite hemisphere and sustaining the circuit. The gap confined to a single (anode) hemisphere implies asymmetric hard X-ray production, possibly detectable in phase-resolved magnetar spectra. 
+
+Keywords: Magnetars (992); Neutron stars (1108); Plasma astrophysics (1261); X-ray sources (1822); High energy astrophysics (739) 
+
+1. INTRODUCTION Magnetars are young, highly magnetized neutron stars (NSs) generating persistent and transient X-ray emis-sion (Kaspi & Beloborodov 2017; Esposito et al. 2020). Their inferred magnetic fields exceed the characteristic quantum electrodynamics field BQED = 4 .4 × 10 13 G. Dissipation of magnetic energy is believed to power the observed X-rays, including long-lived emission with lu-minosities of 10 34 − 10 36 erg s −1. The spectrum of this persistent (long-lived) emission typically has a quasi-thermal component near 1 keV, and a nonthermal tail extending beyond 100 keV. While thermal emission may come from the magnetar surface, nonthermal X-rays must be emitted by the surrounding magneto-
+
+> Corresponding author: Jens F. Mahlmann Email: jens.f.mahlmann@dartmouth.edu
+
+sphere. An expected emission process is resonant in-verse Compton scattering (RICS, e.g., Thompson et al. 2002; Beloborodov 2013a; Wadiasingh et al. 2018; Hard-ing et al. 2025). RICS emission can be calculated for a given pattern of plasma motion in the twisted magneto-sphere. Finding this self-organized pattern is a key chal-lenge, which requires understanding of how and where electrons and positrons, e±, are created. Beloborodov (2013a) proposed a model of e± outflow from an elec-tric gap near the neutron star and decelerated by RICS. The model was found to fit the phase-resolved spectra of observed nonthermal X-rays (Hasco¨ et et al. 2014). A self-organized plasma state in a current-carrying (twisted) magnetosphere, persisting over observed timescales of months to years, involves a delicate bal-ance in the plasma circuit (Beloborodov & Thompson 2007; Beloborodov 2013b). Charge carriers of density n
+
+move with velocity v∥ along magnetic field lines to sus-arXiv:2609.17661v1 [astro-ph.HE] 15 Sep 2026 2tain a magnetospheric current density j ∼ nev ∥, where e
+
+is the elementary charge. Some primary particles can be supplied by the atmospheric layer on the stellar surface. However, most of magnetospheric plasma is provided by 
+
+e± creation, triggered by particle acceleration in regions of unscreened electric fields, which must exist somewhere in the circuit. Particles also experience significant ra-diative losses, which regulate v∥. Beloborodov (2011) predicted two distinct zones set by RICS. In the inner corona, where the magnetic field satisfies B ≫ BQED ,pair creation is efficient, while RICS only mildly decel-erates the flow. The pair plasma therefore maintains a moderate multiplicity, M ≈ nec/j , where c is the speed of light. In the outer corona, where B ≲ BQED ,the flow becomes drag-force-dominated and decelerates strongly when approaching the magnetic equator. The 
+
+e± outflow along such extended magnetic field lines is expected to have a high multiplicity as a result of the RICS-mediated pair-creation avalanche. Kinetic particle-in-cell (PIC) simulations have become a powerful tool to generate insight into relativistic plas-mas around compact objects. Despite the substantial challenges of resolving the relevant kinetic and radiative scales, they have been successfully used to model parti-cle acceleration, plasma supply, and coherent emission in pulsar magnetospheres (Philippov & Kramer 2022, and references therein). First-principles models of global plasma kinetics in magnetar magnetospheres are chal-lenging due to the separation between radiative-reaction and plasma scales. The first kinetic model of an e± dis-charge in magnetars used a 1D setup (Beloborodov & Thompson 2007), and later Chen & Beloborodov (2017) simulated pair production in 2D (axisymmetric) twisted magnetospheres. This Letter first summarizes key challenges of PIC simulations of the magnetar circuit, including limita-tions on RICS drag arising from the required resolution of plasma scales. Then, we simulate the magnetosphere as a collection of 1D (curved) field lines with a dipo-lar geometry, and find the self-organized plasma state on each field line. The paper is organized as follows. Section 2 reviews how magnetospheric currents acceler-ate plasmas along field lines, the basics of RICS (2.1), and the scales induced by the radiative drag (2.2). We describe our simulations in Section 3 and present their results in Section 4, focusing on the location of pair pro-duction (4.1), as well as the resulting pair multiplic-ity distribution and its scaling with the ion-to-electron mass ratio (4.2). We discuss our results in Section 5. The Appendix reviews RICS energetics (Appendix A), specifics of our simulation setup (Appendix B), and the dependence of the circuit on the RICS drag-time limit (Appendix C).  
+
+> 2.
+
+THE MAGNETAR PLASMA CIRCUIT Displacements of the solid magnetar surface can shear magnetic field lines (Thompson & Duncan 1995). The toroidal shear of axisymmetric dipole fields induces a twist ψ, measuring the difference ψ = ϕ1 − ϕ0 of a field line’s footpoint positions in spherical coordinates (r, θ, ϕ ). The current required to sustain such a magne-tospheric twist is approximately 
+
+jψ = c
+
+4π |∇ × B| ≈ c
+
+4πB∗
+
+R∗
+
+ψ . (1) Here, R∗ denotes the stellar radius, and B∗ is the surface magnetic field. The target current jψ requires a charge-separated flow of density nψ = jψ /(ec ). The energy available to leptons before reacting with the radiation field is limited by the double-layer potential, Vψ (Car-lqvist 1982; Beloborodov & Thompson 2007): 
+
+γψ = eV ψ
+
+mec2 = κ R∗
+
+dψ
+
+, (2) where d2 
+
+> ψ
+
+= mec2/(4 πn ψ e2) is the cold plasma skin-depth associated with the circuit, me and mi are the electron and ion masses, respectively, and κ = [1 + (mi/m e)1/2]/2 for electron–ion plasmas. We assumed an acceleration length Lacc ≈ R∗ to account for trans-verse gradients in the current bundle that limit the ac-celerating potential. Ohmic dissipation, E · j = E∥jψ ,becomes substantial when the potential of the plasma-filled circuit, Vc ≡ − R E∥ dl, reaches a non-negligible fraction of the double-layer potential, Vψ . Here, E∥ is the electric field along the magnetic field, and the in-tegral is taken along the field line with differential arc length d l. Strong E∥ dissipate the magnetospheric twist by transferring magnetic energy to particles, resulting in decreasing currents jψ and suppressed RICS (Be-loborodov & Thompson 2007, section 2.2). Observations of persistent magnetar emission imply slow dissipation timescales (e.g., Esposito et al. 2020; Younes et al. 2022, 2025). We therefore define ‘ignited’ magnetar circuits as those that sustain the plasma flows required to maintain the magnetospheric twist in the presence of radiation re-action without strong dissipation. This Letter identifies steady-state solutions of this kind. 2.1. Resonant Inverse Compton Scattering (RICS) 
+
+In this section, we review the resonance condition for RICS and its implications for the energy of upscattered photons. Leptons interact with thermal photons emitted from the magnetar surface. In strong magnetic fields, 3radiative feedback is mediated by RICS through the first excited Landau state, with rest-frame energy 
+
+EB
+
+mec2 =
+
+
+
+1 + 2BBQED 
+
+1/2
+
+, (3) where BQED = m2
+
+> e
+
+c3/ℏe. A photon of energy ℏ˜ωX ex-cites a lepton to EB if it matches the resonance condition ˜ωX = ωB = eB mec . (4) Here, tilde denotes quantities in the rest frame of a lep-ton moving along the magnetic field with Lorentz factor 
+
+γ = (1 − β2)−1/2. For a photon with an angle μ = cos θ
+
+to the lepton trajectory, this corresponds to 
+
+ωX = ˜ωX
+
+γ(1 − βμ ) = B/B QED 
+
+γ(1 − βμ )
+
+mec2
+
+ℏ , (5) where ℏωB = ( B/B QED )mec2. The resonance condition for lepton excitation to the first Landau level is 
+
+γres = 511 × B/B QED 
+
+(1 − βμ )
+
+ 1 keV 
+
+EX
+
+
+
+, (6) using the photon energy EX in the NS frame. RICS has an excitation phase, where leptons occupy the first Landau level, and a de-excitation phase, where an ener-getic photon is emitted. The energy of the up-scattered photons, Eγ , depends on the emission angle (see Ap-pendix A.3) and can be estimated in the NS frame: 
+
+γres 
+
+
+
+1 − mec2
+
+EB
+
+
+
+< Eγ
+
+mec2 < γ res 
+
+
+
+1 − m2
+
+> e
+
+c4
+
+E2
+
+> B
+
+
+
+. (7) Using Equation (6), one obtains a constraint on the mag-netic field strength required to produce photons with 
+
+Eγ ≥ 2mec2, sufficient for pair production: 
+
+b ≡ BBQED 
+
+≳ 0.063 ×
+
+ EX
+
+1 keV 
+
+
+
+. (8) Here, we assume b ≪ 1 and expand 1 − mec2/E B ≈ b.2.2. Scales of the RICS Drag Force 
+
+In this section, we derive the RICS-induced drag force and associated RICS drag timescale considering only the direct thermal photon field from the stellar surface and neglecting re-processed photons scattered by the mag-netospheric plasma. We then compare the RICS drag length to the plasma skin-depth of the magnetosphere. The RICS rate for a thermal background of temperature 
+
+T follows from Planck’s law (here for perpendicular pho-ton polarization, with I∥ = 0): 
+
+Iω = ℏω3
+
+8π3c2
+
+
+
+exp 
+
+ ℏωkB T
+
+
+
+− 1
+
+−1
+
+. (9) The spectral energy density is uω = Iω /c . Using 
+
+λ = ℏ/m ec to calculate the photon number density nω
+
+in a specific angular frequency interval, the number of scattering events per unit time and lepton is ˙Nsc = c
+
+Z
+
+dΩ 
+
+Z
+
+dω n ω σres 
+
+= re
+
+4πλ 2
+
+cγ
+
+Z
+
+dΩ 
+
+ ℏωX
+
+mec2
+
+2 1exp 
+
+h ℏωX 
+
+> kBT
+
+i
+
+− 1
+
+,
+
+(10) where σres is the RICS cross section (see Beloborodov 2013a). We evaluate the radiative drag force F ≡
+
+˙Nsc ∆P for the de-excitation momentum loss of leptons, ∆P = γ ˜μℏωB /c (lab frame), and ˜ μ = ( μ − β)/(1 − βμ ): 
+
+F = reΘ3
+
+4x2λ2 γ (μ − β) g(y)mec2 . (11) Here, we use x = r/R ∗, Θ = kB T / (mec2), g(y) = 
+
+y3/ (exp [ y] − 1), y = ℏωX /(kB T ), and a dimensionless drag coefficient (Beloborodov 2013a, equation B8): 
+
+D = rc
+
+1
+
+p
+
+dp
+
+dt = rc
+
+1
+
+p F . (12) The RICS drag timescale is τRICS = p/ |dp/ dt|, and sub-stitution into Equation (12) yields D = ( r/c )τ −1RICS . We write the RICS drag length as lRICS = cτ RICS = r/ D.
+
+D measures the fractional momentum loss over a light crossing time r/c . The radiative drag pushes a particle towards a velocity attractor ¯β = μ, with ¯ γ = 1 when the flow reaches the equator plane. For small deviations from the attractor momentum ˜ p = ¯ γ ¯βm ec, linearization around the equilibrium in Equation (11) implies 
+
+D = α
+
+4xR∗
+
+re
+
+Θ3 g(˜ y)¯γ2
+
+
+
+1 − p
+
+˜p
+
+
+
+≡ ¯D
+
+
+
+1 − p
+
+˜p
+
+
+
+. (13) For typical values of ¯D in the magnetospheric equator with R∗ = 10 6 cm and maximum radiation density at 
+
+g(˜ y) ≈ 1.4 we estimate the RICS drag length 
+
+lRICS = r
+
+¯D ≈ 200 × ¯γ2  x
+
+10 
+
+2  1 keV 
+
+kB T
+
+3
+
+cm . (14) We can compare this length scale to the approximate plasma skin-depth. The plasma density roughly scales with the magnetic field strength, n ∝ B ∝ r−3. For typical densities n ∼ 10 37 r−3 (see Beloborodov 2013a, 2020), we find: 
+
+dp =
+
+ mec2
+
+4πn 0e2
+
+1/2
+
+≈ 5.4 × 10 −3  x
+
+10 
+
+3/2
+
+cm . (15) At the magnetospheric equator, the scale hierarchy is 
+
+dp ≪ lRICS = cτ RICS ∼ 1 m ≪ r ∼ 100 km , (16) 4for the fiducial parameters and ¯ γ ≈ 1. The dimension-less parameter of key importance for the magnetospheric circuit is η ≡ τRICS ωp = lRICS /d p, where 
+
+η ≈ 3.8 × 10 4  x
+
+10 
+
+1/2  1 keV 
+
+kB T
+
+3
+
+. (17) In practice, numerical simulations do not reach the huge ratios lRICS /d p and r/l RICS found in real magnetar mag-netospheres. However, limiting η > η min ≈ 10 3 in our models appears sufficient to achieve the correct physical regime of the circuit, as discussed below.  
+
+> 3.
+
+SIMULATIONS We use Tristan-MP.v2 (Hakobyan et al. 2024) to conduct 1D PIC simulations of relativistic plasma flows along dipolar magnetic field lines with RICS drag in-duced by photons emitted from a magnetar. The 1D domain resolves field lines of length L with Nx cells and a fixed resolution of ∆ l/R ∗ = ( L/R ∗) N −1 
+
+> x
+
+= 6 .67 ×10 −5
+
+(see Figure 1, panel C). Each update advances the simu-lation by a timestep ∆ t = ( c0/c ) ∆ l, where c0/c = 0 .5 is an effective CFL factor. The fiducial magnetization at density n0 is σ0 = 1 .6×10 8, with 48 cells per skin-depth. Normalized to code-units, the density scales as 
+
+nψ
+
+n0
+
+= jψ
+
+n0ec =
+
+ d0
+
+R∗
+
+
+
+σ1/20 ψ , (18) and the acceleration potential can be written as 
+
+γψ = κ R∗
+
+d0
+
+ jψ
+
+n0ec 
+
+1/2
+
+= κ
+
+ R∗
+
+d0
+
+σ1/20 ψ
+
+1/2
+
+. (19) Particle and field boundary conditions at the domain ends are treated separately. We impose atmospheric conditions for particles: electrons and ions of mass ra-tio mi/m e and temperature T /m ec2 = 0 .01 are continu-ously injected up to a local plasma density threshold pre-scribed by gravitationally supported hydrostatic equilib-rium with up to n/n ψ ≈ 18 close to the star. The expo-nentially decaying atmospheric density has a scale height of a few (local) skin-depths. Resolving the skin-depth puts limits on the maximum atmospheric density at the available resolution, but choosing n/n ψ ≫ 1 ensures that enough atmospheric particles are available and that boundary parameters (e.g., temperature of newly in-jected particles) do not affect the magnetospheric equi-librium. The atmosphere’s ‘puffy’ high-density layers serve as a source of plasma for the domain interior (Fig-ure 1, and Appendix B.1). EM fields have perfect con-ductor boundaries. We prescribe a static external current jext = jψ ˆx in the entire domain, using jψ /(n0ec ) = 28, correspond-ing to a twist ψ ≈ 0.7. This external current is ap-plied by solving d E/dt = 4 π (jext − j), effectively freez-ing the magnetospheric twist and allowing the plasma current j to self-consistently respond to it (Beloborodov & Thompson 2007; Timokhin & Arons 2013). Initially, at t = 0, a homogeneous electron-positron (+ /−) pair plasma streaming with velocity β± = ±c/ M fills the domain, where M denotes the pair multiplicity and we use M ≈ nec/j ψ . We model atmospheric electrons and ions separately from secondary electron–positron pairs, with leptons undergoing RICS interactions. Throughout the domain, pairs are annihilated once the total density approaches the skin-depth limit nmax , ensuring that the local plasma skin-depth is resolved by at least one grid cell. This numerical constraint also reflects the physi-cal expectation that annihilation becomes more efficient where the flow decelerates and densities increase. We track the plasma response to realistic RICS drag, com-bined with a simplified treatment of pair production. In this toy model, the derivation of the radiative drag on each particle uses the geometry, magnetic field strength, and photon distribution of a dipole magnetosphere (Ap-pendix B.2) with a surface field strength B∗/B QED = 10. The radiation kernel evolves momenta ˆp = γβ with a normalized drag-force ˆF = F × R∗/(mec2), accounting for the rescaling of spatial coordinates to units of R∗.Our numerical scheme distinguishes two RICS re-sponses. For b > 0.09, up-scattered energetic photons can pair produce (Equation 8). We define an approxi-mate scattering probability psc = ˙Nsc ∆t for every par-ticle. When activated, RICS events induce lepton recoil via excitation and de-excitation of the first Landau level (Appendix A). When the energy of an up-scattered pho-ton exceeds the pair production threshold, Eγ ≥ 2mec2,we immediately inject an electron-positron pair, shar-ing the photon momentum equally. Pair production is limited by nmax to preserve the skin-depth constraint. For b < 0.1, photons escape without appreciable pair production and need not be retained on the grid. The total force on particles is the sum of the Lorentz force and the radiative drag force. We use Strang splitting to apply the continuous radiative drag force ˆF: a drag update over ∆ t/ 2, the particle pusher’s Lorentz-force update over ∆ t, and a second drag update over ∆ t/ 2. We limit the applied drag force by 
+
+∆pp0
+
+≈ ˆF × ∆t
+
+2p0
+
+≲ ∆t/ 2
+
+τmin 
+
+, (20) where we choose ηmin ≡ τmin ωp = 10 3 × (nψ /n 0)1/2 ≫ 1(see Equation 17) and ∆ p = p1 − p0 is the difference to the initial momentum p0. When |∆p/p 0| < ∆t/ (2 τmin ), 5N
+
+Thermal photons (radial) 
+
+Dipolar magnetar magnetosphere 
+
+RICS imposes minimum lepton velocity 
+
+1 2 5 10 20 1510 50 100 
+
+req 
+
+> γmin
+
+Maximum fieldline radius  req 
+
+# A B
+
+Critical fieldline (see panel A) 
+
+Fast lepton flow 
+
+# C 1D pair-loaded fieldline simulations (initial configuration) 
+
+# jψ
+
+Ions 
+
+Electrons 
+
+Positrons 
+
+Photon & B-field gradients 
+
+External current 
+
+# rcrit 
+
+S
+
+Geometry governing RICS 
+
+Critical fieldline (complete slowdown boundary) 
+
+Lepton flow stalls 
+
+β−
+
+β+Initial velocities 
+
+γmin > 1  γmin ≈ 1 
+
+Atmosphere 
+
+N
+
+S
+
+Figure 1. Schematic illustration of the radiation-rich dipolar magnetar magnetosphere and simulation setup for kBT = 1 keV and B∗/B QED = 10. Panel A shows the dipole magnetosphere, with thermal photons emerging radially from the stellar surface (orange arrows). Panel B shows the minimum velocity of the lepton flow obtained for RICS of test particles, with plasma coming to a complete slow-down beyond the critical radius (also indicated in Panel A, and see Appendix A). Panel C shows the initial configuration of the 1D toy model of field lines in an effectively dipolar geometry (Section 3). A gravitationally supported atmosphere of ions and electrons is maintained at the domain boundaries (i.e., the stellar surface). The domain is initially filled with electrons and positrons sustaining an external current jψ . The RICS reaction is modeled by prescribing gradients of photon properties and magnetic field strength consistent with the dipolar geometry (Appendix B.2). 
+
+we calculate p1 by solving the implicit midpoint equation 
+
+p1 = p0 + ∆t
+
+2 × ˆF(p0) + ˆF(p1)2 , (21) with an appropriate Newton-Raphson scheme. Oth-erwise, we drive the momentum to its target value ˜p = μ/ (1 − μ2)1/2 by applying the following damping: 
+
+p1 = ˜ p + ( p0 − ˜p) × exp 
+
+
+
+− ∆t
+
+2τmin 
+
+
+
+. (22) This prescription is a semi-implicit realization of radia-tive drag capable of handling strong RICS recoil. Our RICS module captures radiative drag self-consistently for dipolar field geometries with a single-temperature photon background, while the pair production treat-ment remains simplified in the 1D geometry (see also Section 5). In steady state at fixed twist, magnetic energy is converted into particle acceleration, and our RICS model accounts for the subsequent radiative losses of the accelerated leptons. 
+
+4. RESULTS We present 1D solutions of plasma dynamics in the quasi-steady state found during the time interval ct/L ∈
+
+[5 , 10], following an initial relaxation period ct/L ∈
+
+[0 , 5). All simulations use thermal background photons with kBT = 1 keV. The main results of Section 4 are obtained with a mass ratio of mi/m e = 100, and Sec-tion 4.2 examines the dependence of the equilibrium 6multiplicity on the mass ratio. We discuss limitations of our 1D setup in Section 5. 4.1. Phase-Space Structure and Gap Formation Along Magnetospheric Field Lines 
+
+To sustain the twist-induced current jψ , charge carri-ers are extracted from the atmosphere layer at the do-main boundary (i.e., from the stellar surface), with the species and direction of extraction determined by the sign of jψ . In our simulations, the northern hemisphere provides atmospheric electrons propagating southward (left to right), while the southern hemisphere provides atmospheric ions propagating northward (right to left). We define electric gaps as the localized regions with unscreened fields E∥ that strongly accelerate particles. Hard X-rays and secondary e± can be produced out-side the gaps, especially for plasma flowing toward larger radii. The drag force tends to reduce the Lorentz fac-tors γ of the outflowing leptons toward the attractor ¯ γ
+
+(Equation 13). Leptons flowing along field lines with 
+
+req < r crit cross the equator with γmin > 1, and γ > ¯γ
+
+(Figure 1, left panel, see also Appendix A). For field lines with req > r crit , strong RICS drag efficiently slows down leptons to γmin ≈ 1 (Figure 1, right panel). Figure 2 shows the time-averaged plasma parameters measured on two chosen field lines and the history of the total potential drop Vc. For the field line with 
+
+req < r crit (left panels), leptons are accelerated mainly in the southern hemisphere, where strong electric poten-tials are induced to extract ions from the stellar surface. Efficiently accelerated leptons moving towards the star undergo RICS reactions and pair production close to the atmosphere. Leptons moving away from the star encounter RICS drag in the extended magnetosphere, and pair production continues until the local magnetic field drops below b ≈ 0.1. The pair-loaded outflow then proceeds toward the apex of the magnetic field line at the magnetic equator, crosses the equatorial plane and continues into the northern hemisphere. Once the flow passes the equatorial region with the strongest RICS drag, it moves toward the star without further decelera-tion. As a result, the pair-loaded flow from the southern hemisphere screens E∥ and prevents gap formation in the northern hemisphere. A single gap in the southern hemisphere is sufficient to sustain jψ along the entire field line. Remarkably, the gap is localized near the star, right above the atmospheric layer. There is no notable magnetospheric potential away from the atmo-sphere (left bottom panel). The gap structure is different on field lines with req >rcrit (Figure 2, right panels). Leptons are still efficiently accelerated where atmospheric ions are extracted from the star, and pair production still extends to larger radii until b ≈ 0.1. However, the drag in the equatorial re-gion is so strong that γmin ≈ 1. Any lepton outflow approaching the equator cannot stream freely and cross into the other hemisphere. We find that the plasma circuit can sustain jψ in two ways. First, for realistic RICS drag times ηmin = 10 3 × (nψ /n 0)1/2, efficient gaps close to the star in the southern hemisphere can acceler-ate ions that move through the equator at larger veloci-ties without experiencing RICS drag (see Figure 2, right panel). Fast-moving ions carry velocity and density fluc-tuations northward, and accelerate leptons in the direc-tion of ion motion via an ion-pair streaming instability. Some leptons cross the strong-drag equatorial plane and screen E∥ in the northern hemisphere. This results in an asymmetric configuration with one prominent gap and pair production in the southern hemisphere. Second, for shorter RICS drag times ηmin = 10 2 × (nψ /n 0)1/2, the radiative drag is so strong that no leptons are carried across the equatorial plane. Pairs are instead generated by pair production in both hemispheres (Appendix C, Figure 8). The resulting gap structure is more symmet-ric, and plasma flows in both hemispheres toward the equator, where it accumulates and annihilates. In this regime, ions are accelerated less efficiently. 8
+
+In either case, the steady state electric potential re-mains small in the extended magnetosphere but can be substantially higher close to the stellar surface. As shown in the bottom panels of Figure 2, the near-surface region dominates the magnetospheric potential (black line), reaching eV c/m ec2 ≈ 200 ( Vc ≈ 100 MeV) and ac-celerating leptons to energies sufficient for pair produc-tion via RICS. The near-surface voltage sets an upper limit on the dissipation rate of magnetospheric twist. Figure 3 displays pair production rates obtained for individual field lines in the model with ηmin = 10 3 ×
+
+(nψ /n 0)1/2. While electric gaps are localized near the star, the pair production zones extend to a larger radius where b ≈ 0.1. One can also see the asymmetry between the northern and southern hemispheres: pair production is far weaker in the northern hemisphere (and appears only for field lines with req > r crit ). The pair production rate and resulting (a)symmetry is controlled by the ratio of the drag timescale τmin and the plasma timescale ω−1p
+
+(cf. Appendix C, Figure 8).    
+
+> 8For mi/m e= 1, the gap structure becomes symmetric between the northern and southern hemispheres. In this case, without energetic ions to mediate lepton transport through the strong-drag region at the equator, the current is sustained by gaps in both hemispheres, and pairs are produced symmetrically regardless of the drag strength.
+
+7req = 4 R* < rcrit  nec /jψ   
+
+> eV c / m ec2
+> 2req = 10 R* >rcrit nec /jψ
+> eVc / mec 2
+> 2
+
+Figure 2. Phase space, multiplicity, and circuit potentials for selected field lines with γmin > 1 (left panels) and γmin ≈ 1 (right panels). We show phase space averages for electrons ( e−, first row), positrons ( e+, second row), and ions ( p+, third row) after initialization, once the plasma reaches a quasi-equilibrium during ct/L ∈ [5 , 10]. The fourth row shows the average total density of all simulated particles (black line) and the pair production rate averaged over one light crossing time (magenta). The bottom row shows circuit potentials across the full domain (black line), with the red line indicating the same quantity restricted to radii 
+
+r > 2R∗ on both sides, excluding the near-surface atmospheric region. No large-scale potentials develop in the outer corona. Top panels show magnetic isosurfaces b = [1 , 0.1, 0.01]. 
+
+In some cases, sharp bumps appear in the pair creation rate near the pair production magnetic field threshold (Figure 2). We suspect these are numerical artifacts caused by the matching between full RICS scattering and the continuous drag force. These features do not substantially affect the pair multiplicity, so we neglect their impact here, but future simulations should revisit this boundary matching with greater care. 4.2. Pair Multiplicity and Mass-Ratio Dependence 
+
+Our simulations demonstrate that pair multiplic-ity is distributed asymmetrically throughout the mag-netosphere. Extended RICS zones produce a high-multiplicity pair outflow from a single gap. In the equatorial region, the lepton density increases to main-tain current continuity as particles approach their min-imum velocity. For field lines with req < r crit , where the plasma does not slow down completely, a high-multiplicity flow propagates northward toward the star, forming an extended region of pair-dominated plasma. Along field lines with req > r crit , RICS slows the leptons to a nearly complete stop at the equator, forming a high-multiplicity region symmetric about the equator. There, the highest densities approach the annihilation thresh-old imposed by the numerical constraints (Figure 4, top left panel). In our models, this threshold is reached only in localized regions of the highest density. While it may induce transient feedback, it does not significantly affect the time-averaged pair production or gap structure. In the equilibrium state, pair-produced particles carry most of the current jψ . The left panels of Figure 4 show that neither atmospheric leptons nor ions contribute sig-nificantly to the total density. Due to the complete slow-down of the plasma at the equator, the req = 10 R∗ field line retains a subdominant fraction of atmospheric elec-trons (top left panel of Figure 4). We conclude that the simulated circuits ignite and self-sustain, with at-mospheric electrons playing at most a minor role as seeds for pair production. The extracted atmospheric ions play a more significant role by helping current cir-culation through the region of strongest drag. 8Pair-production rate  Δnpairs ec / j0      
+
+> b= 0.1 b= 0.01
+> b= 1.0
+> 0510
+
+Figure 3. Distribution of pair production locations throughout the magnetosphere. Left: Pair production rate averaged over one light-crossing time in the equilibrium state ct/L ∈ [5 , 10] for field lines extending (top to bottom) to 10, 6, and 2 R⋆. Right: Pair production rate and location in a 2D representation, with dipolar field lines shown as solid grey lines. The color scale is saturated to better highlight the distribution. All panels show magnetic isosurfaces corresponding to b = [1 , 0.1, 0.01]. 2 4 6 8 10        
+
+> -4
+> -2024x/R⋆
+> z / R⋆
+> b= 0.1 b= 0.01
+> b= 1.0
+> Multiplicity
+
+npairs ec /j0  
+
+> 010 20
+
+Figure 4. As Figure 3, but showing the magnetospheric multiplicity distribution. Left: Total particle density averaged over 
+
+ct/L ∈ [5 , 10]. Right: Multiplicity and its spatial distribution in a 2D representation. 
+
+The maximum acceleration of leptons close to the star controls the number of pairs produced by the RICS cas-cade. Beloborodov (2013a) estimate that the pair cas-cade produces multiplicities M ∼ Vψ ∝ (mi/m e)1/2
+
+(Equation 2). In PIC simulations with artificial scale separation, the available acceleration increases with the mass ratio mi/m e. Thus, simulated pair loading and multiplicity distributions approximate the magne-tospheric equilibrium, but require rescaling to realistic conditions. For this work, it was computationally pro-hibitive to model higher mass ratios in the strong drag limit for req > r crit . Then, the high-density flow in the equatorial region would approach the annihilation threshold, requiring resolutions beyond the currently employed Nx = 3 .84 × 10 5 cells (for req /R ∗ = 10). 910 0 10 1 10 2 10 3               
+
+> Mass ratio m i/m e(atmospheric ions) 10 0
+> 10 1
+> 10 2
+> Multiplicity nec/j 0
+> 48 4Average for x/L [0.45, 0.55]
+> Multiplicity estimate at m i/m e= 1836 req = 2 R
+> req = 4 R
+> y = 1.41 (m i/m e)0.15
+> y = 2.82 (m i/m e)0.38
+> Figure 5. Scaling of the average multiplicity in the equa-torial region for field lines with req < r crit as a function of ion mass ratio. Data points from PIC simulations are shown as dots, and fitted power laws are indicated by the dashed lines. The extrapolated value at mi/m e= 1836 is shown in red color. Results for mi/m e= 1 are displayed as circles and not included in the curve fitting. The shaded bands de-note the 1 σuncertainty of the power-law fit, obtained via the covariance of the linear regression in log–log space.
+
+Figure 5 evaluates the scaling of maximum M with mass ratio for field lines with req < r crit , for which no additional density buildup due to complete plasma slow-down occurs. We vary the mass ratio of atmo-spheric ions between mi/m e = 1 − 300 while keeping all other parameters constant. All runs use the same setup as outlined above, except at the highest ion-mass-ratio (mi/m e = 300), where we employ twice the resolution and use a shorter steady-state interval to determine M.Extrapolating to realistic mi/m e = 1836, the result-ing multiplicities can reach M ∼ 10 2 −10 3 in the outer corona (as predicted by Beloborodov 2013a); the inner corona remains in a low-M regime.  
+
+> 5.
+
+DISCUSSION AND CONCLUSION The presented PIC simulations demonstrate how self-sustained plasma circuits enable long-lived magnetic equilibria in RICS-regulated magnetar magnetospheres. We identify an asymmetric gap structure that adjusts to sustain the required electric current jψ against the self-consistent radiative drag. The amount of pair pro-duction and symmetry of the RICS zones depends on the maximum strength of radiative drag (Equation 17, see Appendix C). In all cases, we find that the current is sustained by a modest potential drop along the mag-netic field lines (Figure 2), which enables a long lifetime of the magnetospheric twist. Thus, our simulations with the detailed implementation of RICS confirm the basic picture of Beloborodov & Thompson (2007, who used 1D PIC simulations with a simplified prescription for pair creation, based on a fixed activation threshold) and provide new insights into gap locations on different mag-netic field lines. Forming RICS zones and maintaining a balanced plasma supply critically depend on efficient particle ac-celeration prior to the onset of RICS. As shown in Equa-tion (2), the available acceleration potential scales with the magnetospheric twist, setting the conditions under which leptons can reach the energies required to initiate pair cascades. Capturing this process in PIC simulations introduces strong numerical requirements on resolving sufficiently small plasma skin-depths and achieving large magnetizations. If these scales are under-resolved, parti-cles enter the RICS regime with energies insufficient for pair production, leading to spurious electric fields that would artificially dissipate the magnetic twist. Hard X-ray production is expected in the regions of efficient RICS drag acting on e± outflows from the elec-tric gaps (Beloborodov 2013a). The pair production threshold b ≳ 0.1 (Equation 8) and the condition for the nearly complete stopping of the outflow in the equato-rial plane divide the magnetospheric field lines into four types/regions (see Appendix A.4). Region I: b > 0.1 is satisfied along the entire field line. In this case, a sin-gle extended gap forms along the field line, including its part near the equatorial plane. Region II: b < 0.1at sufficient distance from the star, and req < r crit .Here, the pair production zone cannot cross the equa-tor. The gap forms in the southern hemisphere near the star. The plasma outflow from the gap is not stopped in the equatorial plane and continues to the northern hemisphere. There, it screens any significant E∥, pre-venting the formation of a second gap. The asymmetry between the two hemispheres is caused by the extrac-tion of ions, rather than electrons, from the southern (anode) footpoint of the magnetic field line. Region III: 
+
+req > r crit . Here, we still find gaps near the star in the southern hemisphere. Although, the drag is extremely strong and practically stops the leptons in the equatorial plane, ions streaming northward carry a small fraction of leptons across the equatorial plane via streaming in-stabilities and thereby screen E∥ in the northern hemi-sphere. Region IV: field lines extend very far from the star ( req > 30 R⋆) where drag becomes inefficient (Be-loborodov 2013b). We did not simulate Region IV in the present paper; its gap structure is expected to be similar to that in Region II. We emphasize the importance of the parameter η
+
+for the magnetospheric circuit, in particular in Re-10 gion III where ion streaming instabilities (operating on a timescale ∝ ω−1p ) play a crucial role. We presented the results obtained with a more realistic large ηmin (Sec-tion 4); however, we also performed simulations with a smaller ηmin ≈ 10 2 (Appendix C). The parameter η
+
+(Equation 17) is sensitive to two factors: (i) the local plasma temperature (which enters in the third power), and (ii) the local plasma density. We used a conserva-tively low estimate of density; in reality, densities in the annihilation zone will be considerably higher, giving a shorter skin depth and increasing η. We therefore con-sider the models presented in Section 4 to be the more re-alistic case. The low-ηmin runs presented in Appendix C show intermittent gap activity at the equator, compet-ing with gaps closer to the star. This results in a higher voltage in the circuit (and hence a shorter lifetime of the magnetospheric twist). The development of equatorial voltage drops may indicate that the imposed RICS drag in the low-ηmin models is unrealistically strong, and that the simulation may not sufficiently separate the relevant scales. The locations of gaps determine the directions of e±
+
+flows that emit hard X-rays. Photons generated by RICS in Region I are too energetic for direct escape; they will become reprocessed by the outward pair cas-cade until it reaches radii where b ≲ 0.1. The emission powered by gaps in Region I can cover a large part of the magnetosphere. However, Region I may be completely deactivated, since the lifetime of electric currents in this region is shortest (Beloborodov 2009). In Region II, the energy of RICS photons scales as Eγ ∼ 5 × 10 4 b2 keV. It drops below ∼ 1 MeV at sufficient distance from the star, where b ≲ 0.1 allows direct escape without further pair creation (Beloborodov 2013a). The fact that the gap is present only in one hemisphere implies an asym-metry in X-ray production. As a result, X-rays from Region II will be invisible for a large set of unfavorable lines of sights. The predicted phase-resolved spectra of magnetars can be calculated and compared with data using fitting methods similar to Hasco¨ et et al. (2014). We leave this investigation to future work. The 1D PIC simulations used in this paper and in Be-loborodov & Thompson (2007) have limitations. The current jψ is prescribed and fixed, and E∥ is determined by the 1D Gauss law integrated along a magnetic field line. For real magnetars, the transverse structure of the electric circuit becomes important (Chen & Beloborodov 2017). In particular, the corrected E∥ is reduced com-pared with the 1D model. We note, however, that the accelerating potentials found in our models are concen-trated near the star, where the corrections to E∥ are moderate. Therefore, we expect that our conclusions will hold in 2D (axisymmetric) or full 3D models. Our unpublished preliminary 2D models indicate that such simulations require large computational resources be-cause of the demanding resolution constraints. For the magnetospheric circuit in Region III, plasma accumulates near the equatorial plane, balanced by e±
+
+annihilation. Our implementation of annihilation im-poses a maximum plasma density that allows sufficient resolution of the plasma skin depth. The true annihi-lation rate is lower and will operate at higher plasma densities. Careful implementation of the annihilation regime will be essential also in 2D/3D simulations. Future work can further improve the implementation of pair production in the magnetar circuit. Our simula-tions assumed instantaneous pair creation by RICS pho-tons that have sufficient energies for e± creation. This approximation is inherent to the 1D model, where pho-ton emission and pair creation must occur on the same magnetic field line. Actual finite free paths of photons lead to redistribution of pairs in the transverse direction across the magnetospheric field lines, which becomes im-portant near the transition to transparency at b ∼ 0.1(Beloborodov 2013a). Inclusion of this effect is left to future 2D/3D models. It may also be important to in-clude additional channels of pair creation unrelated to RICS. In particular, collisional QED processes become a strong source of photons if the magnetospheric currents are localized in thin current sheets with high current and plasma densities (Thompson & Kostenko 2020; Ki-uru et al. 2026; Kiuru 2026). Pair discharges in a global 2D/3D circuit depend on the global distribution of the magnetospheric twist, which gradually evolves due to the untwisting process (Beloborodov 2009). RICS further depends on the lo-cal intensity of X-rays and their angular distribution. The actual radiation field may differ from the idealized, spherically symmetric radial flow of thermal X-rays as-sumed in this work. In particular, it is shaped by the neutron star’s anisotropic surface emission–which may include hot spots–as well as radiative transfer through the magnetosphere. A self-consistent treatment in a global model can be achieved using the ‘virtual beams’ method developed by Beloborodov (2013b). In summary, RICS-driven pair cascades are a viable self-consistent mechanism for sustaining magnetospheric twists, with a naturally developing asymmetry between the gaps in the northern and southern hemispheres of the magnetosphere. Our results confirm the main fea-tures of the inner/outer corona model of Beloborodov (2011) and extend it by identifying the locations of gaps on different field lines in Regions I, II, and III. In con-trast to the 2D simulations of Chen & Beloborodov 11 (2017), we find gaps located away from the magnetic equator and closer to the star, in particular for field lines forming Regions II and III that should dominate the observed X-ray luminosity. Pair production zones crossing the equator are found only in the innermost magnetosphere (in Region I). ACKNOWLEDGEMENTS We thank Alexander Chernoglazov, Hayk Hakobyan, Amir Levinson, Jazm´ ın Romero-Dold´ an, Anatoly Spitkovsky, Christopher Thompson, Zorawar Wadias-ingh, George Younes, and Owen Young for valuable dis-cussions throughout the course of this work. J.F.M. and A.S. acknowledge support from NSF grant AST-2508744. A.M.B. acknowledges support by NASA grant 80NSSC24K1229, NSF grant AST-2408199, and Simons Foundation grant 446228. L.S. acknowledges support from the DOE Early Career Award DE-SC0023015, NASA ATP 80NSSC24K1826, NSF AST-2307202, and the Simons Foundation (MP-SCMPS-00001470). This work was facilitated by the Multimessenger Plasma Physics Center (NSF PHY-2206609) and supported in part by NSF PHY-2309135 to the Kavli Institute for Theoretical Physics. J.F.M. acknowledges support as a Visiting Professor and Fellow (2025–2027) at the Obser-vatoire de Paris and Universit´ e Paris Sciences et Lettres (PSL), hosted by the Laboratoire d’ ´Etude de l’Univers et des Ph´ enom` enes Extrˆ emes (LUX), Sorbonne Univer-sit´ e, where this work was finalized. We acknowledge GitHub Copilot for assistance with code development and ChatGPT 5.6 Terra for assistance with figure de-sign and language editing. Simulations were performed on the Rusty (Flatiron Institute), and Discovery (Dart-mouth College) clusters. REFERENCES 
+
+Beloborodov, A. M. 2009, ApJ, 703, 1044, doi: 10.1088/0004-637X/703/1/1044 Beloborodov, A. M. 2011, in High-Energy Emission from Pulsars and their Systems, ed. D. F. Torres & N. Rea (Berlin, Heidelberg: Springer Berlin Heidelberg), 299–322, doi: 10.1007/978-3-642-17251-9 24 Beloborodov, A. M. 2013a, ApJ, 762, 13, doi: 10.1088/0004-637X/762/1/13 —. 2013b, ApJ, 777, 114, doi: 10.1088/0004-637x/777/2/114 —. 2020, ApJ, 896, 142, doi: 10.3847/1538-4357/ab83eb Beloborodov, A. M., & Thompson, C. 2007, ApJ, 657, 967–993, doi: 10.1086/508917 Carlqvist, P. 1982, Ap&SS, 87, 21, doi: 10.1007/BF00648904 Chen, A. Y., & Beloborodov, A. M. 2017, ApJ, 844, 133, doi: 10.3847/1538-4357/aa7a57 Esposito, P., Rea, N., & Israel, G. L. 2020, Magnetars: A Short Review and Some Sparse Considerations (Springer Berlin Heidelberg), 97–142, doi: 10.1007/978-3-662-62110-3 3 Hakobyan, H., Spitkovsky, A., Chernoglazov, A., et al. 2024, PrincetonUniversity/tristan-mp-v2: v2.6, doi: 10.5281/zenodo.7566725 Harding, A. K., Wadiasingh, Z., & Baring, M. G. 2025, ApJ, 991, 178, doi: 10.3847/1538-4357/adfa06 Hasco¨ et, R., Beloborodov, A. M., & den Hartog, P. R. 2014, ApJL, 786, L1, doi: 10.1088/2041-8205/786/1/L1 Kaspi, V. M., & Beloborodov, A. M. 2017, ARA&A, 55, 261–301, doi: 10.1146/annurev-astro-081915-023329 Kiuru, O. 2026, Evaluation of QED cross sections in strong magnetic fields. https://arxiv.org/abs/2603.26545 Kiuru, O., N¨ attil¨ a, J., Paatelainen, R., & Vuorinen, A. 2026, QED cross sections in strong magnetic fields. https://arxiv.org/abs/2603.25491 Philippov, A., & Kramer, M. 2022, ARA&A, 60, 495, doi: 10.1146/annurev-astro-052920-112338 Thompson, C., & Duncan, R. C. 1995, MNRAS, 275, 255, doi: 10.1093/mnras/275.2.255 Thompson, C., & Kostenko, A. 2020, ApJ, 904, 184, doi: 10.3847/1538-4357/abbe87 Thompson, C., Lyutikov, M., & Kulkarni, S. R. 2002, ApJ, 574, 332, doi: 10.1086/340586 Timokhin, A. N., & Arons, J. 2013, MNRAS, 429, 20, doi: 10.1093/mnras/sts298 Wadiasingh, Z., Baring, M. G., Gonthier, P. L., & Harding, A. K. 2018, ApJ, 854, 98, doi: 10.3847/1538-4357/aaa460 Younes, G., Hu, C.-P., Bansal, K., et al. 2022, ApJ, 924, 136, doi: 10.3847/1538-4357/ac3756 Younes, G., Lander, S. K., Baring, M. G., et al. 2025, ApJ, 989, 89, doi: 10.3847/1538-4357/ade716 12 APPENDIX  
+
+> A.
+
+ENERGETICS OF RESONANT INVERSE COMPTON SCATTERING The energetics of resonant inverse Compton scattering (RICS) are discussed in detail by, e.g., Beloborodov & Thompson (2007) and Beloborodov (2013b). Here, we outline the main aspects relevant for this work and for the numerical implementation of RICS in PIC simulations. In this section, we denote the lab frame (e.g., the NS frame) by a dash, all other quantities are measured in the excitation and de-excitation frame, respectively. A.1. Excitation Phase 
+
+Once a scattering event is triggered, we solve the photon-lepton collision in the lepton rest frame. Energy conservation for a lepton in an elevated Landau level with rest energy EB reads 
+
+γE B = mec2 + ℏω′ 
+
+> X
+
+. (A1) Momentum conservation for the electron momentum pe = γβe and a photon momentum with unit direction ˆpγ reads 
+
+βe = ℏω′
+
+> X
+
+γE B
+
+ˆp′ 
+
+> γ
+
+=⇒ γ = 12
+
+ EB
+
+mec2 + mec2
+
+EB
+
+
+
+. (A2) A.2. De-excitation Phase 
+
+Leptons in the first Landau level can return to the ground state by emitting a photon. In the rest frame of the excited lepton, the photon is emitted at angles ˜ μ. According to the two polarization states discussed in Beloborodov (2013b, Appendix A). With the recoil directed along the magnetic field, the energy of the emitted photon is 
+
+Eγ (θ) = EB
+
+sin 2 θ
+
+"
+
+1 −
+
+
+
+cos 2 θ + m2
+
+> e
+
+c4
+
+E2
+
+> B
+
+sin 2 θ
+
+1/2#
+
+. (A3) The energy of the de-excited lepton is Ee = EB − Eγ . The corresponding lepton momentum is directed in the opposite direction from the photon momentum, and along the magnetic field direction ˆb = B/B , such that pe = −Eγ μ′ ˆb.A.3. Energies of Upscattered Photons 
+
+For initial (i) lepton velocities γi ≫ 1, βi ≈ 1, we can use velocity addition to write the velocity of the excited (e) lepton in the lab frame using Equation (A2): 
+
+γe = γγ i (1 − β) = γi
+
+
+
+γ − ℏω′
+
+> X
+
+EB
+
+
+
+= 12 γi
+
+ EB
+
+m2
+
+> e
+
+c4 + 1
+
+EB
+
+− EB
+
+m2
+
+> e
+
+c4 + 1
+
+EB
+
+
+
+mec2 = γi
+
+EB
+
+mec2 . (A4) For emission perpendicular to the magnetic field (minimum recoil and maximum photon energy), the lab-frame photon frequency is related to the emission frequency in the rest frame of the excited lepton by 
+
+Eγ = γeE′ 
+
+> γ
+
+= γe
+
+ EB − mec2 = γi
+
+
+
+1 − mec2
+
+EB
+
+
+
+mec2 . (A5) For emission along the magnetic field and γe ≫ 1 we can write 
+
+Eγ ≈ γe
+
+ E2 
+
+> B
+
+− m2
+
+> e
+
+c4
+
+EB
+
+
+
+= γi
+
+
+
+1 − m2
+
+> e
+
+c4
+
+E2
+
+> B
+
+
+
+mec2 . (A6) We use this estimate to derive Equation (8). Beloborodov (2013a) estimates μ ∼ − 0.5, and therefore the resonance condition in Equation (6) becomes γres ≈ 10 2b (1 keV /E X ). Equations (A5) and (A6) can be evaluated for their scaling with EB when γi = γres and EX ≈ 1 keV: 
+
+Eγ ∼
+
+
+
+γi b m ec2 ≈ 10 2 b2 mec2 ≈ 5 × 10 4b2 keV , B ≪ BQ ,γi mec2 ≈ 10 2 b m ec2 ≈ 5 × 10 4b keV , B ≫ BQ .
+
+(A7) 13                       
+
+> Figure 6. RICS-limited lepton velocities and pair production zone extent in a dipolar magnetosphere with B∗/B QED = 10 and 1 keV thermal photons. The top panel shows an estimate of the size of the pair creation zone, defined as the distance between the first scattering of a lepton with γ0= 1000 and the location where the magnetic field drops below b= 0 .1. For field lines that do not reach regions with b < 0.1, the pair production zone spans both hemispheres, leading to a sharp increase in its length (Region I, blue shaded). The bottom panel shows the minimum Lorentz factor γmin imposed by RICS drag. The orange shaded region marks a transition regime in which the b < 0.1 threshold still limits pair production, while γmin >1 (Region II). In Region III, pair production extend up to the b < 0.1 limit, and the plasma efficiently decelerates to γmin ≈1 in the equatorial region.
+
+A.4. Extent of the Pair-Producing Region 
+
+We use the RICS geometry and associated thresholds to infer the general structure of a dipolar magnetosphere with 
+
+B∗/B QED = 10, assuming a distribution of 1 keV photons emerging radially from the stellar surface (Figure 1). In a test-particle approach, we integrate particle trajectories along magnetic field lines under the action of the drag force F
+
+defined in Equation (11). By tracking the particle velocity throughout the magnetosphere, we determine the minimum Lorentz factor γmin set by RICS drag. For these parameters, the resulting velocity structure is shown in Figure 1 (panel B) and Figure 6. The strong RICS drag partitions the magnetosphere into two distinct regimes separated by the critical radius rcrit : field lines along which the minimum Lorentz factor remains above unity ( γmin > 1), and those along which leptons are completely slowed down ( γmin ≈ 1). We also estimate the possible extent lpp of the RICS-mediated pair production region. Assuming leptons are injected with an initial Lorentz factor γ0 = 1000, we follow their trajectories along individual field lines to determine the location of the first RICS scattering, marking the onset of the pair cascade. We further identify the point along each field line where the magnetic field drops below the threshold b = 0 .1. We use the distance between these two locations as an estimate of the size of the pair production region, lpp /R ∗, for a given field line. For field lines that remain entirely within the b > 0.1 regime, the pair production region can extend across the equator; in this case, we assume symmetry about the equator to estimate its size. The resulting distribution of lpp /R ∗ throughout the magnetosphere is shown in Figure 6 (top panel). The size increases for short field lines, and then sharply decreases to lpp /R ∗ ≈ 2. The pair production threshold b > 0.1 (see also Equation 8), together with the critical radius rcrit for complete lepton slow-down, divides the magnetosphere into three distinct regions. Region I: the pair production zone can extend across the equator, as b > 0.1 is satisfied along the entire field line, and the minimum Lorentz factor remains above unity. 
+
+Region II: the pair production zone cannot cross the equator, and must self-regulate in one hemisphere according to the threshold in Equation (8), here taken as b = 0 .1. In this regime, leptons do not undergo complete slow-down. Region III: plasma flows into the equatorial region from both hemispheres, where separate gaps open. Particles experience complete slow-down, reaching γmin ≈ 1 due to strong RICS drag. The distribution and relative extent of these regions 14 -4                        
+
+> -2024z / R*
+> 0.01 0.10 110 B / BQED 0246810 1510 50 100 500 1000
+> req /R*
+> γprimary
+> req /R*=6
+> req /R*=10 0.0 0.2 0.4 0.6 0.8 1.0
+> -1.0
+> -0.5 0.0 0.5 1.0 L/Ltotal Photon incident angle  μ
+> v∥Bv⇵B
+
+Figure 7. Visualization of the dipolar geometry of magnetic fields and photon properties along isolated field lines. We show the field lines (top left), the velocity evolution of a test particle subject to RICS drag along these lines (bottom left), the magnetic field strength (top right), and the angle between the photon and lepton propagation directions (bottom right). The critical radius rcrit is indicated by a dashed line in the left panels. Along dipolar field lines extending beyond this radius, leptons subject to RICS drag decelerate toward the attractor μ = ¯β (see Equation 11) and eventually come to rest at the equator. The quantities outlined in this figure are provided to the RICS kernel, effectively capturing dipolar geometry within a 1D setup. 
+
+depend on the magnetic field strength and the properties of the background photon field. A systematic exploration of this parameter space is beyond the scope of this work and will be addressed in future studies. 
+
+B. DETAILS OF THE NUMERICAL SETUP B.1. Atmospheric Boundary Conditions 
+
+We model the stellar surface at radius R∗ as a perfect conductor with frozen-in magnetic field lines. Surrounding the boundary, pairs and ions are continuously supplied in an atmospheric layer by maintaining the density profile 
+
+natmo 
+
+n0
+
+= a0 exp 
+
+
+
+− r − R∗
+
+h
+
+
+
+, r > R ∗ . (B8) Here a0 denotes the ratio between the maximum atmospheric density and the fiducial density n0, and h is the scale height. The atmosphere is held in hydrostatic equilibrium, where T ∂ r natmo = natmo g with a temperature T and a radial gravitational force g. This exponential profile corresponds to a constant acceleration g = −T /h . In practice, the gravitational force is set to zero once natmo /n 0 ≪ 1. B.2. Magnetic and Radiation Geometry Along 1D Field Lines 
+
+In this work, we set up 1D PIC simulations that mimic the global geometry of a dipolar magnetosphere. The radiative reaction follows the dipolar magnetic field geometry and photon distributions expected from a single blackbody of radius 
+
+R∗ emitting radially. The dipole magnetic field in spherical coordinates ( r, θ, ϕ ), for a surface field strength B∗ is 
+
+Bd = B∗R3
+
+> ∗
+
+2
+
+ 2 cos θr3 , sin θr4 , 0
+
+
+
+, Bd = B∗R3
+
+> ∗
+
+2r3
+
+p3 cos 2 θ + 1 . (B9) 15 req = 10 R* > rcrit  nec /jψ   
+
+> eV c / m ec2
+> 2req = 10 R* >rcrit nec /jψ
+> eVc / mec 2
+> 2
+
+Figure 8. Comparison of magnetar circuit realizations for field lines with γmin ≈ 1 for different limits of the fastest RICS drag time. We compare ηmin = 10 3 × (nψ /n 0)1/2 (right panel, also shown in Figure 2) with a faster RICS drag timescale, 
+
+ηmin = 10 2 × (nψ /n 0)1/2 (left panel). The pair production rate in the southern hemisphere remains mostly unchanged, while for stronger RICS drag, a second gap with substantial pair production opens in the northern hemisphere. 
+
+We use field-line-aligned coordinates to parametrize Bd(l) such that l ∈ [0 , L ] tracks the entire length of a field with footpoints located at co-latitude 
+
+θ0 = arcsin 
+
+q 
+
+R∗/r eq 
+
+
+
+. (B10) For the same field line, we derive the angle between surface-emitted photons and the magnetic field, μ = Br /B d,and parametrize it as μ(l). Figure 7 shows these parametrized quantities for the field lines modeled in this work, exemplified by req /R ∗ = 6 and req /R ∗ = 10. We also include the effect of the drag force on a single particle entering the magnetosphere with γ0 = 10 3 for a blackbody photon temperature of 1 keV. 
+
+C. DEPENDENCE ON THE RICS DRAG TIME As an additional test, we probe the response of the plasma circuit to shorter RICS drag times (Equation 17). We use the same parameters as for the cases shown in Section 3 but now limit ηmin = 10 2 × (nψ /n 0)1/2. Figure 8 directly compares the resulting equilibrium (left panel) with the previously obtained results (right panel, and Figure 2). For shorter RICS drag times, ion velocities and acceleration potentials close to the stellar surface notably decrease. Leptons can no longer be carried to, and in part across, the equator by the northward-moving ions. Instead, an efficient accelerator and pair production gap emerges in the northern hemisphere, resulting in a more symmetric gap structure. Leptons flow into the equatorial region from both sides. The maximum pair multiplicity does not change significantly, though fewer pairs contribute to the current jψ in the presence of faster ions (Figure 8, right panel). Transients with notable Vc can occur when the gaps fail to provide sufficient charge carriers to the equatorial region. Then, a fraction of leptons can accelerate at the equator despite strong RICS drag. In our models, numerically imposed pair annihilation likely enhances and in part controls this effect. However, the potentials observed in our simulations do not drive notable long-lived ion acceleration at the equator.
