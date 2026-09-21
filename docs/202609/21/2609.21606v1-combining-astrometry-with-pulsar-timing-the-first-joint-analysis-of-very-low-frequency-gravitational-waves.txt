@@ -1,0 +1,554 @@
+Title: Combining astrometry with pulsar timing: the first joint analysis of very low frequency gravitational waves
+
+URL Source: https://arxiv.org/pdf/2609.21606v1
+
+Published Time: Mon, 21 Sep 2026 00:55:07 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+Astronomy & Astrophysics manuscript no. filipello_2026 ©ESO 2026 September 21, 2026 
+
+# Combining astrometry with pulsar timing: the first joint analysis of very low frequency gravitational waves 
+
+# Astrometry and pulsar timing for low frequency GWs 
+
+L. Filipello 1, 2⋆, W. Beordo 1, V. Akhmetov 1, 3, 4, M. Crosta 1, and M.G. Lattanzi 1 
+
+> 1
+
+INAF – Osservatorio Astrofisico di Torino, Via Osservatorio 20, 10025 Pino Torinese (TO), Italy  
+
+> 2
+
+University of Torino, Department of Physics, Via Pietro Giuria 1, 10125 Torino, Italy  
+
+> 3
+
+Main Astronomical Observatory of the NAS of Ukraine, 27 Akademika Zabolotnoho St., 03143 Kyiv, Ukraine  
+
+> 4
+
+Institute of Astronomy of V.N.Karazin Kharkiv National University, Svobody sq. 4, 61022 Kharkiv, Ukraine September 21, 2026 
+
+ABSTRACT 
+
+Context. The pHz to sub-nHz gravitational wave (GW) regime remains largely unexplored but is crucial for mapping the early inspiral stage of supermassive black hole binaries (SMBHBs) and probing early-Universe physics. Astrometry and pulsar timing o ff er orthogonal and deeply complementary secular observables to investigate this frequency band. 
+
+Aims. We aim to present the first joint data analysis combining real astrometric proper motions with binary pulsar timing, to search for and constrain continuous gravitational waves (CWs) sourced by SMBHBs in the ultra-low-frequency regime (10 −12 Hz ≤ fGW ≤
+
+10 −9 Hz). 
+
+Methods. We employ a Bayesian model selection and upper limit estimation framework to combine apparent proper motion displace-ments of ∼ 1.5 × 10 6 quasars from the Gaia CRF3 catalog with the line-of-sight orbital period derivatives ( ˙ Pb) of 11 high-precision binary pulsars. To prevent spurious detections, we heavily model instrumental and astrophysical systematics: we propagate the Galac-tic potential uncertainty for pulsars via Monte Carlo simulations and perform a Vector Spherical Harmonics (VSH) decomposition up to the octupole order ( ℓ = 3) for quasars. 
+
+Results. We find no statistically significant evidence for a CWs signal in the joint analysis (ln Bjoint = −0.42 ± 0.03). In the absence of detection, we set the tightest constraints to date on CW strain in the pHz band, yielding a 95% upper limit of h0 ≤ 6.4 × 10 −11 at a reference frequency of fref = 4 × 10 −10 Hz. The combined dataset achieves full sky coverage and improves single-dataset upper limits by 20%–30%. 
+
+Conclusions. Combining orthogonal observables successfully breaks spatial degeneracies intrinsic to isolated searches. Furthermore, forecasts from injection-recovery indicate that with the extended temporal baseline and reduced uncertainties of the upcoming Gaia DR4, this joint framework is poised to break the h0 < 10 −11 upper limit barrier for sub-nHz CWs. 
+
+Key words. gravitational waves – methods: numerical – methods: statistical – proper motions - pulsar timing 
+
+1. Introduction 
+
+Thanks to observational detections of Gravitational Waves (GWs), new frontiers of physics have opened up in the last decades. However, while current cosmological models predict signals from mHz to sub-pHz frequencies, still no clear evi-dence for the presence of GW of any kind has been found in such a regime: claims of 3 σ detection for a Gravitational Waves Background (GWB) at fre f = 1yr −1 have been posed by PTA collaborations (Agazie et al. 2023a), approaching a confidence of 4 σ at the time of writing (Taylor 2025). At the same time, the Planck experiment was only able to put an upper limit on inflation-driven GWB at ∼ 10 −18 Hz (Pagano et al. 2016). Nevertheless, even with the combination of all these experi-ments, a broad range, namely the pHz region, is still a quite unex-plored, yet crucial, observational regime. Gravitational waves in this band are produced by two main classes of astrophysical and cosmological phenomena. The first is represented by extremely massive outliers Supermassive Black Holes Binaries (SMBHBs)  
+
+> ⋆
+
+Corresponding author: lorenzo.filipello@unito.it 
+
+in the early stage of inspiral, with periods spanning from years to millenia. These sources will produce quasi-monochromatic con-tinuous signals. The second kind of GW is a Stochastic Gravita-tional Wave Background (SGWB) of cosmological origin: in the sub-nHz to pHz regime, a cosmological background can arise from di ff erent early-Universe processes. These include cosmic strings (Wachter et al. 2026), where radiating loops produce a broad-band stochastic signal extending to very low frequencies, phase transitions at intermediate energy scales (Bagherian et al. 2026), and primordial metric perturbations associated with in-flation or primordial black hole formation scenarios (Bi et al. 2026). Probing this frequency band allows us to map the high-mass tail of the SMBHB population and place independent con-straints on early-Universe physics, with astrometry as one of the main candidates for filling this gap. The current state-of-the-art experiment for astrometry is Gaia (Prusti et al. 2016), whose goal is the micro-arcsecond pre-cision for catalog astrometric parameters. It has been shown how a passing GW can perturb the incoming photons from celestial objects, resulting in an apparent and periodic motion in the sky 
+
+Article number, page 1 arXiv:2609.21606v1 [astro-ph.IM] 18 Sep 2026 A&A proofs: manuscript no. filipello_2026 
+
+(Pyne et al. 1996). Even though some works have tried to de-fine possible data analysis pipelines for GW periodic signals us-ing Gaia time series (Moore et al. 2017; Geyer et al. 2025), this instrument was not designed to provide astrometric time series (epoch astrometry will only be published with the fourth Data Release); therefore, all current constraints from real astromet-ric data are derived from proper motions (Akhmetov et al. 2026; Darling 2025; Jaraba et al. 2023). Using astrometric proper motions as a GW induced secular eff ect, we can in principle observe any GW signal with a pe-riod larger than the total observation time. To implement our first joint analysis, we use the Gaia Celestial Reference Frame (CRF) catalog of quasars from DR3, or Quasi Stellar Object (QSO) (Klioner et al. 2022), due to the high precision and high number of sources in the dataset. While the standard Pulsar Timing tech-nique focuses on periodic signals confined between the Nyquist limit and the observation time of the experiment (Agazie et al. 2023b), di ff erent approaches have been proposed to explore pHz signals using secular e ff ects of pulsar binaries (Kumamoto et al. 2019; DeRocco & Dror 2023; Zheng et al. 2026). Due to their strong complementarity, a cross-correlation be-tween these two di ff erent and independent measurements could enhance the sensitivity we can achieve on low-frequencies GW (Cruz et al. 2025), with optimistic forecasts of joint-analysis reaching an improvement factor of 50% compared to Pulsar Tim-ing observations alone (Perna et al. 2026). However, no com-bined analysis on real datasets has ever been made until now. With this work, we develop a data analysis pipeline for search-ing and characterizing a continuous gravitational waves (CWs) sourced by a single Supermassive Black Hole Binary, as very loud and slowly rotating SMBHBs are one of the most promi-nent candidates for GW sources in this regime. Nevertheless, the analysis pipeline can easily be implemented for a broader range of sources. In the following section we define and briefly explain the formalism of the GW e ff ects on the two di ff erent observables, altogether with all other astrophysical and systematic expected contributions. Then, in Sec. 3, we present the used datasets and describe how they were constructed. Moving to Sec. 4, the whole data analysis framework and pipeline is defined. Finally, in Sec. 5 and 6, we show the obtained results and the improvements we expect in the (nearby) future. 
+
+2. Theoretical Framework 
+
+In this section, we highlight and summarise the theoretical derivation of the formulas used in the following analysis. Here, we combine two di ff erent, yet complementary, e ff ects caused by a passing GW. Since we are confining ourselves to secular ef-fects, rather than periodic signals, the GW periods range we can measure spans from the look-back time (lowest frequency limit) to the total observation period (highest frequency limit). More-over, since we also restrict the analysis to CW, a tighter limit on observable frequencies is set by loss of coherence due to the dis-tance horizon limit, putting the lowest limit to roughly 10 −12 Hz (Margalit et al. 2020). In order to explain the actual observables, we define the GW no-tation; for a Single Source (SS) GW, the perturbation is written as: 
+
+hi j (t, ˆx) = e+
+
+> i j
+
+(ˆ k)h+(t, ˆx) + e×
+
+> i j
+
+(ˆ k)h×(t, ˆx) , (1) with 
+
+h+ = h0 cos(2 Ψ)(1 + cos 2(ι)) sin(2 ϕ) (2) 
+
++ 2h0 sin(2 Ψ) cos( ι) cos(2 ϕ) ,
+
+h× = h0 sin(2 Ψ)(1 + cos 2(ι)) cos(2 ϕ) (3) 
+
++ 2h0 cos(2 Ψ) cos( ι) sin(2 ϕ) .
+
+Here, h0 is the strain of the GW, ι and Ψ are the inclination and polarization angles of the GW source, ˆ k(αGW , δ GW ) is the nor-malised propagation direction of the wave and 
+
+ϕ = ω(t − ˆk · ˆx) + Φ 0 , (4) with ω as the angular velocity and Φ0 as the phase. Assuming that such GW is formed by a SMBHB, the amplitude of the strain is related to the chirp mass M and luminosity distance 
+
+dL through 
+
+h0 = ω2/3 2( GM)5/3
+
+dLc4 . (5) Also the tensor bases e+ 
+
+> i j
+
+and e× 
+
+> i j
+
+can be expressed in terms of the GW source sky direction ˆ αGW and ˆ δGW :
+
+( ˆαGW = (− sin( αGW ), cos( αGW ), 0) ,
+
+ˆδGW = (− sin( δGW ) cos( αGW ), − sin( δGW ) sin( αGW ), cos( δGW )) .
+
+(6) as 
+
+(e+ = ˆαGW ˆαGW − ˆδGW ˆδGW ,
+
+e× = −( ˆ αGW ˆδGW + ˆδGW ˆαGW ) . (7) Finally, since we restrict our analysis to GW periods much larger than observation time, i.e. ωt << 1, the following approximation will hold: 
+
+ϕ ≃ − ˆk · ˆx + Φ 0 . (8) 
+
+2.1. Radial Effect 
+
+In the context of Pulsar Timing, GW can modify the time of arrival of millisecond pulsars photons, from which we can infer the GW parameters. However, when dealing with periods longer than observation time, a GW can induce an apparent velocity between the pulsar and the observer (Romano & Cornish 2017), that can be written as 
+
+vGW =
+
+X
+
+> a=+ ,×
+
+ˆnip ˆn jpeai j (ˆ k)2(1 + ˆk · ˆnp) (ha(t, 0) − ha(t − dp, ˆdp)) , (9) where ˆ dp is the pulsar distance vector and dp its magnitude. The time derivative of this equation represents the GW induced ac-celeration aGW . Therefore, under the e ff ect of a GW, the time derivative of a periodic signal will be directly proportional to the GW induced acceleration and the unperturbed period: ˙P = aGW P , (10) where the complete formula is provided in eq. (B.1) in Appendix B. For this analysis we will use pulsar binaries and their orbital pe-riod Pb parameters, due to the high precision and stability of the measurement through all PTA collaborations. 
+
+> Article number, page 2 L. Filipello et al.: Combining astrometry with pulsar timing: the first joint analysis of very low frequency gravitational waves
+
+Low-frequencies GW are not the only contributions to orbital period changes, since other astrophysical e ff ects are present. The most relevant are the following (more negligible going right): ˙Pb,obs 
+
+Pb
+
+= ashk + ˙Pb,gal 
+
+Pb
+
++ ˙Pb,int 
+
+Pb
+
++ aGW (11) The first term is the Shklovskii kinematic e ff ect (Shklovskii 1970), i.e. the Doppler e ff ect due to the angular proper motion μ
+
+of a celestial object. Its magnitude is ashk = μ2dp/c.The second term is the orbital change due to the Milky Way grav-itational potential induced acceleration. The contribution to the observed ˙ Pb is the line of sight net acceleration: since we also experience the Galactic potential, we can only measure the net acceleration ˙Pb,gal 
+
+Pb
+
+= (ap − aS S ) · ˆnp
+
+c , (12) where aS S is the Galactic acceleration at Solar System position and ap is the acceleration at pulsar position. The first one can be directly measured (Gaia Collaboration et al. 2021), while the second can be estimated from Galactic models. The last term to define is the intrinsic orbital deceleration: a com-pact binary will lose energy due to the continuous emission of GW, resulting in a change of the fractional time derivative of the orbital period (Peters & Mathews 1963): ˙Pb,int 
+
+Pb
+
+= − 192 πG5/3 f (e)5c5
+
+ Pb
+
+2π
+
+−8/3 mpmc
+
+(mp + mc)1/3 , (13) where mp is the pulsar mass, while mc is the mass of the com-panion, and f (e) is a function of the orbital eccentricity ef (e) = 1 + 73 24 e2 + 37 96 e4
+
+!
+
+(1 − e2)−7/2. (14) In absence of more accurate measurement, we assume the mass of the pulsar to be the standard 1 .4 M⊙ and use the inferred me-dian for the companion mass. 
+
+2.2. Tangential Effect 
+
+We will now describe the complementary e ff ect measured by as-trometry. It has been shown that a passing GW can perturb the path of a photon emitted from a celestial object, resulting in an apparent position displacement. In the far-away zone approxi-mation, with respect to a static observer tetrad, this e ff ect has an analytical formula (Pyne et al. 1996): 
+
+δniGW =
+
+X
+
+> a=+ ,×
+
+" (ˆ ni + ˆki)ha(t, 0) 2(1 + ˆn · ˆk) eajk (ˆ k)ˆ n j ˆnk − 12 eai j (ˆ k)ˆ n jha(t, 0) 
+
+#
+
+,
+
+(15) where ˆ k is the GW direction of propagation and ˆ n is the unper-turbed position of the celestial object on the sky sphere. Due to the extreme distance of quasars, the "star" term is neglected and just treated as random white noise. Even in this scenario, if we restrict to frequencies smaller than the inverse of observation period, only secular e ff ects shall sur-vive. For the astrometric displacement, this secular e ff ect is an apparent proper motion μGW , i.e. the time derivative of eq. (15). For a generic celestial object, the measured proper motion is a combination of several factors: 
+
+μobs = μint + μglide + μ∗ 
+
+> sys
+
++ μGW , (16) where the first term is the intrinsic proper motion of the ob-ject, potentially caused by Galactic gravitational potential, local interactions, stellar streams or supernova ejections, or transient events. The second term is the so-called "glide", or secular aberration, namely the apparent motion of stars we see due to the free-fall of the Solar System toward the Galactic centre: 
+
+μglide = 1
+
+c [aS S − (aS S · ˆn)ˆ n] . (17) We define the third term as μ∗ 
+
+> sys
+
+≡ μrot + μsys , where μrot is the apparent proper motion due the reference frame’s rotation (or rotation of the universe), while the last term will collect all un-known systematic e ff ects. We highlighted μglide and μrot since their e ff ect is purely a dipolar contribution, hence they can be precisely estimated from a Vector Spherical Harmonics (VSH) decomposition. For Gaia stars, μint is typically orders of magnitude greater than other contributions. However, due to the cosmological distance of quasars, their intrinsic proper motion is absolutely below the instrument precision: this means that any non-zero measured proper motion for QSOs is purely caused by the astrophysical and systematic e ff ects explained above. 
+
+3. Dataset 
+
+3.1. Gaia CRF3 
+
+The Gaia CRF3 catalog provides astrometric parameters of ∼
+
+1.6 millions of QSOs. It is the result of Gaia Data Release 3, comprising 34 months of observations (from July 2014 to May 2017). The majority of these quasars are at a redshift of 
+
+z ≈ 1.5 − 2, putting the accessible frequency range between 10 −17 Hz < fGW < 5.6 × 10 −9 Hz (note that for the CW analysis we set the e ff ective lower limit to 1 pHz for loss of coherence at lower frequencies (Margalit et al. 2020)). While there are other QSO catalogs with higher purity such as Quaia (Storey-Fisher et al. 2024), we decide to use Gaia CRF3 because it also provides proper motion components covariance. Neglecting the correlation between μα and μδ would result in two downsides: the most straightforward is underestimating the total errors (and therefore the upper limits we can set), and secondly, all ellipsis’ uncertainties will have the same orientation, poten-tially biasing the results of a CW analysis towards a preferred GW direction of propagation (Akhmetov et al. 2026). We only exclude sources with goodness-of-fit parameter 
+
+RUWE ≤ 1.4 and total proper motion amplitude above 1 mas /yr, to exclude possible contaminations from stellar sources or astro-metric artifacts. This results in keeping in the analysis also ob-jects with very high proper motions (almost ∼400k sources with 
+
+μ > 0.5 mas /yr), but we preferred to improve the modelling of signals rather than dealing with a selection bias on the resulting upper limits. Due to high computational costs, an isolatitude pixellization is Table 1: Statistical properties of the 1 505 427 quasars from the Gaia CRF3 catalog. 
+
+Parameter Mean St. Dev. Min. Max. 
+
+μ∗ 
+
+> α
+
+(μas yr −1) −0.68 793 −8 521 8 728 
+
+μδ (μas yr −1) −1.37 736 −8 566 9 297 
+
+σμ∗ 
+
+> α
+
+(μas yr −1) 653 476 9.72 3 365 
+
+σμδ (μas yr −1) 606 441 12.98 3 387  
+
+> Article number, page 3 A&A proofs: manuscript no. filipello_2026
+
+Fig. 1: Spatial density of QSOs from the Gaia DR3 catalog and positions of all pulsar binaries in the ATNF catalog (red markers). The red crosses are the pulsars satisfying the imposed mask and therefore used for the analysis. performed on the catalog, as it has been shown that this kind of data compression can bring substantial boosts in time perfor-mance at a negligible cost in information loss. For each pixel we use the weighted (through inverse of variance) value of proper motions components, with Gaussian errors of the mean as pixel’s proper motion components uncertainties. Also mean correlation of μα and μδ is taken into account for the caclulations of the full covariance matrix of each pixel. Pixels with less than 10 objects are not included in the anal-ysis, in order to avoid portions of the sky with fewer sources to have a major impact on the final results. 
+
+> 3.2. Pulsar Binaries
+
+We construct our pulsar binaries dataset from the ATNF Pulsar catalog (Hobbs et al. 2004) after applying careful restrictions. The major issue with this kind of analysis is related to the bi-nary distance estimation. Almost every contribution to ˙ Pb heav-ily depends on the distance, namely, the leading order correction 
+
+ashk , the Galactic acceleration, and the Pulsar term of aGW . For this reason, we only use binaries with well-defined parallax ϖ
+
+measurements and with σϖ/ϖ < 10%. Moreover, we also ap-ply a cut over the distance to alleviate the degeneracies related to phase multiplicity of the GWs and diminish the uncertainties on the Galactic acceleration; therefore, we only include binaries closer than 1 kpc. This results in a final dataset of 11 binaries with good esti-mates of distance, proper motion, position, and companion mass. Unfortunately, due to Interstellar Medium extinction, most of the binaries are located outside the stellar disk, therefore the isotropy of the joint dataset does not improve significantly. This issue should drastically improve with SKA telescope, which is sup-posed to see and investigate the millisecond pulsar population close to the Galactic bulge (Braun et al. 2015). A table with the pulsars used in the analysis and their pa-rameters is provided in Appendix. Moreover, Fig. B.1 shows the observed values of ˙ Pb/Pb compared to all astrophysical contri-butions. As expected, the kinetic term is the predominant one for the majority of the binary systems except for B1534 +12, where the dominant term is the intrinsic emission due to several factors (massive neutron star as companion, high eccentricity, short or-bital period). Finally, all line of sight Galactic acceleration have a negative sign (except for J0613-0200 and J1614-2230), indicating a de-celeration towards the Sun. In fig. 1 we present the spatial distribution of the combined datasets used in this analysis. It is possible to visualise the ex-tinction from the Galaxy disk and bulge a ff ecting the number of quasars observed by Gaia. 
+
+4. Data Analysis 
+
+In this work, we adopt a Bayesian framework for statistically ro-bust signal detection and upper limit estimation. After defining the likelihoods for the problem, we adopt a Nested Sampling al-gorithm for signal detection and a Monte Carlo Markov Chain (MCMC) for the calculation of the posterior distributions. For a CW search, we need 7 parameters to model the GW (as-suming such a wave is emitted by a SMBHB), i.e. the strain h0,the GW frequency fGW , the direction of propagation ( αGW , δ GW ,in ICRS coordinates), the orientation angles of the SMBHB ι
+
+and Ψ and the random phase Φ0. We define a standard Gaussian likelihood for pulsar search: 
+
+LPT A (ΘGW , dn) =
+
+> Npul
+
+Y
+
+> n=1
+
+1
+
+√2πσ n
+
+exp 
+
+"
+
+− res 2
+
+> n
+
+(ΘGW , dn)2σ2
+
+> n
+
+#
+
+, (18) 
+
+> Article number, page 4 L. Filipello et al.: Combining astrometry with pulsar timing: the first joint analysis of very low frequency gravitational waves
+
+where res n = ˙Pb,exp /Pb − ˙Pb,obs /Pb is the residual of the n-pulsar, 
+
+dn is the pulsar distance, σn is the total uncertainty on the resid-ual, and ˙Pb,exp is the derivative of the modelled period. Even though we only selected binaries with good parallax uncertain-ties, all contributions (except for the intrinsic emission) can as-sume significantly di ff erent values within the error range. There-fore, in order to reduce the dimension of the parameter space of the MCMC, we fix position and proper motions (and prop-agate their errors in the total uncertainties), as they are not the main source of uncertainty, while keeping the distance as a free parameter. The Galactic acceleration is the most complicated term since it is heavily model-dependent and there is no consensus nei-ther on the total mass of the Galaxy nor on its components (Ou et al. 2024; Beordo et al. 2024; Jiao et al. 2023; Zhou et al. 2023; Eilers et al. 2019; McMillan 2017). Therefore, estimat-ing the uncertainty of the Galactic acceleration is key in order to avoid spurious detections. Despite the recent claims signifi-cantly reweighting the Galaxy virial mass down to 2 × 10 11 M⊙
+
+(Ou et al. 2024; Jiao et al. 2023), in this work we refer to the standard McMillan17 model (McMillan 2017). Given this model, we assess how the Galactic acceleration changes with varying the model parameters over their posterior distributions. In Appendix A, we detail the Monte Carlo approach used to compute the uncertainty on the Galactic acceleration, given the uncertainties on the model parameters. Then, for each pulsar bi-nary, we add this model-induced variance to the total residual variances σ2
+
+> n
+
+.We stress the fact that without this additional uncertainty the residuals di ff er significantly from zero, as shown in (Moran et al. 2024), were a jitter parameter is defined to absorb the excessive power, meaning that the expected values do not su ffi ciently de-scribe the residuals or that the observational error is underesti-mating the actual uncertainty. Due to the high precision and ac-curacy of astrometric parameters and without raw data of timing parameters, we infer that this extra noise should come from the highly uncertain Galactic modelling. A similar approach is applied for the analysis of quasars. Since proper motions are two-dimensional vectors, we construct a Gaussian likelihood from the standard Mahalanobis distance: 
+
+LGaia =
+
+> NQS O
+
+Y
+
+> p=1
+
+12π pdet( Cp) exp 
+
+"
+
+− 12 res Tp C−1 
+
+> p
+
+res p
+
+#
+
+, (19) where res p = (μα, obs − μα, exp , μ δ, obs − μδ, exp ) and μexp takes into account systematic contributions and GW e ff ect. Cp is the 2 × 2 covariance matrix for each quasar, containing errors of proper motion components and their correlation. We find that dipole contribution alone is not su ffi cient for describing quasars proper motion power, as Gaia CRF3 has non-zero systematic correlations at medium and small scales (Klioner et al. 2022). As a consequence, the algorithm forces the GW parameters to absorb this residual power, resulting in spurious posteriors of the GW strain. As shown in Appendix C, after implementing a harmonic decomposition, a plane GW should exhibit its sig-nal mainly at quadrupolar level, with smaller fractions at each higher order. Therefore, we propose a hybrid technique imple-menting standard Bayesian inference and Vector Spherical Har-monics (Mignard & Klioner 2012) analysis: besides dipole con-tributions, VSH coe ffi cients are also implemented as free param-eters in the MCMC. We cut the VSH analysis at the ℓ ≤ 3 level, i.e. only quadrupole and octupole contributions are implemented, since the higher 
+
+Parameter Distribution Domain 
+
+h0 uniform [10 −20 , 10 −4]log fGW uniform [−12 , −9.4] 
+
+αGW uniform [0 , 2π)
+
+δGW 12 cos δGW (−π, π )
+
+Ψ uniform [0 , 2π)
+
+ι 12 cos ι (−π, π )
+
+Φ0 uniform [0 , 2π)Table 2: GW priors distributions and allowed ranges. computational cost was not resulting in an enhanced GW con-straining performance. Therefore, the final value of μexp (and hence the astrometric likelihood) will be a function of GW pa-rameters ΘGW and VSH coe ffi cients ΘVS H .A proper definition of the VSH decomposition employed, its jus-tification and the astrometric-only results are fully discussed in Appendix C. Finally, we have all the building blocks for the definition of our joint analysis likelihood: 
+
+L joint = LPT A × L Gaia , (20) which will be a function of GW parameters, VSH parameters and pulsar distances. 
+
+4.1. Priors 
+
+According to Bayes theorem, the formulation of the posterior distribution, requires specific likelihood function and prior dis-tribution: in the context of setting upper limits, Bayesian evi-dence serves exclusively as a normalization constant, leaving the functional form of the posterior unaltered. In the absence of any previous detection, we adopt isotropic uniform priors for the di-rection of propagation ( αGW , δ GW ) and source binary orientation (ι, Ψ). We choose uniform prior distributions for strain h0 and random phase Φ0. Finally, GW frequency is sampled from a log-uniform distribution, since our analysis spans over several orders of magnitude. Moreover, frequency boundaries are carefully se-lected in order to avoid physically inaccessible periods. Regarding quasars glide and rotation dipolar contributions, we cannot use Gaia CRF3 results for the prior distributions, since our analysis is constructed on the same dataset. These data double-counting could, in best scenario, underestimate the real uncertainties on the free parameters or enforce possible bias and systematics present in the catalog. Therefeore, as nominal value, we choose an independent VLBI measurement (Titov & Krásná 2018) of the secular drift of magnitude 5 .2μas / yr directed to-wards the Galactic centre αglide = 266 ◦ and δglide = 29 ◦. Since we assume the cosmological principle of a non-rotating universe, we set a zero rotation vector as nominal value. For both dipole contributions we choose a Gaussian prior distribution with a loose standard deviation of 5 μas /yr , while we set uninformative uniform priors on the remaining VSH coe ffi cients. The final posterior distribution will be the product of the joint likelihood and the joint prior distribution π = QNi=0 π(Θi). 
+
+5. Results 
+
+5.1. Signal Detection 
+
+We choose a Dynamic Nested Sampling algorithm from 
+
+dynesty library for the calculation of the Bayes factor (BF) de- 
+
+> Article number, page 5 A&A proofs: manuscript no. filipello_2026
+
+fined as 
+
+B = Z1 = R L(Θ1)π(Θ1)dΘ1
+
+Z0 = R L(Θ0)π(Θ0)dΘ0
+
+, (21) where Z0 is the evidence for the null hypothesis, hence no GW eff ects (only astrophysical or other instrumental systematics), while Z1 is the evidence for a GW signal. In scenarios like ours, i.e. SNR = 0, high auto-correlations of parameters and heavy sys-tematic e ff ects, nested sampling algorithms perform significantly better and are more robust than standard MCMC methods, which easily get trapped in local extrema or fail to explore degenerated parameter spaces (Buchner 2023). Starting from the pulsar binaries dataset, we find similar re-sults to Zheng et al. (2026), namely: ln BPT A = −2.82 ± 0.41 , (22) indicating a strong preference for the model with no GW signal. Repeating the analysis with mock signal injections showed that the False Positive Rate (FPR) of the analysis is well bounded, with no log-Bayes factor > −1. For the astrometric search, due to the presence of non negli-gible systematic e ff ects, we define three di ff erent scenarios: 
+
+– M0 only dipole contribution, 
+
+– M1 dipole, quadrupole, and octupole contributions, 
+
+– M2 dipole, quadrupole, octupole contributions, and CWs sig-nal, and estimate the evidence for each proposed model. We find the following results: 
+
+– ln B10 = Z1
+
+Z0
+
+= 14 .42 ± 0.40 , 
+
+– ln B21 = Z2
+
+Z1
+
+= 1.41 ± 0.52 , where Zi is the evidence for model Mi. The retrieved values show a very strong evidence, according to the Kass-Raftery scale (Kass & Raftery 1995), for the model with ℓ = 2, 3 contributions compared to the one with just dipole e ff ects. This indicates the fact that the secular aberration and rotation are not su ffi cient to explain the quasars’ proper motions, which is in total agreement with results in literature (Klioner et al. 2022). On the other hand, ln B21 > 1 shows a weak preference for the model with a GW; however, there are few aspects to consider: this value is 3 σ com-patible with zero and the very high-dimensionality of the model can bring numerical noise (in the h0 → 0 regime, the remain-ing parameter posterior distribution is completely flat and unin-formative). As we show in Appendix C, in the full Gaia CRF3 catalog, there is a residual power also at ℓ > 3: as a result, the Nested Sampling algorithm is weakly overfitting this excessive power at high multipoles. Instead of adding even more parameters to the model, we use the fact that M1 is a nested model of M2 in the limit h0 → 0 and evaluate the Bayes factor using the Savage-Dickey Density Ratio (SDDR) as a countercheck. The new BF is defined as the ratio between the posterior density at h0 = 0 and the prior density in the same scenario: 
+
+BS DDR = p (Θ = Θ 0|y, M2)
+
+p (Θ = Θ 0|M2) . (23) We find that, using SDDR method for scenario M2/M1 (i.e. GW signal vs. no GW signal), ln BS DDR = −0.71 ± 0.03, which indi-cates no evidence for a CWs signal. We conclude that also in the astrometric catalog there is no robust evidence of a GW detec-tion and therefore move on to the joint analysis. For the combined Bayes factor, due to the above discussed problems, we stick to the SDDR method. The model M1 will consider previously discussed astrophysical e ff ects for pulsar bi-naries and generic VSH contributions up to octupole order for quasars plus a coherent GW signal. The nested model is defined as M1 in the limit h0 → 0. We find the following value: ln B joint = −0.42 ± 0.03 , (24) showing no evidence for a GW signal even in the combined datasets. We assess the FPR by sky scrambling: while keep-ing the real values of μ and ˙ Pb/Pb with their corresponding er-rors, we randomly shu ffl e the position of the objects in the two datasets. After creating 50 samples, none of them exceeded the value of ln B = −0.2, with all realisations being more than 5 σ
+
+from threshold value of zero. We conclude that our analysis is well-bounded with minimal risks of False Positive detection. In the absence of signal detection, we move to GW strain upper limit estimation from marginalised posterior distribution. Direc-tion of propagation, source binary orientation and phase poste-riors are completely uninformative, perfectly following the prior distributions, as shown in Fig. 2. Since we are studying observables proportional to the first time derivative of the GW, the amplitude of the e ff ect is ∝ h0 · f . In order to disentangle and properly estimate the sensitivity curve, we demote the GW frequency from being a free parameter, fix it to a specific value and run the MCMC. A robust upper limit on GW observable strain is set from the 95-th quantile of the pos-terior distribution. Then, the process is repeated on the whole accessible frequency range for the combined dataset. We stop the analysis at a conservative value of f = (4 Tobs )−1 to keep the approximation ωt << 1 valid. The results are shown in Fig. 3, where we find the upper limit for the join analysis to be h0 ≤ 6.4×10 −11 at the reference frequency of fre f = 4 × 10 −10 Hz. Due to current data quality, Gaia DR3 sensitivity to pHz CW is still 2-3 times less performative than the one achieved with pulsar binaries data. Hence, the combined analysis improves the upper limits by a factor of 20-30% with respect to the analysis on ˙ Pb alone. Nevertheless, we achieve the tightest constraints to date on pHz CWs. We also study the directional sensitivity of the combined datasets by fixing the frequency value to fGW = 2.5 × 10 −10 Hz and running the MCMC with the incoming GW direction set to a specific value. The analysis is repeated on the whole sky and the results are presented in Fig. 4. The smallest achieved upper limit is h0 ≤ 2.94 × 10 −11 while the least sensitive region yields 
+
+h0 ≤ 2.65 × 10 −10 . The spatial sensitivity follows the expected antenna pattern of the chosen binaries and the spatial density of used quasars. 
+
+6. Gaia DR4 forecasts 
+
+With the upcoming Gaia fourth data release (at the time of writ-ing), we can forecast the possible performances of the QSO cat-alog and estimate the expected improvements on the CW joint analysis. The main upgrade comes from the increased time baseline: while astrometric position uncertainties scale as N−1/2 
+
+> obs
+
+∝ T −1/2, proper motion uncertainties benefit additionally from the extended tem-poral lever arm, scaling as T −3/2. Assuming a scanning rate roughly linear with time, this results in the following estimated precision: 
+
+> Article number, page 6 L. Filipello et al.: Combining astrometry with pulsar timing: the first joint analysis of very low frequency gravitational waves
+
+Fig. 2: Posterior distribution of the joint analysis. The shaded areas represent, from darker to brighter, the 50-th, the 88-th and 95-th quantiles. The black dotted lines show qualitatively the adopted prior. The GW strain was sampled with log-uniform prior distributions for the sake of better visualization. 
+
+σDR4 ≈ TDR3 
+
+TDR4 
+
+!3/2
+
+σDR3 ≈ 0.37 σDR3 , (25) as we move from a 34-month observation to 5.5 years. An ad-ditional performance improvement comes from the number of sources: in a regime of SNR e ff ectively equal to zero, the proper motion magnitude will be proportional to the measurement un-certainty. Therefore, with better precision due to a longer time baseline, the number of sources surviving the 1 mas /yr cut will increase, ideally converging to the size of the whole catalog. Fi-nally, in the next data release, Gaia might see new sources with full astrometric solution and the usage of epoch astrometry shall improve the purity of the dataset. However, we only addressed the white component of the proper motion noise, while in reality a systematic floor is non negligible (Lindegren et al. 2021). Moreover, the additional sources after the proper motion cut might be characterised by worse measurement precision (high proper motion values can be correlated with fainter sources (Brown et al. 2021)), bringing down the overall sensitivity of the dataset. A mock catalog with real DR3 quasars position and expected new errors is constructed, and a new analysis is performed. To do so, we inject a CW signal from simulated SMBHB using oddAGN 
+
+package. For each frequency bin, we generate 20 loud binaries  
+
+> Article number, page 7 A&A proofs: manuscript no. filipello_2026
+
+Fig. 3: Upper limit estimation on CW strain for di ff erent datasets. Dashed lines are the results from the two disjoint analysis, while the orange solid lines show the improvements from the new combined method. Forecasts of results with estimated Gaia DR4 errors are also presented with dotted lines. 
+
+Fig. 4: Directional sensitivity on CW strain for the joint datasets at a standard frequency value of fGW = 2.5 × 10 −10 Hz. with random direction in sky, in order to average the possible loss of sensitivity due to the anisotropic quasar distribution, run the analysis pipeline and take the mean upper limit. The same approach is repeated after creating a mock cata-log of pulsar binaries with realistic astrophysical parameters and simulated values of observed ˙ Pb/Pb; then we find the forecast joint sensitivity curve from mock DR4 data. We see that, in a fairly realistic scenario, a combined analysis might break the wall of h0 < 10 −11 95% upper limit for sub-nHz CW signals. Finally, a injection-recovery method is used to estimate fore-casts, limits of detectability, and parameter estimation perfor-mance. For each strain amplitude bin, we inject 100 mock signals 
+
+Fig. 5: Retrieved Bayes factor from injected signals at reference frequency fGW = 2.5 × 10 −10 Hz. For each strain bin the percent-age of BF surpassing notable threshold is shown with di ff erent colours. with frequency set to fGW = 2.5 × 10 −10 Hz and uniformly ran-dom angular variables in order to marginalise over them. Then, the bayesian evidence is calculated for the null models and GW models to compute the log Bayes factor. As shown in Fig. 5, no mock datasets showed a positive log BF below h0 = 10 −11 ,while for all injections greater than h0 = 10 −10 there was very strong evidence for the signal model. We conclude that with the next data release, the false positive /negative region will be 
+
+> Article number, page 8
+
+L. Filipello et al.: Combining astrometry with pulsar timing: the first joint analysis of very low frequency gravitational waves 
+
+Fig. 6: Strain amplitude estimation from injection of mock sig-nals at the reference frequency of fGW = 2.5 × 10 −10 Hz. The orange shaded area represents the 68% confidence interval (i.e. 1σ region from the best-fit parameters), while the blue shaded area is the 95% confidence interval. constrained between these two orders of magnitude, while set 
+
+h0 = 10 −10 as the 95% true positive threshold. In Fig. 6 we present the retrieved strain from the same injec-tion recovery approach. It clearly shows that in the strain region of detectability the algorithm is perfectly estimating the param-eters, while a noticeable loss of precision starts to kick in below 
+
+h0 = 10 −11 , in perfect accordance with the previous plot. Moreover, Gaia DR4 will also publish single epoch astromet-ric and photometric time series. Such observables will open up new frontiers for the first searches of GW periodic signals with astrometry, with possibilities of a full cross-correlation from as-trometry and pulsar timing analysis, spanning from pHz to mHz and covering more than 5 orders of magnitudes. 
+
+7. Conclusions 
+
+In this work, we have presented the first joint data analysis pipeline combining real astrometric measurements from Gaia CRF3 proper motions with orbital period derivatives ( ˙ Pb/Pb)of binary pulsars from the ATNF catalog, for searching and constraining CWs in the ultra-low frequency (pHz) regime (10 −12 Hz ≲ fGW ≲ 10 −9 Hz). This hybrid approach takes ad-vantage of the deep geometrical complementarity of the two ob-servational techniques: pulsar binary timing is sensitive to the line-of-sight acceleration induced by passing GWs, whereas as-trometric measurements of distant quasars detect the transverse sky-plane apparent proper motion displacement. Thanks to the combination of these complementary e ff ects, the joint frame-work helps break the spatial degeneracies inherent to single-method searches and provides complementary sensitivity to the full three-dimensional GW response. Employing Bayesian model selection via Dynamic Nested Sampling and the Savage-Dickey Density Ratio (SDDR), we found no statistically significant evidence for a GWs signal in either the isolated datasets or the joint analysis (ln Bjoint =
+
+−0.42 ± 0.03). In addition to that, accounting for systematic e ff ects proved critical to avoid spurious strain signals. For pulsar binaries, in-corporating Monte Carlo propagation of Galactic potential pa-rameters provided the necessary variance to absorb unmodeled residual power. For quasars, modelling and implementing sys-tematic correlations through Vector Spherical Harmonics up to the octupole order ( ℓ = 3) prevented artificially inflated GW strain from parameter estimation. In the absence of a detection, we derived the tightest upper limits to date on CW strain in the pHz band. For a reference frequency of fref = 4 × 10 −10 Hz, the joint analysis resulted in a 95% up-per limit of h0 ≤ 6.4 × 10 −11 , representing an improvement of 20% − 30% over the limits obtained from binary pulsar timing alone. Directional sensitivity maps yield upper limits ranging from h0 ≤ 2.94 × 10 −11 in the most sensitive sky directions to 
+
+h0 ≤ 2.65 × 10 −10 in less constrained regions, also improving the performance and scattering in directional sensitivity compared to single-datasets analysis. Looking ahead, several developments will substantially ex-tend the sensitivity and scope of this framework, with Gaia DR4 as the closest and primary upgrade. With an extended obser-vational baseline of 5.5 years, individual proper motion uncer-tainties are expected to decrease significantly. Our injection-recovery forecasts demonstrate that a joint analysis with Gaia DR4 can break the h0 < 10 −11 upper limit barrier for sub-nHz CWs. Furthermore, the publication of single-epoch astrometric time series in DR4 will enable direct searches for periodic GW signals spanning from pHz to mHz. In addition to that, the arrival of the Square Kilometre Array will dramatically enhance the number of observed millisecond binary pulsars, particularly to-ward the Galactic bulge (Abbate et al. 2025). A larger and more isotropically distributed sample of high-precision pulsar binaries will substantially improve the directional coverage and three-dimensional sensitivity of the joint analysis. Future implementations of this pipeline will incorporate other secular observables, such as pulsar spinning period jerks (i.e. ¨ P), since cross-correlation of proper motions with a second order time derivative could break strain-frequency degeneracies. Finally, extending this joint framework to searches for a stochas-tic gravitational-wave background (SGWB) could provide new opportunities to probe cosmological sources in the pHz − nHz frequency range, including possible signatures of early-Universe phase transitions.                    
+
+> Acknowledgements. Data from the European Space Agency (ESA) mission Gaia (https://www.cosmos.esa.int/gaia ), processed by the Gaia Data Processing and Analysis Consortium (DPAC, https: //www.cosmos.esa.int/web/gaia/dpac/consortium ) was used for this work, along with ATNF ( https://www.atnf.csiro.au/research/pulsar
+> for the pulsar analysis. L.F., M.C., acknowledge support from the PRIN 2022 grant 20227MYL2X “General Relativistic Astrometry and Pulsar Experiment (GRAPE) financed by the European Union - Next Generation EU, Mission 4 Component 1 CUP C53D23000890006.
+
+References 
+
+> Abbate, F. et al. 2025, Open J. Astrophys., 8, 154252 Agazie, G. et al. 2023a, Astrophys. J. Lett., 951, L8 Agazie, G. et al. 2023b, Astrophys. J. Lett., 951, L9 Akhmetov, V., Filipello, L., Crosta, M., et al. 2026, Astron. Astrophys., Forth-coming article, Akhmetov, V. S., Fedorov, P. N., Tsvetkova, V. S., & Bannikova, E. Y. 2021, MNRAS, 505, 3219 Alam, M. F. et al. 2021, Astrophys. J. Suppl., 252, 4 Antoniadis, J. et al. 2023, Astron. Astrophys., 678, A48 Bagherian, H., Ekhterachian, M., & Stelzl, S. 2026, JHEP, 01, 068 Beordo, W., Crosta, M., & Lattanzi, M. G. 2024, Journal of Cosmology and Astroparticle Physics, 2024, 024 Bi, Y.-C., Wu, Y.-M., & Huang, Q.-G. 2026, , , Braun, R., Bourke, T., Green, J. A., Keane, E., & Wagg, J. 2015, PoS, AASKA14, 174
+
+Article number, page 9 A&A proofs: manuscript no. filipello_2026 
+
+Brown, A. G. A. et al. 2021, Astron. Astrophys., 649, A1, [Erratum: As-tron.Astrophys. 650, C3 (2021)] Buchner, J. 2023, Statistics Surveys, 17, 169 Cruz, N. M. J., Malhotra, A., Tasinato, G., & Zavala, I. 2025, Phys. Rev. D, 112, 083558 Darling, J. 2025, Astrophys. J. Lett., 982, L46 DeRocco, W. & Dror, J. A. 2023, Phys. Rev. D, 108, 103011 Eilers, A.-C., Hogg, D. W., Rix, H.-W., & Ness, M. K. 2019, The Astrophysical Journal, 871, 120 Fonseca, E., Stairs, I. H., & Thorsett, S. E. 2014, Astrophys. J., 787, 82 Gaia Collaboration, Klioner, S. A., Mignard, F., et al. 2021, Astronomy & As-trophysics, 649, A9 Geyer, R., Klioner, S. A., Lindegren, L., & Lammers, U. 2025, Astron. Astro-phys., 695, A172 Guo, Y. J. et al. 2021, Astron. Astrophys., 654, A16 Hobbs, G., Manchester, R., Teoh, A., & Hobbs, M. 2004, IAU Symp., 218, 139 Janssen, G. H., Stappers, B. W., Kramer, M., et al. 2008, Astron. Astrophys., 490, 753 Jaraba, S., García-Bellido, J., Kuroyanagi, S., Ferraiuolo, S., & Braglia, M. 2023, Mon. Not. Roy. Astron. Soc., 524, 3609 Jiao, Y., Hammer, F., Wang, H., et al. 2023, Astronomy & Astrophysics, 678, A208 Kass, R. E. & Raftery, A. E. 1995, J. Am. Statist. Assoc., 90, 773 Klioner, S. A. et al. 2022, Astron. Astrophys., 667, A148 Kumamoto, H., Imasato, Y., Yonemaru, N., Kuroyanagi, S., & Takahashi, K. 2019, Mon. Not. Roy. Astron. Soc., 489, 3547 Lindegren, L., Bastian, U., Biermann, M., et al. 2021, A&A, 649, A4 Margalit, A., Contaldi, C. R., & Pieroni, M. 2020, Phys. Rev. D, 102, 083506 McMillan, P. J. 2017, Monthly Notices of the Royal Astronomical Society, 465, 76 Mignard, F. & Klioner, S. 2012, Astron. Astrophys., 547, A59 Moore, C. J., Mihaylov, D. P., Lasenby, A., & Gilmore, G. 2017, Phys. Rev. Lett., 119, 261102 Moran, A., Mingarelli, C. M. F., Van Tilburg, K., & Good, D. 2024, Phys. Rev. D, 109, 123015 Ou, X., Eilers, A.-C., Necib, L., & Frebel, A. 2024, Monthly Notices of the Royal Astronomical Society, 528, 693 Pagano, L., Salvati, L., & Melchiorri, A. 2016, Phys. Lett. B, 760, 823 Perna, G., Bellomo, N., & Bertacca, D. 2026, , , Peters, P. C. & Mathews, J. 1963, Phys. Rev., 131, 435 Prusti, T. et al. 2016, Astron. Astrophys., 595, A1 Pyne, T., Gwinn, C. R., Birkinshaw, M., Eubanks, T. M., & Matsakis, D. N. 1996, Astrophys. J., 465, 566 Reardon, D. J. et al. 2021, Mon. Not. Roy. Astron. Soc., 507, 2137 Romano, J. D. & Cornish, N. J. 2017, Living Rev. Rel., 20, 2 Shklovskii, I. S. 1970, Soviet Astronomy, 13, 562 Storey-Fisher, K., Hogg, D. W., Rix, H.-W., et al. 2024, Astrophys. J., 964, 69 Stovall, K. et al. 2019, Astrophys. J., 870, 74 Taylor, S. R. 2025, Astrophys. Space Sci., 370, 124 Titov, O. & Krásná, H. 2018, Astronomy & amp; Astrophysics, 610, A36 Wachter, J. M., Olum, K. D., & Blanco-Pillado, J. J. 2026, Phys. Rev. D, 113, 083533 Zheng, Q., Mingarelli, C. M. F., DeRocco, W., et al. 2026, Phys. Rev. D, 113, 023037 Zhou, Y., Li, X., Huang, Y., & Zhang, H. 2023, The Astrophysical Journal, 946, 73 
+
+Article number, page 10 L. Filipello et al.: Combining astrometry with pulsar timing: the first joint analysis of very low frequency gravitational waves 
+
+Appendix A: Uncertainty on the Galactic acceleration 
+
+Since distances are free parameters in the MCMC, the Galactic contribution is marginalised only over the distances, while RA and DEC are fixed, as their relative uncertainties are orders of magnitude below the parallax average error. However, due to our strict cut on the parallax and parallax error, the change in the agal term is much lower than the instrumental error for most of the binaries, as shown in Table A.1. This results in an underestimation of the total uncertainty for the expected Galactic contribution, as discussed in (Moran et al. 2024). However, for our work we do not implement a jitter noise parameter to deal with this excessive power, but we implement the model uncertainty in the analysis with a Monte Carlo approach. Since McMillan (2017) is the sum of di ff erent contributions (bulge, gas disk, thin and thick stellar discs, HI and molecular gas discs, and a DM halo, for a total of 7 free parameters. In order to evaluate the uncertainty on the acceleration, for each parameter, we consider the mean and standard deviation obtained from the posterior distribution (see Table 2 of McMillan 2017), with the exception of the bulge central density that we keep fixed to 10 
+
+the best-fitting value. From these values, we define Gaussian distributions (truncated to avoid negative values) from which we draw 10k random values for each of the 6 free parameters. Then, from each simulated vector of free parameters, we evaluate the Galactic accelerations for all pulsar binaries and calculate the corresponding standard deviations. For each pulsar binary, we adopt this standard deviation as an estimator for the model-induced uncertainty on the Galactic acceleration. After implementing this additional error in the likelihood, the issue of spurious detection is no longer present, indicating a possible underestimation of the ˙ Pb errors in the catalog or an inadequate understanding of the local Galactic potential and its modelling. Improving Galactic models is outside the scope of this work, but it will be an interesting challenge for the near future, in light of the next Gaia data release. A combined analysis to constrain the (local) Galactic potential could bring important advantages: since we can only observe pulsars’ 20 
+
+line of sight acceleration, a strong constraint on the Solar System acceleration can, in principle, disentangle this problem and let us study the proper Galactic acceleration acting on nearby pulsar binaries. 
+
+ID −5σ Best-fit 5σ
+
+J0437-4715 -0.048 -0.049 -0.051 J0613-0200 0.023 0.032 0.043 J1012 +5307 -0.080 -0.080 -0.079 J1022 +1001 -0.103 -0.118 -0.125 J1455-3330 -0.022 -0.031 -0.041 J1518 +4904 -0.152 -0.167 -0.180 B1534 +12 -0.115 -0.146 -0.175 J1614-2230 0.002 0.006 0.010 J2145-0750 -0.112 -0.138 -0.162 J2222-0137 -0.083 -0.084 -0.085 J2234 +0611 -0.162 -0.184 -0.205 Table A.1: Expected Galactic accelerations (in 10 −18 s−1 units) from McMillan17 for the selected binaries at di ff erent distance values. We show agal at dp ± 5σ and the best-fit value.  
+
+> Article number, page 11 A&A proofs: manuscript no. filipello_2026
+
+Appendix B: Pulsar Binaries data and formulas 
+
+Taking the time derivative of eq. (9) one gets the following analytical formula for the GW-induced acceleration: 
+
+aGW = ˆnip ˆn jp
+
+1 + ˆk · ˆnp
+
+ω0h0[e+
+
+> i j
+
+(ˆ k)[cos(2 Ψ)(1 + cos 2(i))(cos(2 ϕ0) − cos(2 ϕ0 − 2ω0(1 + ˆk · ˆnp)dp)) ++ 2 sin(2 Ψ) cos( i)( − sin(2 ϕ0) + sin(2 ϕ0 − 2ω0(1 + ˆk · ˆnp)dp))] ++ e×
+
+> i j
+
+(ˆ k)[sin(2 Ψ)(1 + cos 2(i))(cos(2 ϕ0) − cos(2 ϕ0 − 2ω0(1 + ˆk · ˆnp)dp)) +
+
+− 2 cos(2 Ψ) cos( i)( − sin(2 ϕ0) + sin(2 ϕ0 − 2ω0(1 + ˆk · ˆnp)dp))]] ,
+
+(B.1) under the approximation ωt ≪ 1, i.e. the epoch of observation is negligible compared to the period of the wave. We now provide the pulsar binaries dataset used for the analysis: 
+
+ID ϖ [mas] α [deg] δ [deg] Pb [d] ˙Pb Ref. J0437-4715 6.43(4) 69.317 -47.253 5.7410459(4) 3.7329(15) × 10 −12 (Antoniadis et al. 2023) J0613-0200 1.0(5) 93.433 -2.013 1.198512575192(8) 3.5(2) × 10 −14 (Antoniadis et al. 2023) J1012 +5307 1.17(2) 153.139 53.117 0.604672722921(3) 5.46(6) × 10 −14 (Antoniadis et al. 2023) J1022 +1001 1.16(8) 155.742 10.031 7.805134(2) 2.2(1) × 10 −13 (Antoniadis et al. 2023) J1455-3330 1.3(1) 223.956 -33.513 76.174567479(8) 5(2) × 10 −12 (Antoniadis et al. 2023) J1518 +4904 1.24(4) 229.57 49.076 8.6340050964(11) 2.4(22) × 10 −13 (Janssen et al. 2008) B1534 +12 1.07(7) 234.292 11.932 0.420737298879(2) −1.366(3) × 10 −13 (Fonseca et al. 2014) J1614-2230 1.54(1) 243.652 -22.509 8.68661942256(6) 1.57(13) × 10 −12 (Alam et al. 2021) J2145-0750 1.4(1) 326.46 -7.838 6.83890261495(9) 1.3(2) × 10 −13 (Reardon et al. 2021) J2222-0137 3.723(13) 335.525 -1.621 2.445759995471(6) 2.55(8) × 10 −13 (Guo et al. 2021) J2234 +0611 1.03(4) 338.596 6.191 32.00140163(8) 3.1(25) × 10 −12 (Stovall et al. 2019) Table B.1: Astrometric and timing parameters of pulsar binaries used in the main analysis, including sky position in ICRS, parallax, binary period and its first time derivative. The data were obtained from the publicly available ATNF catalog.(Hobbs et al. 2004). 
+
+> Article number, page 12 L. Filipello et al.: Combining astrometry with pulsar timing: the first joint analysis of very low frequency gravitational waves
+
+Fig. B.1: Observed values of fractional change of binary periods and their expected contributions. Intrinsic GW emission is shown in blue, while Galactic expected acceleration in pink and Shklovskii contribution in green. At the bottom, the final residuals used for the analysis with corresponding uncertainties.  
+
+> Article number, page 13 A&A proofs: manuscript no. filipello_2026
+
+Fig. C.1: VSH total power of the Gaia CRF3 catalog at di ff erent multipoles. The blue points represent the total power of the pure divergence vector base, while the pure curl vector base is displayed in orange. The o ff set on the x-axis is implemented for better visualization. 
+
+Appendix C: Gaia systematics and Harmonic Decomposition 
+
+As explained in Sec. 2, the Gaia CRF3 catalog is heavily a ff ected by systematic e ff ects, some of which have a clear astrophysical origin, while others are just instrumental. A very useful and elegant approach for addressing this issue is the implementation of a harmonic decomposition using VSH functions. With this method, we can decompose a two-dimensional vector field on the sphere as a sum of E-mode and B-mode bases (i.e. pure divergence and pure curl vector bases) (Mignard & Klioner 2012): 
+
+YE 
+
+> ℓm
+
+= 1
+
+√ℓ(ℓ + 1) ∇Yℓm(α, δ ) , (C.1) 
+
+YB 
+
+> ℓm
+
+= − 1
+
+√ℓ(ℓ + 1) u × ∇Yℓm(α, δ ) , (C.2) where the superscripts E and B correspond to the spheroidal (electric-like) and toroidal (magnetic-like) modes, respectively, while 
+
+Yℓm is the standard spherical harmonic function. A generic two-dimensional vector on the sphere will be 
+
+V(α, δ ) =
+
+> ∞
+
+X
+
+> ℓ=1
+> ℓ
+
+X
+
+> m=−ℓ
+
+(sℓmYE
+
+> ℓm
+
+(α, δ ) + tℓmYB
+
+> ℓm
+
+(α, δ )) , (C.3) where sℓm and tℓm are complex expansion coe ffi cients describing the amplitudes of the corresponding E- and B-mode multipoles. 30 
+
+In this formalism, two important contributions to quasars proper motion (i.e. secular aberration, or glide, and rotation of the reference system and /or the universe) can be interpreted as pure dipole ℓ = 1 terms, while the main contribution coming from a passing GW (CW or Stochastic Background) is confined to the quadrupole ℓ = 2 terms, and the remaining power leaks to smaller scales with amplitude ∝ (1 + ˆk· ˆn)−ℓ for each multipole. Rotation and glide will produce an apparent proper motion with the following characteristics: 
+
+μ∗ 
+
+> α
+
+= −gx sin α + gy cos α + −wx cos α sin δ − wy sin α sin δ + wz cos δ ,μδ = −gx cos α sin δ − gy sin α sin δ + gz cos δ + wx sin α − wy cos α , (C.4) where g = (gx, gy, gz) is the Solar System acceleration vector (divided by c) and ω = (ωx, ω y, ω z) measures the non-inertiality of the reference system or the rotation of the universe at cosmological scales (Akhmetov et al. 2021). In Fig. C.2, we show the posterior distributions for the glide and rotation contributions from our analysis, while the prior distributions are described in Sec. 4. Our retrieved secular aberration has magnitude compatible with the Gaia CRF3 reference value within 1 σ, with direction pointing towards the Galactic centre within the error range (i.e. αg = 271 .71 ◦ and δg = −30 .78 ◦). 40 
+
+As seen in Fig. C.1, higher multipoles have non-negligible power, indicating the presence of systematics at medium /small scales. 
+
+> Article number, page 14 L. Filipello et al.: Combining astrometry with pulsar timing: the first joint analysis of very low frequency gravitational waves
+
+Fig. C.2: Dipole contribution extracted from the MCMC analysis of the Gaia CRF3 dataset. Left: posterior distributions of secular acceleration vector components. Right: posterior distributions of rotation vector components. A CW analysis is impossible to perform on the CRF3 catalog without accounting for these contributions in the residuals calculation (or without performing a strict cut on the proper motion amplitude in order to discard all sources with significant systematic contributions, but that would bring to underestimation bias as shown in (Akhmetov et al. 2026)). We show in Fig. C.3 that with a model comprehending only glide, rotation and CW, the fitting algorithms forces the wave amplitude to non-physical values to explain all the remaining large-medium correlations in proper motion. Therefore, we decide to include in our model also generic systematic eff ects using VSH decomposition up to ℓ = 3, as this was the best compromise between physical results and computational cost. In principle, the VSH coe ffi cients could absorb the GW signal, as the total quadrupole VSH power is the standard proxy in astrometry for the detection of a GWB (Mignard & Klioner 2012). However, in the case of a CW, only seven parameters are necessary for describing the phenomenon, meaning that the VSH coe ffi cients must take an extremely specific configuration to eliminate the extra 50 
+
+degrees of freedom (ten coe ffi cients from quadrupole contribution plus GW power leakage at higher multipole orders). As a result, due to the lower dimensionality of the model, in the presence of a passing CW, the fitting algorithm will prefer the GW model and pass the remaining unmodeled quadrupole signal to the VSH coe ffi cients.  
+
+> Article number, page 15 A&A proofs: manuscript no. filipello_2026
+
+Fig. C.3: Left: posterior distributions of GW parameters from the Gaia CRF3 assuming only dipole contributions. Right: posterior distributions from the same dataset after including generic quadrupole contributions. 
+
+> Article number, page 16
+
+L. Filipello et al.: Combining astrometry with pulsar timing: the first joint analysis of very low frequency gravitational waves 
+
+Fig. C.4: Posterior distributions of GW parameters after implementing VSH coe ffi cients as free parameters up to the order ℓ = 3. 
+
+Article number, page 17
