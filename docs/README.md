@@ -6,45 +6,44 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-09-23
-- 运行时间：2026-09-23 21:50:06 UTC
+- 最新运行日期：2026-09-24
+- 运行时间：2026-09-24 22:15:59 UTC
 - 运行状态：成功
 - 本次总论文数：7
-- 精读区：5
-- 速读区：2
+- 精读区：2
+- 速读区：5
 
 ### 今日简报（AI）
-今日精选 7 篇文献，精读 5 篇、速读 2 篇，重点聚焦快速射电暴统计性质综述与爱因斯坦探针新发现的磁星 EP J223759.5+531421。
-
-最值得看的是满分综述《A Brief Review on the Statistical Properties of Fast Radio Bursts》（10.0/10）对 FRB 统计规律的梳理，以及 9.0 分的爱因斯坦探针磁星发现——它展示了 X 射线时域观测捕捉中子星极端天体的能力。
-
-普通读者可先读 FRB 综述建立整体图景，再借磁星发现一文感受时域天文学的新进展，速读的两篇（数值相对论标准化检验、原初核合成与脉冲星计时阵列解释）留作扩展了解即可。
-- 详情：[/202609/23/README](/202609/23/README)
+- 今日共生成 7 篇推荐（精读 2 篇，速读 5 篇）
+- 精读：《A Coherent Search for New Galactic Magnetars using Fermi/GBM and follow-up Swift/BAT: 7 Candidates and a Large Burst Catalog》（9.0/10）, 《A multi-telescope fit to the FRB population, allowing for FRB repetition》（9.0/10）
+- 速读：《A magnetar-powered jet-wind outflow in gamma-ray burst-associated supernovae: Application to the thermal components of GRB 060218-SN 2006aj》（7.0/10）, 《Pulsar magnetospheres in dynamical Chern-Simons gravity: deathline conditions and polar-cap particle acceleration》（7.0/10）, 《A dynamic magneto-ionic environment around a long-period radio transient》（6.0/10）
+- 这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。
+- 详情：[/202609/24/README](/202609/24/README)
 
 ### 精读区论文标签
-1. [A Brief Review on the Statistical Properties of Fast Radio Bursts](/202609/23/2609.25810v1-a-brief-review-on-the-statistical-properties-of-fast-radio-bursts)  
-   标签：评分：10.0/10、query:pulsar-frb
-   evidence：快速射电暴统计、前身星与辐射机制综述
-2. [Einstein Probe discovery of the magnetar EP J223759.5+531421](/202609/23/2609.25990v1-einstein-probe-discovery-of-the-magnetar-ep-j2237595531421)  
+1. [A Coherent Search for New Galactic Magnetars using Fermi/GBM and follow-up Swift/BAT: 7 Candidates and a Large Burst Catalog](/202609/24/2609.26897v1-a-coherent-search-for-new-galactic-magnetars-using-fermigbm-and-follow-up-swiftbat-7-candidates-and-a-large-burst-catalog)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：磁星发现与爆发特性
-3. [Quarkyonic matter suppresses neutron-star $g$ modes and reverses their mass trend](/202609/23/2609.25175v1-quarkyonic-matter-suppresses-neutron-star-g-modes-and-reverses-their-mass-trend)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：g模振荡探测中子星致密物质成分与状态方程
-4. [Gravitational Imprints of Dark Energy in Neutron Stars](/202609/23/2609.25910v1-gravitational-imprints-of-dark-energy-in-neutron-stars)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：中子星状态方程与质量半径约束
-5. [IXPE observation of the new magnetar source EP J223759.5+531421](/202609/23/2609.25958v1-ixpe-observation-of-the-new-magnetar-source-ep-j2237595531421)  
-   标签：评分：8.0/10、query:pulsar-frb
-   evidence：对新增磁星EP J223759.5+531421的IXPE X射线偏振观测
+   evidence：搜寻银河系磁星并构建暴目录，直接对应磁星性质与爆发
+2. [A multi-telescope fit to the FRB population, allowing for FRB repetition](/202609/24/2609.27282v1-a-multi-telescope-fit-to-the-frb-population-allowing-for-frb-repetition)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：快速射电暴群体与重复率建模
 
 ### 速读区论文标签
-1. [Rotating Neutron Star Migrations as a Standardized Test for 3+1 Numerical Relativity](/202609/23/2609.22080v1-rotating-neutron-star-migrations-as-a-standardized-test-for-31-numerical-relativity)  
+1. [A magnetar-powered jet-wind outflow in gamma-ray burst-associated supernovae: Application to the thermal components of GRB 060218-SN 2006aj](/202609/24/2609.27649v1-a-magnetar-powered-jet-wind-outflow-in-gamma-ray-burst-associated-supernovae-application-to-the-thermal-components-of-grb-060218-sn-2006aj)  
+   标签：评分：7.0/10、query:pulsar-frb
+   evidence：磁星驱动的喷流-星风模型，涉及磁星中央引擎性质
+2. [Pulsar magnetospheres in dynamical Chern-Simons gravity: deathline conditions and polar-cap particle acceleration](/202609/24/2609.28428v1-pulsar-magnetospheres-in-dynamical-chern-simons-gravity-deathline-conditions-and-polar-cap-particle-acceleration)  
+   标签：评分：7.0/10、query:pulsar-frb
+   evidence：脉冲星磁层电动力学与死亡线条件
+3. [A dynamic magneto-ionic environment around a long-period radio transient](/202609/24/2609.23259v1-a-dynamic-magneto-ionic-environment-around-a-long-period-radio-transient)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：采用两种状态方程的旋转中子星迁移测试
-2. [Big Bang Nucleosynthesis Confronts Domain Walls and First-Order Phase Transitions as the Pulsar Timing Array Explanations](/202609/23/2609.25950v1-big-bang-nucleosynthesis-confronts-domain-walls-and-first-order-phase-transitions-as-the-pulsar-timing-array-explanations)  
+   evidence：长周期射电暂现源的法拉第旋转与旋转测度变化，关联脉冲星与快速射电暴
+4. [Analysis of radial and quasiradial oscillations in quark stars for different equations of state](/202609/24/2609.27529v1-analysis-of-radial-and-quasiradial-oscillations-in-quark-stars-for-different-equations-of-state)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：脉冲星计时阵列纳赫兹引力波背景的物理诠释
+   evidence：不同夸克物质状态方程下夸克星振荡模式研究
+5. [The compressible liquid drop model with curvature included algebraically for the pasta phases in neutron stars](/202609/24/2609.28162v1-the-compressible-liquid-drop-model-with-curvature-included-algebraically-for-the-pasta-phases-in-neutron-stars)  
+   标签：评分：6.0/10、query:pulsar-frb
+   evidence：可压缩液滴模型与意面相研究约束中子星状态方程
 
 
 <div class="dpr-home-promo-card">
