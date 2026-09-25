@@ -6,44 +6,45 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-09-24
-- 运行时间：2026-09-24 22:15:59 UTC
+- 最新运行日期：2026-09-25
+- 运行时间：2026-09-25 21:57:27 UTC
 - 运行状态：成功
-- 本次总论文数：7
-- 精读区：2
-- 速读区：5
+- 本次总论文数：8
+- 精读区：4
+- 速读区：4
 
 ### 今日简报（AI）
-- 今日共生成 7 篇推荐（精读 2 篇，速读 5 篇）
-- 精读：《A Coherent Search for New Galactic Magnetars using Fermi/GBM and follow-up Swift/BAT: 7 Candidates and a Large Burst Catalog》（9.0/10）, 《A multi-telescope fit to the FRB population, allowing for FRB repetition》（9.0/10）
-- 速读：《A magnetar-powered jet-wind outflow in gamma-ray burst-associated supernovae: Application to the thermal components of GRB 060218-SN 2006aj》（7.0/10）, 《Pulsar magnetospheres in dynamical Chern-Simons gravity: deathline conditions and polar-cap particle acceleration》（7.0/10）, 《A dynamic magneto-ionic environment around a long-period radio transient》（6.0/10）
-- 这些结果覆盖了当下较热的方向，建议先看精读区论文的关键问题与方法。
-- 详情：[/202609/24/README](/202609/24/README)
+今日日报：8篇新文、4精4速，FRB宿主星系、脉冲星计时与致密星多信使齐上阵。  
+最值得看的是两篇9分精读：CHIME/FRB Outrigger用矮星系宿主检验快速射电暴前身星的金属性依赖，以及双脉冲星计时作为三维太阳系加速度计
+- 详情：[/202609/25/README](/202609/25/README)
 
 ### 精读区论文标签
-1. [A Coherent Search for New Galactic Magnetars using Fermi/GBM and follow-up Swift/BAT: 7 Candidates and a Large Burst Catalog](/202609/24/2609.26897v1-a-coherent-search-for-new-galactic-magnetars-using-fermigbm-and-follow-up-swiftbat-7-candidates-and-a-large-burst-catalog)  
+1. [Probing the Metallicity Dependence of Fast Radio Burst Progenitors with CHIME/FRB Outrigger Dwarf Host Galaxies](/202609/25/2609.28629v1-probing-the-metallicity-dependence-of-fast-radio-burst-progenitors-with-chimefrb-outrigger-dwarf-host-galaxies)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：搜寻银河系磁星并构建暴目录，直接对应磁星性质与爆发
-2. [A multi-telescope fit to the FRB population, allowing for FRB repetition](/202609/24/2609.27282v1-a-multi-telescope-fit-to-the-frb-population-allowing-for-frb-repetition)  
+   evidence：快速射电暴前身星的金属丰度依赖
+2. [Binary-pulsar Timing: A 3D Solar-System Accelerometer and Unknown-Source Probe](/202609/25/2609.29162v1-binary-pulsar-timing-a-3d-solar-system-accelerometer-and-unknown-source-probe)  
    标签：评分：9.0/10、query:pulsar-frb
-   evidence：快速射电暴群体与重复率建模
+   evidence：双脉冲星计时重建太阳系加速度
+3. [Extending multi-messenger constraints on neutron star matter through the inclusion of direct Urca cooling](/202609/25/2609.30112v1-extending-multi-messenger-constraints-on-neutron-star-matter-through-the-inclusion-of-direct-urca-cooling)  
+   标签：评分：9.0/10、query:pulsar-frb
+   evidence：用直接Urca约束贝叶斯推断中子星状态方程
+4. [Stiffness corrections for f-mode neutron star universal relations](/202609/25/2609.30143v1-stiffness-corrections-for-f-mode-neutron-star-universal-relations)  
+   标签：评分：8.0/10、query:pulsar-frb
+   evidence：中子星状态方程的f模普适关系
 
 ### 速读区论文标签
-1. [A magnetar-powered jet-wind outflow in gamma-ray burst-associated supernovae: Application to the thermal components of GRB 060218-SN 2006aj](/202609/24/2609.27649v1-a-magnetar-powered-jet-wind-outflow-in-gamma-ray-burst-associated-supernovae-application-to-the-thermal-components-of-grb-060218-sn-2006aj)  
+1. [Finite-Temperature Axion-Admixed Neutron Stars in a Quarkyonic Crossover Framework](/202609/25/2609.28555v1-finite-temperature-axion-admixed-neutron-stars-in-a-quarkyonic-crossover-framework)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：磁星驱动的喷流-星风模型，涉及磁星中央引擎性质
-2. [Pulsar magnetospheres in dynamical Chern-Simons gravity: deathline conditions and polar-cap particle acceleration](/202609/24/2609.28428v1-pulsar-magnetospheres-in-dynamical-chern-simons-gravity-deathline-conditions-and-polar-cap-particle-acceleration)  
+   evidence：轴子混合中子星的质量半径与形变度关联状态方程
+2. [Multi-messenger and multi-band signal from first-order phase transitions in proto-neutron stars](/202609/25/2609.29761v1-multi-messenger-and-multi-band-signal-from-first-order-phase-transitions-in-proto-neutron-stars)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：脉冲星磁层电动力学与死亡线条件
-3. [A dynamic magneto-ionic environment around a long-period radio transient](/202609/24/2609.23259v1-a-dynamic-magneto-ionic-environment-around-a-long-period-radio-transient)  
+   evidence：用模型无关状态方程计算原中子星相变的多信使信号
+3. [A Diagnostic Method for Proto-Neutron Star Magnetic Fields by Supernova Fallback Neutrinos](/202609/25/2609.28057v1-a-diagnostic-method-for-proto-neutron-star-magnetic-fields-by-supernova-fallback-neutrinos)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：长周期射电暂现源的法拉第旋转与旋转测度变化，关联脉冲星与快速射电暴
-4. [Analysis of radial and quasiradial oscillations in quark stars for different equations of state](/202609/24/2609.27529v1-analysis-of-radial-and-quasiradial-oscillations-in-quark-stars-for-different-equations-of-state)  
+   evidence：原初中子星磁场诊断
+4. [Dynamically Stable Magnetic Fields in Relativistic Neutron Stars: A Diverse Landscape of GRMHD Equilibria](/202609/25/2609.28651v1-dynamically-stable-magnetic-fields-in-relativistic-neutron-stars-a-diverse-landscape-of-grmhd-equilibria)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：不同夸克物质状态方程下夸克星振荡模式研究
-5. [The compressible liquid drop model with curvature included algebraically for the pasta phases in neutron stars](/202609/24/2609.28162v1-the-compressible-liquid-drop-model-with-curvature-included-algebraically-for-the-pasta-phases-in-neutron-stars)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：可压缩液滴模型与意面相研究约束中子星状态方程
+   evidence：GRMHD模拟给出的中子星稳定磁场位形
 
 
 <div class="dpr-home-promo-card">
