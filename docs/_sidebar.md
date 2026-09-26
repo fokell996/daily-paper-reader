@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-09-26 <!--dpr-date:20260926-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202609/26/2609.29078v1-qcd-crossover-transfer-functions-for-scalar-induced-gravitational-waves-in-the-pta-band" data-sidebar-item="{&quot;title&quot;: &quot;QCD Crossover Transfer Functions for Scalar-Induced Gravitational Waves in the PTA Band&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2609.29078v1-qcd-crossover-transfer-functions-for-scalar-induced-gravitational-waves-in-the-pta-band&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;pulsar-frb&quot;}], &quot;evidence&quot;: &quot;脉冲星计时阵列波段引力波与状态方程&quot;}">QCD Crossover Transfer Functions for Scalar-Induced Gravitational Waves in the PTA Band</a>
   * 2026-09-25 <!--dpr-date:20260925-->
     * 精读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202609/25/2609.28629v1-probing-the-metallicity-dependence-of-fast-radio-burst-progenitors-with-chimefrb-outrigger-dwarf-host-galaxies" data-sidebar-item="{&quot;title&quot;: &quot;Probing the Metallicity Dependence of Fast Radio Burst Progenitors with CHIME/FRB Outrigger Dwarf Host Galaxies&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2609.28629v1-probing-the-metallicity-dependence-of-fast-radio-burst-progenitors-with-chimefrb-outrigger-dwarf-host-galaxies&quot;, &quot;score&quot;: &quot;9.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;pulsar-frb&quot;}], &quot;evidence&quot;: &quot;快速射电暴前身星的金属丰度依赖&quot;}">Probing the Metallicity Dependence of Fast Radio Burst Progenitors with CHIME/FRB Outrigger Dwarf Host Galaxies</a>
