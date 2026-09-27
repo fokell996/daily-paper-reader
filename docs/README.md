@@ -6,26 +6,22 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-09-26
-- 运行时间：2026-09-26 21:50:32 UTC
+- 最新运行日期：2026-09-27
+- 运行时间：2026-09-27 21:53:07 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：0
 - 精读区：0
-- 速读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-今天速读1篇、精读0篇，唯一入选的是《QCD Crossover Transfer Functions for Scalar-Induced Gravitational Waves in the PTA Band》（6.0/10）。
-值得关注的方向是该文把QCD crossover阶段的传递函数与脉冲星计时阵列（PTA）频段的标量诱导引力波联系起来，但6.0分说明结论仍需谨慎看待。
-普通读者可先补一点PTA和标量诱导引力波的基础背景，等后续精读或更多同类工作出来再判断其可信度。
-- 详情：[/202609/26/README](/202609/26/README)
+> 今日无新推荐，系统未产出可展示论文。
+- 详情：[/202609/27/README](/202609/27/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [QCD Crossover Transfer Functions for Scalar-Induced Gravitational Waves in the PTA Band](/202609/26/2609.29078v1-qcd-crossover-transfer-functions-for-scalar-induced-gravitational-waves-in-the-pta-band)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：脉冲星计时阵列波段引力波与状态方程
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
