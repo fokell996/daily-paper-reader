@@ -1,0 +1,1453 @@
+Title: Spectral and Polarization Properties of Coherent Radio Emission from Relativistic Magnetized Pair Plasma Shocks
+
+URL Source: https://arxiv.org/pdf/2609.30494v1
+
+Published Time: Mon, 28 Sep 2026 00:11:20 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+> Draft version September 28, 2026 Typeset using L ATEX twocolumn style in AASTeX631
+
+Spectral and Polarization Properties of Coherent Radio Emission from Relativistic Magnetized Pair Plasma Shocks 
+
+Yuanhong Qu ,1, 2, 3, ∗ Joonas Nättilä ,1, 4, † and Lorenzo Sironi 4, 5, ‡
+
+> 1Department of Physics, University of Helsinki, P.O. Box 64, FI-00014 University of Helsinki, Finland
+> 2Nevada Center for Astrophysics, University of Nevada, Las Vegas, NV 89154
+> 3Department of Physics and Astronomy, University of Nevada Las Vegas, Las Vegas, NV 89154, USA
+> 4Department of Astronomy and Columbia Astrophysics Laboratory, Columbia University, New York, NY, 10027, USA
+> 5Center for Computational Astrophysics, Flatiron Institute, 162 5th Avenue, New York, NY 10010, USA
+
+ABSTRACT Fast radio bursts (FRBs) are millisecond-duration radio transients whose emission mechanism remains an open question. The so-called synchrotron maser instability in relativistic magnetized shocks is a leading candidate for FRBs produced outside the compact object magnetosphere, yet its spectral and polarization predictions have not been systematically explored. We present three-dimensional particle-in-cell simulations of relativistic magnetized pair plasma shocks with upstream magnetization 𝜎 > 1 and bulk Lorentz factor 𝛾 0 = 10, assuming a plane-parallel shock geometry and neglecting radiative cooling, and compute the spectra and polarization of the precursor maser emission for an arbitrary line of sight. For on-axis observers aligned with the shock-propagation direction, the X-mode dominates the emission. The O-mode power increases at off-axis viewing angles and is primarily associated with currents parallel to the upstream background magnetic field. Assuming a spherical shock, we find full-width-at-half-maximum fractional bandwidths of Δ𝜈 /𝜈 0 ≃ 0.57 and 0 .82 for 𝜎 = 3 and 6, respectively. For highly magnetized shocks, the intrinsic emission bandwidth accounts for most of the spectral width, while high-latitude contributions provide additional broadening. The integrated emission remains highly linearly polarized near the spectral peak, with a nearly constant polarization angle due to the dominance of the X-mode. Our results suggest that synchrotron maser emission can produce spectra with bandwidths and high linear polarization degrees compatible with observations of some non-repeating FRBs, and may provide testable signatures for distinguishing shock-powered FRBs from other emission mechanisms. 
+
+Keywords: Radio transient sources – masers – radiation mechanisms: non-thermal – shock waves. 
+
+1. INTRODUCTION Fast Radio Bursts (FRBs; for reviews, see Cordes & Chat-terjee (2019); Petroff et al. (2019); Platts et al. (2019); Zhang (2020); Lyubarsky (2021); Zhang (2023)) are highly coher-ent millisecond-duration radio bursts detected at frequencies from ∼ 100 MHz to several GHz (Lorimer et al. 2007; Thorn-ton et al. 2013). Magnetars serve as the leading central-engine candidate for FRBs, supported by the detection of FRB 20200428 from the Galactic magnetar SGR 1935+2154 (CHIME/FRB Collaboration et al. 2020; Bochenek et al. 2020; Li et al. 2021). In the magnetar framework, radia-tion mechanisms divide into two categories: those operating inside the magnetosphere and those operating outside the magnetosphere (Zhang 2020, 2023). The radiation site and    
+
+> ∗E-mail: yuanhong.y.qu@helsinki.fi
+> †E-mail: joonas.nattila@helsinki.fi
+> ‡E-mail: lsironi@astro.columbia.edu
+
+the emission mechanism, however, remain unknown and ac-tively debated. Polarization and spectral observations of FRBs increas-ingly constrain emission mechanisms. Most repeating FRBs are highly linearly polarized, while a small fraction exhibit significant circular polarization. Polarization measurements encode information about both intrinsic emission mechanisms and propagation effects (Qu & Zhang 2023). We summarize the key observational features: 
+
+• Most repeating FRBs show high linear polarization Π𝐿 ∼
+
+100% (Petroff et al. 2019). Several repeating FRBs lack detected circular polarization, including FRB 20180301A (Price et al. 2019; Luo et al. 2020), FRB 20180916B (Nimmo et al. 2021), FRB 20190417A (Feng et al. 2022), FRB 20190604A (Feng et al. 2022), FRB 20190711A (Day et al. 2020; Kumar et al. 2021), and a few other CHIME repeaters (Fonseca et al. 2020). 
+
+• A minority of bursts from some repeating FRBs exhibit significant circular polarization, with circular polarization arXiv:2609.30494v1 [astro-ph.HE] 24 Sep 2026 2degrees ranging from a few to tens of percent, e.g., reach-ing up to Π𝑉 ∼ 90% in FRB 20201124A (Jiang et al. 2022, 2024), Π𝑉 ∼ 70% in FRB 20220912A (Zhang et al. 2023), Π𝑉 ∼ 75% in FRB 20240114A (Wang et al. 2026). For FRB 20201124A, the frequency-independent circular polarization degrees observed in some bursts cannot be ex-plained by Faraday conversion or synchrotron / cyclotron absorption (Jiang et al. 2024). The small and stable rota-tion measure (RM) of FRB 20220912A suggests a relatively clean local environment, disfavoring propagation effects as the origin of its high circular polarization (Zhang et al. 2023; Feng et al. 2024). No evidence for Faraday conver-sion has been found in FRB 20240114A, suggesting that its observed circular polarization is likely intrinsic to the emis-sion mechanism (Uttarkar et al. 2026; Wang et al. 2026). These observations suggest that high circular polarization may be linked to the intrinsic FRB radiation mechanism. 
+
+• Both constant and varying polarization angles (PAs) ap-pear in the same repeating FRB source. Most FRB bursts exhibit nearly constant PAs and a small fraction display sig-nificant variations. Varying PA can be classified into two forms: regular S-shaped swings and irregular swings. Apulsar-like S-shaped PA swing has been observed in the non-repeating FRB 20221022A (Mckinven et al. 2025). FRBs can also exhibit ∼ 90 ◦ PA jumps within individ-ual millisecond-duration bursts, analogous to the abrupt PA jumps commonly observed in radio pulsars (Manchester et al. 1975; Backer et al. 1976). Such PA jumps have been detected in FRB 20201124A and attributed to orthogonal-mode switching (Niu et al. 2024). Spectral features further constrain FRB emission mod-els. Statistical analysis of the first CHIME/FRB catalog—62 bursts from 18 repeating FRBs and 474 from non-repeating FRBs—shows that repeaters display significantly narrower frequency bandwidths than non-repeaters (Pleunis et al. 2021). The fractional bandwidths Δ𝜈 /𝜈 0 of several active re-peaters, where Δ𝜈 is the full width at half-maximum (FWHM) and 𝜈 0 is the central frequency, confirm this narrow-band char-acter: FRB 20201124A has an extremely narrow bandwidth of ∼ 277 MHz (full frequency width at 10% of the emission peak) detected by the Five-hundred-meter Aperture Spherical radio Telescope (FAST) over 1.0–1.5 GHz (Zhou et al. 2022); FRB 20220912A has Δ𝜈 /𝜈 0 ∼ 0.1–0 .2 (Zhang et al. 2023); and FRB 20230607A has Δ𝜈 /𝜈 0 ∼ 0.1–0 .2 (Zhou et al. 2025). In contrast to repeating FRBs, non-repeating FRBs tend to exhibit broader bandwidths (Pleunis et al. 2021; FRB Col-laboration et al. 2026). These spectral differences suggest that repeating and non-repeating FRBs may involve distinct emission mechanisms. Alternatively, it has been speculated that they may arise from different time-frequency evolution within a common emission framework (Metzger et al. 2022). The synchrotron maser instability 1 at strongly magnetized shocks in magnetar winds provides a candidate emission mechanism for FRBs (Iwamoto et al. 2018; Metzger et al. 2019; Iwamoto et al. 2019; Plotnikov & Sironi 2019; Be-loborodov 2020; Babul & Sironi 2020; Iwamoto et al. 2024). The synchrotron maser model predicts high linear polariza-tion Π𝐿 ∼ 100% dominated by the X-mode when the magne-tization exceeds unity. The O-mode is also produced, but its relative strength decreases with increasing magnetization in 3D particle-in-cell (PIC) simulations (Sironi et al. 2021). In this paper, we investigate the spectral and polarization properties of the synchrotron maser emission model out-side the magnetosphere, by performing and analyzing 3D PIC simulations of relativistic magnetized shocks. Previous simulation-based studies focused on the line of sight (LOS) aligned with the shock propagation direction. We go beyond this restriction by systematically measuring the emission at arbitrary viewing angles in our simulations. We then inte-grate the emission over the spherical shock surface to include high-latitude emission and confront the synchrotron maser predictions with FRB observations. The paper is organized as follows. Section 2 presents the methods and numerical set-up. Section 3 discusses the dispersion relations of X-and O-modes. Section 4 describes simulation results in the downstream (simulation) rest frame, and Section 5 covers the viewing-angle-integrated case. In Section 6, we ana-lytically investigate the spectral broadening caused by the high-latitude effect and its dependence on the magnetization. Section 7 summarizes our conclusions and discussions. The convention 𝑄 = 10 𝑛 𝑄 𝑛 in cgs units is adopted.  
+
+> 2.
+
+SIMULATION METHODS AND SET-UP We use the electromagnetic PIC code runko to perform 3D shock simulations in the downstream frame (Nättilä 2022), which we refer to as the simulation frame. The basic con-figuration of our simulations is illustrated in Figure 1. The upstream flow is a cold pair plasma drifting in the − ˆ𝒙 direc-tion with a bulk Lorentz factor 𝛾 0 = 10. The pair plasma in the upstream carries a frozen-in magnetic field 𝐵 0 oriented along the 𝑧 -axis. The upstream magnetization is defined as the ratio of Poynting to kinetic energy flux 
+
+𝜎 = 𝐵 20
+
+4𝜋𝛾 0𝑛 0𝑚 𝑒 𝑐 2 = 𝐵 ′20
+
+4𝜋𝑛 ′
+
+> 0
+
+𝑚 𝑒 𝑐 2 = Ω2
+
+> 𝐵
+
+Ω2
+
+> 𝑝
+
+= 𝜔 ′2
+
+> 𝐵
+
+𝜔 ′2
+
+> 𝑝
+
+, (1) where primed quantities are measured in the rest frame of the upstream. The gyration frequency and the plasma frequency  
+
+> 1Although Sironi et al. (2021) showed that the emission mechanism does not involve a population inversion, as originally postulated for the synchrotron maser instability, we retain this terminology, as it is widely used in the literature.
+
+3
+
+Figure 1. Geometry of the relativistic magnetized pair plasma shock simulation. The shock propagates radially outward, and the upstream magnetic field 𝑩 0 is assumed to be toroidal and thus perpendicular to the shock propagation direction. Coherent radio waves (purple wigglers) originate from the downstream region behind the shock front. The viewing angle 𝜃 𝑣 measures the angle between the observer’s LOS and the local background magnetic field; 𝜃 𝑣 = 90 ◦ corresponds to the on-axis view along the shock propagation direction, while smaller 𝜃 𝑣 sample off-axis emission. The two LOSs equivalently correspond to different portions of the shock surface seen by a single observer, with small 𝜃 𝑣 
+
+corresponding to high-latitude emission. 
+
+Figure 2. 3D rendering of the shock structure, showing density (top), magnetic field 𝐵 𝑧 /𝐵 0 (bottom, in the upstream) and current density 𝑗 𝑦 /𝑛 0𝑒𝑐 (bottom, in the downstream) from a simulation with 𝛾 0 = 10 and 𝜎 = 3 at Ω𝑝 𝑡 = 2000. The 𝑥 coordinate is measured with respect to the shock location 𝑥 sh in units of 𝑐 /Ω𝑝 .The upstream is at 𝑥 − 𝑥 sh > 0 and the downstream at 𝑥 − 𝑥 sh <
+
+0. The arrow in the top panel indicates the direction of shock propagation. Magnetic field lines are shown with red tubes with thickness proportional to |𝑩 |. The oscillating electric currents (red and blue) excite the electromagnetic radiation (green and brown) to the shock upstream. Upstream plasma filamentation, which causes the O-mode component, is visible as stripes in the plasma density. 
+
+in the simulation frame are defined as 
+
+Ω𝐵 = 𝑒𝐵 0
+
+𝛾 0𝑚 𝑒 𝑐 , Ω𝑝 =
+
+ 4𝜋𝑒 2𝑛 0
+
+𝛾 0𝑚 𝑒 
+
+1/2
+
+, (2) and in the upstream rest frame as 
+
+𝜔 ′ 
+
+> 𝐵
+
+= 𝑒𝐵 ′
+
+> 0
+
+𝑚 𝑒 𝑐 , 𝜔 ′ 
+
+> 𝑝
+
+= 4𝜋𝑒 2𝑛 ′
+
+> 0
+
+𝑚 𝑒 
+
+!1/2
+
+, (3) where 𝐵 ′ 
+
+> 0
+
+= 𝐵 0/𝛾 0 for a perpendicular shock and 𝑛 ′ 
+
+> 0
+
+= 𝑛 0/𝛾 0
+
+is the total number density of upstream positrons and elec-trons, 𝑚 𝑒 is the electron mass, and 𝑒 is the elementary electric charge. We also note Ω𝐵 = 𝜔 ′ 
+
+> 𝐵
+
+and Ω𝑝 = 𝜔 ′ 
+
+> 𝑝
+
+.In the simulation, the upstream moves with velocity −𝛽 0𝑐 ˆ𝒙 
+
+and the background magnetic field 𝑩 0 is along the 𝑧 -axis. Thus a motional electric field 𝐸 𝑦, 0 = −𝛽 0 𝐵 𝑧, 0 is required in the rest frame of the wall (simulation frame) to ensure that the electric field in the rest frame of the upstream vanishes. The particle flow is reflected at the left wall and the shock front is formed to steadily propagate along the + ˆ𝒙 direction. Figure 2 shows the shock structure from a simulation when the system has reached a quasi-steady state, corresponding to the local region indicated by the red box in Figure 1. We resolve the upstream plasma skin depth with 𝑐 /Ω𝑝 =
+
+25 Δ, where Δ is the spatial grid size, on a grid of 𝑁 𝑥 × 𝑁 𝑦 ×
+
+𝑁 𝑧 = 65536 × 128 × 128 cells. The transverse box size is 
+
+𝐿 𝑦 = 𝐿 𝑧 = 5.12 𝑐 /Ω𝑝 , sufficient to resolve the filamentation modes (Sironi et al. 2021; Sobacchi et al. 2025). This resolu-tion ensures that the particle gyroradius 𝑟 𝑔 ≃ 𝜎 −1/2𝑐 /Ω𝑝 is well resolved up to the largest magnetization 𝜎 = 6 studied here. The simulation time step is 𝑐 Δ𝑡 = 0.5Δ, correspond-ing to Δ𝑡 = 0.02 Ω−1 
+
+> 𝑝
+
+. We initialize 𝑁 ppc = 2 particles per cell per species in the upstream plasma with a thermal spread 
+
+𝑘 𝐵 𝑇 0/( 𝑚 𝑒 𝑐 2) = 10 −4. Numerical Cherenkov radiation is mit-igated by using a 3D-generalization of the Blinne et al. (2018) field solver (Nättilä, in prep.). Particle momentum is updated with a Higuera & Cary (2017) pusher and current deposited 4with a ZigZag scheme (Umeda et al. 2003). We filter the current with 8 Binomial filter passes. Each simulation runs for several thousand Ω−1 
+
+> 𝑝
+
+, long enough for both the X- and O-mode precursor waves to reach a quasi-steady state with nearly constant amplitude.  
+
+> 3.
+
+DISPERSION RELATIONS OF X-MODE AND O-MODE IN THE HIGHLY MAGNETIZED PLASMAS In the highly magnetized regime considered here, both X-and O-mode waves approach the dispersion relation of elec-tromagnetic waves in vacuum. This allows us to directly relate the wavenumber spectra measured in the PIC simulations to the corresponding frequency spectra. In the simulation frame, the peak frequency of the precursor emission for 𝜎 ≳ 1 is (Plotnikov & Sironi 2019) 
+
+𝜔 ≃ 𝜉 √𝜎 Ω𝑝 , (4) with 𝜉 ≃ 3 found in 1D PIC simulations. The refractive indices of O- and X-modes can be written as 
+
+𝑛 2O = 1 − Ω2
+
+> 𝑝
+
+𝜔 2 ≃ 1 − 1
+
+𝜉 2𝜎 , (5) and 
+
+𝑛 2X = 1 − Ω2
+
+> 𝑝
+
+𝜔 2 − Ω2
+
+> 𝐵
+
+≃ 1 − 1
+
+(𝜉 2 − 1)𝜎 . (6) For 𝜎 ≫ 1, both modes satisfy 
+
+𝑛 O ≃ 𝑛 X ≃ 1. (7) We conclude that both X- and O-modes have nearly identical dispersion relations and propagate approximately as vacuum electromagnetic waves. Thus their 𝜔 -spectra can be directly identified with their 𝑘 -spectra in the simulation frame.  
+
+> 4.
+
+SIMULATION RESULTS In this section, we present the spectral and polarization properties of coherent emission from relativistic magnetized pair plasma shocks across a range of viewing angles. All quantities are measured in the downstream frame. The anal-ysis uses the Fourier-transformed electric fields described in Appendix A. The signal is attenuated by a Hamming window function in the ˆ 𝒙 -direction to account for the non-periodic 𝑥 
+
+boundaries. The spectra are computed from the upstream re-gion 5 𝑐 /Ω𝑝 < 𝑥 −𝑥 sh < 35 𝑐 /Ω𝑝 ahead of the shock front. The corresponding minimum wavenumber is 𝑘 min 𝑐 /Ω𝑝 ∼ 0.2, and we restrict our analysis to 𝑘𝑐 /Ω𝑝 ≥ 1. The simulation domain represents a finite patch of the shock front (red box in Figure 1), whose transverse extent (perpen-dicular to the 𝑥 -axis) is much smaller than the curvature radius of a realistic shock in the magnetar wind region. Thus each PIC simulation models one local patch of the shock front. Different viewing angles of a single simulated shock patch correspond to different patches of a spherical shock viewed by a single observer. We defer the integration of emission from different latitudes of the shock surface to Section 5. 4.1. Radiation spectra 
+
+We decompose the radiation from the relativistic shock into the X-mode and O-mode eigenmodes perpendicular to the LOS and compute their spectra for arbitrary viewing angles. The LOS unit vector is ˆ 𝒏 = sin 𝜃 𝑣 cos 𝜙 𝑣 ˆ𝒙 + sin 𝜃 𝑣 sin 𝜙 𝑣 ˆ𝒚 +
+
+cos 𝜃 𝑣 ˆ𝒛 . The spherical-shock geometry adopted here is az-imuthally symmetric, allowing us to choose the local coordi-nate system such that the LOS lies in the 𝑥 − 𝑧 plane ( 𝜙 𝑣 = 0) without loss of generality, i.e. ˆ𝒏 = sin 𝜃 𝑣 ˆ𝒙 + cos 𝜃 𝑣 ˆ𝒛 , which contains both the shock normal and the background magnetic field 𝑩 0. The two orthogonal complex Fourier-space electric field amplitudes from Appendix A simplify to 
+
+e𝐸 1 = e𝐸 𝑦 , (8) for the X-mode, and 
+
+e𝐸 2 = e𝐸 𝑥 cos 𝜃 𝑣 − e𝐸 𝑧 sin 𝜃 𝑣 , (9) for the O-mode. The spectral intensities of the X-mode and O-mode are then 
+
+| e𝐸 X |2 = | e𝐸 𝑦 |2, (10) and 
+
+| e𝐸 O |2 = | e𝐸 𝑥 cos 𝜃 𝑣 − e𝐸 𝑧 sin 𝜃 𝑣 |2. (11) Before analyzing the viewing-angle dependence of the emission, we first examine the temporal stability of the spec-tra. The left panel of Figure 3 shows the time evolution of the Poynting flux carried by X- and O-modes, both of which reach a quasi-steady state at late times 1500 ≤ Ω𝑝 𝑡 ≤ 2300. The right panel shows the X- and O-mode spectra at different times over this interval. The spectral shape around the emis-sion peak remains stable, although there are relatively large temporal variations at low wavenumbers. We first analyze a representative snapshot for each simulation in the following. For the on-axis observer with 𝜃 𝑣 = 90 ◦, the X-mode corre-sponds to e𝐸 𝑦 and the O-mode to e𝐸 𝑧 . The first row of Figure 4 shows the X- and O-mode spectra for 𝜎 = 3 and 𝜎 = 6. The X-mode dominates across the entire emission band. In highly magnetized shocks, the pair plasma motion is confined to the 
+
+𝑥 –𝑦 plane. The current 𝑗 𝑧 arises from filamentation of the upstream plasma, which bends the magnetic field when enter-ing the shock front. As 𝜎 increases, the downstream particle motion becomes increasingly confined to the 𝑥 − 𝑦 plane, re-ducing the current 𝑗 𝑧 that generates the O-mode emission and leading to a high degree of linear polarization. The O-mode and X-mode spectra overlap at high wavenumbers. These results agree with Sironi et al. (2021). 5500 1000 1500 2000           
+
+> pt
+> 10 10
+> 10 8
+> 10 6
+> 10 4
+> 10 2
+> 10 0
+> X/O  = E2X/O  /B20
+> X,= 3
+> X,= 6
+> O,= 3
+> O,= 6 10 010 1
+> kc /Ωp
+> 10 −7
+> 10 −6
+> 10 −5
+> 10 −4
+> 10 −3
+> 10 −2
+> kxP(kx)/ B20
+
+σ = 3 
+
+> X-mode O-mode
+
+Figure 3. Left panel: Time evolution of the Poynting flux carried by X- and O-modes, 𝜁 X/O = ⟨𝐸 2X/O⟩/ 𝐵 20, for upstream magnetizations 𝜎 = 3(solid lines) and 𝜎 = 6 (dashed lines). The precursor wave energy was extracted from a 30 𝑐 /Ω𝑝 wide slab located at 5 𝑐 /Ω𝑝 < 𝑥 −𝑥 sh < 35 𝑐 /Ω𝑝 .The shaded region marks the quasi-steady time interval 1500 ≤ Ω𝑝 𝑡 ≤ 2300 used for the right panel and for all our subsequent analysis. Right panel: temporal evolution of the 1D X- and O-mode power spectra for 𝜎 = 3 in the downstream frame. The solid curves show the median spectra over the quasi-steady time interval 1500 ≤ Ω𝑝 𝑡 ≤ 2300, and the dashed curves show the 16th and 84th percentiles over the same time interval. The shaded regions indicate the temporal variation of the spectra. Here 𝑃 (𝑘 𝑥 ) = ∫ 𝑃 3D (𝑘 𝑥 , 𝑘 𝑦 , 𝑘 𝑧 )𝑑𝑘 𝑦 𝑑𝑘 𝑧 and 𝑃 3D is the 3D power spectral density. 
+
+For different LOSs, we normalize both X-mode and O-mode spectra by the frequency-integrated on-axis X-mode emission. Figure 5 shows the X- and O-mode spectra for a range of off-axis viewing angles. As the LOS becomes in-creasingly misaligned with respect to the shock normal, the O-mode emission approaches the X-mode, particularly at high frequencies. As 𝜃 𝑣 decreases, an increasing fraction of the 
+
+𝑥 -directed current is projected onto the plane perpendicular to the LOS, providing an additional contribution to the O-mode emission. However, this contribution remains subdominant, as the O-mode emission is primarily associated with the elec-tric current parallel to the background magnetic field (i.e., along the 𝑧 -axis). To isolate the contributions from different radiation field components, we first set e𝐸 𝑧 = 0, in which case the X-mode then dominates at all viewing angles. We next set e𝐸 𝑥 = 0and find that the relative X- and O-mode intensities remain nearly identical to those in Figure 4 and 5, indicating that the dominant O-mode emission is associated with the current along the 𝑧 -axis. In the limiting case 𝜃 𝑣 → 0, both modes are strongly suppressed as the LOS lies outside the radiation cone. 4.2. Polarization properties 
+
+The four Stokes parameters characterize the polarization of a quasi-monochromatic electromagnetic wave (Rybicki & Lightman 1979): 
+
+𝐼 = 12 ( e𝐸 ∗ 
+
+> 1
+
+e𝐸 1 + e𝐸 ∗ 
+
+> 2
+
+e𝐸 2), 𝑄 = 12 ( e𝐸 ∗ 
+
+> 1
+
+e𝐸 1 − e𝐸 ∗ 
+
+> 2
+
+e𝐸 2),𝑈 = Re ( e𝐸 ∗ 
+
+> 1
+
+e𝐸 2), 𝑉 = Im ( e𝐸 ∗ 
+
+> 1
+
+e𝐸 2),
+
+(12) where e𝐸 1 and e𝐸 2 are the complex Fourier-space electric field amplitudes of the two linearly polarized eigenmodes perpen-dicular to the LOS, the superscript “ ∗ ” denotes the complex conjugation, 𝐼 is the total intensity, 𝑄 and 𝑈 characterize the magnitude and orientation of linear polarization, and 𝑉 mea-sures circular polarization. The degrees of linear, circular, and total polarization are Π𝐿 = (𝑄 2 + 𝑈 2)1/2/𝐼 , Π𝑉 = |𝑉 |/ 𝐼 ,and Πtot = (𝑄 2 + 𝑈 2 + 𝑉 2)1/2/𝐼 , respectively, all satisfying 
+
+≤ 1 by definition 2. The polarization angle (PA) is defined as PA = 12 arctan 𝑈 𝑄 . (13) For on-axis observers ( 𝜃 𝑣 = 90 ◦), the emission is strongly linearly polarized with a nearly flat PA near the peak fre-quency. At higher frequencies, the O-mode contribution grows comparable to the X-mode, producing significant cir-cular polarization and a frequency-dependent PA.    
+
+> 2For emission from a single-patch at a given time, the Stokes parameters are constructed directly from the complex Fourier-space electric-field am-plitudes at each frequency, and hence the total polarization degree satisfies
+> Πtot =1 by construction.
+
+610 −8
+
+> 10 −6
+> 10 −4
+> 10 −2
+> 10 0
+> |̃E|2/B20
+
+σ = 3, θv = 90 ∘ 
+
+> X-mode O-mode
+> 0.00 0.25 0.50 0.75 1.00
+> Stokes
+> Stokes-I Stokes-L Stokes-V
+> 0% 25% 50% 75% 100%
+> PD
+> Πtot
+> ΠL
+> ΠV
+> 10 010 1
+
+kc /Ωp   
+
+> -50 ∘
+> 0∘
+> 50 ∘
+> PA
+> PA 10 −8
+> 10 −6
+> 10 −4
+> 10 −2
+> 10 0
+> |̃E|2/B20
+
+σ = 6, θv = 90 ∘ 
+
+> X-mode O-mode
+> 0.00 0.25 0.50 0.75 1.00
+> Stokes
+> Stokes-I Stokes-L Stokes-V
+> 0% 25% 50% 75% 100%
+> PD
+> Πtot
+> ΠL
+> ΠV
+> 10 010 1
+
+kc /Ωp   
+
+> -50 ∘
+> 0∘
+> 50 ∘
+> PA
+> PA
+
+Figure 4. Radiation spectra, Stokes parameters, polarization degree (PD), and polarization angle (PA) as a function of 𝑘𝑐 /Ω𝑝 for on-axis observer ( 𝜃 𝑣 = 90 ◦) for 𝜎 = 3 (left panel) and 𝜎 = 6 (right panel) at Ω𝑝 𝑡 = 1900 in the downstream frame. These results are extracted directly from the PIC simulations, which adopt 𝛾 0 = 10. The X-mode dominates the entire emission band, producing a high degree of linear polarization near the spectral peak; circular polarization grows at high frequencies where the O-mode becomes comparable to the X-mode. 
+
+For off-axis viewing angles, the increasing O-mode contri-bution modifies the polarization properties. As 𝜃 𝑣 decreases from 90 ◦, the linear polarization degree decreases and the circular polarization becomes increasingly prominent, partic-ularly at frequencies where the X- and O-mode powers be-come comparable. Yet, around the spectral peak the X-mode remains dominant, and the emission retains a high degree of linear polarization with a nearly constant PA. 4.3. Time-averaged spectral and polarization properties 
+
+To assess the temporal robustness of the spectral and po-larization properties, we repeat the spectra and polarization analyses over 𝑁 𝑡 = 41 snapshots in the quasi-steady interval 1500 ≤ Ω𝑝 𝑡 ≤ 2300. For each LOS, the X- and O-mode spectra are computed for every snapshot and then averaged as 
+
+| e𝐸 X,O |2 
+
+> 𝑡
+
+= 1
+
+𝑁 𝑡 𝑁 𝑡 ∑︁ 
+
+> 𝑗 =1
+
+| e𝐸 X,O (𝑡 𝑗 )| 2. (14) The Stokes parameters are averaged as 
+
+⟨𝑆 ⟩𝑡 = 1
+
+𝑁 𝑡 𝑁 𝑡 ∑︁ 
+
+> 𝑗 =1
+
+𝑆 (𝑡 𝑗 ), 𝑆 ∈ { 𝐼, 𝑄, 𝑈, 𝑉 }. (15) The time-averaged polarization degrees and PA are calcu-lated from ⟨𝐼 ⟩𝑡 , ⟨𝑄 ⟩𝑡 , ⟨𝑈 ⟩𝑡 , and ⟨𝑉 ⟩𝑡 using the definitions in Section 4.2. Figure 6 shows the time-averaged spectral and polariza-tion properties. The faint curves in the spectral panels show 710 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> |̃E|2/B20
+
+σ = 3, θv = 87 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> |̃E|2/B20
+
+σ = 3, θv = 81 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> |̃E|2/B20
+
+σ = 3, θv = 75 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> |̃E|2/B20
+
+σ = 6, θv = 87 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> |̃E|2/B20
+
+σ = 6, θv = 81 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> |̃E|2/B20
+
+σ = 6, θv = 75 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 
+
+Figure 5. Radiation spectra, Stokes parameters, PD, and PA as a function of 𝑘𝑐 /Ω𝑝 for off-axis viewing angles for 𝜎 = 3 and 𝜎 = 6 at 
+
+Ω𝑝 𝑡 = 1900 in the downstream frame. As 𝜃 𝑣 decreases from 90 ◦, the O-mode contribution grows at high frequencies, reducing the linear polarization degree and introducing circular polarization. The total emission power decreases with increasing misalignment. 810 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> ⟨|̃E|2⟩t/B20
+
+σ = 3, θv = 90 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> ⟨|̃E|2⟩t/B20
+
+σ = 3, θv = 87 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> ⟨|̃E|2⟩t/B20
+
+σ = 3, θv = 81 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> ⟨|̃E|2⟩t/B20
+
+σ = 6, θv = 90 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> ⟨|̃E|2⟩t/B20
+
+σ = 6, θv = 87 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> ⟨|̃E|2⟩t/B20
+
+σ = 6, θv = 81 ∘
+
+X-mode O-mode 
+
+0.00 0.25 0.50 0.75 1.00 
+
+> Stokes
+
+Stokes-I Stokes-L Stokes-V 
+
+0% 25% 50% 75% 100% 
+
+> PD
+
+Πtot 
+
+ΠL
+
+ΠV
+
+10 0 10 1
+
+kc /Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+
+PA 
+
+Figure 6. Time-averaged radiation spectra, Stokes parameters, PD, and PA as a function of 𝑘𝑐 /Ω𝑝 for on-axis and off-axis viewing angles for 
+
+𝜎 = 3 and 𝜎 = 6 in the downstream frame. The faint curves in the upper panels show spectra from individual snapshots during the quasi-steady interval 1500 ≤ Ω𝑝 𝑡 ≤ 2300 and the solid curves show their time averages. The Stokes parameters are averaged over the same time interval, and the polarization degrees and PA are calculated from the time-averaged Stokes parameters. The black curve shows the maximum combined power of the X- and O-modes at each wavenumber during the quasi-steady time interval. 9the individual snapshots and the solid curves show the corre-sponding time averages. The broad spectral envelope remains stable throughout the quasi-steady interval. For both 𝜎 = 3and 𝜎 = 6, the X-mode remains dominant around the spectral peak, and the relative contribution of the O-mode increases as 𝜃 𝑣 decreases, particularly at high wavenumbers. The time-averaged emission remains predominantly linearly polarized around the spectral peak since the X-mode is dominant, with a nearly constant PA. At higher wavenumbers, the O-mode contribution becomes more important, the circular polariza-tion degrees increase and the PAs exhibit larger variations. Since the Stokes parameters are averaged before computing the polarization degrees, depolarization can occur, and the total polarization degree could be below unity.  
+
+> 5.
+
+INTEGRATION OVER A SPHERICAL SHOCK Consider a relativistic spherical shell propagating with Lorentz factor Γ in the lab frame, which corresponds to the relative Lorentz factor 𝛾 0 between the upstream and down-stream frames in the simulation. The emission radius of the relativistic shock can be estimated as 
+
+𝑟 ≃ 2𝑐 Γ2Δ𝑡 FRB ∼ ( 10 12 cm ) Γ22 ΔFRB ,−3, (16) where ΔFRB is the typical time duration of FRBs. This esti-mate assumes that the emitting region is causally connected over the angular scale ∼ 1/Γ, i.e., that the shock front is suf-ficiently smooth and does not exhibit corrugation on angular scales smaller than 1 /Γ (e.g., Demidem et al. (2023); Bresci et al. (2023)). Equivalently, any perturbations to the shock surface have a typical angular scale larger than the emission cone of angular size 1 /Γ. The shock can therefore be ap-proximated as spherical. In performing the integration, each surface element is treated as a local planar shock patch with the same magnetic field geometry as in our PIC simulations, with the upstream magnetic field perpendicular to the local shock normal. Through relativistic aberration, different loca-tions on the spherical surface correspond to different viewing angles in the downstream frame sampled by the PIC simula-tions (see Figure 1). An observer receives radiation not only from the patch of the shock surface moving directly along the LOS but also from higher-latitude regions whose veloci-ties are misaligned with respect to the LOS. We present the spectra and polarization properties obtained by integrating the emission over the spherical shock front. Two distinct modes of superposition may arise: coherent and incoherent. In coherent superposition, wave trains over-lap along the LOS, allowing the electric fields to be added linearly before computing the Stokes parameters. Incoher-ent superposition occurs when radiation arriving from differ-ent LOS originates from two spatially distinct emission re-gions. The observer detects the two waves independently, so the Stokes parameters (rather than the electric fields) should be added linearly. The phase coherence between radiation from different surface elements is controlled by the differ-ence in their propagation path length to the observer. At the largest observable latitude, corresponding to an angu-lar offset of order ∼ 1/( Γ√𝜎 ) (Babul & Sironi 2020), the characteristic path-length difference in the observer frame is 
+
+𝐿 coh ∼ 𝑟 /( Γ2𝜎 ). If this path-length difference is smaller than or comparable to the observed radio wavelength, i.e., 
+
+𝐿 coh ≲ 𝜆 FRB , the emission from spatially separated points on the shell can add coherently. However, for the 1 /( Γ√𝜎 )
+
+radiation cone, the length scale 𝐿 coh is much larger than the FRB wavelength, i.e., 
+
+𝐿 coh ≃ 𝑟 
+
+2Γ2𝜎 ∼ ( 10 7 cm ) Δ𝑡 FRB ,−3
+
+ 𝜎 
+
+3
+
+ −1
+
+≫ 𝜆 FRB , (17) where 𝜎 = 3 is adopted, Δ𝑡 FRB and 𝜆 FRB are the typical duration and wavelength of FRBs, respectively. We define the critical opening angle 𝜃 𝑐 by the condition that the propagation path-length difference is comparable to the wavelength, 
+
+𝑟 − 𝑟 cos 𝜃 𝑐 ≲ 𝜆 FRB ⇒ 12 𝜃 2
+
+> 𝑐
+
+𝑟 ≲ 𝜆 FRB , (18) which gives 
+
+𝜃 𝑐 ≲
+
+ 2𝜆 FRB 
+
+𝑟 
+
+1/2
+
+≃ ( 10 −5 rad ) 𝜈 −1/2FRB ,9Γ−12 Δ𝑡 −1/2FRB ,−3.
+
+(19) Waves from different regions on the shock front therefore superpose incoherently when the emission originates at 𝜃 > 𝜃 𝑐 . We note that the characteristic radiation cone ∼ 1/Γ is much wider than 𝜃 𝑐 , which implies that waves emitted from different regions of the shock front lose phase coherence and are therefore superposed incoherently. We integrate the emission over the spherical shock surface as follows. The radiation originates from a thin, relativisti-cally expanding spherical shell. Each emitting surface ele-ment moves with its own radial velocity direction. The elec-tromagnetic fields measured in the downstream frame must be transformed individually for each surface element into the observer frame before summing their contributions. For a surface element at an angular separation 𝜓 obs from the LOS, the local plasma velocity (which is radial) makes an angle 
+
+𝜓 obs with the LOS in the observer frame. The correspond-ing viewing angle 𝜃 𝑣 in the downstream frame is obtained through relativistic aberration (see Appendix B). We perform a Lorentz transformation of the electromag-netic fields with velocity 𝛽𝑐 along the local radial direction, where 𝛽 = (1 − Γ−2)1/2, followed by a projection of the transformed electric field onto the plane of the sky (see Ap-pendix B for detailed derivations). After transforming the fields to the observer frame, the radiation from different sur-face elements superposes incoherently, yielding the surface-10 integrated Stokes parameters 
+
+𝐼 tot =∑︁ 
+
+> 𝑖
+
+𝐼 𝑖 , 𝑄 tot =∑︁ 
+
+> 𝑖
+
+𝑄 𝑖 , 𝑈 tot =∑︁ 
+
+> 𝑖
+
+𝑈 𝑖 , 𝑉 tot =∑︁ 
+
+> 𝑖
+
+𝑉 𝑖 ,
+
+(20) where the subscript 𝑖 labels the individual emitting surface elements on the spherical shock front, and 𝐼 𝑖 , 𝑄 𝑖 , 𝑈 𝑖 , and 
+
+𝑉 𝑖 are the Stokes parameters of each surface element after transformation to the observer frame. 5.1. Radiation spectra 
+
+The first panel of Figure 7 shows the shock-integrated spec-tra of X- and O-modes as a function of 𝑘 obs 𝑐 /𝛾 0Ω𝑝 . To char-acterize the bandwidth in a manner consistent with observa-tional analyses, we fit the envelope of the integrated combined X- and O-mode spectra with a Gaussian profile and define the fractional bandwidth as Δ𝜈 /𝜈 0 = FWHM /𝜈 0, where 𝜈 0 is the central frequency of the fitted Gaussian. For 𝜎 = 3, the fractional bandwidth 3 increases from Δ𝜈 /𝜈 0 ≃ 0.41 for the single-patch spectrum to ≃ 0.57 after the viewing-angle in-tegration, and for 𝜎 = 6 it increases from ≃ 0.74 to ≃ 0.82 (see Appendix C and Figure 8). The bandwidth is broader than the single-patch spectra because emission from higher latitudes experiences different Doppler factors, spreading the observed frequencies. 5.2. Polarization properties 
+
+The shock-integrated radiation is highly linearly polarized, with the PA remaining nearly constant around the spectral peak due to the dominance of the X-mode. Although the incoherent superposition of emission from different latitudes introduces some depolarization at frequencies higher than the peak, the overall PD remains high. In contrast, for a single shock patch at a given snapshot, the total polarization degree is unity by construction. In addition, a non-zero level of circular polarization is present. Although the PA is essentially flat near the peak frequency, it shows modest variations of ∼ ± 10 ◦ at higher 𝑘 obs .
+
+6. SPECTRAL BANDWIDTH OF A RELATIVISTIC MAGNETIZED SPHERICAL SHOCK In this section, we provide an estimate of the spectral broad-ening caused solely by the high-latitude effect. We consider a thin spherical shock expanding relativistically with a constant Lorentz factor Γ. We assume that the emission is monochro-matic in the comoving frame of the shock, with a characteristic frequency 𝜈 ′
+
+> 0
+
+. The specific intensity in the comoving frame is 
+
+𝐼 ′ 
+
+> 𝜈 ′
+
+= 𝐼 ′
+
+> 0
+
+𝛿 (𝜈 ′ − 𝜈 ′
+
+> 0
+
+), (21)    
+
+> 3An analytical estimate by Kumar et al. (2024), assuming monochromatic emission from each local shock patch, gives a fractional bandwidth of
+> Δ𝜈 /𝜈 0≈0.58 due to the high-latitude effect. In our PIC simulations, each local shock patch has a finite intrinsic spectral width and contains multiple narrow spectral features.
+
+where 𝐼 ′ 
+
+> 0
+
+is assumed to be independent of emission time. We further assume that Γ, 𝜈 ′
+
+> 0
+
+, and 𝐼 ′ 
+
+> 𝜈 ′
+
+remain constant over time. Here, 𝜃 is the angle measured relative to the local shock normal. In the upstream frame, the emission cone is restricted to a maximum angle (Babul & Sironi 2020) 
+
+𝜃 max = 𝐴 
+
+Γ√𝜎 , (22) where 𝐴 is a dimensionless factor of order unity. The ob-served frequency can be written as 𝜈 (𝜃 ) = D ( 𝜃 )𝜈 ′ 
+
+> 0
+
+and the maximum observed frequency is 𝜈 0 = 𝜈 (0). The Lorentz invariant 𝐼 𝜈 /𝜈 3 gives 𝐼 𝜈 = D3 𝐼 ′ 
+
+> 𝜈 ′
+
+. For monochromatic emis-sion, the intensity can be written as 
+
+𝐼 𝜈 = D3 𝐼 ′
+
+> 0
+
+𝛿 
+
+ 𝜈 
+
+D − 𝜈 ′
+
+> 0
+
+
+
+. (23) The contribution to the observed flux from an annulus be-tween 𝜃 and 𝜃 + 𝑑𝜃 is proportional to 𝑑𝐹 𝜈 ∝ 𝐼 𝜈 sin 𝜃𝑑𝜃 . Thus the flux can be calculated as 
+
+𝐹 𝜈 ∝
+
+∫
+
+D3𝛿 
+
+ 𝜈 
+
+D − 𝜈 ′
+
+> 0
+
+
+
+sin 𝜃𝑑𝜃 ∝ 𝜈 2. (24) The normalized instantaneous spectrum at a fixed observer time is 
+
+𝐹 𝜈 
+
+𝐹 𝜈, 0
+
+=
+
+ 𝜈 𝜈 0
+
+2
+
+, 𝜈 min ≤ 𝜈 ≤ 𝜈 0, (25) where 𝐹 𝜈, 0 is the specific flux evaluated at the maximum observed frequency 𝜈 0. The minimum observed frequency corresponds to the edge of the emitting region, i.e. 𝜃 =
+
+𝜃 max = 𝐴 /( Γ√𝜎 ). We have 
+
+𝜈 min 
+
+𝜈 0
+
+= 1 − 𝛽 
+
+1 − 𝛽 cos 
+
+ 𝐴 
+
+Γ√𝜎 
+
+ ≃ 𝜎 𝜎 + 𝐴 2 , (26) where we have assumed Γ ≫ 1 and 𝐴 /( Γ√𝜎 ) ≪ 1. We define 𝜈 1/2 as the frequency at which the specific flux drops to half of its peak value 𝐹 𝜈, 0, i.e. 
+
+𝐹 𝜈 1/2 = 12 𝐹 𝜈, 0, 𝜈 1/2
+
+𝜈 0
+
+= 1
+
+√2 . (27) Thus the FWHM fractional bandwidth is 
+
+Δ𝜈 𝜈 0
+
+= 2(𝜈 0 − 𝜈 1/2)/ 𝜈 0 ≃ 0.58 , (28) which is consistent with Kumar et al. (2024). For the half-maximum point to lie within the emission cone, we require 
+
+𝜈 min ≤ 𝜈 1/2 ⇒ 𝜎 𝜎 + 𝐴 2 ≤ 1
+
+√2 . (29) We can define a critical magnetization 𝜎 crit such that 
+
+𝜎 crit ≡ 𝐴 2
+
+√2 − 1 ≃ 2.4𝐴 2. (30) 11 10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> ⟨|̃E|2⟩t/B20
+
+σ = 3 
+
+> X-mode O-mode
+
+0.00 0.25 0.50 0.75 1.00 Stokes 
+
+> Stokes-I Stokes-L Stokes-V
+
+0% 25% 50% 75% 100% PD 
+
+> Πtot
+> ΠL
+> ΠV
+
+10 1
+
+kobs c/γ0Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+> PA
+
+10 −8
+
+10 −6
+
+10 −4
+
+10 −2
+
+10 0
+
+> ⟨|̃E|2⟩t/B20
+
+σ = 6 
+
+> X-mode O-mode
+
+0.00 0.25 0.50 0.75 1.00 Stokes 
+
+> Stokes-I Stokes-L Stokes-V
+
+0% 25% 50% 75% 100% PD 
+
+> Πtot
+> ΠL
+> ΠV
+
+10 1
+
+kobs c/γ0Ωp
+
+-50 ∘
+
+0 ∘
+
+50 ∘
+
+> PA
+> PA
+
+Figure 7. Viewing-angle-integrated spectra, Stokes parameters, PD, and PA as a function of 𝑘 obs 𝑐 /𝛾 0Ω𝑝 for 𝜎 = 3 and 𝜎 = 6 in the observer frame. The faint curves in the top panels show the individual snapshots over 1500 ≤ Ω𝑝 𝑡 ≤ 2300, the thick red and blue curves show the time-averaged X- and O-mode spectra over the same interval, respectively. The black curve shows the maximum combined X- and O-mode power at each wavenumber over the same time interval. The Stokes parameters are averaged over time before calculating the polarization degrees and PA. 
+
+For 𝜎 ≤ 𝜎 crit , we conclude that the FWHM spectral band-width is independent of magnetization. For 𝜎 > 𝜎 crit , the angular boundary is reached before the spectrum decreases to half its peak value. For a relativistic magnetized shock with 
+
+Γ ≫ 1 and 𝐴 /( Γ√𝜎 ) ≪ 1, spectral power sharply drops at 
+
+𝜈 min 
+
+𝜈 0
+
+≃ 𝜎 𝜎 + 𝐴 2 , (31) where the flux immediately before the cutoff is 𝐹 𝜈 min /𝐹 𝜈, 0 =
+
+[𝜎 /( 𝜎 + 𝐴 2)] 2 > 1/2. The FWHM fractional bandwidth can be calculated as 
+
+Δ𝜈 𝜈 0
+
+= 2𝐴 2
+
+𝜎 + 𝐴 2 ∼ 2𝐴 2
+
+𝜎 for 𝜎 ≫ 1. (32) To summarize the main results of this section, we study the fractional bandwidth of intrinsically monochromatic emis-sion from a relativistic magnetized spherical shock and find that the resulting bandwidth depends on the upstream mag-netization. For 𝜎 > 𝜎 crit , the fractional bandwidth decreases with increasing magnetization and scales as Δ𝜈 /𝜈 0 ∝ 𝜎 −1
+
+in the limit of Γ ≫ 1 and 𝜎 ≫ 1. Thus, we conclude that higher magnetization leads to a narrower observed spectrum. This trend applies to the geometric broadening of intrinsi-cally monochromatic emission and does not imply that the full PIC spectrum must become narrower with increasing mag-netization, since the local shock emission has some intrinsic finite bandwidth. The high-latitude effect can still broaden an intrinsically finite-bandwidth spectrum, as demonstrated by the viewing-angle-integrated spectra in Section 5. At the same time, higher magnetization shocks are also expected to 12 produce precursor emission increasingly dominated by the X-mode, resulting in high linear polarization degrees and flat PA, while the emission efficiency decreases with increasing magnetization (Plotnikov & Sironi 2019; Sironi et al. 2021). There are two important caveats. First, the maximum emis-sion angle adopted above is determined by requiring that the precursor wave group velocity along the shock normal ex-ceeds the shock velocity. Waves that do not satisfy this condi-tion cannot be measured in our simulations, since they cannot reach the upstream region 5 𝑐 /Ω𝑝 < 𝑥 − 𝑥 sh < 35 𝑐 /Ω𝑝 ahead of the shock front used in our analysis. However, whether these waves are ultimately damped or eventually escape ahead of a decelerating shock remains uncertain. Second, we have assumed that the characteristic frequency and the intrinsic emission intensity remain constant during the shock propa-gation. The intrinsic temporal evolution of the emission fre-quency and the emitted flux will introduce additional spectral evolution beyond the geometric high-latitude effect that we have considered here.  
+
+> 7.
+
+CONCLUSIONS AND DISCUSSIONS In this work, we have studied the observable spectra and polarization signatures of the synchrotron maser emission from relativistic magnetized pair-plasma shocks. Using 3D particle-in-cell simulations, we first calculate the precursor emission from a plane-parallel perpendicular shock, neglect-ing radiative cooling. Then we project the simulated emission onto an arbitrary LOS and apply the planar shock-patch re-sults to a spherical shock front to investigate the effects of different viewing angles and high-latitude emission on the observed radiation. The main findings of our paper are: 
+
+• Polarization properties: At the peak frequency of the syn-chrotron maser emission, both the total and linear polariza-tion degrees are ∼ 100%. We conclude that this emission mechanism can reproduce the extremely high PD of many FRBs. For a single planar shock patch, when the LOS is aligned with the shock propagation direction, the emis-sion is dominated by the X-mode. O-mode emission is required to generate circular polarization, which can arise at off-axis viewing angles. However, the globally integrated emission, resulting from incoherent superposition over dif-ferent regions of a spherical shock, is still expected to be dominated by linear polarization. The PA is expected to remain nearly constant around the spectral peak because of the dominance of the X-mode. At frequencies above the spectral peak, where the emission is fainter, the increasing relative contribution of the O-mode can produce significant circular polarization. 
+
+• Spectral properties: Most repeating FRBs exhibit ex-tremely narrow spectra, with Δ𝜈 /𝜈 0 ∼ 0.1 − 0.2 (e.g., FRB 20201124A, FRB 20220912A, FRB 20230607A, and FRB 20240114A). In contrast, non-repeating FRBs show statis-tically broader spectra (Pleunis et al. 2021; FRB Collabo-ration et al. 2026). The radiation spectra of a single planar shock patch have finite intrinsic bandwidths and exhibit much narrower spectral spikes. In Section 5, we showed that the high-latitude effect further broadens the synchrotron maser spectrum. The Gaussian-envelope fractional band-width increases from Δ𝜈 /𝜈 0 ≃ 0.41 to 0.57 for 𝜎 = 3, and from ≃ 0.74 to 0.82 for 𝜎 = 6 after viewing-angle inte-gration (Appendix C). In Section 6, our analytical calcula-tion further shows that, in the extreme limit of intrinsically monochromatic emission, the spectral broadening induced by the high-latitude effect decreases as Δ𝜈 /𝜈 0 ∝ 𝜎 −1 in the limit of Γ ≫ 1 and 𝜎 ≫ 1. Therefore, at high mag-netizations, the observed spectral bandwidth is expected to be determined primarily by the intrinsic bandwidth of the emission of a single shock patch. For a sensitivity-limited observation in which only the brightest spectral components are detectable, the apparent fractional bandwidths can be much narrower, with [Δ𝜈 /𝜈 ]peak ≃ 0.06 and 0 .05 for 𝜎 = 3and 6, respectively. 
+
+• Implications for FRBs: For the magnetizations considered in this work ( 𝜎 = 3 and 6), the Gaussian-envelope band-widths, together with the high linear polarization degrees and nearly flat PAs, are compatible with the properties of some non-repeating FRBs. If only the brightest spectral components can be detectable due to the limited telescope sensitivity, the apparent fractional bandwidth can be as nar-row as Δ𝜈 /𝜈 ∼ 0.05 − 0.06. However, in this case, the detectable emission is dominated by the X-mode and is ex-pected to be highly linearly polarized with a nearly flat PA. This differs from known narrow-band repeating FRBs that can also exhibit strong circular polarization, PA swings, and abrupt PA jumps. Therefore, the joint observed spec-tral and polarization properties provide a stringent test of the synchrotron maser shock model. Our simulations do not include the radiation-reaction force, and quantifying its impact on the integrated radiation spec-trum remains an open question. The radiation reaction may become important for GHz emission from extremely rela-tivistic shocks with upstream Lorentz factors 𝛾 0 ∼ 10 4 − 10 6
+
+(Zhang et al. 2026b), well above the Lorentz factor considered in our simulations. 2D PIC simulations of monster shocks within a dipolar magnetosphere show that the shock front can be deformed from a spherical shape (Bernardi et al. 2025). For our calculation, spherical symmetry is only required over the angular extent of the emitting region ∼ 1/( Γ√𝜎 ). Whether the relativistic magnetized shocks outside the magnetosphere remain approximately spherical on this angular scale requires further investigation. Another important direction for future investigations is how upstream plasma fluctuations on small scales affect the stability and efficiency of the synchrotron 13 maser mechanism (see e.g., Demidem et al. 2023; Bresci et al. 2023). ACKNOWLEDGEMENTS Y.Q. and J.N. are supported by the Research Council of Fin-land Centre of Excellence in Neutron-Star Physics (project 374063). J.N. is additionally supported by an ERC grant (ILLUMINATOR, 101114623). The views and opinions ex-pressed are however those of the authors only and do not necessarily reflect those of the European Union or the Eu-ropean Research Council. Neither the European Union nor the granting authority can be held responsible for them. L.S. acknowledges support from the DOE Early Career Award DE-SC0023015, NASA ATP 80NSSC24K1826, NSF AST-2307202, NSF PHY-2206609 (the Multimessenger Plasma Physics Center, MPPC), and the Simons Foundation (MP-SCMPS-00001470). APPENDIX  
+
+> A.
+
+POLARIZATION MEASUREMENTS FOR ARBITRARY VIEWING ANGLES We describe the method for measuring the Stokes param-eters and polarization degree from the PIC simulation data. At a given simulation time, the electric fields are 
+
+𝑬 (𝑥, 𝑦, 𝑧 ) = 𝐸 𝑥 ˆ𝒙 + 𝐸 𝑦 ˆ𝒚 + 𝐸 𝑧 ˆ𝒛 . (A1) We apply a Hamming window along the non-periodic 𝑥 -direction and then apply a discrete Fourier transform to obtain 
+
+e𝑬 (𝑘 𝑥 , 𝑘 𝑦 , 𝑘 𝑧 ) = e𝐸 𝑥 ˆ𝒙 + e𝐸 𝑦 ˆ𝒚 + e𝐸 𝑧 ˆ𝒛 . (A2) Let ˆ 𝒏 denote the unit vector along the LOS. The complex electric field in the plane perpendicular to ˆ 𝒏 is 
+
+e𝑬 ⊥ = e𝑬 − ( e𝑬 · ˆ𝒏 ) ˆ𝒏 = e𝑬 1 + e𝑬 2, (A3) where e𝐸 1 and e𝐸 2 are the complex amplitudes along two or-thogonal polarization basis vectors in the plane perpendicular to the LOS. Without loss of generality, we set the LOS unit vector to ˆ𝒏 = sin 𝜃 𝑣 cos 𝜙 𝑣 ˆ𝒙 + sin 𝜃 𝑣 sin 𝜙 𝑣 ˆ𝒚 + cos 𝜃 𝑣 ˆ𝒛 , (A4) where 𝜃 𝑣 and 𝜙 𝑣 are the viewing angle and azimuthal angle, respectively. The unit vector perpendicular to the LOS and to the upstream background magnetic field is ˆ𝜻 = ˆ𝒏 × ˆ𝑩 bg 
+
+| ˆ𝒏 × ˆ𝑩 bg | = sin 𝜙 𝑣 ˆ𝒙 − cos 𝜙 𝑣 ˆ𝒚 . (A5) Expanding the perpendicular electric field components ex-plicitly gives 
+
+e𝑬 ⊥ = [ e𝐸 𝑥 − cos 𝜙 𝑣 sin 𝜃 𝑣 ( e𝐸 𝑧 cos 𝜃 𝑣 + e𝐸 𝑥 cos 𝜙 𝑣 sin 𝜃 𝑣 
+
++ e𝐸 𝑦 sin 𝜙 𝑣 sin 𝜃 𝑣 )] ˆ𝒙 + [ e𝐸 𝑦 − sin 𝜙 𝑣 sin 𝜃 𝑣 ( e𝐸 𝑧 cos 𝜃 𝑣 
+
++ e𝐸 𝑥 cos 𝜙 𝑣 sin 𝜃 𝑣 + e𝐸 𝑦 sin 𝜙 𝑣 sin 𝜃 𝑣 )] ˆ𝒚 + [ e𝐸 𝑧 − cos 𝜃 𝑣 
+
+× ( e𝐸 𝑧 cos 𝜃 𝑣 + e𝐸 𝑥 cos 𝜙 𝑣 sin 𝜃 𝑣 + e𝐸 𝑦 sin 𝜙 𝑣 sin 𝜃 𝑣 )] ˆ𝒛 .
+
+(A6) Projecting e𝑬 ⊥ onto ˆ 𝜻 yields the first eigen-mode, 
+
+e𝑬 1 = ( e𝑬 ⊥ · ˆ𝜻 ) ˆ𝜻 = ( e𝐸 𝑥 sin 𝜙 𝑣 − e𝐸 𝑦 cos 𝜙 𝑣 ) sin 𝜙 𝑣 ˆ𝒙 
+
++ ( e𝐸 𝑦 cos 𝜙 𝑣 − e𝐸 𝑥 sin 𝜙 𝑣 ) cos 𝜙 𝑣 ˆ𝒚 . (A7) The corresponding complex amplitude of e𝑬 1 is 
+
+e𝐸 1 = e𝐸 𝑥 sin 𝜙 𝑣 − e𝐸 𝑦 cos 𝜙 𝑣 . (A8) The complex amplitude of the second mode perpendicular to the first can be calculated as 
+
+e𝐸 2 = e𝑬 ⊥ · ( ˆ𝜻 × ˆ𝒏 )
+
+= ( e𝐸 𝑥 cos 𝜙 𝑣 + e𝐸 𝑦 sin 𝜙 𝑣 ) cos 𝜃 𝑣 − e𝐸 𝑧 sin 𝜃 𝑣 . (A9) For a given viewing direction (𝜃 𝑣 , 𝜙 𝑣 ), we extract the ra-diation spectra along the corresponding ray in wave-vector space, 
+
+𝒌 = 𝑘 ˆ𝒏 = 𝑘 (sin 𝜃 𝑣 cos 𝜙 𝑣 , sin 𝜃 𝑣 sin 𝜙 𝑣 , cos 𝜃 𝑣 ). (A10) The Fourier-space electric field components at these wave vectors are obtained by interpolation on the Cartesian 
+
+(𝑘 𝑥 , 𝑘 𝑦 , 𝑘 𝑧 ) grid. The resulting complex amplitudes 
+
+e𝐸 1 (𝑘, 𝜃 𝑣 , 𝜙 𝑣 ) and e𝐸 2 (𝑘, 𝜃 𝑣 , 𝜙 𝑣 ) are then used to calculate the X- and O-mode spectra and the Stokes parameters at each wavenumber (Section 4).  
+
+> B.
+
+LORENTZ TRANSFORMATIONS AND INTEGRATION OVER THE SPHERICAL SHOCK We describe the transformation of the electromagnetic waves measured in the downstream frame to the observer frame and their integration over the surface of an expand-ing spherical shock. Each PIC simulation represents a lo-cal planar patch of the shock surface. Throughout this Ap-pendix, quantities without a frame subscript are measured in the downstream (simulation) frame, consistent with the con-vention adopted in the main text, and quantities measured in the observer frame are denoted by the subscript "obs". For a given local patch, the Fourier-space wave fields are 
+
+e𝑬 = ( e𝐸 𝑥 , e𝐸 𝑦 , e𝐸 𝑧 ), e𝑩 = ( e𝐵 𝑥 , e𝐵 𝑦 , e𝐵 𝑧 ). (B1) 14 For a surface element with local radial velocity 𝜷 𝑐 , the wave fields are transformed from the downstream frame to the ob-server frame using the Lorentz transformation (Jackson 1998) 
+
+e𝑬 obs =Γ 
+
+ e𝑬 − 𝜷 × e𝑩 
+
+
+
+− Γ2
+
+Γ + 1 𝜷 
+
+
+
+𝜷 · e𝑬 
+
+
+
+,
+
+e𝑩 obs =Γ 
+
+ e𝑩 + 𝜷 × e𝑬 
+
+
+
+− Γ2
+
+Γ + 1 𝜷 
+
+
+
+𝜷 · e𝑩 
+
+
+
+,
+
+(B2) where Γ = (1 − 𝛽 2)−1/2. The wave four-vector is transformed consistently with the electromagnetic fields. The frequency and wave vector in the observer frame can be written as 
+
+𝜔 obs = Γ (𝜔 + 𝑐 𝜷 · 𝒌 ) , (B3) and 
+
+𝒌 obs = 𝒌 +
+
+ Γ − 1
+
+𝛽 2 ( 𝜷 · 𝒌 ) + Γ 𝜔 𝑐 
+
+
+
+𝜷 . (B4) The precursor waves considered here are approximately vac-uum electromagnetic waves (Section 3). For spherical integration, we consider that 𝜓 obs denotes the angle between the local radial velocity and the LOS in the observer frame. In the local basis of each shock patch, we choose ˆ 𝒙 loc along the radial velocity and ˆ 𝒛 loc along the background magnetic field, then we have ˆ 𝒙 loc ⊥ ˆ𝒛 loc and we define ˆ 𝒏 obs as the LOS in the observer frame, i.e., ˆ 𝒏 obs =
+
+cos 𝜓 obs ˆ𝒙 loc +sin 𝜓 obs ˆ𝒛 loc . The radiation propagation direction associated with the surface element is transformed from the observer frame to the downstream frame using relativistic aberration ˆ𝒏 𝑥 = cos 𝜓 obs − 𝛽 
+
+1 − 𝛽 cos 𝜓 obs 
+
+, ˆ𝒏 𝑧 = sin 𝜓 obs 
+
+Γ(1 − 𝛽 cos 𝜓 obs ) . (B5) The viewing angle is the angle between the aberrated LOS and the local background magnetic field, cos 𝜃 𝑣 = ˆ𝒏 · ˆ𝒛 loc = sin 𝜓 obs 
+
+Γ(1 − 𝛽 cos 𝜓 obs ) . (B6) Thus each latitude 𝜓 obs on the spherical shell maps, through relativistic aberration, onto a corresponding viewing angle 
+
+𝜃 𝑣 in the downstream frame. The integration covers the full range of aberrated viewing angles 0 ≤ 𝜃 𝑣 ≤ 90 ◦ in the down-stream frame. The assumed toroidal background magnetic field is perpendicular to the local radial direction at every point on the spherical shock. Thus, when mapping the planar PIC calculation to different surface elements, both the local velocity direction and the local background field direction rotate together, i.e. 𝑩 0 · ˆ𝒓 = 0 for every patch. Since the local background magnetic field is perpendicular to the boost direction, its magnitude transforms as 𝐵 0,obs = Γ 𝐵 0, where 
+
+𝐵 0 is the background field in the downstream frame. Con-sequently, the transformed radiation fields are normalized by 
+
+𝐵 0,obs when calculating the radiation spectra in the observer frame (Figure 7). The radiation field of each patch is pro-jected onto a common basis in the observer’s plane of the sky. We define ˆ 𝒆 1,obs = ˆ𝜻 obs , ˆ𝒆 2,obs = ˆ𝒏 × ˆ𝒆 1,obs to obtain the two complex electric field amplitudes as 
+
+e𝐸 1,obs = e𝑬 obs · ˆ𝒆 1,obs , e𝐸 2,obs = e𝑬 obs · ˆ𝒆 2,obs . (B7) The Stokes parameters of each surface element are then cal-culated from e𝐸 1,obs and e𝐸 2,obs using Equation (12). Before summing the contributions from different surface elements, the Doppler-shifted fields are interpolated onto a common wavenumber grid in the observer frame. Radiation from spa-tially separated surface elements is summed incoherently, as discussed in Section 5. The polarization degrees and polar-ization angle of the integrated radiation are finally evaluated from the summed Stokes parameters.  
+
+> C.
+
+CHARACTERIZATION OF THE SPECTRAL BANDWIDTH We characterize the spectral width of the shock-integrated total emission using a Gaussian fit in Section 5. Here we describe the procedure in more detail and also consider an alternative measure that is more sensitive to the brightest spectral components. For a direct comparison with the fractional bandwidths inferred from FRB observations, we characterize the overall spectral envelope using a Gaussian function. This method follows the commonly adopted observational characterization of narrow band FRB spectra, in which the central frequency and bandwidth are obtained from a Gaussian fit to the burst spectra (e.g., Law et al. 2017; Aggarwal et al. 2021; Nimmo et al. 2023; Zhang et al. 2023; Gopinath et al. 2024; Zhou et al. 2025; Zhang et al. 2026a). Specifically, we fit both the single-patch and angle-integrated combined X- and O-mode spectra with 
+
+𝑦 (𝜈 ) = 𝐴 0 exp 
+
+
+
+− (𝜈 − 𝜈 0)2
+
+2𝜎 2
+
+> 𝜈
+
+
+
+, (C1) where 𝐴 0 is the normalization, 𝜈 0 is the fitted central fre-quency, and 𝜎 𝜈 is the standard deviation of the Gaussian. The spectral bandwidth is defined as the FWHM Δ𝜈 = 2√2 ln 2 𝜎 𝜈 
+
+and the fractional bandwidth can be written as 
+
+Δ𝜈 𝜈 0
+
+= 2√2 ln 2 𝜎 𝜈 
+
+𝜈 0
+
+. (C2) Figure 8 illustrates this procedure for the single-patch and angle-integrated combined X- and O-mode spectra for 𝜎 = 3and 𝜎 = 6. Although the spectrum contains narrow spectral substructures, the Gaussian fit is intended to characterize the broad envelope rather than individual spectral spikes. We 15 1 2 3 4 5 6 7 8 9 10  
+
+> kc /p
+> 0.0 0.5 1.0 1.5 2.0 2.5 3.0
+> |E|2/B20
+
+= 3, v = 90         
+
+> X+O modes Gaussian fit
+> peak 246810 12 14 16
+> kc /p
+> 0.0 0.5 1.0 1.5 2.0 2.5 3.0
+> |E|2/B20
+
+= 6, v = 90            
+
+> X+O modes Gaussian fit
+> peak 246810 12 14 16 18 20
+> kobs c/0p
+> 0.00 0.02 0.04 0.06 0.08 0.10 0.12 0.14 0.16
+> |Eobs |2/B20, obs
+
+= 3        
+
+> X+O modes Gaussian fit
+> peak 510 15 20 25 30
+> kobs c/0p
+> 0.00 0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08
+> |Eobs |2/B20, obs
+
+= 6 
+
+> X+O modes Gaussian fit
+> peak
+
+Figure 8. Comparison of the spectral bandwidths of the single-patch and viewing-angle-integrated spectra. The upper panels show the single-patch spectra at 𝜃 𝑣 = 90 ◦, the lower panels show the corresponding viewing-angle-integrated spectra, for 𝜎 = 3 (left) and 𝜎 = 6 (right). The black curves show the combined spectral power of the X- and O-modes, and the blue curves show Gaussian fits to the broad spectral envelope. The red dashed lines mark the peak frequencies. The grey regions indicate the high-flux spectral interval adopted for the alternative sensitivity-limited estimate. 
+
+obtain single-patch: 
+
+ Δ𝜈 𝜈 0
+
+
+
+> 𝜎 =3
+
+≈ 0.41 ,
+
+ Δ𝜈 𝜈 0
+
+
+
+> 𝜎 =6
+
+≈ 0.74 .
+
+angle-integrated: 
+
+ Δ𝜈 𝜈 0
+
+
+
+> 𝜎 =3
+
+≈ 0.57 ,
+
+ Δ𝜈 𝜈 0
+
+
+
+> 𝜎 =6
+
+≈ 0.82 .
+
+(C3) This definition is useful for comparison with observational analyses, where the fitted Gaussian center and FWHM are commonly used to characterize the central frequency and spectral bandwidth of FRB bursts. The Gaussian fit above assumes that the broad spectral en-velope is detectable. However, a telescope with limited sensi-tivity may preferentially detect only the brightest portions of the spectra, while the fainter underlying spectral components fall below the detection threshold. The simulated spectra con-tain a number of narrow and bright spectral spikes, thus the apparent observed bandwidth can be smaller than the width inferred from the full spectral envelope. We introduce an alternative estimate based on the high-flux spectral compo-nents. We identify the peak spectral intensity at 𝜈 peak and measure the bandwidth Δ𝜈 = 𝜈 + − 𝜈 − , where 𝜈 − and 𝜈 + are the lowest and highest frequencies, respectively, at which the spectral intensity reaches half of its peak value. The corre-sponding fractional bandwidth is defined as 
+
+ Δ𝜈 𝜈 
+
+
+
+> peak
+
+= 𝜈 + − 𝜈 −
+
+𝜈 peak 
+
+. (C4) 16 We obtain single-patch: 
+
+ Δ𝜈 𝜈 
+
+ 𝜎 =3peak 
+
+≈ 0.06 ,
+
+ Δ𝜈 𝜈 
+
+ 𝜎 =6peak 
+
+≈ 0.05 .
+
+angle-integrated: 
+
+ Δ𝜈 𝜈 
+
+ 𝜎 =3peak 
+
+≈ 0.06 ,
+
+ Δ𝜈 𝜈 
+
+ 𝜎 =6peak 
+
+≈ 0.05 .
+
+(C5) An even narrower observed bandwidth could arise if the telescope sensitivity is insufficient to detect the full spectral envelope. In this case, only the brightest part of the spectrum might be detectable above the sensitivity threshold, resulting in an apparent bandwidth substantially narrower than that in-ferred from the Gaussian envelope. Moreover, an individual narrow spectral spike can be even narrower than the estimate in Equation (C5). The inferred bandwidth would then be sub-stantially narrower than that obtained from the Gaussian fit to the full spectral envelope. Since the brightest spectral fea-tures are strongly dominated by the X-mode, such a detection would also be expected to exhibit a very high degree of linear polarization with Π𝐿 ∼ 100%. However, only a fraction of the total emitted flux would be detected, leading to a lower observed flux. REFERENCES 
+
+Aggarwal, K., Agarwal, D., Lewis, E. F., et al. 2021, ApJ, 922, 115, doi: 10.3847/1538-4357/ac2577 Babul, A.-N., & Sironi, L. 2020, MNRAS, 499, 2884, doi: 10.1093/mnras/staa2612 Backer, D. C., Rankin, J. M., & Campbell, D. B. 1976, Nature, 263, 202, doi: 10.1038/263202a0 Beloborodov, A. M. 2020, ApJ, 896, 142, doi: 10.3847/1538-4357/ab83eb Bernardi, D., Yuan, Y., & Chen, A. Y. 2025, PhRvL, 135, 265201, doi: 10.1103/y9p7-1zms Blinne, A., Schinkel, D., Kuschel, S., et al. 2018, Computer Physics Communications, 224, 273, doi: 10.1016/j.cpc.2017.10.010 Bochenek, C. D., Ravi, V., Belov, K. V., et al. 2020, Nature, 587, 59, doi: 10.1038/s41586-020-2872-x Bresci, V., Lemoine, M., & Gremillet, L. 2023, Physical Review Research, 5, 023194, doi: 10.1103/PhysRevResearch.5.023194 CHIME/FRB Collaboration, Andersen, B. C., Bandura, K. M., et al. 2020, Nature, 587, 54, doi: 10.1038/s41586-020-2863-y Cordes, J. M., & Chatterjee, S. 2019, ARA&A, 57, 417, doi: 10.1146/annurev-astro-091918-104501 Day, C. K., Deller, A. T., Shannon, R. M., et al. 2020, MNRAS, 497, 3335, doi: 10.1093/mnras/staa2138 Demidem, C., Nättilä, J., & Veledina, A. 2023, ApJL, 947, L10, doi: 10.3847/2041-8213/acc84a Feng, Y., Li, D., Yang, Y.-P., et al. 2022, Science, 375, 1266, doi: 10.1126/science.abl7759 Feng, Y., Li, D., Zhang, Y.-K., et al. 2024, ApJ, 974, 296, doi: 10.3847/1538-4357/ad7a64 Fonseca, E., Andersen, B. C., Bhardwaj, M., et al. 2020, ApJL, 891, L6, doi: 10.3847/2041-8213/ab7208 FRB Collaboration, Abbott, T., Andersen, B. C., et al. 2026, arXiv e-prints, arXiv:2601.09399, doi: 10.48550/arXiv.2601.09399 Gopinath, A., Bassa, C. G., Pleunis, Z., et al. 2024, MNRAS, 527, 9872, doi: 10.1093/mnras/stad3856 Higuera, A. V., & Cary, J. R. 2017, Physics of Plasmas, 24, 052104, doi: 10.1063/1.4979989 Iwamoto, M., Amano, T., Hoshino, M., & Matsumoto, Y. 2018, ApJ, 858, 93, doi: 10.3847/1538-4357/aaba7a Iwamoto, M., Amano, T., Hoshino, M., et al. 2019, ApJL, 883, L35, doi: 10.3847/2041-8213/ab4265 Iwamoto, M., Matsumoto, Y., Amano, T., Matsukiyo, S., & Hoshino, M. 2024, PhRvL, 132, 035201, doi: 10.1103/PhysRevLett.132.035201 Jackson, J. D. 1998, Classical Electrodynamics, 3rd Edition Jiang, J.-C., Wang, W.-Y., Xu, H., et al. 2022, Research in Astronomy and Astrophysics, 22, 124003, doi: 10.1088/1674-4527/ac98f6 Jiang, J. C., Xu, J. W., Niu, J. R., et al. 2024, National Science Review, 12, nwae293, doi: 10.1093/nsr/nwae293 Kumar, P., Qu, Y., & Zhang, B. 2024, ApJ, 974, 160, doi: 10.3847/1538-4357/ad6cda Kumar, P., Shannon, R. M., Flynn, C., et al. 2021, MNRAS, 500, 2525, doi: 10.1093/mnras/staa3436 Law, C. J., Abruzzo, M. W., Bassa, C. G., et al. 2017, ApJ, 850, 76, doi: 10.3847/1538-4357/aa9700 Li, C. K., Lin, L., Xiong, S. L., et al. 2021, Nature Astronomy, 5, 378. https://arxiv.org/abs/2005.11071 Lorimer, D. R., Bailes, M., McLaughlin, M. A., Narkevic, D. J., & Crawford, F. 2007, Science, 318, 777, doi: 10.1126/science.1147532 Luo, R., Wang, B. J., Men, Y. P., et al. 2020, Nature, 586, 693, doi: 10.1038/s41586-020-2827-2 Lyubarsky, Y. 2021, Universe, 7, 56, doi: 10.3390/universe7030056 Manchester, R. N., Taylor, J. H., & Huguenin, G. R. 1975, ApJ, 196, 83, doi: 10.1086/153395 Mckinven, R., Bhardwaj, M., Eftekhari, T., et al. 2025, Nature, 637, 43, doi: 10.1038/s41586-024-08184-4 Metzger, B. D., Margalit, B., & Sironi, L. 2019, MNRAS, 485, 4091, doi: 10.1093/mnras/stz700 Metzger, B. D., Sridhar, N., Margalit, B., Beniamini, P., & Sironi, L. 2022, ApJ, 925, 135, doi: 10.3847/1538-4357/ac3b4a 17 
+
+Nättilä, J. 2022, A&A, 664, A68, doi: 10.1051/0004-6361/201937402 Nimmo, K., Hessels, J. W. T., Keimpema, A., et al. 2021, Nature Astronomy, 5, 594, doi: 10.1038/s41550-021-01321-3 Nimmo, K., Hessels, J. W. T., Snelders, M. P., et al. 2023, MNRAS, 520, 2281, doi: 10.1093/mnras/stad269 Niu, J. R., Wang, W. Y., Jiang, J. C., et al. 2024, arXiv e-prints, arXiv:2407.10540, doi: 10.48550/arXiv.2407.10540 Petroff, E., Hessels, J. W. T., & Lorimer, D. R. 2019, A&A Rv, 27, 4, doi: 10.1007/s00159-019-0116-6 Platts, E., Weltman, A., Walters, A., et al. 2019, PhR, 821, 1, doi: 10.1016/j.physrep.2019.06.003 Pleunis, Z., Good, D. C., Kaspi, V. M., et al. 2021, ApJ, 923, 1, doi: 10.3847/1538-4357/ac33ac Plotnikov, I., & Sironi, L. 2019, MNRAS, 485, 3816, doi: 10.1093/mnras/stz640 Price, D. C., Foster, G., Geyer, M., et al. 2019, MNRAS, 486, 3636, doi: 10.1093/mnras/stz958 Qu, Y., & Zhang, B. 2023, MNRAS, 522, 2448, doi: 10.1093/mnras/stad1072 Rybicki, G. B., & Lightman, A. P. 1979, Radiative processes in astrophysics Sironi, L., Plotnikov, I., Nättilä, J., & Beloborodov, A. M. 2021, PhRvL, 127, 035101, doi: 10.1103/PhysRevLett.127.035101 Sobacchi, E., Lyubarsky, Y., Sironi, L., & Iwamoto, M. 2025, A&A, 701, A124, doi: 10.1051/0004-6361/202555899 Thornton, D., Stappers, B., Bailes, M., et al. 2013, Science, 341, 53, doi: 10.1126/science.1236789 Umeda, T., Omura, Y., Tominaga, T., & Matsumoto, H. 2003, Computer Physics Communications, 156, 73, doi: 10.1016/S0010-4655(03)00437-5 Uttarkar, P. A., Shannon, R. M., Gourdji, K., et al. 2026, arXiv e-prints, arXiv:2602.16409, doi: 10.48550/arXiv.2602.16409 Wang, T.-C., Zhang, J.-S., Liu, X.-H., et al. 2026, ApJS, 284, 77, doi: 10.3847/1538-4365/ae632f Zhang, B. 2020, Nature, 587, 45, doi: 10.1038/s41586-020-2828-1 —. 2023, Reviews of Modern Physics, 95, 035005, doi: 10.1103/RevModPhys.95.035005 Zhang, L.-X., Tian, S., Shen, J., et al. 2026a, ApJ, 998, 276, doi: 10.3847/1538-4357/ae314a Zhang, Y., Yang, Y.-P., & Ji, L.-L. 2026b, PhRvL, 137, 045201, doi: 10.1103/49dm-cfgp Zhang, Y.-K., Li, D., Zhang, B., et al. 2023, ApJ, 955, 142, doi: 10.3847/1538-4357/aced0b Zhou, D., Han, J. L., Zhang, B., et al. 2025, ApJ, 988, 41, doi: 10.3847/1538-4357/addfdb Zhou, D. J., Han, J. L., Zhang, B., et al. 2022, Research in Astronomy and Astrophysics, 22, 124001, doi: 10.1088/1674-4527/ac98f8
