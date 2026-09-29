@@ -1,0 +1,465 @@
+Title: A Delayed Rejection Reversible Jump Markov Chain Monte Carlo Method for Multi-Resolution Maps of the Stochastic Gravitational Wave Background with Pulsar Timing Array Data
+
+URL Source: https://arxiv.org/pdf/2609.32022v1
+
+Published Time: Tue, 29 Sep 2026 00:22:27 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+> Draft version September 29, 2026
+> Typeset using L ATEX twocolumn style in AASTeX7.0.1
+
+A Delayed Rejection Reversible Jump Markov Chain Monte Carlo Method for Multi-Resolution Maps of the Stochastic Gravitational Wave Background with Pulsar Timing Array Data 
+
+Taha T. Moursy 1 and Nihan S. Pol 1
+
+> 1Department of Physics and Astronomy, Texas Tech University, Box 41051, Lubbock, TX 79409, USA
+
+ABSTRACT Pulsar timing array anisotropy analyses often use a naive counting argument to set resolutions of in-ferred maps of the stochastic gravitational wave background (GWB). We present a data-driven method in the form of a delayed rejection reversible jump sampler tailored to multi-resolution pixel decomposi-tions of the angular power density of the GWB. We also consider a rapid, frequentist alternative based on information criteria statistics. We verify our methods with a series of injection-and-recovery simu-lations, finding that the standard counting argument would lead to drastic overfitting of the data and that our data-driven methods reduce the number of parameters in the models by one to three orders of magnitude yet can achieve higher resolution than the standard counting argument when justified by the data. We make our sampler and frequentist method implementation available on GitHub. 
+
+Keywords: Gravitational Waves (678) — Pulsars (1306) — Supermassive Black Holes (1663) 
+
+1. INTRODUCTION Pulsar timing arrays (PTAs, M. V. Sazhin 1978; S. Detweiler 1979) are sensitive to low-frequency gravita-tional waves (GWs) produced by supermassive black hole binaries (SMBHBs), among other potential sources. PTA experiments are conducted through precision tim-ing of millisecond pulsars. The observed times of ar-rival (TOAs) of electromagnetic pulses are compared to predicted TOAs generated through careful modeling of various physical phenomena and noise processes (e.g., G. Agazie et al. (2023a,b)), and the differences are analyzed primarily to search for GWs. One of the GW analyses that can be performed with PTA data is inferring the angular power distribution of a stochastic gravitational wave background (GWB) (see, e.g., J. D. Romano & N. J. Cornish (2017)). This is an important analysis because anisotropy in the GWB is decisive evidence for an SMBHB origin as opposed to other hypotheses such as GWs from inflation (see e.g., A. Afzal et al. (2023)), which predict statistically isotropic GWBs (C. Caprini & D. G. Figueroa 2018). Many anisotropy searches have been performed by PTA collab-orations but none have reported evidence for anisotropy (S. R. Taylor et al. 2015; G. Agazie et al. 2023c; K. Grunthal et al. 2025; Y. Chen et al. 2026). Inferring the angular power distribution of the GWB necessitates choosing a cutoff in the expansion of ba-sis functions. This cutoff is typically chosen using a counting argument that the number of model param-eters should not exceed the number of data points. Specifically, frequentist anisotropy analyses use cross-correlation estimators between pairs of pulsars as the data, so the counting argument in the pixel basis typ-ically takes the form of Npix ≲ Ncc , where Npix is the number of pixels in a HEALPix 1 (K. M. Gorski et al. 2005) tessellation of the sky and Ncc is the number of cross-correlations. In practice, analyses are typically performed by setting the number of model parameters as close to the number of cross-correlations as possible (within the constraints of the nature of the basis), i.e., 
+
+Npix ≈ Ncc .This counting argument is flawed for several reasons. One is that the cross-correlations are covariant and hence not “independent measurements” (J. D. Romano et al. 2021; B. Allen & J. D. Romano 2023; K. A. Gers-bach et al. 2025). Other issues are that it does not in-clude any information about signals present in the data, noise in the PTA, or the geometry of the array. The geometry of the PTA, set by the sky positions of the pulsars in the array, defines the directional sensitivity to anisotropy for that PTA, and a non-uniform distribu-tion of pulsars on the sky implies a similarly non-uniform sensitivity to anisotropy on the sky (D. J. Oliver et al. 2026; T. T. Moursy et al. 2026).  
+
+> 1http://healpix.sf.net arXiv:2609.32022v1 [astro-ph.IM] 25 Sep 2026
+
+2This non-uniform sky-sensitivity of PTAs has led to a new method by K. Grunthal et al. (2026) in which one sets the cutoff resolution higher than the typical choice but then uses truncated singular value decomposition (SVD) to discard modes of the reconstruction which the PTA is not sensitive to. This aims to produce sky maps adapted to the local resolution of a PTA at each sky location. D. Agarwal et al. (2026) use a similar method to address biases in the inferred angular power distri-bution due to using too few terms in the expansion (F. Semenzato et al. 2025). While these methods improve on the standard counting argument, they introduce an-other manually implemented hyper-parameter since one must select a threshold for the SVD truncation. Regardless of the method, all previous works on the subject of inferring sky maps from PTA data use sev-eral arbitrary choices, including the maximum resolution and any regularization thresholds. In this work, we pro-pose an entirely data-driven method using the reversible jump Markov chain Monte Carlo (RJMCMC; P. J. Green (1995)) algorithm and multi-resolution HEALPix meshes to simultaneously infer resolutions and angu-lar power densities at each sky location, automatically incorporating in our inference the geometry and noise properties of the PTA as well as any signals and covari-ances that may be present in the data. This paper is organized as follows. In Section 2, we describe relevant aspects of PTA data analysis, multi-resolution maps and reversible jump methods. We also describe a rapid but less robust and less informative method based on information criteria statistics. We end the section by describing the simulations we use to ver-ify our methods, and we present in Section 3 our results of analyzing these simulations with our methods. We discuss our results and conclude with a brief summary in Section 4.  
+
+> 2.
+
+METHODS 2.1. Frequentist Map-Making with PTA Data 
+
+We first give a summary of the commonly used cross-correlation method for inferring an angular distribution of the GWB using PTA data. This method has been used in PTA collaboration searches for anisotropy in the GWB (G. Agazie et al. 2023c; K. Grunthal et al. 2025; Y. Chen et al. 2026). We will use this method for this work, but we note that the sampler we develop does not depend fundamentally on this method and could be modified to handle different methods of constructing GWB maps, such as using the TOAs directly (S. R. Taylor et al. 2020). Letting the angular power density of the GWB in di-rection ˆΩ be P( ˆΩ), the GWB induces spatial correla-tions in the pulsar timing residuals, which are the differ-ences between measured and expected times-of-arrivals (TOAs) of the emission from the pulsar. The expecta-tion value of the correlations is the model-specific over-lap reduction function (ORF). The ORF corresponding to a purely isotropic GWB is the well-known Hellings & Downs (HD) curve (R. W. Hellings & G. S. Downs 1983). The general formula of the ORF Γ ab for two pulsars a and b, given P( ˆΩ) and the detector response 
+
+Rab ( ˆΩ), is the convolution over the sky of P with Rab 
+
+(E. E. Flanagan 1993) Γab =
+
+Z
+
+Rab ( ˆΩ) P( ˆΩ) dΩ. (1) One can thus restrict the analysis to using just the inter-pulsar correlations rather than the full TOA ba-sis with the advantage that the former is a signifi-cantly smaller dataset and allows lower computational turnaround time when searching for anisotropy (N. Pol et al. 2022). This model is often applied in anisotropy analysis pipelines with the following log-likelihood log L(ρ|Γ) = − 12 (ρ−Γ) T C−1(ρ−Γ) − 12 log |C|− Ncc 
+
+2 log 2 π
+
+(2) where ρ is the vector of measured pulsar pair cross-correlations, C is the covariance matrix of the cross-correlations and Ncc = Npsr (Npsr − 1) /2 is the number of cross-correlations given Npsr pulsars in the PTA. In this pipeline, the cross-correlations are computed using the PTA optimal statistic (OS, M. Anholm et al. 2009) framework. The OS is a statistic used to esti-mate the inter-pulsar cross-correlations, which can then be used to estimate the amplitude of the GWB in PTA data using the HD ORF as a template to fit the es-timated cross-correlations. This framework was ex-tended by K. A. Gersbach et al. (2025) to calculate frequency-resolved cross-correlations. This statistic is called the per-frequency OS (PFOS) and is advanta-geous for anisotropy searches as it enables the produc-tion of narrowband GWB sky-maps (K. A. Gersbach et al. 2025). Narrowband anisotropy is a more realis-tic expectation if the source of the anisotropy is a loud SMBHB emitting approximately monochromatic GWs. In addition to using the PFOS in our work, we also ac-count for the covariance of the cross-correlations induced by the presence of a GWB (J. D. Romano et al. 2021; B. Allen & J. D. Romano 2023; A. D. Johnson et al. 2024; K. A. Gersbach et al. 2025). Modeling the covariance of the cross-correlations improves the accuracy of GWB sky-map reconstruction (K. A. Gersbach et al. 2025). The cross-correlations and covariance matrices are com-puted as given by Equations 28 and C21-C23 of K. A. 3Gersbach et al. (2025), and we use the software package 
+
+Defiant (K. A. Gersbach et al. 2025) for these inputs to our likelihood in Equation 2. 2.2. Multi-Resolution Maps 
+
+In this work, we use the multi-resolution pixel basis introduced in T. T. Moursy et al. (2026) with the goal of determining a preferred HEALPix tessellation of the sky given a PTA dataset. The multi-resolution pixel basis decomposes the GWB angular distribution P( ˆΩ) into a set of HEALPix pixels. For a decomposition with e.g. 12 pixels, there are 12 parameters in the model, and the estimated angular distribution vector is simply a 12-element vector with each element being an estimate of the GWB density at the center of the corresponding pixel ( P( ˆΩk) for pixel k). The multi-resolution pixel basis makes use of the multi-order-coverage (MOC, P. Fernique et al. 2014; M. Reinecke & E. Hivon 2015; R. W. Youngren & M. D. Petty 2017) method developed by L. P. Singer & L. R. Price (2016) with applications to LIGO (T. L. S. Col-laboration et al. 2015) data analysis. These methods were further developed by I. Martinez-Castellanos et al. (2022)) and implemented as a Python software package, 
+
+mhealpy (I. Martinez-Castellanos et al. 2024), which provides convenient routines for manipulating and plot-ting these maps. The multi-resolution pixel basis for PTA mapping of the GWB makes use of the NESTED and UNIQ HEALPix schemes for pixel identification, with the UNIQ scheme being the driving technology behind MOCs. The NESTED scheme works by identifying all pixels of a given resolution with the identifiers 0 through Npix − 1, where Npix is the number of pix-els. A desirable quality of the NESTED scheme is that, for a pixel with a given NESTED index, iNESTED ,the four sub-pixels at the next resolution are given by 4iNESTED , 4iNESTED +1 , 4iNESTED +2, and 4 iNESTED +3. These sub-pixels are the pixels which together cover the area originally covered by the pixel at the previous resolution with index iNESTED . The NESTED scheme thus makes querying pixels of different resolution trivial through simple multiplication and division by 4. The NESTED scheme uses the indices 0 through Npix 
+
+for every given resolution. Therefore, knowing a pixel has index e.g. 0 does not uniquely identify the pixel. One also needs to know the resolution, either through the total number of pixels or some resolution parame-ter. The UNIQ scheme solves this by uniquely mapping the integers (greater than 3) to every possible pixel at all resolutions with a single mapping. It does this by not resetting the index to 0 after stepping to another resolution. One caveat is that it begins the indices from 4. So, the first 12 pixels at the lowest resolution of the HEALPix tessellations are numbered 4-15. The next 48 pixels (which are at the next resolution) are numbered 16-63, and so on. The relation between the UNIQ and NESTED indices of a pixel is 
+
+iUNIQ = iNESTED + 4 N 2side , (3) where Nside is a resolution parameter. Nside specifically is equal to the number of sub-pixels along one edge of a pixel at the lowest HEALPix resolution. For example, splitting a lowest-resolution pixel once gives four sub-pixels, with two along each edge of the original pixel, and so these sub-pixels have Nside = 2. Possible values of Nside in the UNIQ scheme are powers of 2, beginning with 2 0.Coming back to PTA data analysis, we can choose any valid set of pixels to constitute our multi-resolution pixel basis, compute the detector response matrix R in the basis, and evaluate the log-likelihood given in Equation 2. The detector response matrix has elements 
+
+Rkab = ∆Ω k
+
+4π
+
+h
+
+F× 
+
+> a
+
+( ˆΩk)F× 
+
+> b
+
+( ˆΩk) + F+ 
+
+> a
+
+( ˆΩk)F+ 
+
+> b
+
+( ˆΩk)
+
+i
+
+, (4) where ∆Ω k is the area of pixel k and FAa ( ˆΩk) is the response of pulsar a to a GW of polarization A eval-uated at the location ˆΩk, which is the center of pixel 
+
+k (see, e.g., G. Agazie et al. (2023c)). Once one selects a multi-resolution tessellation, one can simply maximize the likelihood shown in Equation 2 for a frequentist esti-mate of the GWB angular power distribution. However, it is not obvious what resolution GWB sky-maps should be reconstructed with using PTA data, so we use an RJMCMC method to simultaneously infer the preferred number, resolution, and amplitudes of pixels in a GWB sky-map. 2.3. Reversible Jump MCMC 
+
+The RJMCMC algorithm, proposed by P. J. Green (1995), is a reframing of Metropolis-Hastings (MH, N. Metropolis et al. 1953; W. K. Hastings 1970) which en-ables an MCMC sampler to move across models hav-ing different parameter spaces and, in general, different dimensionality. The RJMCMC algorithm works as fol-lows. Let x denote the current state, represented by a vector of parameter values for the current model and some label specifying the model. Let y denote a pro-posed state for a new model and associated parameter values. The RJMCMC algorithm then consists of draw-ing a vector u of auxiliary variables from a density q,mapping ( x, u) through a diffeomorphism T to the pro-posed state y, and accepting it with probability (P. J. 4Green 1995) 
+
+α(x, y ) = min 
+
+
+
+1, π(y)
+
+π(x)
+
+q′(u′)
+
+q(u)
+
+j′(x|y)
+
+j(y|x)
+
+∂(y, u ′)
+
+∂(x, u )
+
+
+
+, (5) where u′ is the vector of auxiliary variables drawn from the density q′ for the reverse move y → x such that (y, u′) is mapped to ( x, u) by the inverse diffeomor-phism T −1. u and u′ also serve to satisfy the dimension-matching condition of the RJMCMC algorithm, which states the number of dimensions in the model of state x
+
+plus the number of auxiliary variables drawn in u must equal the corresponding sum of dimensions in the model of state y and the number of auxiliary variables in the vector u′. This condition is necessary for T to be in-vertible or, equivalently, bijective. π includes priors on the models themselves, priors on the parameters of the models, and the likelihood. j and j′ are the model pro-posal kernels from which y and x are drawn, respectively. Finally, the absolute value of the determinant of the Ja-cobian accounts for the change of variables. In our application of multi-resolution HEALPix maps, we use a reversible pair of proposals that consists of (1) merging four pixels of a given Nside into one pixel of resolution Nside /2 and (2) splitting a single pixel of res-olution Nside into four sub-pixels with resolution 2 Nside .As a concrete example, we show explicitly how a split-move is performed in our application. In determining the acceptance ratio, we will also need to consider at the same time the hypothetical merge-move which re-verses our split-move. Given a state x, uniquely iden-tified by the collection of amplitudes and UNIQ indices of its constituent pixels, we propose a new state y which is identical to x except one of the pixels in x has been removed and replaced with the four pixels of the next resolution. Three probabilities go into proposing y from 
+
+x: (1) choosing to propose a split-move, (2) choosing which pixel to split, and (3) determining the amplitudes of the new pixels, which involves the auxiliary variables 
+
+u. Our j probability is the product of (1) and (2). We set the probability of proposing a split-move equal to the merge-move proposal probability, so (1) contributes only a factor of 1 to j′(x|y)/j (y|x). For (2), we set the probability of choosing the particular pixel to split to be 1 out of the total number of available pixels that can be split (i.e., equal weights), which is often the total number of pixels in x except we set a model prior in the form of a resolution cap Nside < 128. So far, we have 
+
+j(y|x) = 1 /N pix ,x , assuming no pixels are at the resolu-tion cap, which is done to simplify this example but not assumed in the corresponding code in our sampler. For (3), we draw four auxiliary variables comprising the vec-tor u independently from q, so the probability of drawing 
+
+u is the product of q evaluated at each auxiliary variable. We describe our choice for q in Section 2.5. After de-termining a proposed state y, we evaluate the prior (on both the proposed model and the proposed parameters) and the likelihood to compute π(y). One must then determine the probabilities for revers-ing the move in order to compute the acceptance ratio. We determine the auxiliary variables u′ which would have to be drawn to propose x from y and evaluate the probability as q′(u′). For the probability of proposing the model of state x from y (i.e., j′(x|y)), we use our merge-move transition kernel, which works by randomly selecting a pixel from the set of available pixels. The set of available pixels is the intersection of the set of pixels with resolution greater than Nside = 1 and the set of pixels with all their sister pixels in the current model. To clarify this second set, compare the two sets of pix-els {16 , 17 , 18 , 19 } and {64 , 65 , 66 , 67 , 17 , 18 , 19 }: in the first set, all four pixels can be selected for a merge-move, while only the pixels {64 , 65 , 66 , 67 } would be valid choices from the second for a merge-move. This is required because our split-move transition kernel only generates single increments in resolution, so attempt-ing to merge the seven pixels in {64 , 65 , 66 , 67 , 17 , 18 , 19 }
+
+would give j′(x|y) = 0. We emphasize this is not funda-mental to RJMCMC but is due to our implementation as we could simply choose a more complex transition kernel which allows for larger jumps in resolution. To summarize, we have π(y), π(x), q′(u′)/q (u), and 
+
+j′(x|y)/j (y|x), although we have not discussed our choice of q and q′ yet as we will do so in Section 2.5. This leaves the Jacobian in the acceptance ratio, which we explain next. The diffeomorphism we use, T , maps the pixels which are the same between states x and y to each other (i.e., their amplitudes and resolutions remain the same after a merge or split move) and maps the single auxiliary vari-able u′ to the pixel to be split and the auxiliary vector u
+
+to the four new pixels. In this way, the Jacobian of T is the identity matrix for the first Npix ,x − 1 pixels, but the last five rows and columns of the Jacobian are four row-swaps from the identity. Therefore, the determinant of this Jacobian is ( −1) 4 = 1. Explicitly, 
+
+J = INpix-1 00 J
+
+!
+
+, (6) where 5
+
+J =
+
+
+
+> ∂θ ′
+> Npix
+> ∂θ Npix
+> ∂θ ′
+> Npix
+> ∂u 1
+> ∂θ ′
+> Npix
+> ∂u 2
+> ∂θ ′
+> Npix
+> ∂u 3
+> ∂θ ′
+> Npix
+> ∂u 4
+> ∂θ ′
+> Npix +1
+> ∂θ Npix
+> ∂θ ′
+> Npix +1
+> ∂u 1
+> ∂θ ′
+> Npix +1
+> ∂u 2
+> ∂θ ′
+> Npix +1
+> ∂u 3
+> ∂θ ′
+> Npix +1
+> ∂u 4
+> ∂θ ′
+> Npix +2
+> ∂θ Npix
+> ∂θ ′
+> Npix +2
+> ∂u 1
+> ∂θ ′
+> Npix +2
+> ∂u 2
+> ∂θ ′
+> Npix +2
+> ∂u 3
+> ∂θ ′
+> Npix +2
+> ∂u 4
+> ∂θ ′
+> Npix +3
+> ∂θ Npix
+> ∂θ ′
+> Npix +3
+> ∂u 1
+> ∂θ ′
+> Npix +3
+> ∂u 2
+> ∂θ ′
+> Npix +3
+> ∂u 3
+> ∂θ ′
+> Npix +3
+> ∂u 4
+> ∂u ′
+> 1
+> ∂θ Npix
+> ∂u ′
+> 1
+> ∂u 1
+> ∂u ′
+> 1
+> ∂u 2
+> ∂u ′
+> 1
+> ∂u 3
+> ∂u ′
+> 1
+> ∂u 4
+
+
+
+.
+
+(7) Setting u = ( θ′ 
+
+> Npix
+
+, ..., θ ′
+
+> Npix +3
+
+) and u′ = θNpix and then evaluating the derivatives gives 
+
+J =
+
+
+
+0 1 0 0 00 0 1 0 00 0 0 1 00 0 0 0 11 0 0 0 0
+
+
+
+. (8) This concludes our description of the split-move, and the merge-move is simply the inverse. We additionally include a second pair of split and merge moves in which the entire map is updated rather than keeping the com-mon pixels between models at the same amplitude. The proposed values are drawn independently of the current state of the sampler, so in this case we take u = θ′ and 
+
+u′ = θ, and so the Jacobian is the identity matrix. 2.4. Delayed Rejection 
+
+The standard MH algorithm accepts a proposed move with the MH acceptance ratio. If the proposed move is rejected, the current state is repeated in the chain and the algorithm continues. However, this algorithm can lead to inefficiency by increasing the auto-correlation length of the MCMC. Delayed rejection is a method that aims to improve the efficiency of MCMCs by al-lowing for more proposed moves (which may depend on the rejected move) after a move is rejected. The delayed rejection method was proposed by L. Tierney & A. Mira (1999) for MH and adapted for RJM-CMC by P. J. Green & A. Mira (2001). The acceptance ratio for the RJMCMC algorithm, Equation 5, when generalized to include delayed rejection and applied to second-stage delayed rejection, is (P. J. Green & A. Mira 2001) 
+
+α2(z, x ) = min 
+
+(
+
+1, π(z)
+
+π(x)
+
+g′
+
+> 1
+
+(u′
+
+> 1
+
+, x |y∗)g′
+
+> 2
+
+(u′
+
+> 2
+
+, y ∗|z)
+
+g1(u1, y ∗|x)g2(u2, z |y∗)
+
+× 1 − α1(z, y ∗)1 − α1(x, y )
+
+∂(z, u ′
+
+> 1
+
+, u ′
+
+> 2
+
+)
+
+∂(x, u 1, u 2)
+
+)
+
+, (9) where z is the proposed state at the second stage (i.e., after rejecting model y), u′ 
+
+> 1
+
+and u′ 
+
+> 2
+
+are auxiliary vari-ables drawn in going from z to x, y∗ is an intermediate state between x and z that may be different from y,and α1(z, y ∗) is given by Equation 5 with the appro-priate substitution, replacing x and y in that equation with z and y∗, respectively. We use g(u, y |x) following P. J. Green & A. Mira (2001) as an abbreviation for 
+
+q(u)j(y|x). In what follows, we restrict ourselves to the case that 
+
+y = y∗. The specific details of applying this equation to our application are essentially identical to those given under Equation 5 but with appropriate replacements of variable names, e.g., using z instead of x when comput-ing α1(z, y ). In our application, we use delayed rejection in the case that an inter-model proposal is rejected. We propose a new model that is the result of applying the rejected proposal type to the rejected proposed model. For ex-ample, if a split-move is rejected, we apply a second split to the rejected mesh and propose the resulting model, and we do likewise for merge-moves. This enables the sampler to move two steps in resolution in a single it-eration, as well as enabling move types where different pixels around the map are merged or split. Note that, while the delayed rejection algorithm can be nested to generate an arbitrary number of proposed moves, we find that our sampler performs well with only one iteration of delayed rejection. In addition, as dis-cussed by P. J. Green & A. Mira (2001), nested itera-tions can be computationally expensive, so the trade-off between auto-correlation length and computational runtime should be considered when designing a delayed rejection sampler. 2.5. Sampler 
+
+We implement the above methods in Resolve , an open-source Python package accompanying this work and available on PyPI and GitHub 2. The sampler is accelerated with JAX and Numba and makes use of the Levenberg-Marquardt (LM, K. Levenberg 1944; D. W. Marquardt 1963) algorithm as implemented in JAXopt .We use this local optimization algorithm to obtain maximum-likelihood estimates (MLEs) which are used in evaluating Hessians and in generating random pro-posals for new pixel amplitudes, which we find to be much more efficient than drawing from the prior or us-ing an approximate analytical solution. We cache the optimal solution to improve the speed and efficiency of  
+
+> 2github.com/TTMoursy/Resolve
+
+6our sampler so that the optimization problem is solved only once per model explored by the sampler. For intra-model moves, simple symmetric draws from independent normal distributions for pixel angular power densities can be inefficient for some tessella-tions due to strong covariances between pixels, so in-stead we compute the Hessian of the log-likelihood with JAX ’s automatic differentiation and draw propos-als from a multivariate normal with a covariance equal to the inverse of the negative Hessian evaluated at the maximum-likelihood pixel amplitudes. However, we modify the Hessian before inverting because some pixels have upper-limit type posteriors and can therefore cause numerical instabilities when inverting the Hessian. We cache the Cholesky (or, if needed, singular-value) de-composition of the covariance matrix the first time this move is proposed in a model, allowing for rapid future proposals within the model. We described much of our sampler’s inter-model pro-posal mechanisms in Sections 2.3 and 2.4, but here we detail some choices we make that are not necessarily specific to RJMCMC. In particular, we discuss our aux-iliary variable densities q and q′ and our default priors, although the priors can be set by the user of our sampler. When proposing a new model, we first perform numer-ical optimization of the likelihood using the LM algo-rithm as mentioned previously. We use numerical opti-mization because modeling the pixel amplitudes in log-space comes at the expense of no longer having an ana-lytical maximum likelihood solution but has the benefits of ensuring positivity and improving scaling of the pa-rameter space. To set an initial state for the optimizer, we use the standard, linear pixel basis and the Tikhonov-regularized analytical solution P = ( M +λI )−1X, where 
+
+M = RT C−1R and X = RT C−1ρ are the Fisher infor-mation matrix and dirty map, respectively, (J. D. Ro-mano & N. J. Cornish 2017; Y. Ali-Ha¨ ımoud et al. 2020, 2021), and we arbitrarily select λ = 10 −3, which we find to balance well between stabilizing and biasing the ini-tial estimate, helping the optimizer to converge more efficiently and reliably. After obtaining the MLE for the pixel amplitudes for the proposed model, we draw auxiliary variables u and u′
+
+from q and q′, which we construct as follows. We use two different density forms for these distributions, depend-ing on whether the posterior of the pixel amplitudes is well-constrained or is only an upper limit. We classify pixels as having upper-limit posteriors during sampling by evaluating the log-likelihood at the MLE but with one pixel at a time having amplitude set to the lower prior bound. If the log-likelihood changes by less than  
+
+> 12
+
+, we classify the pixel as having an upper-limit poste-rior and draw from the mixture described; otherwise, we classify the pixel as having a well-constrained amplitude and draw from a multivariate normal as previously de-scribed. For pixels which are well-constrained, we draw their amplitudes from a multivariate normal distribu-tion centered on the MLE and with a covariance matrix obtained through a Fisher estimate and JAX -based au-tomatic differentiation. For pixels with upper-limit type posteriors, we draw the amplitudes from a mixture of a uniform distribution from the lower prior bound up to an estimated upper limit for each pixel and a triangular distribution with vertices at the prior bounds and mode at the lower prior bound (i.e., a straight line with a neg-ative slope from one end of the prior to the other). We estimate the upper limits for each upper-limit-type pixel by changing its value while holding the other pixel am-plitudes fixed at the MLE and determining values where the log-likelihood decreases by 12 . For more precise es-timates, one would use the profile likelihood to account for covariances between pixels, but this comes with the added computational cost of solving many optimization problems, and we are interested only in a rough estimate for the proposal density. We find this approximation works well in practice as can be seen in Section 3. Our priors for pixel angular power densities are taken as independent and uniform in log-space over [ −7, 7], and we adopt a uniform prior on models. We impose a maximum Nside of 64, although this seems unlikely to have affected our results since the preferred models have low values of Nside . These prior choices can each be spec-ified by the user before running our sampler in Resolve ,but note that Nside must be a power of two since our method is based on the UNIQ HEALPix scheme (which is based on the NESTED scheme). These schemes al-low for trivial pixel querying at different resolutions by simply multiplying or dividing pixel indices by factors of four. This requires that Nside only be incremented by factors of two. In contrast, the RING scheme (not used in this work) has neither the restriction on Nside nor the convenient querying routines for changing resolution. 2.6. Post-Processing 
+
+After obtaining a chain from an RJMCMC simulation (with burn-in discarded), one can estimate the posterior odds ratio between two models by taking the ratio of the number of samples that correspond to each of the two models. If one uses uniform priors on the models, this estimate also serves as an estimate for the Bayes factor between the two models. In the general case, one can obtain an estimate for the Bayes factor by dividing the posterior odds ratio estimate by the prior model ratio; this allows for convenient model selection independent 7of the model priors. We use this method to compute all of the Bayes factors reported in this work, and we use bootstrap resampling to estimate uncertainties on the Bayes factors. 2.7. A Rapid Frequentist Method 
+
+Performing an RJMCMC analysis with our sampler can take from a few hours to several days, depending on the complexity of the posterior and the desired num-ber of samples, so we also present a rapid but purely frequentist alternative based on the Akaike information criterion (AIC), 2 Npix − 2 log L, and Bayesian informa-tion criterion (BIC), Npix log Ncc − 2 log L. This method we propose is based on the algorithm presented by L. P. Singer & L. R. Price (2016) but is simplified and works by iteratively splitting some threshold percentage of the integrated angular power density MLE, computing the AIC or BIC for each mesh, and selecting as the pre-ferred model the one which minimizes the AIC or BIC. This alternative method does not provide Bayes factors between models and introduces some arbitrary choices (and thereby losing the purely data-driven aspect of RJMCMC), but it is much faster, taking only a few sec-onds for an analysis or a few minutes if one also com-putes uncertainties on the angular power density. We estimate uncertainties on the parameters using a profile likelihood method, whereby we use a root-finding algorithm to find the density which decreases the profile likelihood by 12 from the maximum likelihood. At each iteration of the root-finding algorithm, we perform op-timization of all other pixels using the limited-memory Broyden-Fletcher-Goldfarb-Shanno (LBFGS) algorithm (J. Nocedal & S. J. Wright 2006; L. Sorber et al. 2012); therefore, these uncertainties account for the covariance between pixels and is more robust than the approximate likelihood scan we describe in Section 2.5 although this is more computationally expensive. The root-finding al-gorithm we use is bisection, and both the bisection and LBFGS algorithms we use are implemented in JAXopt ,which comes with the benefit of being compatible with automatic parallelism through JAX so that batches of in-dependent optimization problems can be solved simul-taneously. 2.8. Simulations 
+
+To verify our method, we create two sets of simula-tions, one idealistic and the other realistic. The ide-alistic set consists of two simulations which have data simulated at the cross-correlation level. The simulated PTA for these datasets consists of 75 pulsars distributed randomly across the sky; the sky positions can be seen in Figure 1. The first simulation in this set is generated by drawing cross-correlations from independent normal dis-tributions centered at the HD coefficients and with stan-dard deviation 0.1 (the maximum HD cross-correlation has value 0.5, for reference). This simulation is meant to represent an isotropic GWB with a small amount of noise in the measurements. For the second idealistic simulation, we would like to test the ability of the sam-pler in recovering multiple hotspots and well-localized anisotropies. So, we generate this simulation by choos-ing a mesh and pixel amplitudes and calculating the the-oretical cross-correlations such a GWB would produce. We use cross-correlation uncertainties of 0.1, but we do not add any noise to the theoretical cross-correlations for this second simulation. We include two pixels with angular power densities greater than 1, and we set the resolution of one of these pixels to Nside = 4 and the other to Nside = 16. The injected mesh is shown in the bottom left panel of Figure 1. Note that the injected angular power density is 100 for the Nside = 4 pixel and 1600 for the Nside = 16 pixel, which are equivalent pixel amplitudes and correspond to an angular power density of ∼ 6 at Nside = 1. The second set of simulated datasets is more realis-tic and generated at the TOA-level. The simulations are based on the NANOGrav 12.5-yr dataset (M. F. Alam et al. 2020). We generate simulated versions of the 45 pulsars used in the NANOGrav GWB search (Z. Arzoumanian et al. 2020) of that dataset. Our simu-lated pulsars have the same timing models as the real dataset but include some simplifications. We simulate three datasets with various signals injected: a GWB in all three datasets and a CW with different chirp mass in two of the datasets. All of the CW parameters are identical in the two datasets except for the chirp mass; one CW has a chirp mass of 10 9M⊙, and the other has a chirp mass of 10 10 M⊙. The other parameters for the CWs are fGW = 6 .8/T span ≈ 15 nHz, θ = 2 .13 rad, ϕ = 3 .57 rad, dL = 55 Mpc, ψ = π/ 3 rad, and 
+
+ι = π/ 4 rad. We inject measurement noise into the simulated datasets in the form of EFAC, EQUAD, and ECORR, using the same values measured in the real dataset. We also inject intrinsic pulsar red noise with a power-law (PL) power spectral density (PSD), again using the same values measured in the real dataset. The injected GWB is isotropic and has a PL PSD with spec-tral index γ = 13 /3 and amplitude A = 2 .4 × 10 −15 at a reference frequency of f = 1 /yr, taken from the results of G. Agazie et al. (2023d) and generally consistent with the range of results from the various PTA collaborations. 8 
+
+> 3.
+
+RESULTS 3.1. Idealistic Simulations 
+
+We show in Figure 1 the injection and recovery re-sults of using our method with the idealistic simulations. For the simulation which is meant to mimic an isotropic GWB by drawing the correlations from normal distri-butions centered on the HD curve, we find the preferred mesh is the lowest HEALPix resolution, with the am-plitude posteriors all consistent with an isotropic GWB. For the simulation which uses the exact analytic cross-correlations produced by the anisotropic GWB repre-sented in the lower left panel of the figure, the preferred mesh is identical to the injected mesh, and the recov-ered pixel amplitudes are consistent with the injections. Since the Mollweide projections require a point estimate of the pixel amplitudes rather than being able to repre-sent the whole posterior, we show trace plots and his-tograms of 1d-marginalized posteriors of the pixel an-gular power densities in the left column of Figure 2 for comparison between the injected and recovered ampli-tudes. It can be seen from that column that the sampler achieves good mixing within the model and that the re-covered amplitudes are consistent with the injections, while the right column of Figure 2 shows good mixing between models. This simulation verifies the ability of our sampler in recovering multiple pixels of excess angu-lar power density and to recover appropriate resolutions for each region of excess angular power density (in this case, one at Nside = 4 and one at Nside = 16). 3.2. Realistic Simulations 
+
+To mimic the real data analysis pipeline used in PTA map-making of the GWB, we also generate simulations starting at the level of the TOAs as described in Sec-tion 2.8. Following standard PTA methods, we use 
+
+ENTERPRISE and PTMCMCSampler to conduct a broken power law (BPL) analysis and then a power law (PL) analysis for each simulation. We fix the measurement (“white”) noise parameters to their true values in both analyses. We use the BPL analysis to determine an ap-propriate number of Fourier modes for the GWB model, and we then estimate the red noise and GWB parame-ters from the PL analysis with the inferred number of modes. As in G. Agazie et al. (2023c); K. Grunthal et al. (2025); K. A. Gersbach et al. (2025), we next use the pair-covariant PFOS framework to estimate cross-correlations and the covariance matrix as described in Section 2.1. Using the resulting cross-correlations and covariance matrix to compute the likelihood in Equation 2, we run our sampler for each of the three realistic simulations described in Section 2.8. We show in Figure 3 the pre-ferred models, with the pixel amplitudes shown being the modes of the 1d-marginalized posteriors. We find that for the isotropic GWB injection, the preferred mesh is the lowest resolution HEALPix mesh, and integrating the angular power density point estimate (shown in the Mollweide projection) over the sky gives a characteristic strain of 8 × 10 −15 . Integrating each sample in the pos-terior gives a minimum characteristic strain of 2 × 10 −17 
+
+and maximum of 2 × 10 −14 . The injected GWB has a characteristic strain of 4 × 10 −15 at this frequency. For the simulation which includes an injected CW with chirp mass 10 9M⊙, the preferred mesh is again the lowest resolution mesh except for the pixel containing the sky location of the injected CW, which is split once so that the anisotropy induced by the CW is localized to a pixel with resolution Nside = 2. As an example of how our method produces Bayes factors, the preferred mesh has ∼ 600 , 000 samples in a chain of 10 6 iterations, and the mesh which is the same but one step further in res-olution (i.e., Nside = 4 for the pixel containing the sky location of the CW) has ∼ 4, 000 samples. The Bayes factor between these two meshes is ∼ 150 ± 2 in favor of the mesh with the Nside = 2 pixel, and the uncertainties represent 1 − σ uncertainties from bootstrap resampling as mentioned in Section 2.5. The base HEALPix mesh has even less posterior odds, with only ∼ 800 samples, and ranks as the 74th model; the Bayes factor between the preferred mesh and the base mesh is 720 ± 30. Inte-grating the point estimate shown for the angular power density shown in Figure 3 for this simulation gives a characteristic strain of 2 × 10 −14 . The strain amplitude of the injected CW is 6 × 10 −15 , although the frequency at which it is injected is at 6 .8/T span while the analysis results correspond to 7 /T span . Integrating each sample of the posterior separately gives a minimum character-istic strain of 1 × 10 −14 and maximum of 3 × 10 −14 .The results for the 10 10 M⊙ chirp mass injected bi-nary simulation show a preferred mesh that achieves much higher resolution than the previous two simula-tions, with the anisotropy induced by the CW localized to a pixel of resolution Nside = 64. Note that this Nside 
+
+is the upper bound of our prior, so we perform a second analysis in which we allow Nside to reach 256, but the preferred mesh is the same, so this result is not an arti-fact of the prior choice. Integrating the point estimate angular power density in Figure 3 gives a characteristic strain of 1 × 10 −12 , and the injected strain amplitude of the CW is 3 × 10 −13 . Integrating each sample in the posterior gives a minimum and maximum characteris-tic strain of ±1% of the point estimate, so the injected strain amplitude is excluded from the posterior. 90 π/ 2 π
+
+Angular separation [rad] 
+
+> −0.4
+> −0.20.00.20.40.6
+> ρ
+> simulated HD
+
+0.6 0.8 1.0 1.2 1.4
+
+P ( ˆΩ) 
+
+250 500 750 1000 1250 1500 
+
+P ( ˆΩ) 
+
+250 500 750 1000 1250 1500 
+
+P ( ˆΩ) 
+
+Figure 1. Injection and recovery summary plots for the idealistic datasets. The left column represents the injections, and the right column shows the preferred mesh from each analysis with the plotted angular power densities being point estimate summary statistics taken from the posteriors. The point estimate we use is the mode of the 1d-marginalized posterior of each pixel. Top Row: The simulation in which the cross-correlations are drawn from independent normal distributions around the HD curve, representing an isotropic GWB with noise. Bottom Row: The simulation in which the exact analytic cross-correlations are used in order to test the ability of the sampler in recovering a high-resolution anisotropy as well as multiple hotspots. This simulation involves a base isotropic GWB with two pixels of increased angular power density and at higher resolutions. The preferred mesh and inferred angular power densities shown in the right column indicate the sampler succeeded in both simulation tests. The simulation represented in the bottom row is the same as that represented in the left column of Figure 2. The cyan markers in the Mollweide projections show the positions of the simulated pulsars. 
+
+3.3. Impact of Choice of Initial Mesh 
+
+By default, our sampler begins with a single-resolution mesh with Nside = 1, but the starting resolution or start-ing mesh can be specified by the user. Of course, it is less computationally expensive to begin a sampler near the mode of the posterior than in a region of low support. We would like to verify however that the performance of the sampler is independent of the starting mesh and that the inference is not biased by such an initialization. To do so, we reanalyze the realistic simulation containing a 10 9M⊙ chirp mass binary but beginning the sampling with a multi-resolution mesh which has Nside = 64 at the location of the CW and decreases in resolution to 
+
+Nside = 1 following a multivariate normal, produced us-ing a built-in mhealpy method and documented in its set of tutorials. We show in the bottom right panel of Figure 2 the trace plot of the number of pixels at each iteration of the algorithm for the two different initial meshes. As can be seen, the sampler moves efficiently across models until convergence. This shows that our sampler is robust to being initialized in poor regions of the space of models and that our inference is unaffected by starting with a convenient mesh. 3.4. Information Criterion Analysis Results 
+
+To verify the rapid frequentist method proposed in Section 2.7, we use the method to analyze the realistic set of three simulations. We perform a few iterations for each simulation and show both the AIC and BIC as a function of iteration number in Figure 4, although the 10 0 2000 4000 6000 8000 10000 12000 Iteration number                       
+
+> −6
+> −4
+> −202log  P
+> samples injected 0100000 200000 300000 400000 500000 600000 Iteration number 20 40 60 80 100
+> Npix
+> −6−4−202log P
+> 10 −3
+> 10 −2
+> 10 −1
+> 10 0
+> 10 1
+> 10 2
+> PDF samples injected 10 010 110 210 310 410 510 6
+> Iteration number 10 2
+> Npix
+> Nside = 64 initialization
+> Nside = 1 initialization 3.175 3.200 3.225
+
+Figure 2. Diagnostics of the sampler’s performance. The left column represents posteriors (after thinning) for the angular power density of the preferred mesh for one of the simulations used in this work. Top left: Trace plots of the angular power density of each pixel in the mesh, with the recovered values shown in black and the injected values shown with dashed blue lines. This shows the sampler achieves good mixing within a given model. Bottom left: Histograms of the 1d-marginalized posteriors for each pixel, and an inset plot showing the histogram for the pixel with the largest angular power density, better showing the shape of the posterior. The notable differences in shape of posterior indicate the importance of using well-designed transition kernels. Top right: Number of pixels as a function of iteration number for one of the simulations in this work. The number of pixels changes rapidly through the sampling, indicating the sampler achieves good mixing between models. Note also that the number of pixels does not correspond one-to-one to the different models; in general, each value of Npix corresponds to many distinct meshes. For example, in the chain here, there are ∼47000 meshes visited by the sampler. Bottom right: Number of pixels as a function of iteration number of the sampler for two different chains. One chain is initialized with Nside = 1, and the other chain is initialized with pixels near the injected CW source having Nside = 64. The two chains become indistinguishable within a few hundred iterations despite the much higher initial resolution. This shows that the sampler can rapidly and efficiently traverse inter-model space when initialized far from the preferred mesh. 
+
+values shown are normalized by dividing by the mini-mum value for each respective statistic. We present the preferred models and the MLE angular power densities in Figure 5. For one simulation, we also show the esti-mated 1 −σ uncertainties on the angular power densities in Figure 6 overlaid on histograms of the inferred angu-lar power densities from the corresponding RJMCMC analysis. The preferred mesh is the same whether one uses the AIC or BIC for two of the simulations, but the pre-ferred mesh is different between the two statistics for the simulation which contains a 10 9M⊙ chirp mass bi-nary. In this case, the mesh preferred using the AIC almost matches that of the RJMCMC analysis but con-tains an extra split pixel. This is because of the choice of threshold percentage of the integrated angular power density we use in this example; repeating the analysis with a lower threshold results in the same mesh being selected using the AIC as the mesh preferred from the RJMCMC analysis. In the case of the simulation with no injected CW, the two information criteria and the RJMCMC analysis indicated the same preferred model, the base resolution HEALPix tessellation. For the sim-ulation containing a 10 10 M⊙ chirp mass binary, the pre-11 1 2 3 4 5 6 7
+
+hc( ˆΩ) ×10 −15 
+
+0.5 1.0 1.5 2.0 2.5 3.0 3.5
+
+hc( ˆΩ) ×10 −14 
+
+0.5 1.0 1.5 2.0 2.5
+
+hc( ˆΩ) ×10 −11 
+
+0.5 1.0 1.5 2.0 2.5
+
+hc( ˆΩ) ×10 −11         
+
+> Figure 3. Projections of the preferred mesh from the realistic set of simulations. The top left plot corresponds to a simulation in which only an isotropic GWB was injected. The top right plot corresponds to a simulation in which a 10 9M⊙chirp mass binary was injected at the position marked with a blue x. The bottom plots correspond to a simulation in which a 10 10 M⊙
+> chirp mass binary was injected (at the position marked with a blue x in the right plot), with the left plot being a Mollweide projection of the whole sky and the right plot being a 10 ◦×10 ◦Cartesian projection centered on the location of the injected binary. Note that the quantity plotted here is the angular power density, so one must integrate these values over the sphere to get the characteristic strain of the GWB. Altogether, these results give further verification to the sampler and indicate that the counting argument conventionally used would lead to over-resolution in most sky locations and under-resolution when the signal is loud enough, emphasizing the importance of data-driven methods.
+
+ferred model is the same whether one uses the AIC or BIC, but this model is different than the model pre-ferred through an RJMCMC analysis as can be seen in Figure 3. This is because the frequentist method we use increases the resolution at the locations of highest in-tegrated angular power density and so cannot explore models which contain higher resolution pixels with low integrated angular power density unlike the RJMCMC sampler which is more flexible.  
+
+> 4.
+
+DISCUSSION AND CONCLUSION Our set of simulation tests show that the sampler per-forms well; as shown in Figure 2, it achieves good mixing both within models and between models, and it accu-rately recovers injected angular power densities. Addi-tionally, the choice of initial mesh does not bias the in-ference; the sampler moves efficiently across model space towards the mode of the posterior as seen in the bottom right panel of Figure 2. The preferred mesh for the two simulations represen-tative of isotropic GWBs – one at the cross-correlation level with idealized noise and one at the TOA level with realistic noise levels – is the base resolution HEALPix mesh. This is a natural consequence of Bayes’ theorem, whereby models with fewer parameters are preferred over more complex models which do not fit the data substantially better. Using an RJMCMC sampler en-ables automatic application of this principle and there-fore avoids overfitting (and underfitting). In contrast, if one were to use a counting argument and set Nside = 8 (768 pixels) for the realistic simulations (which had 990 pulsar pairs) and Nside = 15 (2700 pixels) for the ide-alistic simulations (which had 2775 pulsar pairs), this 12 0 1 2 31.00 1.02 1.04 Normalized IC 0 1 2 31.00 1.02 1.04 Normalized IC 0 1 2 3 4 5Iteration number 1.00 1.02 1.04 Normalized IC  AIC BIC       
+
+> Figure 4. The AIC and BIC divided by their respective min-imum value over several iterations of the frequentist method described in Section 2.7. The panels correspond to the real-istic simulations having no CW, a 10 9M⊙chirp mass binary, and a 10 10 M⊙chirp mass binary, respectively, from top to bottom. The minimum AIC and BIC is attained after four iterations for the 10 10 M⊙chirp mass binary simulation, but the minimum AIC and BIC correspond to zero iterations for the simulation with no injected CW. For the simulation with a 10 9M⊙binary, the two information criteria disagree slightly, with the BIC favoring a base resolution HEALPix tessellation and the AIC favoring one iteration more. We show the corresponding preferred meshes and MLE angular power densities in Figure 5. The first two information crite-ria values for the bottom panel are not shown as we truncate the y-axis for legibility.
+
+would result in overfitting the data in every sky loca-tion for most of the simulations and would even result in underfitting for the dataset with the 10 10 M⊙ chirp mass binary injected. An additional, related benefit of this method is that the number of parameters in the sky map decreases by approximately one to three orders of magnitude, drastically reducing computational expense. We also developed an alternative, significantly faster frequentist method based on information criteria. While being much faster than an RJMCMC analysis, it loses the purely data-driven nature of the RJMCMC algo-rithm and introduces several arbitrary choices. In par-ticular, one must choose a method for exploring models as it is computationally infeasible to compute the infor-mation criterion for every mesh since the model space is so numerous. We follow the method of L. P. Singer & L. R. Price (2016) in that we start at a uniform resolu-tion and iterate by splitting some user-specified thresh-old percentage of the integrated angular power density. In addition to being less data-driven, this method does not allow for straightforward model comparison between each pair of meshes; in contrast, the RJMCMC sampler automatically produces Bayes factors estimates for ev-ery pair of meshes explored. Despite these flaws, we find the method works well in rapidly approximating the preferred mesh that the more robust sampling produces. This can be seen by comparing Figures 3 and 5. The maximum-likelihood point estimates for the angular power density are gener-ally consistent with the posteriors, and the frequentist uncertainties on the angular power density are also in good agreement with the posteriors as can be seen in Figure 6. The profile likelihood method we use for un-certainties is able to capture asymmetries in the uncer-tainties and allows it to be applied to upper-limit type pixels whereas a Fisher estimate would likely perform poorly in such cases (and cannot produce asymmetric uncertainties). As with Fisher estimates and Bayesian inference, the method is able to account for covariances between pixels since the values of other pixels are opti-mized as functions of the pixel under consideration. Some of the results for the realistic simulations may seem unintuitive. In particular, the simulation with no CW injected results in strong overdensities of angular power in parts of the sky despite the injected GWB be-ing isotropic. This result is consistent between the sam-pler and the frequentist method. To verify this is not unique to our new methods, we calculate a standard fre-quentist MLE with the square-root spherical harmonic basis (S. Banagiri et al. 2021; E. Payne et al. 2020; S. R. Taylor et al. 2020) as in, e.g., G. Agazie et al. (2023c); K. A. Gersbach et al. (2025) with the same set of cross-correlations and covariance matrix, and we find the same overdensity in the recovered sky map, indicating this is intrinsic to the simulated data and is not an issue with our methods. Another result that may seem unintuitive is that, for the realistic simulation with a 10 10 M⊙ chirp mass binary injected, the preferred mesh selected through our RJM-CMC sampler may appear to be a worse model than the preferred mesh selected through the AIC and BIC since the pixel of maximum angular power density does not 13 1 2 3 4 5 6 7 8
+
+hc( ˆΩ) ×10 −15 
+
+0.5 1.0 1.5 2.0 2.5 3.0
+
+hc( ˆΩ) ×10 −14 
+
+0.2 0.4 0.6 0.8 1.0 1.2 1.4
+
+hc( ˆΩ) ×10 −11 
+
+0.2 0.4 0.6 0.8 1.0 1.2 1.4
+
+hc( ˆΩ) ×10 −11        
+
+> Figure 5. The preferred meshes and MLE angular power densities from the AIC results shown in Figure 4. The top left Mollweide projection corresponds to the GWB-only simulation, the top right corresponds to the 10 9M⊙chirp mass binary injection, and the bottom row corresponds to the 10 10 M⊙chirp mass binary injection, with the left being an all-sky view and the right being a 10 ◦×10 ◦Cartesian projection centered on the sky location of the injected CW.
+
+contain the injected CW and because there are regions of the sky with low angular power density but higher resolution. As a quick test, we perform numerical opti-mization of the likelihood for each of the two preferred meshes and find that the mesh selected by RJMCMC corresponds to a maximum log-likelihood greater than that of the AIC and BIC mesh by ∼ 100. These counter-intuitive effects are likely due to realization-dependent noise fluctuations in the process of simulating the TOAs for each dataset. Finally, we note that our sampler and methods do not depend fundamentally on the frequentist cross-correlation likelihood in Equation 2, so one could use a Bayesian likelihood at the level of the TOAs instead of the likelihood we use in this work. However, the sampler does require JAX -based likelihoods, e.g. for automatic differentiation, so this likelihood could be constructed with Discovery (M. Vallisneri et al. 2025). ACKNOWLEDGMENTS T.T.M. thanks Rutger van Haasteren for sandboxing 
+
+libstempo . T.T.M and N.S.P. acknowledge support from startup funds from Texas Tech University. The authors acknowledge the High Performance Computing Center (HPCC) at Texas Tech University for providing computational resources that have contributed to the research results reported within this paper. Some of the results in this paper have been derived using the healpy 
+
+and HEALPix packages. AUTHOR CONTRIBUTIONS T.T.M. conceived of the project, implemented the sampler, performed the analyses, produced the plots, and wrote the manuscript. N.S.P. provided guidance throughout. 
+
+# Software: Defiant (K. A. Gersbach et al. 2025), ENTERPRISE (J. A. Ellis et al. 2020), 
+
+enterprise extensions (S. R. Taylor et al. 2021), 
+
+FastShermanMorrison (R. van Haasteren 2023), 14 −6 −4 −2 0 2log P 
+
+> 0500 1000 1500 2000 2500 Number of samples 1.75 2.00
+
+Figure 6. Comparison of frequentist uncertainties us-ing profile likelihoods with 1d-marginalized posteriors from RJMCMC sampling for the realistic simulation containing an injected 10 9M⊙ chirp mass binary. The blue histograms represent the marginalized posteriors, and the black vertical lines represent the frequentist 1 − σ levels. The inset plot shows the posterior for the pixel containing the sky location of the injected CW, and the black vertical lines represent the 1 − σ levels along with the MLE angular power density for that pixel. This shows validation of our frequentist un-certainties and also shows that these methods are able to capture asymmetries in the uncertainties. For legibility, we only show one upper-limit posterior. 
+
+healpy (A. Zonca et al. 2019), JAX (J. Brad-bury et al. 2018), JAXopt (M. Blondel et al. 2021), la forge (J. S. Hazboun 2020), libstempo 
+
+(https://github.com/vallis/libstempo), MAPS (N. Pol et al. 2022), Matplotlib (J. D. Hunter 2007), mhealpy 
+
+(I. Martinez-Castellanos et al. 2024), Numba (S. K. Lam et al. 2015), NumPy (C. R. Harris et al. 2020), 
+
+Optimistix (J. Rader et al. 2024), PTMCMCSampler 
+
+(J. Ellis & R. van Haasteren 2017), Resolve 
+
+(https://github.com/TTMoursy/Resolve), SciPy (P. Virtanen et al. 2020) REFERENCES 
+
+Afzal, A., Agazie, G., Anumarlapudi, A., et al. 2023, The Astrophysical Journal Letters, 951, L11, doi: 10.3847/2041-8213/acdc91 Agarwal, D., Romano, J. D., Ali-Ha¨ ımoud, Y., & Smith, T. L. 2026, Addressing leakage and mode suppression in angular power spectrum estimation for gravitational-wave backgrounds using pulsar timing arrays, https://arxiv.org/abs/2602.20075 Agazie, G., Alam, M. F., Anumarlapudi, A., et al. 2023a, The Astrophysical Journal Letters, 951, L9, doi: 10.3847/2041-8213/acda9a Agazie, G., Anumarlapudi, A., Archibald, A. M., et al. 2023b, The Astrophysical Journal Letters, 951, L10, doi: 10.3847/2041-8213/acda88 Agazie, G., Anumarlapudi, A., Archibald, A. M., et al. 2023c, The Astrophysical Journal Letters, 956, L3, doi: 10.3847/2041-8213/acf4fd Agazie, G., Anumarlapudi, A., Archibald, A. M., et al. 2023d, The Astrophysical Journal Letters, 951, L8, doi: 10.3847/2041-8213/acdac6 Alam, M. F., Arzoumanian, Z., Baker, P. T., et al. 2020, The Astrophysical Journal Supplement Series, 252, 4, doi: 10.3847/1538-4365/abc6a0 Ali-Ha¨ ımoud, Y., Smith, T. L., & Mingarelli, C. M. F. 2020, PhRvD, 102, doi: 10.1103/physrevd.102.122005 Ali-Ha¨ ımoud, Y., Smith, T. L., & Mingarelli, C. M. F. 2021, PhRvD, 103, doi: 10.1103/physrevd.103.042009 Allen, B., & Romano, J. D. 2023, PhRvD, 108, doi: 10.1103/physrevd.108.043026 Anholm, M., Ballmer, S., Creighton, J. D. E., Price, L. R., & Siemens, X. 2009, PhRvD, 79, doi: 10.1103/physrevd.79.084030 Arzoumanian, Z., Baker, P. T., Blumer, H., et al. 2020, The Astrophysical Journal Letters, 905, L34, doi: 10.3847/2041-8213/abd401 Banagiri, S., Criswell, A., Kuan, T., et al. 2021, Monthly Notices of the Royal Astronomical Society, 507, 5451–5462, doi: 10.1093/mnras/stab2479 Blondel, M., Berthet, Q., Cuturi, M., et al. 2021, arXiv preprint arXiv:2105.15183 Bradbury, J., Frostig, R., Hawkins, P., et al. 2018, JAX: composable transformations of Python+NumPy programs, 0.3.13 http://github.com/jax-ml/jax Caprini, C., & Figueroa, D. G. 2018, Classical and Quantum Gravity, 35, 163001, doi: 10.1088/1361-6382/aac608 15 
+
+Chen, Y., Zhao, S.-Y., Peng, Z.-Z., et al. 2026, PhRvD, 113, doi: 10.1103/czxp-zrd6 Collaboration, T. L. S., Aasi, J., Abbott, B. P., et al. 2015, Classical and Quantum Gravity, 32, 074001, doi: 10.1088/0264-9381/32/7/074001 Detweiler, S. 1979, ApJ, 234, 1100, doi: 10.1086/157593 Ellis, J., & van Haasteren, R. 2017, jellis18/PTMCMCSampler: Official Release, doi: 10.5281/zenodo.1037579 Ellis, J. A., Vallisneri, M., Taylor, S. R., & Baker, P. T. 2020, ENTERPRISE: Enhanced Numerical Toolbox Enabling a Robust PulsaR Inference SuitE,, Zenodo doi: 10.5281/zenodo.4059815 Fernique, P., Boch, T., Donaldson, T., et al. 2014, MOC -HEALPix Multi-Order Coverage map Version 1.0,, IVOA Recommendation 02 June 2014 doi: 10.5479/ADS/bib/2014ivoa.spec.0602F Flanagan, E. E. 1993, PhRvD, 48, 2389, doi: 10.1103/PhysRevD.48.2389 Gersbach, K. A., Taylor, S. R., B´ ecsy, B., et al. 2025, Mapping the Gravitational-wave Background Across the Spectrum with a Next-Generation Anisotropic Per-frequency Optimal Statistic, https://arxiv.org/abs/2509.07090 Gersbach, K. A., Taylor, S. R., Meyers, P. M., & Romano, J. D. 2025, PhRvD, 111, 023027, doi: 10.1103/PhysRevD.111.023027 Gorski, K. M., Hivon, E., Banday, A. J., et al. 2005, The Astrophysical Journal, 622, 759 Green, P. J. 1995, Biometrika, 82, 711, doi: 10.1093/biomet/82.4.711 Green, P. J., & Mira, A. 2001, Biometrika, 88, 1035, doi: 10.1093/biomet/88.4.1035 Grunthal, K., Champion, D. J., Thrane, E., et al. 2026, Optimising gravitational-wave sky maps for pulsar timing arrays, https://arxiv.org/abs/2601.13957 Grunthal, K., Nathan, R. S., Thrane, E., et al. 2025, MNRAS, 536, 1501, doi: 10.1093/mnras/stae2573 Harris, C. R., Millman, K. J., van der Walt, S. J., et al. 2020, Nature, 585, 357, doi: 10.1038/s41586-020-2649-2 Hastings, W. K. 1970, Biometrika, 57, 97, doi: 10.1093/biomet/57.1.97 Hazboun, J. S. 2020, La Forge, 0.3.0 Zenodo, doi: 10.5281/zenodo.4152550 Hellings, R. W., & Downs, G. S. 1983, ApJL, 265, L39, doi: 10.1086/183954 Hunter, J. D. 2007, Computing in Science & Engineering, 9, 90, doi: 10.1109/MCSE.2007.55 Johnson, A. D., Meyers, P. M., Baker, P. T., et al. 2024, Physical Review D, 109, doi: 10.1103/physrevd.109.103012 Lam, S. K., Pitrou, A., & Seibert, S. 2015, in Proceedings of the Second Workshop on the LLVM Compiler Infrastructure in HPC, LLVM ’15 (New York, NY, USA: Association for Computing Machinery), doi: 10.1145/2833157.2833162 Levenberg, K. 1944, Quarterly of Applied Mathematics, 2, 164. http://www.jstor.org/stable/43633451 Marquardt, D. W. 1963, Journal of the Society for Industrial and Applied Mathematics, 11, 431. http://www.jstor.org/stable/2098941 Martinez-Castellanos, I., Singer, L. P., Burns, E., et al. 2022, The Astronomical Journal, 163, 259, doi: 10.3847/1538-3881/ac6260 Martinez-Castellanos, I., Singer, L. P., Burns, E., et al. 2024, mhealpy: Object-oriented healpy wrapper with support for multi-resolution maps,, Astrophysics Source Code Library, record ascl:2404.023 http://ascl.net/2404.023 Metropolis, N., Rosenbluth, A. W., Rosenbluth, M. N., Teller, A. H., & Teller, E. 1953, JChPh, 21, 1087, doi: 10.1063/1.1699114 Moursy, T. T., Pol, N. S., Agazie, G., et al. 2026, The Astrophysical Journal, 1008, 205, doi: 10.3847/1538-4357/ae9759 Nocedal, J., & Wright, S. J. 2006, Numerical Optimization (Springer New York, NY) Oliver, D. J., Hazboun, J. S., Maggi, M., Baier, J. G., & Gourlie, K. E. 2026, Directional Anisotropic Sensitivity Curves for Pulsar Timing Arrays, https://arxiv.org/abs/2608.00250 Payne, E., Banagiri, S., Lasky, P. D., & Thrane, E. 2020, PhRvD, 102, 102004, doi: 10.1103/PhysRevD.102.102004 Pol, N., Taylor, S. R., & Romano, J. D. 2022, The Astrophysical Journal, 940, 173, doi: 10.3847/1538-4357/ac9836 Rader, J., Lyons, T., & Kidger, P. 2024, arXiv:2402.09983 Reinecke, M., & Hivon, E. 2015, A&A, 580, A132, doi: 10.1051/0004-6361/201526549 Romano, J. D., & Cornish, N. J. 2017, Living reviews in relativity, 20, 2 Romano, J. D., Hazboun, J. S., Siemens, X., & Archibald, A. M. 2021, Physical Review D, 103, doi: 10.1103/physrevd.103.063027 Sazhin, M. V. 1978, Soviet Ast., 22, 36 Semenzato, F., Bellomo, N., Raccanelli, A., & Mingarelli, C. M. F. 2025, Bias from small-scale leakage in Pulsar Timing Array maps, https://arxiv.org/abs/2510.24857 16 
+
+Singer, L. P., & Price, L. R. 2016, PhRvD, 93, doi: 10.1103/physrevd.93.024013 Sorber, L., Barel, M. V., & Lathauwer, L. D. 2012, SIAM Journal on Optimization, 22, 879, doi: 10.1137/110832124 Taylor, S. R., Baker, P. T., Hazboun, J. S., Simon, J., & Vigeland, S. J. 2021, enterprise extensions, https://github.com/nanograv/enterprise extensions Taylor, S. R., van Haasteren, R., & Sesana, A. 2020, PhRvD, 102, 084039, doi: 10.1103/PhysRevD.102.084039 Taylor, S. R., Mingarelli, C. M. F., Gair, J. R., et al. 2015, Phys. Rev. Lett., 115, 041101, doi: 10.1103/PhysRevLett.115.041101 Tierney, L., & Mira, A. 1999, Statistics in Medicine, 18, 2507, doi: https://doi.org/10.1002/(SICI)1097-0258(19990915/ 30)18:17/18 ⟨2507::AID-SIM272 ⟩3.0.CO;2-J Vallisneri, M., Meyers, P. M., Wright, D., et al. 2025, nanograv/discovery: 0.5.1, 0.5.1 Zenodo, doi: 10.5281/zenodo.17711454 van Haasteren, R. 2023, fastshermanmorrison-pulsar: Fast Sherman-Morrison Updates for Pulsar Timing, 0.5.4 GitHub, doi: 10.5281/zenodo.17439723 Virtanen, P., Gommers, R., Oliphant, T. E., et al. 2020, Nature Methods, 17, 261, doi: 10.1038/s41592-019-0686-2 Youngren, R. W., & Petty, M. D. 2017, Heliy, 3, doi: 10.1016/j.heliyon.2017.e00332 Zonca, A., Singer, L., Lenz, D., et al. 2019, Journal of Open Source Software, 4, 1298, doi: 10.21105/joss.01298
