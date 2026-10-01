@@ -1,6 +1,9 @@
 * <a class="dpr-sidebar-root-link" href="#/">首页</a>
 * <a class="dpr-sidebar-root-link dpr-sidebar-noactive-link" href="javascript:void(0)" data-dpr-hash="#/tutorial/README">使用教程</a>
 * Daily Papers
+  * 2026-10-01 <!--dpr-date:20261001-->
+    * 速读区
+      * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202610/01/2609.34816v1-prompt-and-afterglow-constraints-on-the-central-engine-of-grb-240825a" data-sidebar-item="{&quot;title&quot;: &quot;Prompt and Afterglow Constraints on the Central Engine of GRB 240825A&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2609.34816v1-prompt-and-afterglow-constraints-on-the-central-engine-of-grb-240825a&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;pulsar-frb&quot;}], &quot;evidence&quot;: &quot;毫秒磁星中心引擎及其自转减慢与磁弹性振荡&quot;}">Prompt and Afterglow Constraints on the Central Engine of GRB 240825A</a>
   * 2026-09-30 <!--dpr-date:20260930-->
     * 速读区
       * <a class="dpr-sidebar-item-link dpr-sidebar-item-structured" href="#/202609/30/2609.32726v1-pulse-profiles-of-tall-accretion-columns-in-x-ray-pulsars" data-sidebar-item="{&quot;title&quot;: &quot;Pulse profiles of tall accretion columns in X-ray pulsars&quot;, &quot;link&quot;: &quot;https://arxiv.org/abs/2609.32726v1-pulse-profiles-of-tall-accretion-columns-in-x-ray-pulsars&quot;, &quot;score&quot;: &quot;6.0&quot;, &quot;tags&quot;: [{&quot;kind&quot;: &quot;query&quot;, &quot;label&quot;: &quot;pulsar-frb&quot;}], &quot;evidence&quot;: &quot;吸积X射线脉冲星中磁化中子星的脉冲轮廓&quot;}">Pulse profiles of tall accretion columns in X-ray pulsars</a>

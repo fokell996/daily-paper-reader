@@ -6,27 +6,28 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-09-30
-- 运行时间：2026-09-30 22:36:26 UTC
+- 最新运行日期：2026-10-01
+- 运行时间：2026-10-01 23:16:44 UTC
 - 运行状态：成功
-- 本次总论文数：2
+- 本次总论文数：1
 - 精读区：0
-- 速读区：2
+- 速读区：1
 
 ### 今日简报（AI）
-2026-09-30 日报精选 2 篇速读，聚焦 X 射线脉冲星与核心坍缩超新星引力波。两篇均获 6.0 分，分别探讨吸积柱脉冲轮廓和引力波对前身星、自转及核物态的依赖。对天体物理感兴趣的读者可从这两篇入手，感受致密星与引力波前沿的交叉魅力。
-- 详情：[/202609/30/README](/202609/30/README)
+今日速读 1 篇、精读 0 篇，唯一入选的是伽马暴 GRB 240825A 的中心引擎研究。
+
+值得一看的是它用瞬时辐射与余辉的联合观测来约束中心引擎，属"多波段联手反推天体内部"的思路（评分 6.0，中等水平）。
+
+普通读者可先看该文的摘要与结论图，把它当作伽马暴中心引擎的入门案例，无需深究模型细节。
+- 详情：[/202610/01/README](/202610/01/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Pulse profiles of tall accretion columns in X-ray pulsars](/202609/30/2609.32726v1-pulse-profiles-of-tall-accretion-columns-in-x-ray-pulsars)  
+1. [Prompt and Afterglow Constraints on the Central Engine of GRB 240825A](/202610/01/2609.34816v1-prompt-and-afterglow-constraints-on-the-central-engine-of-grb-240825a)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：吸积X射线脉冲星中磁化中子星的脉冲轮廓
-2. [Gravitational Waves from Core-Collapse Supernovae: Dependence on the Progenitor Star, Rotation Rate and Nuclear Equation of State](/202609/30/2609.34405v1-gravitational-waves-from-core-collapse-supernovae-dependence-on-the-progenitor-star-rotation-rate-and-nuclear-equation-of-state)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：核状态方程对核坍缩超新星引力波辐射的影响
+   evidence：毫秒磁星中心引擎及其自转减慢与磁弹性振荡
 
 
 <div class="dpr-home-promo-card">
