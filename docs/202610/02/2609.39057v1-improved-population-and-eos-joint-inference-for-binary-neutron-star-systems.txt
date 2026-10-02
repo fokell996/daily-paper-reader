@@ -1,0 +1,611 @@
+Title: Improved Population and EOS Joint Inference for Binary Neutron Star Systems
+
+URL Source: https://arxiv.org/pdf/2609.39057v1
+
+Published Time: Thu, 01 Oct 2026 01:11:38 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Improved Population and EOS Joint Inference for Binary Neutron Star Systems 
+
+Marc Ebiri 1 and Richard O’Shaughnessy 1
+
+> 1
+
+Center for Computational Relativity and Gravitation, Rochester Institute of Technology, Rochester, New York 14623, USA 
+
+The extreme environment within neutron stars presents the opportunity to probe the nuclear equa-tion of state at high densities while studying the properties of these stellar remnants. Historically, the equation of state and neutron star mass distribution have been inferred separately, with the latter often simply assumed to be fixed in studies of the former, but the dependence of the equation of state on neutron star mass indicates they should be inferred together. In this work, we extend the generalized version of the popular RIFT algorithm known as HyperPipe to interface with flexi-ble, user-provided priors that will facilitate joint inference of equation of state and binary neutron star population hyperparameters. We demonstrate this framework’s utility via application to a combination of several existing observations, particularly including massive galactic pulsars, double neutron star systems, millisecond X-ray pulsars, the gravitational wave event GW170817 and the nuclear symmetry energy, within the context of a widely-adopted parametric EOS family and a simple Gaussian population model. We recover parameters consistent with previous analyses of the EOS and binary neutron star population, finding the latter to fit a bivariate normal distribution with mean ( μ1, μ 2) = (1 .39 , 1.27) M⊙ and width σ = 0 .08 M⊙. Furthermore, we implement novel coordinate transformations in our pipeline, with which we have discovered that the ad hoc prior boundaries used for this EOS family may be too restrictive. We present results with relaxed yet still physical prior boundaries, noting vastly improved hyperparameter posteriors and modestly different equation of state inferences. 
+
+I. INTRODUCTION 
+
+The nuclear equation of state (EOS) - the relationship between pressure and density in cold nuclear matter -remains weakly constrained by terrestrial experiments, with differences having substantial impact on the pre-dicted properties of neutron stars [1, 2]. Astrophysical observations of neutron star systems, however, provide a natural mechanism by which to investigate the nu-clear EOS, and countless studies have therefore sought to constrain it via measurements of neutron stars (NS), improving and refining their estimates as more observa-tions have become available; e.g., [3–10]. For example, the size of isolated, rotating neutron stars is encoded in the pulsed X-ray emission from their surface, allowing observations and theoretical modeling of galactic X-ray sources to limit the range of possible neutron star mass-radius relationships [11–14]. Meanwhile, neutron stars in coalescing binaries are subject to strong tidal interactions in the late stages of inspiral, which have an observable impact on the outgoing gravitational wave signal [15–17] and thus enable constraints on the nuclear EOS [18–20]. With GW170817, the imprint of these tidal interactions on the inspiral signal was first constrained [3, 21–23], af-fording widely-investigated implications for the nuclear equation of state (e.g., [4]). Previous studies (e.g., [6, 8, 24]) have sought to con-strain the nuclear EOS by joining together distinct mea-surements of NS properties, but many of these analyses chose to assume the distribution of the corresponding NS population rather than infer it, often selecting a uni-form distribution or, rarely, a more complex model (e.g., [25]). However, this approach introduces biases into the inference [26], since there exists an inherent relationship between a neutron star’s equation of state and its mass encoded in its tidal deformability [27]. It is therefore logical to estimate these properties simultaneously. In this work we extend the general-purpose code pipeline called HyperPipe introduced by Kedia et al. [24], itself a generalization of the RIFT inference engine [28], to implement a flexible method for simultaneously inferring the binary NS population and the nuclear EOS. Similar recent studies [29–31] have pursued this goal us-ing distinct methodologies; our approach largely paral-lels that of [25], except that we choose a simpler popula-tion model, since our focus is primarily on implementing backend code that can support those more sophisticated models in future studies. In addition, we implement two other significant improvements to HyperPipe , adopting a superior coordinate system for fitting our hyperparam-eter posteriors and altering how our code explores the hyperparameter space to increase our efficiency. While doing so, we also investigate the suitability of the prior bounds typically employed for our EOS model. We organize the present work as follows. Section II details our inference framework and priors, Section III outlines the data sources we incorporate and their corre-sponding likelihood factors, while Section IV overviews our inference pipeline and our modifications to it. Sec-tion V presents and discusses our results, and Section VI concludes with a note on how they can be further improved with new data in the future. 
+
+II. JOINT INFERENCE FRAMEWORK 
+
+Bayesian inference expresses the posterior distribution 
+
+p(Y| d) as a likelihood L(d|Y ) times a prior p(Y) and a normalization factor C [32]: 
+
+p(Y| d) = C L(d|Y ) p(Y) (1) arXiv:2609.39057v1 [astro-ph.HE] 30 Sep 2026 2where C is called the “evidence” and can be defined as: 1
+
+C ≡
+
+Z
+
+dYL (d|Y )p(Y) (2) Our goal, then, is to estimate p(Y| d) via the HyperPipe 
+
+algorithm, which takes in the data d to compute Eqns. 1 and 2 simultaneously via iterative calculations of 
+
+L(d|Y )p(Y) (see Sec. IV). Furthermore, since indepen-dent observations of an event possess independent sta-tistical uncertainties and are associated with distinct as-trophysical phenomena, we can combine multiple obser-vations together via the product of their individual like-lihoods. Thus, for a set of hyperparameters Y with a prior p(Y), we can expand the likelihood in Eq. (1) as a product of likelihood functions of the form: 
+
+Lnet (Y) = 
+
+"Y
+
+> k
+
+Dk(Y)
+
+#"Y
+
+> g
+
+Eg (Y)
+
+#"Y
+
+> n
+
+Zn(Y)
+
+#
+
+C(Y) S(Y)(3) In this equation, k indexes DNS mass observations, g
+
+indexes gravitational wave observations, and n indexes x-ray neutron star observations. We detail each of these factors and their corresponding data sources in Sec. III. First, however, we describe our prior models for the EOS and population hyperparameters, since all of these fac-tors depend in some fashion on assumptions about the NS populations responsible for the associated events, which we encode in the prior model p(Y). For brevity, hereafter we use a subscript α to refer to an expression conditioned on a specific EOS realization; i.e., Y = {Y α}. 
+
+> A. EOS framework
+
+The structure of neutron stars in a static, spheri-cally symmetric limit is governed by the TOV equations [33, 34]. Solving these equations requires a mass-radius relation m(r), dependent on the baryon density ρ, and a pressure-density relation P (ρ): the equation of state. Following previous work (e.g., [4, 5, 13, 25]), we employ the spectral EOS parameterization introduced by Lind-blom [35, 36], which approximates the zero-temperature adiabatic index Γ( p) as a 4-term power series expan-sion in the basis of a dimensionless pressure variable 
+
+x = log( p/p 0): Γ( p) = exp 
+
+" 3X
+
+> k=0
+
+γk (log p/p 0)k
+
+#
+
+(4) The reference pressure p0 is often (e.g., [37]) taken to be the pressure at half the nuclear saturation density, 
+
+p0 = nsat /2, in accordance with the calculation in [7] that it is approximately the crust-core transition den-sity. While we do not explicitly enforce other typical constraints (e.g., bounding the adiabatic index) on this model, our TOV solver only allows equations of state that are nearly causal, so any highly unphysical samples are rejected by default in our algorithm. The hyperparameter ranges we employ for these γk
+
+coordinates, which were introduced in [5] and have be-come customary for EOS inference using GW data, are shown in the top row of Table I below. Unfortunately, as noted in [25], the only EOS realizations produced by the spectral decomposition model that are physically al-lowed lie in a narrow, strongly-correlated subspace V of the conventional four-dimensional Cartesian space C with coordinates γk, occupying a region only V ≃ 0.005% of 
+
+C. Because the axes of C do not align with the axes that would define the subspace V, sampling along them is mas-sively inefficient: for example, for a posterior grid created on the first iteration of a HyperPipe analysis using Eq. (3), only ∼ 1% of the samples drawn were physical. In this work, we endeavor to mitigate this issue by in-troducing two new strategies in our sampling algorithm: a rotated coordinate system, described below, and a re-flection mechanism, described in Sec. IV. As a result, we employ the traditional γk parameter ranges only for the comparative analysis discussed in Appendix A.  
+
+> 1. Rotated Coordinate System
+
+Sampling efficiency can be substantially increased without altering the (local) prior density by using an affine transformation, choosing the coordinate system of a more efficicent hypercube C′ that closely bounds the shape of V, such that uniform sampling produces a much higher fraction of physical EOS realizations. Before fit-ting and sampling our posteriors, then, we rotate the EOS parameter sets Y, which initially lie in the hyper-cube C with axes ( γ0, γ1, γ2, γ3), to the new hypercube 
+
+C′ with axes ( r′
+
+> 0
+
+, r′
+
+> 1
+
+, r′
+
+> 2
+
+, r′
+
+> 3
+
+) using the transformation de-scribed by Wysocki et al. [25]. We apply the inverse of this rotation to the sampled posteriors in r′ 
+
+> i
+
+coordinates to obtain our final posteriors in γk coordinates. For our hyperparameter ranges in the r′ 
+
+> i
+
+coordinates, we adopt the bounds found by [25], reproduced in the second row of Table I. However, note that, due to the necessarily limited sample size used to estimate V, the hypercube C′ formed from these bounds may not enclose all of V. To accomodate this possibility, we simply add a fractional buffer to each of the r′ 
+
+> i
+
+bounds; while this slightly reduces our sampling efficiency, it should ensure that we allow the full space of physical EOS hyperparam-eters to be sampled. To check this expectation, we perform two analyses in this work that are identical except for the size of their buffer factor. Our primary analysis uses the 10% buffer suggested by [25], while our additional test vastly ex-pands the prior ranges with a buffer of 400%. The exact values of these bounds are presented in the bottom two rows of Table I. Although the 10% buffer is expected to encompass all of the physical subspace for valid EOS hy-perparameters, the larger buffer aims to provide a clearer view of how the hyperparameter posteriors behave when sampling in another coordinate system. 3                              
+
+> TABLE I. Hypercube bounds used in our analyses in both the Cartesian γispace Cand in the rotated r′
+> ispace C′, with the latter shown with buffered bounds of 10% and 400%. Hypercube Space γ0γ1γ2γ3
+> C[+0.2, +2.0] [−1.6, +1.7] [−0.6, +0.6] [−0.02, +0.02]
+> r′
+> 0r′
+> 1r′
+> 2r′
+> 3
+> C′[−4.37722, +4.91227] [−1.82240, +2.06387] [−0.32445, +0.36469] [−0.09529, +0.11426]
+> C′+10% [−4.814942, +5.403497] [ −2.004640, +2.270257] [ −0.356895, +0.401159] [ −0.104819, +0.121506]
+> C′+400% [−21 .88610, +24.56135] [−9.11200, +10.31935] [−1.62225, +1.82345] [−0.47645, +0.55230]
+> 2. Initial EOS Samples
+
+For our initial injected EOS samples, we utilize a pub-licly available datafile for GW170817 from the LIGO DCC [38], which contains posterior samples for the 4 Γ-spectral EOS hyperparameters γk. All our initial param-eter sets {Y α} therefore produce a valid EOS model.  
+
+> B. Population model
+
+Efforts to characterize the NS population date back several decades (e.g., [39]), and over time two general ap-proaches have developed. In one approach, neutron stars in different types of systems are treated as entirely sep-arate populations [24, 29, 30, 40–42], while in the other, all NS sources are inferred as part of one universal pop-ulation [25, 43–45]. The latter method requires careful attention towards population selection effects, since neu-tron stars in different species of systems (NS-WD, DNS, LMXB, etc.) can follow different evolutionary paths [29] and indeed seem to fit distinct population distri-butions [30, 42]. We focus only on the binary neutron star (BNS/DNS) population in this work, and thus the mass measurements we incorporate for our population inference, described in Sec. III A, only belong to those systems. In contrast to previous works employing similar like-lihood evaluation techniques, which assumed uniform priors [8, 24] or priors dependent on other parameters [9, 37] for their inference, we assume an independent, non-evolving ([29]) and non-uniform distribution for the BNS population in gravitational mass m. Specifically, we model the population as a truncated multivariate nor-mal distribution, with limits ( m1, m 2) ∈ [1 .0M⊙, 3.0M⊙]and m1 ≥ m2. We therefore extend our set of prior pa-rameters Y to include two population means μ1 and μ2,subject to fiducial bounds 1 .0M⊙ ≤ μ2 ≤ μ1 ≤ 3.0M⊙,and a single uncertainty parameter σ that applies to both means, such that we can infer the BNS population simul-taneously with the EOS within our algorithm. Note that this prior constitutes an assumption about the astrophysical distribution of real neutron stars, which need not reach the maximum mass theoretically allowed by the EOS. Additionally, a fully self-consistent popu-             
+
+> FIG. 1. Initial distribution of population samples ( μ1,μ2), drawn from a multivariate normal with mean ( μ1, μ 2)=(1 .39 ,1.39) M⊙. All population samples throughout the infer-ence procedure in this study are truncated within the shaded triangular region μ2≥1, μ1≤3, μ1≥μ2.
+
+lation model needs to account for parameter-dependent selection effects [26, 46], but to simplify the discussion for our present analysis we neglect these. We generate an initial sample set for the new prior parameters ( μ1, μ 2, σ ) by sampling points from two nor-mal distributions. We draw the means ( μ1, μ 2), sorted to ensure μ1 ≥ μ2, from a two-dimensional distribution with mean values μ1,pop = μ2,pop = 1 .39 M⊙ and width 
+
+σpop = 0 .14 M⊙ in both dimensions, and we draw the widths σ from a one-dimensional distribution with mean 
+
+σpop and standard deviation σpop /4, requiring only that 
+
+σ > 0. We obtain our values for ( μi,pop , σ pop ) from the DNS population parameter results of Anik et al. [29] for their modified linear EOS model; while these val-ues were thus produced via a different EOS model than our own, we use them only as a starting point, much as our initial EOS samples are drawn from previous GW170817 results. This initial population distribution is plotted in Fig. 1 to illustrate the region in which our model is bounded. We append these sets of parameters 
+
+{(μ1, μ 2, σ )} to the EOS samples described in the pre-ceding subsection to form the initial proposed parameter sets Y0 for our inference pipeline. 4In addition to the EOS and masses, we must also as-sume a prior on the NS spin. For our analyses, we employ the usual prior for the aligned spin z-component intro-duced by [28], which distributes the spin isotropically in a sphere and uniformly in magnitude, enforcing a max-imum dimensionless value a = S/m 2 < 0.05 [24]. This prior becomes equivalent to that for uniform spin mag-nitude after marginalizing out other degrees of freedom.  
+
+> III. DATA FACTORS AND SOURCES
+
+We next describe the data and equations utilized in computing each of the factors present in Eq. (3).  
+
+> A. Galactic DNS Masses
+
+The majority of known NS masses have been mea-sured via the binary interactions of galactic radio pulsars, which account for only about 250 of over 3000 known pul-sars [47]. Radio measurements of pulsars in binary sys-tems obtain mass estimates by accounting for a mixture of Keplerian and post-Keplerian effects, most notably the Shapiro time delay (e.g., [48]). These methods have been used to identify neutron stars across a range of masses up to 2.35 M⊙ [49]. For our analysis, we use 11 pairs of DNS masses com-piled by [29], reproduced in Table II and plotted in Fig. 2, to weight the likelihood that any sample drawn from our population distribution is part of the real DNS pop-ulation. For the k-th real mass pair mk = ( m1,k , m 2,k ), this weighting is accomplished by integrating over the product of two-dimensional normal distributions for the sample mass and real mass, as: 
+
+Dk =
+
+Z Z 
+
+N (m|μα, σ α) gk(m|mk, σ k)d2m (5) This integral is performed over a cut-corner-rectangular region, bounded by mk − 3σk ≤ m ≤ mk + 3 σk in both dimensions where those bounds do not exceed our fixed population boundaries of 1 .0M⊙ ≤ m ≤ 3.0M⊙ and 
+
+m1 = m2. The narrow measurement uncertainties σk
+
+on several of these masses cause this factor to strongly downweight any parameter set with masses even slightly distant from this measured population sample.  
+
+> B. Pulsar Maximum Mass
+
+For each EOS there is a maximum possible mass al-lowed by general relativity [50, 51]. As a result, the EOS can be indirectly probed using very massive pul-sars, whose measured masses bound the maximum mass from below and rule out EOS models that are not stiff enough to support such massive stars.                                                                
+
+> TABLE II. Masses and 1-σuncertainties of 11 pairs of DNS systems, organized such that m1> m 2[29]. System m1[M⊙]m2[M⊙]σ1[M⊙]σ2[M⊙]J0453+1559 1.559 1.174 0.004 0.004 J1906+0746 1.322 1.291 0.011 0.011 B1534+12 1.3452 1.3332 0.001 0.001 B1913+16 1.4398 1.3886 0.0002 0.0002 B2127+11C 1.358 1.354 0.01 0.01 J0737-3039AB 1.3381 1.2489 0.0007 0.0007 J1756-2251 1.312 1.258 0.017 0.017 J1807-2500B 1.3655 1.2064 0.0021 0.002 J1518+4904 1.56 1.05 0.13 0.11 J1811-1736 1.56 1.12 0.24 0.13 J1829+2456 1.40 1.20 0.12 0.12
+> FIG. 2. Masses of 11 DNS systems, plotted with their 1-σ
+> errorbars. Several masses have been measured to such high precision that their errorbars are not visible. The shaded area indictates the region to which we constrain the population masses, with bounds 1 M⊙≤m2≤m1≤3M⊙.
+
+We follow [6] in expressing the likelihood of an EOS consistent with the observations of three massive pul-sars, shown in Table III, as the product of three normal distributions: 
+
+Cα = Y
+
+> i
+
+Φ
+
+ Mmax,α − mi
+
+σi
+
+
+
+(6) where Φ( z) is the cumulative distribution function (CDF). These pulsar observations suggest that the max-imum NS mass is larger than 2.1 M⊙, and we therefore apply the product Cα as a constraint factor in Eq. (3), reducing the likelihood of any EOS parameter set Yα
+
+that supports a maximum mass lower than these ob-served masses. The masses of these pulsars are shown as horizontal bands in the mass-radius plot Fig. 3 below. We can also impose a fixed lower bound on the max-imum mass, automatically discarding any EOS with 
+
+Mmax < 1.8M⊙ as unphysical: since we have several well-measured neutron star masses above this bound, there is no point investigating EOS parameters that cannot sup-port them. While it is common practice for physical EOS 5         
+
+> TABLE III. Masses and 1-σuncertainties of three of the most massive pulsars known, as in [6]. Note that we use the newer value for J1614 from [52], while our value for J0740 has been superseded by that in [53]. Pulsar M[M⊙]σ[M⊙]PSR J0740+6620 2.14 0.1 PSR J0348+0432 2.01 0.04 PSR J1614-2230 1.908 0.016
+
+model development to require Mmax > 2.0M⊙ [50], we retain our more generous bound, both to acknowledge the arguments made by [9] (especially since we use data for PSR J1614, with M < 2M⊙) and to let our algorithm reach this conclusion independently via the strong down-weighting provided by Eq. (6). As a result, we find that our posteriors are not significantly affected by which of these cutoff values we employ.  
+
+> C. Gravitational Waves
+
+Neutron stars in coalescing binaries are subject to strong tidal interactions in the late stages of inspiral, which have an observable impact on the outgoing gravi-tational wave signal [15, 16] and thus enable constraints on the nuclear EOS [18–20]. During the late stages of the inspiral of coalescing neutron stars, the gravitational gra-dient across the diameter of one binary component due to its companion’s field induces a quadrupole moment in the star, causing enhanced emission of gravitational radi-ation and a slight acceleration to the inspiral phase. The magnitude of the induced quadrupole moment is related to neutron stars’ internal structure, with larger stars be-ing less compact and thus more easily deformable under the influence of an external field. This effect is quantified through the dimensionless tidal deformability Λ, defined as the ratio of the induced quadrupole moment to exter-nal perturbing tidal field [15]: Λ = 23 k2
+
+ c2rGm 
+
+5
+
+(7) where k2 is the l = 2 Love number, m is the mass, and 
+
+r is the radius. As this equation indicates, the utility of the tidal deformability for EOS inference lies in its uniqueness: there is only one value Λ( m|EOS) for each given set of EOS parameters and mass. Since the individ-ual Λ i for each NS in the binary are strongly correlated and thus difficult to distinguish within an observed GW signal [27], the leading order contribution to the phase evolution of a GW inspiral is typically measured via the weighted combination of Λ terms ˜Λ = 16 13 (m1 + 12 m2)m41Λ1 + ( m2 + 12 m1)m42Λ2
+
+(m1 + m2)5 (8) We assume this contribution fully characterizes the ef-fect the EOS has on emitted gravitational waves. Fol-lowing the procedure of [24], we utilize the RIFT in-ference algorithm [28, 54–56] to generate marginal like-lihoods Lmarg (X) for many candidate points X =(m1, m 2, χ1, χ2, Λ1, Λ2) via the waveform model IMR-PhenomPv2 NRTidalv2 [17, 57]. This model incor-porates precession physics while omitting higher-order modes, but we still allow only for aligned z-component spins in our analysis, such that χi = (0 , 0, χ i,z ), using the 
+
+z-component prior mentioned in Sec. II B. RIFT’s itera-tive assessments produce estimates of the posterior ppost 
+
+for the intrinsic parameters X, proportional to the prod-uct L(X)pgw (X) of a fiducial population prior pgw (X)and an interpolated estimate ˆL(X) of the true likelihood 
+
+L(X), as: 
+
+ppost = L(X)pgw (X)
+
+R dX L(X)pgw (X) , (9) These estimates Lmarg (X) are computed by RIFT’s CIP (Construct Intrinsic Posterior) stage via random forest interpolation and exported as a data product contain-ing {(X, Lmarg (X)) }. We then input this data into 
+
+HyperPipe , interpolating it via the EOS-derived rela-tionship connecting the tides Λ( m|Y ) to the NS mass m
+
+and EOS model Y. The result is a new, EOS-informed marginal likelihood Lmarg (X) with which we compute the marginal evidence: 
+
+E =
+
+Z
+
+Lmarg (X(x, Y)) p(x) dx (10) Here, x = (m1, m 2, χ 1,z , χ 2,z ) are the intrin-sic binary parameters, which X supplements with the EOS-derived tidal parameters: X(x, Y) =(Mc, η, χ 1,z , χ 2,z , Λ( m1|Y ), Λ( m2|Y )), where Mc is the chirp mass, Mc = ( m1m2)3/5/(m1 + m2)1/5, and η =
+
+m1m2/(m1 + m2)2 is the symmetric mass ratio. The 
+
+p(x) term is the prior on the parameters in x, which is uniform for all except the NS population parameters m1,
+
+m2, to which we apply our model described in Sec. II B. Note that Eq. (3) indicates that multiple GW events 
+
+g can be incorporated into the overall likelihood factor Q 
+
+> g
+
+Eg (Y), and indeed other studies have considered mul-tiple dark BNS events [31] or have included the signal GW190425 (e.g., [8]), which originated from a more mas-sive system that may or may not have been a BNS merger and, correspondingly, had weaker tidal interactions as well as an overall low SNR signal [58]. For simplicity, we utilize only data for GW170817 in this work; thus, g = 1 here.  
+
+> D. X-ray Pulsars
+
+Beginning in 2017, the Neutron Star Interior Compo-sition Explorer (NICER) experiment has observed peri-odic thermal soft X-ray emission from hot spots on the 6   
+
+> FIG. 3. Mass vs. radius posterior samples of NICER pulse profiles for three millisecond pulsars, PSR-J0030, PSR-J0437, and PSR-J0740, and the HESS-J1731 object. Overlaid are ellipses representing the two-dimensional normal distributions with which we approximate the data in our calculations. We also show the mass bounds for the three high-mass pulsars listed in Table III.
+
+surfaces of millisecond pulsars (MSPs) in both isolated and binary systems [59]. Time-series observations of this emission from an MSP accumulates a pulse profile, which can be fit using soft X-ray waveform models and esti-mates for the hot spots’ size, shape, and number. Deter-mining these properties allows the NS mass and radius to be jointly inferred [14, 47, 50]. Significantly, in contrast to older estimates that were susceptible to glitches and systematic errors [11, 13], the high SNR of the NICER data increases the precision of the measured mass and ra-dius, leading to tighter constraints on the inferred EOS. We utilize data from observations of three NICER objects in this work: PSR J0030+0451 [13, 60], PSR J0740+6620 [37, 61], and PSR J0437-4715 [62, 63]. We also include the HESS source J1731-347 [64, 65]. This is a larger composition of data than other studies (e.g., [8, 24, 66]) have used. For HESS J1731, we paral-lel [24, 67] in using only the x-ray data from [65] that assumes a uniformly-emitting, single-temperature car-bon atmosphere model and Gaia parallax priors. The weighted mass-radius posterior samples reported for each data set are shown in Fig. 3 to give an idea of their shape. For our analysis, we simply adopt all the conventions of [24], approximating the posteriors for each NICER ob-ject as two-dimensional normal distributions (shown as overlaid ellipses in Fig. 3), and we compute for these Gaussian likelihoods L(m, r ) the marginal likelihood for each EOS Yα using the same kind of evidence integral as Eq. (2): 
+
+Z(Yα) = 
+
+Z
+
+L(mα(s), r α(s)) p(s) ds (11) where s is a fiducial parameter characterizing the dimen-sionless prior p(s) along each one-parameter family in the EoS Yα. Unlike for the GW likelihood in Eq. (10), however, we do not implement our Gaussian population model from Sec. II B as the prior here; instead we adopt a uniform mass prior with fixed, EOS-independent limits 
+
+m ∈ [mmin , m max ] = [0 .4M⊙, 2.1M⊙]. Our population model is for binary neutron star masses, while NICER sources are primarily isolated pulsars [50], and we have no reason to assume that these populations share the same distribution. We do, however, assume the same distribution from [28] for neutron star spin. We there-fore choose p(s) to be compatible with this uniform mass prior and rewrite Eq. (11) to depend on m:
+
+Z(Yα) = F
+
+Z
+
+L(m(s), r α(m(s))) dm (12) where F = 1 /(mmax − mmin ) is the necessary normal-ization constant. To compute the radius Rα(m(s)) for a given Yα and mass m drawn from our uniform dis-tribution, we utilize the RePrimAnd library developed by Wolfgang Kastaun [68, 69], which provides a robust TOV solver to find stable branch solutions and recover primi-tive variables, like pressure and baryon rest-mass density, for a given set of EOS parameters Yα. 
+
+> E. Nuclear Symmetry Energy
+
+Finally, we incorporate an additional constraining fac-tor on nuclear-density matter. At the nuclear saturation number density nsat , the symmetry energy S can be de-fined as the difference between the energies per baryon of pure nuclear matter (PNM) and symmetric nuclear matter (SNM): 
+
+S(nsat ) ≃ ϵPNM (nsat )
+
+nsat 
+
+− ϵSNM (nsat )
+
+nsat 
+
+(13) Following [24, 70], we fix the saturation density and bind-ing energy, rather than propagating their uncertainties. We set nsat = 0 .16 fm −3, which corresponds to the rest-mass density ρsat ≃ 2.7 × 10 14 g cm −3 [71, 72], while we fix the SNM binding energy per baryon at saturation to 
+
+B = −16 MeV and take mnc2 = 939 .6 MeV [70]. We then evaluate the symmetry-energy proxy 
+
+Sproxy  
+
+> α
+
+(nsat ) = ϵα(nsat )
+
+nsat 
+
+−  mnc2 + B
+
+= ϵα(nsat )
+
+nsat 
+
+− 923 .6 MeV , (14) where ϵα is the energy density of the cold, beta-equilibrated barotropic EOS α. Note that this proxy treats the NS matter as PNM at saturation, neglecting the proton and leptonic contributions [1]. We assume the proxy to be normally constrained, with S0 = 32 MeV and 
+
+σ0 = 2 MeV [37, 71, 72]; our likelihood factor for a single 7EOS realization Yα is therefore 
+
+S(Yα) = L(S0|Sproxy  
+
+> α
+
+(nsat )) = N (Sproxy  
+
+> α
+
+(nsat )|S0, σ 0).
+
+(15) We obtain Sproxy  
+
+> α
+
+(nsat ) by interpolating the rest-mass and energy densities extracted from our TOV solution. Kedia et al. [24] noted that this constraint favors smaller radii for any given Mmax . 
+
+> IV. JOINT INFERENCE PIPELINE
+
+To generate the posterior distribution from Lnet and 
+
+p(Y) as written in Eq. (3), we employ the HyperPipe 
+
+algorithm, a generalized version of RIFT originally in-troduced by Kedia et al. [24]. This pipeline extends the base RIFT package [28, 55, 56, 73] to include a general-purpose, physics-neutral implementation of the RIFT al-gorithm that can interface with generic codes, enabling it to handle non-GW model parameters Y and arbitrary, externally-supplied marginal evidence factors that ap-pear in multi-event and multi-messenger inference, such as those in Eq. (3). The algorithm for HyperPipe oth-erwise closely follows the original RIFT implementation and reuses many of the same components. In general, the algorithm adaptively explores the space of selected hyperparameters Y to resolve distinct fea-tures in the posterior distribution. We provide an ini-tial grid of these parameters Y0 containing estimates within a subregion of the 7-dimensional space of Y =
+
+{(γ0, γ 1, γ 2, γ 3, μ 1, μ 2, σ )} for its initial (index 0) itera-tion; these grid points are the values described in Sec. II. The primary stages of each iteration are illustrated in the flowchart in Fig. 4. We only focus on our mod-ifications to these stages here; each stage is outlined in greater detail in [74]. Given an input grid of proposed hyperparameter sets 
+
+Yα and the appropriate data, HyperPipe first computes the marginal likelihood factors in Eq. (3) using the user-supplied modules. For this work, we employ three such modules, one for Eq. (5), one for Eqns. (12) and (15), and one for Eq. (10). For this last factor, we repurpose the CIP module from RIFT mentioned in Sec. III C. We here extend HyperPipe from its form in [24] by modifying the CIP module to interface with an external prior script that computes p(x) for Eq. (10) using a user-specified model. The interface is generalized such that the implementation will be the same regardless of the 
+
+p(x) model, providing broad flexibility. As our model is simply a normal distribution, we evaluate p(x) for a given pair of masses x = ( m1, m 2) as: 
+
+p(x) = 1
+
+Nα
+
+N (x|μα, σ α) (16) where Nα is a normalization constant, defined as the mul-tivariate CDF of N within the valid region of our popu-lation model (see Fig. 1). The external prior module is   
+
+> FIG. 4. Flowchart for the iterative workflow of HyperPipe ,adapted from that for RIFT in [55]. The MARG and PUFF groups can contain multiple generic marginalization codes, such as CIP, that are simultaneously run hundreds of times in parallel to evaluate a selected number of samples from the input grid. We extend this stage of the algorithm by enabling the interaction between CIP and an external prior process that influences CIP’s likelihood calculation.
+
+depicted in Fig. 4 with a feedback loop connecting it to CIP alone. In addition to the prior factor p(x), this external mod-ule can provide CIP with a custom EOS solver and other likelihood factors, reducing reliance upon the current (limited) hardcoded functionality. To demonstrate this point, we also compute the pulsar maximum mass factor 
+
+Cα (Eq. (6)) in our external module, using EOS objects created via lalsuite [75, 76]. Our code therefore sup-plies the product C(Y) p(x), such that: 
+
+LCIP =
+
+Z
+
+Lmarg (X(x, Y)) fexternal (x, Y) dx 
+
+=
+
+Z
+
+Lmarg (X(x, Y)) ( p(x)C(Y)) dx 
+
+= C(Y)
+
+Z
+
+Lmarg (X(x, Y)) p(x) dx (17) Although this point is strictly technical, we highlight it to show the efficiency afforded by an external module, which reduces computing costs compared to running an entirely separate marginalization module for Eq. (6). In addition to this external prior functionality, which is mainly limited to working with the CIP module since it would be largely superfluous for other non-production codes, we implement two further technical modifications with broader impacts on the overall computational ef-8ficiency of HyperPipe . Firstly, we implement the hy-percube rotation described in Sec. II A into the poste-rior construction stage, denoted CEP, which performs a Monte Carlo integration to estimate the hyperparameter posteriors, similarly to Eq. (9): 
+
+ppost = L(Y)p(Y)
+
+R dY L (Y)p(Y) (18) In the original HyperPipe implementation, the integra-tion was performed over the γk coordinates (and popu-lation hyperparameters) directly. Now, we first convert the γk parameters to the better-aligned r′ 
+
+> i
+
+coordinates, modifying HyperPipe to access externally-provided coor-dinate transformation codes, specifically the transforma-tion from [25]. Then, the CEP stage integrates over the 
+
+r′ 
+
+> i
+
+coordinates to more effectively sample posteriors for those hyperparameters, which are then converted back to γk coordinates. We implement this same functionality in the final stage of HyperPipe , denoted PUFF, which dithers the poste-rior grid to create a “puffed” grid that further explores the hyperparameter space. Specifically, we transform the puffed points into the rotated coordinate space to apply our second modification to HyperPipe , which alters how the PUFF stage handles puffed points that fall outside the specified parameter ranges. Whereas the original ver-sion of HyperPipe (and, indeed, RIFT) simply discarded these points, often substantially reducing the size of the puffed grid, we now reflect them at the (buffered) r′ 
+
+> i
+
+pa-rameter boundaries, placing them back inside the hyper-cube C′ as a unique sampling point. As a result, we retain nearly all proposed puffed samples (culling only those for which μ2 > μ 1), increasing the sampling density within 
+
+C′ and enhancing the resolution of our posteriors. Note that, for our specific case, we only dither six of our seven total hyperparameters: we exclude the pop-ulation width σ. Since it is poorly constrained by our observational data (see Sec. V A), all positive values of σ
+
+remain physically valid, and puffed samples for this pa-rameter would therefore broaden the widths of our Gaus-sian population model over multiple iterations, driving it towards uniform distributions in μ1, μ2 within our trun-cated ranges (1 M⊙ ≤ μ1, μ 2 ≤ 3M⊙). Collectively, applying these rotation and reflection changes improves the overall efficiency of HyperPipe ,with the fraction of physical parameter sets in the first iteration jumping from ∼ 1% to ∼ 80% and the same fraction remaining at > 95% in subsequent iterations. We further describe this behavior and how it alters the posteriors in Appendix A.  
+
+> V. RESULTS & DISCUSSION
+
+We first perform several tests to verify that the com-ponent modules behave as expected before running our modified pipeline in the full 7-dimensional configuration.  
+
+> A. Validation Tests
+
+We look first at the behavior of the three population hyperparameters. Figure 5 shows three corner plot dia-grams, each of which plots the 90% credible interval of the converged posterior in black on top of the accumu-lated marginal likelihoods computed for all iterations in our analysis. A 1-D histogram for each parameter accom-panies the scatterplots, with the dashed lines indicating the 5% and 95% quantiles for each parameter. The top panel of Fig. 5 shows the posterior obtained with only the DNS data likelihoods, calculated via Eq. (5), included in the pipeline. As expected for an inte-gral over the product of two Gaussians, the posterior also converges to a roughly normal distribution, cen-tered on ( μ1, μ 2) = (1 .39 ± 0.04 M⊙, 1.26 ± 0.04 M⊙). For comparison, the sample means and widths for the 11 pairs of measured DNS masses listed in Table II are (μ1, μ 2) = (1 .41 ± 0.10 M⊙, 1.24 ± 0.10 M⊙). Because the integral result drops off steeply the further μpop is from the region containing the real measurements, this factor constrains the sample population shown in Fig. 1 tightly and drives the width σ towards 0 (i.e., an unrealistic delta function population). Note that, because this code is completely independent of the EOS hyperparameters, it is essentially a population inference code only. On the other hand, if we only use the CIP module with our external prior while holding the EOS parame-ters “fixed” - i.e., we apply the same fiducial set of EOS parameters to every set of population parameters for all iterations, neither fitting nor puffing the EOS values in 
+
+HyperPipe - the population posterior rails towards ex-treme mass ratio q = μ2/μ 1, as shown in the center panel of Fig. 5. The width σ also rails towards large values, simply because broader distributions produce higher av-erage likelihoods via Eq. (16); note that we only integrate over the region σ ∈ [0 .01 , 0.499] in these tests, however. This behavior is expected, as there are no constraints placed on the mass values in this configuration, and the coordinate system we use in CIP favors extremal q.Combining these two tests to incorporate both DNS and our prior via one fiducial GW170817 data point, as seen in the bottom panel of Fig. 5, reproduces well-constrained posteriors for the population parameters, with somewhat broader distributions on the masses com-pared to the DNS-only test. The width σ is now re-strained by the competing effects of the two integrations, with a more Gaussian-shaped posterior, though it re-mains only weakly informed by the DNS samples. From these tests, we conclude that the population inference side of our pipeline is functional. On the other hand, we can also consider EOS inference on its own and compare our updated results to those of [24], which utilized nearly identical data constraints, only omitting the NICER data for PSR-J0740, PSR-J0437, and the HESS J1731 source ([65]). As pointed out in [24], the HESS source only affects the posterior incrementally, consistent with the effect of the GW170817 measurement, 9                  
+
+> (a)
+> (b)
+> (c)
+> FIG. 5. Corner plot posteriors for three population param-eters μ1,μ2, and σ, generated over 3 HyperPipe iterations using ( a) only galactic DNS mass constraints; ( b) only the GW170817 observation, interpreted with a flexible popula-tion but fixed EOS parameters; and ( c) both the DNS obser-vations and GW170817 with fixed EOS and flexible masses. Under just the GW170817 constraint, the mass posteriors trend toward extremal mass ratio q=μ2/μ 1≪1, but they become well-constrained when the DNS observations are in-corporated.
+> FIG. 6. Corner plot posteriors for the four Γ-spectral hy-perparameters obtained over 4 iterations of the improved
+> HyperPipe algorithm, generated using data for GW170817 and NICER objects, alongside pulsar maximum mass and symmetry energy factors. Cf. Figure D.1 of [24]: the new posteriors are much better defined than those found by the original HyperPipe algorithm, though they now rail towards one corner of the bounded physical space.
+
+so its inclusion does not strongly affect our comparison. Over 4 HyperPipe iterations, we obtain the posterior samples and 90% credible intervals shown in Fig. 6, which quickly stabilize around a thoroughly-sampled re-gion determined by the bounds of the rotated coordinate system (with 10% buffer) detailed in Sec. II A. By con-trast, the original HyperPipe algorithm took 7 iterations to obtain sparsely-sampled, less coherent distributions for each of the hyperparameters: see Figure D.1 of [24]. Our rotated coordinates thus enable quicker recovery of stable, well-defined posteriors than the standard Carte-sian γk coordinates when performing EOS inference. Significantly, however, our posteriors for each hyperpa-rameter appear to rail towards one corner of the hyper-cube in which every physical EOS lives. This behavior may be an outcome of using the non-causal Γ-spectral EOS parametrization, which allows the likelihood to peak in a non-physical region of the hyperparameter space. We address this behavior further below.  
+
+> B. Joint Inference Analyses
+
+We turn now to performing full 7-dimensional joint inference of the neutron star EOS and BNS population hyperparameters Y = ( γ0, γ 1, γ 2, γ 3, μ 1, μ 2, σ ), with all five constraining factors in Eq. (3) and all data sources 10   
+
+> FIG. 7. Corner plot posteriors for seven hyperparameters, generated over 6 HyperPipe iterations with prior bounds buffered by 10% and using constraint data from DNS masses, GW170817 with Gaussian population prior, high-mass and NICER pulsars and the HESS J1731 source, and the symmetry energy. The mass posteriors are constrained to Gaussians in line with the DNS mass weighting, while the spectral EOS parameters converge towards skewed distributions due to significant railing.
+
+incorporated into the analysis. Integrating over the pa-rameters yields the 90% credible posteriors shown in the corner plots in Figs. 7 and 8 for two analyses, which apply a 10% and a 400% buffer factor to the hyperpa-rameter ranges and which we hereafter denote as the C′
+
+> 10
+
+and C′ 
+
+> 400
+
+analyses, respectively. For the former analysis, the posteriors converged within 6 iterations of the HyperPipe algorithm. The population hyperparameters (in the lower right section of the plot) converge as they did in the independent pop-ulation inference test due to the strong weighting pro-vided by the DNS population factor Eq. (5), while the EOS hyperparameters (in the top half of the plot) are shifted somewhat away from the corner of the physical hypercube, unlike in the EOS-only test of Fig. 6, but still continue to rail towards the hypercube edges. This 11   
+
+> FIG. 8. Corner plot posteriors for seven hyperparameters, generated over 15 HyperPipe iterations, bounded by rotated coor-dinate prior bounds expanded by 400%, and using the same data factors as in Fig. 7. The mass posteriors remain essentially the same as in Fig. 7, while the EOS parameters are still skewed but no longer appear to be railing.
+
+shift demonstates the effect that inferring the popula-tion simultaneously with the equation of state has on the EOS hyperparameters, as indicated by [25]. We note that some sampled points have escaped our imposed physical hypercube bounds; this is a known artifact of the adap-tive volume sampler [77] we use. On the other hand, the C′ 
+
+> 400
+
+analysis (Fig. 8) ran for 15 iterations. While the population parameter posteriors remain largely identical to the C′ 
+
+> 10
+
+analysis - the buffer factor does not affect those hyperparameters’ bounds -the EOS parameter posteriors no longer appear to be rail-ing, and instead lie well inside the bounds of the 400%-buffered rotated hypercube C′, as demonstrated by Fig. 9, where the samples tested in the C′ 
+
+> 400
+
+analysis are over-layed on many draws that illustrate the shape and size of 
+
+C′. Whether the hyperparameters would still rail, given many more iterations, is uncertain. It is possible that 
+
+HyperPipe did not explore the space quickly enough for 12 
+
+FIG. 9. Corner plot of EOS hyperparameter samples for the 
+
+C′ 
+
+> 400
+
+analysis, overlaid on points showing the 400%-buffered hypercube. Colored points represent physical EOS realiza-tions, while grey points are unphysical samples. The physical region is fully enclosed by the hypercube bounds and do not appear to be railing against the edges. 
+
+the posteriors to reach the edge of the larger hypercube within 15 iterations: as shown in Fig. 10, the posteriors appear to have mostly stabilized after 12 iterations, ex-panding only slightly towards the upper left corner of the 
+
+γ0 − γ1 scatterplot with each additional iteration. How-ever, the likelihoods of the samples in that upper-left re-gion do not smoothly transition to smaller values. This ragged end may indicate the edge of the physical space, as our TOV solver enforces its inherent causality con-straint, or it simply suggests this region was not sampled thoroughly enough during the analysis (despite the high number of samples already drawn there, as seen in Fig. 9). For the remainder of this work, we take these poste-riors to have indeed stabilized around the fully-sampled physical space of the spectral EOS model, as inferred us-ing our data sources. Note that the original Cartesian bounds for the γk hy-perparameters, as proposed in [5] and given in the top row of Table I, exclude physically-valid samples contained in these posteriors, and those EOS realizations produce markedly different EOS posterior curves. Figure 11 plots EOS pressure-density curves for 40 realizations drawn from the hyperparameter posteriors of Fig. 8, 20 from within the standard Cartesian bounds (shown in blue) and 20 that are partially outside these bounds, having values for γ0 < 0.2 and γ1 > 1.7 (shown in purple). 1 The latter curves exhibit a substantial change in sound speed    
+
+> 1Even with expanded bounds in rotated coordinates, the γ2and
+
+FIG. 10. Corner plot posteriors for two EOS hyperparameters over the final 4 iterations of the C′ 
+
+> 400
+
+analysis. While mostly stable, the posterior grows slightly with each iteration toward the upper-left corner, where the sample likelihoods stop scal-ing continuously. 
+
+FIG. 11. P (ρ) curves for 40 sets of EOS parameters drawn from the final posterior of the C′ 
+
+> 400
+
+analysis. Blue : 20 sets with all γk parameters within the original Cartesian region defined by [5]. Purple : 20 sets lying outside that original region in two dimensions, with γ0 < 0.2 and γ1 > 1.7. 
+
+at the matching density and lower pressures at high den-sity. The joint EOS constraints associated with both anal-yses C′ 
+
+> 10
+
+and C′ 
+
+> 400
+
+are shown in Fig. 12, with the ini-   
+
+> γ3samples mostly fit within the original Cartesian bounds; as a result, in our final posteriors, there were no EOS realizations with all four γkcoordinates outside the original bounds.
+
+13   
+
+> FIG. 12. Joint 6-factor EOS constraint from DNS systems, galactic radio and x-ray pulsars, symmetry energy, and GW170817 using the 4-dimensional uniform-prior Γ-spectral EOS parametrization and a 3-dimensional truncated Gaussian DNS population prior. The blue and purple lines bound the 90% confidence intervals for the 10% and 400% buffered EOS parameter ranges, respectively. We provide a comparison with our initial EOS samples drawn from a posterior for GW170817. Our posteriors indicate a sharper shift from low to high pressure as density increases and put tighter constraints on the possible radii at each mass.
+
+tial EOS samples from GW170817 ([38]) indicated by the shaded region, for comparison. We refer to these analyses as “6-factor inferences,” distinguishing between 
+
+HyperPipe ’s base GW inference module, which defaults to uniform mass priors, and our external prior mass model, since it is a central focus of this work. We find both posteriors to be roughly similar in shape in both the pressure-density and mass-radius plots. The key differences are inherited from the extra hyperparame-ter configurations afforded by the C′ 
+
+> 400
+
+analysis and il-lustrated in Fig. 11: the pressure at low density is marginally lower, the sound speed at high density is gen-erally smaller, and the pressure has a more pronounced change at densities around log 10 ρ ∼ 14 .8 g/cm 3. Mean-while, the mass-radius posteriors indicate a more tightly constrained bound than the initial samples, which is ex-pected since we incorporated both an independent mass prior and data from DNS sources that directly influenced the mass parameters. In particular, our analyses favor smaller radii ( R <
+
+∼ 10-12 km) at low and subsolar masses. Given the similarity of our two analyses’ results, for the remainder of this discussion we consider just the results of the C′ 
+
+> 10
+
+inference. It is worth comparing the result of this EOS inference with the results when certain factors are removed from Eq. (3), to observe their effects on the posterior distribu-tions. In particular, as demonstrated by [25], the choice of population model should have a significant impact on the inferred EOS. However, if we disable our external prior code, such that the GW inference module reverts to its default uniform mass priors, we find that the EOS inference is only shifted slightly by the prior, as seen in Fig. 13, where the uniform-prior results are plotted in orange and the 6-factor results are shown as the shaded region. This outcome is not surprising, though, since our prior model informs the EOS solely through the gravita-tional wave likelihood factor Eq. (10), which itself carries relatively little weight in our specific analysis because we have included only one GW measurement, GW170817. As shown by the green line in Fig. 13, the EOS inferred without the GW170817 data (and therefore without the prior) only shifts the M (R) and P (ρ) posteriors incre-mentally. Thus, while this choice of prior has some effect on the population inference (see Fig. 5), its impact on the EOS is limited by the number of gravitational wave detections involved in the inference. A more complex population model, as well as additional GW events, will induce more interesting behavior, but this test at least demonstrates that HyperPipe will correctly handle those cases. In contrast to the GW data, the NICER data imposes much stronger constraints on the EOS, as evidenced by comparing the green 90% confidence intervals in Fig. 13, which exclude the GW data, with the red bounds in the figure, which exclude the NICER data and symmetry en-ergy. Without these factors, the EOS is clearly much more poorly constrained than in our 6-factor inference, indicating that the GW170817 data with external prior and the NS maximum mass constraint (Eq. (6)) alone do not tightly constrain the EOS, particularly at high den-sity. Also, the NICER data supports stiffer EOS models than the GW data, since its inclusion pulls the posterior’s lower mass-radius bound to larger radii for each mass. Again, though, while the NICER data currently has the largest influence on the EOS, future GW measurements should shift this balance of power towards more equal 14    
+
+> FIG. 13. Joint EOS constraint at 90% confidence intervals, with individual marginal likelihood factors of Eq. (3) removed: the external prior, the NICER data and symmetry energy, and the GW data with external prior. The 6-factor inference posterior from Fig. 12 is plotted as the shaded region. Removing our Gaussian prior to use a uniform one produces minute changes in both plots, while removing the GW inference and prior altogether shifts the results slightly more. Excluding the NICER observations creates a much less tightly constrained distribution in both plots.
+
+weight between these data sources. Finally, we can look quantitatively at our novel results for the population parameters, which have not been in-ferred in this manner before now. Previous studies have typically reported just one parameter μdns , assuming a unimodal population distribution from which both mem-bers of a binary NS system are independently drawn, but this approach disregards the possibility that the in-dividual members of the pair could have strongly corre-lated masses due to their astrophysical formation chan-nels [25]. In particular, [44] considered several Gaus-sian mixture models for the population and found that the n = 1 (i.e., unimodal) model was strongly disfa-vored compared to higher-component models, most no-tably that with n = 2. In our analysis, we have employed a separate unimodal model on each member of an NS bi-nary system, μ1 and μ2, treating them as independent hyperparameters and allowing HyperPipe to determine the shape of the population for itself, based on the data we provided. For the 6-factor inference posteriors shown in Fig. 7, our population hyperparameters have mean values μ1,pop = 1 .39 ± 0.03 M⊙, μ2,pop = 1 .27 ± 0.03 M⊙,and σpop = 0 .08 ± 0.02 M⊙.Comparing these results with those of other popula-tion inference studies, listed in Table IV, we find that our mass distribution is broadly consistent with the uni-modal distribution previously reported to peak in the range of ≈ 1.32 − 1.39 M⊙ [29, 40, 41], from which both masses in a given binary are considered to be drawn inde-pendently. In particular, [40] tested a bivariate popula-tion indentical to ours, with independent distributions for primary and companion masses, and found parameters 
+
+μ1,pop = 1 .35 M⊙, μ2,pop = 1 .32 M⊙, and σpop = 0 .05 M⊙.That work concluded that both masses were most likely drawn from the same narrow distribution; although our masses are slightly further apart, they too remain within one population width σpop of each other, so our results do not definitively indicate a bimodal normal distribu-tion for the population. Indeed, if we assume our mass posteriors for each hyperparameter are equally likely, we can average them to obtain a single distribution with peak μ = 1 .33 ± 0.08 M⊙, in close agreement with the unimodal result of [40]. We can also consider the more robust bimodal distribu-tions determined by [25, 43, 44]; clearly our results show no indication of a secondary (or tertiary, if considering 
+
+μ1,pop and μ2,pop as belonging to distinct distributions) higher-mass peak, since we assumed only a unimodal dis-tribution for our prior model, but our μ1,pop value agrees well with their lower-mass peaks, particularly that of [43]. It is possible that incorporating more X-ray and NS-WD system measurements into the likelihood calculation and employing a bimodal normal prior in each of our hyperpa-rameters could reveal such bimodality within each of our two-dimensional posteriors, and HyperPipe is fully capa-ble of handling such a complex model. However, such an analysis would no longer be inferring just the double 
+
+neutron star population but instead a universal NS mass distribution, and we have not accounted for the various selection effects that arise in that scenario [29].  
+
+> VI. CONCLUSIONS & FUTURE WORK
+
+We have extended HyperPipe to incorporate externally-evaluated prior factors into RIFT’s gravitational-wave marginalization and to support arbitrary coordinate transformations when constructing 15 
+
+TABLE IV. Population means and dispersions for the NS mass distribution as reported by several studies. Note that we relabel the masses in the bimodal models such that μ1 ≥ μ2, for consistency with our notation. Work Model μ1 [M⊙] μ2 [M⊙] σ1 [M⊙] σ2 [M⊙]This work 2-D normal 1.39 +0 .03  
+
+> −0.03
+
+1.27 +0 .03  
+
+> −0.03
+
+0.08 +0 .02  
+
+> −0.02
+
+0.08 +0 .02 
+
+> −0.02
+
+Anik et al. [29] Skewed unimodal normal 1.39 +0 .04  
+
+> −0.07
+
+— 0.14 +0 .04  
+
+> −0.01
+
+—¨Ozel et al. [40] Unimodal normal 2-D normal 1.33 1.35 —1.32 0.05 0.05 —0.05 Kiziltan et al. [41] Skewed unimodal normal 1.32 — 0.225 —Alsing et al. [44] Truncated bimodal Gaussian 1.80 +0 .15  
+
+> −0.18
+
+1.34 +0 .03  
+
+> −0.02
+
+0.21 +0 .18  
+
+> −0.14
+
+0.07 +0 .02 
+
+> −0.02
+
+Antoniadis et al. [43] Bimodal Gaussian 1.807 +0 .081  
+
+> −0.132
+
+1.393 +0 .031  
+
+> −0.029
+
+0.177 +0 .115  
+
+> −0.072
+
+0.064 +0 .064 
+
+> −0.025
+
+and exploring hyperparameter posteriors. We applied this framework to a seven-parameter joint inference of the neutron star EOS and binary neutron star mass distribution, combining a four-parameter Γ-spectral EOS decomposition with a truncated bivariate normal mass model. The analysis included constraints from galactic double neutron stars, GW170817, massive radio pulsars, NICER X-ray pulsars and the HESS J1731 source, and the nuclear symmetry energy. For the population parameters, the joint analysis in-ferred μ1,pop = 1 .39 ± 0.03 M⊙, μ2,pop = 1 .27 ± 0.03 M⊙,and σpop = 0 .08 ± 0.02 M⊙. These values are broadly consistent with previous unimodal estimates of the dou-ble neutron star mass distribution [29, 31, 40, 41] and do not by themselves require distinct mass subpopu-lations. However, of the present data set, the mass-radius measurements of the NICER pulsars had the most significant constraining effect on the EOS poste-rior, while the population prior had only a minor effect since GW170817 was the sole gravitational-wave event coupling the mass distribution to the EOS. With addi-tional binary neutron star merger detections, the popu-lation model should more strongly inform the joint EOS inference. Regardless, this test establishes the machinery needed to incorporate more complex population models, including the mixture distributions considered in previ-ous work [25, 43, 44], into the pipeline structure. Additionally, the new mechanisms for coordinate ro-tation and reflection of exploratory samples allowed 
+
+HyperPipe to obtain densely sampled, stable EOS poste-riors more quickly than the unmodified Cartesian work-flow. Expanding the rotated EOS-parameter bounds from [25] also removed the visible EOS boundary-railing in our primary analysis while leaving the population pos-terior nearly unchanged, exposing physical EOS realiza-tions outside the standard Cartesian bounds that have been in use since [5]. Future HyperPipe applications should incorporate the associated population selection effects into the mass in-ference, such as those for radio pulsar surveys, which Drummond et al. [78] recently found to have negligible impact on the recovered mass distribution but significant effect on other binary parameters. In addition, other data factors could substantially influence the inference, such as high-density constraints from perturbative QCD analyses [79] and additional (e.g., [80]), alternate (e.g., [81–83]) or updated (e.g., [84, 85]) mass-radius estimates for MSPs from NICER data sets. Finally, further tests could also examine the sensitivity of the EOS posterior to alternative interpretations of the low-mass HESS J1731 compact object [67, 86, 87]; mass-radius estimates of this source have so far been noted to only have an incremen-tal effect on the posterior, roughly consistent with that of gravitational wave events [24]. 
+
+ACKNOWLEDGMENTS 
+
+The authors are grateful for computational resources provided by the LIGO Laboratory and supported by National Science Foundation Grants PHY-0757058 and PHY-0823459. This material is based upon work sup-ported by NSF’s LIGO Laboratory, which is a major fa-cility fully funded by the National Science Foundation. 
+
+Appendix A: Effect of the Coordinate Rotation 
+
+To illustrate the effect our rotation and reflection changes to HyperPipe have made on the hyperparam-eter posteriors, we compare the results of our primary 6-factor inference with a 10% buffer factor described in Sec. V B (the “rotated run”) to an identical analysis that did not apply these two modifications (the “unro-tated run”), retaining the γk coordinates and traditional associated parameter bounds throughout the analysis. For the initial sample set (iteration 0), the results between runs are identical. However, the first posteri-ors generated follow dramatically different behaviors, as shown in Fig. 14, which plots sequential posteriors from each run together on corner plots for some of the EOS pa-rameters. As shown in the left-hand panel, the unrotated run first fits a broad posterior that is nearly entirely un-physical, since it is sampling over the Cartesian volume 
+
+C. The algorithm then slowly converges around a small physical space in about 4 more iterations. On the other 16         
+
+> FIG. 14. Corner plot comparison of the posterior evolution for three of the Γ-spectral EOS hyperparameters in the same 6-factor HyperPipe inference, without ( left ) and with ( right ) the coordinate transformation and reflection. Iterations 1, 2, 4 and 5 are shown. The unrotated analysis slowly converges on a small region, while the rotated analysis quickly jumps to a small region before expanding. The axis ranges are the same in both plots to aid comparison. Several of the γkand r′
+> iparameter bounds are visible in both panels, truncating the posteriors.
+
+hand, the rotated run, as shown in the right-hand panel of the figure, samples its first posterior in the rotated hy-percube C′ and therefore immediately finds better cover-age of the physical space, honing in on a small region of the physical volume on the next iteration. Subsequently, the algorithm begins broadening its fit as HyperPipe ’s ex-ploratory dithering phase finds more high-likelihood EOS points, attaining a more comprehensive sampling of the posterior region. The final 90% credible posteriors for both runs are shown in Fig. 15 over top the accumulated samples of the unrotated run, with the unrotated posterior shown in solid black and the rotated posterior in dashed blue. These two posteriors differ in both size and location in pa-rameter space, since the rotated run explores the (tightly-correlated) parameter space more efficiently and discov-ers more high-likelihood points, producing a large pos-terior displaced from that of the non-rotated analysis. The rotated algorithm can find all these physically valid points because the rotated C′ space is aligned with the physical volume, enabling HyperPipe to sample along it, whereas the Cartesian coordinate space essentially slices just a narrow cross-section of the physical volume. The population hyperparameters are less strongly af-fected by these changes, but μ1 still shifts towards a smaller mean value in the rotated run and σ is able to be sampled in its full parameter range; it is unclear why the sampling for σ became truncated at σ ≈ 0.1 M⊙ in the unrotated run. The parameter bounds in both C and C′ are also clearly visible in both Figures 14 and 15, showing the clear trun-cations imposed on the posteriors in both runs, with the unrotated run enforcing γ0 ≥ 0.2 and the rotated run’s posterior railing to one corner of the 10%-buffered ro-tated hypercube. These artificial limits on the posterior demonstrate why the 400% buffer on the rotated coor-dinate bounds explored in the main text should be the preferred bounds in future work using this EOS model family. We conclude that using the rotated coordinate space to sample the EOS posteriors gives HyperPipe vastly superior efficiency during early iterations, allowing it to quickly converge on a high-likelihood posterior. Re-flecting puffed points also appears to prevent extremely unphysical samples from crashing the marginalization codes; the corresponding increase in the number of sam-ples filling out the allowed space is easy to observe in the right-hand panel of Fig. 14. These factors combined significantly reduce the amount of computational time wasted on useless points and increase the density of valid sampled points, producing better-resolved posteriors for the EOS hyperparameters.  
+
+> [1] J. M. Lattimer and M. Prakash, Physics Reports 621 ,127 (2016). [2] G. Baym, T. Hatsuda, T. Kojo, P. D. Powell, Y. Song,
+
+17 
+
+FIG. 15. Corner plot of the 6-factor HyperPipe inference analysis, without the coordinate transformation and reflection, after 6 iterations. The corresponding posteriors from the analysis using the transformation and reflection modifications are overlaid as dashed blue lines. The Cartesian cutoff of γ0 ≥ 0.2 is clearly visible on the left edge of the EOS parameter plots, as is the size difference between the posterior regions. and T. Takatsuka, Reports on Progress in Physics 81 ,056902 (2018). [3] The LIGO Scientific Collaboration, the Virgo Collabora-tion, B. P. Abbott, R. Abbott, T. D. Abbott, F. Acer-nese, K. Ackley, C. Adams, T. Adams, P. Addesso, R. X. Adhikari, V. B. Adya, and et al., Physical Review X 9,011001 (2019). [4] The LIGO Scientific Collaboration, The Virgo Collab-oration, B. Abbott, R. Abbott, T. Abbott, F. Acer-nese, K. Ackley, C. Adams, T. Adams, P. Addesso, and et al., Physical Review Letters 121 (2018), 10.1103/phys-revlett.121.161101. [5] M. F. Carney, L. E. Wade, and B. S. Irwin, Physical Review D 98 (2018), 10.1103/physrevd.98.063004. [6] T. Dietrich, M. W. Coughlin, P. T. H. Pang, M. Bulla, J. Heinzel, L. Issa, I. Tews, and S. Antier, Science 370 ,1450 (2020). [7] K. Hebeler, J. M. Lattimer, C. J. Pethick, and A. Schwenk, The Astrophysical Journal 773 , 11 (2013). [8] P. Landry, R. Essick, and K. Chatziioannou, Physical Review D 101 (2020), 10.1103/physrevd.101.123007. [9] M. C. Miller, C. Chirenti, and F. K. Lamb, The Astro-physical Journal 888 , 13 (2020). [10] A. Vilkha, A. Yelikar, R. O’Shaughnessy, and J. Read, “Inference on neutron star parameters and the nuclear equation of state with RIFT, using prior EOS information,” (2024), arXiv:2407.15753 [gr-qc], arXiv:2407.15753 [gr-qc]. [11] F. ¨Ozel, G. Baym, and T. G¨ uver, Physical Review D 82 ,101301(R) (2010). [12] J. M. Lattimer and A. W. Steiner, The Astrophysical Journal 784 , 123 (2014). [13] M. C. Miller, F. K. Lamb, A. J. Dittmann, S. Bogdanov, Z. Arzoumanian, K. C. Gendreau, S. Guillot, A. K. Hard-ing, W. C. G. Ho, J. M. Lattimer, R. M. Ludlam, S. Mah-moodifar, S. M. Morsink, P. S. Ray, T. E. Strohmayer, K. S. Wood, T. Enoto, R. Foster, T. Okajima, and et al., The Astrophysical Journal Letters 887 , L24 (2019). [14] S. Bogdanov, F. K. Lamb, S. Mahmoodifar, M. C. Miller, S. M. Morsink, T. E. Riley, T. E. Strohmayer, A. K. Tung, A. L. Watts, A. J. Dittmann, D. Chakrabarty, S. Guillot, Z. Arzoumanian, and K. C. Gendreau, The Astrophysical Journal Letters 887 , L26 (2019). [15] E. E. Flanagan and T. Hinderer, Physical Review D 77 
+
+(2008), 10.1103/physrevd.77.021502. [16] M. Favata, Physical Review Letters 112 (2014), 10.1103/physrevlett.112.101101. [17] T. Dietrich, S. Khan, R. Dudi, S. J. Kapadia, P. Ku-mar, A. Nagar, F. Ohme, F. Pannarale, A. Samaj-dar, S. Bernuzzi, G. Carullo, W. Del Pozzo, M. Haney, C. Markakis, M. P¨ urrer, G. Riemenschneider, Y. E. Setyawati, K. W. Tsang, and C. Van Den Broeck, Phys-ical Review D 99 , 024029 (2019). [18] W. Del Pozzo, T. G. F. Li, M. Agathos, C. Van Den Broeck, and S. Vitale, Physical Review Letters 111 ,071101 (2013). [19] M. Agathos, J. Meidam, W. Del Pozzo, T. G. F. Li, M. Tompitak, J. Veitch, S. Vitale, and C. Van Den Broeck, Physical Review D 92 (2015), 10.1103/phys-revd.92.023012. 18 
+
+[20] B. D. Lackey and L. Wade, Physical Review D 91 (2015), 10.1103/physrevd.91.043002. [21] The LIGO Scientific Collaboration, the Virgo Collabora-tion, B. P. Abbott, R. Abbott, T. D. Abbott, F. Acer-nese, K. Ackley, C. Adams, T. Adams, P. Addesso, R. X. Adhikari, V. B. Adya, and et al., Physical Review Let-ters 119 , 161101 (2017). [22] S. De, D. Finstad, J. M. Lattimer, D. A. Brown, E. Berger, and C. M. Biwer, Physical Review Letters 
+
+121 (2018), 10.1103/physrevlett.121.091102. [23] The LIGO Scientific Collaboration, the Virgo Collabora-tion, B. P. Abbott, R. Abbott, T. D. Abbott, S. Abra-ham, F. Acernese, K. Ackley, C. Adams, V. B. Adya, C. Affeldt, M. Agathos, and et al., Classical and Quan-tum Gravity 37 , 045006 (2020). [24] A. Kedia, R. O’Shaughnessy, L. Wade, and A. Yelikar, “Astrophysical assumptions and equation of state framework have larger impact on equation of state inference than individual neutron star ob-servations,” (2025), arXiv:2405.17326v3 [astro-ph.HE], arXiv:2405.17326 [astro-ph.HE]. [25] D. Wysocki, R. O’Shaughnessy, L. Wade, and J. Lange, “Inferring the neutron star equation of state simultane-ously with the population of merging neutron stars,” (2020), arXiv:2001.01747v1 [gr-qc], arXiv:2001.01747 [gr-qc]. [26] D. Wysocki, J. Lange, and R. O’Shaughnessy, Physical Review D 100 (2019), 10.1103/physrevd.100.043012. [27] L. Wade, J. D. E. Creighton, E. Ochsner, B. D. Lackey, B. F. Farr, T. B. Littenberg, and V. Raymond, Physical Review D 89 (2014), 10.1103/physrevd.89.103012. [28] J. Lange, R. O’Shaughnessy, and M. Rizzo, “Rapid and accurate parameter inference for coalescing, precessing compact binaries,” (2018), arXiv:1805.10457v1 [gr-qc], arXiv:1805.10457 [gr-qc]. [29] M. H. Anik, A. W. Steiner, and R. O’Shaughnessy, The Astrophysical Journal 1005 , 148 (2026), arXiv:2512.12130 [astro-ph.HE]. [30] J. Golomb, I. Legred, K. Chatziioannou, and P. Landry, Phys. Rev. D 111 , 023029 (2025). [31] T. Ghosh, B. Biswas, S. Bose, and S. J. Kapadia, The Astrophysical Journal Supplement Series 281 , 11 (2025). [32] E. Thrane and C. Talbot, Publications of the Astronom-ical Society of Australia 36 (2019), 10.1017/pasa.2019.2. [33] J. R. Oppenheimer and G. M. Volkoff, Physical Review 
+
+55 , 374 (1939). [34] R. C. Tolman, Physical Review 55 , 364 (1939). [35] L. Lindblom, Physical Review D 82 (2010), 10.1103/physrevd.82.103011. [36] L. Lindblom, Physical Review D 97 (2018), 10.1103/physrevd.97.123019. [37] M. C. Miller, F. K. Lamb, A. J. Dittmann, S. Bogdanov, Z. Arzoumanian, K. C. Gendreau, S. Guillot, W. C. G. Ho, J. M. Lattimer, M. Loewenstein, S. M. Morsink, P. S. Ray, M. T. Wolff, C. L. Baker, T. Cazeau, S. Manthripra-gada, C. B. Markwardt, T. Okajima, S. Pollard, I. Cog-nard, and et al., The Astrophysical Journal Letters 918 ,L28 (2021). [38] “LIGO document P1800115-v12: GW170817: Measure-ments of neutron star radii and equation of state,” (2018), https://dcc.ligo.org/LIGO-P1800115/public. [39] L. S. Finn, Physical Review Letters 73 , 1878 (1994). [40] F. ¨Ozel, D. Psaltis, R. Narayan, and A. Santos Villarreal, The Astrophysical Journal 757 , 55 (2012). [41] B. Kiziltan, A. Kottas, M. De Yoreo, and S. E. Thorsett, The Astrophysical Journal 778 , 66 (2013). [42] P. Landry and J. S. Read, The Astrophysical Journal Letters 921 , L25 (2021). [43] J. Antoniadis, T. M. Tauris, F. ¨Ozel, E. Barr, D. J. Champion, and P. C. C. Freire, “The mil-lisecond pulsar mass distribution: Evidence for bi-modality and constraints on the maximum neutron star mass,” (2016), arXiv:1605.01665v1 [astro-ph.HE], arXiv:1605.01665 [astro-ph.HE]. [44] J. Alsing, H. O. Silva, and E. Berti, Monthly Notices of the Royal Astronomical Society 478 , 1377 (2018). [45] J. Golomb and C. Talbot, The Astrophysical Journal 
+
+926 , 79 (2022). [46] I. Mandel, W. M. Farr, and J. R. Gair, Monthly Notices of the Royal Astronomical Society 486 , 1086 (2019). [47] F. ¨Ozel and P. Freire, Annual Review of Astronomy and Astrophysics 54 , 401 (2016). [48] H. T. Cromartie, E. Fonseca, S. M. Ransom, P. B. De-morest, Z. Arzoumanian, H. Blumer, P. R. Brook, M. E. DeCesar, T. Dolch, J. A. Ellis, R. D. Ferdman, E. C. Ferrara, N. Garver-Daniels, P. A. Gentile, M. L. Jones, M. T. Lam, D. R. Lorimer, R. S. Lynch, M. A. McLaugh-lin, C. Ng, and et al., Nature Astronomy 4, 72 (2019). [49] R. W. Romani, D. Kandel, A. V. Filippenko, T. G. Brink, and W. Zheng, The Astrophysical Journal Letters 934 ,L17 (2022). [50] A. L. Watts, N. Andersson, D. Chakrabarty, M. Fe-roci, K. Hebeler, G. Israel, F. K. Lamb, M. C. Miller, S. Morsink, F. ¨Ozel, A. Patruno, J. Poutanen, D. Psaltis, A. Schwenk, A. W. Steiner, L. Stella, L. Tolos, and M. van der Klis, Reviews of Modern Physics 88 (2016), 10.1103/revmodphys.88.021001. [51] N. Chamel, P. Haensel, J. L. Zdunik, and A. F. Fantina, International Journal of Modern Physics E 22 , 1330018 (2013). [52] Z. Arzoumanian, A. Brazier, S. Burke-Spolaor, S. Cham-berlin, S. Chatterjee, B. Christy, J. M. Cordes, N. J. Cor-nish, F. Crawford, H. T. Cromartie, K. Crowter, M. E. DeCesar, P. B. Demorest, T. Dolch, J. A. Ellis, R. D. Ferdman, E. C. Ferrara, E. Fonseca, N. Garver-Daniels, P. A. Gentile, and et al., The Astrophysical Journal Sup-plement Series 235 , 37 (2018). [53] E. Fonseca, H. T. Cromartie, T. T. Pennucci, P. S. Ray, A. Y. Kirichenko, S. M. Ransom, P. B. Demorest, I. H. Stairs, Z. Arzoumanian, L. Guillemot, A. Parthasarathy, M. Kerr, I. Cognard, P. T. Baker, H. Blumer, P. R. Brook, M. DeCesar, T. Dolch, F. A. Dong, E. C. Fer-rara, and et al., The Astrophysical Journal Letters 915 ,L12 (2021). [54] C. Pankow, P. Brady, E. Ochsner, and R. O’Shaughnessy, Physical Review D 92 (2015), 10.1103/physrevd.92.023002. [55] J. Wofford, A. B. Yelikar, H. Gallagher, E. Cham-pion, D. Wysocki, V. Delfavero, J. Lange, C. Rose, V. Valsan, S. Morisaki, J. Read, C. Henshaw, and R. O’Shaughnessy, Physical Review D 107 , 024040 (2023). [56] K. J. Wagner, R. O’Shaughnessy, A. Yelikar, N. Man-ning, D. Fernando, J. Lange, V. Tiwari, A. Fer-nando, and D. Williams, “Narrowing RIFT: Focused simulation-based-inference for interpreting exceptional 19 
+
+GW sources,” (2025), arXiv:2505.11655 [astro-ph.IM], arXiv:2505.11655 [astro-ph.IM]. [57] T. Dietrich, A. Samajdar, S. Khan, N. K. Johnson-McDaniel, R. Dudi, and W. Tichy, Physical Review D 
+
+100 (2019), 10.1103/physrevd.100.044003. [58] The LIGO Scientific Collaboration, the Virgo Collabora-tion, B. P. Abbott, R. Abbott, T. D. Abbott, S. Abra-ham, F. Acernese, K. Ackley, C. Adams, R. X. Adhikari, V. B. Adya, C. Affeldt, and et al., The Astrophysical Journal Letters 892 , L3 (2020). [59] K. C. Gendreau, Z. Arzoumanian, P. W. Adkins, C. L. Albert, J. F. Anders, A. T. Aylward, and C. L. Baker, in Space Telescopes and Instrumentation 2016: Ultravio-let to Gamma Ray , Society of Photo-Optical Instrumen-tation Engineers (SPIE) Conference Series, Vol. 9905, edited by J.-W. A. den Herder, T. Takahashi, and M. Bautz (2016) p. 99051H. [60] M. C. Miller, F. K. Lamb, A. J. Dittmann, S. Bogdanov, Z. Arzoumanian, K. C. Gendreau, S. Guillot, A. K. Hard-ing, W. C. G. Ho, J. M. Lattimer, R. M. Ludlam, S. Mah-moodifar, S. M. Morsink, P. S. Ray, T. E. Strohmayer, K. S. Wood, T. Enoto, R. Foster, T. Okajima, and et al., “NICER PSR J0030+0451 Illinois-Maryland MCMC samples [data set], Version 1.0.0,” (2019), zenodo. https://doi.org/10.5281/zenodo.3473466. [61] M. C. Miller, F. K. Lamb, A. J. Dittmann, S. Bog-danov, Z. Arzoumanian, K. C. Gendreau, S. Guil-lot, W. C. G. Ho, J. M. Lattimer, M. Loewen-stein, S. M. Morsink, P. S. Ray, M. T. Wolff, C. L. Baker, T. Cazeau, S. Manthripragada, C. B. Mark-wardt, T. Okajima, S. Pollard, I. Cognard, and et al., “NICER PSR J0740+6620 Illinois-Maryland MCMC samples [data set], Version v1,” (2021), zenodo. https://doi.org/10.5281/zenodo.4670689. [62] D. Choudhury, T. Salmi, S. Vinciguerra, T. Riley, Y. Kini, A. L. Watts, B. Dorsman, S. Bogdanov, S. Guillot, P. S. Ray, D. Reardon, R. A. Remillard, A. Bilous, D. Huppenkothen, J. Lattimer, N. Ruther-ford, Z. Arzoumanian, K. Gendreau, S. Morsink, and W. C. G. Ho, “Reproduction package for: ’A NICER view of the nearest and brightest millisecond pulsar: PSR J0437-4715’ [data set], Version v3,” (2024), zenodo. https://doi.org/10.5281/zenodo.13766753. [63] D. Choudhury, T. Salmi, S. Vinciguerra, T. E. Riley, Y. Kini, A. L. Watts, B. Dorsman, S. Bogdanov, S. Guil-lot, P. S. Ray, D. J. Reardon, R. A. Remillard, A. V. Bilous, D. Huppenkothen, J. M. Lattimer, N. Ruther-ford, Z. Arzoumanian, K. C. Gendreau, S. M. Morsink, and W. C. G. Ho, The Astrophysical Journal Letters 971 ,L20 (2024). [64] V. Doroshenko, V. F. Suleimanov, G. P¨ uhlhofer, and A. Santangelo, “MCMC samples for X-ray spectra fits summarised in the paper “A strangely light neu-tron star” [data set], Version v2,” (2022), zenodo. https://doi.org/10.5281/zenodo.8232233. [65] V. Doroshenko, V. F. Suleimanov, G. P¨ uhlhofer, and A. Santangelo, Nature Astronomy 6, 1444 (2022). [66] M. Mendes, H. G¨ ottling, A. Hensel, I. Svensson, K. Hebeler, A. Schwenk, N. Rutherford, and A. Watts, “Astrophysics equation of state inference with bayesian chiral effective field theory uncertainties,” (2026), arXiv:2605.18560 [nucl-th], arXiv:2605.18560 [nucl-th]. [67] P. Char and B. Biswas, Physical Review D 113 , 044002 (2026). [68] W. Kastaun, J. V. Kalinani, and R. Ciolfi, Physical Re-view D 103 , 023018 (2021). [69] W. Kastaun, “wokast/RePrimAnd: RePrimAnd library [computer software], Version v1.7,” (2024), zenodo. https://doi.org/10.5281/zenodo.10617510. [70] D. Mroczek, M. C. Miller, J. Noronha-Hostler, and N. Yunes, Physical Review D 110 , 123009 (2024). [71] M. B. Tsang, J. R. Stone, F. Camera, P. Danielewicz, S. Gandolfi, K. Hebeler, C. J. Horowitz, J. Lee, W. G. Lynch, Z. Kohley, R. Lemmon, P. M¨ oller, T. Murakami, S. Riordan, X. Roca-Maza, F. Sammarruca, A. W. Steiner, I. Vida˜ na, and S. J. Yennello, Physical Review C 86 , 015803 (2012). [72] B.-A. Li, P. G. Krastev, D.-H. Wen, and N.-B. Zhang, The European Physical Journal A 55 (2019), 10.1140/epja/i2019-12780-8. [73] D. Wysocki, R. O’Shaughnessy, J. Lange, and Y.-L. L. Fang, Physical Review D 99 (2019), 10.1103/phys-revd.99.084026. [74] M. Ebiri, A HyperPipeline for Joint Inference of the Equation of State and Population of Binary Neutron Stars , Master’s thesis, Rochester Institute of Technology (2026), database copyright ProQuest LLC. [75] The LIGO Scientific Collaboration, the Virgo Collabora-tion, and the KAGRA Collaboration, “LVK Algorithm Library - LALSuite,” Free software (GPL) (2018), dOI: https://doi.org/10.7935/GT1W-FZ16. [76] K. Wette, SoftwareX 12 , 100634 (2020). [77] V. Tiwari, C. Hoy, S. Fairhurst, and D. MacLeod, Phys-ical Review D 108 (2023), 10.1103/physrevd.108.023001. [78] L. V. Drummond, K. Chatziioannou, and E. Fon-seca, “Observational selection effects on radio pul-sars are minimal for masses, but significant for or-bits and spins,” (2026), arXiv:2609.03157 [astro-ph.HE], arXiv:2609.03157 [astro-ph.HE]. [79] O. Komoltsev and A. Kurkela, Physical Review Letters 
+
+128 , 202701 (2022). [80] L. Mauviard, S. Guillot, L. Suleiman, Y. Kini, D. Gonz´ alez-Caniulef, C. Kazantsev, P. Stammler, D. Choudhury, B. Dorsman, M. Hoogkamer, D. Hup-penkothen, T. Salmi, A. L. Watts, J. Novak, N. A. Webb, J.-F. Olive, M. Kerr, L. Guillemot, I. Cog-nard, and G. Theureau, “A NICER view of PSR J1614-2230: a massive and compact millisec-ond pulsar,” (2026), arXiv:2609.00172 [astro-ph.HE], arXiv:2609.00172 [astro-ph.HE]. [81] T. E. Riley, A. L. Watts, S. Bogdanov, P. S. Ray, R. M. Ludlam, S. Guillot, Z. Arzoumanian, C. L. Baker, A. V. Bilous, D. Chakrabarty, K. C. Gendreau, A. K. Harding, W. C. G. Ho, J. M. Lattimer, S. M. Morsink, and T. E. Strohmayer, The Astrophysical Journal Letters 887 , L21 (2019). [82] T. E. Riley, A. L. Watts, P. S. Ray, S. Bogdanov, S. Guillot, S. M. Morsink, A. V. Bilous, Z. Arzouma-nian, D. Choudhury, J. S. Deneva, K. C. Gendreau, A. K. Harding, W. C. G. Ho, J. M. Lattimer, M. Loewen-stein, R. M. Ludlam, C. B. Markwardt, T. Okajima, C. Prescod-Weinstein, R. A. Remillard, and et al., The Astrophysical Journal Letters 918 , L27 (2021). [83] T. Salmi, S. Vinciguerra, D. Choudhury, T. E. Riley, A. L. Watts, R. A. Remillard, P. S. Ray, S. Bogdanov, S. Guillot, Z. Arzoumanian, C. Chirenti, A. J. Dittmann, K. C. Gendreau, W. C. G. Ho, M. C. Miller, S. M. Morsink, Z. Wadiasingh, and M. T. Wolff, The Astro-20 
+
+physical Journal 941 , 150 (2022). [84] S. Vinciguerra, T. Salmi, A. L. Watts, D. Choudhury, T. E. Riley, P. S. Ray, S. Bogdanov, Y. Kini, S. Guil-lot, D. Chakrabarty, W. C. G. Ho, D. Huppenkothen, S. M. Morsink, Z. Wadiasingh, and M. T. Wolff, The Astrophysical Journal 961 , 62 (2024). [85] A. J. Dittmann, M. C. Miller, F. K. Lamb, I. Holt, C. Chirenti, M. T. Wolff, S. Bogdanov, S. Guillot, W. C. G. Ho, S. M. Morsink, Z. Arzoumanian, and K. C. Gendreau, (2024), arXiv:2406.14467 [astro-ph.HE]. [86] J. E. Horvath, L. S. Rocha, L. M. de S´ a, P. H. R. S. Moraes, L. G. Bar˜ ao, M. G. B. de Avellar, A. Bernardo, and R. R. A. Bachega, Astronomy & Astrophysics 672 ,L11 (2023). [87] S. Pal, S. Podder, and G. Chaudhuri, The Astrophysical Journal 983 , 24 (2025).

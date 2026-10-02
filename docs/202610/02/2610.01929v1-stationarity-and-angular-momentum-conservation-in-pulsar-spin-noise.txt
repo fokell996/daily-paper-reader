@@ -1,0 +1,2302 @@
+Title: Stationarity and angular momentum conservation in pulsar spin noise
+
+URL Source: https://arxiv.org/pdf/2610.01929v1
+
+Published Time: Fri, 02 Oct 2026 02:01:18 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+MNRAS 000 , 1–21 (2026) Preprint 2 October 2026 Compiled using MNRAS L ATEX style file v3.2 
+
+# Stationarity and angular momentum conservation in pulsar spin noise 
+
+## Reginald Christian Bernardo, ★
+
+Max Planck Institute for Gravitational Physics (Albert Einstein Institute), Leibniz Universität Hannover, Callinstrasse 38, D-30167 Hannover, Germany 
+
+Accepted XXX. Received YYY; in original form ZZZ 
+
+ABSTRACT 
+
+We present an analysis of pulsar spin noise based on physically-motivated two-component models of spin wandering. We focus on two models, distinguished by their total angular momentum dynamics: a singular, nonstationary model with a diffusive total angular momentum, and a minimal, stationary model anchored on a conserved total angular momentum. We develop scalable Gaussian process methods and, using mock data, show that the two models are fully testable and distinguishable with full-state observations, i.e., simultaneous independent data on the crust and the superfluid rotational states. This paves a path to testing stationarity in pulsar spin noise, potentially achievable with joint continuous gravitational wave observations and radio timing of pulsars. However, robust inferences and predictions are harder to achieve, and depend on the priors and data quality, when only one component is observationally accessible. 
+
+Key words: pulsars: general – methods: data analysis – methods: statistical 
+
+1 INTRODUCTION 
+
+Pulsars are highly magnetized, stably rotating neutron stars that send beams of electromagnetic radiation at regular intervals (Hewish et al. 1968; Pilkington et al. 1968; Wallace et al. 1977; Taylor & Manch-ester 1977). For this reason, they are regarded as one of the Uni-verse’s most precise natural clocks (Lorimer 2001; Kaspi & Kramer 2016; Bassa et al. 2017; Clark et al. 2018; Nieder et al. 2020; Clark et al. 2025; Bagchi et al. 2025). This exquisite timing precision has been used to set constraints on fundamental physics through time delays caused by fields such as strong gravity (Manchester 2015; Kramer et al. 2021; Freire & Wex 2024), dark matter (Khmelnitsky & Rubakov 2014; Porayko & Postnov 2014; Porayko et al. 2018; Smarra et al. 2023), and gravitational waves (Hulse & Taylor 1975; Taylor & Weisberg 1982; Hulse 1994; Damour 2015). Pulsar timing arrays have made the best out of this to search for a gravitational wave background signal via spatially-correlated time delays (Agazie et al. 2023; Antoniadis et al. 2023; Reardon et al. 2023; Xu et al. 2023). The precision achievable with pulsar timing has a limit that re-mains incompletely understood. Once a deterministic timing model – accounting for the pulsar’s spin period, period derivative, orbital dynamics, and other deterministic effects – is subtracted, glitches, timing noise, mode switching, and nulling are among the phenom-ena that set the ceiling on a pulsar’s utility for testing fundamental physics through time delays. Physical pictures exist for some of these. Glitches are reasonably well described by a two-step pinning and un-pinning process of superfluid vortices entrained in the neutron star’s crust (Baym et al. 1969; Andersson et al. 2012; Chamel 2013); timing noise is commonly depicted as a red stochastic process in the neu-tron star’s spin or angular momentum, i.e., spin wandering (Groth  
+
+> ★
+
+E-mail: reginald.christian.bernardo@aei.mpg.de 
+
+1975; Hobbs et al. 2010); and mode switching and nulling are asso-ciated with the dynamics of the magnetosphere (Backer 1970; Bartel et al. 1982; Timokhin 2010). However, a unified physical picture connecting these phenomena, and in particular tying timing noise to a falsifiable physical origin, remains lacking. We start with glitches and timing noise, both of which have been given phenomenological accounts within a single body-averaged two-component dynamical model of a neutron star’s rotational de-grees of freedom. A glitch is preceded by the build-up of a crust-core lag and an angular momentum reservoir that is released in a sudden spin-up of the crust (Montoli et al. 2020; Andersson et al. 2012; Chamel 2013). Timing noise, on the other hand, is associated with stochastic torques that continuously act on the components of the neutron star. However, the two-component models considered so far to explain radio timing noise correspond to a nonstationary Gaus-sian process (Meyers et al. 2021a,b; Antonelli et al. 2023; Bernardo 2026), whose nonstationarity can be traced to a diffusive total angu-lar momentum mode excited by the stochastic torques. A stationary process can instead be motivated by imposing that the total angular momentum is conserved, or that stochastic torques compel only in-ternal angular momentum exchanges (Antonelli et al. 2023, 2025). Conservation of total angular momentum therefore sits at the heart of the question of whether pulsar spin noise is stationary, and hints at a potentially falsifiable prediction of pulsar physics: testing stationarity in spin noise amounts to testing whether the total angular momentum of a neutron star is conserved. This work sets out to develop methods geared toward testing stationarity in pulsar spin noise. However, there is an observational caveat. Radio pulsar timing measures only the crust; in principle, we take this to be the part of the star that is strongly electromagnetically-coupled. The detected pulses, and our understanding of their emission, are tied to the crust’s rotational state. Theory offers insights into the star’s interior dynam-ics (Prix 1999; Prix et al. 2002; Prix 2004; Andersson et al. 2006; 
+
+© 2026 The Authors arXiv:2610.01929v1 [astro-ph.HE] 1 Oct 2026 2 Reginald Christian Bernardo 
+
+Melatos & Link 2014; Haskell & Melatos 2015; Haskell & Sedrakian 2018), and continuous gravitational waves may complement radio timing by probing the star’s interior rotation (Jaranowski et al. 1998; Prix 2009; Owen et al. 2009; Haskell & Schwenzer 2021; Ming et al. 2022; Dergachev & Papa 2025, 2026; McGloughlin et al. 2026), completing the picture beyond the radio band. This raises a question that this work takes up directly: if only a single axis of a multidi-mensional rotational dynamics is observed, what can we robustly say about the underlying model, or about the interior state it predicts? Previous studies have focused on parameter identifiability. Elec-tromagnetic timing data alone can only recover a subset of the model parameters, and gravitational wave data on the superfluid rotation is needed to break the remaining degeneracies (Meyers et al. 2021a,b). The model’s power spectral density has been used to extract ana-lytic timing-noise-strength scalings (Antonelli et al. 2023), and fu-ture joint electromagnetic-gravitational wave correlations have been proposed to observationally distinguish internal and magnetospheric noise (Antonelli et al. 2025). Robust tests of these physical models must also confront the prac-tical realities of pulsar timing data (Kelly et al. 2014; Ambikasaran et al. 2015; van Haasteren & Vallisneri 2015; Goncharov et al. 2020): decades-long, unevenly sampled time series with heteroscedastic measurement uncertainties, frequently analyzed jointly across many pulsars in a pulsar timing array. A direct Gaussian process likelihood evaluation scales as O( 𝑁 3) in the number of observations, which becomes prohibitive as data spans lengthen and as more pulsars, or additional rotational-state observables, enter a joint analysis. This motivates the development of scalable, physically-motivated Gaus-sian process methods (Singh et al. 2018; Foreman-Mackey et al. 2017) that retain the O( 𝑁 ) efficiency of phenomenological kernels while remaining anchored to the dynamics of spin wandering. We first revisit the two-component model of spin wandering (Sec-tion 2) and its analytical solutions (Section 3), which together pro-vide the foundation for constraining stationarity in spin noise from timing observations. Building on this foundation, we develop scal-able, physically-motivated Gaussian process methods for pulsar spin noise using well-established diffusion theory and the corresponding analytical solutions (Section 4). We then test the method on mock angular velocity residuals generated from both the nonstationary and the stationary spin noise models (Sections 5–6). We conclude with a discussion of future work (Section 7). We include four appendices with additional details. Appendix A motivates the two-component model starting from a two-fluid description of a neutron star; Appendix B briefly reviews the fluctuation-dissipation theorem; Appendix C illustrates the fast Bayesian method of Section 4 on 2D Brownian motion; and Ap-pendix D presents the full-state semiseparable likelihood for the two-component model. 
+
+2 SPIN WANDERING WITH TWO COMPONENTS 
+
+Consider the neutron star two-component model with spin wandering described by the equations of motion (Baym et al. 1969; Groth 1975; Meyers et al. 2021a,b; Antonelli et al. 2023) 
+
+𝐼 c ¤Ωc = − 𝐼 c
+
+𝜏 c
+
+(Ωc − Ωs) + 𝑁 c + 𝜉 c (𝑡 ) (1) 
+
+𝐼 s ¤Ωs = 𝐼 s
+
+𝜏 s
+
+(Ωc − Ωs) + 𝑁 s + 𝜉 s (𝑡 ) (2) where subscripts c and s correspond to crust and superfluid compo-nents, respectively, (𝐼 c, 𝐼 s) are constant moments of inertia, (Ωc, Ωs)
+
+are angular velocities, and (𝑁 c, 𝑁 s) are external torques. The time scales 𝜏 c and 𝜏 s characterize nondissipative mutual friction between the crust and the superfluid, and the stochastic torques (𝜉 c (𝑡 ), 𝜉 s (𝑡 )) 
+
+represent the random fluctuations. Mutual friction terms balance each other in the limit 𝐼 s/𝐼 c = 𝜏 s/𝜏 c. We adopt this detailed-balance regime throughout; its consequence for the total angular momentum equation of motion is made explicit below. The stochastic torques 
+
+𝜉 c (𝑡 ) and 𝜉 s (𝑡 ) are assumed to be Gaussian white noise processes with zero mean and correlation functions 
+
+⟨𝜉 c (𝑡 )𝜉 c (𝑡 ′)⟩ = 𝑄 c 𝐼 2c 𝛿 (𝑡 − 𝑡 ′) (3) 
+
+⟨𝜉 s (𝑡 )𝜉 s (𝑡 ′)⟩ = 𝑄 s 𝐼 2s 𝛿 (𝑡 − 𝑡 ′) (4) 
+
+⟨𝜉 c (𝑡 )𝜉 s (𝑡 ′)⟩ = 0 (5) where (𝑄 c, 𝑄 s) are diffusion coefficients. The notation ⟨·⟩ denotes an ensemble average; or the average over a large number of re-alizations of a stochastic process. Appendix A motivates (1-5) by coarse-graining a two-fluid model. The model (1-5) has six free parameters –
+
+(𝜏 c, 𝜏 s, 𝑁 c/𝐼 c, 𝑁 s/𝐼 s, 𝑄 c, 𝑄 s), a relaxation time scale, a diffu-sion coefficient, and an external torque coefficient for each component. The time scales can also be expressed in terms of a crust-core coupling time scale 𝜏 and ratio 𝑟 given by 
+
+𝜏 = 𝜏 c𝜏 s
+
+𝜏 c + 𝜏 s
+
+(6) 
+
+𝑟 = 𝜏 s
+
+𝜏 c
+
+. (7) For a random variable, 𝑂 (𝑡 ), with an ensemble average that ap-proaches a finite constant limit at large times compared to the system relaxation time, we define constant steady state values ⟨⟨·⟩⟩ by 
+
+⟨⟨ 𝑂 (𝑡 )⟩⟩ ≡ lim 
+
+> 𝑡 →∞
+
+⟨𝑂 (𝑡 )⟩ ≡ ⟨ 𝑂 (𝑡 )⟩ ∞ . (8) The constant external torques weighted by the moments of inertia can be expressed in terms of the constant steady-state crust angular acceleration, ⟨⟨ 𝛼 c⟩⟩ = ⟨ ¤ Ωc⟩∞, and crust-core spin lag, ⟨⟨ ΔΩ ⟩⟩ = ⟨Ωc −
+
+Ωs⟩∞, through the following equations: 
+
+⟨⟨ ΔΩ ⟩⟩ = 𝜏 
+
+ 𝑁 c
+
+𝐼 c
+
+− 𝑁 s
+
+𝐼 s
+
+
+
+(9) 
+
+⟨⟨ 𝛼 c⟩⟩ = 1
+
+𝜏 c + 𝜏 s
+
+ 𝜏 c 𝑁 c
+
+𝐼 c
+
++ 𝜏 s 𝑁 s
+
+𝐼 s
+
+
+
+. (10) The processes ¤Ωc and Ωc − Ωs have constant steady state values and are stationary (Meyers et al. (2021a,b); Bernardo (2026)). (6-9) can be inverted to obtain: 
+
+𝜏 c = 𝜏 
+
+
+
+1 + 𝑟 −1 
+
+(11) 
+
+𝜏 s = 𝜏 (1 + 𝑟 ) (12) 
+
+𝑁 c
+
+𝐼 c
+
+= ⟨⟨ 𝛼 c⟩⟩ + ⟨⟨ ΔΩ ⟩⟩ 
+
+𝜏 𝑟 
+
+1 + 𝑟 (13) 
+
+𝑁 s
+
+𝐼 s
+
+= ⟨⟨ 𝛼 c⟩⟩ − ⟨⟨ ΔΩ ⟩⟩ 
+
+𝜏 
+
+11 + 𝑟 . (14) Then, the free parameters of the two-component model with spin wandering can be treated as (𝜏, 𝑟, ⟨⟨ 𝛼 c⟩⟩ , ⟨⟨ ΔΩ ⟩⟩ , 𝑄 c, 𝑄 s). O’Neill et al. (2024); Dong et al. (2026) have shown that four out of six of the parameters of the model ( 𝜏, ⟨⟨ Δ𝛼 c⟩⟩ , 𝑄 c, 𝑄 s) can be constrained by electromagnetic observations of the pulsar phase; ⟨⟨ Δ𝛼 c⟩⟩ can be associated with the spin down, or more precisely the spin down rate at steady state, and (𝜏, 𝑄 c, 𝑄 s) to timing noise exhibited through spin wandering. We shall refer to (𝜏 c, 𝜏 s, 𝑁 c/𝐼 c, 𝑁 s/𝐼 s, 𝑄 c, 𝑄 s) as component  
+
+> MNRAS 000 , 1–21 (2026)
+
+## Stationarity and angular momentum conservation in pulsar spin noise 3
+
+parametrization and (𝜏, 𝑟, ⟨⟨ 𝛼 c⟩⟩ , ⟨⟨ ΔΩ ⟩⟩ , 𝑄 c, 𝑄 s) as eigenbasis parametrization, respectively. For this work, we will work directly with the angular velocities Ωi (𝑡 )’s or spin frequencies 𝑓 i (𝑡 ) =Ωi (𝑡 )/( 2𝜋 ) and their residuals (O’Neill et al. 2024). 1
+
+Spin noise and the conservation of total angular momentum 
+
+The model (1-5) can be parametrized with the crust-core lag Ω− and the total angular momentum 𝐽 :
+
+Ω− ≡ Ωc − Ωs (15) 
+
+𝐽 ≡ 𝐼 cΩc + 𝐼 sΩs . (16) These system eigenmodes can be identified by diagonalizing the equations of motion (Meyers et al. 2021a,b; Antonelli et al. 2023; Bernardo 2026) and lead to the dynamical system 
+
+¤𝐽 = 𝑁 c + 𝑁 s + 𝜉 c (𝑡 ) + 𝜉 s (𝑡 ) (17) 
+
+¤Ω− = − Ω−
+
+𝜏 + 𝑁 c
+
+𝐼 c
+
+− 𝑁 s
+
+𝐼 s
+
++ 𝜉 c (𝑡 )
+
+𝐼 c
+
+− 𝜉 s (𝑡 )
+
+𝐼 s
+
+. (18) This simplified form of ¤𝐽 follows from the detailed-balance condition 
+
+𝐼 s/𝐼 c = 𝜏 s/𝜏 c imposed above. Without it, diagonalizing (1-2) instead gives ¤𝐽 = (𝐼 s/𝜏 s − 𝐼 c/𝜏 c) Ω− + 𝑁 c + 𝑁 s + 𝜉 c (𝑡 ) + 𝜉 s (𝑡 ), so total an-gular momentum is sourced by the crust-core lag whenever detailed balance is broken. A physical conclusion can be reached with the above parametrization: even in the absence of deterministic external torques, stochastic torques will continue to pump in angular momen-tum into the system. The crust-core lag is an OU process. This turns the process nonstationary as a linear combination of a diffusive total angular momentum eigenmode stationary crust-core lag eigenmode. For this reason, we refer to the model (1-5) as singular, nonstationary, or both in what follows. The word ‘singular’ is used to describe the general two-component model that is described by a singular drift matrix (Section 3). A minimal physical model that conserves angular momentum can be explicitly constructed by setting 𝜉 c (𝑡 ) ≡ − 𝜉 s (𝑡 ) (Meyers et al. 2021a). This can be realized by imposing that the total angular mo-mentum mode is internally conserved (Antonelli et al. 2023, 2025), or by invoking the fluctuation-dissipation theorem (Appendix B). An appealing feature of this model is that it has one parameter 
+
+𝑁 c/𝐼 c that can be associated to spin-down, and three free parameters 
+
+(𝜏, 𝑥 s = 𝑟 /( 1 + 𝑟 ), 𝑄 ) to spin wandering; where 𝑥 c = 𝐼 c/( 𝐼 c + 𝐼 s)
+
+and 𝑥 s = 1 − 𝑥 c are fractional moments of inertia in the crust and the superfluid. The eigenbasis equations of motion of this model are given by 
+
+¤𝐽 = 𝑁 c (19) 
+
+¤Ω− = − Ω−
+
+𝜏 + 𝑁 c
+
+𝐼 c
+
++ 𝜉 (𝑡 )
+
+𝑥 c𝑥 s 𝐼 , (20) where 𝜉 (𝑡 ) = −𝜉 c (𝑡 ) = 𝜉 s (𝑡 ), and 
+
+⟨𝜉 (𝑡 )𝜉 (𝑡 ′)⟩ = 𝑄𝐼 2𝛿 (𝑡 − 𝑡 ′) . (21) The component form of the equations of motion is given by (Antonelli                                       
+
+> 1The pulsar phase 𝜙 (𝑡 )is related to Ωc(𝑡 )through 𝜙 (𝑡 )=∫𝑡
+> 0𝑑𝑡 ′Ωc(𝑡 ′)
+> (O’Neill et al. 2024; Dong et al. 2026). This is related to the timing residual
+> 𝑟 (𝑡 )via 𝑟 (𝑡 ) ≃ 𝛿 𝜙 /( 2𝜋𝜈 )where 𝜈 is a nominal spin frequency and 𝛿 𝜙 =
+> 𝜙 −𝜙 Mis the observed phase residual relative to a particular timing model
+> 𝜙 M(𝑡 )that factors in spin-down and other deterministic effects.
+
+et al. 2023, 2025) 
+
+𝐼 c ¤Ωc = − 𝐼 c 𝐼 s
+
+𝐼 c + 𝐼 s
+
+(Ωc − Ωs)
+
+𝜏 + 𝑁 c + 𝜉 (𝑡 ) (22) 
+
+𝐼 s ¤Ωs = 𝐼 c 𝐼 s
+
+𝐼 c + 𝐼 s
+
+(Ωc − Ωs)
+
+𝜏 − 𝜉 (𝑡 ) . (23) The above equations reveal that nondissipative mutual friction is expressed symmetrically between the two components. Most impor-tantly, this model accommodates a single random dynamical variable, 
+
+Ω− , that is an OU process, and is therefore inherently 1D and station-ary. Therefore, we refer to the model (19-21) as minimal, stationary or both. ’Minimal’ is used relatively to indicate a model with fewer parameters and dimensions. Realizations of the singular-nonstationary (1-5) and minimal-stationary (19-21) are shown in Figure 1. 
+
+3 ANALYTICAL SOLUTIONS 
+
+The model (1-5) can be written as a shifted bivariate OU process: 2
+
+¤𝛀 = −D𝛀 + N + 𝝈 ¤W (24) where 
+
+𝛀 =
+
+Ωc
+
+Ωs
+
+
+
+, (25) 
+
+D =
+
+ 1/𝜏 c −1/𝜏 c
+
+−1/𝜏 s 1/𝜏 s
+
+
+
+, (26) 
+
+N =
+
+𝑁 c/𝐼 c
+
+𝑁 s/𝐼 s
+
+
+
+, (27) 
+
+𝝈 =
+
+√𝑄 c 00 √𝑄 s
+
+
+
+, (28) and ¤W(𝑡 ) is a Gaussian white noise process with zero mean and correlation function 
+
+⟨ ¤ 𝑊 𝑖 (𝑡 ) ¤ 𝑊 𝑗 (𝑡 ′)⟩ = 𝛿 𝑖 𝑗 𝛿 (𝑡 − 𝑡 ′) . (29) We refer to D and 𝝈 as the drift and volatility matrices, respectively. The volatility matrix gives rise to the diffusion matrix or process covariance: 
+
+Q = 𝝈𝝈 ⊤ . (30) The matrix Q is a symmetric positive semi-definite matrix with diffu-sion coefficients. The off-diagonal elements of Q encode correlations between the stochastic torques acting on the crust and superfluid components; the model (1-5) assumes these are uncorrelated. The eigenvalues of D are given by 𝜆 D = 𝜏 −1, 0, and so D is singular, i.e., |D| = 0. The first eigenvalue belongs to a stationary eigenmode or damped random walk with a finite relaxation time 𝜏 . The sec-ond corresponds to a nonstationary eigenmode or pure random walk. The former can be identified with the crust-core lag and the latter to the total angular momentum mode (Bernardo 2026). This implies that the Gaussian process 𝛀 is nonstationary and not mean-reverting (Meyers et al. (2021a,b); Antonelli et al. (2023); Bernardo (2026)). This implies that the analytic solution to the multivariate OU   
+
+> 2‘Shifted’ mathematically means that the process is of nonzero mean, or physically that external forces act on the system. MNRAS 000 , 1–21 (2026)
+
+## 4 Reginald Christian Bernardo 0.0002 0.0000 0.0002 0.0004 0.0006 0.0008                     
+
+> c(t)c(ti) (rad day 1)
+> 0.006
+> 0.004
+> 0.002
+> 0.000 0.002
+> s(t) s(ti) (rad day  1)
+> 0.00075
+> 0.00050
+> 0.00025
+> 0.00000 0.00025 0.00050 0.00075 0.00100
+> c (rad day  1)
+> 57200 57400 57600 57800 58000 58200 58400 MJD 0.003
+> 0.002
+> 0.001
+> 0.000 0.001 0.002 0.003 0.004
+> s (rad day  1)0.0002 0.0001 0.0000 0.0001 0.0002
+> c(t)c(ti) (rad day 1)
+> 0.02
+> 0.01
+> 0.00 0.01 0.02
+> s(t) s(ti) (rad day  1)
+> 0.0003
+> 0.0002
+> 0.0001
+> 0.0000 0.0001 0.0002
+> c (rad day  1)
+> 57200 57400 57600 57800 58000 58200 58400 MJD 0.02
+> 0.01
+> 0.00 0.01 0.02 0.03
+> s (rad day  1)
+
+Figure 1. Sample realizations of the singular, nonstationary model (1–5) and the minimal, stationary model (19-21) with parameters in Tables 1 and 4. 
+
+process expressed in terms of the solution of the Lyapunov equation is not directly applicable (Singh et al. 2018). Analytical (time-domain, dynamical) solutions to (1-5) were presented in Bernardo (2026) to highlight the process’ nonstationary behavior – that can be traced to stochastic variations in the total angular momentum. We circle around this limitation by regularizing the drift matrix as follows. In place of D in (24), we use D𝜂 given by 
+
+D𝜂 =
+
+ 1/𝜏 c −1/𝜏 c + 1/𝜂 
+
+−1/𝜏 s + 1/𝜂 1/𝜏 s
+
+
+
+, (31) where 𝜂 > 0 is a constant regularization parameter. The time scale 𝜂 
+
+controls the growth of the total angular momentum in the regularized model. The eigenvalues of D𝜂 are given by 𝜆 = 𝜏 −1 − 𝜂 −1 and 𝜆 =
+
+𝜂 −1, and so D𝜂 has strictly positive eigenvalues in the parameter space 
+
+𝜂 > 𝜏 > 0. For a relaxation time 𝜏 = O( 1) yr and an observation window 𝑇 obs = O( 1) yr, an appropriate choice of 𝜂 is 𝜂 ≫ 𝜏, 𝑇 obs .3
+
+Then, the standard OU analytical solution can be applied to the regularized process (Singh et al. 2018). The solution to (24) can be presented as follows. We write down 
+
+𝛀 = 𝛀 D + 𝛀 S (32) where 
+
+¤𝛀 D = −D𝜂 𝛀 D + N (33) and 
+
+¤𝛀 S = −D𝜂 𝛀 S + 𝝈 ¤W . (34)  
+
+> 3
+
+The original singular process can be approached informally by taking in-creasingly large values of the regularization parameter, or formally in the limit 𝜂 → ∞ of the regularized process. MNRAS 000 , 1–21 (2026) Stationarity and angular momentum conservation in pulsar spin noise 5
+
+The linearity of (24) guarantees that it is satisfied by (32) together with deterministic and stochastic inhomogeneous parts in (33-34). Clearly, 𝛀 D and 𝛀 S are the deterministic and stochastic parts of 
+
+𝛀 , respectively. The deterministic part 𝛀 D can be dealt with using methods for solving linear ordinary differential equations. We have 
+
+𝛀 D (𝑡 ) = 𝑒 −D𝜂 𝑡 𝛀 0 +
+
+∫ 𝑡 
+
+> 0
+
+𝑑𝑡 1 𝑒 −D𝜂 (𝑡 −𝑡 1 ) N , (35) where 𝛀 0 is an initial prior. The stochastic part 𝛀 S can be recognized as a bivariate OU process with a drift matrix D𝜂 and a diffusion matrix Q. The probability 
+
+𝑃 (𝛀 S, 𝑡 |𝛀 ′
+
+> S
+
+, 𝑡 ′) of observing 𝛀 S at time 𝑡 and 𝛀 ′ 
+
+> S
+
+at time 𝑡 ′ satisfies the Fokker-Planck equation: 
+
+𝜕 𝑡 𝑃 (𝛀 S, 𝑡 |𝛀 ′
+
+> S
+
+, 𝑡 ′) = L [ 𝑃 (𝛀 S, 𝑡 |𝛀 ′
+
+> S
+
+, 𝑡 ′)] , (36) where the functional L [ 𝐹 (𝛀 S)] is given by 
+
+L [ 𝐹 (𝛀 S)] ≡ 𝜕 𝜕 ΩS,𝑖 
+
+ 𝐷 𝑖 𝑗 ΩS, 𝑗 𝐹 (𝛀 S)+ 12
+
+𝜕 2
+
+𝜕 ΩS,𝑖 𝜕 ΩS, 𝑗 
+
+ 𝑄 𝑖 𝑗 𝐹 (𝛀 S) .
+
+(37) The solution is a Gaussian distribution 𝑃 (𝛀 S, 𝑡 |𝛀 ′
+
+> S
+
+, 𝑡 ′) ∼ N ( 𝝁 , 𝚺 )
+
+with mean 𝝁 and covariance 𝚺 given by 
+
+𝚲 = 𝑒 −D𝜂 |𝑡 −𝑡 ′ | (38) 
+
+𝝁 = 𝚲𝛀 ′ 
+
+> S
+
+(39) 
+
+𝚺 = c − 𝚲 c𝚲 ⊤ . (40) This is valid for arbitrary times 𝑡 and 𝑡 ′. The matrix c is the solution to the Lyapunov equation: 
+
+D𝜂 c + cD ⊤ 
+
+> 𝜂
+
+= Q . (41) The Lyapunov equation can be solved analytically for the regularized drift matrix D𝜂 . The stationary solution is given by 
+
+𝛀 S ∼ N ( 0, c) . (42) This solution anchors a fast Bayesian inference method to be intro-duced in the following section (Singh et al. 2018). The covariance of the stochastic part 𝛀 S determines the covariance of the process 𝛀 ; since the deterministic and stochastic parts are uncorrelated. We have 
+
+⟨𝛀 ⟩ = 𝛀 D + ⟨ 𝛀 S⟩ (43) and 
+
+⟨𝛀𝛀 ⊤⟩ = 𝛀 D𝛀 ⊤ 
+
+> D
+
++ 𝛀 D ⟨𝛀 ⊤ 
+
+> S
+
+⟩ + ⟨ 𝛀 S⟩𝛀 ⊤ 
+
+> D
+
++ ⟨ 𝛀 S𝛀 ⊤ 
+
+> S
+
+⟩ . (44) At long times compared to the initial time, 𝑡 − 𝑡 0 ≫ 𝜏 , the mean of the stochastic contribution vanishes, ⟨𝛀 S⟩ → 0. Then, the mean and the covariance can be written as 
+
+⟨𝛀 ⟩ ∼ 𝛀 D (45) and 
+
+⟨𝛀𝛀 ⊤⟩ ∼ 𝛀 D𝛀 ⊤ 
+
+> D
+
++ ⟨ 𝛀 S𝛀 ⊤ 
+
+> S
+
+⟩ , (46) with ⟨𝛀 S𝛀 ⊤ 
+
+> S
+
+⟩ ∼ c where c is the solution of the Lyapunov equation (41). This gives a regularized solution to (1-5) that is rooted in estab-lished theory (Singh et al. 2018). In addition, time-domain analytical (exact and asymptotic) solutions to the frequencies and phases have been expressed in Bernardo (2026). These will be utilized in Section 4 to develop scalable Gaussian process models of spin noise. 
+
+The stationary limit 
+
+The four-parameter process (19-21) characterized by a conserved total angular momentum (Antonelli et al. 2023) can be considered as the stationary limit of the six-parameter process (1-5). A regularized solution can be teased out analytically following the method outlined previously. In vector form (24), the stationary model (19-21) is given by the drift, torque, and volatility matrices 
+
+D =
+
+ 𝑥 s/𝜏 −𝑥 s/𝜏 
+
+−𝑥 c/𝜏 𝑥 c/𝜏 
+
+
+
+, (47) 
+
+N =
+
+𝑁 c/𝐼 c
+
+0
+
+
+
+, (48) 
+
+𝝈 =√︁ 𝑄 
+
+ 1/𝑥 c 0
+
+−1/𝑥 s 0
+
+
+
+. (49) However, the solution to (19-21) can also be expressed simply. At large times compared to the relaxation time, the stationary, Gaussian process can be fully determined by the angular momentum and the first two moments of the crust-core lag: 
+
+𝐽 ∼ 𝑁 c𝑡 (50) 
+
+⟨Ω− (𝑡 )⟩ ∼ 𝜏𝑁 c
+
+𝐼 c
+
+(51) 
+
+⟨Ω− (𝑡 )Ω− (𝑡 ′)⟩ − ⟨ Ω− (𝑡 )⟩⟨ Ω− (𝑡 ′)⟩ ∼ 𝑄𝜏 
+
+2(𝑥 c𝑥 s)2 𝑒 − | 𝑡 ′ −𝑡 |/ 𝜏 . (52) This can be translated to component form. 4 For the crust, we have 
+
+⟨Ωc (𝑡 )⟩ ∼ 𝜏𝑥 s 𝑁 c
+
+𝐼 c
+
++ 𝑁 c
+
+𝐼 𝑡 (53) 
+
+⟨Ωc (𝑡 )Ωc (𝑡 ′)⟩ − ⟨ Ωc (𝑡 )⟩⟨ Ωc (𝑡 ′)⟩ ∼ 𝑄𝜏 
+
+2𝑥 2c
+
+𝑒 − | 𝑡 ′ −𝑡 |/ 𝜏 , (54) and for the superfluid, we have 
+
+⟨Ωs (𝑡 )⟩ ∼ − 𝜏𝑥 c 𝑁 c
+
+𝐼 c
+
++ 𝑁 c
+
+𝐼 𝑡 (55) 
+
+⟨Ωs (𝑡 )Ωs (𝑡 ′)⟩ − ⟨ Ωs (𝑡 )⟩⟨ Ωs (𝑡 ′)⟩ ∼ 𝑄𝜏 
+
+2𝑥 2s
+
+𝑒 − | 𝑡 ′ −𝑡 |/ 𝜏 . (56) The above solutions make desirable features of (19-21) transpar-ent. First, in contrast with (1-5), the angular velocity residuals are a stationary process. The spin-down of a pulsar can be entirely asso-ciated with the constant external torque 𝑁 c, and spin wandering to mutual friction and the stochastic torque 𝜉 (𝑡 ). The component resid-uals are described by an OU process with the same relaxation time and amplitudes differentiated only by each components’ moment of inertia. It can be shown that 𝛿 Ωc (𝑡 ) ∼ −( 𝑥 s/𝑥 c)𝛿 Ωs (𝑡 ) where 
+
+𝛿 Ω𝑖 (𝑡 ) = Ω 𝑖 (𝑡 ) − ⟨ Ω𝑖 (𝑡 )⟩ are corresponding zero mean processes. The negative sign implies that the frequency residuals of the crust and the superfluid are anticorrelated. Note that if 𝑥 s ≪ 1 and 𝑥 c ∼ 1, the superfluid angular velocity residuals will at least two orders of magnitude above the corresponding crust velocity residuals (Ander-sson et al. 2012). This sets down a path to falsifying the stationary model. Radio timing noise tied to the crust rotational state will be sensitive to spin wandering through the two-parameter combination 
+
+(𝜏, 𝐴 min = 𝑄𝜏 /𝑥 2c ). Glitches constrain the fractional moment of iner-tia 𝑥 s (Montoli et al. 2020). Then, an independent observation of the               
+
+> 4In terms of the total angular momenta and the crust-core lag, the crust and superfluid angular velocities can be written as Ωc=𝑥 sΩ−+ ( 𝐽 /𝐼 )and
+> Ωs=−𝑥 cΩ−+ ( 𝐽 /𝐼 ), respectively. MNRAS 000 , 1–21 (2026)
+
+## 6 Reginald Christian Bernardo 
+
+superfluid angular velocity residuals provides a consistency check of, or falsify, the stationary process (19-21) as a physical model of spin noise. 
+
+4 FAST BAYESIAN INFERENCE METHODS 
+
+The regularized two-component model (24) with drift matrix (31) constitutes a bivariate OU process with strictly positive eigenvalues. This enables application of the fast Bayesian inference method in Singh et al. (2018) for multivariate OU processes in the idealized scenario that both Ωc and Ωs are observed and that the data is sampled evenly. The sufficient statistics must be computed from the stochastic residuals 𝛀 S = 𝛀 − 𝛀 D = [𝛿 Ωc, 𝛿 Ωs]⊤; where 𝛿 Ωc and 𝛿 Ωs are the stochastic spin wandering components of the crust and superfluid angular velocities, respectively. When only the crust angular velocity is observed, we rely on analytic time-domain solution derived in Bernardo (2026) to construct a scalable Gaussian process method. 
+
+4.1 Sufficient statistics 
+
+Consider discrete observations of the stochastic residuals 𝛀 S,𝑛 ≡
+
+𝛀 𝑛 − 𝛀 D,𝑛 at times 𝑡 𝑛 = 𝑛 Δ𝑡 (𝑛 = 1, . . . , 𝑁 ): 𝑿 =𝛀 S,1, 𝛀 S,2, . . . , 𝛀 S, 𝑁 , where 𝛀 S,𝑛 = [𝛿 Ωc (𝑡 𝑛 ), 𝛿 Ωs (𝑡 𝑛 )] ⊤. Uti-lizing the Markov property of the OU process, the likelihood of the observed stochastic residuals given parameters 𝜽 = (𝜏 c, 𝜏 s, 𝑄 c, 𝑄 s)
+
+can be factorized as 
+
+𝑃 ( 𝑿 |𝜽 ) = 𝑃 (𝛀 S,1 |𝜽 ) 
+
+> 𝑁 −1
+
+Ö
+
+> 𝑛 =1
+
+𝑃 (𝛀 S,𝑛 +1 |𝛀 S,𝑛 , 𝜽 ) . (57) Bayes theorem gives the posterior distribution over parameters 𝜽 as 
+
+𝑃 (𝜽 | 𝑿 ) = 𝑃 ( 𝑿 |𝜽 )𝑃 (𝜽 )
+
+𝑃 ( 𝑿 ) . (58) Considering uniform priors over the parameters, the posterior, pro-portional to the likelihood, 𝑃 (𝜽 | 𝑿 ) ∝ 𝑃 ( 𝑿 |𝜽 ), can be evaluated analytically as (Singh et al. (2018)) ln 𝑃 (𝜽 | 𝑿 )
+
+= − 12 tr 
+
+(
+
+𝚺 −1 h 𝚲 − T2T−13
+
+T3
+
+ 𝚲 − T2T−13
+
+⊤ +  T1 − T2T−13 T⊤
+
+> 2
+
+i )
+
+− 𝑁 − 12 ln |2𝜋 𝚺 | − 12 tr 
+
+
+
+c−1T4
+
+
+
+− 12 ln |2𝜋 c| ,
+
+(59) where the four 2 × 2 sufficient statistic matrices are given by 
+
+T1 = 
+
+> 𝑁 −1
+
+∑︁ 
+
+> 𝑛 =1
+
+𝛀 S,𝑛 +1𝛀 ⊤ 
+
+> S,𝑛 +1
+
+, (60) 
+
+T2 = 
+
+> 𝑁 −1
+
+∑︁ 
+
+> 𝑛 =1
+
+𝛀 S,𝑛 +1𝛀 ⊤ 
+
+> S,𝑛
+
+, (61) 
+
+T3 = 
+
+> 𝑁 −1
+
+∑︁ 
+
+> 𝑛 =1
+
+𝛀 S,𝑛 𝛀 ⊤ 
+
+> S,𝑛
+
+, (62) 
+
+T4 = 𝛀 S,1𝛀 ⊤ 
+
+> S,1
+
+. (63) These matrices encode all information needed for parameter estima-tion and can be computed in O( 𝑁 ) time. 
+
+Maximum a posteriori (MAP) estimation 
+
+The MAP estimates for the transition matrix 𝚲 = 𝑒 −D𝜂 Δ𝑡 and the covariance matrix 𝚺 are: 
+
+𝚲 ∗ = T2T−13 , (64) 
+
+𝚺 ∗ = 1
+
+𝑁 
+
+
+
+T1 − T2T−13 T⊤
+
+> 2
+
+
+
+. (65) The drift matrix D∗ 
+
+> 𝜂
+
+is recovered via the matrix logarithm, D∗ 
+
+> 𝜂
+
+=
+
+− ln 𝚲 ∗/Δ𝑡 , and the stationary covariance c∗ is obtained by numeri-cally solving the Lyapunov Stein equation (40) at the MAP 𝚲 ∗ and 
+
+𝚺 ∗.The physical parameters are then extracted as follows. The di-agonal entries of the regularized drift matrix (31) are exactly 
+
+𝐷 𝜂, 11 = 1/𝜏 c and 𝐷 𝜂, 22 = 1/𝜏 s for any value of 𝜂 , so the indi-vidual relaxation times are read off directly from the MAP estimate: 
+
+𝜏 ∗ 
+
+> c
+
+= 1/𝐷 ∗ 
+
+> 11
+
+, 𝜏 ∗ 
+
+> s
+
+= 1/𝐷 ∗ 
+
+> 22
+
+, (66) from which 𝜏 ∗ and 𝑟 ∗ follow via (6–7): 
+
+𝜏 ∗ = 𝜏 ∗ 
+
+> c
+
+𝜏 ∗
+
+> s
+
+𝜏 ∗ 
+
+> c
+
++ 𝜏 ∗
+
+> s
+
+, 𝑟 ∗ = 𝜏 ∗
+
+> s
+
+𝜏 ∗
+
+> c
+
+. (67) The diffusion coefficients follow from the diagonal elements of the Lyapunov equation (41) evaluated at D∗ 
+
+> 𝜂
+
+and c∗:
+
+𝑄 ∗ 
+
+> c
+
+= 2𝑐 ∗
+
+> 11
+
+𝜏 ∗
+
+> c
+
++ 2𝑐 ∗
+
+> 12
+
+ 1
+
+𝜂 − 1
+
+𝜏 ∗
+
+> c
+
+
+
+, (68) 
+
+𝑄 ∗ 
+
+> s
+
+= 2𝑐 ∗
+
+> 22
+
+𝜏 ∗
+
+> s
+
++ 2𝑐 ∗
+
+> 12
+
+ 1
+
+𝜂 − 1
+
+𝜏 ∗
+
+> s
+
+
+
+. (69) The off-diagonal element of the Lyapunov equation provides a self-consistency check on c∗:
+
+𝑐 ∗
+
+> 12
+
+ 1
+
+𝜏 ∗
+
+> c
+
++ 1
+
+𝜏 ∗
+
+> s
+
+
+
++ 𝑐 ∗ 
+
+> 11
+
++ 𝑐 ∗
+
+> 22
+
+𝜂 − 𝑐 ∗
+
+> 22
+
+𝜏 ∗
+
+> c
+
+− 𝑐 ∗
+
+> 11
+
+𝜏 ∗
+
+> s
+
+= 0. (70) The steady-state quantities ⟨⟨ 𝛼 c⟩⟩ and ⟨⟨ ΔΩ ⟩⟩ are recovered by fitting the deterministic solution (35) to the sample mean 𝛀 , which yields 
+
+𝑁 c/𝐼 c and 𝑁 s/𝐼 s, and hence ⟨⟨ 𝛼 c⟩⟩ and ⟨⟨ ΔΩ ⟩⟩ through (10–9). 
+
+Model comparison 
+
+We have assumed that the regularized two-component model is given and that our task is to estimate its parameters. In practice, the model itself may be uncertain, and one may wish to compare results with different values of the regularization parameter 𝜂 or compare the two-component model with alternatives; such as to test stationarity. The probability of a model M𝛼 given the data 𝑿 is 
+
+𝑃 (M 𝛼 | 𝑿 ) ∝ 𝑃 ( 𝑿 |M 𝛼 ) 𝑃 (M 𝛼 ) , (71) where the first factor is the evidence for the model and the second its prior probability. Assuming all models to be a priori equally likely, the evidence is the normalizing constant obtained by marginalizing the likelihood over the parameter space 𝜽 :
+
+𝑃 ( 𝑿 |M 𝛼 ) =
+
+∫
+
+𝑑 𝜽 𝑃 ( 𝑿 |𝜽 , M𝛼 ) 𝑃 (𝜽 |M 𝛼 ) . (72) For unimodal posteriors, the height at the MAP value 𝜽 ∗ times the width Δ𝜽 provides a good approximation for the evidence (Singh et al. 2018): 
+
+𝑃 ( 𝑿 |M 𝛼 ) ≃ 𝑃 ( 𝑿 |𝜽 ∗, M𝛼 ) 𝑃 (𝜽 ∗ |M 𝛼 ) Δ𝜽 . (73) The first factor is the best-fit likelihood. The second or the product of the prior for the MAP estimate and its standard error is called the Ockham factor.  
+
+> MNRAS 000 , 1–21 (2026)
+
+## Stationarity and angular momentum conservation in pulsar spin noise 7
+
+The width Δ𝜽 is determined by the Hessian matrix A =
+
+−∇∇ ln 𝑃 (𝜽 | 𝑿 ) evaluated at the MAP. It can be shown that (Mackay 2003): ln 𝑃 ( 𝑿 |M 𝛼 ) ≃ ln 𝑃 ( 𝑿 |𝜽 ∗) + ln 𝑃 (𝜽 ∗) − 12 ln |A/( 2𝜋 )| . (74) The Hessian A, partitioned into blocks over (𝚺 −1, 𝚲 ) at the MAP estimates (64–65), is (Singh et al. 2018): 
+
+A11 = 𝑁 
+
+2 (𝚺 ∗)2 , (75) 
+
+A12 = 𝑁 
+
+2
+
+ 𝚲 ∗c∗ + c∗𝚲 ∗⊤  , (76) 
+
+A22 = 𝚺 ∗− 1  T3 − 𝑁 c∗  − 𝑁 
+
+2 𝚺 ∗− 2  𝚲 ∗c∗ + c∗𝚲 ∗⊤ 2 . (77) The logarithm of the evidence evaluates to (Singh et al. 2018; Mackay 2003): ln 𝑃 ( 𝑿 |M 𝛼 ) ≃ − 𝑁 
+
+2 ln 
+
+
+
+(2𝜋𝑒 )𝑀 |𝚺 ∗ |
+
+
+
+− 12 ln 
+
+
+
+|A22 | | A11 − A12 A−122 A21 |
+
+
+
++ 𝑀 
+
+2 ln 2 𝜋 , 
+
+(78) where 𝑀 = 2 for the two-component model. The Laplace approximation (73-78) assumes a unimodal posterior that is well approximated by a Gaussian around 𝜽 ∗, with the MAP estimate lying away from any prior boundary; it can be inaccurate for multimodal or boundary-peaked posteriors, which should be checked against the full posterior samples used elsewhere in this work. It is also worth clarifying the scalability of the different pieces of this framework: the sufficient statistics (60-63) and the MAP/Laplace ev-idence above are O( 𝑁 ) for the full-state (crust and superfluid) like-lihood, whereas the analytic semiseparable likelihood of Section 4.2 extends this O( 𝑁 ) scaling to the crust-only case; the O( 𝑁 3) direct-GP evidence reported in Sections 5-6 is used only as a full-state cross-check, not as the scalable endpoint of the method. Appendix C sets a baseline example of the above method applied to 2D Brownian motion. 
+
+4.2 Analytic semiseparable likelihood 
+
+The fast Bayesian method in the previous sections assumes evenly sampled observations of the full stochastic state 𝛀 S = (𝛿 Ωc, 𝛿 Ωs)⊤.Real radio timing data do not satisfy these assumptions. The obser-vations are irregularly sampled, heteroscedastic, and directly probe only the crustal angular velocity. We construct an independent fast likelihood from the analytical covariance of the crust alone, using the time-domain solutions derived in Bernardo (2026). The resulting method is analogous in spirit to Foreman-Mackey et al. (2017); in-stead of forming and factorizing a dense covariance matrix, we utilize a semiseparable representation that permits the action of the inverse covariance and the logarithm of its determinant to be evaluated in 
+
+O( 𝑁 ) operations. The full-state algorithm is given in Appendix D. Let 𝑡 𝑖 denote radio-frequency epochs and let 
+
+𝑦 𝑖 = 𝛿 Ωc (𝑡 𝑖 ) + 
+
+> 𝑝 −1
+
+∑︁ 
+
+> 𝜇 =0
+
+𝑀 𝑖𝜇 𝛽 𝜇 + 𝜀 𝑖 (79) be the observed crust angular velocity residual. Here 𝑀 𝑖𝜇 is a low-order deterministic trend design matrix, e.g. 𝑀 𝑖𝜇 = (1, 𝑡 𝑖 − 𝑡 ref ) for a constant and linear spin-frequency trend, 𝛽 𝜇 are nuisance trend parameters, and 
+
+⟨𝜀 𝑖 𝜀 𝑗 ⟩ = 𝜎 2 
+
+> 𝑖
+
+𝛿 𝑖 𝑗 (80) is the heteroscedastic radio measurement covariance. The stochastic covariance entering the likelihood is therefore 
+
+𝐶 𝑖 𝑗 (𝜽 ) = 𝐾 c (𝑡 𝑖 , 𝑡 𝑗 ; 𝜽 ) + 𝜎 2 
+
+> 𝑖
+
+𝛿 𝑖 𝑗 , (81) where 𝜽 = (𝜏, 𝑟, 𝑄 c, 𝑄 s) and 𝐾 c is the finite-start analytical covari-ance of the crustal angular velocity. The useful structure appears most transparently in the plus and minus modes. Define 
+
+𝜏 Ω+ = 𝜏 cΩc + 𝜏 sΩs , Ω− = Ω c − Ωs . (82) The mode Ω− is the damped crust-core lag and Ω+ is the diffusive total angular momentum mode. Writing 𝑥 = 𝑡 − 𝑡 0 and 𝑥 ′ = 𝑡 ′ − 𝑡 0,the finite-start mode covariances are (Bernardo 2026) 
+
+𝐾 + (𝑡, 𝑡 ′) = 𝑄 + min (𝑥, 𝑥 ′), (83) 
+
+𝐾 − (𝑡, 𝑡 ′) = 𝑄 − 𝜏 
+
+2
+
+h
+
+𝑒 − | 𝑥 −𝑥 ′ |/ 𝜏 − 𝑒 − ( 𝑥 +𝑥 ′ )/ 𝜏 i
+
+, (84) 
+
+𝐾 +− (𝑡, 𝑡 ′) = 𝑄 × 𝜏 
+
+h
+
+𝑒 − ( 𝑥 ′ −𝑥 )/ 𝜏 Θ(𝑥 ′ − 𝑥 ) + Θ(𝑥 − 𝑥 ′) − 𝑒 −𝑥 ′/𝜏 i
+
+,
+
+(85) where 
+
+𝑄 + = 𝜏 2c 𝑄 c + 𝜏 2s 𝑄 s
+
+𝜏 2 , 𝑄 − = 𝑄 c + 𝑄 s , 𝑄 × = 𝜏 c𝑄 c − 𝜏 s𝑄 s
+
+𝜏 .
+
+(86) The crust is the linear combination 
+
+Ωc = 𝑤 − Ω− + 𝑤 +Ω+ , 𝑤 − = 𝜏 s
+
+𝜏 c + 𝜏 s
+
+, 𝑤 + = 𝜏 𝜏 c + 𝜏 s
+
+. (87) Hence 
+
+𝐾 c (𝑡, 𝑡 ′) = 𝑤 2 
+
+> −
+
+𝐾 − (𝑡, 𝑡 ′)+ 𝑤 − 𝑤 + [𝐾 +− (𝑡, 𝑡 ′) + 𝐾 +− (𝑡 ′, 𝑡 )] + 𝑤 2
+
+> +
+
+𝐾 + (𝑡, 𝑡 ′) . (88) For 𝑡 𝑖 > 𝑡 𝑗 , (88) factorizes into a rank-two semiseparable form, 
+
+𝐾 c (𝑡 𝑖 , 𝑡 𝑗 ) = U𝑖 V⊤ 
+
+> 𝑗
+
+, 𝑖 > 𝑗 , (89) where 
+
+U𝑖 = 𝑒 −𝑥 𝑖 /𝜏 1 , (90) and 
+
+V(1) 
+
+> 𝑗
+
+= 𝑤 2
+
+> −
+
+𝑄 − 𝜏 
+
+2
+
+
+
+𝑒 𝑥 𝑗 /𝜏 − 𝑒 −𝑥 𝑗 /𝜏 
+
++ 𝑤 − 𝑤 +𝑄 × 𝜏 
+
+
+
+𝑒 𝑥 𝑗 /𝜏 − 1
+
+
+
+, (91) 
+
+V(2) 
+
+> 𝑗
+
+= 𝑤 2
+
+> +
+
+𝑄 +𝑥 𝑗 + 𝑤 − 𝑤 +𝑄 × 𝜏 
+
+
+
+1 − 𝑒 −𝑥 𝑗 /𝜏 
+
+. (92) The diagonal is stored separately, 
+
+𝐴 𝑖 = 𝐾 c (𝑡 𝑖 , 𝑡 𝑖 ) + 𝜎 2 
+
+> 𝑖
+
+, (93) and the upper triangle follows by symmetry. (89) show that the dense 
+
+𝑁 × 𝑁 covariance does not need to be materialized. The required information is the diagonal vector 𝐴 𝑖 and the two 𝑁 ×2 factor matrices 
+
+U and V.The Gaussian log likelihood contains the two operations that nor-mally dominate a dense GP calculation, ln L = − 12
+
+r⊤C−1r + ln |C| + 𝑁 ln (2𝜋 ) , (94) where r is the residual vector after subtracting the deterministic trend. A dense Cholesky factorization evaluates C−1 and ln |C| in O( 𝑁 3)
+
+time and stores O( 𝑁 2) numbers.  
+
+> MNRAS 000 , 1–21 (2026)
+
+## 8 Reginald Christian Bernardo 0.0002 0.0004 0.0006 0.0008 0.0010 0.0012                        
+
+> c (rad day  1)
+> state singular minimal data
+> 57200 57400 57600 57800 58000 58200 58400 MJD 0.004
+> 0.002
+> 0.000 0.002 0.004
+> s (rad day  1)
+> 0.0004 0.0006 0.0008 0.0010
+> c(rad day 1)
+> 0.004
+> 0.002
+> 0.000 0.002 0.004
+> s (rad day  1)
+> singular minimal state data 0.0002 0.0004 0.0006 0.0008 0.0010 0.0012
+> c (rad day  1)
+> state singular minimal data
+> 57200 57400 57600 57800 58000 58200 58400 MJD 0.20
+> 0.15
+> 0.10
+> 0.05
+> 0.00 0.05 0.10 0.15
+> s (rad day  1)
+> 0.0002 0.0004 0.0006 0.0008 0.0010
+> c(rad day 1)
+> 0.2
+> 0.1
+> 0.0 0.1
+> s (rad day  1)
+> singular minimal state
+
+Figure 2. Reconstruction of a singular model realization using the singular and minimal models. The top figure uses full-state observations of the crust and superfluid. The lower figure uses crust-only observations. The left panels show the component time series and 95 percent reconstruction bands, while the right panels show the 2D trajectories. The black curve is the true state, the points with error bars are the mock data, and the blue and green curves denote the singular and minimal reconstructions, respectively. 
+
+For a rank-𝐽 semiseparable matrix ( 𝐽 = 2), define S0 = 0. Sweep-ing through the data in time order gives 
+
+𝑑 𝑖 = 𝐴 𝑖 − U𝑖 S𝑖 −1U⊤
+
+𝑖 , (95) 
+
+W𝑖 = V𝑖 − S𝑖 −1U⊤
+
+𝑖 
+
+𝑑 𝑖 
+
+, (96) 
+
+S𝑖 = S𝑖 −1 + 𝑑 𝑖 W⊤
+
+𝑖 W𝑖 . (97) The numbers 𝑑 𝑖 are the Cholesky pivots, and therefore ln |C| =
+
+𝑁 ∑︁ 
+
+𝑖 =1
+
+ln 𝑑 𝑖 . (98) The same factorization gives the inverse action x = C−1b without forming C−1. First perform the forward pass 
+
+𝑧 𝑖 = 𝑏 𝑖 − U𝑖 f𝑖 −1
+
+√𝑑 𝑖 
+
+, (99) 
+
+f𝑖 = f𝑖 −1 + W⊤
+
+𝑖 √︁ 𝑑 𝑖 𝑧 𝑖 , (100) followed by the backward pass 
+
+𝑥 𝑖 = 𝑧 𝑖 
+
+√𝑑 𝑖 
+
+− W𝑖 g𝑖 +1, (101) 
+
+g𝑖 = g𝑖 +1 + U⊤
+
+𝑖 𝑥 𝑖 . (102) The factorization costs O( 𝑁 𝐽 2) and each solve costs O( 𝑁 𝐽 ).In the analysis we marginalize over the deterministic trend param-
+
+MNRAS 000 , 1–21 (2026) Stationarity and angular momentum conservation in pulsar spin noise 9full state crust only                
+
+> 2.4
+> 1.6
+> 0.8
+> 0.0 log 10  r
+> 13
+> 12
+> 11
+> 10
+> log 10  (Qc/rad 2 day  3)
+> 1.2 1.8 2.4 3.0 3.6 log 10 (/day)
+> 10.5
+> 9.0
+> 7.5
+> 6.0
+> log 10  (Qs/rad 2 day  3)
+> 2.4
+> 1.6
+> 0.8
+> 0.0 log 10 r
+> 13
+> 12
+> 11
+> 10
+> log 10 (Qc/rad 2day 3)
+> 10.5
+> 9.0
+> 7.5
+> 6.0
+> log 10 (Qs/rad 2day 3)full state crust only
+> 7
+> 6
+> 5
+> 4
+> 3
+> log 10  (Amin /rad 2 day  2)
+> 3.0 3.3 3.6 3.9 log 10 (/day)
+> 2.5
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> log 10  xs
+> 7
+> 6
+> 5
+> 4
+> 3
+> log 10 (Amin /rad 2day 2)
+> 2.5
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> log 10 xs
+
+Figure 3. Parameter posteriors for the singular model realization (Table 1) analyzed with the singular model (left) and the minimal model (right). Blue solid distributions use full-state observations and orange dashed distributions use crust-only observations. Red lines mark the injected parameters only in the generating-model panel. Contours enclose 68 and 95 percent posterior probability. 
+
+eters with a flat prior. Let M be the 𝑁 × 𝑝 trend design matrix. The generalized least-squares estimate at fixed 𝜽 is ˆ𝜷 =
+
+
+
+M⊤C−1M
+
+ −1
+
+M⊤C−1y. (103) The trend-marginalized log likelihood is ln L( 𝜽 ) = − 12
+
+
+
+r⊤C−1r + ln |C| + ln M⊤C−1M + ( 𝑁 − 𝑝 ) ln (2𝜋 )
+
+
+
+,
+
+(104) where r = y − M ˆ𝜷 . All appearances of C−1 in (104) are inverse actions computed by the semiseparable solve above. This construction is inspired by Foreman-Mackey et al. (2017); which is formulated for scalar, 1D and stationary Gaussian pro-cesses whose kernels can be written as sums of exponentials. The neutron-star problem is intrinsically multivariate and nonstationary: the physical state is (Ωc, Ωs), the eigenmodes are mixed, and the superfluid is hidden in radio data. We overcome this obstruction by using the analytical two-component solution to marginalize the latent superfluid at the covariance level (Bernardo 2026). The posterior for the stochastic parameters is obtained from ln 𝑃 (𝜽 |y) = ln L( 𝜽 ) + ln 𝑃 (𝜽 ) + Constant . (105) After the MAP or posterior samples are obtained, the hidden su-perfluid stochastic residual can be reconstructed by Gaussian con-ditioning using the analytical cross covariance between Ωs and Ωc
+
+(Bernardo 2026). 
+
+Table 1. Reference parameters for the singular, nonstationary model (1–5) and the measurement noise considered in Section 5. Parameter Value Unit 
+
+Spin noise 
+
+𝜏 365 day 
+
+𝑟 0.1 –
+
+𝑄 c 10 −10 rad 2 day −3
+
+𝑄 s 10 −8 rad 2 day −3
+
+Measurement noise 
+
+𝑅 c 10 −9 rad 2 day −3
+
+𝑅 s 10 −8 rad 2 day −3
+
+5 INFERENCE WITH SINGULAR MODEL SIMULATIONS 
+
+Consider the singular, nonstationary model (1–5) as a mock data-generating process. This section provides a controlled test of the inference and reconstruction when the neutron star rotational state is fully observed, and of the systematic errors that arise when only the crust is observed. We generate 101 evenly sampled observations over 1400 days with a cadence Δ𝑡 = 14 day. The parameters are shown in Table 1. The orders of magnitude are broadly motivated by the spin-noise param-eters inferred for PSR J1359 −6038 (O’Neill et al. 2024); however, the values are rounded and rescaled and should not be interpreted as a new fit. We choose the composite time scale to be one year so that the observation window contains several correlation time scales. The 
+
+MNRAS 000 , 1–21 (2026) 10 Reginald Christian Bernardo 57200 57400 57600 57800 58000 58200 58400 MJD 3                                 
+
+> 2
+> 1
+> 01234normalized whitened residual
+> crust residual superfluid residual
+> 02468density 9.1 9.0 8.9
+> log 10 Rc
+> log 10  Rs
+> 0.0 2.5 5.0 7.5 10.0 density
+> injected measurement noise 57200 57400 57600 57800 58000 58200 58400 MJD 4
+> 2
+> 024normalized whitened residual
+> crust residual superfluid residual
+> 0246density 9.00 8.75 8.50 8.25
+> log 10 Rc
+> log 10  Rs
+> 05000 10000 density
+> injected measurement noise 57200 57400 57600 57800 58000 58200 58400 MJD 3
+> 2
+> 1
+> 0123whitened residual
+> singular minimal
+> 432101234whitened residual 0.0 0.1 0.2 0.3 0.4 0.5 0.6 density
+> singular minimal
+> N(0, 1)
+
+Figure 4. Noise diagnostics for the singular model realization. From top to bottom, the figures show the full-state singular fit, the full-state minimal fit, and the crust-only whitened residuals. In the full-state panels, + and × mark the normalized crust and superfluid residuals. The right panels show the residual-based estimates of 𝑅 c and 𝑅 s, with solid and dashed contours enclosing 68 and 95 percent probability. Red lines mark the measurement noise parameters. 
+
+diffusion coefficients are chosen to produce visibly noisy realizations over this short observation window. We additionally consider independent measurement noise such that the covariance of a sampled observation is RΔ𝑡 , where R =
+
+diag (𝑅 c, 𝑅 s). The crust measurement noise is chosen to be compa-rable to the corresponding stochastic variations to produce visible error bars in the mock data. The mock trajectories used are the stochastic residuals obtained af-ter removing the deterministic mean evolution. Consequently, ⟨⟨ 𝛼 c⟩⟩ 
+
+and ⟨⟨ ΔΩ ⟩⟩ specify the equivalent deterministic parameter basis. The posterior analysis concerns the parameters (𝜏, 𝑟, 𝑄 c, 𝑄 s) that deter-mine spin wandering. The same residual realization is analysed with the singular and minimal models. For full-state observations, the MAP estimate based on the sufficient statistics (Section 4.1) is used as an initializer. The re-ported endpoint is obtained with the exact noisy direct-GP likelihood. For crust-only observations, we use the analytical crust covariance and reconstruct the hidden superfluid state by Gaussian conditioning (Section 4.2). The same fitted objects are used for the reconstructions, parameter posteriors, noise diagnostics, and evidence calculations. Preliminary prior-expansion tests established ranges wide enough to contain the relevant likelihood support, after which those ranges were fixed across all realizations in each experiment. The purpose of this section is to illustrate the behavior of the inference and reconstruction when the data are generated from a known model. Figure 2 shows the reconstructions in a reference realization. We 
+
+MNRAS 000 , 1–21 (2026) Stationarity and angular momentum conservation in pulsar spin noise 11 0 250 500 750 1000 1250 1500 1750 2000 ln Bsingular, minimal       
+
+> 050 100 150 200 250 realizations
+> full-state exact GP
+> 420246ln Bsingular, minimal
+> crust-only MCMC
+
+Figure 5. Distribution of ln 𝐵 singular ,minimal for data generated with the singular model. The left panel contains 1000 full-state exact-GP results and the right panel contains 500 crust-only MCMC stepping-stone sampling results. Positive values favour the singular model. 
+
+define the RMSE as the root mean square difference between the posterior mean and the true state, and normalize it by the sample standard deviation of the corresponding true state. Pointwise inclu-sion fraction is the fraction of observing epochs at which the true state lies inside the pointwise 95 percent posterior interval. With full-state observations, the singular model follows both com-ponents of the state. Its normalized RMSE is 0 .24 for the crust and 0.12 for the superfluid, with empirical 95 percent pointwise inclu-sion fractions of 97 and 96 percent, respectively. The minimal model cannot reproduce the diffusive total angular momentum mode of the singular process. It consequently gives a poor crust reconstruction, with a normalized RMSE of 1 .10 and only 2 percent pointwise inclu-sion fraction, even though its superfluid reconstruction follows more of the injected path. This behaviour is not caused by smaller superfluid error bars. The superfluid measurement uncertainty is larger in absolute units, but the superfluid stochastic excursions are also substantially larger and therefore have a higher signal-to-noise ratio. In the minimal model, the rank-one forcing ties the two components to a single anticorrelated mode. Matching the better-resolved superfluid variations fixes the allowed crust response, leaving the model unable to reproduce the independent diffusive contribution present in the singular crust data. When only crust observations are available, both models recon-struct the 1D data reasonably well. This agreement does not extend to the hidden superfluid state. The singular reconstruction has a normal-ized superfluid RMSE of 1 .03 and a median 95 percent half-width of 6 .5 × 10 −3 rad day −1. The minimal reconstruction is strongly dis-placed from the injected path, with a normalized RMSE of 13 .0. Its pointwise inclusion fraction is high because its uncertainty band expands to a median half-width of 1 .4 × 10 −1 rad day −1. Pointwise inclusion fraction by such a broad band should not be confused with an informative reconstruction. The distinction is also visible in the parameter posteriors in Fig-ure 3 and Tables 2-3. For the singular model, the full-state estimates agree with the in-jected parameters. The crust-only posterior is broad and strongly correlated. Although the injected values lie within much of the pos-terior support in this realization, the widths of the intervals show that the physical decomposition of the crust covariance is only weakly identified. For the minimal model, the localized full-state posterior is driven to the upper bounds in 𝜏 and 𝐴 min . Its small marginalized uncertainties do not represent a precise measurement of parameters 
+
+Table 2. Marginalized estimates obtained by fitting the singular model to the singular model reference realization. Units are given in Table 1. ‘Full’ and ‘crust’ columns correspond to results with full-state and crust-only configura-tions, respectively. Prior entries give the lower and upper limits of the uniform priors. Parameter Input Full Crust Prior log 10 𝜏 2.562 2.56 +0.17  
+
+> −0.16
+
+2.34 +1.00  
+
+> −0.78
+
+[1.36 , 3.76 ]
+
+log 10 𝑟 −1.000 −1.00 +0.31  
+
+> −0.30
+
+−1.36 +1.06  
+
+> −0.80
+
+[− 2.50 , 0.50 ]
+
+log 10 𝑄 c −10 .000 −9.99 +0.22  
+
+> −0.22
+
+−9.79 +0.20  
+
+> −0.51
+
+[− 13 .00 , −7.00 ]
+
+log 10 𝑄 s −8.000 −8.00 +0.15  
+
+> −0.15
+
+−8.4+1.9 
+
+> −1.6
+
+[− 11 .00 , −5.00 ]
+
+Table 3. Marginalized estimates obtained by fitting the minimal model to the singular model reference realization. ‘Full’ and ‘crust’ columns correspond to results with full-state and crust-only configurations, respectively.Prior entries give the lower and upper limits of the uniform priors. Parameter Full Crust Prior log 10 𝜏 4.0620 +0.0002  
+
+> −0.0003
+
+3.61 +0.30  
+
+> −0.33
+
+[1.06 , 4.06 ]
+
+log 10 𝐴 min −2.8541 +0.0001  
+
+> −0.0002
+
+−6.15 +0.31  
+
+> −0.29
+
+[− 10 .85 , −2.85 ]
+
+log 10 𝑥 s −2.3982 +0.0005  
+
+> −0.0005
+
+−0.89 +0.22  
+
+> −0.51
+
+[− 3.00 , −0.60 ]
+
+equivalent to those of the singular model. They characterize a limit-ing configuration adopted by a misspecified model in attempting to reproduce the singular realization. The noise diagnostics in Figure 4 support the same sentiment. For the correct full-state singular fit, the normalized crust and superfluid residuals fluctuate without an obvious coherent trend, and the injected 
+
+𝑅 c and 𝑅 s lie inside the corresponding 68 percent intervals. The full-state minimal fit leaves a coherent structure in the residuals and gives a biased estimate of the measurement noise. The crust-only whitened residuals are approximately consistent with a standard normal distri-bution under both models. However, a 1D residual diagnostic is not sufficient to establish that the hidden state or its physical parameters have been recovered. The displayed measurement noise distributions are residual-based consistency estimates conditional on the fitted dy-
+
+MNRAS 000 , 1–21 (2026) 12 Reginald Christian Bernardo 0.0006                           
+
+> 0.0004
+> 0.0002
+> 0.0000 0.0002
+> c (rad day  1)
+> state singular minimal data
+> 57200 57400 57600 57800 58000 58200 58400 MJD 0.01
+> 0.00 0.01 0.02 0.03
+> s (rad day  1)
+> 0.0004 0.0003 0.0002 0.0001 0.0000 0.0001
+> c(rad day 1)
+> 0.01
+> 0.00 0.01 0.02 0.03
+> s (rad day  1)
+> singular minimal state data 0.0006
+> 0.0004
+> 0.0002
+> 0.0000 0.0002
+> c (rad day  1)
+> state singular minimal data
+> 57200 57400 57600 57800 58000 58200 58400 MJD 0.02
+> 0.01
+> 0.00 0.01 0.02 0.03
+> s (rad day  1)
+> 0.0004 0.0003 0.0002 0.0001 0.0000 0.0001
+> c(rad day 1)
+> 0.02
+> 0.01
+> 0.00 0.01 0.02 0.03
+> s (rad day  1)
+> singular minimal state
+
+Figure 6. Reconstruction of a minimal-model realization using the singular and minimal models. The top figure uses full-state observations and the lower figure uses crust-only observations. The plotting conventions are the same as in Figure 2. 
+
+namics. They include the mean posterior state variance absorbed by the smoother, but they are not jointly sampled nuisance-parameter posteriors. We finally repeat the comparison over independent realizations. We define the log-Bayes factor ln 𝐵 singular ,minimal = ln 𝑍 singular −
+
+ln 𝑍 minimal , where ln 𝑍 M are evidences for model M, such that posi-tive values favour the singular model. Full-state evidence is computed from the exact direct-GP likelihood using bounded Laplace integra-tion. Crust-only evidence is computed by MCMC stepping-stone sampling of the analytical covariance likelihood. Local Laplace ev-idence is not used for the crust-only result because its Hessian is frequently ill-conditioned or limited by the prior boundaries. The results are shown in Figure 5. The full-state experiment correctly selects the singular model in 99.8 percent of 1000 realizations, with a 95 percent Wilson interval of [99 .3, 99 .9] percent and median ln 𝐵 singular ,minimal = 806 .43. Note that the bimodality of the full-state distribution is irrelevant as both peaks (the larger one at ∼ 800 and a smaller group at ∼ 100) assign themselves to the positive side, preferring the generating model. The crust-only experiment selects the singular model in 48.8 percent of 500 realizations, with interval [44 .4, 53 .2] percent and median ln 𝐵 singular ,minimal = −0.05. Changing the width of the singular prior by one decade also changes the sign or magnitude of the crust-only Bayes factor. The crust-only evidence is both data-limited and prior-limited and does not reliably distinguish the two models. This also 
+
+MNRAS 000 , 1–21 (2026) Stationarity and angular momentum conservation in pulsar spin noise 13 full state crust only                
+
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> log 10  r
+> 10.8
+> 10.4
+> 10.0
+> 9.6
+> log 10  (Qc/rad 2 day  3)
+> 1.6 2.4 3.2 4.0 log 10 (/day)
+> 10
+> 8
+> 6
+> log 10  (Qs/rad 2 day  3)
+> 4.8
+> 4.0
+> 3.2
+> 2.4
+> 1.6
+> log 10 r
+> 10.8
+> 10.4
+> 10.0
+> 9.6
+> log 10 (Qc/rad 2day 3)
+> 10
+> 8
+> 6
+> log 10 (Qs/rad 2day 3)full state crust only
+> 8.0
+> 7.5
+> 7.0
+> 6.5
+> 6.0
+> log 10  (Amin /rad 2 day  2)
+> 2.0 2.4 2.8 3.2 3.6 log 10 (/day)
+> 2.5
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> log 10  xs
+> 8.0
+> 7.5
+> 7.0
+> 6.5
+> 6.0
+> log 10 (Amin /rad 2day 2)
+> 2.5
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> log 10 xs
+
+Figure 7. Parameter posteriors for the minimal-model realization analysed with the singular model (left) and the minimal model (right). Blue solid distributions use full-state observations and orange dashed distributions use crust-only observations. Red lines in the generating-model panel mark the injected minimal-model parameters. 
+
+supports why the crust-only evidence does not penalize the model with the larger parameter space. 5
+
+The singular model experiment separates two questions that can appear similar when only one time series is considered. The observed crust can be reconstructed accurately from crust-only data, but the decomposition of its covariance into the underlying two-component dynamics is not robust. The hidden superfluid prediction, physical pa-rameter estimates, and model evidence all become sensitive to model assumptions and prior volume once the second state is unavailable observationally. 
+
+6 INFERENCE WITH MINIMAL MODEL SIMULATIONS 
+
+This section continues the experiment of Section 5 with the minimal, stationary model (19-21) as the mock data-generating process. The observation window, cadence, number of samples, and measurement noise are kept unchanged. The methods used and presentation are also the same. The parameters are shown in Table 4. The one-year relaxation time allows the stationary mode to evolve appreciably over the 1400-day observation. The choices of 𝐴 min and 𝑥 s give character-istic crust and superfluid amplitudes of 1 .73 × 10 −4 rad day −1 and 1.71 × 10 −2 rad day −1, respectively. The crust signal is comparable to its per-sample measurement uncertainty, whereas the superfluid  
+
+> 5
+
+When comparing two models, the Occam argument relies on a few assump-tions: that both have the same likelihood and all their parameters constrained, such that the model with the larger parameter space will occupy a smaller fraction of its prior volume. 
+
+Table 4. Reference parameters for the minimal model (19-21) and the mea-surement noise considered in Section 6. Parameter Value Unit 
+
+Spin noise 
+
+𝜏 365 day 
+
+𝐴 min 3 × 10 −8 rad 2 day −2
+
+𝑥 s 10 −2 –
+
+Measurement noise 
+
+𝑅 c 10 −9 rad 2 day −3
+
+𝑅 s 10 −8 rad 2 day −3
+
+state would be measured at high signal-to-noise if it were directly ob-served. As in the singular model experiment, we simulate and analyze the stochastic residual after removal of the deterministic mean. The spin noise parameters are 𝜏, 𝑥 s, 𝐴 min . Following Section 5, prelimi-nary prior-expansion tests were made to identify ranges wide enough that contain the relevant likelihood support to illustrate inference and reconstruction with mock data. Figure 6 shows the reconstructions of a reference realization. The definitions of normalized RMSE and pointwise inclusion fraction are the same as in Section 5. With full-state observations, both models follow the measured paths. The correct minimal fit has normalized RMSEs of 0 .034 for both components and 97 percent pointwise inclusion fraction. The singular model obtains a similarly accurate reconstruction despite its additional diffusive mode. This does not make the models equivalent. Independent singular model forcing 
+
+MNRAS 000 , 1–21 (2026) 14 Reginald Christian Bernardo 57200 57400 57600 57800 58000 58200 58400 MJD 4                              
+
+> 3
+> 2
+> 1
+> 0123normalized whitened residual
+> crust residual superfluid residual
+> 02468density 9.1 9.0 8.9
+> log 10 Rc
+> log 10  Rs
+> 0100 200 density
+> injected measurement noise 57200 57400 57600 57800 58000 58200 58400 MJD 4
+> 3
+> 2
+> 1
+> 0123normalized whitened residual
+> crust residual superfluid residual
+> 0246density 9.1 9.0 8.9
+> log 10 Rc
+> log 10  Rs
+> 0100 200 density
+> injected measurement noise 57200 57400 57600 57800 58000 58200 58400 MJD 4
+> 3
+> 2
+> 1
+> 01234whitened residual
+> singular minimal
+> 432101234whitened residual 0.0 0.1 0.2 0.3 0.4 0.5 density
+> singular minimal
+> N(0, 1)
+
+Figure 8. Noise diagnostics for the minimal model realization. From top to bottom, the figures show the full-state singular fit, the full-state minimal fit, and the crust-only whitened residuals. Symbols, contours, and injected measurement-noise lines follow Figure 4. 
+
+cannot exactly reproduce the rank-one anticorrelated forcing of the minimal process, but its additional parameters allow it to approximate one finite full-state realization. With crust-only observations, both models reconstruct the mea-sured crust with approximately 98 percent pointwise inclusion frac-tion. However, neither model gives a robust prediction of the hid-den superfluid path. The singular model has a normalized su-perfluid RMSE of 1 .32 and a median 95 percent half-width of 2.1 × 10 −2 rad day −1. The minimal model has a normalized RMSE of 1 .11 and a narrower median half-width of 3 .8 × 10 −3 rad day −1,but its empirical 95 percent pointwise inclusion fraction is only 16.8 percent. In this realization, the correct model is overconfident about the hidden state. The failure is not caused by poor interpolation of the observed crust, but by weak identification of the superfluid reservoir fraction 𝑥 s that converts crust fluctuations into a superfluid predic-tion. The marginalized estimates are presented in Figure 7 and Tables 5-6. The full-state estimates agree with all three spin-noise parameters. The crust-only covariance continues to constrain the amplitude and relaxation time scale, but it does not independently determine how the fluctuations are partitioned between the two components. Conse-quently, the inferred 𝑥 s is displaced from the injected value, leading directly to the biased superfluid reconstruction. On the other hand, the singular fit can closely reproduce the observed full-state path, but its inferred parameters are not measurements of minimal model quantities. In the crust-only case, the broad distributions again show 
+
+MNRAS 000 , 1–21 (2026) Stationarity and angular momentum conservation in pulsar spin noise 15 70 60 50 40 30 20 10 0ln Bsingular, minimal      
+
+> 020 40 60 80 100 120 140 realizations
+> full-state exact GP
+> 64202ln Bsingular, minimal
+> crust-only MCMC
+
+Figure 9. Distribution of ln 𝐵 singular ,minimal for data generated with the minimal model. The left panel contains 1000 full-state exact-GP results and the right panel contains 500 crust-only MCMC stepping-stone sampling results. Negative values favour the minimal model. 
+
+Table 5. Marginalized estimates obtained by fitting the minimal model to the minimal model reference realization. ‘Full’ and ‘crust’ columns correspond to results with full-state and crust-only configurations, respectively. Prior entries give the lower and upper limits of the uniform priors. Parameter Input Full Crust Prior log 10 𝜏 2.562 2.56 +0.22  
+
+> −0.22
+
+2.91 +0.46  
+
+> −0.39
+
+[1.06 , 4.06 ]
+
+log 10 𝐴 min −7.523 −7.52 +0.23  
+
+> −0.22
+
+−7.13 +0.44  
+
+> −0.32
+
+[− 10 .85 , −2.85 ]
+
+log 10 𝑥 s −2.000 −2.000 +0.038  
+
+> −0.037
+
+−0.91 +0.23  
+
+> −0.48
+
+[− 3.00 , −0.60 ]
+
+Table 6. Marginalized estimates obtained by fitting the singular model to the minimal model reference realization. ‘Full’ and ‘crust’ columns correspond to results with full-state and crust-only configurations, respectively. Prior entries give the lower and upper limits of the uniform priors. Parameter Full Crust Prior log 10 𝜏 2.71 +0.30  
+
+> −0.30
+
+2.46 +0.99  
+
+> −0.90
+
+[1.16 , 3.96 ]
+
+log 10 𝑟 −3.0+1.1 
+
+> −1.1
+
+−3.0+1.0 
+
+> −1.0
+
+[− 4.60 , −1.40 ]
+
+log 10 𝑄 c −10 .12 +0.26  
+
+> −0.27
+
+−10 .10 +0.24  
+
+> −0.28
+
+[− 13 .50 , −6.50 ]
+
+log 10 𝑄 s −6.133 +0.061  
+
+> −0.063
+
+−8.0+2.3 
+
+> −2.4
+
+[− 11 .50 , −4.50 ]
+
+that several singular model parameter combinations approximate the 1D crust covariance. Figure 8 shows that the full-state residuals and measurement noise estimates are well behaved for both models. The injected 𝑅 c and 
+
+𝑅 s lie inside the residual-based 68 percent intervals of the singular and minimal fits. The crust-only whitened residuals are likewise ap-proximately standard normal under both models. Residual whiteness tests whether a model describes the observed covariance, but does not guarantee that the latent physical decomposition or the hidden superfluid state has been recovered. Figure 9 shows the evidences for full-state and crust-only experi-ments with the minimal model-generated data. The evidence ensem-ble distinguishes the models when both states are observed. As with the previous section, we do not pay attention to the bimodality of the Bayes factor as both peaks (around −50 and −13) provide sup-port for the data-generating model. The full-state analysis correctly selects the minimal model in 99.8 percent of 1000 realizations, with a 95 percent Wilson interval of [99 .3, 99 .9] percent and median ln 𝐵 singular ,minimal = −42 .71. The evidence therefore penalizes the additional singular model freedom even when that model closely reconstructs one finite full-state path. The crust-only MCMC stepping-stone evidence selects the min-imal model in only 47.8 percent of 500 realizations, with interval 
+
+[43 .5, 52 .2] percent. Its median Bayes factor is ln 𝐵 singular ,minimal =
+
+0.05, consistent with no preference. As in the singular model exper-iment, changing the singular prior width by one decade materially changes the sign or magnitude of the Bayes factor. The two simulation experiments give the same central result from opposite directions. Full-state observations recover the parameters of the generating process, reconstruct both angular velocities, and distinguish the stationary and nonstationary models reliably. Crust-only observations can still give an accurate reconstruction of the measured crust and satisfactory whitened residuals. They do not reliably provide the same information about the hidden superfluid, the physical partitioning of the stochastic forcing, or the model evidence. The dominant limitation is not the interpolation of the radio-observed state, but the systematic uncertainty introduced by projecting a 2D stochastic process onto a single observed component. The singular (1–5) and minimal (19–21) models have different pa-rameterizations and are assigned separate normalized priors, whose integration supplies the corresponding Occam penalty. The prior ranges were established through preliminary expansion tests and held fixed within each simulation ensemble. The singular-model prior differs between the two experiments (Sections 5-6) because its high-likelihood region shifts when it is fitted as a misspecified ap-proximation to minimal-model data. The reported selection fractions are consequently conditional on their respective model-prior pairs rather than a calibration of a single universal classifier. This distinc-tion does not affect the strong full-state preference. The crust-only Bayes factors remain sensitive to the tested prior ranges. 
+
+7 CONCLUSIONS 
+
+Two-component models of pulsar spin wandering, like their use in explaining glitches, are a natural observational starting point for associating radio timing noise with underlying physical processes 
+
+MNRAS 000 , 1–21 (2026) 16 Reginald Christian Bernardo 
+
+in neutron stars. However, these models are completely determined by the rotational states of both the crust and the superfluid. For the observing span, cadence, measurement noise, and model-prior pairs considered here, crust-only evidence does not reliably identify the generating model and remains sensitive to prior volume. Observing only a single component does not provide sufficient information to reliably constrain the model or to make robust predictions, whether of future configurations or of a radio-hidden state (Meyers et al. 2021a; Antonelli et al. 2023). This work has provided an explicit, quantitative example of this limitation. We worked with two spin noise or spin wandering models, distin-guished by the dynamics of their total angular momentum: a singular, nonstationary model (1–5) and a minimal, stationary one (19-21). The former produces nonstationary spin noise owing to a diffusive total angular momentum mode (Meyers et al. 2021a), while the latter produces stationary spin noise anchored on a conserved total angular momentum (Antonelli et al. 2023). Both models were written as a shifted 2D OU process, drawing on their analogy with 2D Brownian motion to develop fast and scalable Gaussian process methods for in-ference and prediction (Section 4). With simulated mock data based on both models, we have shown that the two are fully constrainable and reliably distinguishable when both components are observed, but that robust inferences and predictions cannot be obtained when only a single component is observationally accessible (Sections 5-6). This is analogous to constraining a 2D random walk that is observed only along a single axis. Beyond these physical conclusions, this work is fundamentally a methods contribution. The Gaussian process models constructed here are physical, derived directly from the two-component equations of motion rather than from a generic phenomenological kernel or power spectral density, which is what makes them testable and falsifiable and lets the stationarity of spin noise be read directly as a statement about the conservation of a neutron star’s total angular momentum. They are also scalable, with cost growing linearly rather than cubically with the number of observations, a necessity for the long and ever-growing datasets of pulsar timing. In this sense, the paper pushes the modelling of timing noise in a more physical direction. In radio pulsar timing, the observed pulsar phase and its associated timing noise are tied to the crust’s rotational state. The explanation of glitches by a two-component model provides strong evidence for a neutron superfluid, but glitches constrain only part of the two-component parameter space and are typically treated as a separate phenomenon from timing noise. The results of this work indicate that spin wandering in the two-component model may only be robustly constrained with simultaneous, independent observations of the ro-tational states of the crust and the superfluid, or with an observation of the full state space of the neutron star. Continuous gravitational wave observations tied to the neutron star core, and possibly to the interior superfluid motion, are a promising avenue to complement ra-dio timing and access this state space. The methods developed here are directly applicable to such joint analyses, and we intend to apply them to real pulsar timing data, expanding the methods developed here at the level of angular velocities, to phases, in a different work. 
+
+ACKNOWLEDGEMENTS 
+
+The author is grateful to Reinhard Prix for valuable discussion on neu-tron star hydrodynamics and continuous gravitational waves, Boris Goncharov and Wang-Wei Yu for comments on a preliminary draft, and Bruce Allen for discussions that shaped the direction of this work. 
+
+APPENDIX A: SCHEMATIC COARSE-GRAINING OF A TWO-FLUID MODEL 
+
+We provide a sketch of the derivation of the body-averaged two-component model starting with a two-fluid description of a neu-tron star (Prix 1999, 2004). For clarity, we neglect entrainment, composition-changing reactions, elasticity, and magnetic stresses, and treat the stellar structure and moments of inertia as fixed. Let 𝑥 ∈ { c, s} label the charged/crustal component and the neu-tron superfluid component. We start from the Newtonian two-fluid equations, 
+
+𝜕 𝑡 𝜌 𝑥 + ∇ · ( 𝜌 𝑥 v𝑥 ) = 0 , (A1) 
+
+𝜌 𝑥 (𝜕 𝑡 + v𝑥 · ∇) v𝑥 = −∇ 𝑃 𝑥 − 𝜌 𝑥 ∇Φ + fint  
+
+> 𝑥
+
++ fext  
+
+> 𝑥
+
++ 𝛿 f𝑥 (A2) 
+
+∇2Φ = 4𝜋𝐺 N (𝜌 c + 𝜌 s) . (A3) 
+
+fint  
+
+> 𝑥
+
+, fext  
+
+> 𝑥
+
+, and 𝛿 f𝑥 are the internal, external, and unresolved fluctuating force densities acting on component 𝑥 , respectively. Define the 𝑧 -component of angular momentum of each component by 
+
+𝐽 𝑥 =
+
+∫
+
+𝑑 3𝑟 𝜌 𝑥 (r × v𝑥 )𝑧 . (A4) Taking the angular-momentum moment of (A2), and using (A1), 6
+
+gives 
+
+¤𝐽 𝑥 = 𝑇 int  
+
+> 𝑥
+
++ 𝑁 𝑥 + 𝜉 𝑥 (𝑡 ) , (A5) where 
+
+𝑇 int  
+
+> 𝑥
+
+=
+
+∫
+
+𝑑 3𝑟 
+
+
+
+r × fint 
+
+> 𝑥
+
+ 
+
+> 𝑧
+
+, (A6) 
+
+𝑁 𝑥 =
+
+∫
+
+𝑑 3𝑟  r × fext 
+
+> 𝑥
+
+ 
+
+> 𝑧
+
+, (A7) 
+
+𝜉 𝑥 (𝑡 ) =
+
+∫
+
+𝑑 3𝑟 (r × 𝛿 f𝑥 )𝑧 . (A8) In deriving (A5) we assume that pressure and gravity exert no net torque about the rotation axis. This is appropriate for an isolated, nearly axisymmetric star in the slow-rotation approximation. We impose a rigid-rotation ansatz for each component, 
+
+v𝑥 (𝑡, r) = Ω 𝑥 (𝑡 ) ˆz × r , (A9) so that 
+
+𝐽 𝑥 = 𝐼 𝑥 Ω𝑥 , 𝐼 𝑥 =
+
+∫
+
+𝑑 3𝑟 𝜌 𝑥 𝑟 2 
+
+> ⊥
+
+. (A10) The body-averaged equations become 
+
+𝐼 c ¤Ωc = 𝑇 int c + 𝑁 c + 𝜉 c (𝑡 ) , (A11) 
+
+𝐼 s ¤Ωs = 𝑇 int s + 𝑁 s + 𝜉 s (𝑡 ) . (A12) For small differential rotation, the internal torque may be expanded to leading order in the lag (Andersson et al. 2006; Haskell & Sedrakian 2018): 
+
+Ω− ≡ Ωc − Ωs . (A13) The linear-response form is 
+
+𝑇 int c = −𝐾 Ω− , (A14) 
+
+𝑇 int s = 𝐾 Ω− , (A15)                           
+
+> 6The continuity equation gives 𝜌 𝑥 𝐷 𝑡 v𝑥 =𝜕 𝑡 (𝜌 𝑥 v𝑥 ) + ∇ · ( 𝜌 𝑥 v𝑥 v𝑥 )where
+> 𝐷 𝑡 =𝜕 𝑡 +v𝑥 · ∇ is the convective derivative; 𝜌 𝑥 v𝑥 and 𝜌 𝑥 v2
+> 𝑥 /2 are the fluid
+> 𝑥 ’s momentum and kinetic energy densities, respectively. MNRAS 000 , 1–21 (2026)
+
+## Stationarity and angular momentum conservation in pulsar spin noise 17 
+
+where the coefficient 𝐾 encodes the strength of the effective mutual friction. The opposite signs express conservation of total angular momentum by the internal coupling. Writing down 
+
+𝐾 = 𝐼 c
+
+𝜏 c
+
+= 𝐼 s
+
+𝜏 s
+
+, (A16) we obtain (1–2). Analogous to Brownian motion, the dynamics of a neutron star rel-evant to pulsar timing is dominated by a few body-averaged variables; the rest of the hydrodynamic degrees of freedom are unresolved. The resolved variables are the body-averaged angular velocities (Ωc, Ωs).The unresolved variables include vortex motion, vortex pinning and unpinning, turbulent fluctuations, crustal elasticity, magnetospheric variability, and other short-scale hydrodynamic degrees of freedom. Projecting out these unresolved variables gives, in general, a non-Markov stochastic equation of the schematic form 
+
+𝐼 𝑥 ¤Ω𝑥 (𝑡 ) = 𝑁 𝑥 +𝑇 int  
+
+> 𝑥
+
+[Ωc, Ωs] − ∑︁ 
+
+> 𝑦
+
+∫ 𝑡 
+
+> −∞
+
+𝑑𝑡 ′ 𝐾 𝑥 𝑦 (𝑡 −𝑡 ′)Ω𝑦 (𝑡 ′) + 𝜉 𝑥 (𝑡 ) .
+
+(A17) Projection-operator methods show that eliminating unresolved de-grees of freedom generally yields an effective equation containing an instantaneous drift, a memory term, and an orthogonal fluctu-ating force (Mori 1965; Chorin et al. 2000). The two-component spin-wandering model corresponds to the Markov, linearized limit of (A17), in which the memory kernels are approximated by local damping terms and the fluctuating torques by Gaussian white noise; 
+
+⟨𝜉 𝑥 (𝑡 )⟩ = 0 , ⟨𝜉 𝑥 (𝑡 )𝜉 𝑦 (𝑡 ′)⟩ = 𝐷 𝑥 𝑦 𝛿 (𝑡 − 𝑡 ′) . (A18) For purely internal fluctuations, the total angular momentum should not receive a stochastic impulse, and one should impose 
+
+𝜉 c (𝑡 ) + 𝜉 s (𝑡 ) = 0 , (A19) or write down 
+
+𝜉 c (𝑡 ) = 𝜉 ext (𝑡 ) − 𝜉 int (𝑡 ) , 𝜉 s (𝑡 ) = 𝜉 int (𝑡 ) , (A20) where 𝜉 ext (𝑡 ) represents external torque noise, e.g., magnetospheric or accretion variability (Meyers et al. 2021a,b), and 𝜉 int (𝑡 ) represents stochastic internal angular-momentum exchange. This decomposi-tion makes explicit which part of the noise drives the total angular momentum and which part only excites the crust-superfluid lag (An-tonelli et al. 2023; Haskell & Sedrakian 2018). 
+
+APPENDIX B: FLUCTUATION-DISSIPATION THEOREM 
+
+In Brownian motion, above formally solving the stochastic problem by deriving the probability distribution of the random variables, it is the realization that the damping term and the noise term are related that is physically meaningful. This fluctuation-dissipation relation is the reflection of microscopic dynamics in thermal equilibrium and was key to understanding that the random motion exhibited by a pollen grain in a fluid is due to the molecular collisions with the fluid molecules. Through this, the observation of Brownian motion provided a compelling evidence for the molecular composition of matter (Einstein 1905; Langevin 1908; Lemons & Gythiel 1997; Uhlenbeck & Ornstein 1930; Chandrasekhar 1943). The standard 3D Brownian motion can be described by the Langevin equation with the drift matrix D = 𝜆 I and the diffusion ma-trix Q = Γ I, where 𝜆 is the friction coefficient and Γ is the strength of the noise correlation function. The fluctuation-dissipation rela-tion is Γ = 2𝑘 𝐵 𝑇𝜆 /𝑚 , where 𝑘 𝐵 is the Boltzmann constant, 𝑇 is 3 2 1 0 1 2 3                                                 
+
+> v′
+> x
+> 3
+> 2
+> 1
+> 0123
+> v′
+> y
+> vxvy
+> Eigenbasis axes
+> Figure C1. Three realizations of 2D singular Brownian motion with
+> (𝜆 𝑥 , 𝜎 𝑦 , 𝑓 𝑥 )=(1,1,−1)for 𝑡 ∈[0,5𝜏 𝑥 ], zero initial velocity, and
+> 𝜃 =45 ◦. Time is expressed in units of the relaxation time of the OU eigen-mode 𝜏 𝑥 =𝜆 −1
+> 𝑥 . Crosses mark the position of the walker at 𝑡 =5𝜏 𝑥 . Random motion is damped in 𝑣 𝑥 and diffusive along 𝑣 𝑦 . Observed processes (𝑣 ′
+> 𝑥 , 𝑣 ′
+> 𝑦 )
+> are a superposition of (𝑣 𝑥 , 𝑣 𝑦 )eigenmodes. The state approaches a steady state value ⟨⟨ 𝑣 𝑥 ⟩⟩ =𝑓 𝑥 /𝜆 𝑥 .
+
+the temperature of the fluid, and 𝑚 is the mass of the particle. This relation ensures that the system reaches thermal equilibrium with a Maxwell-Boltzmann distribution at temperature 𝑇 .Thermal noise in an RC circuit has also been explained by the fluctuation-dissipation theorem (Johnson 1928; Nyquist 1928). Ap-plying Kirchhoff’s law, the voltage across the resistor 𝑅 and the capacitor 𝐶 is given by 𝑉 = −𝑅𝐼 + 𝑄 /𝐶 where 𝑄 is the charge and 𝐼 = 𝑑𝑄 /𝑑𝑡 is the current through the circuit. The thermal noise voltage can be modeled as a stochastic process with zero mean and a correlation function given by ⟨𝑉 (𝑡 )𝑉 (𝑡 ′)⟩ = 2𝑘 𝐵 𝑇 𝑅𝛿 (𝑡 − 𝑡 ′). The fluctuation-dissipation theorem relates the existence of thermal noise in a circuit to the dissipative properties of the resistor and is a mani-festation of the microscopic dynamics of electrons in the resistor. The same microscopic dynamics that gives rise to dissipation also gives rise to fluctuations (Callen & Welton 1951). The fluctuation-dissipation theorem is a fundamental principle with wide ranging applications that connects the response of a system to external per-turbations with the internal fluctuations of the system in thermal equilibrium. This may also be viewed as a balance check for macro-scopic dynamics: without dissipation the fluctuations would grow without bound and the system would not be stable. In thermal equi-librium, fluctuation and dissipation can be viewed as two sides of the same coin and the observation of one informs the other. 
+
+APPENDIX C: TWO-DIMENSIONAL BROWNIAN MOTION 
+
+The OU process is Brownian motion (Uhlenbeck & Ornstein 1930). The result that the stochastic component of the phenomenological two-component model with spin wandering is an OU process sug-gests that we can tease out the body-averaged dynamics in a neutron star using Brownian motion as a toy model. For this reason we con- 
+
+> MNRAS 000 , 1–21 (2026)
+
+## 18 Reginald Christian Bernardo 2.5          
+
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> 0.0 0.5 1.0
+> v′
+> x
+> state reconstruction observation
+> 0246810
+> t
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> 0.0 0.5 1.0
+> v′
+> y
+> 2.0 1.5 1.0 0.5 0.0
+> v′
+> x
+> 1.0
+> 0.5
+> 0.0 0.5 1.0
+> v′
+> y
+> state reconstruction mean
+
+Figure C2. Gaussian process reconstruction of the velocity of a particle exhibiting singular Brownian motion (state); with noisy measurements, state parameters 
+
+(𝜆 𝑥 , 𝜎 𝑦 , 𝑓 𝑥 ) = (1, 1, −1), 𝜃 = 45 ◦, observation window 𝑡 ∈ [ 0, 10 𝜏 𝑥 ], and zero initial conditions, where 𝜏 𝑥 = 𝜆 −1 
+
+> 𝑥
+
+. White Gaussian measurement noise 
+
+𝜺 𝑛 ∼ N ( 0, 𝜎 2 
+
+> 𝜀
+
+I2 ) is added to each observed state vector, with 𝜎 2 
+
+> 𝜀
+
+= 0.1. [left] True state (black solid) and reconstructed state with 95% credible intervals (blue bands). Black dots with error bars show observations. [right] True state trajectory (black solid) and mean reconstructed trajectory (blue dashed). This is obtained using the fast Bayesian inference method described in Section 4 (Singh et al. 2018). 
+
+sider 2D Brownian motion with a singular feature that connects with the two-component model. We will also use the toy model to illus-trate the fast Bayesian inference method (Singh et al. 2018) for a regularized singular OU process. Consider the eigenbasis of motion to be the 𝑥 and 𝑦 axes. Then, the equations of motion are given by 
+
+¤𝑣 𝑥 (𝑡 ) = −𝜆 𝑥 𝑣 𝑥 (𝑡 ) + 𝑓 𝑥 +√︁ 𝑄 𝑥 ¤𝑊 𝑥 (𝑡 ) , (C1) 
+
+¤𝑣 𝑦 (𝑡 ) = −𝜆 𝑦 𝑣 𝑦 (𝑡 ) + 𝑓 𝑦 +√︁ 𝑄 𝑦 ¤𝑊 𝑦 (𝑡 ) , (C2) 
+
+⟨ ¤ 𝑊 𝑖 (𝑡 ) ¤ 𝑊 𝑗 (𝑡 ′)⟩ = 𝛿 𝑖 𝑗 𝛿 (𝑡 − 𝑡 ′) , (C3) where 𝜆 𝑥 = 𝜏 −1 
+
+> 𝑥
+
+and 𝜆 𝑦 = 𝜏 −1 
+
+> 𝑦
+
+are relaxation rates along the 𝑥 and 𝑦 
+
+directions, respectively, 𝑓 𝑥 and 𝑓 𝑦 are constant forces per unit mass acting on the particle in the 𝑥 and 𝑦 directions, respectively, and 
+
+¤𝑊 𝑥 (𝑡 ) and ¤𝑊 𝑦 (𝑡 ) are independent Gaussian white noise processes. The constants 𝑄 𝑥 and 𝑄 𝑦 are diffusion coefficients in the 𝑥 and 𝑦 
+
+directions, respectively. The above equations describe a shifted 2D OU process, 
+
+¤v(𝑡 ) = −𝝀 v(𝑡 ) + f + 𝝈 ¤W(𝑡 ) , (C4) with diagonal drift and volatility matrices: 
+
+𝝀 =
+
+𝜆 𝑥 00 𝜆 𝑦 
+
+
+
+, 𝝈 =
+
+√𝑄 𝑥 00√︁ 𝑄 𝑦 
+
+
+
+, (C5) The observation basis is the 𝑥 ′ and 𝑦 ′ axes; which are rotated by an angle 𝜃 with respect to the 𝑥 and 𝑦 axes. The equations of motion in this frame can be derived by appropriately applying the rotation matrix 
+
+R =
+
+cos 𝜃 − sin 𝜃 
+
+sin 𝜃 cos 𝜃 
+
+
+
+(C6) to the vectors and matrices in the eigenbasis; i.e., vectors and matrices in the observation basis are given by 
+
+v′ = Rv , (C7) 
+
+f′ = Rf , (C8) 
+
+𝝀 ′ = R𝝀 R⊤ , (C9) 
+
+𝝈 ′ = R𝝈 R⊤ , (C10) and the equations of motion given by 
+
+¤v′ (𝑡 ) = −𝝀 ′v′ (𝑡 ) + f′ + 𝝈 ′ ¤W(𝑡 ) . (C11) In contrast with the eigenbasis, the drift and volatility matrices in the observation basis are non-diagonal and the processes along the 
+
+𝑥 ′ and 𝑦 ′ axes are correlated. The constant force per unit mass f
+
+provides a long time deterministic (linear) trend v′ 
+
+> D
+
+in the observed velocity v′. The velocity residuals v′ 
+
+> S
+
+= v′ − v′ 
+
+> D
+
+are fully specified by the drift and volatility matrices. For illustration we consider a special case: 𝜆 𝑦 = 0, 𝑓 𝑦 = 0, 𝜎 𝑥 = 0. This turns the problem into a singular OU process because one of the eigenvalues of the drift matrix is zero. Then, the process along the 𝑦 axis is diffusive and the process along the 𝑥 axis is OU for 
+
+𝜆 𝑥 > 0. The deterministic part is parametrized in the eigenbasis as 
+
+𝑣 𝑥 (𝑡 ) = 𝑣 𝑥, 0𝑒 −𝜆 𝑥 𝑡 + 𝑓 𝑥 (1 − 𝑒 −𝜆 𝑥 𝑡 )/ 𝜆 𝑥 ; which at long times com-pared to the relaxation time 𝜏 𝑥 approaches the steady state value 
+
+⟨⟨ 𝑣 𝑥 ⟩⟩ = 𝑓 𝑥 /𝜆 𝑥 . The observed processes along the 𝑥 ′ and 𝑦 ′ axes are a superposition of the OU and diffusive eigenbasis processes; with amounts determined by the rotation angle 𝜃 . The deterministic drift in the observation basis can be obtained by applying the rotation ma-trix to vD = (⟨⟨ 𝑣 𝑥 ⟩⟩ , 0)⊤; this gives v′ 
+
+> D
+
+= (⟨⟨ 𝑣 𝑥 ⟩⟩ cos 𝜃, ⟨⟨ 𝑣 𝑥 ⟩⟩ sin 𝜃 )⊤.This captures key features of the two-component model with spin wandering: one velocity eigenmode has a finite relaxation time and the other an infinite relaxation time. The external forces support a de-celeration. Realizations of the process are shown in Figure C1. This is reminiscent of realizations of the crust and superfluid angular ve-locities in the two-component model with spin wandering (Antonelli et al. 2023). Figures C2–C3 illustrate the application of the fast Bayesian in-ference method (Singh et al. 2018) for a singular OU process; 
+
+MNRAS 000 , 1–21 (2026) Stationarity and angular momentum conservation in pulsar spin noise 19 0.8 1.0 1.2 1.4           
+
+> y
+> 0.66 0.72 0.78 0.84
+> 0.75 1.00 1.25 1.50
+> x
+> 1.5
+> 1.2
+> 0.9
+> 0.6
+> fx
+> 0.8 1.0 1.2 1.4
+> y
+> 0.66 0.72 0.78 0.84
+> 1.5
+> 1.2
+> 0.9
+> 0.6
+> fx
+> fixed noise joint state+noise 0.29 0.30 0.31 0.32 0.33
+> σ²
+> 010 20 30 40 50 60 70 density
+> 68% interval truth MAP median
+> 1.0
+> 0.5
+> 0.0 0.5
+> v′obs
+> x − v′rec
+> x
+> ±ˆσ²
+> 0246810
+> t
+> 1.0
+> 0.5
+> 0.0 0.5 1.0
+> v′obs
+> y − v′rec
+> y
+
+Figure C3. Top panel : Parameter posteriors (68% and 95% credible intervals) in singular Brownian motion (Section C) obtained using a fast Bayesian inference method (Singh et al. 2018) with fixed noise (red dashed) and joint state & noise estimation (black solid). True parameters are shown in gray: 
+
+(𝜆 𝑥 , 𝜎 𝑦 , 𝑓 𝑥 ) = (1, 1, −1) and 𝜃 = 45 ◦. The state is sampled evenly ( 𝑁 = 1000) with zero initial conditions and observation window 𝑡 ∈ [ 0, 10 𝜏 𝑥 ], where 
+
+𝜏 𝑥 = 𝜆 −1 
+
+> 𝑥
+
+. The noisy measurements are obtained by adding white Gaussian noise 𝜺 𝑛 ∼ N ( 0, 𝜎 2 
+
+> 𝜀
+
+I2 ) to the state trajectory, with 𝜎 2 
+
+> 𝜀
+
+= 0.1. Bottom panel : noise diagnostics for the residuals of the state reconstruction with joint state & noise estimation. The left plot shows the measurement noise posterior together with the true value and the MAP estimate; right plot the whitened velocity residuals obtained after subtracting the reconstructed state out of the measurements and dividing by the reconstructed noise standard deviation. 
+
+or Brownian motion with diffusive and damped eigenmodes. The method was applied to reconstruct the velocity of a particle exhibit-ing random Brownian motion and to infer the parameters of the system with clean and noisy measurements. We consider the state 
+
+(𝜆 𝑥 , 𝜎 𝑦 , 𝑓 𝑥 ) = (1, 1, −1) and 𝜃 = 45 ◦. Measurement noise was ac-commodated by adding white Gaussian noise 𝜺 𝑛 ∼ N ( 0, 𝜎 2
+
+𝜀 I2) to the state trajectory with 𝜎 2
+
+𝜀 = 0.1. The choices are arbitrary for il-lustration of the effects of different forces acting on the system (long term drift to ⟨⟨ 𝑣 𝑥 ⟩⟩ = 𝑓 𝑥 /𝜆 𝑥 , OU in 𝑣 𝑥 and diffusion in 𝑣 𝑦 ). The physics holds for arbitrary values. The path reconstruction (Figure C2) shows that the state is consistently tracked by the reconstruction. The parameter posteriors and noise diagnostics (Figure C3) show that the parameters can be inferred with noisy measurements. 
+
+APPENDIX D: ANALYTIC SEMISEPARABLE LIKELIHOOD FOR FULL-STATE ANGULAR-VELOCITY OBSERVATIONS 
+
+In Section 4.2 we specialize to the case that is relevant to radio pulsar timing, where only the crust angular velocity is observed. For completeness, we write down the full-state construction based on the 
+
+MNRAS 000 , 1–21 (2026) 20 Reginald Christian Bernardo 
+
+time-domain analytic solutions in Bernardo (2026) for the case in which both angular-velocity components are directly observed: the crust angular velocity Ωc by radio timing and the superfluid angular velocity Ωs by, say, continuous gravitational-wave observations. The crust-only likelihood of the main text follows as a special case. At each epoch 𝑡 𝑖 the observation is a two-component vector, 
+
+y𝑖 =
+
+𝛿 Ωc (𝑡 𝑖 )
+
+𝛿 Ωs (𝑡 𝑖 )
+
+
+
++ M𝑖 𝜷 + 𝜺 𝑖 , (D1) where M𝑖 is a 2 × 𝑝 deterministic trend matrix, 𝜷 is a 𝑝 -vector of nuisance trend parameters, and 𝜺 𝑖 is heteroscedastic measurement noise with 
+
+⟨𝜺 𝑖 𝜺 ⊤ 
+
+> 𝑗
+
+⟩ = 𝚺 𝑖 𝛿 𝑖 𝑗 , 𝚺 𝑖 =
+
+𝜎 2c,𝑖 00 𝜎 2s,𝑖 
+
+
+
+. (D2) The covariance matrix between epochs 𝑡 𝑖 and 𝑡 𝑗 is 
+
+C𝑖 𝑗 (𝜽 ) = K(𝑡 𝑖 , 𝑡 𝑗 ; 𝜽 ) + 𝚺 𝑖 𝛿 𝑖 𝑗 , (D3) where 
+
+K(𝑡, 𝑡 ′) =
+
+𝐾 cc (𝑡, 𝑡 ′) 𝐾 cs (𝑡, 𝑡 ′)
+
+𝐾 cs (𝑡 ′, 𝑡 ) 𝐾 ss (𝑡, 𝑡 ′)
+
+
+
+, (D4) with 𝐾 cc , 𝐾 ss , and 𝐾 cs given by the finite-start expressions derived in Bernardo (2026). Setting 𝑥 = 𝑡 − 𝑡 0 and 𝑥 ′ = 𝑡 ′ − 𝑡 0, each entry of K is a bilinear combination of the three scalar mode kernels, 
+
+𝐾 + (𝑡, 𝑡 ′) = 𝑄 + min (𝑥, 𝑥 ′), (D5) 
+
+𝐾 − (𝑡, 𝑡 ′) = 𝑄 − 𝜏 
+
+2
+
+h
+
+𝑒 − | 𝑥 −𝑥 ′ |/ 𝜏 − 𝑒 − ( 𝑥 +𝑥 ′ )/ 𝜏 i
+
+, (D6) 
+
+𝐾 +− (𝑡, 𝑡 ′) = 𝑄 × 𝜏 
+
+h
+
+𝑒 − ( 𝑥 ′ −𝑥 )/ 𝜏 Θ(𝑥 ′ − 𝑥 ) + Θ(𝑥 − 𝑥 ′) − 𝑒 −𝑥 ′/𝜏 i
+
+,
+
+(D7) where 𝐾 +− (𝑡, 𝑡 ′) = ⟨ΔΩ + (𝑡 )ΔΩ − (𝑡 ′)⟩ . In terms of the weights 
+
+𝑤 − = 𝜏 s
+
+𝜏 c + 𝜏 s
+
+, 𝑣 − = 𝜏 c
+
+𝜏 c + 𝜏 s
+
+, 𝑤 + = 𝜏 𝜏 c + 𝜏 s
+
+, (D8) the three entries of K are 
+
+𝐾 cc (𝑡, 𝑡 ′) = 𝑤 2 
+
+> −
+
+𝐾 − (𝑡, 𝑡 ′) + 𝑤 − 𝑤 + [𝐾 +− (𝑡, 𝑡 ′) + 𝐾 +− (𝑡 ′, 𝑡 )] + 𝑤 2
+
+> +
+
+𝐾 + (𝑡, 𝑡 ′), (D9) 
+
+𝐾 ss (𝑡, 𝑡 ′) = 𝑣 2 
+
+> −
+
+𝐾 − (𝑡, 𝑡 ′) − 𝑣 − 𝑤 + [𝐾 +− (𝑡, 𝑡 ′) + 𝐾 +− (𝑡 ′, 𝑡 )] + 𝑤 2
+
+> +
+
+𝐾 + (𝑡, 𝑡 ′), (D10) 
+
+𝐾 cs (𝑡, 𝑡 ′) = −𝑤 − 𝑣 − 𝐾 − (𝑡, 𝑡 ′) + 𝑤 + [𝑤 − 𝐾 +− (𝑡 ′, 𝑡 ) − 𝑣 − 𝐾 +− (𝑡, 𝑡 ′)] + 𝑤 2
+
+> +
+
+𝐾 + (𝑡, 𝑡 ′). (D11) For 𝑖 > 𝑗 , each block K(𝑡 𝑖 , 𝑡 𝑗 ) factorizes as 
+
+K(𝑡 𝑖 , 𝑡 𝑗 ) = F𝑖 G⊤ 
+
+> 𝑗
+
+, 𝑖 > 𝑗, (D12) where F𝑖 and G 𝑗 are 2 × 2 factor matrices. Using the shorthand 
+
+𝑠 𝑖 = 𝑒 −𝑥 𝑖 /𝜏 , both rows of F𝑖 share the same two scalar basis functions, 
+
+F𝑖 =
+
+ 𝑤 − 𝑠 𝑖 𝑤 +
+
+−𝑣 − 𝑠 𝑖 𝑤 +
+
+
+
+, (D13) and the coefficient matrix has row-specific entries reflecting the asymmetric coupling of the two eigenmodes to the crust and su-perfluid components. We introduce the shorthand 
+
+𝐵 𝑗 = 𝑄 − 𝜏 
+
+2
+
+
+
+𝑒 𝑥 𝑗 /𝜏 − 𝑒 −𝑥 𝑗 /𝜏 
+
+, (D14) 
+
+𝐴 𝑗 = 𝑄 × 𝜏 
+
+
+
+𝑒 𝑥 𝑗 /𝜏 − 1
+
+
+
+, (D15) 
+
+𝐷 𝑗 = 𝑄 × 𝜏 
+
+
+
+1 − 𝑒 −𝑥 𝑗 /𝜏 
+
+, (D16) 
+
+𝐶 𝑗 = 𝑄 + 𝑥 𝑗 , (D17) where 𝐵 𝑗 is the coefficient of the damped-mode covariance 𝐾 − ,
+
+𝐶 𝑗 is the coefficient of the diffusive-mode covariance 𝐾 +, 𝐴 𝑗 is the coefficient associated with 𝐾 +− (𝑡 𝑗 , 𝑡 𝑖 ), and 𝐷 𝑗 is the coefficient associated with 𝐾 +− (𝑡 𝑖 , 𝑡 𝑗 ) for 𝑖 > 𝑗 . The coefficient matrix is then 
+
+G 𝑗 =
+
+ 𝑤 − 𝐵 𝑗 + 𝑤 + 𝐴 𝑗 𝑤 − 𝐷 𝑗 + 𝑤 +𝐶 𝑗 
+
+−𝑣 − 𝐵 𝑗 + 𝑤 + 𝐴 𝑗 −𝑣 − 𝐷 𝑗 + 𝑤 +𝐶 𝑗 
+
+
+
+, (D18) so that the crust row of G 𝑗 is 
+
+𝐺 c,1 
+
+> 𝑗
+
+= 𝑤 − 𝐵 𝑗 + 𝑤 + 𝐴 𝑗 , (D19) 
+
+𝐺 c,2 
+
+> 𝑗
+
+= 𝑤 − 𝐷 𝑗 + 𝑤 +𝐶 𝑗 , (D20) and the superfluid row is 
+
+𝐺 s,1 
+
+> 𝑗
+
+= −𝑣 − 𝐵 𝑗 + 𝑤 + 𝐴 𝑗 , (D21) 
+
+𝐺 s,2 
+
+> 𝑗
+
+= −𝑣 − 𝐷 𝑗 + 𝑤 +𝐶 𝑗 . (D22) One can verify directly that F𝑖 G⊤ 
+
+> 𝑗
+
+reproduces all three entries of 
+
+K(𝑡 𝑖 , 𝑡 𝑗 ) for 𝑖 > 𝑗 :
+
+h
+
+F𝑖 G⊤
+
+> 𝑗
+
+i 
+
+> 11
+
+= 𝑤 − 𝑠 𝑖 𝐺 c,1 
+
+> 𝑗
+
++ 𝑤 +𝐺 c,2 
+
+> 𝑗
+
+= 𝐾 cc (𝑡 𝑖 , 𝑡 𝑗 ), (D23) 
+
+h
+
+F𝑖 G⊤
+
+> 𝑗
+
+i 
+
+> 22
+
+= −𝑣 − 𝑠 𝑖 𝐺 s,1 
+
+> 𝑗
+
++ 𝑤 +𝐺 s,2 
+
+> 𝑗
+
+= 𝐾 ss (𝑡 𝑖 , 𝑡 𝑗 ), (D24) 
+
+h
+
+F𝑖 G⊤
+
+> 𝑗
+
+i 
+
+> 12
+
+= 𝑤 − 𝑠 𝑖 𝐺 s,1 
+
+> 𝑗
+
++ 𝑤 +𝐺 s,2 
+
+> 𝑗
+
+= 𝐾 cs (𝑡 𝑖 , 𝑡 𝑗 ). (D25) The crust row coincides with the scalar factors [𝑉 (1) 
+
+> 𝑗
+
+, 𝑉 (2) 
+
+> 𝑗
+
+] of the crust-only likelihood in Section 4.2 upon identifying 𝑉 (1) 
+
+> 𝑗
+
+= 𝐺 c,1 
+
+> 𝑗
+
+and 
+
+𝑉 (2) 
+
+> 𝑗
+
+= 𝐺 c,2 
+
+> 𝑗
+
+, confirming that the crust-only construction is the exact reduction of the full-state one. The superfluid row 𝐺 s,· 
+
+> 𝑗
+
+differs from the crust row because the lag mode Ω− couples to the superfluid with weight −𝑣 − rather than 𝑤 − , while the diffusive mode Ω+ retains the same weight 𝑤 + in both components. The rank of the semiseparable structure is still governed by 𝐽 = 2 scalar basis functions {𝑠 𝑖 , 1};the row-specific coefficients in G 𝑗 reflect the asymmetric coupling of the two eigenmodes to the two components and do not increase the rank. The diagonal blocks are stored separately, 
+
+A𝑖 = K(𝑡 𝑖 , 𝑡 𝑖 ) + 𝚺 𝑖 , (D26) and the upper triangle follows by K(𝑡 𝑖 , 𝑡 𝑗 ) = K(𝑡 𝑗 , 𝑡 𝑖 )⊤.
+
+Trend marginalization and posterior 
+
+With the stacked data vector y = (y⊤ 
+
+> 1
+
+, . . . , y⊤ 
+
+> 𝑁
+
+)⊤ and the stacked trend matrix M, the generalized least-squares trend estimate at fixed 
+
+𝜽 is ˆ𝜷 =
+
+
+
+M⊤C−1M
+
+ −1
+
+M⊤C−1y. (D27) With r = y − M ˆ𝜷 , the trend-marginalized likelihood is ln L( 𝜽 ) = − 12
+
+
+
+r⊤C−1r + ln |C|+ ln M⊤C−1M + ( 2𝑁 − 𝑝 ) ln (2𝜋 )
+
+
+
+.
+
+(D28) 
+
+MNRAS 000 , 1–21 (2026) Stationarity and angular momentum conservation in pulsar spin noise 21 
+
+The block semiseparable Cholesky recursion of Section 4.2 gen-eralizes to 2 × 2 blocks by replacing scalars with 2 × 2 matrices throughout; the scalar pivots 𝑑 𝑖 become 2 × 2 pivot matrices D𝑖 , and the log-determinant accumulates as ln |C| = Í𝑖 ln |D𝑖 |. The factor-ization costs O( 𝑁 ) with a fixed prefactor from the 2 × 2 arithmetic. 
+
+Reduction and hidden-state reconstruction 
+
+The crust-only likelihood of Section 4.2 is recovered by retaining only the first row of F𝑖 and the first row of G 𝑗 , which gives back the scalar factors U𝑖 = [𝑤 − 𝑠 𝑖 , 𝑤 +] and V 𝑗 = [𝑉 (1) 
+
+> 𝑗
+
+, 𝑉 (2) 
+
+> 𝑗
+
+] of Eq. (89). When only the crust is observed, the hidden superfluid residual can be reconstructed by Gaussian conditioning. At fixed 𝜽 , the con-ditional mean and variance of the superfluid residual at epoch 𝑡 ★ are 
+
+⟨𝛿 Ωs (𝑡 ★) | r⟩ = kcs (𝑡 ★)⊤C−1cc r, (D29) Var [𝛿 Ωs (𝑡 ★) | r] = 𝐾 ss (𝑡 ★, 𝑡 ★) − kcs (𝑡 ★)⊤C−1cc kcs (𝑡 ★), (D30) where Ccc is the 𝑁 × 𝑁 crust-only covariance matrix and [kcs (𝑡 ★)] 𝑖 =
+
+𝐾 cs (𝑡 𝑖 , 𝑡 ★). Both inverse-covariance actions use the crust-only rank-two semiseparable solve and cost O( 𝑁 ).
+
+REFERENCES 
+
+Agazie G., et al., 2023, Astrophys. J. Lett., 951, L8 Ambikasaran S., Foreman-Mackey D., Greengard L., Hogg D. W., O’Neil M., 2015, IEEE Transactions on Pattern Analysis and Machine Intelligence, 38, 252 Andersson N., Sidery T., Comer G. L., 2006, Mon. Not. Roy. Astron. Soc., 368, 162 Andersson N., Glampedakis K., Ho W. C. G., Espinoza C. M., 2012, Phys. Rev. Lett., 109, 241103 Antonelli M., Basu A., Haskell B., 2023, Mon. Not. Roy. Astron. Soc., 520, 2813 Antonelli M., Basu A., Haskell B., 2025, Publ. Astron. Soc. Austral., 42, e118 Antoniadis J., et al., 2023, Astron. Astrophys., 678, A50 Backer D. C., 1970, Nature, 228, 42 Bagchi M., et al., 2025, J. Astrophys. Astron., 46, 62 Bartel N., Morris D., Sieber W., Hankins T. H., 1982, ApJ, 258, 776 Bassa C. G., et al., 2017, Astrophys. J. Lett., 846, L20 Baym G., Pethick C., Pines D., Ruderman M., 1969, Nature, 224, 872 Bernardo R. C., 2026, Stochastic problems in pulsar timing (arXiv:2604.08373 )Callen H. B., Welton T. A., 1951, Physical Review, 83, 34 Chamel N., 2013, Phys. Rev. Lett., 110, 011101 Chandrasekhar S., 1943, Rev. Mod. Phys., 15, 1 Chorin A. J., Hald O. H., Kupferman R., 2000, Proceedings of the National Academy of Science, 97, 2968 Clark C. J., et al., 2018, Sc. Adv., 4, eaao7228 Clark C. J., et al., 2025, Astrophys. J., 994, 149 Damour T., 2015, Class. Quant. Grav., 32, 124009 Dergachev V., Papa M. A., 2025, Phys. Rev. D, 112, 042005 Dergachev V., Papa M. A., 2026, Phys. Rev. D, 113, 042001 Dong W., Melatos A., O’Neill N. J., Meyers P. M., Boek D. K., 2026, Mon. Not. Roy. Astron. Soc., 545, staf2053 Einstein A., 1905, Annalen der Physik, 322, 549 Foreman-Mackey D., Agol E., Ambikasaran S., Angus R., 2017, Astron. J., 154, 220 Freire P. C. C., Wex N., 2024, Living Rev. Rel., 27, 5 Goncharov B., Zhu X.-J., Thrane E., 2020, Mon. Not. Roy. Astron. Soc., 497, 3264 Groth E. J., 1975, ApJS, 29, 453 Haskell B., Melatos A., 2015, Int. J. Mod. Phys. D, 24, 1530008 Haskell B., Schwenzer K., 2021, arXiv e-prints, p. arXiv:2104.03137 Haskell B., Sedrakian A., 2018, Astrophys. Space Sci. Libr., 457, 401 Hewish A., Bell S. J., Pilkington J. D. H., Scott P. F., Collins R. A., 1968, Nature, 217, 709 Hobbs G., Lyne A. G., Kramer M., 2010, MNRAS, 402, 1027 Hulse R. A., 1994, Rev. Mod. Phys., 66, 699 Hulse R. A., Taylor J. H., 1975, Astrophys. J. Lett., 195, L51 Jaranowski P., Krolak A., Schutz B. F., 1998, Phys. Rev. D, 58, 063001 Johnson J. B., 1928, Physical Review, 32, 97 Kaspi V. M., Kramer M., 2016, in 26th Solvay Conference on Physics: As-trophysics and Cosmology. ( arXiv:1602.07738 )Kelly B. C., Becker A. C., Sobolewska M., Siemiginowska A., Uttley P., 2014, Astrophys. J., 788, 33 Khmelnitsky A., Rubakov V., 2014, JCAP, 02, 019 Kramer M., et al., 2021, Phys. Rev. X, 11, 041050 Langevin P., 1908, C. R. Acad. Sci. Paris., 146, 530 Lemons D. S., Gythiel A., 1997, Am. J. Phys., 65, 1079 Lorimer D. R., 2001, Living Rev. Rel., 4, 5 Mackay D. J. C., 2003, Information Theory, Inference and Learning Algo-rithms Manchester R. N., 2015, Int. J. Mod. Phys. D, 24, 1530018 McGloughlin B., et al., 2026, arXiv e-prints, p. arXiv:2607.18219 Melatos A., Link B., 2014, Mon. Not. Roy. Astron. Soc., 437, 21 Meyers P. M., Melatos A., O’Neill N. J., 2021a, Mon. Not. Roy. Astron. Soc., 502, 3113 Meyers P. M., O’Neill N. J., Melatos A., Evans R. J., 2021b, Mon. Not. Roy. Astron. Soc., 506, 3349 Ming J., Papa M. A., Eggenstein H.-B., Machenschalk B., Steltner B., Prix R., Allen B., Behnke O., 2022, Astrophys. J., 925, 8 Montoli A., Antonelli M., Magistrelli F., Pizzochero P. M., 2020, A&A, 642, A223 Mori H., 1965, Progress of Theoretical Physics, 33, 423 Nieder L., et al., 2020, Astrophys. J. Lett., 902, L46 Nyquist H., 1928, Physical Review, 32, 110 O’Neill N. J., Meyers P. M., Melatos A., 2024, Mon. Not. Roy. Astron. Soc., 530, 4648 Owen B. J., Reitze D. H., Whitcomb S. E., 2009, in astro2010: The As-tronomy and Astrophysics Decadal Survey. p. 229 ( arXiv:0903.2603 ), doi:10.48550/arXiv.0903.2603 Pilkington J. D. H., Hewish A., Bell S. J., Cole T. W., 1968, Nature, 218, 126 Porayko N. K., Postnov K. A., 2014, Phys. Rev. D, 90, 062008 Porayko N. K., et al., 2018, Phys. Rev. D, 98, 102002 Prix R., 1999, Astron. Astrophys., 352, 623 Prix R., 2004, Phys. Rev. D, 69, 043001 Prix R., 2009, in Becker W., ed., Astrophysics and Space Science Library Vol. 357, Astrophysics and Space Science Library. p. 651, doi:10.1007/978-3-540-76965-1_24 Prix R., Comer G. L., Andersson N., 2002, Astron. Astrophys., 381, 178 Reardon D. J., et al., 2023, Astrophys. J. Lett., 951, L6 Singh R., Ghosh D., Adhikari R., 2018, Phys. Rev. E, 98, 012136 Smarra C., et al., 2023, Phys. Rev. Lett., 131, 171001 Taylor J. H., Manchester R. N., 1977, Ann. Rev. Astron. Astrophys., 15, 19 Taylor J. H., Weisberg J. M., 1982, ApJ, 253, 908 Timokhin A. N., 2010, MNRAS, 408, L41 Uhlenbeck G. E., Ornstein L. S., 1930, Phys. Rev., 36, 823 Wallace P. T., et al., 1977, Nature, 266, 692 Xu H., et al., 2023, Res. Astron. Astrophys., 23, 075024 van Haasteren R., Vallisneri M., 2015, MNRAS, 446, 1170 MNRAS 000 , 1–21 (2026)

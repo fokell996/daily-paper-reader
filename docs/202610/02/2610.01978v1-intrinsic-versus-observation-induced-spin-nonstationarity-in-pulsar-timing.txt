@@ -1,0 +1,1120 @@
+Title: Intrinsic versus observation induced spin nonstationarity in pulsar timing
+
+URL Source: https://arxiv.org/pdf/2610.01978v1
+
+Published Time: Fri, 02 Oct 2026 02:06:22 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+> MNRAS 000 , 1–16 (2026) Preprint 2 October 2026 Compiled using MNRAS L ATEX style file v3.2
+
+# Intrinsic versus observation induced spin nonstationarity in pulsar timing 
+
+# Reginald Christian Bernardo, ★
+
+> Max Planck Institute for Gravitational Physics (Albert Einstein Institute), Leibniz Universität Hannover, Callinstrasse 38, D-30167 Hannover, Germany
+> Accepted XXX. Received YYY; in original form ZZZ
+
+ABSTRACT 
+
+Whether spin noise of a neutron star is stationary is, in two-component models, a question of whether stellar angular momentum is conserved internally or exchanged externally through independent stochastic torques on the crust and superfluid. The question is posed in the two components’ angular velocities, but radio pulsar timing observes only the crust, through its rotational phase after a deterministic timing model is fitted. We develop a Gaussian process method for testing spin noise stationarity directly with such phase data. Starting from the exact analytical phase means and covariances of a singular, nonstationary and a minimal, stationary two-component model, we show that the crust phase covariances are semiseparable and construct a likelihood that scales linearly with the number of observations, with the timing model marginalized analytically. We analyze simulated phase data from both models using full-state and crust-only observations, and after differentiation into local spin frequencies. Integration, timing model removal and differentiation neither create nor destroy the distinction between stationary and nonstationary spin noise, but determine how much survives in a finite, noisy data set. With both components observed, the models are distinguished decisively and the generating parameters are recovered. With the crust alone, both models describe the observed phase equally well over much of parameter space, and the Bayes factors are of order unity and prior-limited. The minimal model nonetheless ties the hidden superfluid phase to the observed crust phase through a single factor set by the superfluid inertia fraction, so an independent estimate of this fraction, as from glitches, turns it into a falsifiable prediction that a continuous gravitational wave observation of the interior could test. 
+
+Key words: pulsars: general – methods: data analysis – methods: statistical – stars: neutron 
+
+1 INTRODUCTION 
+
+Radio pulsars (Hewish et al. 1968; Pilkington et al. 1968) are ex-ceptionally stable rotators, and the precision with which their pulses can be timed has made them laboratories for fundamental physics (Lorimer 2001; Manchester 2015; Verbiest et al. 2024). Timing of pulsars in relativistic binaries provides strong-field tests of general relativity (Hulse & Taylor 1975; Kramer et al. 2021), and the timing of arrays of millisecond pulsars has recently yielded support for a nanohertz gravitational wave background (Agazie et al. 2023; Anto-niadis et al. 2023; Reardon et al. 2023; Xu et al. 2023; Miles et al. 2025; Yu & Allen 2025). This precision is nonetheless bounded by timing noise, a slow, red wandering of the rotational phase relative to a deterministic spin-down model that was recognized early in the Crab pulsar (Groth 1975) and that is present in most pulsars with long timing baselines (Hobbs et al. 2010). Timing noise limits the low-frequency sensitivity of pulsar timing experiments (Shannon & Cordes 2010; Lasky et al. 2015), but it is also a signal in its own right, since it carries information on the rotational dynamics of the neutron star (Melatos & Link 2014; Goncharov et al. 2020). A physical picture of timing noise is provided by two-component models of the neutron star, in which a crust that is electromagnetically coupled to the observed pulses exchanges angular momentum with an interior superfluid through mutual friction, and in which stochas- 
+
+> ★E-mail: reginald.christian.bernardo@aei.mpg.de
+
+tic torques act on one or both components (Meyers et al. 2021a,b; Antonelli et al. 2023). The same two-component picture underlies the standard interpretation of glitches (Baym et al. 1969; Groth 1975; Andersson et al. 2012; Chamel 2013; Haskell & Melatos 2015). The coupling time scale has recently been constrained from timing noise, first for PSR J1359-6038 (O’Neill et al. 2024) and subsequently for a sample of UTMOST pulsars (Jankowski et al. 2019; Lower et al. 2020; Dunn et al. 2025; Dong et al. 2026). Within this picture a phys-ical question arises that the present work is concerned with. If the stochastic torques on the two components are independent, the total angular momentum of the star performs a random walk and the spin noise is nonstationary (Meyers et al. 2021a). If instead the stochastic torques are internal, equal and opposite between the components, the total angular momentum is conserved and the spin noise of each component is stationary (Antonelli et al. 2023). The stationarity of pulsar spin noise is therefore a statement about whether angular mo-mentum is conserved inside the neutron star, and it can in principle be tested by comparing two models, referred to below as singular and minimal, that realize the two alternatives. This work follows up Bernardo (2026), which obtained exact time-domain solutions for the singular two-component spin-noise model (Meyers et al. 2021a) and established the stochastic framework used here. In a different work, we take up the physical question directly in the variables in which it is posed, the angular velocities or spin frequencies of the crust and the superfluid, and develops scalable Gaussian process methods to test spin noise stationarity with angular  
+
+> ©2026 The Authors arXiv:2610.01978v1 [astro-ph.HE] 1 Oct 2026
+
+# 2 R. C. Bernardo 
+
+velocity residuals. The present work extends the analytical treatment to the full phase covariance of both the singular and minimal models and develops the corresponding inference problem at the observa-tional level. The present work is concerned with the same question at the observational level. Radio timing does not measure angular velocities. It measures pulse times of arrival, which are converted into rotational phases and then into timing residuals by fitting and subtracting a deterministic timing model that accounts for the spin frequency, the spin-down and other deterministic effects (Hobbs et al. 2006; Edwards et al. 2006; Manchester 2015). Only the crust par-ticipates in this, since the pulses are locked to the crust. The data that are available to test the physics are therefore crust-only phase residuals from which the lowest-order trends have been removed, and a test of spin noise stationarity must be carried out on these data, or on spin-frequency time series derived from them by differentiation (O’Neill et al. 2024). Each step between the physical state and the analyzed data has consequences that must be understood before the physics can be read off. Integration of a stationary angular velocity produces a phase that is not stationary, so that the nonstationarity of the phase is not by itself evidence for a nonstationary spin. The fitting and removal of the timing model suppresses the lowest frequencies, where the difference between a random walk and a stationary process is largest, and is itself known to leave nonstationary residuals (Lee et al. 2012; van Haasteren & Levin 2013; Allen et al. 2026). Differentiating the phases back into spin frequencies averages the state over finite windows and thins the sampling. None of these steps is the object of this work, but each of them could bias a test of stationarity that is carried out at the observational level, and each must therefore be treated exactly. We do so by deriving the phase-domain likelihood of the two models building on the analytical solutions of Bernardo (2026), with the timing model marginalized analytically, and by comparing inference in phase with inference in derived spin frequencies on the same simulated data. The result is a scalable, exact Gaussian process method for the phases, and an assessment of what radio timing alone can and cannot establish about the stationarity of spin noise. We first present the exact phase means and covariances of the singular and minimal models (Section 2). We then derive the phase likelihood with linear scaling in the number of observations, the analytic marginalization of the timing model, and the evidence and superfluid-prediction machinery used throughout (Section 3). The method is tested on simulated phase data generated from the singu-lar and the minimal model, with full-state and crust-only observa-tions (Sections 4–5). We then ask whether the same conclusions are reached when the phases are first processed into local spin frequen-cies (Section 6), and we discuss what pulsar timing can and cannot do to test the stationarity of spin noise and the internal conservation of angular momentum (Section 7). We conclude in Section 8. We include four appendices with additional details. Appendix A derives the finite-start kernel orientation and its multi-output sym-metry; Appendix B presents the semiseparable factorization and the forward and backward solves that give the likelihood its linear cost; Appendix C documents the analytic and numerical checks used to validate the implementation; and Appendix D records the evidence settings and reproducibility metadata for the cached ensembles. 
+
+2 EXACT PHASE MEANS AND COVARIANCES 
+
+We present the phase means and covariances for both the singular (Section 2.1) and the minimal (Section 2.2) models. 
+
+2.1 Singular nonstationary-spin model 
+
+For the singular model (Meyers et al. 2021a,b), we write down the component equations 
+
+𝐼 c ¤Ωc = − 𝐼 c
+
+𝜏 c
+
+(Ωc − Ωs) + 𝑁 c + 𝜉 c , (1) 
+
+𝐼 s ¤Ωs = 𝐼 s
+
+𝜏 s
+
+(Ωc − Ωs) + 𝑁 s + 𝜉 s , (2) where the dot over a variable denotes a time derivative and the 
+
+𝜉 𝑖 (𝑡 )’s are stochastic torques with a zero mean and a covariance 
+
+⟨𝜉 𝑖 (𝑡 )𝜉 𝑗 (𝑡 ′)⟩ = 𝐼 2 
+
+> 𝑖
+
+𝑄 𝑖 𝛿 𝑖 𝑗 𝛿 (𝑡 −𝑡 ′). We work throughout in the detailed-balance limit 𝐼 s/𝐼 c = 𝜏 s/𝜏 c, in which the mutual-friction torques balance each other. The relaxation time and ratio are 
+
+𝜏 = 𝜏 c𝜏 s
+
+𝜏 c + 𝜏 s
+
+, (3) 
+
+𝑟 = 𝜏 s
+
+𝜏 c
+
+, (4) so that (𝜏, 𝑟, 𝑄 c, 𝑄 s) are the four parameters of spin wandering, with 
+
+𝑟 = 𝑥 s/𝑥 c in terms of the fractional moments of inertia 𝑥 𝑖 = 𝐼 𝑖 /( 𝐼 c +
+
+𝐼 s) in this limit. For elapsed times 𝑢 = 𝑡 − 𝑡 0, 𝑢 ′ = 𝑡 ′ − 𝑡 0 measured from the start 𝑡 0 of the observations, we define 𝑢 < = min (𝑢, 𝑢 ′),
+
+𝑢 > = max (𝑢, 𝑢 ′) and Δ = |𝑢 − 𝑢 ′ |.The means are compact in the eigenmode basis. With 
+
+M+ (𝑢 ) = Ω +,0𝑢 + 𝑁 +
+
+2𝐼 𝑢 2 , (5) 
+
+M− (𝑢 ) = Ω −,∞𝑢 + 𝜏 (Ω−,0 − Ω−,∞)( 1 − e−𝑢 /𝜏 ) , (6) we obtain 
+
+⟨𝜙 c⟩ = 𝜙 c,0 + 𝜏 𝑇 Σ
+
+M+ + 𝜏 s
+
+𝑇 Σ
+
+M− , (7) 
+
+⟨𝜙 s⟩ = 𝜙 s,0 + 𝜏 𝑇 Σ
+
+M+ − 𝜏 c
+
+𝑇 Σ
+
+M− , (8) where 𝑇 Σ = 𝜏 c + 𝜏 s, 𝐼 = 𝐼 c + 𝐼 s, Ω− = Ω c − Ωs is the crust– superfluid lag and Ω+ = (𝜏 cΩc +𝜏 sΩs)/ 𝜏 is the diffusive mode, which is proportional to the total angular momentum, 𝐽 = (𝜏 /𝑇 Σ)𝐼 Ω+,in the detailed-balance limit. The torque 𝑁 + = (𝐼 /𝜏 )( 𝜏 c 𝑁 c/𝐼 c +
+
+𝜏 s 𝑁 s/𝐼 s) is the external torque projected on the diffusive mode, such that ⟨ ¤ Ω+⟩ = 𝑁 +/𝐼 , and Ω−,∞ = 𝜏 (𝑁 c/𝐼 c − 𝑁 s/𝐼 s) is the steady-state lag. The remaining quantities (Ω+,0, Ω−,0, 𝜙 c,0, 𝜙 s,0) are the values of the modes and phases at 𝑡 0, which are to be drawn from an initial distribution. The constant, linear and quadratic pieces in ⟨𝜙 c⟩
+
+correspond to a phase offset, a spin-frequency offset and spin-down, respectively. In the likelihood we marginalize over these long-term trends, taking them into the timing model (Section 3). Only the exponentially relaxing piece of M− is not absorbed by the timing model; it decays within a few 𝜏 of the start of the observations and vanishes identically when the lag is initialized at its steady state, 
+
+Ω−,0 = Ω −,∞.The four scalar kernels required by the exact phase covariance are 
+
+I1 (𝑢, 𝑢 ′) = 𝑢 2 
+
+> <
+
+(3𝑢 > − 𝑢 <)
+
+6 , (9) 
+
+I3 (𝑢, 𝑢 ′) = 𝑢 < − 𝜏 + 𝜏 e−𝑢 /𝜏 + 𝜏 e−𝑢 ′/𝜏 − 𝜏 
+
+2 e−Δ/𝜏 − 𝜏 
+
+2 e− ( 𝑢 +𝑢 ′ )/ 𝜏 ,
+
+(10) 
+
+I+− (𝑢, 𝑢 ′) = 𝑢𝑢 < − 𝑢 2
+
+> <
+
+2 − 𝜏 (𝑢 − 𝑢 < + 𝜏 )e− ( 𝑢 ′ −𝑢 < )/ 𝜏 
+
++ 𝜏 (𝑢 + 𝜏 )e−𝑢 ′/𝜏 , (11) 
+
+I−+ (𝑢, 𝑢 ′) = I+− (𝑢 ′, 𝑢 ) , (12)  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Intrinsic versus observation induced spin nonstationarity in pulsar timing 3
+
+We define 
+
+I2 (𝑢, 𝑢 ′) ≡ I +− (𝑢, 𝑢 ′) + I −+ (𝑢, 𝑢 ′) ,
+
+= (𝑢 < − 𝜏 )( 𝑢 > + 𝜏 ) − 𝜏 2e−Δ/𝜏 + 𝜏 (𝑢 + 𝜏 )e−𝑢 ′/𝜏 
+
++ 𝜏 (𝑢 ′ + 𝜏 )e−𝑢 /𝜏 . (13) The kernels I1 (𝑡, 𝑡 ′), I2 (𝑡, 𝑡 ′), and I3 (𝑡, 𝑡 ′) were derived in Bernardo (2026) to express the phase covariance of the singular model; they are the double time integrals of the diffusive, cross and damped pieces of the angular velocity covariance, respectively, and Appendix A summarizes their derivation. We define transformed noise intensities 
+
+𝜏 2𝑄 + = 𝜏 2c 𝑄 c + 𝜏 2s 𝑄 s , (14) 
+
+𝑄 − = 𝑄 c + 𝑄 s , (15) 
+
+𝜏𝑄 × = 𝜏 c𝑄 c − 𝜏 s𝑄 s . (16) The phase covariance blocks are 
+
+𝐾 cc = 𝜏 2
+
+𝑇 2
+
+> Σ
+
+[𝑄 +I1 + 𝑄 × 𝜏 sI2 + 𝑄 − 𝜏 2s I3] , (17) 
+
+𝐾 ss = 𝜏 2
+
+𝑇 2
+
+> Σ
+
+[𝑄 +I1 − 𝑄 × 𝜏 cI2 + 𝑄 − 𝜏 2c I3] , (18) 
+
+𝐾 cs = 𝜏 2
+
+𝑇 2
+
+> Σ
+
+{𝑄 +I1 − 𝑄 − 𝜏 c𝜏 sI3 + 𝑄 × [𝜏 sI−+ − 𝜏 cI+− ]} , (19) 
+
+𝐾 sc = 𝜏 2
+
+𝑇 2
+
+> Σ
+
+{𝑄 +I1 − 𝑄 − 𝜏 c𝜏 sI3 + 𝑄 × [𝜏 sI+− − 𝜏 cI−+ ]} . (20) Then, 𝐾 sc (𝑡, 𝑡 ′) = 𝐾 cs (𝑡 ′, 𝑡 ), but 𝐾 cs need not be symmetric under the exchange of times alone. At late times compared to the initial time, the leading equal-time variance is 𝐾 𝑖𝑖 ∼ 𝜏 2𝑄 +𝑢 3/( 3𝑇 2 
+
+> Σ
+
+), exposing the diffusive total angular momentum mode. 1 The 𝑢 3 growth is the phase-level signature of a random walk in the angular velocity. It is the double time integral of the linearly growing variance of Ω+.
+
+2.2 Minimal stationary-spin model 
+
+The minimal model is obtained by requiring the stochastic torques to be equal and opposite, 𝜉 c (𝑡 ) = −𝜉 s (𝑡 ) ≡ − 𝜉 (𝑡 ), so that the total an-gular momentum receives no stochastic forcing (Meyers et al. 2021a; Antonelli et al. 2023). The component equations are 
+
+𝐼 c ¤Ωc = − 𝐼 c 𝐼 s
+
+𝐼 
+
+(Ωc − Ωs)
+
+𝜏 + 𝑁 c + 𝜉 , (21) 
+
+𝐼 s ¤Ωs = 𝐼 c 𝐼 s
+
+𝐼 
+
+(Ωc − Ωs)
+
+𝜏 − 𝜉 , (22) with ⟨𝜉 (𝑡 )⟩ = 0, ⟨𝜉 (𝑡 )𝜉 (𝑡 ′)⟩ = 𝐼 2𝑄 𝛿 (𝑡 − 𝑡 ′) and 𝐼 = 𝐼 c + 𝐼 s as before. Writing 𝑥 𝑖 = 𝐼 𝑖 /𝐼 for the fractional moments of inertia, the eigenmode form of the equations is 
+
+¤𝐽 = 𝑁 c , (23) 
+
+¤Ω− = − Ω−
+
+𝜏 + 𝑁 c
+
+𝐼 c
+
++ 𝜉 𝑥 c𝑥 s 𝐼 . (24) The total angular momentum evolves deterministically and the lag is an Ornstein–Uhlenbeck (OU) process, the only random dynamical           
+
+> 1In general, the diffusive mode Ω+is not the total angular momentum mode 𝐽 . We restrict our attention to the detailed balance limit where the mutual friction torques balance and, as a consequence, the connection 𝐽 =
+> (𝜏 /𝑇 Σ)𝐼 Ω+appears.
+
+variable. The stochastic residuals of the components are tied to the lag through 
+
+𝛿 Ωc = 𝑥 s 𝛿 Ω− , 𝛿 Ωs = −𝑥 c 𝛿 Ω− , (25) which is the differential form of the conservation law 𝑥 c𝛿 Ωc +𝑥 s𝛿 Ωs =
+
+0. The model has three spin-wandering parameters, (𝜏, 𝑥 s, 𝑄 ), com-pared to four for the singular model. The deterministic parts of the minimal and singular equations of motion coincide in the detailed-balance limit, since 𝐼 c/𝜏 c = 𝐼 c𝑥 s/𝜏 
+
+and 𝐼 s/𝜏 s = 𝐼 s𝑥 c/𝜏 . The phase means are therefore given by the same expressions as in Section 2.1, with 𝑁 s = 0, 𝜏 s/𝑇 Σ = 𝑥 s and 
+
+𝜏 c/𝑇 Σ = 𝑥 c:
+
+⟨𝜙 c⟩ = 𝜙 c,0 + 𝑥 c𝑥 sM+ + 𝑥 sM− , (26) 
+
+⟨𝜙 s⟩ = 𝜙 s,0 + 𝑥 c𝑥 sM+ − 𝑥 cM− , (27) with 𝑁 + = 𝑁 c/( 𝑥 c𝑥 s) and Ω−,∞ = 𝜏𝑁 c/𝐼 c. As in the singular case, the constant, linear and quadratic pieces are absorbed by the timing model. The two models thus share their deterministic evolution and differ only in the statistics of their fluctuations, which is the reason that the phase covariance, rather than the mean, carries the distinction between them. Because the lag is stationary, it is natural to initialize it from its stationary distribution, 𝛿 Ω− (𝑡 0) ∼ N ( 0, 𝑄𝜏 /( 2𝑥 2c 𝑥 2s )) , rather than from a fixed value; this is the initialization adopted throughout this work. For stationary lag initialization, the phase covariance is built from the single kernel 
+
+H ( 𝑢, 𝑢 ′) = 2𝜏𝑢 < − 𝜏 2 [1 + e−Δ/𝜏 − e−𝑢 /𝜏 − e−𝑢 ′/𝜏 ] , (28) which is the double time integral of the stationary OU covariance e−Δ/𝜏 , and reads 
+
+𝑲 min (𝑡, 𝑡 ′) = 𝑄𝜏 
+
+2 H ( 𝑢, 𝑢 ′)
+
+ 𝑥 −2c −( 𝑥 c𝑥 s)−1
+
+−( 𝑥 c𝑥 s)−1 𝑥 −2s
+
+
+
+. (29) Note that this cannot be obtained with a 𝑄 + = 0 substitution into the singular model, which would correspond to a lag fixed at 𝑡 0. The stochastic initialization of the stationary lag contributes an additional separable term. Indeed, 
+
+H = 2𝜏 I3 + 𝜏 2 (1 − e−𝑢 /𝜏 )( 1 − e−𝑢 ′/𝜏 ) , (30) where the second term is the variance of the initial lag propagated to the phases. The crust block is conveniently written as 
+
+𝐾 cc (𝑡, 𝑡 ′) = 𝐴 min 
+
+2 H ( 𝑢, 𝑢 ′) , 𝐴 min ≡ 𝑄𝜏 𝑥 2c
+
+, (31) where 𝐴 min is the stationary variance of the crust angular velocity up to a factor of two. The crust phase covariance therefore depends on the two combinations (𝜏, 𝐴 min ) only; the inertia fraction 𝑥 s enters ex-clusively through the superfluid and cross blocks, 𝐾 ss = (𝑥 c/𝑥 s)2𝐾 cc 
+
+and 𝐾 cs = 𝐾 sc = −( 𝑥 c/𝑥 s)𝐾 cc . This observation controls much of what follows. Crust-only data cannot inform 𝑥 s in the minimal model. The angular velocities are stationary while 𝐾 cc (𝑡, 𝑡 ) ∝ 𝑢 for 𝑢 ≫ 𝜏 .Integration-induced phase nonstationarity persists in a model whose stochastic spin/angular velocity is stationary (Antonelli et al. 2023; Bernardo 2026). The conservation law 
+
+𝑥 c𝛿𝜙 c + 𝑥 s𝛿𝜙 s = 0 (32) makes each component-time covariance block rank one and turns an external measurement of 𝑥 s into a definite hidden-state prediction.  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 4 R. C. Bernardo 
+
+3 LINEAR-SCALING PHASE LIKELIHOOD 
+
+We model the phase observed at epochs 𝑡 1 < · · · < 𝑡 𝑁 as 
+
+𝑦 𝑖,𝑛 = 𝛿𝜙 𝑖 (𝑡 𝑛 ) + 
+
+> 2
+
+∑︁ 
+
+> 𝜇 =0
+
+𝑋 𝑛𝜇 𝛽 𝑖,𝜇 + 𝜀 𝑖,𝑛 , 𝑖 ∈ { c, s} , (33) where 𝛿𝜙 𝑖 is the zero-mean stochastic phase whose covariance was derived in Section 2, 𝜀 𝑖,𝑛 is Gaussian measurement noise with variance 𝜎 2
+
+> 𝑖,𝑛
+
+, independent between epochs and components, and 
+
+𝑋 𝑛𝜇 𝛽 𝑖,𝜇 is the deterministic timing model. The columns of the 𝑁 × 3design matrix 
+
+𝑿 = ©«
+
+1 𝑡 1 − 𝑡 ref (𝑡 1 − 𝑡 ref )2/2
+
+... ... ...
+
+1 𝑡 𝑁 − 𝑡 ref (𝑡 𝑁 − 𝑡 ref )2/2
+
+ª®®¬
+
+(34) carry the phase offset, the spin-frequency offset and the spin-down of each component, so that β𝑖 = (𝛽 𝑖, 0, 𝛽 𝑖, 1, 𝛽 𝑖, 2) collects the constant, linear and quadratic pieces of the phase means of Section 2, which we do not attempt to predict but instead marginalize. In radio timing the crust phase is the observable, and timing residuals 𝑟 (𝑡 ) relative to a timing model are related to it through 𝛿𝜙 c ≃ 2𝜋𝜈 𝑟 for a nominal spin frequency 𝜈 (O’Neill et al. 2024; Dong et al. 2026; Kimpson et al. 2025). For full-state observations, which we use in the simula-tions as an identifiability benchmark, the data vector 𝒚 =
+
+(𝑦 c,1, . . . , 𝑦 c, 𝑁 , 𝑦 s,1, . . . , 𝑦 s, 𝑁 ) has length 2 𝑁 , the covariance is the 2𝑁 × 2𝑁 block matrix 
+
+𝑲 =
+
+𝐾 cc 𝐾 cs 
+
+𝐾 sc 𝐾 ss 
+
+
+
++ diag (𝜎 2c,𝑛 , 𝜎 2s,𝑛 ) , (35) with the oriented blocks of (17-20) or (29), and the timing design is 𝑿 ⊕ 𝑿 , one quadratic per component. Each block of this multi-output covariance is a sum of polynomial-exponential terms in the two times, so the full-state matrix also admits a block semiseparable representation, and a linear-scaling factorization of the same type as the one described below. Full-state phase data are a hypotheti-cal observable that serves here as a benchmark for what the crust alone can and cannot establish, the simulated data sets are small, and the full-state likelihood is therefore evaluated by a dense Cholesky factorization of the 2 𝑁 × 2𝑁 matrix at O( 𝑁 3) cost. Our effort is directed at the crust-only likelihood, which is the one that applies to radio timing data and whose length is set by the observations. 
+
+Semiseparable crust-only likelihood 
+
+The observationally relevant likelihood is that of the crust alone, for which 𝒚 has length 𝑁 and 𝑲 = 𝐾 cc + diag (𝜎 2 
+
+> 𝑛
+
+). Exact evaluation at realistic cadences requires a representation of 𝐾 cc that avoids forming or inverting a dense 𝑁 × 𝑁 matrix. At ordered epochs 𝑡 𝑖 , both models’ crust covariance matrices have the semiseparable form 
+
+𝐾 𝑖 𝑗 = 𝑎 𝑖 𝛿 𝑖 𝑗 +
+
+(𝑼 𝑖 𝑽 T 
+
+> 𝑗
+
+, 𝑖 > 𝑗 , 
+
+𝑽 𝑖 𝑼 T 
+
+> 𝑗
+
+, 𝑖 < 𝑗 . (36) The singular phase kernel has rank three, with a convenient basis proportional to (e−𝑢 /𝜏 , 𝑢, 1); the independently derived minimal ker-nel has rank two, proportional to (e−𝑢 /𝜏 , 1). Measurement variances enter only through 𝑎 𝑖 , which is what makes the semiseparable repre-sentation compatible with heteroscedastic noise. The explicit factors 
+
+𝑼 𝑖 , 𝑽 𝑗 and 𝑎 𝑖 are collected in Appendix B. For rank 𝐽 , the Cholesky recurrences require O( 𝑁 𝐽 2) operations and O( 𝑁 𝐽 ) storage. Starting with 𝑺 0 = 0, one step is 
+
+𝑑 𝑖 = 𝑎 𝑖 − 𝑼 𝑖 𝑺 𝑖 𝑼 T 
+
+> 𝑖
+
+, (37) 
+
+𝑾 𝑖 = 𝑽 𝑖 − 𝑼 𝑖 𝑺 𝑖 
+
+𝑑 𝑖 
+
+, (38) 
+
+𝑺 𝑖 +1 = 𝑺 𝑖 + 𝑑 𝑖 𝑾 T 
+
+> 𝑖
+
+𝑾 𝑖 . (39) The recurrences produce the factorization 𝑲 = 𝑳 𝑫 𝑳 T with 𝑫 =
+
+diag (𝑑 1, . . . , 𝑑 𝑁 ) and a unit lower-triangular 𝑳 whose strictly lower part is itself semiseparable, 𝐿 𝑖 𝑗 = 𝑼 𝑖 𝑾 T 
+
+> 𝑗
+
+for 𝑖 > 𝑗 . The log-determinant is a sum of 𝑁 terms, log |𝑲 | =
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+log 𝑑 𝑖 , (40) and the action of the inverse on a vector 𝒃 is obtained without ever forming 𝑲 −1,
+
+𝑲 −1 𝒃 = 𝑳 −T 𝑫 −1 𝑳 −1 𝒃 , (41) by a forward pass that computes 𝒛 = 𝑫 −1/2 𝑳 −1 𝒃 and a backward pass that computes 𝑳 −T 𝑫 −1/2 𝒛 . Each pass carries a 𝐽 -dimensional accumulator and visits every epoch once (Appendix B), so a solve costs O( 𝑁 𝐽 ). The quadratic form needed by the likelihood is then simply 𝒃 T 𝑲 −1 𝒃 = Í𝑖 𝑧 2 
+
+> 𝑖
+
+. Since 𝐽 is fixed by the physics of the two-component model, the factorization, the log-determinant and every solve scale linearly with the number of observations, in contrast to the O( 𝑁 3) cost and O( 𝑁 2) storage of a dense factorization. The construction is inspired by Ambikasaran et al. (2015); Foreman-Mackey et al. (2017) for stationary scalar kernels; here the factors are fixed by the finite-start, nonstationary phase covariance of a hidden two-component system rather than by a phenomenological kernel. 
+
+Quadratic timing-trend marginalization 
+
+The timing-model coefficients β of (33) are nuisance parameters. They absorb the deterministic spin-down together with the phase and spin-frequency offsets of the phase means, and in this sense they are not separate from the physics. In the singular model the quadratic trend is the deterministic part of the same diffusive mode whose fluctuations render the spin nonstationary, whereas in the minimal model the quadratic trend is the deterministic evolution of a conserved total angular momentum and the fluctuations about it are stationary. What the timing model removes is the same in both cases, so that the comparison between the models rests on the fluctuations that remain. With a flat prior on β, they can be integrated out analytically, and the exact marginalized likelihood for the spin-noise parameters 𝜃 is log 𝑝 (𝒚 |𝜃 )
+
+= − 12
+
+𝒓 T 𝑲 −1 𝒓 + log |𝑲 | + log | 𝑿 T 𝑲 −1 𝑿 | + ( 𝑁 − 3) log (2𝜋 ) ,
+
+(42) where 
+
+bβ = ( 𝑿 T 𝑲 −1 𝑿 )−1 𝑿 T 𝑲 −1 𝒚 , 𝒓 = 𝒚 − 𝑿 bβ (43) are the generalized least-squares (GLS) estimate of the trend at fixed 
+
+𝜃 and the corresponding residual. All appearances of 𝑲 −1 in (42) are inverse actions on 𝒚 and on the three columns of 𝑿 , computed with the O( 𝑁 ) solve of (41), so that one likelihood evaluation costs a single factorization and four solves. The determinant of the normal matrix is part of the normalization; omitting it changes the evidence.  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Intrinsic versus observation induced spin nonstationarity in pulsar timing 5
+
+In the full-state case the same expression holds with 𝑿 → 𝑿 ⊕ 𝑿 
+
+and 𝑁 − 3 → 2𝑁 − 6. The ordinary least-squares (OLS) residual maker 
+
+𝑷 = 𝑰 − 𝑿 ( 𝑿 T 𝑿 )−1 𝑿 T (44) is used only to display all models and truths in one parameter-independent space. It is not substituted for the parameter-dependent GLS marginalization in (42). For a sinusoidal probe 𝒆 𝑓 on an irregular cadence, the empirical transmission is ∥𝑷𝒆 𝑓 ∥2/∥ 𝒆 𝑓 ∥2. Removing a quadratic phase model yields an 𝑓 6 response at 𝑓 ≪ 1/𝑇 ; removing a linear frequency trend yields 𝑓 4 (Allen et al. 2026; Pitrou & Cusin 2025; Hazboun et al. 2019). The projection reduces the total power of the phase residuals, and it does so mostly by suppressing the power at the lowest frequencies, where the spectrum of a red process is largest. This is why the projected phases in Figure 1 have much smaller excursions than the raw ones and why their appearance is dominated by fluctuations on time scales shorter than the observation span. 
+
+Simulated phase data 
+
+Figure 1 shows simulated noisy singular and minimal phase paths before and after projection. The simulation makes direct use of the analytical solutions of Section 2. Because the models are linear and the stochastic torques are Gaussian, the crust and superfluid phases at the 𝑁 observing epochs are jointly a 2 𝑁 -dimensional Gaussian random vector whose mean and covariance are given exactly by the phase means and by the block covariance of (17–20) or (29). A realization is a single draw from this multivariate normal distribution, 
+
+𝛿 𝝓 ∼ N (⟨ 𝝓 ⟩, 𝑲 ) , (45) which we obtain in practice by multiplying a vector of independent standard normal variates by a matrix square root of 𝑲 . Since the analytical moments are exact for arbitrary sampling times, no time stepping of the stochastic differential equations is involved, and the realizations reproduce the finite-start and stationary-lag structure of the kernels without any discretization error. The deterministic means are set to zero, since their constant, linear and quadratic pieces are marginalized in the analysis, and the minimal lag is initialized from its stationary distribution (Section 2.2). We generate 𝑁 = 101 evenly sampled epochs over 1400 days with a cadence of 14 days. Measurement noise is added as independent Gaussian variates, uncorrelated between epochs and between the crust and superfluid channels, with standard deviations 𝜎 c and 𝜎 s listed in Table 1. The crust noise level is chosen to be a sizeable fraction of the projected crust excursions, so that the error bars are visible in the projected data while the stochastic phase remains clearly detected; the superfluid noise is taken larger in absolute terms, since the superfluid channel is a hypothetical observable, but it remains small relative to the super-fluid excursions, which exceed those of the crust for the parameters of Table 1 (by the factor 𝑥 c/𝑥 s in the minimal model). Their orders of magnitude are broadly motivated by the spin-noise parameters inferred for PSR J1359 −6038 (O’Neill et al. 2024), rounded and rescaled so that the observation window contains several relaxation times ( 𝜏 of one year) and the realizations are visibly noisy. The min-imal amplitude 𝐴 min was chosen to give projected crust excursions comparable to the singular case over the observation window. It is worth noting that, when both components are shown, the two realiza-tions in Figure 1 can be told apart by eye even after projection. In the minimal realization the crust and superfluid phases are mirror images of each other up to the factor −𝑥 c/𝑥 s, as required by the conservation                                        
+
+> Table 1. Reference parameters for the singular and minimal models and the phase measurement noise considered throughout this work. Both simulations use 𝑁 =101 evenly sampled epochs with a cadence of 14 days over 1400 days. Parameter Value Unit
+> Singular-nonstationary
+> 𝜏 365 day
+> 𝑟 0.1–
+> 𝑄 c10 −10 rad 2day −3
+> 𝑄 s10 −8rad 2day −3
+> 𝜎 c3×10 −3rad
+> 𝜎 s10 −2rad
+> Minimal-stationary
+> 𝜏 365 day
+> 𝐴 min 3×10 −8rad 2day −2
+> 𝑥 s10 −2–
+> 𝜎 c3×10 −3rad
+> 𝜎 s3×10 −2rad
+
+law (32), whereas in the singular realization the two components share a common wander and no such proportionality holds. = With the crust alone, the projected phases of the two realizations look alike, and telling the models apart becomes the quantitative problem that the rest of this work addresses. 
+
+Bayesian evidence and model comparison 
+
+The question of whether the spin noise is stationary is posed as a comparison between the minimal and singular models given the same phase data. For a model M with spin-noise parameters 𝜃 and prior 𝜋 (𝜃 |M) , the evidence is the trend-marginalized likelihood of (42) integrated over the prior, 
+
+𝑍 M = 𝑝 (𝒚 |M) =
+
+∫
+
+d𝜃 𝑝 (𝒚 |𝜃, M) 𝜋 (𝜃 |M) , (46) and the models are compared through the log Bayes factor ln 𝐵 singular ,minimal = ln 𝑍 singular − ln 𝑍 minimal , (47) so that positive values favour the singular model and negative val-ues the minimal model. With equal prior odds on the two models, 
+
+𝐵 singular ,minimal is the posterior odds; | ln 𝐵 | ∼ 1 corresponds to odds of about three to one and is generally regarded as inconclusive, whereas | ln 𝐵 | ≳ 5 corresponds to odds above about 150 to one and is regarded as strong (Trotta 2008). We use ln 𝐵 𝑠,𝑚 as a shorthand for (47). The evidence rewards fit and penalizes prior volume that the data do not use. Writing ln 𝑍 M = ln 𝐿 max ,M + ln 𝑂 M , where 𝐿 max is the maximum likelihood, defines the Occam factor 𝑂 M ≤ 1, which measures the fraction of the normalized prior volume that remains compatible with the data (Mackay 2003). A coordinate that the data constrain well contributes a small factor; a coordinate whose poste-rior is prior-dominated contributes a factor close to unity. The penalty is therefore set by the effective number of constrained parameters rather than by the nominal dimensionality, a point that matters for the crust-only comparisons below, in which several singular coordi-nates are prior-dominated. The priors that we use are uniform in the logarithms of the spin-noise parameters over the finite ranges listed in Table 2, which makes them normalizable and gives 𝜋 (𝜃 |M) = 1/𝑉 M inside the prior box of  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 6 R. C. Bernardo 0.14                         
+
+> 0.12
+> 0.10
+> 0.08
+> 0.06
+> 0.04
+> 0.02
+> 0.00
+> c [rad]
+> state observed
+> 57200 57400 57600 57800 58000 58200 58400 MJD 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+> 0.0
+> s [rad]
+> state observed 0.03
+> 0.02
+> 0.01
+> 0.00 0.01
+> c [rad]
+> state observed
+> 57200 57400 57600 57800 58000 58200 58400 MJD 0.10
+> 0.05
+> 0.00 0.05 0.10
+> s [rad]
+> state observed 0.10
+> 0.08
+> 0.06
+> 0.04
+> 0.02
+> 0.00
+> c [rad]
+> state observed
+> 57200 57400 57600 57800 58000 58200 58400 MJD 0246810
+> s [rad]
+> state observed 0.015
+> 0.010
+> 0.005
+> 0.000 0.005 0.010
+> c [rad]
+> state observed
+> 57200 57400 57600 57800 58000 58200 58400 MJD 0.6
+> 0.4
+> 0.2
+> 0.0 0.2 0.4 0.6
+> s [rad]
+> state observed
+
+Figure 1. Phase residual simulation for both singular (top) and minimal (bottom) models before (left) and after (right) quadratic projection. The black curves are the latent crust and superfluid phases drawn exactly from the analytical covariances, and the points with error bars are the observations, obtained by adding independent Gaussian measurement noise with standard deviations 𝜎 c = 3 × 10 −3 rad for the crust and 𝜎 s = 10 −2 rad (singular) or 3 × 10 −2 rad (minimal) for the superfluid. The model parameters are given in Table 1. The same OLS projection is applied to the latent phases and to the observations. 
+
+volume 𝑉 M . The ranges were established through preliminary expan-sion tests so that the likelihood support is not artificially truncated, and were then held fixed across all realizations of an experiment. The singular prior differs between the singular and minimal experi-ments because the high-likelihood region of the singular model shifts when it is fitted to minimal-model data. For the crust-only minimal model, the identifiable coordinates are (𝜏, 𝐴 min ) and the prior on 𝑥 s
+
+is an external, normalized prior that integrates to unity; it does not enter the crust-only evidence. To quantify how the results depend on the prior, we repeat the crust-only comparisons with singular prior boxes whose half-widths are reduced or enlarged by one decade about a fixed centre. Two estimators of the evidence are used. For full-state data, whose posteriors are sharply peaked, we use the Laplace approximation about the maximum a posteriori (MAP) estimate 𝜃 ∗ (Mackay 2003), ln 𝑍 M ≃ ln 𝑝 (𝒚 |𝜃 ∗, M) + 𝑑 
+
+2 ln 2 𝜋 − 12 ln | 𝑨 | − ln 𝑉 M , (48) where 𝑑 is the number of spin-noise parameters and 𝑨 =
+
+−∇∇ ln 𝑝 (𝒚 |𝜃, M)| 𝜃 ∗ is the Hessian of the negative log likelihood, evaluated by finite differences. The last term is the normalization of the bounded prior. The approximation is reliable only when the posterior is unimodal and lies well inside the prior box; we monitor the distance of 𝜃 ∗ to the prior boundaries and the conditioning of 𝑨 
+
+and treat (48) as a diagnostic whenever either check fails. For crust-only data, the posteriors are broad, often bounded by the prior along one or more directions, and the Laplace approximation is 
+
+Table 2. Prior ranges used in the simulation experiments (Sections 4–5). All priors are uniform in the logarithm of the parameter, except where noted. The singular prior is centred differently in the two experiments; the minimal and 
+
+𝑥 s priors are shared. The 𝑥 s prior enters only the full-state minimal fits; in the crust-only minimal posteriors, the displayed 𝑥 s column is drawn uniformly in 
+
+𝑥 s over the same range and is not informed by the data. Parameter Singular data Minimal data 
+
+Singular model 
+
+log 10 ( 𝜏 /day ) [1.4, 3.7] [1.4, 3.7]
+
+log 10 𝑟 [− 3.0, 0.5] [− 3.5, 0.5]
+
+log 10 (𝑄 c/rad 2 day −3 ) [− 12 .0, −8.0] [− 13 .0, −7.0]
+
+log 10 (𝑄 s/rad 2 day −3 ) [− 10 .5, −6.5] [− 11 .0, −5.5]
+
+Minimal model 
+
+log 10 ( 𝜏 /day ) [1.4, 3.7] [1.4, 3.7]
+
+log 10 ( 𝐴 min /rad 2 day −2 ) [− 11 .0, −3.0] [− 10 .5, −5.0]
+
+𝑥 s [10 −3 , 0.25 ] [10 −3 , 0.25 ]
+
+not adequate. We instead use the stepping-stone estimator (Xie et al. 2011), which writes the evidence as a telescoping product of ratios of normalizing constants of power posteriors 𝑝 (𝒚 |𝜃 )𝛽 𝜋 (𝜃 ) along a ladder 0 = 𝛽 0 < 𝛽 1 < · · · < 𝛽 𝐾 = 1, ln 𝑍 M =
+
+𝐾 −1∑︁ 
+
+𝑘 =0
+
+ln 𝑝 (𝒚 |𝜃, M) 𝛽 𝑘 +1 −𝛽 𝑘 
+
+𝛽 𝑘 , (49) 
+
+MNRAS 000 , 1–16 (2026) Intrinsic versus observation induced spin nonstationarity in pulsar timing 7
+
+where ⟨·⟩ 𝛽 𝑘 denotes an average over samples from the power poste-rior at 𝛽 𝑘 . The 𝛽 0 = 0 term is an average over prior samples, which is well defined because the prior is normalized, and each subsequent term is estimated from an affine-invariant ensemble Markov chain Monte Carlo (MCMC) run (Foreman-Mackey et al. 2013) warm-started from the previous rung. The standard error of ln 𝑍 is prop-agated from the sample variances of the individual terms. Ladder, chain lengths and diagnostics are recorded in Appendix D. Bounded Laplace values for the crust-only fits are retained only as a check on the local geometry of the posterior. 
+
+Superfluid phase prediction 
+
+Radio timing observes the crust, but both models predict the super-fluid phase given the crust. Since the crust and superfluid phases are jointly Gaussian (with the block covariance of Section 2), the hidden component is predicted by Gaussian conditioning. At fixed spin-noise parameters 𝜃 , and after removing the GLS timing trend 
+
+𝑿 bβ from the crust observations, the conditional mean and covariance of the superfluid phase at any set of times 𝑡 ∗ are 
+
+𝝁 s|c = 𝐾 sc (𝑡 ∗, 𝑡 ) 𝑲 −1 𝒓 , (50) 
+
+𝑪 s|c = 𝐾 ss (𝑡 ∗, 𝑡 ∗) − 𝐾 sc (𝑡 ∗, 𝑡 ) 𝑲 −1𝐾 cs (𝑡, 𝑡 ∗) , (51) where 𝑲 = 𝐾 cc (𝑡, 𝑡 ) + diag (𝜎 2 
+
+> 𝑛
+
+) is the crust covariance of the like-lihood, 𝒓 is the GLS residual of (42), and the orientation of the cross block matters, the first argument of 𝐾 sc being the superfluid time. The same expressions with 𝐾 cc in place of 𝐾 sc and 𝐾 ss give the smoothed crust phase and its uncertainty, and for full-state data the conditioning is on the stacked crust and superfluid observations with the 2 𝑁 ×2𝑁 covariance. Parameter uncertainty is propagated by evaluating (50-51) at draws from the posterior and mixing the result-ing Gaussians. The predicted superfluid phase inherits an unknown timing trend of its own, so predictions, latent phases and observations are all displayed after the common projection 𝑷 .In the singular model the prediction depends on the full set 
+
+(𝜏, 𝑟, 𝑄 c, 𝑄 s) and its uncertainty grows with that of the parameters. In the minimal model the prediction is rigid. Since 𝐾 sc = −( 𝑥 c/𝑥 s)𝐾 cc ,equation (50) reduces to −( 𝑥 c/𝑥 s) times the smoothed crust phase, and the conditional covariance is (𝑥 c/𝑥 s)2 times that of the crust smoother. The shape of the superfluid prediction is thus fixed by the crust data alone and its amplitude by 𝑥 s, which the crust data do not constrain and which must be supplied externally. This is the sense in which the minimal model turns a measurement of 𝑥 s into a definite hidden-state prediction. 
+
+4 SINGULAR SIMULATIONS 
+
+Consider the singular model as the data-generating process. This section provides a controlled test of the phase-domain inference and reconstruction when the rotational state is fully observed (full-state), and of the systematic effects that arise when only the crust is ob-served (crust-only). The noisy singular realization shown in Figure 1, with the model and noise parameters of Table 1 and the cadence of Section 3, is analyzed with the singular model in two observation settings: full state, in which both the crust and superfluid phases are observed, and crust only, in which the superfluid is hidden and must be predicted. In both settings the quadratic timing model of each observed component is marginalized analytically, so that the infer-ence concerns the spin-wandering parameters (𝜏, 𝑟, 𝑄 c, 𝑄 s) alone. The same fitted objects are used for the reconstructions, parameter posteriors and evidence calculations. Figure 2 shows the phase reconstructions and the corresponding full-state and crust-only posterior constraints. With full-state obser-vations, the smoothed crust and superfluid phases follow the latent phases within bands that are comparable to the measurement uncer-tainties; the conditioning of Section 3 then acts as a smoother for both components. With crust-only observations, the crust phase is recon-structed equally well, since the crust data are the same and the crust covariance is well described by either model. The superfluid predic-tion, however, is of a different nature. Its conditional mean stays close to zero and its band is wide, spanning several times the excursions of the latent superfluid phase. This is the conditional covariance of (51) at work. The cross covariance 𝐾 sc transfers information from the crust to the superfluid only through the exchange mode, which is subdominant in the crust phase for the parameters considered here, so that most of the superfluid variance remains unexplained by the crust data. The width of the band is therefore a faithful statement of what the crust alone can say about the superfluid in this model. The parameter posteriors reflect the same hierarchy. With full-state observations, the two diffusion coefficients are determined to within a factor of about two, with the superfluid coefficient 𝑄 s pinned by the superfluid channel. The relaxation time and the ratio 𝑟 remain broad even in this setting, with posteriors that lean toward shorter 
+
+𝜏 and smaller 𝑟 than the injected values; for a window of about four relaxation times and a diffusive mode that dominates the low-frequency phase, the exchange mode that carries 𝜏 and 𝑟 leaves a comparatively weak imprint. With crust-only observations, the crust diffusion coefficient 𝑄 c is constrained about as well as with full-state data, because it sets the amplitude of the crust phase directly. In contrast, the superfluid coefficient becomes prior-dominated. Its marginal is nearly flat over the prior range, and its two-dimensional marginals with 𝜏 and 𝑟 show that the crust phase constrains only the combination 𝜏 2s 𝑄 s that enters the transformed intensities 𝑄 ± and 𝑄 × .The relaxation time and 𝑟 are likewise prior-dominated. The injected parameters lie inside the 95 percent intervals in both settings, so the crust-only posteriors are wide rather than biased; what is lost with the superfluid is the ability to attribute the observed crust wander to a specific partition of the stochastic torques between the components. The same realization is also fitted with the minimal model, and Figure 3 presents the log Bayes factor of equation (47) over indepen-dent realizations of the singular sampled mock data, with indepen-dent measurement-noise draws, using the estimators of Section 3. With full-state observations the Bayes factor is overwhelming. The median ln 𝐵 𝑠,𝑚 is of order several hundred and essentially all realiza-tions favour the singular model. The minimal model has no diffusive common mode and cannot reproduce the joint crust-superfluid co-variance of a singular realization, so that the full-state data rule it out decisively. With crust-only observations the picture changes qualitatively. The median ln 𝐵 𝑠,𝑚 is of order unity, corresponding to posterior odds of only about three to one in favour of the singular model, even though the sign of the Bayes factor selects the singular model in about 96 percent of the realizations. The consistency of the sign across realizations indicates that the crust phase does carry a signature of the diffusive mode, but the magnitude of the Bayes factor indicates that this signature is weak in any single realization of the length and cadence considered here. The weak crust-only preference deserves comment, because both models reconstruct the crust phase equally well and one might ex-pect the Occam factor to penalize the singular model for its two additional parameters. The penalty does not materialize, for the rea-son anticipated in Section 3. The crust-only singular posterior is prior-dominated along 𝜏 , 𝑟 and 𝑄 s, and a coordinate whose normal-ized prior is returned essentially unchanged contributes an Occam  
+
+> MNRAS 000 , 1–16 (2026)
+
+# 8 R. C. Bernardo 0.03                
+
+> 0.02
+> 0.01
+> 0.00 0.01
+> c [rad]
+> state full state crust only observed
+> 57200 57400 57600 57800 58000 58200 58400 MJD 0.3
+> 0.2
+> 0.1
+> 0.0 0.1 0.2 0.3
+> s [rad] full state crust only
+> 3.2
+> 2.4
+> 1.6
+> 0.8
+> 0.0 log 10  r
+> 11.4
+> 10.8
+> 10.2
+> 9.6
+> log 10  (Qc/rad 2 day  3)
+> 1.8 2.4 3.0 3.6 log 10 (/day)
+> 10
+> 9
+> 8
+> 7
+> log 10  (Qs/rad 2 day  3)
+> 3.2
+> 2.4
+> 1.6
+> 0.8
+> 0.0 log 10 r
+> 11.4
+> 10.8
+> 10.2
+> 9.6
+> log 10 (Qc/rad 2day 3)
+> 10
+> 9
+> 8
+> 7
+> log 10 (Qs/rad 2day 3)
+
+Figure 2. Singular inference with full-state and crust-only observations. [left] projected crust and superfluid phase reconstructions; for crust-only, the superfluid phase prediction is obtained by Gaussian conditioning. [right] posterior constraints for the same two observation settings; red markers give the injected coordinates. 0 1000 2000 3000 4000 5000 6000 ln Bsingular, minimal      
+
+> 050 100 150 200 250 300 realizations
+> full state
+> 10123ln Bsingular, minimal
+> crust only
+
+Figure 3. Singular phase simulations evidence ensembles. Positive ln 𝐵 singular ,minimal favours the singular model. The full-state panel contains 1000 bounded-Laplace calculations; the radio-only panel contains 500 stepping-stone calculations. 
+
+factor close to unity. The effective number of constrained singular parameters is therefore closer to that of the minimal model than the nominal count suggests, and the Bayes factor is left to be decided by the modest difference in the maximum likelihoods and by the resid-ual prior-volume differences of the partially constrained coordinates. The same reasoning implies that the crust-only Bayes factor must depend on the prior ranges, and we quantify this directly. Reducing the half-widths of the singular prior by one decade about its centre raises the median crust-only ln 𝐵 𝑠,𝑚 by about a factor of two and increases the fraction of realizations favouring the singular model to unity; enlarging the half-widths by one decade lowers the median by a similar factor and reduces the fraction to about 88 percent. The sign of the median is unchanged across the tested ranges, but its magni-tude is not, and both are reported together as the crust-only result. A crust-only preference for the singular model of the strength found here should accordingly be read as prior-limited evidence rather than as a detection of a diffusive common mode. 
+
+5 MINIMAL SIMULATIONS 
+
+We now take the minimal model as the data-generating process and repeat the experiment of Section 4. The noisy minimal realization of Figure 1, generated with the parameters of Table 1, is analyzed with the minimal model in the full-state and crust-only settings. The angular velocity exchange mode of this realization is stationary, but its integrated phase still wanders, and the removal of the three timing modes changes its appearance substantially. The projected crust phase fluctuates on the scale of the relaxation time with an amplitude only a few times the measurement uncertainty, whereas 
+
+MNRAS 000 , 1–16 (2026) Intrinsic versus observation induced spin nonstationarity in pulsar timing 90.015             
+
+> 0.010
+> 0.005
+> 0.000 0.005 0.010
+> c [rad]
+> state full state crust only observed
+> 57200 57400 57600 57800 58000 58200 58400 MJD 1.00
+> 0.75
+> 0.50
+> 0.25
+> 0.00 0.25 0.50 0.75
+> s [rad] full state crust only
+> 8.5
+> 8.0
+> 7.5
+> 7.0
+> 6.5
+> log 10  (Amin /rad 2 day  2)
+> 1.8 2.4 3.0 3.6 log 10 (/day)
+> 2.5
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> log 10  xs
+> 8.5
+> 8.0
+> 7.5
+> 7.0
+> 6.5
+> log 10 (Amin /rad 2day 2)
+> 2.5
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> log 10 xs
+
+Figure 4. Minimal model inference with full-state and crust-only observations. [left] projected crust and superfluid phase reconstructions; for crust-only, the superfluid phase prediction is obtained by Gaussian conditioning with 𝑥 s fixed at its injected value. [right] posterior constraints for the same two observation settings; red markers give the injected coordinates. The crust-only 𝑥 s column is a draw from its prior, since the crust phase covariance depends on ( 𝜏, 𝐴 min )
+
+only. 60 40 20 0 20 40 ln Bsingular, minimal      
+
+> 050 100 150 200 250 realizations
+> full state
+> 21012ln Bsingular, minimal
+> crust only
+
+Figure 5. Minimal phase simulations evidence ensembles. Positive ln 𝐵 singular ,minimal favours the singular model, negative the minimal model. The full-state panel contains 1000 bounded-Laplace calculations; the radio-only panel contains 500 stepping-stone calculations. 
+
+the superfluid phase, which is 𝑥 c/𝑥 s times larger in the minimal model, is measured with a much higher signal-to-noise ratio. In the full-state setting the inference concerns (𝜏, 𝐴 min , 𝑥 s); in the crust-only setting, only (𝜏, 𝐴 min ) enter the likelihood, and 𝑥 s is carried along as an external prior draw for display and for the superfluid prediction, as explained in Section 3. Figure 4 shows the reconstructions and posteriors. With full-state observations, the smoothed crust and superfluid phases follow the latent phases closely, and the superfluid band is narrow because the superfluid channel is measured with a high signal-to-noise ratio. With crust-only observations, the crust is reconstructed with a band comparable to the crust measurement uncertainty, as in the singular case. The crust-only superfluid prediction is qualitatively different from the singular one; rather than a broad band around zero, it is a rescaled copy of the smoothed crust phase, with the amplitude set by the supplied value of 𝑥 s, here the injected value, and with a band that is the rescaled crust band. When the supplied 𝑥 s matches the generating value, as in the figure, the prediction follows the latent superfluid phase; a different 𝑥 s would rescale the prediction without changing its shape. This rigidity is what makes the minimal model falsifiable with an external handle on the hidden state. The parameter posteriors show a strong degeneracy between 𝜏 and 
+
+𝐴 min in both settings, with a ridge along 𝐴 min ∝ 𝜏 that runs through the injected values, with the bulk of the posterior at shorter relaxation times and smaller amplitudes and a tail extending to the upper end of the 𝜏 prior. The origin of the ridge is that the observation window covers only a few relaxation times. An OU process observed over a span not much longer than 𝜏 is difficult to separate from a random 
+
+MNRAS 000 , 1–16 (2026) 10 R. C. Bernardo 
+
+walk with diffusion coefficient 𝐴 min /𝜏 , and the phase data constrain this ratio far better than 𝜏 and 𝐴 min individually. The marginal poste-riors of 𝜏 and 𝐴 min are nearly identical in the full-state and crust-only settings, because the superfluid channel is an exact rescaling of the crust in the minimal model and carries no independent information about the lag dynamics. What the superfluid channel does supply is the rescaling factor itself. With full-state data, 𝑥 s is determined to a few percent, since the ratio of the two observed phases is −𝑥 c/𝑥 s
+
+epoch by epoch. With crust-only data the displayed 𝑥 s marginal re-produces its prior, as it must, and its two-dimensional marginals with 
+
+𝜏 and 𝐴 min are uncorrelated. The injected parameters lie inside the 95 percent intervals in both settings. The direction of the ridge has a simple physical reading through the definition (31). At fixed 𝑄 and 
+
+𝑥 c, the amplitude 𝐴 min = 𝑄𝜏 /𝑥 2c grows in proportion to the relax-ation time, because a lag that is driven by the same stochastic torque but damped more slowly accumulates a larger stationary variance. Moving along 𝐴 min ∝ 𝜏 is therefore moving at constant 𝑄 /𝑥 2c , that is, at a constant strength of the internal stochastic torque as seen by the crust. Over an observation span of a few relaxation times, the phase data measure this torque strength, which sets the short-time diffusion of the lag, considerably better than they measure the damping that eventually bounds it. The degeneracy is thus between the torque and the damping, and a longer baseline relative to 𝜏 is what would break it. The same realization is also fitted with the singular model, and Figure 5 presents the log Bayes factor over independent minimal realizations. With full-state observations, the Bayes factor favours the minimal model decisively, with a median ln 𝐵 𝑠,𝑚 of order minus ten to minus twenty and the minimal model selected in the large majority of realizations. The singular model can reproduce a single minimal realization closely, by driving its common-mode diffusion toward small values, but it pays for the additional freedom through the Occam factor and through the mismatch of its joint crust–superfluid covariance with the rank-one structure of the minimal process. The magnitude of the full-state Bayes factor is smaller than in the singular experiment, which reflects the asymmetry of nested comparisons. A singular realization cannot be reproduced by the minimal model at all, whereas a minimal realization can be approximated by the singular model. With crust-only observations, the comparison is uninformative. The median ln 𝐵 𝑠,𝑚 is consistent with zero and the fraction of re-alizations favouring the minimal model is consistent with one half. The reason is structural rather than statistical. The crust covariance of the minimal model depends on (𝜏, 𝐴 min ) only, and the singular crust covariance contains, over a substantial part of its prior volume, realizations whose exchange-mode contribution reproduces the min-imal crust covariance to within the measurement uncertainty while the diffusive contribution stays below detectability. The observed crust process can thus be described equally well by both models, the maximum likelihoods are nearly equal, and the Occam factor of the singular model is close to unity along its prior-dominated directions. The models differ in their predictions for the hidden superfluid, which the crust data do not probe. This is the counterpart, from the oppo-site direction, of the singular experiment. Singular data leave a weak but consistent common-mode imprint in the crust, whereas minimal data leave nothing in the crust that the singular model cannot also produce. The prior study is correspondingly revealing. Reducing the sin-gular prior half-widths by one decade shifts the median crust-only ln 𝐵 𝑠,𝑚 to positive values, so that the majority of realizations favour the singular model, whereas enlarging them by one decade shifts the median to negative values and the majority to the minimal model; the nominal prior sits in between with no preference. The sign of the crust-only comparison is therefore set by the prior volume assigned to the singular model rather than by the data, precisely because the data do not constrain the coordinates that distinguish the two physical models. Taken together with the singular experiment (Section 4), this establishes the central result of the simulations. Full-state observa-tions recover the parameters of the generating process, reconstruct both phases and distinguish the stationary and nonstationary spin noise models reliably, whereas crust-only phase observations recon-struct the crust and, at most, leave a weak and prior-limited preference when the generating process is singular. 
+
+6 PHASE OR ANGULAR VELOCITY 
+
+The physical distinction between the two models is a statement about angular velocities. The minimal spin noise is stationary and the sin-gular spin noise is not. Radio timing, however, delivers phases, or equivalently timing residuals. There are then two routes to a test of the models. The phase can be analyzed directly, as with Dong et al. (2026) using the Kalman filter or with the likelihood of Section 3, or it can first be processed into a time series of local spin-frequency estimates, as was done for PSR J1359-6038 by O’Neill et al. (2024). The question we address in this section is whether the features that distinguish the models, stationarity or its absence, survive the chain of operations that separates the physical state from the analyzed data, and whether the two routes lead to the same conclusions. We do so by processing the same simulated phase data along both routes and comparing the results. It is useful to regard each step of the chain as a linear operator acting on the two-component state, since every such operator maps a Gaussian process onto another Gaussian process with a covariance that follows exactly. If 𝑶 is linear and 𝑲 is the covariance of its input, the output covariance is 𝑶𝑲𝑶 T. The data analyzed along the phase route are 𝑷𝑺 𝛿 𝝓 , with 𝑺 the selection of the crust and 𝑷 the timing projection; along the angular velocity route they are 𝑯𝑺 𝛿 𝝓 , with 𝑯 
+
+a differentiation operator, followed by the removal of a linear trend. We discuss the operators in turn. 
+
+Selection of the crust 
+
+Hiding the superfluid maps the multi-output covariance of Section 2 onto its crust block 𝐾 cc . This is an observability loss of physical origin and it is the same along both routes. It removes the parameter combinations that appear only in the cross and superfluid blocks. In the singular model, 𝑺 removes the partition of the stochastic torques between the components, which is why 𝑄 s and 𝑟 become prior-dominated in Section 4. In the minimal model, 𝑺 isolates the superfluid moment of inertia fraction 𝑥 s, which is absent from 𝐾 cc 
+
+altogether. Sections 4-5 have shown that this operation alone reduces a decisive model comparison to a weak or absent one. 
+
+Integration to phase 
+
+The phase is the time integral of the angular velocity, so the phase covariance is the double integral of the angular velocity covariance, and conversely 𝜕 2𝐾 𝜙 /𝜕𝑡 𝜕𝑡 ′ = 𝐾 Ω (Appendix C). For a continuously observed process, integration is invertible and no information is lost. What changes is the distribution of that information. In the frequency domain integration multiplies the spectrum by (2𝜋 𝑓 )−2, so that the phase is dominated by the lowest frequencies the observation window admits; in the time domain it converts a stationary angular velocity  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Intrinsic versus observation induced spin nonstationarity in pulsar timing 11 
+
+into a phase whose variance grows with time, as (17) and (28) make explicit, and it introduces a dependence on the start of the obser-vations. The likelihood leverage of the phase data thus sits at low frequency, which is precisely where the timing model acts. 
+
+Timing projection 
+
+A pulsar timing model fits at least a phase offset, a spin frequency and a spin-down, and only the residual is available for spin-noise analysis. Section 3 treats this exactly by marginalizing the three coefficients, and the OLS projector 𝑷 displays its effect. This process also produces nonstationary residuals (Lee et al. 2012; van Haasteren & Levin 2013; Allen et al. 2026); but of nonstationarity that is dinstinguishable compared to the ones in the spin frequencies that we are interested at. The projection removes three modes from the phase, but these are the modes on which a red process has the greatest leverage, and the transmission of the projected data falls as 𝑓 6 below the inverse observation span (Hazboun et al. 2019; Pitrou & Cusin 2025; Allen et al. 2026). A spin-frequency time series, by contrast, needs only a frequency offset and a spin-down, so its trend has one fewer degree of freedom and the corresponding transmission falls as 𝑓 4 (Pitrou & Cusin 2025). The timing projection therefore removes more low-frequency information from the phase route than the frequency-trend removal does from the angular velocity route; but the angular velocity route has already lost information in the differentiation step, to which we now turn. 
+
+Differentiation 
+
+The simplest estimate of the angular velocity from sampled phases is the finite difference of adjacent epochs, 
+
+c𝛿 Ω𝑛 +1/2 = 𝑦 𝑛 +1 − 𝑦 𝑛 
+
+𝑡 𝑛 +1 − 𝑡 𝑛 
+
+, (52) which has two well-known drawbacks. Its measurement uncertainty is √︃ 𝜎 2 
+
+> 𝑛 +1
+
++ 𝜎 2 
+
+> 𝑛
+
+/( 𝑡 𝑛 +1 − 𝑡 𝑛 ), which for a cadence of 14 days and the phase uncertainties of Table 1 is comparable to the angular veloc-ity excursions themselves, and adjacent differences share one phase datum and are therefore anticorrelated, with correlation coefficient 
+
+−1/2 for equal uncertainties. Treating the finite differences as in-dependent measurements discards this correlation and miscalibrates the likelihood. The standard remedy is to fit a straight line to the phases within a window of several epochs and to take its slope as the local spin frequency at the centre of the window (O’Neill et al. 2024). Each slope is a weighted least-squares estimate, and it is a fixed linear combination of the phases in its window; collecting these combinations as rows gives the operator 𝑯 with as many rows as there are windows. Here we use non-overlapping windows of at least 20 days containing at least five phase epochs, weight the phases by their inverse variances and assign each slope to the weighted mean epoch of its window. With this choice the 101 phase epochs of the simulations are compressed into 20 local spin-frequency estimates with an effective cadence of about 70 days. Since the windows do not overlap, the slopes have independent measurement errors, with variances given by the diagonal of 𝑯 diag (𝜎 2 
+
+> 𝑛
+
+)𝑯 T; the price of this independence is the compression of the cadence. Differentiation acts on the spectrum as (2𝜋 𝑓 )2 and thus undoes the integration. But, a window slope is not an instantaneous angular velocity, but rather the average of the angular velocity over the win-dow, weighted by a linear kernel. Window averaging is a low-pass operation that suppresses fluctuations on time scales shorter than the window, and the compression of the cadence removes the ability to                                                  
+
+> Table 3. Median log Bayes factors over independent realizations for the phase and window-derived angular velocity routes, for singular and minimal generating models and for full-state and crust-only observations. The column ‘recovery’ is the fraction of realizations in which the sign of ln 𝐵 𝑠,𝑚 selects the generating model. Full-state values use bounded Laplace evidences; crust-only values use stepping-stone sampling. domain generator setting runs ln 𝐵 𝑠,𝑚 recovery phase singular full 1000 368.513 99.4 phase singular crust 500 1.002 95.8 phase minimal full 1000 -15.882 93.8 phase minimal crust 500 -0.027 51.6 velocity singular full 1000 39.739 94.5 velocity singular crust 500 1.015 88.8 velocity minimal full 1000 -45.452 99.2 velocity minimal crust 500 0.003 49.8
+
+resolve them. For the relaxation time of one year used here the win-dows are short compared with 𝜏 , and the covariance of the slopes, 
+
+𝑯𝑲 𝜙 𝑯 T, differs from the analytic covariance of the instantaneous angular velocity at the window epochs by only a few percent. The angular velocity route of this section nonetheless treats the slopes as instantaneous angular velocities at their epochs, with indepen-dent measurement errors and a linear trend, so that it corresponds to how such processed data would be analyzed in practice; the exact covariance 𝑯𝑲 𝜙 𝑯 T is retained as a diagnostic of the approximation. 
+
+Paired experiment 
+
+We generate joint realizations of the latent phase and angular ve-locity from their exact cross covariance, add measurement noise to the phase only, and analyse the same realization along the two routes/domains: directly in phase, with the likelihood of Section 3 and a quadratic timing model, and in window-derived angular ve-locity, with the corresponding analytic angular velocity likelihood (Bernardo 2026) and a linear trend. Figure 6 shows one such re-alization for each generating model, with the projected crust phase beside the window slopes and the instantaneous angular velocity at the window epochs. The two routes share the latent realization and the measurement-noise draw, so that any difference between them is due to the operators and not to sampling. Table 3 collects the Bayes factors (47) over independent realizations for both routes, both gen-erating models and both observation settings. The phase rows repeat the results of Sections 4-5. The table shows that the qualitative conclusions of Sections 4-5 survive the passage to window-derived angular velocities. With full-state data, both routes prefer the generating model in the large majority of realizations, with Bayes factors that are decisive in mag-nitude. With crust-only data, both routes are weak or uninformative. A singular generator leaves a consistent but small preference in its favour, somewhat less consistent along the angular velocity route, and a minimal generator leaves no preference along either route. The stationarity or nonstationarity of the underlying spin noise is therefore neither created nor destroyed by integration, projection and differentiation. What these operations change is how much of the distinction is retained in a finite, noisy data set. Within the full-state rows, the phase route gives a much larger singular-generator Bayes factor and a smaller minimal-generator Bayes factor than the angular velocity route. The former reflects the fact that the integrated diffu-sive mode dominates the phase at low frequency, where the phase likelihood has its leverage, so that the singular common mode is very visible in phase; the latter reflects the same low-frequency em- 
+
+> MNRAS 000 , 1–16 (2026)
+
+# 12 R. C. Bernardo 0.020 
+
+0.015 
+
+0.010 
+
+0.005 
+
+0.000 0.005 0.010 0.015 singular  c [rad]  
+
+> latent crust noisy phase
+
+0.0003 
+
+0.0002 
+
+0.0001 
+
+0.0000 0.0001 0.0002 0.0003 
+
+> c [rad day  1]
+> instantaneous latent ideal direct window slope
+
+57200 57400 57600 57800 58000 58200 58400 MJD 0.02 
+
+0.01 
+
+0.00 0.01 0.02 minimal  c [rad] 
+
+57200 57400 57600 57800 58000 58200 58400 MJD 0.0003 
+
+0.0002 
+
+0.0001 
+
+0.0000 0.0001 0.0002 
+
+> c [rad day  1]
+
+Figure 6. Paired phase-angular velocity experiment for singular (top) and minimal (bottom) realizations. [left] projected crust phase observations and latent crust phase. [right] window-derived local spin-frequency estimates with their errors, the instantaneous latent angular velocity at the window epochs, and an ideal control that observes the instantaneous angular velocity at the same epochs with the same nominal errors. The slopes are derived from the phases on the left; both panels share the latent realization and the measurement-noise draw. direct phase window-derived velocity      
+
+> 3
+> 2
+> 1
+> 0log 10  r
+> 12.0
+> 11.2
+> 10.4
+> 9.6
+> log 10  Qc
+> 1.8 2.4 3.0 3.6 log 10 (/day)
+> 10.5
+> 9.0
+> 7.5
+> 6.0
+> log 10  Qs
+> 3
+> 2
+> 1
+> 0log 10 r
+> 12.0
+> 11.2
+> 10.4
+> 9.6
+> log 10 Qc
+> 10.5
+> 9.0
+> 7.5
+> 6.0
+> log 10 Qsdirect phase window-derived velocity
+> 8.0
+> 7.5
+> 7.0
+> 6.5
+> 6.0
+> log 10  Amin
+> 2.0 2.5 3.0 3.5
+
+log 10 ( /day) 
+
+> 2.5
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+> log 10  xs
+> 8.0
+> 7.5
+> 7.0
+> 6.5
+> 6.0
+
+log 10 Amin 
+
+> 2.5
+> 2.0
+> 1.5
+> 1.0
+> 0.5
+
+log 10 xs
+
+Figure 7. Crust-only posteriors from direct phase (solid blue) and window-derived angular velocity (dashed orange) for singular (left) and minimal sampled mock data (right). Each realization is analyzed with its generating model, and red markers give the injected coordinates. MNRAS 000 , 1–16 (2026) Intrinsic versus observation induced spin nonstationarity in pulsar timing 13 
+
+phasis working the other way, since the quadratic timing projection removes part of what would distinguish a stationary from a slowly diffusing process, whereas the angular velocity route retains more of the exchange-mode dynamics on which the minimal model is tested. Figure 7 compares the crust-only posteriors obtained along the two routes when each realization is analyzed with its generating model. For the singular realization the two posteriors overlap closely. 𝑄 c is constrained to the same values along both routes, and 𝜏 , 𝑟 and 𝑄 s
+
+are prior-dominated along both. For the minimal realization the two posteriors differ markedly. Both lie on the ridge 𝐴 min ∝ 𝜏 discussed in Section 5, but the angular velocity posterior is displaced along the ridge toward longer relaxation times and larger amplitudes, by close to an order of magnitude in both coordinates relative to the phase posterior, while the ratio 𝐴 min /𝜏 that sets the short-time diffusion of the lag is nearly unchanged. It is worth noting that this displacement is not primarily a consequence of the window length. The windows of 20 days are short compared with the relaxation time, and the co-variance of the slopes differs from the instantaneous covariance by only a few percent. Rather, the direction of the shift is the one in which the data are least informative, and the angular velocity route is less informative there than the phase route for three compound-ing reasons. First, the cadence compression from 101 phases to 20 slopes removes the short-lag pairs that best resolve the curvature of the OU covariance near zero lag, which is what separates 𝜏 from 
+
+𝐴 min /𝜏 . Second, the window slopes have a lower signal-to-noise ra-tio per point than the phases from which they are formed. Third, an ideal control in which the instantaneous angular velocity is observed at the same twenty epochs with the same nominal errors recovers the generating parameters, which locates the loss in the averaging and cadence compression of 𝑯 rather than in the sample count or the noise level alone. The singular posterior is less affected because its best-constrained coordinate, 𝑄 c, sets the amplitude of the dom-inant diffusive mode, which is a low-frequency feature that both routes retain, whereas the minimal posterior is constrained through the exchange mode, whose time scale must be resolved against the sampling. The shift is seen in a single realization and the two poste-riors are compatible within their widths along the ridge; we do not read it as a bias of one route relative to the other, but as an indication that, for a stationary process, the phase route retains more of the information that pins the relaxation time. The measurement equation can also carry systematic structure that is not part of either model. A phase step, an epoch offset or an un-modelled low-order trend is transformed differently along the two routes. The timing projection absorbs slow trends, whereas differen-tiation suppresses them but converts a phase step into a localized, high-amplitude feature in the derived angular velocities. Such ef-fects are best interpreted through the actual linear operator and its propagated covariance rather than through a generic description of differentiation as a high-pass filter. Radio timing data are phases, and the physical question is posed in angular velocity. In summary, we find that both routes/domains can both lead to the same qualitative conclusions about what full-state and crust-only observations can establish. The phase route analyses the data as they are delivered, with a likelihood that accounts exactly for the timing model and for the integration-induced nonstationarity, and it retains the short-lag information that a window-averaged angular velocity series compresses away. The angular velocity route places the analysis in the variables in which the physics is stated, at the cost of an intermediate processing step whose averaging and cadence compression must be kept in mind when interpreting the posteriors. Neither route recovers the information lost with a hidden superfluid state. 
+
+7 WHAT PULSAR TIMING CAN DO? 
+
+The question that motivates this work is whether radio pulsar timing can tell us whether the spin noise of a neutron star is stationary, and thereby whether the angular momentum of the star is conserved inter-nally or exchanged with the outside through independent stochastic torques on its components. The preceding sections allow a conserva-tive answer to be given, in three parts, on what timing can do on its own, on what it cannot, and on what becomes possible with external information. Radio timing on its own can be analyzed exactly for this purpose. The likelihood of Section 3 is written for the phases that timing delivers and it scales linearly with the number of observations. The simulations show that this likelihood reconstructs the crust phase and constrains the parameters that set the amplitude of the crust spin noise, the crust diffusion coefficient in the singular model and the torque strength 𝐴 min /𝜏 in the minimal model, from the crust alone. Timing also responds to the physics we are after. When the generating process has a diffusive total angular momentum, the crust phase carries an imprint of it that the singular model picks up, and the sign of the Bayes factor points to the singular model in most realizations. This is what one would hope for from a method that is to be applied to real pulsars, and it holds regardless of whether the phases are analyzed directly or first differentiated into spin frequencies. Radio timing on its own cannot, for observations of the span and quality simulated here, establish either alternative with confidence. The crust-only Bayes factors are of order unity for a singular gener-ating process, corresponding to odds of a few to one, and consistent with zero for a minimal generating process, and their magnitudes shift with the prior volume assigned to the singular model. The rea-son is that both models describe the observed crust phase equally well over a substantial part of their parameter space. The crust phase of the minimal model is fixed by two combinations of its param-eters, and the singular model reproduces it whenever its diffusive mode is weak enough to hide below the measurement noise. The parameters that distinguish the two pictures physically, the partition of the stochastic torques between the components in the singular model and the superfluid inertia fraction in the minimal one, do not enter the crust phase covariance and are returned as their priors. The crust-only comparison therefore reduces to a question of which model has the smaller effective prior volume near the observed crust covariance, which is a statement about the priors as much as about the star. A crust-only preference of the magnitude found here should accordingly be reported together with its prior dependence and not be read as a detection of a diffusive mode or of angular momentum conservation. External information changes the problem, and this is where the minimal model becomes falsifiable. Because its crust and superfluid phases are tied by the conservation law (32), the minimal model predicts the superfluid phase from the crust phase up to the single factor −𝑥 c/𝑥 s (Section 3). An independent estimate of the superfluid inertia fraction, such as that inferred from the angular momentum reservoir required by glitches in the same pulsar (Andersson et al. 2012; Haskell & Melatos 2015; Montoli et al. 2020), fixes this factor and turns the minimal model into a definite prediction for a quantity that timing does not observe, with a well-defined uncertainty inher-ited from the crust reconstruction. Any independent measurement of the superfluid rotation, however sparse, then tests the prediction directly, and continuous gravitational waves from the interior of the star are the natural candidate for such a measurement (Jaranowski et al. 1998; Haskell & Schwenzer 2021; Ming et al. 2022; Haskell & Schwenzer 2021; Haskell et al. 2022; Dergachev & Papa 2025; An- 
+
+> MNRAS 000 , 1–16 (2026)
+
+# 14 R. C. Bernardo 
+
+tonelli et al. 2025). The singular model makes no comparably rigid prediction, since its superfluid phase depends on the partition of the stochastic torques, which the crust does not constrain. Nonetheless, an independent measurement of the superfluid moment of inertia fraction or the superfluid phase at a few epochs can be used to con-strain the parameter space. Whether a glitch-derived inertia fraction refers to the same effective superfluid component that participates in spin wandering is a question of neutron-star physics that the present framework does not settle, and we treat such an identification as a hypothesis to be tested rather than as an input. Two further directions follow from these considerations. A pulsar with both a long timing baseline and a glitch-derived inertia fraction is the immediate application. Beyond individual pulsars, the station-arity test could be carried out across a population. Isolated pulsars are the natural sample, since a binary companion provides an ex-ternal channel through which angular momentum may be exchanged stochastically with the pulsar, and a preference for the singular model in isolated pulsars would be harder to attribute to external torques. Millisecond pulsars whose timing noise is loud compared with the gravitational wave background are of particular interest, since they combine long, dense baselines with a spin noise that can be studied on its own. Such a study would ask whether the crust-only Bayes factors of a population lean consistently in one direction. 
+
+8 CONCLUSIONS 
+
+We have developed a scalable Gaussian process method for pulsar spin noise that works directly with the phases, or timing residu-als, delivered by radio pulsar timing. The method is built on the exact analytical solutions of the singular, nonstationary and the min-imal, stationary two-component models of a neutron star (Bernardo 2026). The crust phase covariances of the two models turn out to be semiseparable, of rank three and two respectively, which allows the likelihood to be evaluated with a cost that grows linearly with the number of observations, and the deterministic timing model is marginalized analytically within the same framework. The result is an exact likelihood for the observable of radio timing that is anchored to the dynamics of the two components. The physical question is whether the spin noise of a neutron star is stationary, which within two-component models is the question of whether the total angular momentum of the star is conserved in-ternally. It is posed in the angular velocities, or spin frequencies, whereas timing observes the crust phase. We have therefore had to deal with several operations that stand between the physics and the data. Integration turns a stationary angular velocity into a nonsta-tionary phase, so that a wandering phase is not by itself evidence for a random walk in the spin (Antonelli et al. 2023; Bernardo 2026). The least-squares removal of the timing model suppresses the lowest frequencies and is itself a source of nonstationarity in the residuals (Lee et al. 2012; van Haasteren & Levin 2013; Allen et al. 2026). Differentiation of the phases into local spin frequencies averages the state over finite windows and thins the sampling. We have treated each of these operations exactly, and we have found that none of them changes the qualitative answer to the physical question. The stationarity or nonstationarity of the spin noise is neither created nor destroyed on the way from the state to the data. What the operations change is how much of the distinction survives in a finite, noisy data set, and here the phase route retains the short-lag information that a window-averaged spin-frequency series compresses away, which matters most for the stationary model, whose relaxation time and amplitude are otherwise degenerate over observation spans of a few relaxation times. The simulations give the same central result as their angular veloc-ity counterparts. When both the crust and the superfluid are observed, the parameters of the generating process are recovered, both phases are reconstructed, and the stationary and nonstationary models are told apart decisively. When only the crust is observed, as in radio timing, the crust phase is reconstructed and the amplitude of its spin noise is measured, but the two models describe the observed crust equally well over much of their parameter space. A singular generat-ing process leaves a weak preference in its favour, with posterior odds of a few to one that shift with the prior volume of the singular model. A minimal generating process leaves no preference. Radio timing alone, for observations of the span and quality simulated here, does not establish either alternative with confidence, and the crust-only Bayes factors should be read as prior-limited. The minimal model nevertheless makes a prediction that timing alone does not. Because its stochastic torques conserve angular mo-mentum, it ties the superfluid phase to the crust phase up to a single factor set by the superfluid inertia fraction. An external estimate of this fraction, as inferred from glitches in the same pulsar, turns the minimal model into a falsifiable prediction for the hidden rotational state, which a continuous gravitational wave observation of the inte-rior could test. 
+
+APPENDIX A: KERNEL DERIVATION AND ORIENTATION 
+
+For deterministic initial modes the singular phase fluctuations can be written 
+
+𝛿𝜙 c (𝑡 ) = 𝜏 𝑇 Σ 𝐼 
+
+∫ 𝑡 𝑡 0
+
+{( 𝑡 − 𝜆 )𝜉 + (𝜆 ) + 𝜏 s [1 − e− ( 𝑡 −𝜆 )/ 𝜏 ]𝜉 − (𝜆 )} d𝜆, 
+
+(A1) 
+
+𝛿𝜙 s (𝑡 ) = 𝜏 𝑇 Σ 𝐼 
+
+∫ 𝑡 𝑡 0
+
+{( 𝑡 − 𝜆 )𝜉 + (𝜆 ) − 𝜏 c [1 − e− ( 𝑡 −𝜆 )/ 𝜏 ]𝜉 − (𝜆 )} d𝜆. 
+
+(A2) Contracting the white-noise increments gives (9-20). The first in-dex of I+− identifies the response evaluated at the first covariance time. This convention immediately yields the multi-output symmetry 
+
+𝐾 𝑖 𝑗 (𝑡, 𝑡 ′) = 𝐾 𝑗𝑖 (𝑡 ′, 𝑡 ).
+
+APPENDIX B: SEMISEPARABLE FACTORS AND SOLVES 
+
+For 𝑖 > 𝑗 , every polynomial–exponential term in the singular 𝐾 cc 
+
+separates into a product of a function of 𝑡 𝑖 and a function of 𝑡 𝑗 .Collecting the independent functions gives three columns in 𝑼 and 
+
+𝑽 . The minimal kernel cancels the diffusive polynomial column and requires two. Exponential centring at the midpoint of the elapsed-time range leaves 𝑼 𝑖 𝑽 T 
+
+> 𝑗
+
+invariant while avoiding overflow. Explicitly, with 𝑢 𝑖 = 𝑡 𝑖 − 𝑡 0 and 𝐺 𝜙 = 𝜏 2/𝑇 2 
+
+> Σ
+
+, the singular crust kernel of equation (17) has, for 𝑖 > 𝑗 ,
+
+𝑼 𝑖 =
+
+
+
+e−𝑢 𝑖 /𝜏 𝑢 𝑖 1
+
+
+
+, (B1)  
+
+> MNRAS 000 , 1–16 (2026)
+
+# Intrinsic versus observation induced spin nonstationarity in pulsar timing 15 
+
+and 
+
+𝑉 (1) 
+
+> 𝑗
+
+= 𝐺 𝜙 
+
+n
+
+𝑄 × 𝜏 s
+
+𝜏 (𝑢 𝑗 + 𝜏 ) − 𝜏 2e𝑢 𝑗 /𝜏 
+
++ 𝑄 − 𝜏 2s
+
+h
+
+𝜏 − 𝜏 
+
+> 2
+
+
+
+e𝑢 𝑗 /𝜏 + e−𝑢 𝑗 /𝜏 i o 
+
+, (B2) 
+
+𝑉 (2) 
+
+> 𝑗
+
+= 𝐺 𝜙 
+
+n 𝑄 + 
+
+> 2
+
+𝑢 2 
+
+> 𝑗
+
++ 𝑄 × 𝜏 s
+
+𝑢 𝑗 − 𝜏 + 𝜏 e−𝑢 𝑗 /𝜏  o
+
+, (B3) 
+
+𝑉 (3) 
+
+> 𝑗
+
+= 𝐺 𝜙 
+
+n
+
+− 𝑄 + 
+
+> 6
+
+𝑢 3 
+
+> 𝑗
+
++ 𝑄 × 𝜏 s
+
+𝜏𝑢 𝑗 − 𝜏 2 + 𝜏 2e−𝑢 𝑗 /𝜏 
+
++ 𝑄 − 𝜏 2s
+
+𝑢 𝑗 − 𝜏 + 𝜏 e−𝑢 𝑗 /𝜏  o
+
+, (B4) which follow from grouping the terms of I1, I2 and I3 according to their dependence on the later time. The diagonal is 
+
+𝑎 𝑖 = 𝜎 2 
+
+> 𝑖
+
++ 𝐺 𝜙 
+
+h
+
+𝑄 + 
+
+> 𝑢 3
+> 𝑖
+> 3
+
++ 𝑄 × 𝜏 s
+
+
+
+𝑢 2 
+
+> 𝑖
+
+− 2𝜏 2 + 2𝜏 (𝑢 𝑖 + 𝜏 )e−𝑢 𝑖 /𝜏 
+
++ 𝑄 − 𝜏 2s
+
+
+
+𝑢 𝑖 − 3𝜏  
+
+> 2
+
++ 2𝜏 e−𝑢 𝑖 /𝜏 − 𝜏  
+
+> 2
+
+e−2𝑢 𝑖 /𝜏  i 
+
+. (B5) For the minimal crust kernel of equation (31), 
+
+𝑼 𝑖 =
+
+
+
+e−𝑢 𝑖 /𝜏 1
+
+
+
+, (B6) 
+
+𝑉 (1) 
+
+> 𝑗
+
+= 𝐴 min 
+
+2 𝜏 2 
+
+1 − e𝑢 𝑗 /𝜏 
+
+, (B7) 
+
+𝑉 (2) 
+
+> 𝑗
+
+= 𝐴 min 
+
+2
+
+
+
+2𝜏𝑢 𝑗 − 𝜏 2 + 𝜏 2e−𝑢 𝑗 /𝜏 
+
+, (B8) and 𝑎 𝑖 = 𝜎 2 
+
+> 𝑖
+
++ 𝐴 min  
+
+> 2
+
+H ( 𝑢 𝑖 , 𝑢 𝑖 ). The growing exponentials e 𝑢 𝑗 /𝜏 in 𝑽 𝑗 
+
+are paired with the decaying e −𝑢 𝑖 /𝜏 in 𝑼 𝑖 ; the centring mentioned above rescales both by a common factor so that neither overflows. For a right-hand side 𝑏 𝑖 , the forward solve uses 
+
+𝑧 𝑖 = 𝑏 𝑖 − 𝑼 𝑖 𝒇 𝑖 
+
+√𝑑 𝑖 
+
+, 𝒇 𝑖 +1 = 𝒇 𝑖 + 𝑾 T
+
+> 𝑖
+
+√︁ 𝑑 𝑖 𝑧 𝑖 , (B9) and the backward solve uses 
+
+𝑥 𝑖 = 𝑧 𝑖 
+
+√𝑑 𝑖 
+
+− 𝑾 𝑖 𝒈 𝑖 , 𝒈 𝑖 −1 = 𝒈 𝑖 + 𝑼 T 
+
+> 𝑖
+
+𝑥 𝑖 . (B10) The same factorization solves simultaneously for 𝒚 and the three columns of 𝑿 .
+
+APPENDIX C: ANALYTIC AND NUMERICAL VERIFICATION 
+
+The implementation was checked at three levels. Differentiation ver-ifies 
+
+𝜕 2𝐾 𝑖 𝑗 (𝑡, 𝑡 ′)
+
+𝜕𝑡 𝜕𝑡 ′ = Cov [Ω𝑖 (𝑡 ), Ω 𝑗 (𝑡 ′)] (C1) piecewise away from the covariance cusp. Centred finite differences reproduce the same angular velocity covariances numerically. Fi-nally, exact-covariance Monte Carlo phase simulations were differen-tiated and compared with direct angular velocity simulations; sample covariances converge to the analytic blocks. Dense and semiseparable phase likelihoods agree to numerical precision, covariance matrices are positive semidefinite, and oriented cross-blocks satisfy the re-quired transpose relation. 
+
+APPENDIX D: EVIDENCE SETTINGS AND REPRODUCIBILITY 
+
+Full-state ensembles use bounded Laplace evidence from the exact dense multi-output phase Gaussian process. The radio-only head-line uses stepping-stone evidence with normalized bounded priors. The cached high-statistics products contain 1000 full-state realiza-tions, 500 stepping-stone radio realizations and 200 singular-prior sensitivity realizations for each generator and domain. Their meta-data record deterministic seeds, bounds, configuration fingerprints, software context and acceptance diagnostics. The high-statistics pro-duction ladder used 80 retained steps, 40 burn-in steps, thinning by four and 1024 prior samples; smaller real-data applications may use longer chains. Laplace radio evidences are retained only as local-geometry diagnostics. 
+
+REFERENCES 
+
+Agazie G., et al., 2023, Astrophys. J. Lett., 951, L8 Allen B., von Blanckenburg A. L., Olum K. D., 2026, Phys. Rev. D, 113, 102001 Ambikasaran S., Foreman-Mackey D., Greengard L., Hogg D. W., O’Neil M., 2015, IEEE Transactions on Pattern Analysis and Machine Intelligence, 38, 252 Andersson N., Glampedakis K., Ho W. C. G., Espinoza C. M., 2012, Phys. Rev. Lett., 109, 241103 Antonelli M., Basu A., Haskell B., 2023, Mon. Not. Roy. Astron. Soc., 520, 2813 Antonelli M., Basu A., Haskell B., 2025, Publ. Astron. Soc. Austral., 42, e118 Antoniadis J., et al., 2023, Astron. Astrophys., 678, A50 Baym G., Pethick C., Pines D., Ruderman M., 1969, Nature, 224, 872 Bernardo R. C., 2026, Stochastic problems in pulsar timing (arXiv:2604.08373 )Chamel N., 2013, Phys. Rev. Lett., 110, 011101 Dergachev V., Papa M. A., 2025, Phys. Rev. D, 112, 042005 Dong W., Melatos A., O’Neill N. J., Meyers P. M., Boek D. K., 2026, Mon. Not. Roy. Astron. Soc., 545, staf2053 Dunn L., et al., 2025, MNRAS, 541, 1792 Edwards R. T., Hobbs G. B., Manchester R. N., 2006, Mon. Not. Roy. Astron. Soc., 372, 1549 Foreman-Mackey D., Hogg D. W., Lang D., Goodman J., 2013, Publ. Astron. Soc. Pac., 125, 306 Foreman-Mackey D., Agol E., Ambikasaran S., Angus R., 2017, Astron. J., 154, 220 Goncharov B., Zhu X.-J., Thrane E., 2020, Mon. Not. Roy. Astron. Soc., 497, 3264 Groth E. J., 1975, ApJS, 29, 453 Haskell B., Melatos A., 2015, Int. J. Mod. Phys. D, 24, 1530008 Haskell B., Schwenzer K., 2021, arXiv e-prints, p. arXiv:2104.03137 Haskell B., Antonelli M., Pizzochero P., 2022, Universe, 8, 619 Hazboun J. S., Romano J. D., Smith T. L., 2019, Phys. Rev. D, 100, 104028 Hewish A., Bell S. J., Pilkington J. D. H., Scott P. F., Collins R. A., 1968, Nature, 217, 709 Hobbs G., Edwards R., Manchester R., 2006, Mon. Not. Roy. Astron. Soc., 369, 655 Hobbs G., Lyne A. G., Kramer M., 2010, MNRAS, 402, 1027 Hulse R. A., Taylor J. H., 1975, Astrophys. J. Lett., 195, L51 Jankowski F., et al., 2019, MNRAS, 484, 3691 Jaranowski P., Krolak A., Schutz B. F., 1998, Phys. Rev. D, 58, 063001 Kimpson T., O’Neill N. J., Meyers P. M., Melatos A., 2025, arXiv e-prints, p. arXiv:2510.11077 Kramer M., et al., 2021, Phys. Rev. X, 11, 041050 Lasky P. D., Melatos A., Ravi V., Hobbs G., 2015, MNRAS, 449, 3293 Lee K. J., Bassa C. G., Karuppusamy R., Kramer M., Smits R., Stappers B. W., 2012, Mon. Not. Roy. Astron. Soc., 423, 2642 Lorimer D. R., 2001, Living Rev. Rel., 4, 5 Lower M. E., et al., 2020, MNRAS, 494, 228 Mackay D. J. C., 2003, Information Theory, Inference and Learning Algo-rithms Manchester R. N., 2015, Int. J. Mod. Phys. D, 24, 1530018 Melatos A., Link B., 2014, Mon. Not. Roy. Astron. Soc., 437, 21 MNRAS 000 , 1–16 (2026) 16 R. C. Bernardo 
+
+Meyers P. M., Melatos A., O’Neill N. J., 2021a, Mon. Not. Roy. Astron. Soc., 502, 3113 Meyers P. M., O’Neill N. J., Melatos A., Evans R. J., 2021b, Mon. Not. Roy. Astron. Soc., 506, 3349 Miles M. T., et al., 2025, Mon. Not. Roy. Astron. Soc., 536, 1489 Ming J., Papa M. A., Eggenstein H.-B., Machenschalk B., Steltner B., Prix R., Allen B., Behnke O., 2022, Astrophys. J., 925, 8 Montoli A., Antonelli M., Magistrelli F., Pizzochero P. M., 2020, A&A, 642, A223 O’Neill N. J., Meyers P. M., Melatos A., 2024, Mon. Not. Roy. Astron. Soc., 530, 4648 Pilkington J. D. H., Hewish A., Bell S. J., Cole T. W., 1968, Nature, 218, 126 Pitrou C., Cusin G., 2025, Phys. Rev. D, 111, 083544 Reardon D. J., et al., 2023, Astrophys. J. Lett., 951, L6 Shannon R. M., Cordes J. M., 2010, ApJ, 725, 1607 Trotta R., 2008, Contemp. Phys., 49, 71 Verbiest J. P. W., Vigeland S. J., Porayko N. K., Chen S., Reardon D. J., 2024, Results Phys., 61, 107719 Xie W., Lewis P. O., Fan Y., Kuo L., Chen M.-H., 2011, Systematic Biology, 60, 150 Xu H., et al., 2023, Res. Astron. Astrophys., 23, 075024 Yu W.-W., Allen B., 2025, arXiv e-prints, p. arXiv:2512.08666 van Haasteren R., Levin Y., 2013, Mon. Not. Roy. Astron. Soc., 428, 1147 MNRAS 000 , 1–16 (2026)

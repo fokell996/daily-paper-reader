@@ -1,0 +1,1551 @@
+Title: Joint Mass-Radius and Magnetic-Geometry Inference of PSR J0740+6620
+
+URL Source: https://arxiv.org/pdf/2609.37928v1
+
+Published Time: Wed, 30 Sep 2026 02:17:35 GMT
+
+Number of Pages: 30
+
+Markdown Content:
+> Draft version May 20, 2026
+> Typeset using L ATEX twocolumn style in AASTeX631
+
+Joint Mass-Radius and Magnetic-Geometry Inference of PSR J0740+6620 
+
+Chun Huang, 1 Tuomo Salmi, 2 and Alexander Y. Chen 1
+
+> 1Department of Physics and McDonnell Center for the Space Sciences, Washington University in St. Louis, St. Louis, MO 63130, USA
+> 2Department of Physics, University of Helsinki, P.O. Box 64, FI-00014 University of Helsinki, Finland
+
+ABSTRACT X-ray pulse-profile modeling can measure neutron-star radii, but its physical interpretation remains limited by the largely phenomenological description of the surface hotspots. Here we connect the X-ray hotspots directly to the pulsar magnetospheric structure and jointly infer the mass, radius, and mag-netic geometry of the massive millisecond pulsar PSR J0740+6620 from NICER and XMM-Newton 
+
+observations. Using a GPU-accelerated implementation, we compare two low-dimensional magnetic configurations that can produce non-antipodal emission: a centered axisymmetric dipole–quadrupole and a shifted dipole. The shifted-dipole model is decisively favored under the adopted priors, with ∆ ln Z = 5 .65 (Bayes factor ∼ 285), and yields M = 2 .059 +0 .068  
+
+> −0.069
+
+M⊙ and R = 13 .28 +1 .47  
+
+> −1.07
+
+km, broadly consistent with previous phenomenological analyses, while requiring nearly symmetric heating of the two polar caps. Both the marginalized shifted-dipole posterior and the timing-compatible representa-tive require an effective X-ray-emitting footprint much smaller than the nominal force-free polar cap calibrated for a centered dipole. This compact footprint is not reproduced by our exploratory photon-conversion estimates and instead points to missing physics in the mapping from magnetospheric cur-rents to observable X-ray emission. Our results show that physically motivated hotspots can preserve the mass–radius inference while turning hotspot morphology into a probe of pulsar magnetospheric structure and emission physics. 
+
+1. INTRODUCTION X-ray pulse-profile modeling (PPM) constrains neutron-star masses and radii through the rota-tional modulation of surface emission. Gravitational light bending and redshift depend primarily on stel-lar compactness, while Doppler boosting, aberration, propagation-time delays, and rotational oblateness in-troduce additional radius dependence and help break the mass–radius degeneracy (Pechenick et al. 1983; Be-loborodov 2002; Poutanen & Beloborodov 2006; Morsink et al. 2007; Watts et al. 2016). Energy-resolved model-ing further exploits the spectrum and angular beam-ing set by the neutron-star atmosphere. With the long-duration, energy-resolved timing observations pro-vided by the Neutron Star Interior Composition Ex-plorer ( NICER ), PPM has yielded mass–radius con-straints for several rotation-powered millisecond pulsars when relativistic, atmospheric, instrumental, and back-
+
+> Corresponding author: Chun Huang chun.h@wustl.edu
+
+ground effects are modeled consistently (Bogdanov et al. 2019, 2021). Independent NICER analyses of PSR J0030+0451 obtained the first mass–radius constraints for this source and strongly disfavored simple antipodal cir-cular hotspots, instead favoring non-antipodal, non-circular, or multi-component emitting regions (Miller et al. 2019; Riley et al. 2019). Joint NICER and 
+
+XMM-Newton analyses subsequently measured the ra-dius of PSR J0740+6620 (Miller et al. 2021; Riley et al. 2021). This pulsar is particularly informative because radio Shapiro-delay timing tightly constrains its mass to M = 2 .08 ± 0.07 M⊙ and orbital inclination to iorb =87 .56 +0 .17  
+
+> −0.18
+
+degrees (Fonseca et al. 2021). Its high mass makes the radius especially valuable for probing dense matter at high central densities, while the orbital incli-nation and gamma-ray observations can provide com-plementary information on the viewing and magneto-spheric geometry (Guillemot et al. 2016). More recent analyses using longer NICER exposures have further re-fined the radius inference (Dittmann et al. 2024; Salmi et al. 2024). Previous pulse-profile analyses of PSR J0740+6620 described the hot regions phenomenologically, allowing arXiv:2609.37928v1 [astro-ph.HE] 29 Sep 2026 2 Huang et al. 
+
+their positions, sizes, and component temperatures to vary independently, while typically representing the sur-face emission with one or more approximately isother-mal regions (Miller et al. 2021; Riley et al. 2021; Dittmann et al. 2024; Salmi et al. 2024). The in-ferred departure from an antipodal two-spot configura-tion is suggestive of an off-centered magnetic structure, although it does not uniquely imply a shifted dipole. In contrast, a physics-motivated model ties the emitting geometry and its continuous temperature distribution to an explicit magnetic-field and current-heating prescrip-tion. This tests whether a proposed magnetosphere can reproduce the observed X-ray waveform and what mass and radius it implies. A recent complementary study modeled the emitting regions using open-field-line foot-points of a static vacuum offset dipole plus axisymmetric quadrupole field while fixing several stellar and geomet-ric parameters to values inferred from phenomenological modeling (Taiyebah et al. 2026). Here, we present the first end-to-end Bayesian pulse-profile analysis of PSR J0740+6620 in which force-free-current-informed tem-perature maps are fitted directly to the X-ray data while the stellar mass and radius, magnetic geometry, view-ing geometry, and current-to-heating parameters are in-ferred jointly. This turns hotspot morphology from phe-nomenological freedom into a model-conditional physi-cal observable. The semi-analytic matched-asymptotic force-free framework of Gralla et al. (2016, 2017) connects the near-surface polar-cap structure and current distribu-tion to the magnetic field and the far-zone force-free solution. Lockhart et al. (2019) used this approach to calculate temperature maps and X-ray light curves for inclined dipolar and dipole–quadrupole configurations, while Huang & Chen (2025) extended the hotspot cal-culation to non-axisymmetric, off-centered dipoles and reproduced important features of the X-ray light curves of PSR J0030+0451 and PSR J0437 −4715. Huang (2026) further derived analytic expressions for the field-aligned current invariant in inclined dipolar and general dipole–quadrupole fields, extending the efficient map-ping from magnetospheric structure to polar-cap heat-ing to a multipole-consistent current prescription. Such physics-motivated models are computationally demanding because each sampled magnetic configura-tion requires evaluating a smooth surface temperature map and computing the corresponding surface emis-sion. Although the temperature map is determined from an analytic prescription, its evaluation still requires re-peated derivatives and equation solving, while the con-tinuous temperature distribution introduces an addi-tional dimension in the atmosphere interpolation com-pared with uniform-temperature hotspots. We therefore use the GPU-accelerated pulse-profile modeling frame-work GPU-PPM (Zhou & Huang 2026). Temperature-map evaluation, atmosphere interpolation, relativistic ray tracing, detector-response convolution, and multi-instrument likelihood evaluation are all performed on the GPU, making high-resolution Bayesian inference computationally practical. In the following sections, we jointly analyze the 
+
+NICER and XMM-Newton observations of PSR J0740+6620 to infer its mass and radius together with the magnetic geometry and current-to-heating parame-ters. We compare two primary magnetic configurations, a centered dipole–quadrupole and a shifted dipole, and also examine a shifted dipole–quadrupole model as an exploratory extension in the appendix. We ask which primary magnetic configuration is better supported by the data, how replacing phenomenological hotspots with a magnetospherically organized temperature distribu-tion affects the inferred mass and radius, and whether the inferred viewing geometry, effective footprint cutoff, and relative current-to-heating normalization between the two polar caps are consistent with independent ob-servations and existing theoretical expectations for pul-sar magnetospheric and surface-heating physics.  
+
+> 2.
+
+DATA AND MODELING FRAMEWORK 2.1. Observations 
+
+We used the processed NICER event list described by Salmi et al. (2024) 1. The observations span 2018 September 21–2022 April 21 and have a total exposure of 2 ,733 ,812 s. Events in pulse-invariant (PI) chan-nels 30 ≤ PI < 150 (0 .3–1 .5 keV) were folded into 32 rotational-phase bins. The resulting phase–energy ar-ray contains 1,176,389 counts in 120 detector channels (source plus background). We fitted these data jointly with the phase-averaged 
+
+XMM–Newton EPIC-pn, MOS1, and MOS2 spectra in the same energy band. For each XMM–Newton detec-tor, we used the source and blank-sky spectra, ARF, and RMF provided in the same archive as the NICER data. For both NICER and XMM–Newton , the response op-erator was RMF × ARF × input-energy-bin width. The 
+
+XMM–Newton blank-sky exposures and BACKSCAL factors entered the background constraints separately (Section 2.4). Table 1 lists the XMM–Newton selec-tions. We did not sample cross-calibration or effective-area factors for any instrument, so the inferred hotspot temperature and area constraints are conditional on the  
+
+> 1https://doi.org/10.5281/zenodo.10519473
+
+Physics-Informed Modeling of J0740 3nominal responses and do not incorporate calibration uncertainty. 2.2. Current-informed temperature template 
+
+Our physical hypothesis is that the thermal X-ray pat-tern follows the surface footprint of the magnetospheric current, rather than a freely drawn set of spots. In a sta-tionary force-free magnetosphere, the electromagnetic field determines the four-current required to maintain it. This fixes the location and relative structure of the candidate heating regions once the magnetic geometry is specified. It does not fix the gap voltage, pair multi-plicity, returning-particle fraction, or heat deposited per particle. We therefore derive the surface current distri-bution from the force-free prescription while fitting a small number of parameters that map this current to surface heating. We describe the near-zone magnetic field using the Euler-potential formulation of Gralla et al. (2017), to leading order in ϵ = Ω R/c , where Ω ≡ | Ω| = 2 πν is the spin angular frequency: 
+
+B = ∇α × ∇ β. (1) Here α labels magnetic-flux surfaces and β distinguishes individual field lines on each surface. To describe a displaced magnetic source, we follow the construction of Huang & Chen (2025). Let r denote the position relative to the stellar center and s = ( xs, y s, z s)the physical displacement of the magnetic source. We define the dimensionless source-centered coordinate 
+
+r′ = r − s
+
+R , (2) with r′ = |r′|. Primed spherical coordinates are centered on the magnetic source, with the polar axis aligned with the magnetic moment; θ′ and ϕ′ are therefore the mag-netic colatitude and azimuth. For the aligned, axisym-metric multipoles considered here, we take β = ϕ′. The sampled displacement is s/R = ( xs/R, y s/R, z s/R ). For the dipole–quadrupole configurations, we use the multipolar extension of Huang (2026), for which the flux function is 
+
+α(r) = μ sin 2 θ′
+
+r′ + qα
+
+sin 2 θ′ cos θ′
+
+r′2 , (3) where the first term is dipolar and the second is an ax-isymmetric quadrupolar perturbation. We set the effec-tive dipole moment to μ = 1 for normalization, and qα
+
+controls the quadrupolar contribution. When s̸ = 0, the displacement applies to the complete near-zone field. A fully general quadrupole would introduce additional de-grees of freedom and could produce different current and temperature maps; we do not explore this larger model space in order to limit the number of free parameters. For the boundary of the open-field region, we adopt the nominal force-free value of the flux function on the last open field line (Gralla et al. 2017; Lockhart et al. 2019), 
+
+α0,FF =
+
+ 32
+
+1/2
+
+μ Ω  1 + 0 .2 sin 2 αB
+
+ , (4) where αB is the angle between the spin and magnetic axes. The observer inclination iobs , introduced below, is instead the angle between the spin axis and the line of sight. We set α0 ≡ fopen α0,FF and define the model open footprint by 0 < α < α 0. The lower bound excludes negative-α surfaces that do not connect to the adopted dipole-dominated far zone. Equation (4) provides a leading-order reference when the field is dipole dom-inated on scales approaching the light cylinder, even if higher multipoles strongly distort the surface foot-prints (Gralla et al. 2016, 2017). Such higher multipoles can also arise from a displaced dipole. The moderate changes in spin-down found in global force-free simu-lations of off-centered dipoles further support adopting the dipolar open-flux scale as an approximate reference (P´ etri 2020), even though the displacement can sub-stantially reshape the surface polar caps. We have not quantified the accuracy of this reference for the geome-tries considered here using global magnetospheric calcu-lations. The nominal footprint also neglects the general-relativistic modification of the stellar field. The four-current in our model is evaluated covariantly and in-cludes frame dragging (Huang & Chen 2025), but Equa-tion (3) is a flat-spacetime potential, because no rela-tivistic solution is available for a displaced dipole. For a centered dipole, the Schwarzschild exterior solution re-tains the sin 2 θ′ dependence but enhances the surface value of the flux function by ∆1(u) = − 38u3
+
+ln(1 − 2u) + 2 u + 2 u2 , (5) where u ≡ GM/ (Rc 2) is the stellar compactness ( C =2u in the notation of Gralla et al. 2016, 2017). Because 
+
+α0,FF is fixed by the far-zone dipole moment, the open flux is concentrated into a footprint smaller by 1 /∆1
+
+(see Figure 1 of Gralla et al. 2017), i.e., by factors of 0.71 and 0 .65 at u = 0 .19 and 0 .23, respectively. For a centered dipole this is a uniform rescaling of α on the stellar surface and is therefore exactly degenerate with 4 Huang et al.                              
+
+> Table 1. XMM–Newton Data Used in the Joint Likelihood Detector Channels Nsrc tsrc (s) tblank (s) BACKSCAL pn 57–298 94 6808.730 451098 0.9212 MOS1 20–99 59 17959.574 1576230 1.074 MOS2 20–99 67 18680.734 1512560 1.260
+> Note — The pn selection spans 0 .303906–1 .50264 keV; the MOS selections span 0 .3–1 .5 keV. Nsrc is the number of counts in the selected source region. tsrc and tblank are the source and blank-sky exposures, and BACKSCAL is the supplied geometric scaling factor for the extraction region.
+
+fopen : the relativistic nominal footprint corresponds to 
+
+fopen ≃ 1/∆1 rather than unity. The open flux can also depend on the plasma supply and departures from the force-free approximation. We therefore interpret fopen as an effective flux-cutoff pa-rameter that can accommodate uncertainty in the nom-inal open flux, including its relativistic normalization, and incomplete heating of the physical open cap. In this sense, fopen absorbs our uncertainty in the hotspot area relative to the nominal force-free scale adopted here. The effective emitting region may be smaller, for example, if photon conversion occurs at finite alti-tude rather than directly near the stellar surface, or if the heating is concentrated into smaller-scale structures, such as regions associated with current-sheet heating. In the small-cap dipolar limit, the selected footprint area and angular radius scale approximately as fopen 
+
+and f 1/2open , respectively; the actively heated area also de-pends on the heating prescription. We also define the open-footprint area ratio Sopen as 
+
+Sopen ≡ Aopen (fopen )
+
+Aopen (1) ,Aopen (f ) ≡
+
+Z
+
+H[α(θ, ϕ )] H[α0(f ) − α(θ, ϕ )] dA, 
+
+(6) where H(x) is the Heaviside step function, defined as 
+
+H = 1 for x > 0 and H = 0 for x < 0. The nu-merator and denominator are evaluated at identical val-ues of s/R , qα, R, and αB. We evaluate Equation (6) on a 256 × 256 surface quadrature for all equal-weight posterior samples from each model. Sopen directly mea-sures the change in the integrated surface area satisfying 0 < α < α 0 relative to the nominal fopen = 1 footprint, and is therefore a more direct measure of the hotspot-area change. The field-aligned current is set by the scalar Λ( α, β ), which is constant on a magnetic field sheet at the or-der retained. The regular dipolar solution contains J0
+
+and J1 Bessel-function terms, multiplied by cos αB and sin αB cos β, respectively (Gralla et al. 2017). An ax-isymmetric quadrupole rotated into the spin frame adds 
+
+m = 0, 1, and 2 terms, represented by J0, J1 cos β, and 
+
+J2 cos 2 β, with the corresponding Wigner rotation coef-ficients (Huang 2026). The amplitude of this quadrupo-lar contribution to the current invariant is denoted by 
+
+qΛ. The distinction between qα and qΛ is physical: qα
+
+controls the near-zone field and hence the cap shape, whereas qΛ controls how the outer magnetosphere closes the quadrupolar current. For a centered field, leading-order matching gives qΛ ≃ κ(2 /√6) ϵq α, where κ is an order-unity geometric factor. Neither κ nor the corre-sponding relation for a shifted multipole is known accu-rately enough to impose as a prior constraint. We there-fore infer the two amplitudes independently. The sepa-ratrix return-current sheet, localized near the boundary 
+
+α = α0 between open and closed field lines, is unre-solved by our smooth current prescription. We therefore exclude its surface footprint from the heating map. At each surface element, we evaluate the charge den-sity ρe and spatial current J in a local orthonormal frame. The invariant JμJμ = |J|2 − ρ2 
+
+> e
+
+(assuming c = 1) separates spacelike currents, which cannot be supplied by a single charge species, from timelike currents. To-gether with the sign of J ˆr /ρ e, it identifies the current systems most likely to require pair creation and a return-ing beam (Huang & Chen 2025; Huang 2026). Force-free electrodynamics alone does not specify the kinetic tran-sition between these regimes. We consequently regard the binary activity mask χact 
+
+as part of the heating closure. In the sign conven-tion used in our calculation, χact = 0 outside the open cap and for elements satisfying both JμJμ < 0 and 
+
+J ˆr /ρ e > 0, and χact = 1 elsewhere. With the radial direction defined as outward, J ˆr /ρ e represents the ra-dial velocity of a single-species timelike current. Thus, 
+
+J ˆr /ρ e < 0 corresponds to inward particle flow, whereas 
+
+J ˆr /ρ e > 0 corresponds to an outward sub-Goldreich– Julian current, which is expected to be inactive (Chen & Beloborodov 2013). Physics-Informed Modeling of J0740 5On the remaining open-field elements, the native heat-ing temperature is 
+
+TJ = 10 6 K
+
+
+
+|J| max 
+
+
+
+1 − αα0
+
+, 0
+
+ 1/4
+
+. (7) The fourth root converts the adopted current-dependent deposited flux to an effective temperature. The factor approaching zero at α0 is a proxy for the declining gap potential toward the last open field line; without it, the cap would end at an unphysical, sharply heated edge. The temperature passed to the atmosphere calculation is 
+
+T (θ, ϕ ) = 10 ℓfloor K + χact 10 ℓT C±TJ , (8) Thus, elements with χact = 0 receive only the base-line temperature 10 ℓfloor K, rather than being assigned zero temperature. The cap label is assigned according to the sign of cos θ′, where θ′ is measured relative to the magnetic axis in the magnetic-source-centered co-ordinate system. Surface elements with cos θ′ ≥ 0 be-long to the positive magnetic branch and are assigned 
+
+C+ = 10 −ℓC /2, whereas those with cos θ′ < 0 be-long to the negative magnetic branch and are assigned 
+
+C− = 10 ℓC /2. Thus, C−/C + = 10 ℓC . These labels re-fer to magnetic-pole identity, not to the northern and southern stellar hemispheres. We also define the common temperature multiplier 
+
+AT ≡ 10 ℓT . Each of the four quantities introduced in Equations (4) and (8) corresponds to a specific limita-tion of the heating calculation. The normalization ℓT
+
+absorbs the unknown field amplitude, accelerating volt-age, return fraction, and thermalization efficiency; the force-free current map otherwise predicts only relative temperatures. The parameter ℓC allows the two polar caps to deposit different fractions of their power at the surface. Equal efficiencies give ℓC = 0, but asymmet-ric pair supply or heat transport need not respect this expectation even when the global current closes. The baseline temperature 10 ℓfloor K is included as a nuisance term representing the unspecified cold-surface temperature in regions receiving negligible or no current heating. It prevents the temperature from being exactly zero wherever TJ vanishes. It should not be interpreted as an independently X-ray-bright whole-surface compo-nent: its prior lies below the lower temperature limit of the neutron-star non-magnetic atmosphere (NSX) grid implemented here, log 10 (T / K) = 5 .10, and surface ele-ments below that limit contribute no model counts. Be-cause this baseline is added to the current-heating tem-perature, its fractional effect is largest for weakly heated cells near the lower boundary of the atmosphere grid and is subdominant in the bright cap interiors. Retaining it marginalizes over the uncertain cold-surface bound-ary condition while preventing a cool surface component from being used to fit the data. Thus, fopen accounts for uncertainty in the effective open-flux cutoff, while 
+
+ℓT , ℓC , and ℓfloor account for uncertainties in converting the current pattern into surface temperatures. 2.3. Models for Stellar Magnetic Field 
+
+A pure centered dipole is too restrictive for the sub-stantially non-antipodal emitting geometry inferred in previous analyses of PSR J0740+6620. We therefore use two primary models that add the simplest distinct kinds of magnetic freedom. The centered dipole–quadrupole model fixes s/R = 0 and varies qα and qΛ. It tests whether a surface multipole and its associated current redistribution are sufficient to explain the observations. The shifted-dipole model varies ( xs/R, y s/R, z s/R ) and sets qα = qΛ = 0. It tests whether displacement of the dipole field alone can account for the non-antipodal emission geometry. Including the stellar, viewing, heat-ing, and phase parameters, these models have 11 and 12 dimensions, respectively. We also calculate a 14-dimensional shifted dipole–quadrupole extension that allows all five magnetic quantities to vary. Because the present data do not require this additional freedom, its detailed results are deferred to Appendix A. 2.4. Relativistic Waveform and Joint Likelihood 
+
+Waveforms were calculated with GPU-PPM (Zhou & Huang 2026) 2. We used the oblate-Schwarzschild ap-proximation (Morsink et al. 2007; AlGendy & Morsink 2014), including the latitude-dependent surface shape and normal, gravitational redshift and light bending, Doppler boosting, aberration, propagation-time delays, and the projected emission angle. The comoving specific intensity was interpolated from a fully ionized hydrogen NSX atmosphere table in effective temperature, surface gravity, photon energy, and emission angle (Ho & Lai 2001).For all instruments, interstellar absorption (using the tbnew prescription; Wilms et al. 2000) and detector redistribution were included in the tabulated instrumen-tal operator. We fixed the hydrogen column density to NH = 2 .0 ×
+
+10 20 cm −2 in all our analyses. This value lies within the 68% credible interval obtained by Salmi et al. (2024) when NH was sampled using the same dataset. How-ever, fixing NH means that its uncertainty and correla-tions with the hotspot parameters are not propagated into our results. The inferred hotspot constraints are therefore conditional on this choice. Fixing NH and 
+
+> 2
+
+6 Huang et al. 
+
+the effective-area normalizations removes nuisance di-rections that can trade soft X-ray attenuation and abso-lute flux against hotspot temperature and area. Salmi et al. (2024) sampled both NH and correlated instru-mental scale factors and found their radius inference robust to reasonable changes in the calibration priors. That result is reassuring for the inferred stellar radius, but it does not demonstrate that the hotspot properties are unchanged in our different surface-heating model. The inferred cap contraction and temperature normal-ization should therefore be interpreted as conditional on the fixed absorption and nominal instrument responses adopted here. The temperature template was constructed on a256 × 256 grid, interpolated onto a HEALPix surface tessellation with resolution parameter Nside = 40, and ray traced from those surface elements (G´ orski et al. 2005). We included propagation-time delays when mapping emission phase to observer phase. The 
+
+NICER calculation used 32 emission-phase interpola-tion nodes and evaluated each of the 32 observed phase bins using one-point Gauss–Legendre quadra-ture. Each phase-averaged EPIC spectrum used four observer-phase quadrature points and 16 emission-phase interpolation nodes. The light-bending table contained 256 × 512 × 512 points in compactness, deflection, and emission angle. Temperature-map generation, ray tracing, atmo-sphere interpolation, response convolution, and evalu-ation of the scalar joint likelihood were all performed on the GPU. Parameter vectors were passed from the CPU to the GPU, while likelihood values were returned to the CPU. Let ϑ denote the sampled model parameters. Let 
+
+dXjp be the observed counts for instrument X, detec-tor channel j, and phase bin p, and let λsrc 
+
+> Xjp
+
+(ϑ) be the corresponding predicted source counts. The joint log likelihood is ln L(ϑ) = ln LNICER +ln Lpn +ln LMOS1 +ln LMOS2 . (9) For every detector channel, we marginalized over aphase-independent background rate bXj . Defining the total expected counts in each phase bin as 
+
+λXjp (ϑ, b Xj ) ≡ λsrc 
+
+> Xjp
+
+(ϑ) + tX bXj 
+
+Nϕ,X 
+
+, (10) the channel likelihood is 
+
+LXj ∝
+
+Z b+
+
+> Xj
+> b−
+> Xj
+
+"Y
+
+> p
+
+λ dXjp  
+
+> Xjp
+
+e−λXjp 
+
+dXjp !
+
+#
+
+db Xj , (11) including the Poisson factorial terms. Here b− 
+
+> Xj
+
+and 
+
+b+ 
+
+> Xj
+
+are the lower and upper integration bounds, tX is the source exposure, and Nϕ,X is the number of phase bins, with ln LX = P 
+
+> j
+
+ln LXj . For each pn, MOS1, and MOS2 channel, the blank-sky counts were scaled using the source-to-blank-sky exposure ratio and the corre-sponding BACKSCAL factor. We then adopted an in-tegration interval with bounds set to ±4 standard de-viations about the scaled blank-sky estimate, with the lower bound truncated at zero. This treatment lets the pulsed signal determine the source contribution without imposing a spectral model on the detector background. Because the NICER backgrounds have no finite upper bound, the EPIC data also retain independent informa-tion about the phase-averaged source flux. The EPIC source spectrum was averaged over rotational phase be-fore the response and likelihood calculation, so Nϕ,X = 1 for those instruments. The effective computation cost of the complete joint likelihood was 6.8–11 .7 ms per forward-model eval-uation, as estimated from the sampling time. We tested the numerical reproducibility of the predicted counts at the maximum-likelihood point from each of the three models. For each of the three maximum-likelihood parameter vectors, we recomputed the pre-dicted counts using the independent CPU implementa-tion. For this diagnostic, we added the channel-wise background prediction evaluated at the corresponding maximum-likelihood point to the source prediction. The comparison was performed over the 120 PI channels and 32 phase bins used for NICER , and over the phase-averaged 242, 80, and 80 detector channels used for pn, MOS1, and MOS2, respectively. The maximum abso-lute difference in any detector bin was less than 5 ×10 −10 
+
+counts for NICER and 5 × 10 −12 counts for EPIC. 2.5. Priors 
+
+Table 2 lists all sampled parameters, but the reasons for the adopted ranges are summarized here. Uniform distributions are denoted by U (a, b ). The radio Shapiro-delay measurement supplies the informative mass prior, 
+
+N (2 .08 , 0.07 2) M⊙ (Fonseca et al. 2021); truncation at 1.6 and 2 .4 M⊙ removes only the far tails while keeping the numerical domain finite. We used the broad radius interval 6–20 km so that the X-ray data, rather than an assumed equation of state, determine the allowed com-pactness u ≡ GM/ (Rc 2). We adopted uniform priors on cos αB and cos iobs over [0 , 1], corresponding to isotropic orientations within the selected angular ranges [0 , π/ 2]. These angular restric-tions are modeling assumptions: our adopted priors do not guarantee that configurations outside these ranges are represented by equivalent configurations with the same prior weight within them. Unlike previous NICER Physics-Informed Modeling of J0740 7analyses of PSR J0740+6620 that used timing-informed inclination priors under approximate spin–orbit align-ment (Miller et al. 2021; Riley et al. 2021; Dittmann et al. 2024; Salmi et al. 2024), we do not concentrate the observer-inclination prior near the measured or-bital inclination. This allows solutions that may require substantial spin–orbit misalignment and lets the X-ray waveform constrain the viewing geometry. The phase offset is uniform over one complete rotation because the absolute phase origin does not constrain the magnetic geometry. The temperature-related priors were assigned in log-arithmic variables because their physical normaliza-tions are uncertain by orders of magnitude. The range 
+
+ℓT ∈ [−2, 2] permits the current-defined temperature scale to vary by a factor of 10 −2–10 2 relative to the nominal 10 6 K template. This deliberately broad in-terval encompasses uncertainty in field strength, gap voltage, pair loading, and the fraction of particle en-ergy thermalized in the atmosphere. The floor prior, 
+
+ℓfloor ∈ [2 , 4.5], corresponds to 10 2–3 .16 ×10 4 K. It keeps the unheated surface cooler than the X-ray-emitting caps and normally subdominant in the fitted band. We allowed ℓC ∈ [−0.7, 1.7], corresponding to a negative-to-positive magnetic-branch temperature-normalization ratio C−/C + between approximately 0 .2 and 50. An exploratory calculation with ℓC ∈ [−0.2, 0.2] yielded a posterior extending toward the upper boundary, moti-vating a wider adopted prior with greater extent toward positive values. This range includes equal normaliza-tions and substantial asymmetry between the magnetic branches. The nominal force-free prediction lies at fopen = 1 within the adopted range fopen ∈ [0 .1, 1.5]. In the small-cap dipolar limit, this spans approximate cap-area ratios of 0 .1–1 .5 and cap-radius ratios of 0 .32–1 .22. The broad range below unity allows for the possibility that the an-alytic dipolar open-flux boundary overpredicts the ef-fective heating area when only part of the nominal open cap sustains pair-producing return currents. Conversely, the upper range admits a modest enlargement if the true force-free or kinetic open flux exceeds the nominal cali-bration. Inferring this parameter therefore tests whether the cap area required by the data is compatible with the magnetospheric expectation; an extreme inferred value is physically informative even if the waveform can be fitted. For shifted models, |s|/R is uniform in volume inside a sphere of radius 0 .95, rather than uniform independently in its Cartesian components. This choice assigns equal prior density per unit stellar volume and prevents the magnetic singularity from reaching the surface. Both quadrupole priors include zero and both polarities. The broad near-zone range qα ∈ [−5, 5] admits locally im-portant surface-field distortions, whereas the narrower current-invariant range qΛ ∈ [−0.5, 0.5] reflects the more rapid radial decay of a quadrupole and the expectation that the outer magnetosphere remains predominantly dipolar (Huang 2026). It nevertheless contains the nom-inal centered-field mapping by a wide margin, allowing the posterior to reveal suppression, enhancement, or re-versal of the quadrupolar current contribution. The spin frequency was fixed at ν = 346 .5319965 Hz. We implemented the distance uncertainty by marginal-izing over the radio-timing distance distribution in-ferred by Fonseca et al. (2021), who obtained D =1.14 +0 .17  
+
+> −0.15
+
+kpc (68.3% credible interval). Specifically, we adopted the analytic approximation to this distance dis-tribution used by Riley et al. (2021), represented by a skew-normal distribution 
+
+p(D) = 2
+
+ω ϕ
+
+ D − ξω
+
+
+
+Φ
+
+
+
+a
+
+ D − ξω
+
+ 
+
+, (12) where ϕ and Φ denote the probability density function and cumulative distribution function of the standard normal distribution, respectively, with shape parameter 
+
+a = 1 .7, location ξ = 1 .002 kpc, and scale ω = 0 .227 kpc, truncated to 0 < D < 1.7 kpc. A free phase offset ac-counts for the arbitrary phase origin of the X-ray profile. 2.6. Nested Sampling 
+
+Posterior sampling and evidence calculation used the reactive nested-sampling implementation in UltraN-est (Buchner 2021). Nested sampling was chosen be-cause the phase, viewing geometry, magnetic displace-ment, and quadrupolar parameters produce curved de-generacies and potentially separated modes, while the model comparison also requires a direct calculation of the Bayesian evidence. New points within each like-lihood constraint were generated with a slice sampler using mixed random directions and 96 slice steps. The trajectory length is substantially larger than twice the 11–14 sampled dimensions and was chosen conserva-tively to reduce the dependence of each replacement point on its initial live point and to improve mixing within anisotropic likelihood-constrained regions. Two MPI workers, each assigned to one GPU, evaluated like-lihoods concurrently; this parallelization changes the throughput but not the statistical stopping rules. We required a minimum of 6000 live points globally and 80 live points in every identified cluster. The large global population was used to reduce the probability of 8 Huang et al. 
+
+Table 2. Sampled Parameters and Priors                                                                            
+
+> Parameter Meaning Prior Models
+> MGravitational mass N(2 .08 ,0.07 2)M⊙, truncated to [1 .6,2.4] M⊙All
+> REquatorial circumferential radius U(6 ,20) km All cos αBSpin–magnetic-axis orientation U(0 ,1) All cos iobs Spin–observer orientation U(0 ,1) All
+> ℓfloor log 10 whole-surface temperature (K) U(2 ,4.5) All
+> ℓTlog 10 current-temperature scale U(−2,2) All
+> ℓClog 10 relative cap normalization U(−0.7,1.7) All
+> fopen Open-flux rescaling U(0 .1,1.5) All
+> ϕ0Rotational phase offset (cycles) U(0 ,1) All (xs/R, y s/R, z s/R )Dimensionless magnetic-source displacement Uniform volume, |s|/R ≤0.95 Shifted models
+> qαQuadrupole amplitude in αU(−5,5) Quadrupolar models
+> qΛQuadrupole amplitude in Λ U(−0.5,0.5) Quadrupolar models
+> Note —“All” denotes all calculated magnetic families. “Shifted models” denotes the shifted dipole and shifted dipole–quadrupole families; “quadrupolar models” denotes the centered and shifted dipole–quadrupole families. Fixed quantities, detector backgrounds and distance marginalized within the likelihood.
+
+losing narrow magnetic-geometry modes during prior-volume compression, while the cluster requirement pre-vents a mode with small prior mass from being repre-sented by only a few points. A finite fraction of the ini-tial prior volume may lie outside the numerical domain of the forward model. For example, the compactness may fall outside the tabulated ray-tracing range, or the surface gravity may fall outside the NSX atmosphere grid. These points were assigned a constant very low likelihood. UltraNest detected this plateau and re-actively enlarged the initial root populations from 6000 to 14,289, 13,077, and 26,833 points for the centered dipole–quadrupole, shifted-dipole, and shifted dipole– quadrupole runs, respectively. This enlargement oc-curred before compression of the physical likelihood con-tours and preserved the requested live-point resolution after the invalid region was discarded. The reactive stopping targets were d ln Z = 0.1, 
+
+dD KL = 0 .5, a remaining-evidence fraction of 0 .01, and at least 1500 effective posterior samples; we addition-ally set the likelihood-range tolerance to Lϵ = 10 −3.These conditions constrain complementary aspects of the calculation. The first two bound, respectively, the bootstrap dispersion of the evidence integral and the bootstrap uncertainty of the posterior representation, whereas the remaining-evidence criterion requires the as-yet-unintegrated contribution to be no more than 1% of the total. The Lϵ condition permits termina-tion if the likelihoods of the surviving points have be-come numerically indistinguishable, and the effective-sample requirement protects marginalized intervals from being determined by a small number of highly weighted points. Thus, convergence was not identified with a sin-gle change in ln Z. A limit of 9 × 10 7 likelihood calls was imposed only as a safeguard and was not reached: the centered dipole–quadrupole, shifted-dipole, and shifted dipole–quadrupole runs used 3 .75 × 10 7, 3.83 × 10 7,and 6 .83 × 10 7 evaluations, respectively, over 101,303– 157,056 nested-sampling iterations. We assessed convergence from the saved nested-sampling records rather than from the termination flag alone. The usual between-chain statistic bR is not ap-plicable to this calculation. The relevant checks con-cern the fidelity of constrained-prior sampling, the sta-bility of the weighted posterior, and completion of the evidence integral. All three runs passed Ultra-Nest ’s Mann–Whitney–Wilcoxon insertion-order test, which compares the ranks of replacement points with those expected from unbiased sampling within each like-lihood constraint. Their final effective sample sizes were 27,320, 22,035, and 32,589, exceeding the requested min-imum by more than an order of magnitude, and the fi-nal bootstrap estimates of dD KL were 0 .45, 0 .46, and 0.46, below the adopted target of 0 .5. The central ev-idence estimates from the single integration and from 30 bootstrap realizations differed by less than 0.005 in ln Z, while the fractional contribution assigned to the unresolved evidence tail was 0 .010 in each run. Over the final 10% of the stored nested-sampling sequence, the cumulative ln Z changed by only 0.080, 0.067, and 0.067 for the three models in the same order. We also inspected the weighted posterior projections and likelihood–prior-volume traces for late-emerging modes or abrupt changes in the marginal distributions. These diagnostics probe complementary failure modes and support convergence within the explored posterior regions. They do not replace independent repeat runs or sampler-setting comparisons and therefore cannot Physics-Informed Modeling of J0740 9exclude a missed disconnected mode or establish the detailed relative weights of weak tails and separated modes. As with any finite nested-sampling calculation, they also cannot exclude an arbitrarily small, completely disconnected mode. In the present application, that risk is reduced by the large root populations, the explicit per-cluster live-point floor, the reactive enlargement of the live-point population, and the successful insertion-rank tests. The final bootstrap-inclusive uncertainties in ln Z were 0.132, 0.118, and 0.080 for the centered dipole–quadrupole, shifted-dipole, and shifted dipole– quadrupole models, respectively. These estimated un-certainties were propagated when calculating uncertain-ties in the log-evidence differences.  
+
+> 3.
+
+RESULTS We first present the centered dipole–quadrupole model and then ask whether shifting the dipole provides a more natural description of the same data. The cen-tered model supplies non-antipodal freedom through a quadrupole, whereas the shifted model places the asym-metry directly in the dipole geometry. Unless otherwise stated, quoted parameter constraints are posterior me-dians with 16th and 84th percentiles. For the represen-tative surface maps and two-dimensional count compar-isons, we show the global maximum-likelihood configu-ration for the centered model. For the preferred shifted-dipole model, we instead show the highest-likelihood stored sample with iobs in the 68% orbital-inclination interval measured by Fonseca et al. (2021), mapped to the observer inclination under the assumption of spin– orbit alignment. This sample lies only ∆ ln L = 0 .974 below the global maximum. Although the global max-imum remains the correct point for reporting ln Lmax 
+
+and the Bayesian evidence, its parameter vector is not representative of the marginalized posterior. The ob-server inclination, radius, and compactness all lie away from the main posterior support. We therefore refer to it hereafter as the “timing-compatible representative”, distinguishing it from the formal maximum-likelihood point. We use this representative only where a single parameter vector is required, the marginalized posterior, maximum likelihood, and Bayesian evidence remain un-changed. Table 3 lists the two global maxima and the shifted-dipole representative. By contrast, the contour bands of the marginalized light curve and energy spec-trum show posterior medians and central 68% and 95% intervals from all posterior samples. Below, we state ex-plicitly whether a result refers to this representative or to the marginalized posterior. Table 4 gives the maximum likelihood and Bayesian evidence results for the two primary models. The shifted dipole has a maximum log likelihood larger by 2.57 and a log evidence larger by 5 .654 ±0.177 for the adopted pri-ors, corresponding to a Bayes factor of ∼ 285. This indi-cates a decisive statistical preference under the adopted priors for the shifted-dipole model over the centered model. Beyond this statistical preference, the shifted model yields a mass–radius posterior consistent with previous analyses (Miller et al. 2021; Dittmann et al. 2024; Riley et al. 2021; Salmi et al. 2024) and nearly symmetric heating between the two magnetic branches. The centered model reaches its fit through a large ra-dius and strongly asymmetric cap heating, whereas the shifted dipole does not require either compensation. 3.1. Centered Dipole plus Quadrupole 
+
+Because a pure centered dipole cannot produce the substantially non-antipodal geometry indicated by the data, adding an axisymmetric quadrupole is the mini-mal extension within a centered magnetic configuration. The influence of a centered quadrupole on the heat-ing pattern and pulse-profile observables was discussed by Lockhart et al. (2019) and further developed in the framework of Huang (2026). This model illustrates why fitting the data is not, by itself, sufficient physical justi-fication for a hotspot model. The maximum-likelihood phase–energy comparison in Figure 1 and the posterior projection bands for NICER and all three EPIC detec-tors in Figure 2 show that the model can largely repro-duce the main features of the data despite its lower like-lihood and evidence. Nevertheless, its maximum like-lihood is lower by 2.57 and its evidence is lower by 5.654 ± 0.177 in ln Z relative to the shifted dipole. The main physical differences appear in the inferred parameter posteriors. The full parameter posterior in Figure 4 shows that the centered dipole–quadrupole model favors qα = 1 .22 +0 .13  
+
+> −0.81
+
+and qΛ = −0.139 +0 .039 
+
+> −0.037
+
+in its main mode, using the quadrupole to redistribute both the surface flux and the polar-cap current. The model also moves to much lower compactness, with 
+
+R = 17 .46 +1 .57  
+
+> −1.48
+
+km and a median u = 0 .177. The poste-rior probability that the radius exceeds 16 km is 83.8%. The maximum-likelihood point is still more extreme, at 
+
+M = 2 .270 M⊙ and R = 19 .52 km, near the high-radius prior boundary and in the upper tail of the radio mass prior. These values are well above the PSR J0740+6620 radii inferred in the analyses cited above. The posterior is truncated by the 20 km radius prior, suggesting that the centered dipole–quadrupole hypothesis compensates 10 Huang et al. 
+
+Table 3. Global Maximum-Likelihood Configurations and the Timing-Compatible Shifted-Dipole Representative 
+
+Parameter or quantity Centered dipole–quadrupole Shifted dipole Shifted representative Sampled parameters 
+
+xs/R · · · −0.06652 0.07198 
+
+ys/R · · · 0.2039 −0.1937 
+
+zs/R · · · −0.4553 −0.5276 
+
+qα 1.298 · · · · · · 
+
+qΛ −0.1200 · · · · · · 
+
+M (M⊙) 2.270 2.028 2.025 
+
+R (km) 19 .52 15 .93 13 .26 
+
+ℓfloor 3.422 2.240 3.974 cos αB 0.9190 0.06719 0.04720 cos iobs 0.7768 0.9518 0.04354 
+
+ℓT −0.07778 0.4144 0.3446 
+
+ℓC 0.7917 −0.04545 0.03603 
+
+fopen 1.426 0.5607 0.1942 
+
+ϕ0 (cycles) 0.9391 0.7071 0.2737 Derived quantities 
+
+u 0.1717 0.1879 0.2255 
+
+αB (deg) 23 .22 86 .15 87 .29 
+
+iobs (deg) 39 .03 17 .86 87 .50 
+
+C−/C + 6.190 0.9006 1.087 
+
+Sopen 1.168 0.5314 0.1726 
+
+pSopen 1.081 0.7290 0.4155 
+
+Tmax (10 6 K) 1.171 1.884 1.414 
+
+⟨T ⟩X (10 6 K) 0.8893 0.8939 0.7758 
+
+Note —The first two data columns list the global maximum-likelihood vectors. The final column lists the timing-compatible shifted-dipole represen-tative used in the pointwise figures, selected as the highest-likelihood stored sample in the Fonseca et al. (2021) 68% orbital-inclination interval under spin–orbit alignment. Values are rounded to four significant figures. A blank entry denotes a parameter absent from that magnetic family. Fixed inputs such as D, NH, responses, and stellar spin are not repeated. Detector backgrounds are not components of these sampled vectors; the two-dimensional count figures add the channel-wise background that maximizes the likelihood conditional on the listed sample. 
+
+Table 4. Likelihoods and Bayesian Evidences 
+
+Magnetic model k ln Lmax ln Z ∆ ln Z
+
+Centered dipole–quadrupole 11 −21864 .685 −21896 .392 ± 0.132 −5.654 ± 0.177 Shifted dipole 12 −21862 .110 −21890 .738 ± 0.118 0
+
+Note —k is the number of sampled parameters. Evidence differences are relative to the shifted-dipole model. The quoted uncertainties include the bootstrap integration uncer-tainty described in Section 2. 
+
+for its restricted surface geometry by increasing the ra-dius. The same model favors iobs = 39 .85 +9 .51 
+
+−6.34 degrees, far from the nearly edge-on orbital inclination; the ge-ometric interpretation of this result is discussed in Sec-tion 4.4. The associated temperature map is qualitatively very diffuse. A broad heating region covers a substantial part of the southern hemisphere, and the northern hotspot is also large. For this maximum-likelihood configuration, the local maximum temperature is Tmax = 1 .171 ×10 6 K, and the surface-area-weighted mean over the X-ray-active cells is ⟨T ⟩ = 8 .893 × 10 5 K. Moreover, the fit re-quires C−/C + = 6 .36 +1 .65 
+
+−4.19 , with a maximum-likelihood value of 6.19. Only 7.9% of the posterior permits the cap normalizations to agree within a factor of two. Thus, the centered quadrupolar model transfers part of the geo-metrical burden into a strong asymmetry in the current-Physics-Informed Modeling of J0740 11 0.0 0.5 1.0    
+
+> Pulse phase
+> 0.40.60.81.01.21.4
+> Energy (keV) Data
+> 0.00.51.0
+> Pulse phase
+> 0.40.60.81.01.21.4
+> Energy (keV) Maximum-likelihood model
+> 0.00.51.0
+> Pulse phase
+> 0.40.60.81.01.21.4
+> Energy (keV) Data - model
+> 0200 400 600
+> Counts
+> 0200 400 600
+> Counts
+> −40
+> −20 020 40
+> Count residual
+
+Centered dipole + quadrupole    
+
+> Figure 1. Observed NICER phase–energy counts (left), the maximum-likelihood centered dipole–quadrupole prediction in-cluding the channel-wise background that maximizes the likelihood for the given sample (center), and their difference (right). The parameter vector is listed in Table 3.
+
+to-temperature conversion between the two magnetic branches. The hotspot area is also enlarged, with fopen =1.275 +0 .165  
+
+> −0.914
+
+and a maximum-likelihood value of 1.426. Because the quadrupolar mapping makes the area re-sponse nonlinear, the actual footprint enlargement is milder: Sopen = 1 .111 +0 .068 
+
+> −0.164
+
+, about 1.1 times the nom-inal force-free value. The median open region covers 24.4% of the stellar surface. Thus, a centered dipole plus an axisymmetric quadrupole combines a broad hotspot region and a large radius with strongly asymmetric cur-rent heating to reproduce the observed pulse profile. The lower evidence shows that this compensation oc-cupies less useful prior volume than the shifted-dipole solution. The large radius and strong magnetic-branch heating asymmetry also require more extreme physical conditions than the shifted-dipole model. 3.2. Shifted Dipole 
+
+The centered dipole–quadrupole and shifted-dipole models test two distinct mechanisms for producing non-antipodal heating. The former keeps the magnetic source at the stellar center and adds the lowest-order axisymmetric multipolar correction, whereas the latter retains a dipolar field but shifts its source from the stel-lar center. They are therefore not strictly ordered by complexity. The centered model has two model-specific magnetic parameters, qα and qΛ, while the shifted model has the three displacement coordinates xs/R , ys/R , and 
+
+zs/R . Previous phenomenological pulse-profile analyses of PSR J0740+6620 have favored non-antipodal circular hotspots, a configuration suggestive of an off-centered dipole (Miller et al. 2021; Riley et al. 2021; Salmi et al. 2024; Dittmann et al. 2024). However, in those mod-els the hot-region locations, sizes, and temperatures are not constrained by a magnetic field or magnetospheric current solution. A shifted dipole is therefore the mini-mal displacement-based alternative, testing whether the observed pulse profile can arise from a force-free current and heating prescription rather than from freely placed phenomenological spots. Figure 5 compares the phase- and energy-resolved 
+
+NICER counts with the timing-compatible representa-tive prediction defined above. The model reproduces the observed pulse profile without evident systematic struc-ture in the residual panel. Figure 6 collects the cor-responding one-dimensional NICER phase and energy projections together with the phase-averaged XMM-Newton EPIC-pn, MOS1, and MOS2 spectra; the pos-terior bands show similarly good agreement for all four detectors. Figure 8 shows the posterior of selected model param-eters. We infer 
+
+M = 2 .059 +0 .068  
+
+> −0.069
+
+M⊙,R = 13 .28 +1 .47  
+
+> −1.07
+
+km .
+
+The radius inferred in this work largely agrees with pre-vious analyses based on phenomenological emitting re-gions (Miller et al. 2021; Riley et al. 2021; Dittmann et al. 2024; Salmi et al. 2024; Hoogkamer et al. 2025). The radius posterior has an extended upper tail and is therefore not well represented by a Gaussian: 5.9% of its probability lies above 16 km and 1.5% above 18 km. A similar high-radius tail is present in the analysis of Miller et al. (2021) and in the results of Dittmann et al. (2024). In Riley et al. (2021); Salmi et al. (2024); Hoogkamer et al. (2025), the tail was less pronounced, but their ra-dius priors had an upper bound of 16 km. Thus, despite replacing phenomenological hotspots with a physically 12 Huang et al. 0.0 0.2 0.4 0.6 0.8 1.0          
+
+> Pulse phase
+> 36000 37000 38000
+> Counts
+> NICER : phase projection
+> 0.40.60.81.01.21.4
+> Energy (keV)
+> 5000 10000 15000 20000
+> Counts
+> NICER : energy projection
+> 0.02.55.0
+> EPIC-pn
+> 05
+> Counts
+> EPIC-MOS1
+> 0.40.60.81.01.21.4
+> Energy (keV)
+> 05
+> EPIC-MOS2
+
+Centered dipole + quadrupole       
+
+> Total model Data
+> Figure 2. Observed-count projections for the centered dipole–quadrupole fit. The left column shows the NICER phase and energy projections; the right column shows the phase-averaged EPIC-pn, MOS1, and MOS2 spectra. Points have Poisson uncertainties, the solid curve is the posterior median total prediction, and the dark and light bands contain 68% and 95% of predictions from 4096 posterior samples.
+
+motivated shifted-dipole heating model, the inferred ra-dius distribution remains broadly similar to those ob-tained with phenomenological surface-emission models. The mass–radius posterior remains broadly consistent when a quadrupole is added to the shifted dipole in Ap-pendix A, although that extension broadens the upper-radius tail. This stability indicates that the mass–radius inference is not strongly sensitive to this additional mag-netic freedom. The preferred viewing geometry is close to orthogo-nal, with median αB ≃ 80 ◦ and iobs ≃ 70 ◦, but the posterior distributions of both angles are concentrated toward the upper limits of their prior ranges. Unlike the centered model, the shifted-dipole posterior retains ap-preciable support near the timing-informed inclination, as quantified in Section 4.4. The dimensionless shift co-ordinates ( xs/R, y s/R, z s/R ) are correlated and exhibit multimodal behavior; in particular, ys/R contains two peaks nearly symmetric about zero. Their joint poste-rior nevertheless supplies the non-antipodal surface ge-ometry that the centered model lacks. The xs/R poste-rior is close to zero, the two modes of ys/R exclude zero, and zs/R is centered at a comparatively large nonzero displacement while still containing zero within its broad distribution. The floor-temperature parameter remains unconstrained by the data. The timing-compatible representative surface map in Figure 7 contains two compact heated regions, with a local maximum temperature Tmax = 1 .414 × 10 6 K and a surface-area-weighted mean over the X-ray-active cells of ⟨T ⟩ = 7 .758 × 10 5 K. Their interiors have compara-tively broad temperature distributions, with most of the spatial variation confined to the hotspot boundaries and some unheated regions within the polar-cap footprint. This explains why uniform-temperature cap models can recover the pulse-profile data and provide similar mass– radius measurements. At the present observational pre-cision, the data respond primarily to the location, pro-jected area, and mean spectrum of each bright region. The physical model adds information that a uniform cap without a magnetic-field connection cannot provide. It asks whether that projected area follows from the open magnetic flux and whether the two regions can be heated with a common efficiency. For the shifted dipole, the inferred cap heating ratio is C−/C + = 1 .074 +0 .233 
+
+> −0.183
+
+, consistent with equal current-Physics-Informed Modeling of J0740 13 North hemisphere South hemisphere  
+
+> 3.54.04.55.05.56.0
+> log 10 (T / K)
+> Centered dipole + quadrupole
+> line-of-sight track line of sight at pulse phase 0
+
+Figure 3. Maximum-likelihood centered dipole–quadrupole temperature map. No longitude roll is applied to the surface view. The centered solution favors a broad heated footprint and a large contrast between the two current systems. Its local maximum temperature is 1 .171 × 10 6 K, X-ray active cells weighted mean temperature is 8 .893 × 10 5 K. The parameter vector is listed in Table 3. 
+
+to-heat conversion between the negative and positive magnetic branches. The timing-compatible represen-tative shown in Figure 7 has a contracted effective footprint, with fopen = 0 .1942, Sopen = 0 .1726, and pSopen = 0.4155. The marginalized posterior gives 
+
+fopen = 0 .187 +0 .174 
+
+> −0.062
+
+, with P (fopen < 0.5) = 90 .9%; di-rect surface integration gives Sopen = 0 .176 +0 .150  
+
+> −0.059
+
+and pSopen = 0 .420 +0 .151 
+
+> −0.077
+
+. The representative was selected using only the independently measured inclination inter-val and the X-ray likelihood, so the agreement in foot-print was not imposed. Both the representative and the marginalized posterior require an emitting footprint smaller than the nominal fopen = 1 scale within the shifted-dipole model. The resulting tension between the inferred X-ray-emitting area and the nominal force-free polar-cap scale is discussed in Section 4.1. The spectrum constrains the common current-temperature normalization to ℓT = log 10 AT =0.346 +0 .082 
+
+> −0.114
+
+. Its principal posterior dependence is the expected compensation with footprint area. The Spear-man correlation coefficient between log Sopen and ℓT is 
+
+−0.40. For samples with 0 .10 < f open < 0.15, the me-dian normalization is AT = 2 .43, compared with 1.67 for 0 .5 < f open < 1. Because AT rescales the tempera-ture map and absorbs unresolved heating physics, it is not itself a physical hotspot temperature, and we do not interpret its absolute value, or A4 
+
+> T
+
+, as a return-particle efficiency. The relative trend is the expected spectral response to concentrating the current-heated flux into a smaller area. 3.3. Physical Comparison of the Two Models 
+
+Our shifted-dipole result, R = 13 .28 +1 .47  
+
+> −1.07
+
+km, has a central 68% interval of 12 .21–14 .75 km. For joint 
+
+NICER –XMM-Newton analyses, Miller et al. (2021) reported 13 .7+2 .6 
+
+> −1.5
+
+km and Riley et al. (2021) re-ported 12 .39 +1 .30  
+
+> −0.98
+
+km. With the longer NICER data set also used here, Dittmann et al. (2024) ob-tained 12 .92 +2 .09  
+
+> −1.13
+
+km and Salmi et al. (2024) obtained 12 .49 +1 .28  
+
+> −0.88
+
+km. These intervals all overlap ours substan-tially. Thus, a temperature map generated from a phys-ical magnetic and heating prescription can recover a ra-dius inference broadly consistent with those obtained using flexible phenomenological hotspots. The mass agreement has a different interpretation. Our M = 2 .059 +0 .068  
+
+> −0.069
+
+M⊙ remains close to the infor-mative radio prior, as do the masses inferred in previous PPM analyses. These analyses use the same or closely related Shapiro-delay information: Riley et al. (2021); Salmi et al. (2024) use timing-informed mass–inclination constraints, whereas Miller et al. (2021); Dittmann et al. (2024) broaden the mass uncertainty to 0 .09 M⊙ to al-low for systematic error. Their agreement in mass is therefore largely expected and is not an independent validation of the hotspot model. The radius comparison instead tests the consequences of the different surface prescriptions conditional on that mass information. Prior support also matters for the radius comparison. Our prior is uniform over 6–20 km, whereas Riley et al. (2021); Salmi et al. (2024) exclude R > 16 km. Miller et al. (2021); Dittmann et al. (2024) instead sample in-14 Huang et al. M
+
+2.088 +0 .068 
+
+> −0.070
+
+15 .017 .5
+
+> R
+
+R
+
+17 .47 +1 .57 
+
+> −1.46
+
+0.15 0.20 
+
+> u
+
+u
+
+0.177 +0 .016 
+
+> −0.015
+
+25 75 
+
+> αB
+
+αB
+
+21 .8+19 .4
+
+> −3.4
+
+25 75 
+
+> iobs
+
+iobs 
+
+39 .9+9 .5
+
+> −6.3
+
+34
+
+> `floor
+
+`floor 
+
+3.24 +0 .86 
+
+> −0.84
+
+−0.50.5
+
+> `T
+
+`T
+
+−0.03 +0 .12 
+
+> −0.06
+
+01
+
+> `C
+
+`C
+
+0.80 +0 .10 
+
+> −0.46
+
+0.51.0
+
+> fopen
+
+fopen 
+
+1.28 +0 .16 
+
+> −0.92
+
+−2.52.5
+
+> qα
+
+qα
+
+1.22 +0 .13 
+
+> −0.79
+
+2.0 2 .2
+
+M
+
+−0.25 0.25 
+
+> qΛ
+
+15 .0 17 .5
+
+R
+
+0.15 0.20 
+
+u
+
+25 75 
+
+αB
+
+25 75 
+
+iobs 
+
+3 4
+
+`floor 
+
+−0.5 0.5
+
+`T
+
+0 1
+
+`C
+
+0.5 1.0
+
+fopen 
+
+−2.5 2.5
+
+qα
+
+−0.25 0 .25 
+
+qΛ
+
+qΛ
+
+−0.14 +0 .04 
+
+> −0.04
+
+Figure 4. One- and two-dimensional posterior distributions for the selected centered dipole–quadrupole model parameters, where u = GM/ (Rc 2) is compactness. Titles give the median and 16th–84th percentiles; contours enclose 68% and 95% of the smoothed posterior density. The concentration at large radius is correlated with the viewing and heating parameters and is not imposed by the radio mass prior. 
+
+verse compactness uniformly over 3 .2 ≤ Rc 2/(GM ) ≤
+
+8.0, corresponding to approximately 9 .83–24 .57 km at 
+
+M = 2 .08 M⊙, rather than using a mass-independent radius interval. Restricting the Dittmann et al. (2024) samples to R < 16 km gives R = 12 .76 +1 .49  
+
+> −1.02
+
+km. This illustrates how the upper prior support affects a high-radius tail, but it does not isolate the cause of differences with our result. Viewing priors, distance treatment, ab-sorption, calibration, background treatment, and sam-pling also differ. In particular, we marginalize over the radio-timing distance distribution while fixing the ab-sorption and instrumental normalizations. The poste-rior overlap thus establishes compatibility under the re-spective assumptions. The mass–radius comparison in Figure 9 shows the central contrast between the two primary models. The shifted dipole is centered at R ≃ 13–14 km and u ≃
+
+0.22–0.23, whereas the centered dipole–quadrupole oc-Physics-Informed Modeling of J0740 15 0.0 0.5 1.0
+
+Pulse phase 
+
+> 0.40.60.81.01.21.4
+> Energy (keV)
+
+Data   
+
+> 0.00.51.0
+
+Pulse phase 
+
+> 0.40.60.81.01.21.4
+> Energy (keV)
+
+Timing-compatible representative   
+
+> 0.00.51.0
+
+Pulse phase 
+
+> 0.40.60.81.01.21.4
+> Energy (keV)
+
+Data - model 
+
+> 0200 400 600
+> Counts
+> 0200 400 600
+> Counts
+> −40
+> −20 020 40
+> Count residual
+
+Shifted dipole    
+
+> Figure 5. Observed NICER phase–energy counts (left), the timing-compatible representative shifted-dipole model including the channel-wise background that maximizes the likelihood conditional on this sample (center), and their difference (right). The common color scale in the first two panels makes the broad two-pulse morphology directly comparable. The representative solution parameter vector is listed in the final column of Table 3.
+
+cupies R ≃ 16–19 km and u ≃ 0.18. Since the same mass prior, atmosphere, instrument response, back-ground treatment, and heating prescription were used in both calculations, this difference arises from the mag-netic geometry and its associated surface-temperature pattern. A model can therefore reproduce the phase and energy projections while shifting the inferred stel-lar compactness to compensate for a constrained surface geometry. This is precisely the degeneracy that physics-informed hotspot modeling is intended to reveal. The comparison also suggests that the mass–radius inference is relatively insensitive to the detailed hotspot prescription once the surface model has sufficient geo-metric freedom to reproduce the observed emission pat-tern. The shifted-dipole result remains broadly consis-tent with previous phenomenological hotspot analyses despite imposing a substantially more restrictive connec-tion between the magnetic field configuration. Within this class of sufficiently flexible models, differences in the inferred mass–radius distribution may therefore depend more strongly on choices such as the radius and viewing-angle priors, distance treatment, absorption, calibra-tion, and background modeling than on the detailed hotspot parameterization itself. This stability does not extend to an overly restrictive physical model, as the centered dipole–quadrupole configuration cannot repro-duce the required surface geometry without shifting the inference toward a substantially larger radius and lower compactness. Figure 10 makes the footprint contraction in the dif-ferent models explicit. The sampled fopen is the multi-plier of the flux cutoff and remains the natural quantity to compare with the force-free expectation. It is not directly a surface-area ratio in the presence of higher multipoles. The quantity Sopen measures the overall open-footprint area ratio. The radiating subset also de-pends on the quadrupole component, the return-current region, and the inferred heating normalizations. The posterior area ratios reported below are calculated di-rectly from Equation (6), without imposing the heating-activity mask or a cut on the resulting temperature. For the shifted dipole, Sopen = 0.176 +0 .150  
+
+> −0.059
+
+and pSopen = 0.420 +0 .151 
+
+> −0.077
+
+, close to but not identical to the small-angle estimates fopen and pfopen . The cen-tered dipole–quadrupole has fopen = 1 .275 +0 .165  
+
+> −0.914
+
+but only Sopen = 1 .111 +0 .068 
+
+> −0.164
+
+. Its nonlinear quadrupolar contour makes the footprint area much less sensitive to the cutoff. Its median open region nevertheless covers 24.4% of the stellar surface, compared with 1.1% for the shifted dipole, explaining the broad map in Figure 3. At the posterior median of fopen , the shifted-dipole open footprint corresponds to ≈ 25 km 2, whereas the nom-inal fopen = 1 footprint covers ≈ 6.4% of the surface, or ≈ 140 km 2. For comparison, the two uniform hot regions of the phenomenological analyses, with angular radii ζ ≈ 0.10–0 .15 rad, together cover 1 − cos ζ ≈ 0.5– 1.1% of the stellar surface, or ≈ 10–20 km 2 at their inferred radii (Miller et al. 2021; Riley et al. 2021; Dittmann et al. 2024; Salmi et al. 2024). The physical and phenomenological models therefore require compa-rable emitting areas. Because the activity mask and the heating taper in Equation (7) remove part of the open footprint, the shifted-dipole value should be considered an upper bound on its X-ray-active area. Figures 9, 10, and 11 therefore make clear that displacement removes the large-radius and heating-asymmetry tensions of the 16 Huang et al. 0.0 0.2 0.4 0.6 0.8 1.0          
+
+> Pulse phase
+> 36000 37000 38000
+> Counts
+> NICER : phase projection
+> 0.40.60.81.01.21.4
+> Energy (keV)
+> 5000 10000 15000 20000
+> Counts
+> NICER : energy projection
+> 0.02.55.0
+> EPIC-pn
+> 05
+> Counts
+> EPIC-MOS1
+> 0.40.60.81.01.21.4
+> Energy (keV)
+> 05
+> EPIC-MOS2
+
+Shifted dipole   
+
+> Total model Data
+> Figure 6. Observed-count projections for the shifted-dipole fit. The organization and graphical elements follow Figure 2.
+
+centered model, but replaces them with a much smaller inferred effective open-field footprint. The inference therefore separates a magnetic-flux question from a geometric-area question. Neither quan-tity directly measures a pair-production attenuation length or a kinetic gap height. About 92.0% of the shifted-dipole posterior samples have Sopen < 0.5, corre-sponding to less than half the computed nominal polar-cap area. The timing-compatible representative has 
+
+Sopen = 0.173 and lies within the contracted region favored by the posterior. In Section 4.1, we compare pair-cascade estimates as an illustrative check, while Appendix A tests whether additional magnetic struc-ture can provide a solution toward the nominal force-free hotspot area. Finally, Figure 11 compares the inferred negative-to-positive magnetic-branch heating asymmetry. The shifted dipole is concentrated around C−/C + = 1, and the timing-compatible representative is also nearly sym-metric, with C−/C + = 1 .087. The centered model is qualitatively different: its main solution requires the temperature normalization of one magnetic branch to be approximately six times that of the other. The shifted dipole therefore shows that the two observed pulses need not be produced by strongly different current-to-heat conversion between the two magnetic branches. Con-versely, the centered field favors substantial branch-to-branch differences in the heating normalization. The Bayesian evidence, the reproduction of the pulse-profile data, the nearly symmetric heating between the two magnetic branches, and the mass–radius poste-rior identify the shifted dipole as our preferred physi-cal model for PSR J0740+6620. It reproduces the ob-servations without requiring the large radius or strong branch-to-branch heating asymmetry of the centered dipole–quadrupole model, while yielding a mass–radius posterior broadly consistent with previous phenomeno-logical analyses. Both its marginalized posterior and timing-compatible representative solution require an ef-fective open-field footprint smaller than the nominal force-free scale calibrated for a centered dipole. The shifted-dipole model therefore removes the main geo-metrical and heating tensions of the centered configu-ration while exposing a different unresolved piece of the physics: the mapping from magnetospheric current to observable X-ray emission. This may require a more complete surface-emission and heating prescription, po-tentially including spatially concentrated heating asso-ciated with the unresolved return-current sheet.  
+
+> 4.
+
+DISCUSSION Physics-Informed Modeling of J0740 17 North hemisphere South hemisphere  
+
+> 4.00 4.25 4.50 4.75 5.00 5.25 5.50 5.75
+> log 10 (T / K)
+> Shifted dipole
+> line-of-sight track line of sight at pulse phase 0
+
+Figure 7. Timing-compatible representative shifted-dipole temperature map in fixed north- and south-hemisphere orthographic views. The dashed cyan curve traces the line of sight over one rotation, while the cyan segment and diamond mark the line of sight at phase zero. The local maximum temperature is 1 .414 × 10 6 K, and the X-ray-active-area-weighted mean is 7 .758 × 10 5
+
+K. The parameter vector is the final column of Table 3. 
+
+The two primary models considered in the main text differ substantially in their inferred mass–radius distri-butions and in the physical conditions required to repro-duce the X-ray data. The centered dipole–quadrupole matches the displayed projections without obvious resid-ual structure but favors a large radius, with its poste-rior extending to the upper prior boundary, together with a broad footprint and strongly asymmetric heat-ing. The shifted dipole gives a radius consistent with previous analyses and nearly symmetric heating, mak-ing it the more natural model. Its remaining problem is specific: the inferred effective open-field footprint is much smaller than the nominal force-free polar cap. The timing-compatible representative gives fopen ≈ 0.194, close to the marginalized posterior median fopen ≈ 0.19. This contraction may indicate missing physics in our mapping from open-zone currents to surface emission. We next consider pair-cascade microphysics and surface heating. In addition, we discuss constraints on the in-ferred viewing angle derived under the assumption of spin–orbit alignment. 4.1. Physical Explanations for the Cap Contraction 
+
+The shifted-dipole posterior requires fopen =0.187 +0 .174 
+
+> −0.062
+
+, corresponding to an open footprint of about 1% of the stellar surface. As shown in Section 3.3, this area is comparable to previous phenomenological anal-yses of the same data assuming uniform hot regions, so the small emitting area is a robust property of the obser-vations rather than of our surface prescription. In our model, fopen is the effective flux cutoff relative to the nominal flat-spacetime value α0,FF . We therefore dis-cuss which physical effects can reduce the effective open footprint below its nominal size, considering in turn gen-eral relativity, delayed pair conversion, and alternative pair-production channels, before discussing the implica-tions for the surface magnetic field. 
+
+General relativity. As shown in Section 2.2, the Schwarzschild dipole concentrates the surface flux by the factor ∆ 1(u) of Equation (5). For the shifted-dipole posterior compactness, u = 0 .229 +0 .020 
+
+> −0.023
+
+, the relativis-tic nominal footprint therefore corresponds to fopen ≃
+
+1/∆1 = 0 .65 +0 .04 
+
+> −0.03
+
+. No relativistic solution exists for a shifted dipole, but a comparable near-surface flux con-centration is expected. 
+
+Delayed pair conversion. In the standard picture, par-ticles accelerated in a gap above the polar cap emit cur-vature photons that convert to e± pairs in the magnetic field (Erber 1966; Timokhin & Arons 2013). Because these photons propagate approximately tangent to the field at emission while the field lines continue to curve, pairs produced after a finite propagation distance pop-ulate field lines whose footpoints lie inside the original emission footpoints, closer to the polar cap center. Re-turning particles could then heat a region smaller than the full polar cap. Consider a photon emitted along the field at the cap rim, at magnetic colatitude θpc and cylin-drical radius ϖ ≃ Rθ pc . The field-line tangent makes an angle 3 θpc /2 with the magnetic axis, so after a distance 
+
+s the photon lies at ϖγ ≃ θpc (R + 3 s/ 2) and rγ ≃ R + s.Mapping this point back to the surface along a dipole field line, for which sin 2 θB/r is constant, gives the ratio 18 Huang et al. M
+
+2.059 +0 .068 
+
+> −0.069
+
+10 15 
+
+> R
+
+R
+
+13 .28 +1 .47 
+
+> −1.07
+
+0.20.3
+
+> u
+
+u
+
+0.229 +0 .020 
+
+> −0.023
+
+50 75 
+
+> αB
+
+αB
+
+79 .6+7 .3
+
+> −15 .0
+
+25 75 
+
+> iobs
+
+iobs 
+
+70 .1+13 .6
+
+> −18 .5
+
+34
+
+> `floor
+
+`floor 
+
+3.29 +0 .83 
+
+> −0.86
+
+0.00.5
+
+> `T
+
+`T
+
+0.35 +0 .08 
+
+> −0.11
+
+0.00.5
+
+> `C
+
+`C
+
+0.03 +0 .09 
+
+> −0.08
+
+0.51.0
+
+> fopen
+
+fopen 
+
+0.19 +0 .17 
+
+> −0.06
+
+0.00.5
+
+> xs/R
+
+xs/R 
+
+0.04 +0 .12 
+
+> −0.11
+
+−0.25 0.25 
+
+> ys/R
+
+ys/R 
+
+0.09 +0 .11 
+
+> −0.33
+
+2.0 2 .2
+
+M
+
+−0.50.5
+
+> zs/R
+
+10 15 
+
+R
+
+0.2 0.3
+
+u
+
+50 75 
+
+αB
+
+25 75 
+
+iobs 
+
+3 4
+
+`floor 
+
+0.0 0.5
+
+`T
+
+0.0 0.5
+
+`C
+
+0.5 1 .0
+
+fopen 
+
+0.0 0.5
+
+xs/R 
+
+−0.25 0.25 
+
+ys/R 
+
+−0.5 0.5
+
+zs/R 
+
+zs/R 
+
+−0.23 +0 .31 
+
+> −0.33
+
+Figure 8. Selected parameter posterior distributions for the shifted dipole model. Contours and titles follow Figure 4. The magnetic displacement is in units of the stellar radius. 
+
+of the footprint radius of the conversion field line to the original cap radius, 
+
+g(x) = 1 + 3 x/ 2(1 + x)3/2 , x ≡ sR , fopen = g2(x).
+
+(13) The conversion distance is limited by the dipolar decline of the field. Photons convert once the quantum param-eter χ ≃ ϵ(B/B Q) sin ψ reaches ≈ 0.1–0 .2, where ϵ is the photon energy in units of mec2 and ψ ≃ s/ρ c is the angle between the photon and the field after a distance 
+
+s, with ρc the field-line curvature radius (Timokhin & Arons 2013). With B ∝ (1+ x)−3, χ ∝ x(1+ x)−3 peaks at x = 1 /2 and declines beyond it, so a photon that has not converted by s ≈ R/ 2 escapes. Delayed con-version can therefore contract the footprint by at most Physics-Informed Modeling of J0740 19 12 14 16 18 20 
+
+R (km) 
+
+> 1.92.02.12.22.3
+> M (M )
+
+Mass-radius posterior comparison  
+
+> 15 20
+> R (km)
+> 2.00 2.25
+
+M (M ) 
+
+> 0.15 0.20 0.25
+> u = GM/ (Rc 2)
+> 15 20
+
+R (km) 
+
+> 0.15 0 .20 0 .25
+
+u = GM/ (Rc 2) 
+
+> Centered dipole + quadrupole Shifted dipole
+
+Figure 9. Comparison of the stellar posteriors for the two primary magnetic models. Left: 68% (solid) and 95% (dashed) highest-posterior-density contours in the mass–radius plane. Right: marginalized mass, radius, and compactness distributions. Enforcing a centered source moves the inference toward a larger radius and lower compactness. 0.5 1.0 1.5        
+
+> fopen
+> 0123456
+> Posterior density
+> 0.40.60.81.01.2
+> √Sopen
+> 0246810 0.51.01.5
+> Sopen
+> 0123456
+> Centered dipole + quadrupole Shifted dipole Maximum likelihood
+
+Figure 10. Posterior comparison of fopen (left), the equivalent-area radius ratio pSopen (center), and the open-footprint area ratio Sopen (right). The latter two quantities are obtained by integrating the generally noncircular α < α 0 region and normalizing it to the area obtained for the same magnetic geometry with fopen = 1; see Equation (6). Solid curves are marginalized posterior densities from 4096 equal-weight samples, and dashed vertical lines mark the maximum-likelihood points whose complete vectors are listed in Table 3. The equivalent radius summarizes area only and does not encode the footprint shape or the return-current distribution within it. 
+
+g2(1 /2) ≃ 0.91. This bound is independent of the uncer-tain gap parameters, which determine only whether con-version occurs at all. We do not apply Equation (13) to the quadrupolar models, whose non-circular footprints violate its local dipolar mapping. Whether rim curvature photons convert at all is never-theless relevant for the pair supply of PSR J0740+6620. The conventional vacuum spin-down estimate for ν =346 .5319965 Hz and ˙ ν = −1.46387 × 10 −15 s−2 (Fonseca et al. 2021), Bsd = 3 .2 × 10 19 (P ˙P )1/2 G = 1 .9 × 10 8 Gfor a 10 km star with I = 10 45 g cm 2, corresponds to a dipole moment μ ≃ 1.9 × 10 26 G cm 3 and hence, for 
+
+R = 13 .3 km, a polar surface field Bp = 2 μ/R 3 ≃
+
+1.6 × 10 8 G. Curvature losses limit the primaries to a Lorentz factor γrad well below that of the full polar-cap potential, γpc ≃ 5.9 × 10 8 (Ruderman & Sutherland 1975), obtained by balancing acceleration against radi-20 Huang et al. −0.5 0.0 0.5 1.0 1.5
+
+`C = log 10 (C−/C +) 
+
+> 012345
+> Posterior density
+> 10 010 1
+
+C−/C +         
+
+> 0.00.20.40.60.81.01.21.4
+> Centered dipole + quadrupole Shifted dipole Dashed: centered ML; shifted representative
+> Figure 11. Posterior comparison of the logarithmic (left) and linear (right) negative-to-positive-cos θ′branch temperature-normalization ratio. Solid curves have the same meaning as in Figure 10. The dashed red line marks the centered-model global maximum, and the dashed blue line marks the timing-compatible shifted-dipole representative. Equal current-to-heat conversion corresponds to ℓC= 0 and C−/C += 1.
+
+ation reaction (e.g., Ye & Chen 2025), 
+
+eE ∥ = 2e2
+
+3ρ2
+
+> c
+
+γ4rad . (14) For the vacuum-gap field E∥ ≃ 4πρ GJ rpc = 2Ω Bprpc /c ,with rpc ≃ R(R/R LC )1/2 ≃ 4.1 km and ρc ≃
+
+(4 /3)( RR LC )1/2 ≃ 5.7 × 10 6 cm near the cap rim, this gives γrad ≃ 3.2 × 10 7 and a characteristic curvature-photon energy ϵcurv = 3 ℏγ3rad /(2 ρcmec) ≃ 3.2 × 10 5.Reaching χ ≃ 0.2 at the peak s = R/ 2 instead requires 
+
+ϵ ≳ 1.6 × 10 6, a factor of ≈ 5 higher. Because a screened gap would give lower E∥, this vacuum-gap estimate is optimistic: rim curvature photons at the characteris-tic energy escape without converting. We verified this by tracing rim photons through the timing-compatible representative shifted-dipole field and integrating the magnetic pair-production attenuation coefficient of Er-ber (1966) along straight paths. Although the rim field varies by a factor of ≈ 4 around each displaced cap, photons at the characteristic energy escape, and those energetic enough to convert yield fopen ≥ 0.91. 
+
+Other photon sources and conversion processes. Pair production involves two steps: the production of a γ-ray, by curvature radiation or by inverse-Compton scat-tering (ICS) of surface X-rays, and its conversion, ei-ther in the magnetic field (one-photon conversion) or through collision with a soft X-ray photon (two-photon conversion) (Harding et al. 2002; Salmi & N¨ attil¨ a 2026). Two-photon conversion depends steeply on the surface temperature. For the kT ≈ 0.09 keV hotspots of PSR J0740+6620, integrating the Breit–Wheeler cross section over the radiation field of a hot region of radius 1.5–4 km gives an optical depth τ ≲ 0.1 for outward-moving γ-rays of any energy, compared with τ ≈ 1at kT ≈ 0.3 keV. This is consistent with the finding of Salmi & N¨ attil¨ a (2026) that one-photon conversion can dominate below kT ≈ 0.1 keV. Where two-photon conversion does occur, it is confined to within about one hotspot radius of the surface, where the soft-photon density and collision angles are largest, and therefore produces no significant contraction. ICS instead pro-vides an alternative photon source. In the Klein–Nishina regime, the scattered photons carry a large fraction of the particle energy, well above ϵcurv , and convert mag-netically within s ≪ R, again close to their emission footpoints. The ICS rate, however, is also proportional to the soft-photon density and is correspondingly lower at this surface temperature than in hotter millisecond pulsars. Neither process therefore contracts the foot-print. 
+
+Implications for the surface field. Together, the rela-tivistic normalization and delayed conversion can con-tract the effective footprint only to fopen ≈ 0.6, whereas the shifted-dipole posterior favors fopen ≈ 0.19. Two in-dependent considerations suggest that part of this dis-crepancy may reflect magnetic structure near the sur-face that is stronger than a displaced dipole. First, if the open flux crosses the surface where the field is en-hanced by a factor b ≡ Bsurf /B dip , flux conservation reduces the footprint by 1 /b . The posterior area ratio 
+
+Sopen = 0 .176 +0 .150  
+
+> −0.059
+
+then requires b ≈ 6 (3–9) for a flat-spacetime dipole, or b ≈ 4 (2–6) after the relativistic normalization. Second, pairs are required both for the coherent radio emission of PSR J0740+6620 and for the Physics-Informed Modeling of J0740 21 return-current heating of its polar caps that produces the thermal X-rays modeled here. At the dipolar field strength, however, the estimate above places the star near the death line for curvature-photon pair produc-tion, while two-photon conversion and ICS are ineffi-cient at its surface temperature. Unless the pairs are supplied elsewhere in the magnetosphere, the presence of both radio pulsations and heated polar caps there-fore also points to a stronger surface field. Because 
+
+ϵcurv ∝ B3/4 for a radiation-reaction-limited vacuum gap while the conversion threshold scales as B−1, an enhancement b ≳ 2.5 would allow curvature photons to convert near the surface, consistent with the enhance-ment required by the footprint. Small-scale surface fields have long been invoked for millisecond pulsars near or below the curvature death line (Harding et al. 2002; Harding 2022), and multipolar or double-dipole config-urations have been proposed for PSR J0740+6620 itself (P´ etri et al. 2025; Taiyebah et al. 2026). The shifted dipole–quadrupole extension in Appendix A provides a concrete example: its maximum-likelihood solution reaches fopen ≃ 1 because the quadrupole itself con-centrates the surface flux, although the present data do not require this additional freedom. In summary, none of the mechanisms considered here, namely the general-relativistic correction of the open flux, the delayed magnetic conversion of curvature pho-tons, and two-photon conversion or inverse-Compton photon production, contracts the effective footprint be-low fopen ≈ 0.6, a factor of ≈ 3 above the posterior median. A stronger near-surface field is one plausible explanation of the remaining contraction, but not the only one. Because fopen constrains only the combined effect of the open-flux normalization, the near-surface magnetic geometry, and the heating efficiency across the cap, the discrepancy may equally reflect our simplified heating prescription, which is by no means complete. 4.2. Heating from the Return-Current Sheet 
+
+An obvious omission of our polar cap heating model is the return current sheet concentrated at the separatrix between the open and closed zones. The surface-heating prescription used here includes only the resolved current components of the smooth force-free polar-cap solution. In the force-free approximation adopted by our model, the separatrix current sheet is an infinitely thin layer of discontinuity where the current density is effectively infinite. In reality, the width is set by the kinetic scales of the plasma supporting the current, likely on the or-der of a few plasma skin depths. Neither the width nor the charge composition of the separatrix current sheet is well understood, and must be established by fu-ture magnetospheric calculations with sufficient resolu-tion near the star. The pair-production mechanism that supplies the sheet, and hence the fraction and energy of particles returning to the surface, are likewise uncer-tain. It is therefore plausible that current-sheet precip-itation could contribute heating comparable to, or even greater than, that from the resolved direct-current com-ponents included here, changing the emitting area and temperature structure near the cap boundary. Quanti-fying this contribution will require simulations that re-solve the current sheet, its pair supply, and the deposi-tion of returning-particle energy at the surface, which is far beyond the scope of this paper. Including current-sheet heating could modify the hotspot temperature dis-tribution near the cap boundary, potentially producing a more edge-brightened structure than in the present smooth-current prescription. The thinness of the struc-ture may contribute to the origin of the significantly smaller fopen that we infer from the data. Determining the contribution of return-current heating to the inferred X-ray morphology is therefore a crucial next step in this line of research. 4.3. Polar-cap Heating Asymmetry and Quadrupole Influence 
+
+Because the magnetic model predicts the relative return-current pattern in both branches, their fitted normalization ratio tests the current-to-heat conver-sion after accounting for differences in the incident cur-rent. A temperature contrast between phenomenolog-ical spots alone could not make this distinction, be-cause it would conflate the current supplied to each spot with the efficiency of converting that current into heat. For the shifted dipole, the inferred ratio is 
+
+C−/C + = 1 .074 +0 .233 
+
+> −0.183
+
+, fully consistent with a common current-to-temperature normalization in the negative-and positive-cos θ′ branches. However, the centered dipole–quadrupole fit behaves differently. It favors 
+
+C−/C + = 6 .36 +1 .65 
+
+> −4.19
+
+, and only 7.9% of its posterior al-lows the two normalizations to agree within a factor of two. Thus, once the magnetic source is allowed to be displaced, the observed pulse asymmetry does not require intrinsically different current-to-heat conversion efficiencies in the two branches. Keeping the source cen-tered instead requires a strong branch-to-branch heat-ing asymmetry in the statistically disfavored centered dipole–quadrupole model. The quadrupole modifies the heating pattern through both the surface flux and the field-aligned current: qα re-shapes the open footprints, whereas qΛ redistributes the return current within them. Among the configurations tested, the shifted dipole provides a better-supported 22 Huang et al. 
+
+description of the observations than the centered dipole– quadrupole model. As shown in Appendix A, adding a quadrupole to the shifted geometry remains a viable way to modify the footprint, and a high-likelihood branch approaches the nominal force-free cap scale. However, the broader posterior and lower evidence show that the present observations do not require this additional mag-netic freedom. 4.4. Viewing Inclination and Spin–Orbit Alignment 
+
+For the shifted dipole, the posterior samples give 
+
+iobs = 70 .20 +13 .61  
+
+> −18 .45
+
+degrees, with a central 95% inter-val of 31 .31 ◦–89 .05 ◦. The posterior therefore extends to the nearly edge-on geometry inferred from radio timing, and the Shapiro-delay inclination lies within its 95% in-terval. The median is 17 .36 ◦ below the radio value. We use the global maximum to report ln Lmax , but its pa-rameter vector is not representative of the marginalized solution. It has iobs = 17 .86 ◦, whereas only 2.1% of the shifted-dipole posterior has iobs < 30 ◦. Its radius and open-flux cutoff also lie in the upper posterior tails. We therefore do not use it for the physical illustration of the preferred model. For a broader comparison with radio-timing-informed PPM, the interval 82 .5◦–90 ◦ is the folded version of the 
+
+±5◦ viewing window used by Miller et al. (2021). The shifted-dipole posterior has substantial support near the radio-timing inclination: about 20% of the posterior lies within 82 .5◦–90 ◦, while the radio value itself lies within the 95% credible interval. The centered-model median, 
+
+iobs ≃ 39 .9◦, would imply at least 48 ◦ of spin–orbit mis-alignment if interpreted literally; together with its large radius and unequal heating, we interpret this more nat-urally as model-dependent compensation than as evi-dence for a large spin tilt. For the representative shifted-dipole solution, we se-lected the highest-likelihood stored sample in the ra-dio 68% orbital-inclination interval, 87 .38 ◦ ≤ iorb ≤
+
+87 .73 ◦, which we apply to iobs under the assump-tion of spin–orbit alignment. We reevaluated its joint 
+
+NICER –XMM-Newton likelihood with the production forward model. This sample has iobs = 87 .5044 ◦, M =2.0253 M⊙, R = 13 .2630 km, and ln L = −21863 .08377, compared with −21862 .10986 at the global maximum, corresponding to a likelihood ratio of 0.378. On the 256 × 256 map, the local maximum and X-ray-active-area mean temperatures are Tmax = 1 .414 × 10 6 K and 
+
+⟨T ⟩X = 7 .758 × 10 5 K, using the definition in Table 3. The representative has αB = 87 .29 ◦, a substantial dis-placement |s|/R ≃ 0.567, nearly equal branch normal-ization C−/C + = 1 .087, fopen = 0 .1942, and Sopen =0.1726. At this small likelihood cost, it retains the mass– radius in a reasonable range, nearly symmetric heating, and contracted footprint of the marginalized shifted-dipole solution. Here the “timing-compatible” assumes spin–orbit alignment automatically. Shapiro-delay tim-ing constrains iorb , not iobs directly. We did not apply the same display selection to the other magnetic fami-lies. We retain the centered-model global maximum to show its best fit. A timing-informed model comparison would require the same radio-informed prior or likeli-hood for every model and new posterior and evidence calculations. If the X-ray hotspots are shaped by displaced or mul-tipolar fields near the surface, the inferred magnetic in-clination describes this near-surface magnetic geometry and need not equal the large-scale dipole obliquity, as also suggested by the multiwavelength comparison of P´ etri et al. (2025), testing this interpretation requires a self-consistent global multiwavelength model.  
+
+> 5.
+
+CONCLUSIONS In this work, we have jointly inferred the mass, ra-dius, and magnetic geometry of PSR J0740+6620 us-ing physically motivated force-free-current temperature maps and GPU-accelerated PPM of NICER and XMM-Newton data. The shifted dipole is our preferred physical model and gives M = 2.059 +0 .068  
+
+> −0.069
+
+M⊙ and 
+
+R = 13 .28 +1 .47  
+
+> −1.07
+
+km. Its radius posterior substantially overlaps those from previous phenomenological analy-ses (Miller et al. 2021; Riley et al. 2021; Dittmann et al. 2024; Salmi et al. 2024), showing that the inferred mass–radius region persists when freely parameterized hotspots are replaced by a temperature map tied directly to the magnetic field and magnetospheric current. The two primary magnetic prescriptions differ in both statistical support and physical implications. The cen-tered dipole–quadrupole favors R = 17 .46 +1 .57  
+
+> −1.48
+
+km, with the radius posterior extending toward the upper prior boundary, together with a broad footprint and a branch-heating normalization ratio near six. The shifted dipole is favored by ∆ ln Z = 5 .654 ± 0.177 and reproduces the data with nearly equal heating normalization between the two magnetic branches and without requiring the large-radius solution of the centered model. The com-parison shows that the mass–radius inference can remain relatively stable once the surface model has sufficient geometric freedom, whereas a more restrictive magnetic prescription can shift the inferred stellar compactness to compensate for the allowed surface geometry. These conclusions remain conditional on the adopted priors and nuisance-parameter treatment, including the fixed absorption and nominal instrumental normalizations. Physics-Informed Modeling of J0740 23 The preferred shifted-dipole model nevertheless ex-poses a specific unresolved tension. At the global max-imum, the effective footprint is already contracted rela-tive to the nominal force-free scale, with fopen = 0 .561 and Sopen = 0 .531, while the marginalized posterior fa-vors an even stronger contraction, fopen = 0 .187 +0 .174 
+
+> −0.062
+
+and Sopen = 0.176 +0 .150 
+
+> −0.059
+
+. The global maximum-likelihood viewing angle lies far from the nearly edge-on inclination inferred from Shapiro delay, but this point is not representative of the full posterior. The shifted-dipole posterior extends through the radio inclination, and a stored solution within the Shapiro-delay 68% in-terval has a likelihood loss of only ∆ ln L = 0 .974, while retaining a similar mass, radius, and displaced mag-netic geometry. This radio-compatible solution requires 
+
+fopen = 0 .194 and Sopen = 0 .173. Agreement with the independent viewing geometry therefore does not re-move the small-footprint tension and, for this solution, amplifies it. The exploratory shifted dipole–quadrupole model pre-sented in the appendix admits a high-likelihood branch with a footprint near the nominal force-free scale, but its lower evidence and broad posterior suggests that we do not require this additional magnetic structure to explain the data. Our simple delayed pair-conversion estimate also produces some contraction but is insufficient to ex-plain its inferred magnitude. The remaining discrep-ancy therefore points to missing physics in the mapping from magnetospheric current to observable X-ray emis-sion rather than requiring the shifted geometry itself to be rejected. More complete kinetic calculations of pair production, particle return, and surface energy deposi-tion, including the unresolved separatrix return-current sheet, are needed to determine this mapping. An alter-native route to explain the apparently too small heated region may be forcing a magnetic component close to the surface, similar to P´ etri et al. (2025), but a fully self-consistent surface heating prescription is still a required step. Radio and gamma-ray constraints, together with more complete treatments of surface emission and nui-sance parameters, can further test whether the inferred magnetic geometry and mass–radius result persist. The same framework also provides a path toward genuinely multiwavelength inference of pulsar magne-tospheres, in the spirit of e.g. Chen et al. (2020), Kalapotharakos et al. (2021), Olmschenk et al. (2025), and Taiyebah et al. (2026). Because the X-ray sur-face temperature map is tied to an explicit magnetic geometry and current distribution, the magnetic-field geometry can be fitted simultaneously to radio polariza-tion and gamma-ray light curves, rather than treating each observable with an independent geometric model. Applying this approach to a larger sample of millisec-ond pulsars will show whether displaced or multipolar fields are common, whether the small-footprint tension found here is generic, and how strongly neutron-star mass–radius inference depends on the choice of magne-tospheric model. With improved current and surface-heating prescriptions, future multiwavelength pulse-profile modeling can therefore become a tool for jointly measuring neutron-star interior structure through the mass and radius and probing the magnetosphere that produces the observed emission across different wave-bands.  
+
+> 6.
+
+ACKNOWLEDGMENTS The authors thank Tianzhe Zhou for valuable discus-sions and comments that substantially improved this work. A.C. and C.H. acknowledge support from NSF grant AST-2308111. A.C. additionally acknowledges support from NASA grant 80NSSC24K1095. T.S. ac-knowledges funding by the Research Council of Finland grant 368807 and the Centre of Excellence in Neutron-Star Physics (grant 374063). The authors used generative artificial-intelligence tools, including OpenAI Codex and Anthropic Claude, to assist with numerical cross-checks, code development, and language editing during the analysis and prepara-tion of this manuscript. All scientific results, interpreta-tions, and final manuscript content were independently reviewed and verified by the authors. APPENDIX  
+
+> A.
+
+SHIFTED DIPOLE PLUS QUADRUPOLE EXTENSION As a secondary test, we allowed the magnetic-source displacement and quadrupolar structure to vary simulta-neously. The shifted dipole–quadrupole model shifts the dipole and quadrupole together and allows all five mag-netic quantities ( xs/R, y s/R, z s/R, q α, q Λ) to vary, giv-24 Huang et al. 
+
+Table 5. Comparison with the Shifted Dipole–Quadrupole Extension 
+
+Magnetic model k ln Lmax ln Z ∆ ln Z
+
+Shifted dipole 12 −21862 .110 −21890 .738 ± 0.118 0Shifted dipole–quadrupole 14 −21860 .778 −21892 .541 ± 0.080 −1.803 ± 0.142 
+
+Note —Evidence differences are relative to the shifted dipole. The extension attains the largest maximum likelihood among the calculated models, but its extra prior volume is not rewarded by the evidence. 
+
+Table 6. Maximum-Likelihood Configuration of the Exploratory Extension 
+
+Parameter or quantity Shifted dipole–quadrupole Sampled parameters 
+
+xs/R −0.03273 
+
+ys/R 0.1380 
+
+zs/R −0.6256 
+
+qα 0.1409 
+
+qΛ −0.4315 
+
+M (M⊙) 2.072 
+
+R (km) 14 .13 
+
+ℓfloor 4.403 cos αB 0.1782 cos iobs 0.9282 
+
+ℓT 0.3510 
+
+ℓC 0.007124 
+
+fopen 1.002 
+
+ϕ0 (cycles) 0.7029 Derived quantities 
+
+u 0.2165 
+
+αB (deg) 79 .74 
+
+iobs (deg) 21 .85 
+
+C−/C + 1.017 
+
+Sopen 1.003 
+
+pSopen 1.001 
+
+Tmax (10 6 K) 2.396 
+
+⟨T ⟩X (10 6 K) 0.8585 
+
+Note —Sampled entries are the maximum-likelihood pa-rameter values for the exploratory extension shifted dipole–quadrupole model, all values are rounded here to four significant figures. A blank entry denotes a pa-rameter absent from that magnetic family. Fixed in-puts such as D, NH, responses, and stellar spin are not repeated. Detector backgrounds are not components of these sampled vectors; the two-dimensional count figures add the channel-wise background that maxi-mizes the likelihood conditional on the listed sample. Physics-Informed Modeling of J0740 25 ing 14 sampled parameters. This extension asks whether moderate multipolar structure can preserve the success-ful shifted model geometry while resolving the small-footprint tension of the shifted dipole. Table 5 compares the extension with the shifted dipole. The shifted dipole–quadrupole reaches the largest maximum likelihood of the calculated models, improving ln Lmax by 1.33 relative to the shifted dipole. The improvement is small compared with the two ad-ditional degrees of freedom, and its Bayesian evidence is lower than that of the shifted dipole by 1 .803 ±
+
+0.142. The present data therefore do not require the quadrupole, even though a particular high-likelihood so-lution is physically informative. Figures 12 and 13 show that the phase–energy resid-uals and the NICER and EPIC projections are as satis-factory as those of the two primary models. The mass–radius posterior returns to the shifted-dipole solution, with M = 2.062 +0 .069  
+
+> −0.067
+
+M⊙, R =13 .54 +2 .50  
+
+> −1.23
+
+km, and median u = 0 .224. The radius poste-rior has a main mode near 13 km and a noticeable high-radius shoulder; only 3.8% of its probability lies above 18 km. This shoulder widens the upper uncertainty but does not reproduce the dominant 17–19 km solution of the centered model. The median angles, αB ≃ 80 ◦ and 
+
+iobs ≃ 68 ◦, are also close to the shifted-dipole geometry. As shown in Figure 15, the two additional magnetic parameters are not significant in their one-dimensional marginal distributions. The figure also shows their covariances with fopen and the cap-normalization pa-rameters. The posterior values qα = −0.14 +0 .56  
+
+> −3.18
+
+and 
+
+qΛ = −0.070 +0 .377  
+
+> −0.293
+
+both include zero. The maximum-likelihood solution instead has qα = 0 .141 and qΛ =
+
+−0.431. It should therefore be described as a particular high-likelihood quadrupolar distortion, not as a poste-rior measurement of a nonzero quadrupole. After aligning the arbitrary longitude of the shifted-dipole and shifted dipole–quadrupole maps, the maximum-likelihood temperature distribution in Fig-ure 14 retains the compact two-region organization of the shifted dipole. The quadrupolar current adds inter-nal and boundary structure that would be difficult to represent with a simple phenomenological hotspot. The most important feature of the extension is its abil-ity to resolve the small-footprint tension at a particular high-likelihood point. At the maximum-likelihood solu-tion, fopen = 1 .002, Sopen = 1 .003, and C−/C + = 1 .017. The nominal force-free polar-cap size and nearly equal hemispheric heating can therefore reproduce the data. This contrasts with the maximum-likelihood shifted dipole, for which Sopen = 0.531, and demonstrates that higher multipolar structure can provide a magnetic route to removing the cap-size tension. The full posterior is less decisive than this best-fitting configuration. Its marginalized distribution gives 
+
+fopen = 0 .222 +0 .625 
+
+> −0.097
+
+, and 12.6% of the samples lie in 0.8 < f open < 1.2, compared with 2.6% for the shifted dipole. After the nonlinear surface mapping, Sopen =0.279 +0 .683  
+
+> −0.152
+
+and 28.5% of the area posterior lies within 20% of the nominal footprint. The cap-ratio posterior has a near-symmetric mode and a long high-contrast tail; its median is 1.31, its maximum-likelihood value is 1.017, and 61.8% of the posterior lies within a factor of two of equal heating. The data therefore admit, but do not isolate, the physically attractive nominal-area and symmetric-heating branch. The extension also contains a contracted branch: asmall-cutoff point with fopen = 0 .298 lies only ∆ ln L =1.51 below the maximum. The extension therefore con-tains two physically distinct ways to explain the data: a nominal force-free-area branch with appreciable multi-polar structure and a contracted branch with a smaller quadrupolar contribution. Their likelihoods are close enough that their relative posterior weights are con-trolled mainly by the available parameter volume. Figures 16–18 compare the extension directly with the shifted dipole. They show that the principal stellar solu-tion and symmetric-heating mode remain stable, while the added quadrupolar freedom opens a high-likelihood path toward the nominal footprint and also produces broader marginalized tails. This is why the extension is physically interesting but not strongly required by the current observations. REFERENCES 
+
+> AlGendy, M., & Morsink, S. M. 2014, ApJ, 791, 78, doi: 10.1088/0004-637X/791/2/78 Beloborodov, A. M. 2002, ApJL, 566, L85, doi: 10.1086/339511 Bogdanov, S., Lamb, F. K., Mahmoodifar, S., et al. 2019, ApJL, 887, L26, doi: 10.3847/2041-8213/ab5968 Bogdanov, S., Dittmann, A. J., Ho, W. C. G., et al. 2021, ApJL, 914, L15, doi: 10.3847/2041-8213/abfb79 Buchner, J. 2021, UltraNest – a robust, general purpose Bayesian inference engine. https://arxiv.org/abs/2101.09604 Chen, A. Y., & Beloborodov, A. M. 2013, ApJ, 762, 76, doi: 10.1088/0004-637X/762/2/76
+
+26 Huang et al. 0.0 0.5 1.0
+
+Pulse phase 
+
+> 0.40.60.81.01.21.4
+> Energy (keV)
+
+Data   
+
+> 0.00.51.0
+
+Pulse phase 
+
+> 0.40.60.81.01.21.4
+> Energy (keV)
+
+Maximum-likelihood model   
+
+> 0.00.51.0
+
+Pulse phase 
+
+> 0.40.60.81.01.21.4
+> Energy (keV)
+
+Data - model 
+
+> 0200 400 600
+> Counts
+> 0200 400 600
+> Counts
+> −40
+> −20 020 40
+> Count residual
+
+Shifted dipole + quadrupole 
+
+Figure 12. As in Figure 5, but for the shifted dipole–quadrupole extension. The parameter vector is listed in Table 6. 0.0 0.2 0.4 0.6 0.8 1.0
+
+Pulse phase 
+
+> 36000 37000 38000
+> Counts
+
+NICER : phase projection      
+
+> 0.40.60.81.01.21.4
+
+Energy (keV) 
+
+> 5000 10000 15000 20000
+> Counts
+
+NICER : energy projection 
+
+> 0.02.55.0
+
+EPIC-pn 
+
+> 05
+> Counts
+
+EPIC-MOS1      
+
+> 0.40.60.81.01.21.4
+
+Energy (keV) 
+
+> 05
+
+EPIC-MOS2 
+
+Shifted dipole + quadrupole  
+
+> Total model Data
+
+Figure 13. As in Figure 2, but for the shifted dipole–quadrupole extension. Chen, A. Y., Yuan, Y., & Vasilopoulos, G. 2020, The Astrophysical Journal Letters, 893, L38, doi: 10.3847/2041-8213/ab85c5 Dittmann, A. J., Miller, M. C., Lamb, F. K., et al. 2024, ApJ, 974, 295, doi: 10.3847/1538-4357/ad5f1e Erber, T. 1966, Rev. Mod. Phys., 38, 626, doi: 10.1103/RevModPhys.38.626 Fonseca, E., Cromartie, H. T., Pennucci, T. T., et al. 2021, ApJL, 915, L12, doi: 10.3847/2041-8213/ac03b8 Fonseca, E., Cromartie, H. T., Pennucci, T. T., et al. 2021, The Astrophysical Journal Letters, 915, L12, doi: 10.3847/2041-8213/ac03b8 G´ orski, K. M., Hivon, E., Banday, A. J., et al. 2005, ApJ, 622, 759, doi: 10.1086/427976 Physics-Informed Modeling of J0740 27 North hemisphere South hemisphere  
+
+> 4.50 4.75 5.00 5.25 5.50 5.75 6.00
+> log 10 (T / K)
+> Shifted dipole + quadrupole
+> line-of-sight track line of sight at pulse phase 0
+
+Figure 14. Maximum-likelihood shifted dipole–quadrupole temperature map, shown as in Figure 7. The map preserves the compact two-region organization of the shifted dipole while adding quadrupole-driven current structure. The parameter vector is listed in Table 6. Gralla, S. E., Lupsasca, A., & Philippov, A. 2016, ApJ, 833, 258, doi: 10.3847/1538-4357/833/2/258 —. 2017, ApJ, 851, 137, doi: 10.3847/1538-4357/aa978d Guillemot, L., Smith, D. A., Laffon, H., et al. 2016, Astronomy and Astrophysics, 587, A109, doi: 10.1051/0004-6361/201527847 Harding, A. K. 2022, in Astrophysics and Space Science Library, Vol. 465, Astrophysics and Space Science Library, ed. S. Bhattacharyya, A. Papitto, & D. Bhattacharya, 57–85, doi: 10.1007/978-3-030-85198-9 3 Harding, A. K., Muslimov, A. G., & Zhang, B. 2002, ApJ, 576, 366, doi: 10.1086/341633 Ho, W. C. G., & Lai, D. 2001, MNRAS, 327, 1081, doi: 10.1046/j.1365-8711.2001.04801.x Hoogkamer, M., Kini, Y., Salmi, T., Watts, A. L., & Buchner, J. 2025, PhRvD, 112, 023008, doi: 10.1103/cp8c-2nbk Huang, C. 2026, ApJ, 999, 204, doi: 10.3847/1538-4357/ae4489 Huang, C., & Chen, A. Y. 2025, Astrophys. J., 991, 90, doi: 10.3847/1538-4357/adf747 Kalapotharakos, C., Wadiasingh, Z., Harding, A. K., & Kazanas, D. 2021, The Astrophysical Journal, 907, 63, doi: 10.3847/1538-4357/abcec0 Lockhart, W., Gralla, S. E., ¨Ozel, F., & Psaltis, D. 2019, MNRAS, 490, 1774, doi: 10.1093/mnras/stz2524 Miller, M. C., Lamb, F. K., Dittmann, A. J., et al. 2019, The Astrophysical Journal Letters, 887, L24, doi: 10.3847/2041-8213/ab50c5 —. 2021, The Astrophysical Journal Letters, 918, L28, doi: 10.3847/2041-8213/ac089b Morsink, S. M., Leahy, D. A., Cadeau, C., & Braga, J. 2007, ApJ, 663, 1244, doi: 10.1086/518648 Olmschenk, G., Broadbent, E., Kalapotharakos, C., et al. 2025, The Astrophysical Journal, 991, 169, doi: 10.3847/1538-4357/ae03c0 Pechenick, K. R., Ftaclas, C., & Cohen, J. M. 1983, ApJ, 274, 846, doi: 10.1086/161498 P´ etri, J., Guillot, S., Guillemot, L., et al. 2025, A&A, 701, A39, doi: 10.1051/0004-6361/202555574 Poutanen, J., & Beloborodov, A. M. 2006, MNRAS, 373, 836, doi: 10.1111/j.1365-2966.2006.11088.x P´ etri, J. 2020, Monthly Notices of the Royal Astronomical Society, 501, 4479–4489, doi: 10.1093/mnras/staa3909 Riley, T. E., Watts, A. L., Bogdanov, S., et al. 2019, The Astrophysical Journal Letters, 887, L21, doi: 10.3847/2041-8213/ab481c Riley, T. E., Watts, A. L., Ray, P. S., et al. 2021, The Astrophysical Journal Letters, 918, L27, doi: 10.3847/2041-8213/ac0a81 Ruderman, M. A., & Sutherland, P. G. 1975, ApJ, 196, 51, doi: 10.1086/153393 Salmi, T., & N¨ attil¨ a, J. 2026, arXiv e-prints, arXiv:2608.22027, doi: 10.48550/arXiv.2608.22027 Salmi, T., Choudhury, D., Kini, Y., et al. 2024, The Astrophysical Journal, 974, 294, doi: 10.3847/1538-4357/ad5f1f 28 Huang et al. M
+
+2.063 +0 .069 
+
+> −0.066
+
+10 15 
+
+> R
+
+R
+
+13 .52 +2 .50 
+
+> −1.22
+
+0.20.3
+
+> u
+
+u
+
+0.224 +0 .024 
+
+> −0.033
+
+50 75 
+
+> αB
+
+αB
+
+79 .9+5 .9
+
+> −14 .4
+
+25 75 
+
+> iobs
+
+iobs 
+
+67 .9+14 .1
+
+> −37 .1
+
+34
+
+> `floor
+
+`floor 
+
+3.29 +0 .83 
+
+> −0.82
+
+−0.50.5
+
+> `T
+
+`T
+
+0.29 +0 .12 
+
+> −0.54
+
+01
+
+> `C
+
+`C
+
+0.11 +1 .16 
+
+> −0.15
+
+0.51.0
+
+> fopen
+
+fopen 
+
+0.22 +0 .62 
+
+> −0.10
+
+−0.50.5
+
+> xs/R
+
+xs/R 
+
+0.17 +0 .41 
+
+> −0.32
+
+−0.25 0.25 
+
+> ys/R
+
+ys/R 
+
+−0.09 +0 .26 
+
+> −0.12
+
+−0.50.5
+
+> zs/R
+
+zs/R 
+
+−0.38 +0 .39 
+
+> −0.27
+
+−2.52.5
+
+> qα
+
+qα
+
+−0.13 +0 .56 
+
+> −3.12
+
+1.8 2.2
+
+M
+
+−0.25 0.25 
+
+> qΛ
+
+10 15 
+
+R
+
+0.2 0 .3
+
+u
+
+50 75 
+
+αB
+
+25 75 
+
+iobs 
+
+3 4
+
+`floor 
+
+−0.5 0.5
+
+`T
+
+0 1
+
+`C
+
+0.5 1 .0
+
+fopen 
+
+−0.5 0.5
+
+xs/R 
+
+−0.25 0.25 
+
+ys/R 
+
+−0.5 0.5
+
+zs/R 
+
+−2.5 2 .5
+
+qα
+
+−0.250 .25 
+
+qΛ
+
+qΛ
+
+−0.07 +0 .37 
+
+> −0.29
+
+Figure 15. Selected parameter posterior distributions for the shifted dipole–quadrupole extension. Contours and titles follow Figure 8. The broad and multimodal quadrupole, fopen , and cap-normalization marginals distinguish the posterior from the nominal-footprint maximum-likelihood point. Physics-Informed Modeling of J0740 29 12 14 16 18 20 
+
+R (km) 
+
+> 1.92.02.12.2
+> M (M )
+
+Mass-radius posterior comparison  
+
+> 15 20
+> R (km)
+> 2.00 2.25
+
+M (M ) 
+
+> 0.15 0.20 0.25
+> u = GM/ (Rc 2)
+> 15 20
+
+R (km) 
+
+> 0.15 0 .20 0 .25
+
+u = GM/ (Rc 2)
+
+Shifted dipole Shifted dipole + quadrupole 
+
+Figure 16. Mass–radius and compactness comparison of the shifted dipole with its quadrupolar extension. The extension preserves the principal shifted-dipole stellar solution but develops a broader high-radius shoulder. 0.5 1.0 1.5
+
+fopen     
+
+> 0123456
+> Posterior density
+> 0.40.60.81.01.2
+
+√Sopen   
+
+> 012340.51.01.5
+
+Sopen 
+
+> 0123456
+
+Shifted dipole Shifted dipole + quadrupole Maximum likelihood 
+
+Figure 17. Open-flux multiplier, equivalent-area radius ratio, and open-footprint area ratio for the shifted dipole and shifted dipole–quadrupole extension. The extension admits a maximum-likelihood point near the nominal footprint, but its marginalized posterior retains substantial weight at contracted footprints. The maximum-likelihood vectors are listed in Table 3. 30 Huang et al. −0.5 0.0 0.5 1.0 1.5
+
+`C = log 10 (C−/C +) 
+
+> 012345
+> Posterior density
+> 10 010 1
+
+C−/C +  
+
+> 0.00.20.40.60.81.01.21.4
+> Shifted dipole Shifted dipole + quadrupole Maximum likelihood
+
+Figure 18. Negative-to-positive-cos θ′ branch temperature-normalization ratios for the shifted dipole and shifted dipole– quadrupole extension. Both have a symmetric mode; the extension also contains a broad high-contrast branch. Taiyebah, F., Kalapotharakos, C., Olmschenk, G., et al. 2026, arXiv e-prints, arXiv:2606.30886, doi: 10.48550/arXiv.2606.30886 Timokhin, A. N., & Arons, J. 2013, MNRAS, 429, 20, doi: 10.1093/mnras/sts298 Watts, A. L., Andersson, N., Chakrabarty, D., et al. 2016, Reviews of Modern Physics, 88, 021001, doi: 10.1103/RevModPhys.88.021001 Wilms, J., Allen, A., & McCray, R. 2000, ApJ, 542, 914, doi: 10.1086/317016 Ye, D., & Chen, A. Y. 2025, Astrophys. J., 995, 179, doi: 10.3847/1538-4357/ae19e5 Zhou, T., & Huang, C. 2026, A&A, 709, A111, doi: 10.1051/0004-6361/202659305

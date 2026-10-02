@@ -1,0 +1,677 @@
+Title: Fast and Flow-rious: Gravitational Wave Background Bayesian Model Comparison using Normalizing Flows and Nested Sampling
+
+URL Source: https://arxiv.org/pdf/2609.38122v1
+
+Published Time: Wed, 30 Sep 2026 02:27:43 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# Fast and Flow-rious: Gravitational Wave Background Bayesian Model Comparison using Normalizing Flows and Nested Sampling 
+
+David C. Wright, 1, ∗ Aaron D. Johnson, 2 Jeffrey S. Hazboun, 1 and William G. Lamb 3
+
+> 1
+
+Department of Physics, Oregon State University, Corvallis, Oregon 97331, USA 
+
+> 2
+
+NASA Marshall Space Flight Center, Huntsville, Alabama 35812, USA 
+
+> 3
+
+Department of Physics and Astronomy, Vanderbilt University, 2301 Vanderbilt Place, Nashville, Tennessee 37235, USA 
+
+(Dated: September 30, 2026) In 2023, pulsar timing array (PTA) collaborations around the world announced evidence for a nanohertz gravitational-wave background (GWB). Beyond increasing the detection significance, the next major goal is to characterize the GWB and identify its source(s). The typical model-comparison metric used in PTA analyses is the Bayes factor (BF). However, BF computation methods used in the PTA literature, such as product-space sampling and thermodynamic integration, are computa-tionally expensive or inefficient if the models compared are dissimilar or non-nested. In this work, we introduce a PTA model-comparison method using a combination of normalizing flows, nested sampling, and a PTA likelihood that is marginalized over all non-GWB parameters. The flows are trained using a newly-developed Python package coppuccino , which learns the data’s copula : the dependence structure after transforming to uniform marginals. We validate the method on both analytic targets and simulated PTA data, recovering the analytic evidence within error bars and achieving an area-under-the-curve (AUC) score of 0.996 when treating the BFs as binary classifiers of the injected models. The result is a method to perform Bayesian model comparison of arbitrary GWB spectral models in minutes on consumer hardware. 
+
+> Keywords: gravitational waves; pulsar timing arrays; gravitational-wave background; Bayesian model com-parison; normalizing flows; nested sampling
+
+I. INTRODUCTION 
+
+In recent years, pulsar timing array (PTA) col-laborations have reported evidence for a nanohertz gravitational-wave background (GWB) at the ∼ 3σ level [1–5]. PTA science is now primarily focused on increasing the significance of the measurement [4, 6, 7] and charac-terizing the GWB [8–10]. An observed nanohertz-frequency GWB may be gener-ated by a population of supermassive black hole binaries [11–14] or by “exotic” cosmological processes, such as inflationary gravitational waves [15, 16] and phase tran-sitions in the early universe [17, 18]. Determining the source of the GWB is the next priority for pulsar timing array science. The statistical characteristics of an astro-physical and cosmological GWB differ with respect to their Gaussianity, isotropy, and polarization, which may be measurable by pulsar timing arrays to distinguish be-tween these two origins [19–23]. However, in this study, we limit ourselves to the fiducial GWB model—a station-ary, isotropic, unpolarized, zero-mean Gaussian Process (GP) [24, 25]. Our methods can be easily extended be-yond these minimal scenarios. The GP is defined by a power spectral density (PSD), which characterizes how the GWB’s power is distributed across frequencies. We call this distribution the “shape” of the PSD, which is typically unique to the GWB source. For example, an astrophysical GWB is expected to gen- 
+
+> ∗wrightd2@oregonstate.edu
+
+erate a double-powerlaw PSD spectrum, where the break (or “turnover”) frequency between each powerlaw is de-termined by astrophysical processes [26]. Constraints on the parameters of a given PSD can then inform the under-lying physics; for example, an inflationary interpretation can already rule out certain models of inflation [9] Therefore, we may potentially distinguish between GWB origins by comparing spectral shapes and their fit to data. This is typically done in the context of Bayesian model comparison , where the Bayes factor (BF) is the metric to compare models. The BF is the ratio of Bayesian evidences ZM for each model M, where the evidence appears in the denominator of Bayes’ theorem, 
+
+p(θ | d, M) = p(d | θ, M) p(θ | M )
+
+ZM
+
+, (1) where ZM = p(d | M ), d is the data, and θ is the set of model parameters. For models M1 and M2, the BF in favor of M1 over M2 is BF M1 
+
+> M2
+
+= ZM1
+
+ZM2
+
+. (2) PTA analyses typically estimate BFs with one of four techniques [27]: (1) product-space sampling [28–30], (2) thermodynamic integration [31], (3) likelihood reweight-ing [32], and (4) computing the Savage-Dickey density ratio [33]. Product-space sampling 1, likelihood reweight-ing, and the Savage-Dickey density ratio directly calcu-lates the BF; we cannot recover the evidence Z from these  
+
+> 1Specifically the version of product-space sampling used in PTA arXiv:2609.38122v1 [gr-qc] 29 Sep 2026
+
+2techniques. These methods rely on the assumption that the posteriors of the two models under consideration are similar or nested. Estimating the BF becomes increas-ingly inefficient when the posteriors diverge (for example, see the discussion in Section 3.3 of Agazie et al. [10]). Thermodynamic integration, on the other hand, calcu-lates the Bayesian evidence for any model under consid-eration at the cost of a large increase in computational demand. There is considerable need for a fast and com-putationally efficient model comparison method that is applicable to any model of interest, especially given the ever-growing GWB model space [9, 18]. Nested Sampling [NS, 34–36] is an algorithm designed to calculate the Bayesian evidence directly. It does so by numerically computing the evidence integral, 
+
+Z =
+
+Z
+
+p(d | θ) p(θ) d θ. (3) The rough outline of the algorithm is as follows: First, define a collection of “live points” ˆθ of size Nlive that spans the prior space. Next, find the likelihood value for all live points and take the minimum likelihood Lmin . Set the evidence estimate for this ith iteration to be 
+
+Zi := Zi−1 +
+
+
+
+exp 
+
+ −(i − 1) 
+
+Nlive 
+
+
+
+− exp 
+
+ −iNlive 
+
+ 
+
+Lmin , i ,
+
+(4) with Z0 = 0, where the bracketed factor is the prior mass enclosed by the shell removed at iteration i. Then, re-place the ˆθmin corresponding to Lmin with a new ˆθnew 
+
+that corresponds to a Lnew > L min . Repeat all steps, other than the initial live-point creation, until the esti-mated evidence remaining in the current live points falls below a user-specified fraction of the accumulated evi-dence Zi. This procedure is equivalent to evaluating the same integral, Eq. (3), as a numerical Lebesgue integral of the un-normalized posterior over enclosed prior mass rather than over the parameters directly. Unfortunately, this algorithm scales poorly with the number of parameters. Adequately covering the prior space requires a number of live points that grows super-linearly, and proposing new live points that satisfy the hard likelihood constraint becomes extremely difficult in high dimensions [37, 38]. For PTAs, this means that NS has so far been limited to simple models containing 
+
+∼ 10 pulsars at most [27] or for noise model selection [39]. To use NS on full arrays of pulsars, we must re-duce the dimensionality of the likelihood. We do this by constructing a PTA likelihood marginalized over all non-GWB processes and training a normalizing flow to act as a fast emulator of this likelihood. A normalizing flow (NF) is a series of bijective trans-formations from a simple base distribution to a complex  
+
+> analyses, known as “hypermodeling.” PTA analyses do not in-clude the “pseudo-prior” term used for proposals in the inactive model. [29, 30]
+
+target distribution [40, 41]. With an NF, sampling from a target distribution is made trivial by sampling from a base distribution and pushing forward . Calculating probabilities under the target distribution is possible by 
+
+pulling back —i.e., by evaluating their probabilities under the base distribution. The goal is to work in the simple base distribution as much as possible by using the NF as a “translation layer” to move us to the target. Given a base distribution B, target distribution T , and bijective mapping 
+
+f : B → T, (5) the probability of a given t ∈ T evaluated in the base is 
+
+pT (t) = pB
+
+ f −1(t) |det ( Jf )|−1 , (6) where Jf is the Jacobian of f . The map f may be com-posed of a chain of operations as long as f remains bijec-tive. We have immense freedom in choosing the opera-tions that constitute f , leading to a plethora of potential NF architectures [42, 43]. In this work, we build f from simple splines and use it to learn the copula density of the posterior (see Section II A). Evaluating pT (t) with Eq. (6) is cheap, and a flow trained on the posterior can stand in for a likelihood that would otherwise be expensive to evaluate repeatedly. In this paper, we train a NF on the free-spectrum pos-terior of a PTA [25] marginalized over all non-GWB pro-cesses and use it as a fast, low-dimensional surrogate like-lihood in the blackjax-ns nested sampler. Our work improves upon the marginalized-likelihood techniques of Lamb et al. [44] by replacing the frequency-independent kernel density estimators with a single flow that cap-tures the correlations between frequencies. NFs have already proven useful in PTA analyses, both for param-eter estimation [45–48] and, recently, for model compar-ison across GWB sources [49]. That model-comparison demonstration was limited to a reduced ten-pulsar ar-ray, the same regime NS can already reach. Because we train our flow on the free-spectrum posterior that is marginalized over all pulsar-specific parameters, the prior-space dimension is set by the number of parame-ters for the GWB model of interest alone, allowing us to carry evidence-based model comparison to the full array.  
+
+> II. METHODS
+
+In this section we describe the computational tech-niques, statistical tools and derivations, and simulation study design used to develop and validate our proposed model comparison method. This section is organized as follows: 
+
+• Section II A introduces coppuccino , the NF soft-ware package we use throughout this study. 
+
+• Section II B describes the process of creating a NF-based likelihood, handling the tails of the distribu-3tion, mathematical guarantees that the Bayes fac-tors are unbiased as compared to traditional likeli-hoods, and how the flow is integrated into a nested sampling routine. 
+
+• Section II C validates our approach on a target where the Bayesian evidence is known in closed form. 
+
+• Section II D outlines the simulation study used to validate our method on realistic PTA data.  
+
+> A. coppuccino
+
+coppuccino is a Python package that uses NFs to estimate a probability density p(x) with x =(x1, x 2, . . . , x d) ∈ Rd given samples from the density function. Once fitted, the model can draw new samples and report the probability density at a given point. cop-puccino is built on top of flowjax [50], a package for producing NFs using JAX .We write the marginal cumulative distribution func-tion (CDF) of coordinate i as Fi and its density as 
+
+pi = F ′ 
+
+> i
+
+. The marginal CDF maps each coordinate xi
+
+to ui = Fi(xi) ∼ U [0 , 1]. After this transformation, all marginals are uniformly distributed, but the dependence structure between these uniform distributions persists. The joint CDF of the uniform marginals is called a cop-ula C and has density c which encodes the dependence structure between the marginals. Sklar’s theorem [51] states that the joint CDF H(x) can be written as 
+
+H(x) = C(F1(x1), . . . , F d(xd)) , (7) and taking a derivative leads to a product of marginals and the dependence structure 
+
+p(x) = c(F1(x1), . . . , F d(xd)) 
+
+> d
+
+Y
+
+> i=1
+
+pi(xi). (8) Instead of fitting the joint distribution with a NF di-rectly, we transform the marginals using their empirical CDF ˆFi(xi) and fit the copula density c. The empiri-cal CDF is computed from the samples and fit with a monotonic rational-quadratic spline. We then use the empirical CDF as a map from the parameter space to the unit cube [0 , 1] d. While the unit cube ideally yields a tractable copula density, we find that the number of parameters in the flow is reduced by transforming to a standard normal. We use the inverse Gaussian CDF to map the uniformly distributed parameters to a standard normal distribution zi = Φ −1(ui). The samples then live on Rd, leaving the dependence structure unbounded. The copula density rarely deviates from Gaussian in problems with weak correlation structure, allowing a small num-ber of parameters to effectively fit it. Working in this parameterization also removes multimodality from the marginals. Fitting proceeds in two stages. First, the marginals are estimated once with a one-dimensional empirical CDF built directly from each parameter’s sorted samples using monotonic rational-quadratic splines and then held fixed. 
+
+n knots are placed at equal intervals spanning quantiles 0 to 1, with n = max (20 , min( nmax , ⌊N/ 3⌋)), where N
+
+is the number of data points and nmax = 200 by default. Within coppuccino , we create a fit to the tails of the distribution; however, in this work, we instead truncate the quantiles at 2% and 98% and fit tails as described in Sec. II B 3. Next, we fit a NF to the copula density, the dependence structure between the Gaussianized marginals, using 
+
+flowjax . We learn the flow, an invertible transforma-tion T with adjustable parameters, from a d-dimensional standard normal base distribution N (0, I d) to the Gaus-sianized posterior z. T is produced through a trainable triangular spline flow architecture. Since T is invertible with a tractable Jacobian, it defines an exact density on 
+
+z through the change of variables, log pZ (z) = log N  T −1(z) | 0, I d
+
+ + log det ∂T −1
+
+∂z , (9) where the second term accounts for the change in volume induced by the transformation. The triangular spline flow is a composition of L iden-tical layers ( L = 6 by default). First, every coordinate is passed through its own monotonic rational-quadratic spline with K knots ( K = 4 by default). These splines are defined on [ −1, 1], so each coordinate is mapped into the interval using a leaky tanh on [ −3, 3] with linear tails. The spline is applied and the mapping is inverted so the layer output again spans the real line. Coordinates falling outside the spline interval are passed through un-changed, leaving the extreme tails undistorted. Because this step acts on each coordinate separately, the Jaco-bian is diagonal. Next, the coordinates are mixed by a lower-triangular affine map z 7 → Az + b. The diag-onal entries of this map are constrained to be positive and the rows are weight-normalized for training stabil-ity. Since A is triangular, log | det A| = P 
+
+> i
+
+log Aii , so each layer’s log-determinant is a sum of d scalar terms rather than a d × d determinant. Finally, there is an un-trained permutation that reorders the coordinates. Since a lower-triangular map cannot allow the first coordinate to depend on others, reordering allows arbitrary param-eter dependence over multiple layers. With these default settings, the flow contains 2548 trainable parameters for 
+
+d = 14. Composing the two stages gives the density of the fitted model in closed form. The marginal map 
+
+zi = Φ −1( ˆFi(xi)) acts on each coordinate separately, so its Jacobian is diagonal and contributes a sum of one-dimensional terms, log ˆ p(x) = log pZ (z) + 
+
+> d
+
+X
+
+> i=1
+
+[log ˆ pi(xi) − log φ(zi)] , (10) 4where ˆ pi = ˆF ′ 
+
+> i
+
+is the estimated marginal density and φ
+
+is the standard normal density. The first term is given by the flow through Eq. (9), and the sum is the Jacobian of the Gaussianization. Because the marginal transforms are held fixed, this sum is independent of the flow pa-rameters, so maximizing the likelihood of the model is equivalent to maximizing the likelihood of the flow on the Gaussianized samples. The flow is trained on the Gaussianized samples by minimizing the negative log-likelihood of the transformed data. We use an Adam optimizer [52] with a learning rate of 1 × 10 −3. Training is performed on 90% of the data with 10% held out as a validation set. We train for a maximum of 400 epochs where each epoch consists of one complete pass over the training data, where the data are used in mini batches of 100 samples at a time. If after 30 consecutive epochs of training, the validation loss has not improved, the training stops and the parameters from the best epoch, by validation loss, are used. Put simply, coppuccino splits the density estimation into two pieces that are easier to solve separately than together. The marginals are estimated directly from the sorted samples so that part of the fit requires no training at all. The flow is left with only the dependence structure to learn. A flow fit to the joint density must capture the same dependence, but it must also learn the marginals too, which can require many more parameters when the marginal shapes are complicated.  
+
+> B. Flow-accelerated nested sampling
+
+The main purpose of our method is to construct a low-dimensional, computationally-inexpensive PTA like-lihood that is ideal for NS. This is in contrast to tra-ditional PTA likelihoods that are high-dimensional and computationally expensive. We accomplish this by train-ing an NF on posterior samples of a PTA free-spectrum likelihood (marginalized over non-GWB parameters) and using the flow as a fast likelihood emulator in a nested sampler.  
+
+> 1. PTA free-spectrum analysis
+
+A PTA analysis models the timing residuals δt as a zero-mean Gaussian process, so the likelihood is a multi-variate Gaussian (Eq. 16) whose covariance is the sum of a deterministic timing model, per-pulsar white and red noise, and a common process shared across pulsars that carries the GWB. The red-noise and GWB contributions are represented in a Fourier basis at the frequencies fi
+
+defined below, so the GWB enters the likelihood only through the power it contributes at each fi. We refer the reader to Johnson et al. [27] for a complete description of the PTA likelihood and its implementation. Starting with a PTA data set, we first run a free-spectrum analysis [25], which models the GWB power at each fi without assuming a spectral shape. We define Nf
+
+frequencies with the ith -frequency given by fi = i/T total ,where Ttotal is the total time-span of the PTA dataset. The PSD of the free-spectrum process is then 
+
+S(fi, ρ) = δij ρ2
+
+> j
+
+∆fj
+
+. (11) In words, the PSD evaluated at the ith -frequency is pro-portional to the ith -component of the amplitude vector 
+
+ρ, squared. Under the assumption that the GWB is a zero-mean GP with variance ρ2, the free-spectrum analysis then gives us a posterior on that variance. This variance is the expected power in the GWB over an ensemble of universes. The free-spectrum is useful because it is agnostic to any specific spectral shape, i.e., it is agnostic to the source(s) of the GWB. As long as the source is also a GP, the free spectrum contains it as a nested sub-model. We can then use the free-spectrum posteriors on the PSD parameters 
+
+ρ as a marginalized and compressed version of the PTA likelihood, an approach pioneered in Lamb et al. [44].  
+
+> 2. The surrogate likelihood
+
+To construct a likelihood from the free-spectrum pos-teriors, we first write down the relationship between the posterior and the likelihood using Bayes’ theorem, 
+
+p(ρ | δt ) = p(δt | ρ) p(ρ)
+
+Zfs 
+
+, (12) where δt contains the observed timing residuals. Up to a normalizing constant, the posterior is equal to the like-lihood times the prior. The likelihood p(δt | ρ) here is already marginal-ized over every non-GWB parameter. The free-spectrum MCMC samples the joint posterior over the amplitudes 
+
+ρ and all other parameters η, and we keep the marginal in ρ:
+
+p(ρ | δt ) = 
+
+Z
+
+p(ρ, η | δt ) d η, (13) = p(ρ)
+
+Zfs 
+
+Z
+
+p(δt | ρ, η) p(η) d η, (14) 
+
+∝ p(δt | ρ), (15) where Zfs is the evidence of the free-spectrum model, and we drop the prior term p(ρ) in Eq. (15) because it is a constant, Uniform prior 2. We sample η from its poste-rior, but marginalizing the joint posterior over η is the      
+
+> 2This method does not require Uniform priors. If non-Uniform priors on ρare used, then we must carry around the p(ρ) term, a trivial extension of the method.
+
+5same as integrating the likelihood against the prior p(η), as seen in Eq. (13). Eq. (15) gives us the marginalized PTA likelihood that depends only on ρ, and it is directly proportional to the posterior p(ρ | δt ). We can therefore use the posterior density as a surro-gate for the marginalized likelihood. To do so, we need a way to evaluate the posterior probability of a given ρ.We train a normalizing flow on the posterior p(ρ | δt )using coppuccino , which gives us a fast, accurate way to evaluate posterior probabilities and to draw posterior samples. 
+
+3. Taming the tails 
+
+The flow is an accurate surrogate likelihood inside the support of its training samples. However, the nested sam-pler will routinely query it outside the training data be-cause the live points span the entire prior, which is often wider than the posterior. Extending our likelihood surro-gate into these regions can be tricky and requires close at-tention. Previous methods [44] appended a constant like-lihood beyond the support of the training data—holding the likelihood at its boundary value. Here, we improve upon this method by exploiting our knowledge of the asymptotic behavior of the PTA free-spectrum likelihood as ρ → 0 and ρ → ∞ .At high power, the PTA likelihood decays exponen-tially. Conversely, at low power, it plateaus at the noise floor. We can read this off directly from the Gaussian form of the PTA likelihood: 
+
+p(δt | θ) = N (δt | 0, C (θ)) , (16) where δt are the timing residuals and C (θ) is the co-variance matrix as a function of the free parameters. The GWB parameters enter Eq. (16) only through the covari-ance, while the observed residuals stay fixed. Therefore, both limits follow from how C depends on ρ.We adopt the notation of Johnson et al. [27] and write 
+
+C = N + T BT T . Here N is the white-noise covariance, and T = [ M F ] collects the timing-model design ma-trix and the Fourier basis. The prior covariances for the timing model and the Fourier-coefficient covariance are contained in the block-diagonal matrix B. We assume an improper prior on the timing model covariance such that its entries go to zero in B−1. Therefore, we are only interested in the non-timing-model portions of B, with block diagonal entries given by [ϕ](ai )( bj ) = δij (δab φai + Γ ab Φi) , (17) where the intrinsic red noise of pulsar a at frequency i is 
+
+φai , the overlap reduction function Γ ab equals δab for the common, uncorrelated red-noise (CURN) process we fit, and the common power in bin i is Φ i = S(fi)∆ f = ρ2 
+
+> i
+
+.Two pieces of the log-likelihood depend on ρi: the quadratic form − 12 δt T C−1δt and the log-determinant 
+
+− 12 log det C. For the determinant, the matrix determi-nant lemma gives log det C = log det N + log det B − log det Σ, (18) where Σ =  B−1 + T T N −1T −1. As ρi → ∞ , log det B
+
+grows as 4 Npsr log ρi, where the extra factor of two comes from the sine and cosine components both modeled by ρi.In the same high-power limit, Σ and the quadratic form become independent of ρi, so log det B is the only term that still grows. Because the log-determinant en-ters the log-likelihood as − 12 log det C, and assuming a vanishing covariance with this high-power mode, the log-arithmic derivative of the log-likelihood with respect to this mode is then 
+
+∂ log p(δt | ρi)
+
+∂ log ρi
+
+= −2Npsr , (19) and this holds for all non-singular Γ 3. In the opposite limit as ρi → 0, Φ i falls below φai , and ϕ then depends only on the intrinsic red noise. Neither C nor the likeli-hood changes further, so the lower tail plateaus. The upper tail approaches Eq. (19) only asymptoti-cally, and near the edge of the training data the decay is much shallower. Rather than impose the asymptotic slope directly at the edge of the training data, we freeze all nuisance parameters at their posterior medians and explore the behavior of each bin’s upper tail with the full likelihood. Because the covariance is a sum of non-negative variances, increased common power cannot be entirely canceled by the per-pulsar noise. This justifies holding the nuisance parameters constant, as they do not significantly affect the likelihood in this high-power regime. We evaluate the likelihood on a grid of ρi’s out to two dex (path sampling, [53]), interpolate during excursions above the training data, and continue along Eq. (19) be-yond the training data. Fig. 1a validates this prescription against the exact marginal found by NUTS [54] sampling the full likelihood while holding ρi constant at each grid point. We choose to use this frozen upper tail instead of the exact marginal for computational savings in our large-scale study. However, the full marginal is prefer-able for production-level results. For the lower tails, our treatment depends on whether the bin is noise-dominated. If it is, the sampler will                                           
+
+> 3In general the slope is −2 rank( Γ) rather than −2Npsr .The
+> ρi-dependent block of Bis D+ Φ iΓ,with D=diag( φai )the intrinsic red noise. We can whiten the correlation matrix as D−1/2ΓD−1/2,whose eigenvalues we call μk.Then, B
+> is D1/2(I+ Φ iD−1/2ΓD−1/2)D1/2.Taking the determinant and using det( AB ) = det Adet Bgives det DQ
+> k(1 + Φ iμk) for det B.Differentiating with respect to log ρitherefore picks up only the rank( Γ) terms with μk̸= 0, each approaching 2 as Φi→ ∞ and picking up an extra factor of 2 for the sine and cosine components. Both Γ=Iand the Hellings-Downs matrix are full rank for distinct sky positions, so the slope is the same in both cases.
+
+6explore the noise floor, and the surrogate is adequate. Signal-dominated bins, however, will never sample the noise floor. The decrease in probability from the edge of the training data to the noise floor is the penalty a model pays for predicting power well below the level the data support, and it must be properly characterized for reliable model comparison. Unlike the upper tails, we cannot hold the nuisance parameters at their posterior medians. In the lower tails, the nuisance parameters can “inflate” to make up for low common-process power, so they are strongly covariant with ρ.For each of the signal-dominated bins, we again define a grid of ρ’s extending two dex below the training data and marginalize over the nuisance parameters numeri-cally. We utilize Fisher’s identity (see Eq. (5.12) of [55]) to relate the gradient of the marginalized log-likelihood to the expected gradient of the full log-likelihood over the posterior of the nuisance parameters η:d log p(δt | ρi)dρi
+
+=
+
+ ∂ log p(δt | ρi, η)
+
+∂ρ i
+
+ 
+
+> p(η|ρi,δt )
+
+. (20) To acquire posterior samples, we hold the signal-dominated bin’s ρi constant on the grid and allow all other parameters to vary during a NUTS run, and eval-uate the gradients cheaply by automatic differentiation. Integrating Eq. (20) gives the change in likelihood be-tween grid points, which we interpolate between. Below the grid for signal-dominated bins and the training data of the noise-dominated bins, we hold the likelihood value constant, having assured ourselves that the grid or the training data extend to low enough power such that the likelihood has reached the noise floor. In order to avoid edge-effects, the boundaries that we splice our tails onto, [ ρlo  
+
+> i
+
+, ρ hi  
+
+> i
+
+], are the 2% and 98% quan-tiles of the training data. Outside these bounds, we clip 
+
+ρi to the nearest boundary, evaluate the flow there, and add the change in log-likelihood measured along that bin’s profile between the edge and the requested value. Define the following operation to restrict a given ρ within the training data’s [ ρlo  
+
+> i
+
+, ρ hi  
+
+> i
+
+], clip( ρ) = min  ρhi , max  ρlo , ρ . (21) The final surrogate log-likelihood is then log p (δt | ρ) = log q (clip( ρ)) + X
+
+> i
+
+[log p(δt | ρi) − log p(δt | clip( ρ))] ,
+
+(22) where q is the flow density and the clip acts component-wise. Each difference vanishes for a bin inside the defined boundaries, so the tails inherit the flow’s own constant offset rather than introducing one of their own. Summing the per-bin corrections in Eq. (22) treats si-multaneous excursions into the tails as independent. For the upper tail, this is treatment is well justified because the common power dominates the variance, leading to 0.0 0.5 1.0 1.5 2.0
+
+−400 
+
+−200 0∆ log  L (nats)  (a) 
+
+> asymptotic slope frozen (used) exact marginal
+
+0 1 2 3 4 5 6∆ log 10 ρi above ρhi  
+
+> i
+
+(dex) 0.00.51.0slope  / 2Npsr 
+
+(b)        
+
+> signal bins bin in (a) asymptote grid cutoff (2 dex)
+> FIG. 1. Upper-tail behavior above the trusted-region edge
+> ρhi
+> i, for a power-law realization. (a) Profile for one signal-dominated bin. Freezing the nuisance parameters at their posterior medians (solid) tracks the exact marginal profile from NUTS and Fisher’s identity (dashed). The asymptotic slope of Eq. (19) (dotted) is far steeper than the profile here, which is why we measure the profile rather than impose the asymptote from the boundary. (b) Local slope of the frozen profile in units of the predicted asymptote, for every signal-dominated bin, on a grid extending well beyond the range of panel (a). The magnitude of the slope in each bin converges to 2 Npsr .
+
+Eq. (19). For the lower tail, it is an approximation be-cause the nuisance parameters that can absorb the miss-ing power often influence multiple bins at once. Thus, we verify the full scheme numerically in Section III C.  
+
+> 4. Sampling the models
+
+Now that we have a likelihood surrogate that is well-behaved everywhere, we can supply it to a NS code. We use blackjax-ns : a recently developed algorithm from Yallup et al. [56] based on the blackjax Bayesian-inference library [57]. This variant of NS is written in 
+
+JAX [58], which enables easy GPU acceleration, au-tomatic vectorization, and interoperability with JAX ’s growing scientific-computing ecosystem. blackjax-ns 
+
+uses JAX to update its live points in parallel , giving a large speedup compared to other NS codes and making especially effective use of GPU acceleration. This sam-pler gives us posterior constraints and evidences in min-utes on consumer hardware. To test new models with the likelihood surrogate and 7
+
+blackjax-ns , we construct a hierarchical model on the free-spectrum parameters ρ. First, we choose model(s) 
+
+M with parameters θ. Then, the hierarchical model is 
+
+p(ρ, θ | δt , M) ∝ p(δt | ρ) p(ρ | M , θ) p(θ | M ) , (23) where p(δt | ρ) is our NF likelihood surrogate. Note that p(ρ | M , θ) is a Dirac-delta function under the Gaussian GWB assumption: it is zero everywhere ex-cept at ρ = M(θ), where M(θ) denotes the evaluation of model M’s spectrum with parameters θ. The model 
+
+M may be a single source or a compound model whose PSD is the sum of several component spectra, e.g. a cos-mological background in conjunction with an astrophys-ical background from supermassive black hole binaries. In that case θ collects the parameters of every compo-nent and M(θ) returns their summed power. The delta-function relation ρ = M(θ) is unchanged, so compound models require no special treatment. Therefore, we never need to sample ρ . We instead equivalently calculate ρ = M(θ) and evaluate the prob-ability for that ρ with the likelihood surrogate. Then, rewriting Eq. (23) with this notation and simplifying leads us to 
+
+p(ρ, θ | δt , M) ∝ p(δt | ρ) δ(ρ − M (θ)) p(θ | M ). (24) To compare two models Mi and Mj , we run the nested sampler for each and gather their evidences. The Bayes factor is then just the ratio of evidences or the difference of their logarithms, log 10 BF Mi 
+
+> Mj
+
+= log 10 ZMi − log 10 ZMj . (25)  
+
+> 5. Marginalization leaves the Bayes factor invariant
+
+Using this marginalized likelihood in place of the full one does not change the Bayes factor. To see this, we will build a hierarchical model as in the previous section on ρ
+
+with parameters θ and use a typical PTA free-spectrum likelihood. We partition the parameters of a model M
+
+into the GWB-related parameters θ, the free-spectrum parameters ρ, and all other parameters η.The evidence for a model M is 
+
+ZM =
+
+Z Z Z 
+
+p(δt | ρ, θ, η, M) p(ρ, θ, η | M ) d ρ dθ dη .
+
+(26) In all realistic PTA models, there is no conditional prob-ability between ρ and η or θ and η, but there is condi-tional dependence of ρ and θ. The parameters θ together with the PSD of model M predict a set of free-spectrum parameters ρ: this is the hierarchical part of our model. Therefore, 
+
+p(ρ, θ, η | M ) = p(θ | ρ, M) p(ρ) p(η) , (27) where the free-spectrum prior p(ρ) and the nuisance prior 
+
+p(η) carry no dependence on M. Eq. (26) then becomes, 
+
+ZM =
+
+Z Z Z 
+
+p(δt | ρ, θ, η, M) p(θ | ρ, M) p(ρ) p(η) d ρ dθ dη . (28) A PTA free-spectrum likelihood, however, does not de-pend on the parameters θ or the choice of model M—it only depends on ρ (and the nuisance parameters η). Thus, we may drop θ and M from the likelihood term as there is no conditional dependence: 
+
+p(δt | ρ, θ, η, M) = p(δt | ρ, η). (29) Then, using Eq. (29) together with Bayes’ theorem, we may rewrite Eq. (28) as 
+
+ZM = Zfs 
+
+Z Z Z 
+
+p(ρ, η | δt ) p(θ | ρ, M) d ρ dθ dη . (30) Integrating over η leaves us with, 
+
+ZM = Zfs 
+
+Z Z 
+
+p(ρ | δt ) p(θ | ρ, M) d ρ dθ , (31) where p(ρ | δt ) is the density our coppuccino flows learn. To integrate over ρ, we expand the conditional p(θ |
+
+ρ, M) with Bayes’ theorem. The forward map is deter-ministic: model M with parameters θ predicts a single free spectrum ρ = M(θ), where M(θ) denotes the eval-uation of model M’s spectrum at parameters θ. Thus, 
+
+p(ρ | θ, M) is a Dirac delta and 
+
+p(θ | ρ, M) = p(ρ | θ, M) p(θ | M )
+
+p(ρ) , (32) = δ (ρ − M (θ)) p(θ | M )
+
+p(ρ) . (33) Substituting into Eq. (31) and integrating the delta over 
+
+ρ gives 
+
+ZM = Zfs 
+
+Z p(M(θ) | δt ) p(θ | M )
+
+p(M(θ)) dθ , (34) = Zfs 
+
+c
+
+Z
+
+p(M(θ) | δt ) p(θ | M ) d θ , (35) where the Uniform free-spectrum prior p(ρ) = c.When comparing models using the Bayes factor, the 8constant factor Zfs /c cancels 4:BF M1 
+
+> M2
+
+= ZM1
+
+ZM2
+
+, (36) = Zfs /c R p(M1(θ) | δt ) p(θ | M 1) d θ
+
+Zfs /c R p(M2(θ) | δt ) p(θ | M 2) d θ , (37) =
+
+R p(M1(θ) | δt ) p(θ | M 1) d θ
+
+R p(M2(θ) | δt ) p(θ | M 2) d θ . (38) For each model M, Eq. (38) is the exact integral we compute with our method. Therefore, our method is an-alytically equivalent to the full PTA evidence, and the only differences must come from the flow fidelity, inex-actness of the nested sampling algorithm, or treatment of the tails. 
+
+C. Validation on an analytic target 
+
+To validate our method, we apply it to a target whose evidence we know analytically: a ten-dimensional Gaus-sian. We use a standard multivariate Gaussian, so the likelihood is simply the standard-normal probability den-sity function (PDF). NS requires that we specify a prior range for the parameters of our likelihood, and we choose a uniform prior over the hypercube bounded by −5 to 5 in each dimension. This choice makes the evidence integral a simple dif-ference of the standard-normal CDF evaluated at the bounds, and the likelihood factorizes over the dimensions because the covariance is diagonal, 
+
+Z =
+
+Z 
+
+> [−5,5] D
+> D
+
+Y
+
+> i=1
+
+N (xi | 0, 1) p(xi) d xi =
+
+ Φ(5) − Φ( −5) 10 
+
+D
+
+,
+
+(39) where D = 10, Φ is the standard normal CDF, and 
+
+p(xi) = 1 /10 is the uniform prior density on [ −5, 5]. With the analytic evidence in hand, we turn to nested sampling (Fig. 2). Our first test case uses the Gaussian PDF directly as the likelihood. The nested sampler re-turns a mean and standard deviation of the log evidence, and it recovers the analytic value within one standard deviation. Next, we use the trained coppuccino flow as the likelihood in the NS. Again we recover the ana-lytically integrated evidence within one standard devia-tion, and the result is unbiased relative to the Gaussian-PDF test case. Taken together, these tests show that our method introduces no inherent bias or loss of accuracy.               
+
+> 4If instead M1and M2correspond to different overlap reduction functions (ORFs) Γ 1and Γ 2, the constant factor no longer re-duces to the identity. The constant prior term will still cancel, but we must multiply Eq. (38) by a pre-factor of Zfs ,Γ1/Zfs ,Γ2.This is simply the Bayes factor for ORF Γ 1over Γ 2using a free-spectrum model. Additionally, models assuming a specific ORF must use a likelihood surrogate produced assuming the same ORF.
+
+analytic integral NS (analytic) NS (flow) 
+
+−23 .1
+
+−23 .0
+
+−22 .9log  Z   
+
+> log Z: mean ±std. from NS.
+
+FIG. 2. Evidence validation on a ten-dimensional Gaussian target. We sample a standard multivariate Gaussian with a uniform hypercube prior on the ten-dimensional random vec-tor xi ∼ U (−5, 5) for i ∈ [1 , 10] . The analytic integral is easily found by the difference of the CDF at the prior bounds, and it factorizes over dimension. NS using the analytic Gaussian PDF and a coppuccino flow trained on target samples both recover the analytic log Z (dashed). The flow likelihood in-troduces no detectable evidence bias. 
+
+D. Simulation study design 
+
+Fig. 3 summarizes the full simulation study, which we now describe in detail. 
+
+1. Choosing injection parameters 
+
+We begin by sampling parameters from the prior space of two models: a power law and a log-normal (which we will refer to as “Gaussian”). The PSDs of these models in units of s 3 are PSD i, PL = A2
+
+12 π2f 3
+
+> yr
+
+ fi
+
+fyr 
+
+−γ
+
+, and (40) PSD i, Gauss = A2
+
+12 π2f 3
+
+> yr
+
+exp 
+
+
+
+−
+
+
+
+log 
+
+ fi
+
+> fpeak
+
+ 2
+
+2σ2
+
+ , (41) where the subscript denotes evaluation at the ith fre-quency. These models are specifically chosen as repre-sentatives of two signal classes: signals of astrophysical or cosmological origin. The power law is the benchmark PSD for a GWB produced by a collection of supermas-sive black hole binaries (SMBHBs) [59]. This is a simple model, but it is the one used in all GWB “detection” pipelines. The log-normal represents a GWB sourced by scalar-induced gravitational waves (SIGWs). SIGWs are produced by modified scalar power spectra that result from modified expansion histories in the early universe [60, 61]. As seen in Table I, the “injection” prior space is more narrow than the “recovery”. We deliberately made this 9
+
+Sample model priors and target SNR ∈ [3 , 8] 
+
+Simulate PTA 
+
+> iterate towards target SNR
+
+Free-spectrum MCMC 
+
+> NUTS
+
+Train 
+
+coppuccino flow   
+
+> p(ρ|δt )
+
+Nested sampling   
+
+> using flow evidence log ZM
+
+Bayes factor       
+
+> log BF M1
+> M2=log ZM1−log ZM2
+> ×2
+
+FIG. 3. Flow chart showing simulation study pipeline. We begin by drawing a target SNR, sampling from the models’ prior spaces, and injecting a signal using those parameters. The SNR of the injected signal most likely will not match the target, so we iterate on the signal injection as described in Section II D 2. After achieving the desired SNR, we run a PTA free-spectrum analysis and train a coppuccino flow on the resulting posterior. This flow is then used in the blackjax-ns 
+
+nested sampler to produce Bayesian evidences used for model comparison. Parameter Injection prior Recovery prior log 10 AP L Uniform(-15.0, -13.5) Uniform(-18, -11) 
+
+γP L Uniform(2.0, 6.0) Uniform(0.0, 7.0) log 10 AGauss Uniform(-14.0, -10.5) Uniform(-17, -10) log 10 fpeak, Gauss Uniform(-8.45, -8.05) Uniform(-8.55, -8.0) 
+
+σGauss Uniform(0.3, 0.6) Uniform(0.3, 1.0) TABLE I. Table of parameters used to build simulated PTA datasets and run inferences. The injection and recovery priors are not identical because we wish to simulate signals that are 
+
+distinct . There are pathological regions of parameter space where these models are indistinguishable, e.g. σGauss ≫ 1. 
+
+choice to keep the models near regimes where they are genuinely distinguishable. Our study’s purpose is to prove the efficacy of our method when we know the mod-els are separable. It is not meant to explore the areas of parameter space where the models can emulate one another and become indistinguishable. A study using parameters in those regimes does not strictly test the capabilities of our new method: even a perfect classifier would produce order unity Bayes factors if the models are degenerate with each other (modulo Occam penalty). 5    
+
+> 5The question of “when is a cosmological model detectable over a power law” is nonetheless an interesting and important one. It will be explored in an upcoming work by Lamb et al. [62].
+
+2. Tuning the SNR 
+
+After sampling model parameters from the injection priors, we also pull a target SNR ∈ [3 , 8] that mimics the range of current PTA SNRs [4]. The model parameters that we sampled are highly unlikely to match that target SNR, so we iteratively move towards the target SNR by resampling the amplitude parameter only. Assume we first sample an amplitude parameter A0
+
+that gives SNR 0 in combination with the other GWB pa-rameters and constant noise. The SNR is approximately SNR 0 ≈ A0/noise , (42) for a given signal amplitude A. For our sampled param-eters, there is an A1 that gives the target SNR 1. Then, constructing the same ratio as Eq. (42) and equating, we can solve for A1 in terms of A0 and the two SNRs: 
+
+A1 ≈ SNR 1
+
+SNR 0
+
+A0. (43) However, this relationship is not perfect, and we will most likely not reach the target SNR in one go. There-fore, we iterate this relationship a number of times, re-placing A0 and SNR 0 with the current amplitude and SNR each time. Once our current SNR is within 0.5 of the target SNR or the relative error is less than 5%, we cease iterating and save the amplitude value. 
+
+3. Using the likelihood as a generative model 
+
+Next, we simulate timing residuals by treating the like-lihood as a generative model. Once we have defined the probability of the data given parameters (the likelihood), we can sample data from that distribution conditioned on the parameters. We build an HD-correlated likelihood in discovery 
+
+mimicking that of the NANOGrav 15yr flagship analysis [1]. The likelihood setup requires times of arrival, timing model design matrices, and pulsar sky positions, which PTA codes have begun storing in the Apache Feather file format [63]. The discovery GitHub repository [64] contains the NG15yr data [65] stored in this format, and we use this data as the basis of our simulations. Given the data in this format, we construct a PTA likelihood and use it to simulate timing residuals. This is possible because the PTA likelihood is a Gaussian likeli-hood on the residuals with covariance given by our mod-eled processes. To simulate residuals, we sample from this zero-mean, multivariate Gaussian where the covari-ance matrix is constructed from the sampled GWB pa-rameters and maximum a posteriori estimates of the noise parameters. As mentioned previously, we choose two representative GWB models: a power law and a log-normal. For each model, we simulate fifty independent realizations follow-ing the procedure described above. 10  
+
+> 4. Calculating the Bayesian evidences
+
+With the simulated data in hand, we produce a flow-based likelihood-surrogate, as described in Section II B, for each simulation. Then, to acquire Bayesian evidences and parameter posteriors, we run NS with blackjax-ns .The output of blackjax-ns gives us the log Bayesian ev-idence, log Z, and posterior samples. We run NS using a power law and a log-normal model for each simulation, giving us 200 NS runs total. As a cross-check on the ev-idence calculation, we run NUTS on the full PTA likeli-hood and estimate the evidence with a learned-harmonic-mean estimator [66], an independent check that does not use the surrogate. Then, to ensure that our surrogate returns the same parameter constraints as a typical PTA likelihood, we compare to the NS+surrogate posteriors. After we have completed our NS runs and cross-checks, all that remains is to calculate the Bayes factors. For each simulation, we calculate the Bayes factor for power law over the log-normal using the stored log evidences, log 10 BF PL Gauss = log 10 ZPL − log 10 ZGauss . (44)   
+
+> III. RESULTS A. Flow quality on free-spectrum posteriors
+
+Before turning to the model-comparison results, we first ensure that our flows accurately capture the free-spectrum posterior. We quantify the fidelity with a classifier two-sample test (C2ST) [67, 68] with scikit-learn [69]. We train a gradient-boosted classifier to dis-tinguish flow samples from free-spectrum MCMC sam-ples and report its cross-validated accuracy in Fig. 4. The interpretation of the accuracy is as follows: a value of 0 .5 means the two sample sets are indistinguishable, while 1 .0 means they are trivially separable. We anchor the scale with four comparisons against the free-spectrum chain. As null test-case, two independent halves of the same free-spectrum chain are only weakly distinguishable (median accuracy 0 .54), reflecting finite-sample noise alone. The flow sits at this null (median accuracy 0 .51): a classifier cannot separate flow draws from true posterior draws any better than it can sepa-rate the posterior from itself. By contrast, destroying the inter-frequency correlations by independently permuting each bin ( shuffled ) raises the accuracy to 0 .57, and a ran-dom distribution over the matched support is trivially separated ( random , median accuracy 0 .97). The flow is therefore indistinguishable from the free-spectrum poste-rior: its accuracy distribution overlaps the free-spectrum 
+
+null and straddles the 0 .5 line. The shuffled control sits only modestly above the null because the test is a in-sensitive to correlation structure, as noted above, so we examine the cross-bin correlations the flow must preserve directly below. free-spectrum flow shuffled random 0.50.60.70.80.91.0C2ST accuracy 
+
+powerlaw gaussian        
+
+> FIG. 4. Fidelity of the flow to the free-spectrum poste-rior, measured by a classifier two-sample test (C2ST). We train a gradient-boosted classifier to distinguish two sample sets. Its accuracy (left axis) is 0 .5 when the sets are in-distinguishable and 1 .0 when trivially separable. Each split violin is the distribution over all 50 realizations per model (power law left/blue, Gaussian right/red), overlaid with a sina point cloud with black tick marks showing the median. We show four comparisons against the free-spectrum chains: “free-spectrum”, two independent halves of the same chain; “flow”, the coppuccino flow against the chain; “shuffled”, the chain against a copy with each frequency bin indepen-dently permuted (marginals preserved, cross-bin correlations destroyed); and “random”, the chain against a uniform dis-tribution over the matched per-bin support. The flow is indistinguishable from the posterior: its violin overlaps the free-spectrum control and contains the 0 .5 “indistinguishable” line. Destroying correlations or substituting a random distri-bution is readily detected, confirming both the flow’s fidelity and the C2ST’s sensitivity to the different distributions.
+
+We examine the inter-frequency correlations more di-rectly with a Spearman rank-correlation plot (Fig. 5 and 6), where we mask out the diagonal to make the inter-frequency correlations apparent. The difference be-tween the flow and free-spectrum-posterior correlations is near zero, with an RMS of 0 .01, showing that the flows accurately recover the inter-frequency correlations.  
+
+> B. Parameter recovery and calibration
+
+Next, we show that the flow-accelerated NS recovers the same parameter constraints as a traditional PTA analysis. To do so, we construct calibration plots for both of our models. Typically, one would create a probability– probability (P–P) plot, the standard simulation-based-calibration check in which one shows the fraction of times that a parameter is recovered within a given highest-density interval. Equivalently, this is the empirical CDF of the posterior quantiles (the probability-integral-11 −0.25 0.00 0.25 Spearman  ρ free-spec. flow diff. 
+
+-0.03 0.00 0.03 ∆ρ
+
+FIG. 5. Cross-bin correlation structure for a representa-tive power law realization. We use Spearman’s correlation to capture any monotonic correlations. The free-spectrum pos-terior is shown on the left, the flow in the middle, and their difference to the right. We mask out the diagonals (they are identity) such that the off diagonal scale is dominant. The free-spectrum and flow panels share a color scale. The differ-ence is roughly an order of magnitude smaller and is shown on its own expanded scale with a distinct colormap. The flow reproduces the joint-correlation structure, not just the marginals. Across all realizations the flow matches the chain’s off-diagonal Spearman correlations with RMS 0 .01. −0.10.00.1Spearman  ρ free-spec. flow diff. 
+
+-0.02 0.00 0.02 ∆ρ
+
+FIG. 6. Cross-bin correlation structure for a representative Gaussian realization. The setup and visualization scheme are the same as Fig. 5. As in Fig. 5, the RMS of the off-diagonal Spearman correlations is 0.01. 
+
+transform values), which is diagonal when the method is calibrated and the injections are drawn from their pri-ors. In our case, however, we are comparing two methods recovering the same parameters, and we do not draw uni-formly from the prior. We therefore construct a variant of this plot where we show the difference between the curves that the two methods would produce. If the methods agree on their calibration, this difference should be iden-tically zero. There is, however, inherent Monte Carlo er-ror in this process. To show the deviations from zero that could arise entirely from Monte Carlo error, we construct bands following the prescription of S¨ ailynoja et al. [70]. These bands mark the one-, two-, and three-sigma re-gions of deviation from zero consistent with Monte Carlo error alone. Both calibration figures (Fig.s 7 and 8) show that the difference lies near zero and entirely within the 1σ band, implying that our method is identical in cal-ibration to the traditional analysis and that we recover the same posteriors. 
+
+C. Aggregate model selection 
+
+Finally, we turn our attention to the results of the model comparison itself. For each simulation we have a 0.0 0.2 0.4 0.6 0.8 1.0credible level 
+
+−0.4
+
+−0.20.00.2∆ coverage    
+
+> log 10 Aγ
+> 3σ2σ1σ
+
+FIG. 7. Calibration of the flow-accelerated nested sam-pling against a full-likelihood, traditional MCMC run using the power law model. Each line is the difference of the two empirical coverage curves (flow+NS − traditional) for one pa-rameter. A difference consistent with zero means the surro-gate is as calibrated as the traditional inference. The shaded bands are simultaneous 1 σ/ 2σ/ 3σ envelopes for the hypothe-sis that the deviations from zero are Monte Carlo error [70]. To construct the bands, we create two populations of sam-ples from U(0 , 1), find their ECDFs, and take their difference. We repeat this process 2000 times and draw the 1, 2, and 3 σ
+
+regions as the bands wide enough to contain that fraction of the difference curves in their entirety. 0.0 0.2 0.4 0.6 0.8 1.0credible level 
+
+−0.20.00.2∆ coverage     
+
+> log 10 Alog 10 fpeak σ, SD 3σ2σ1σ
+
+FIG. 8. As Fig. 7, for the Gaussian injection parameters. 
+
+log-evidence for both models, giving us 200 log-evidences in total. From each pair, we form the Bayes factor in favor of the power law: log 10 BF PL Gauss (Eq. 44). This should be positive for the power-law (“PL”) injections and negative for the log-normal (“Gauss”) injections. To cross-check our results, we compare against an ev-idence estimate built from the full PTA likelihood, by-passing the surrogate entirely. For each simulation we run NUTS on the full PTA likelihood for both test mod-els. Then, we estimate each model’s evidence from those posterior samples with a learned harmonic-mean esti-mator [66], using a temperature-scaled Gaussian as the internal importance density. Because this uses the full 12 −20 0 20 40 log 10 BF PL Gauss (full likelihood) 
+
+−20 020 40 log 10  BF PL Gauss  (NS) 
+
+> truth: powerlaw truth: gaussian
+
+−5 0 5NS − full    
+
+> FIG. 9. NS log 10 BF PL Gauss versus an independent learned-harmonic-mean estimate on NUTS-sampled posteriors, with residuals in the right-hand panel. The difference between the NS results and the learned harmonic mean have a mean of -0.18 and standard deviation of 1.62.
+
+likelihood rather than our flow surrogate, it is an inde-pendent check of our NS Bayes factors. We plot the two against each other in Fig. 9. If they agree, they should lie along the diagonal. That is indeed what we see, confirm-ing that the Bayes factors recovered from our surrogate-based NS are in agreement with those of the full PTA likelihood. Moreover, in Section III B we show that our surrogate recovers the same posteriors as the full PTA likelihood. The surrogate Bayes factor also equals the full-likelihood Bayes factor, which we show analytically in Section II B 5. The only limit on this equality is the fidelity of the flow, which we test in Section III A. We also plot the full distribution of Bayes factors with Jeffreys’ scale overlaid in Fig. 10. The correct model is predominantly identified in the substantial and decisive regimes, with a small number of outliers at lower signif-icance. These outliers are mostly due to injections at the boundaries of the prior space, where the two models begin to become confused. The magnitudes of our Bayes factors, while large, are genuine rather than an artifact of our surrogate. The independent full-likelihood harmonic-mean estimate of Fig. 9, which never touches our tail model, reproduces them. Our large Bayes factors are caused by our models routinely predicting power in the tails of our data. Cor-rectly recovering Bayes factors of this magnitude requires our tail treatment (Sec. II B 3). Without it, the previous prescription of holding the surrogate likelihood constant beyond the training support [44] results in maximum Bayes factors near log 10 BF PL Gauss ∼ 5, severely under-penalizing disfavored models. To quantify the quality of our Bayes factors as model discriminators, we construct a receiver operating charac-teristic (ROC) curve and the associated area under the -10 -5 -2 -1 -0.5 00.5 12510 log 10  BF PL Gauss inconclusive substantial strong decisive     
+
+> truth: powerlaw truth: gaussian
+> FIG. 10. Per-realization log 10 BF PL Gauss grouped by the true, injected model. Shaded bands are the Jeffreys’ scale: incon-clusive, substantial, strong, and (unshaded) decisive. Posi-tive values favor power law, negative favor the Gaussian. The bulk of the Bayes factors lie in the “substantial” region and beyond. The outliers at lower significance (or with incorrect sign) come from injections near the boundaries of the injected parameter space, where the models can begin to become con-fused.
+
+curve (AUC) in Fig. 11. We treat the Bayes factor as a binary classifier, taking the power-law injections as the positive class and sweeping a decision threshold across log 10 BF PL Gauss . For each threshold the ROC traces the true-positive rate against the false-positive rate. A per-fect classifier hugs the left and upper edges of the plot, giving an AUC of unity, whereas a random classifier fol-lows the diagonal with an AUC of 0 .5. We recover a ROC curve confined to the upper-left corner and an AUC of 0.996. Together, these show that our recovered Bayes factors are excellent model discriminators.  
+
+> IV. CONCLUSIONS
+
+We present a fast, computationally-inexpensive method for Bayesian model comparison of PTA data. Our method uses a normalizing-flow likelihood surrogate that, in tandem with the blackjax-ns nested sampler, can produce parameter posteriors and Bayesian evidences in minutes on consumer hardware. Compared to tradi-tional PTA analyses, this flow-based NS approach yields unbiased parameter posteriors (see Fig.s 7 and 8). We validate the quality of the calculated Bayesian evidences as model comparison metrics using a receiver operating characteristic (ROC) and the associated area under the curve (AUC) score in Fig. 11. The AUC score is 0.996, proving that the Bayesian evidences calculated with our new method are reliable for model comparison. Our method is general and flexible. It need not be used with a nested sampler: the likelihood surrogate can be supplied to any sampler. Furthermore, it is automati-cally differentiable via JAX , so it can be used in Hamilto-13 0.0 0.2 0.4 0.6 0.8 1.0false positive rate 0.00.20.40.60.81.0true positive rate     
+
+> powerlaw vs gaussian (AUC = 0 .996) log 10 BF = 0 log 10 BF = +0 .5log 10 BF = −0.5chance
+
+FIG. 11. Model discrimination from a threshold on log 10 BF PL Gauss . We treat the Bayes factor as a binary classifier with power law injections as the positive class. The natu-ral decision point log 10 BF PL Gauss = 0 and Bayes factors corre-sponding to “substantial” on the Jeffreys’ scale are marked. The area under the curve (AUC) score is 0.996, showing that the Bayes factors produced by our methods are excellent clas-sifiers. 
+
+nian Monte Carlo, maximum a posteriori parameter es-timates via gradient descent, and similar gradient-based algorithms. A future avenue we intend to pursue is training our likelihood surrogate directly on the Fourier coefficients instead of on their summary statistics (the variance pa-rameters ρ). This approach is now feasible due to recent developments that lower the computational cost of sam-pling the Fourier coefficients [71]. Our refitting scheme applied to the Fourier coefficients would then also work for continuous waves (CW) from loud, nearby SMBHBs that are discernible above the gravitational-wave back-ground. Training on the coefficients additionally enables the use of non-Gaussian signals, which we expect in gen-eral from realistic populations of SMBHBs and some cos-mological models [19, 20, 72]. In addition, because our method learns inter-frequency correlations, it can be eas-ily applied to posteriors produced by PTA likelihoods that include these correlations [73]. The code and all data products produced as part of this study are publicly available. We intend to integrate our method with existing PTA analysis codes and provide trained normalizing flows for current PTA datasets. As we enter the detection era of PTA science, the main goal evolves from the detection of the GWB to its charac-terization and source identification. Our method enables and democratizes the means to reliably accomplish these goals. 
+
+ACKNOWLEDGMENTS 
+
+The authors are funded as part of the NANOGrav Collaboration through the National Science Founda-tion (NSF) NANOGrav Physics Frontiers Center award #2020265. JSH acknowledges support from NSF CA-REER Award No. 2339728. JSH is also supported through an Oregon State University start up fund. 
+
+DATA AVAILABILITY 
+
+coppuccino is available at https://github.com/A aronDJohnson/coppuccino or on PyPI; the analysis pipeline used in this work is available at https://gith ub.com/davecwright3/fast-and-flowrious .
+
+[1] G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Ar-zoumanian, P. T. Baker, B. B´ ecsy, L. Blecha, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Burnette, R. Case, M. Charisi, S. Chatterjee, K. Chatziioannou, B. D. Cheeseboro, S. Chen, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, C. J. Cutler, M. E. DeCesar, D. DeGan, P. B. Demorest, H. Deng, T. Dolch, B. Drachler, J. A. Ellis, E. C. Fer-rara, W. Fiore, E. Fonseca, G. E. Freedman, N. Garver-Daniels, P. A. Gentile, K. A. Gersbach, J. Glaser, D. C. Good, K. G¨ ultekin, J. S. Hazboun, S. Hourihane, K. Islo, R. J. Jennings, A. D. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, T. C. Klein, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, T. B. Littenberg, T. Liu, A. Lommen, D. R. Lorimer, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, M. A. Mattson, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, P. M. Meyers, C. M. F. Mingarelli, A. Mitridate, P. Natara-jan, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, T. T. Pennucci, B. B. P. Perera, P. Petrov, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, S. C. Sardesai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, L. Schult, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Stovall, J. P. Sun, A. Susobhanan, J. K. Swiggum, J. Taylor, S. R. Taylor, J. E. Turner, C. Unal, M. Val-lisneri, R. van Haasteren, S. J. Vigeland, H. M. Wahl, Q. Wang, C. A. Witt, O. Young, and T. N. Collabora-tion (NANOGrav), The NANOGrav 15 yr Data Set: Ev-idence for a Gravitational-wave Background, Astrophys. J. Lett. 951 , L8 (2023), https://dx.doi.org/10.3847 /2041-8213/acdac6 , arXiv:2306.16213 [astro-ph.HE]. 14 
+
+[2] D. J. Reardon, A. Zic, R. M. Shannon, G. B. Hobbs, M. Bailes, V. Di Marco, A. Kapur, A. F. Rogers, E. Thrane, J. Askew, N. D. R. Bhat, A. Cameron, M. Curylo, W. A. Coles, S. Dai, B. Goncharov, M. Kerr, A. Kulkarni, Y. Levin, M. E. Lower, R. N. Manchester, R. Mandow, M. T. Miles, R. S. Nathan, S. Oslowski, C. J. Russell, R. Spiewak, S. Zhang, and X.-J. Zhu, Search for an Isotropic Gravitational-wave Background with the Parkes Pulsar Timing Array, The Astrophysical Journal Letters 951 , L6 (2023), https://doi.org/10.3847/20 41-8213/acdd02 .[3] J. Antoniadis, P. Arumugam, S. Arumugam, S. Babak, M. Bagchi, A.-S. B. Nielsen, C. G. Bassa, A. Bathula, A. Berthereau, M. Bonetti, E. Bortolas, P. R. Brook, M. Burgay, R. N. Caballero, A. Chalumeau, D. J. Cham-pion, S. Chanlaridis, S. Chen, I. Cognard, S. Danda-pat, D. Deb, S. Desai, G. Desvignes, N. Dhanda-Batra, C. Dwivedi, M. Falxa, R. D. Ferdman, A. Franchini, J. R. Gair, B. Goncharov, A. Gopakumar, E. Graikou, J.-M. Grießmeier, L. Guillemot, Y. J. Guo, Y. Gupta, S. Hisano, H. Hu, F. Iraci, D. Izquierdo-Villalba, J. Jang, J. Jawor, G. H. Janssen, A. Jessner, B. C. Joshi, F. Ka-reem, R. Karuppusamy, E. F. Keane, M. J. Keith, D. Kharbanda, T. Kikunaga, N. Kolhe, M. Kramer, M. A. Krishnakumar, K. Lackeos, K. J. Lee, K. Liu, Y. Liu, A. G. Lyne, J. W. McKee, Y. Maan, R. A. Main, M. B. Mickaliger, I. C. Nit ¸u, K. Nobleson, A. K. Paladi, A. Parthasarathy, B. B. P. Perera, D. Perrodin, A. Petiteau, N. K. Porayko, A. Possenti, T. Prabu, H. Q. Leclere, P. Rana, A. Samajdar, S. A. Sanidas, A. Sesana, G. Shaifullah, J. Singha, L. Speri, R. Spiewak, A. Srivastava, B. W. Stappers, M. Surnis, S. C. Susarla, A. Susobhanan, K. Takahashi, P. Tarafdar, G. Theureau, C. Tiburzi, E. van der Wateren, A. Vecchio, V. V. Krish-nan, J. P. W. Verbiest, J. Wang, L. Wang, and Z. Wu, The second data release from the European Pulsar Tim-ing Array - III. Search for gravitational wave signals, Astronomy & Astrophysics 678 , A50 (2023), https: //www.aanda.org/articles/aa/abs/2023/10/aa46 844-23/aa46844-23.html .[4] G. Agazie, J. Antoniadis, A. Anumarlapudi, A. M. Archibald, P. Arumugam, S. Arumugam, Z. Arzouma-nian, J. Askew, S. Babak, M. Bagchi, M. Bailes, A.-S. B. Nielsen, P. T. Baker, C. G. Bassa, A. Bathula, B. B´ ecsy, A. Berthereau, N. D. R. Bhat, L. Blecha, M. Bonetti, E. Bortolas, A. Brazier, P. R. Brook, M. Bur-gay, S. Burke-Spolaor, R. Burnette, R. N. Caballero, A. Cameron, R. Case, A. Chalumeau, D. J. Champion, S. Chanlaridis, M. Charisi, S. Chatterjee, K. Chatziioan-nou, B. D. Cheeseboro, S. Chen, Z.-C. Chen, I. Cog-nard, T. Cohen, W. A. Coles, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, M. Curylo, C. J. Cutler, S. Dai, S. Dandapat, D. Deb, M. E. DeCesar, D. DeGan, P. B. Demorest, H. Deng, S. Desai, G. Desvignes, L. Dey, N. Dhanda-Batra, V. Di Marco, T. Dolch, B. Drachler, C. Dwivedi, J. A. Ellis, M. Falxa, Y. Feng, R. D. Ferdman, E. C. Fer-rara, W. Fiore, E. Fonseca, A. Franchini, G. E. Freed-man, J. R. Gair, N. Garver-Daniels, P. A. Gentile, K. A. Gersbach, J. Glaser, D. C. Good, B. Goncharov, A. Gopakumar, E. Graikou, J.-M. Griessmeier, L. Guille-mot, K. G¨ ultekin, Y. J. Guo, Y. Gupta, K. Grunthal, J. S. Hazboun, S. Hisano, G. B. Hobbs, S. Hourihane, H. Hu, F. Iraci, K. Islo, D. Izquierdo-Villalba, J. Jang, J. Jawor, G. H. Janssen, R. J. Jennings, A. Jessner, A. D. Johnson, M. L. Jones, B. C. Joshi, A. R. Kaiser, D. L. Kaplan, A. Kapur, F. Kareem, R. Karuppusamy, E. F. Keane, M. J. Keith, L. Z. Kelley, M. Kerr, J. S. Key, D. Kharbanda, T. Kikunaga, T. C. Klein, N. Kolhe, M. Kramer, M. A. Krishnakumar, A. Kulkarni, N. Laal, K. Lackeos, M. T. Lam, W. G. Lamb, B. B. Larsen, T. J. W. Lazio, K. J. Lee, Y. Levin, N. Lewandowska, T. B. Littenberg, K. Liu, T. Liu, Y. Liu, A. Lommen, D. R. Lorimer, M. E. Lower, J. Luo, R. Luo, R. S. Lynch, A. G. Lyne, C.-P. Ma, Y. Maan, D. R. Madison, R. A. Main, R. N. Manchester, R. Mandow, M. A. Mattson, A. McEwen, J. W. McKee, M. A. McLaughlin, N. Mc-Mann, B. W. Meyers, P. M. Meyers, M. B. Mickaliger, M. Miles, C. M. F. Mingarelli, A. Mitridate, P. Natara-jan, R. S. Nathan, C. Ng, D. J. Nice, I. C. Nit ¸u, K. No-bleson, S. K. Ocker, K. D. Olum, S. Oslowski, A. K. Paladi, A. Parthasarathy, T. T. Pennucci, B. B. P. Per-era, D. Perrodin, A. Petiteau, P. Petrov, N. S. Pol, N. K. Porayko, A. Possenti, T. Prabu, H. Q. Leclere, H. A. Radovan, P. Rana, S. M. Ransom, P. S. Ray, D. J. Rear-don, A. F. Rogers, J. D. Romano, C. J. Russell, A. Sama-jdar, S. A. Sanidas, S. C. Sardesai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, L. Schult, A. Sesana, G. Shaifullah, R. M. Shannon, B. J. Shapiro-Albert, X. Siemens, J. Simon, J. Singha, M. S. Siwek, L. Speri, R. Spiewak, A. Srivastava, I. H. Stairs, B. W. Stap-pers, D. R. Stinebring, K. Stovall, J. P. Sun, M. Surnis, S. C. Susarla, A. Susobhanan, J. K. Swiggum, K. Taka-hashi, P. Tarafdar, J. Taylor, S. R. Taylor, G. Theureau, E. Thrane, N. Thyagarajan, C. Tiburzi, L. Toomey, J. E. Turner, C. Unal, M. Vallisneri, E. van der Wateren, R. van Haasteren, A. Vecchio, V. Venkatraman Krish-nan, J. P. W. Verbiest, S. J. Vigeland, H. M. Wahl, S. Wang, Q. Wang, C. A. Witt, J. Wang, L. Wang, K. E. Wayt, Z. Wu, O. Young, L. Zhang, S. Zhang, X.-J. Zhu, A. Zic, and T. I. P. T. A. Collaboration (Inter-national Pulsar Timing Array), Comparing Recent Pul-sar Timing Array Results on the Nanohertz Stochastic Gravitational-wave Background, Astrophys. J. 966 , 105 (2024), https://dx.doi.org/10.3847/1538-4357/ad36 be , arXiv:2309.00693 [astro-ph.HE]. [5] M. T. Miles, R. M. Shannon, D. J. Reardon, M. Bailes, D. J. Champion, M. Geyer, P. Gitika, K. Grunthal, M. J. Keith, M. Kramer, et al. , The meerkat pulsar timing array: the first search for gravitational waves with the meerkat radio telescope, Monthly Notices of the Royal Astronomical Society 536 , 1489 (2025). [6] W.-W. Yu and B. Allen, Stochastic gravitational-wave background search using data from five pulsar timing ar-rays 10.48550/arXiv.2512.08666 (2025), http://arxiv. org/abs/2512.08666 , arXiv:2512.08666 [astro-ph.CO]. [7] N. Agarwal et al. , The NANOGrav 15 yr Data Set: Im-pacts of Customized Chromatic Noise Models on Gravi-tational Wave Analyses, (2026), arXiv:2606.28554 [astro-ph.CO]. [8] G. Agazie, A. Anumarlapudi, A. M. Archibald, P. T. Baker, B. B´ ecsy, L. Blecha, A. Bonilla, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Burnette, R. Case, J. A. Casey-Clyde, M. Charisi, S. Chatterjee, K. Chatziioan-nou, B. D. Cheeseboro, S. Chen, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, C. J. Cutler, D. J. D’Orazio, M. E. DeCesar, D. De-Gan, P. B. Demorest, H. Deng, T. Dolch, B. Drachler, 15 
+
+E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freedman, E. Gardiner, N. Garver-Daniels, P. A. Gentile, K. A. Gersbach, J. Glaser, D. C. Good, K. G¨ ultekin, J. S. Hazboun, S. Hourihane, K. Islo, R. J. Jennings, A. John-son, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kel-ley, M. Kerr, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, T. B. Litten-berg, T. Liu, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, A. McEwen, J. W. McKee, M. A. McLaugh-lin, N. McMann, B. W. Meyers, P. M. Meyers, C. M. F. Mingarelli, A. Mitridate, P. Natarajan, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, T. T. Pennucci, B. B. P. Per-era, P. Petrov, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, J. C. Runnoe, S. C. Sarde-sai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, L. Schult, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Sto-vall, J. P. Sun, A. Susobhanan, J. K. Swiggum, J. Tay-lor, S. R. Taylor, J. E. Turner, C. Unal, M. Vallisneri, S. J. Vigeland, J. M. Wachter, H. M. Wahl, Q. Wang, C. A. Witt, D. Wright, and O. Young (NANOGrav), The NANOGrav 15-year Data Set: Constraints on Su-permassive Black Hole Binaries from the Gravitational Wave Background, Astrophys. J. Lett. 952 , L37 (2023), 
+
+http://arxiv.org/abs/2306.16220 , arXiv:2306.16220 [astro-ph.HE]. [9] A. Afzal, G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzoumanian, P. T. Baker, B. B´ ecsy, J. J. Blanco-Pillado, L. Blecha, K. K. Boddy, A. Brazier, P. R. Brook, S. Burke-Spolaor, R. Burnette, R. Case, M. Charisi, S. Chatterjee, K. Chatziioannou, B. D. Cheeseboro, S. Chen, T. Cohen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, C. J. Cut-ler, M. E. DeCesar, D. DeGan, P. B. Demorest, H. Deng, T. Dolch, B. Drachler, R. von Eckardstein, E. C. Fer-rara, W. Fiore, E. Fonseca, G. E. Freedman, N. Garver-Daniels, P. A. Gentile, K. A. Gersbach, J. Glaser, D. C. Good, L. Guertin, K. G¨ ultekin, J. S. Hazboun, S. Houri-hane, K. Islo, R. J. Jennings, A. D. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, V. S. H. Lee, N. Lewandowska, R. R. L. dos San-tos, T. B. Littenberg, T. Liu, D. R. Lorimer, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madison, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, P. M. Meyers, C. M. F. Mingarelli, A. Mitri-date, J. Nay, P. Natarajan, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, T. T. Pennucci, B. B. P. Perera, P. Petrov, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, S. C. Sardesai, A. Schmiedekamp, C. Schmiedekamp, K. Schmitz, T. Schr¨ oder, L. Schult, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Stovall, P. Stratmann, J. P. Sun, A. Susobhanan, J. K. Swiggum, J. Taylor, S. R. Taylor, T. Trickle, J. E. Turner, C. Unal, M. Vallisneri, S. Verma, S. J. Vigeland, H. M. Wahl, Q. Wang, C. A. Witt, D. Wright, O. Young, K. M. Zurek, and T. N. Col-laboration (NANOGrav), The NANOGrav 15 yr Data Set: Search for Signals from New Physics, Astrophys. J. Lett. 951 , L11 (2023), https://dx.doi.org/10.3847/2 041-8213/acdc91 , arXiv:2306.16219 [astro-ph.HE]. [10] G. Agazie et al. , The NANOGrav 15 yr Data Set: Piece-wise Power-law Reconstruction of the Gravitational-wave Background, Astrophys. J. Lett. 1004 , L40 (2026), arXiv:2601.09481 [astro-ph.HE]. [11] M. Rajagopal and R. W. Romani, Ultra-low-frequency gravitational radiation from massive black hole bina-ries, The Astrophysical Journal 446 , 543 (1995), https: //arxiv.org/abs/astro- ph/9412038 , arXiv:astro-ph/9412038. [12] A. H. Jaffe and D. C. Backer, Gravitational waves probe the coalescence rate of massive black hole binaries, The Astrophysical Journal 583 , 616 (2003), https://arxiv. org/abs/astro-ph/0210148 , arXiv:astro-ph/0210148. [13] J. S. B. Wyithe and A. Loeb, Low-frequency gravitational waves from massive black hole binaries: Predictions for LISA and pulsar timing arrays, The Astrophysical Jour-nal 590 , 691 (2003), https://arxiv.org/abs/astro-p h/0211556 , arXiv:astro-ph/0211556. [14] A. Sesana, A. Vecchio, and C. N. Colacino, The stochastic gravitational-wave background from massive black hole binary systems: Implications for observations with pul-sar timing arrays, Monthly Notices of the Royal Astro-nomical Society 390 , 192 (2008), https://arxiv.org/ abs/0804.4476 , arXiv:0804.4476 [astro-ph]. [15] P. D. Lasky, C. M. F. Mingarelli, T. L. Smith, J. T. Gib-lin, E. Thrane, D. J. Reardon, R. Caldwell, M. Bailes, N. D. R. Bhat, S. Burke-Spolaor, S. Dai, J. Dempsey, G. Hobbs, M. Kerr, Y. Levin, R. N. Manchester, S. Oslowski, V. Ravi, P. A. Rosado, R. M. Shannon, R. Spiewak, W. van Straten, L. Toomey, J. Wang, L. Wen, X. You, and X. Zhu, Gravitational-wave cosmol-ogy across 29 decades in frequency, Physical Review X 
+
+6, 011035 (2016), https://arxiv.org/abs/1511.05994 ,arXiv:1511.05994 [astro-ph.CO]. [16] M. C. Guzzetti, N. Bartolo, M. Liguori, and S. Matarrese, Gravitational waves from inflation, La Rivista del Nuovo Cimento 39 , 399 (2016), https://arxiv.org/abs/1605 .01615 , arXiv:1605.01615 [astro-ph.CO]. [17] M. Kamionkowski, A. Kosowsky, and M. S. Turner, Grav-itational radiation from first-order phase transitions, Physical Review D 49 , 2837 (1994), https://arxiv. org/abs/astro-ph/9310044 , arXiv:astro-ph/9310044. [18] C. Caprini and D. G. Figueroa, Cosmological back-grounds of gravitational waves, Classical and Quantum Gravity 35 , 163001 (2018), https://arxiv.org/abs/18 01.04268 , arXiv:1801.04268 [astro-ph.CO]. [19] W. G. Lamb, J. M. Wachter, A. Mitridate, S. C. Sardesai, B. B´ ecsy, E. L. Hagen, S. R. Taylor, and L. Z. Kelley, Finite Populations & Finite Time: The Non-Gaussianity of a Gravitational Wave Background 10.48550/arXiv.2511.09659 (2025), http://arxiv.org/ abs/2511.09659 , arXiv:2511.09659 [gr-qc]. [20] W. G. Lamb and S. R. Taylor, Spectral variance in a stochastic gravitational-wave background from a binary population, The Astrophysical Journal Letters 971 , L10 (2024), https://doi.org/10.3847/2041-8213/ad654a ,arXiv:2407.06270 [gr-qc]. [21] G. Sato-Polito and M. Kamionkowski, Exploring the spectrum of stochastic gravitational-wave anisotropies with pulsar timing arrays, Phys. Rev. D 109 , 123544 (2024). [22] A.-M. Lemke, A. Mitridate, and K. A. Gersbach, De-tecting gravitational wave anisotropies from supermas-sive black hole binaries, Phys. Rev. D 111 , 063068 (2025). [23] E. C. Gardiner, L. Z. Kelley, A.-M. Lemke, and A. Mitridate, Beyond the Background: Gravitational-wave Anisotropy and Continuous Waves from Supermas-16 
+
+sive Black Hole Binaries, The Astrophysical Journal 965 ,164 (2024), https://doi.org/10.3847/1538-4357/ad2b e8 .[24] R. van Haasteren and M. Vallisneri, New advances in the Gaussian-process approach to pulsar-timing data analy-sis, Phys. Rev. D 90 , 104012 (2014), http://arxiv.or g/abs/1407.1838 , arXiv:1407.1838 [gr-qc]. [25] L. Lentati, P. Alexander, M. P. Hobson, S. Taylor, J. Gair, S. T. Balan, and R. van Haasteren, Hyper-efficient model-independent Bayesian method for the analysis of pulsar timing data, Physical Review D 87 ,104021 (2013), https://link.aps.org/doi/10.1103/P hysRevD.87.104021 , arXiv:1210.3578 [astro-ph.IM]. [26] L. Sampson, N. J. Cornish, and S. T. McWilliams, Con-straining the solution to the last parsec problem with pulsar timing, Physical Review D 91 , 084055 (2015). [27] A. D. Johnson, P. M. Meyers, P. T. Baker, N. J. Cornish, J. S. Hazboun, T. B. Littenberg, J. D. Ro-mano, S. R. Taylor, M. Vallisneri, S. J. Vigeland, K. D. Olum, X. Siemens, J. A. Ellis, R. van Haasteren, S. Hourihane, G. Agazie, A. Anumarlapudi, A. M. Archibald, Z. Arzoumanian, L. Blecha, A. Brazier, P. R. Brook, S. Burke-Spolaor, B. B´ ecsy, J. A. Casey-Clyde, M. Charisi, S. Chatterjee, K. Chatziioannou, T. Cohen, J. M. Cordes, F. Crawford, H. T. Cromartie, K. Crowter, M. E. DeCesar, P. B. Demorest, T. Dolch, B. Drach-ler, E. C. Ferrara, W. Fiore, E. Fonseca, G. E. Freed-man, N. Garver-Daniels, P. A. Gentile, J. Glaser, D. C. Good, K. G¨ ultekin, R. J. Jennings, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, T. Liu, D. R. Lorimer, R. S. Lynch, C.-P. Ma, D. R. Madison, A. McEwen, J. W. Mc-Kee, M. A. McLaughlin, N. McMann, B. W. Meyers, C. M. F. Mingarelli, A. Mitridate, C. Ng, D. J. Nice, S. K. Ocker, T. T. Pennucci, B. B. P. Perera, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, S. C. Sarde-sai, C. Schmiedekamp, A. Schmiedekamp, K. Schmitz, B. J. Shapiro-Albert, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Stovall, A. Susobhanan, J. K. Swig-gum, J. E. Turner, C. Unal, H. M. Wahl, C. A. Witt, and O. Young (NANOGrav), The NANOGrav 15-year Gravitational-Wave Background Analysis Pipeline, Phys. Rev. D 109 , 103012 (2024), http://arxiv.org/abs/23 06.16223 , arXiv:2306.16223 [astro-ph.HE]. [28] B. P. Carlin and S. Chib, Bayesian Model Choice Via Markov Chain Monte Carlo Methods, Journal of the Royal Statistical Society: Series B (Methodological) 57 ,473 (1995), https://doi.org/10.1111/j.2517-6161.19 95.tb02042.x .[29] Z. Arzoumanian, P. T. Baker, A. Brazier, S. Burke-Spolaor, S. J. Chamberlin, S. Chatterjee, B. Christy, J. M. Cordes, N. J. Cornish, F. Crawford, et al. , The nanograv 11 year data set: pulsar-timing constraints on the stochastic gravitational-wave background, The As-trophysical Journal 859 , 47 (2018). [30] S. R. Taylor, R. van Haasteren, and A. Sesana, From bright binaries to bumpy backgrounds: Mapping real-istic gravitational wave skies with pulsar-timing arrays, Physical Review D 102 , 084039 (2020). [31] N. Lartillot and H. Philippe, Computing Bayes Factors Using Thermodynamic Integration, Systematic Biology 
+
+55 , 195 (2006), https://academic.oup.com/sysbio/ar ticle/55/2/195/1620800 .[32] S. Hourihane, P. Meyers, A. Johnson, K. Chatziioan-nou, and M. Vallisneri, Accurate characterization of the stochastic gravitational-wave background with pulsar timing arrays by likelihood reweighting, Physical Review D 107 , 084045 (2023), https://link.aps.org/doi/10. 1103/PhysRevD.107.084045 .[33] J. M. Dickey, The Weighted Likelihood Ratio, Linear Hy-potheses on Normal Location Parameters, The Annals of Mathematical Statistics 42 , 204 (1971), https://proj ecteuclid.org/journals/annals-of-mathematical-s tatistics/volume-42/issue-1/The-Weighted-Likel ihood-Ratio-Linear-Hypotheses-on-Normal-Locatio n-Parameters/10.1214/aoms/1177693507.full .[34] J. Skilling, Nested Sampling, in AIP Conf. Proc. , Vol. 735 (AIP, 2004) p. 395, https://ui.adsabs.harvard. edu/abs/2004AIPC..735..395S .[35] J. Skilling, Nested Sampling—The Idea, Physical Sci-ences Forum 9, 22 (2024), https://www.mdpi.com/2 673-9984/9/1/22 .[36] L. Martino and F. Llorente, Nested Sam-pling: A Critical and Comprehensive Theoret-ical Guide 10.48550/arXiv.2606.17916 (2026), 
+
+http://arxiv.org/abs/2606.17916 , arXiv:2606.17916 [stat.CO]. [37] G. Ashton, N. Bernstein, J. Buchner, X. Chen, G. Cs´ anyi, A. Fowlie, F. Feroz, M. Griffiths, W. Han-dley, M. Habeck, E. Higson, M. Hobson, A. Lasenby, D. Parkinson, L. B. Partay, M. Pitkin, D. Schneider, J. S. Speagle, L. South, J. Veitch, P. Wacker, D. J. Wales, and D. Yallup, Nested sampling for physical sci-entists, Nature Reviews Methods Primers 2, 39 (2022), 
+
+https://arxiv.org/abs/2205.15570 , arXiv:2205.15570 [stat.CO]. [38] J. Buchner, Nested sampling methods, Statistics Surveys 
+
+17 , 169 (2023), https://arxiv.org/abs/2101.09675 ,arXiv:2101.09675 [stat.CO]. [39] A. Chalumeau, S. Babak, A. Petiteau, S. Chen, A. Sama-jdar, R. Caballero, G. Theureau, L. Guillemot, G. Desvi-gnes, A. Parthasarathy, et al. , Noise analysis in the eu-ropean pulsar timing array data release 2 and its im-plications on the gravitational-wave background search, Monthly Notices of the Royal Astronomical Society 509 ,5538 (2022). [40] G. Papamakarios, E. Nalisnick, D. J. Rezende, S. Mo-hamed, and B. Lakshminarayanan, Normalizing flows for probabilistic modeling and inference, J. Mach. Learn. Res. 22 , 57:1 (2019). [41] I. Kobyzev, S. J. Prince, and M. A. Brubaker, Normaliz-ing Flows: An Introduction and Review of Current Meth-ods, IEEE Transactions on Pattern Analysis and Machine Intelligence 43 , 3964 (2021), https://ieeexplore.iee e.org/document/9089305 , arXiv:1908.09257 [stat.ML]. [42] L. Dinh, J. Sohl-Dickstein, and S. Bengio, Density esti-mation using Real NVP, in International Conference on Learning Representations (ICLR) (2016) https://arxi v.org/abs/1605.08803 , arXiv:1605.08803 [cs.LG]. [43] C. Durkan, A. Bekasov, I. Murray, and G. Papamakar-ios, Neural spline flows, in Advances in Neural Infor-mation Processing Systems (NeurIPS) , Vol. 32 (2019) 
+
+https://arxiv.org/abs/1906.04032 , arXiv:1906.04032 [stat.ML]. [44] W. G. Lamb, S. R. Taylor, and R. van Haasteren, The Need For Speed: Rapid Refitting Techniques for Bayesian Spectral Characterization of the Gravitational 17 
+
+Wave Background Using PTAs, Physical Review D 108 ,103019 (2023), http://arxiv.org/abs/2303.15442 ,arXiv:2303.15442 [astro-ph, physics:gr-qc]. [45] M. Vallisneri, M. Crisostomi, A. D. Johnson, and P. M. Meyers, Rapid Parameter Estimation for Pulsar-Timing-Array Datasets with Variational Inference and Normaliz-ing Flows, Physical Review Letters 135 , 071401 (2025), 
+
+https://link.aps.org/doi/10.1103/p3f7- rbmv ,arXiv:2405.08857 [gr-qc]. [46] N. Laal, S. R. Taylor, L. Z. Kelley, J. Simon, K. Gul-tekin, D. Wright, B. Becsy, J. A. Casey-Clyde, S. Chen, A. Cingoranelli, D. J. D’Orazio, E. C. Gardiner, W. G. Lamb, C. Matt, M. S. Siwek, and J. M. Wachter, Deep Neural Emulation of the Supermassive Black-hole Bi-nary Population, Astrophys. J. 982 , 55 (2025), http: //arxiv.org/abs/2411.10519 , arXiv:2411.10519 [astro-ph.IM]. [47] A. Gundersen and N. J. Cornish, Rapid inference for in-dividual binaries and a stochastic background with pul-sar timing array data, Phys. Rev. D 112 , 083035 (2025), arXiv:2412.13379 [gr-qc]. [48] A. Gundersen and N. J. Cornish, Escaping neal’s funnel: a multi-stage sampling method for hierarchical models, arXiv preprint arXiv:2510.12917 (2025). [49] J. Lai and C. Li, Accelerated Bayesian inference for pul-sar timing arrays: Normalizing flows for rapid model comparison across stochastic gravitational-wave back-ground sources, Physical Review D 112 , 023533 (2025), 
+
+https://link.aps.org/doi/10.1103/7j5m- m9j7 ,arXiv:2504.04211 [astro-ph.CO]. [50] D. Ward, Flowjax: Distributions and normalizing flows in jax (2026). [51] M. Sklar, Fonctions de repartition a n dimensions et leurs marges (1959) https://www.semanticscholar.org/pa per/Fonctions-de-repartition-a-n-dimensions-e t-leurs-Sklar/d017e0a6a9b93dcab7cdcd44b17544c04 f7678d2 .[52] D. P. Kingma and J. Ba, Adam: A method for stochastic optimization, arXiv preprint arXiv:1412.6980 (2014). [53] A. Gelman and X.-L. Meng, Simulating normaliz-ing constants: From importance sampling to bridge sampling to path sampling, Statistical Science 13 ,10.1214/ss/1028905934 (1998), https://projecteucli d.org/journals/statistical-science/volume-13/is sue-2/Simulating-normalizing-constants--from-i mportance-sampling-to-bridge-sampling/10.1214/ ss/1028905934.full .[54] M. D. Hoffman and A. Gelman, The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo, J. Mach. Learn. Res. 15 , 1593 (2011). [55] Maximum Likelihood Inference, Part I: Optimization Through Exact Smoothing, in Inference in Hidden Markov Models , edited by O. Capp´ e, E. Moulines, and T. Ryd´ en (Springer, New York, NY, 2005) pp. 347–395, 
+
+https://doi.org/10.1007/0-387-28982-8_10 .[56] D. Yallup, M. Prathaban, J. Alvey, and W. Handley, Par-allel Nested Slice Sampling for Gravitational Wave Pa-rameter Estimation 10.48550/arXiv.2509.24949 (2025), 
+
+http://arxiv.org/abs/2509.24949 , arXiv:2509.24949 [astro-ph.IM]. [57] A. Cabezas, A. Corenflos, J. Lao, and R. Louf, Black-JAX: Composable Bayesian inference in JAX (2024), arXiv:2402.10797 [cs.MS]. [58] J. Bradbury, R. Frostig, P. Hawkins, M. J. John-son, Y. Katariya, C. Leary, D. Maclaurin, G. Nec-ula, A. Paszke, J. VanderPlas, S. Wanderman-Milne, and Q. Zhang, JAX: Composable transformations of Python+NumPy programs, http://github.com/jax-m l/jax (2018). [59] E. S. Phinney, A Practical Theorem on Gravitational Wave Backgrounds 10.48550/arXiv.astro-ph/0108028 (2001), http://arxiv.org/abs/astro- ph/0108028 ,arXiv:astro-ph/0108028. [60] G. Dom` enech, Scalar induced gravitational waves review, Universe 7, 398 (2021), http://arxiv.org/abs/2109.0 1398 , arXiv:2109.01398 [astro-ph, physics:gr-qc]. [61] S. Pi and M. Sasaki, Gravitational Waves Induced by Scalar Perturbations with a Lognormal Peak, JCAP 
+
+09 (9), 037, https://arxiv.org/abs/2005.12306 ,arXiv:2005.12306 [gr-qc]. [62] W. G. Lamb et al. , Unpublished. [63] N. Richardson, I. Cook, N. Crane, D. Dunnington, R. Fran¸ cois, J. Keane, B. Mecum, D. Moldovan-Gr¨ unfeld, J. Ooms, J. Wujciak-Jens, and Apache Arrow, Arrow: In-tegration to ’Apache’ ’Arrow’ (2026), https://github.c om/apache/arrow/ .[64] M. Vallisneri, P. M. Meyers, D. Wright, A. D. Johnson, J. G. Baier, and R. van Haasteren, Nanograv/discovery: 0.5.1 10.5281/zenodo.17711454 (2025), https://zenodo .org/records/17711454 .[65] G. Agazie, M. F. Alam, A. Anumarlapudi, A. M. Archibald, Z. Arzoumanian, P. T. Baker, L. Blecha, V. Bonidie, A. Brazier, P. R. Brook, S. Burke-Spolaor, B. B´ ecsy, C. Chapman, M. Charisi, S. Chatterjee, T. Co-hen, J. M. Cordes, N. J. Cornish, F. Crawford, H. T. Cromartie, K. Crowter, M. E. DeCesar, P. B. Demorest, T. Dolch, B. Drachler, E. C. Ferrara, W. Fiore, E. Fon-seca, G. E. Freedman, N. Garver-Daniels, P. A. Gen-tile, J. Glaser, D. C. Good, K. G¨ ultekin, J. S. Hazboun, R. J. Jennings, C. Jessup, A. D. Johnson, M. L. Jones, A. R. Kaiser, D. L. Kaplan, L. Z. Kelley, M. Kerr, J. S. Key, A. Kuske, N. Laal, M. T. Lam, W. G. Lamb, T. J. W. Lazio, N. Lewandowska, Y. Lin, T. Liu, D. R. Lorimer, J. Luo, R. S. Lynch, C.-P. Ma, D. R. Madi-son, K. Maraccini, A. McEwen, J. W. McKee, M. A. McLaughlin, N. McMann, B. W. Meyers, C. M. F. Min-garelli, A. Mitridate, C. Ng, D. J. Nice, S. K. Ocker, K. D. Olum, E. Panciu, T. T. Pennucci, B. B. P. Per-era, N. S. Pol, H. A. Radovan, S. M. Ransom, P. S. Ray, J. D. Romano, L. Salo, S. C. Sardesai, C. Schmiedekamp, A. Schmiedekamp, K. Schmitz, B. J. Shapiro-Albert, X. Siemens, J. Simon, M. S. Siwek, I. H. Stairs, D. R. Stinebring, K. Stovall, A. Susobhanan, J. K. Swiggum, S. R. Taylor, J. E. Turner, C. Unal, M. Vallisneri, S. J. Vigeland, H. M. Wahl, Q. Wang, C. A. Witt, O. Young, and T. N. Collaboration (NANOGrav), The NANOGrav 15 yr Data Set: Observations and Timing of 68 Mil-lisecond Pulsars, Astrophys. J. Lett. 951 , L9 (2023), 
+
+https://dx.doi.org/10.3847/2041- 8213/acda9a ,arXiv:2306.16217 [astro-ph.HE]. [66] J. D. McEwen, C. G. R. Wallis, M. A. Price, and A. S. Mancini, Machine learning assisted Bayesian model comparison: Learnt harmonic mean estimator, http: //arxiv.org/abs/2111.12720 (2023), arXiv:2111.12720 [stat.ME]. [67] D. Lopez-Paz and M. Oquab, Revisiting Classifier Two-Sample Tests, http://arxiv.org/abs/1610.06545 18 
+
+(2018), arXiv:1610.06545 [stat.ML]. [68] J. Friedman, On Multivariate Goodness-of-Fit and Two-Sample Testing , Tech. Rep. SLAC-PUB-10325, 826696 (2004) http://www.osti.gov/servlets/purl/826696/ .[69] F. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O. Grisel, M. Blondel, P. Prettenhofer, R. Weiss, V. Dubourg, J. Vanderplas, A. Passos, D. Cour-napeau, M. Brucher, M. Perrot, and E. Duchesnay, Scikit-learn: Machine learning in Python, Journal of Ma-chine Learning Research 12 , 2825 (2011). [70] T. S¨ ailynoja, P.-C. B¨ urkner, and A. Vehtari, Graphi-cal test for discrete uniformity and its applications in goodness-of-fit evaluation and multiple sample compar-ison, Statistics and Computing 32 , 32 (2022), https: //doi.org/10.1007/s11222-022-10090-6 .[71] A. Gundersen, R. van Haasteren, N. J. Cornish, M. Val-lisneri, and P. M. Meyers, A new framework for lightning-fast gravitational wave analysis of pulsar timing data, (2026), 2607.06834. [72] S. Kumar, R. Sundrum, and Y. Tsai, Non-Gaussian stochastic gravitational waves from phase transitions, Journal of High Energy Physics 11 , 107 (2021), https:// doi.org/10.1007/JHEP11(2021)107 , arXiv:2102.05665 [astro-ph.CO]. [73] M. Crisostomi, R. van Haasteren, P. M. Meyers, and M. Vallisneri, Beyond diagonal approximations: Im-proved covariance modeling for pulsar timing array data analysis 10.48550/arXiv.2506.13866 (2025), http://arxi v.org/abs/2506.13866 , arXiv:2506.13866 [astro-ph.IM].
