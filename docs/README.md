@@ -6,32 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-10-03
-- 运行时间：2026-10-03 22:28:26 UTC
+- 最新运行日期：2026-10-04
+- 运行时间：2026-10-04 21:54:31 UTC
 - 运行状态：成功
-- 本次总论文数：4
-- 精读区：1
-- 速读区：3
+- 本次总论文数：2
+- 精读区：0
+- 速读区：2
 
 ### 今日简报（AI）
-今日精读1篇、速读3篇，聚焦脉冲星故障机制与致密星引力波搜寻。最值得看的是9分精读《Pulsar glitches triggered by quakes when stress reaches a threshold》，以及吸积中子星自旋漂移对引力波搜索的启示。普通读者可先读精读文章，理解脉冲星“星震”触发自转突变的核心阈值图像。
-- 详情：[/202610/03/README](/202610/03/README)
+10月4日速读两篇中子星论文、精读0篇，主题分别聚焦盖亚中子星族群/诞生率，以及奇异夸克星与中子星共存。
+两篇均6.0分，最值得关注的是盖亚数据下的中子星人口与诞生率关联，和原中子星中奇异夸克星与中子星的亚稳与成核共存机制。
+普通读者可先按兴趣选读：偏观测选盖亚篇，偏理论选奇异夸克星篇，再决定是否深入。
+- 详情：[/202610/04/README](/202610/04/README)
 
 ### 精读区论文标签
-1. [Pulsar glitches triggered by quakes when stress reaches a threshold](/202610/03/2609.38837v1-pulsar-glitches-triggered-by-quakes-when-stress-reaches-a-threshold)  
-   标签：评分：9.0/10、query:pulsar-frb
-   evidence：脉冲星glitch星震模型与应力阈值
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Spin wandering of an accreting neutron star near torque balance: implications for gravitational wave searches](/202610/03/2609.32164v1-spin-wandering-of-an-accreting-neutron-star-near-torque-balance-implications-for-gravitational-wave-searches)  
+1. [Gaia neutron stars: demographics, birth rates, and connections to other neutron star populations](/202610/04/2610.00454v1-gaia-neutron-stars-demographics-birth-rates-and-connections-to-other-neutron-star-populations)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：吸积中子星自转游走与计时
-2. [Three New Likely Spider Millisecond Pulsar Binaries and Optical Kinematic Tracers of Intrabinary Shocks](/202610/03/2610.00455v1-three-new-likely-spider-millisecond-pulsar-binaries-and-optical-kinematic-tracers-of-intrabinary-shocks)  
+   evidence：推断中子星族群的内禀人口学与诞生率，并与其他中子星族群联系
+2. [Coexistence of strange quark stars and neutron stars: metastability and nucleation in proto-neutron stars](/202610/04/2610.00699v1-coexistence-of-strange-quark-stars-and-neutron-stars-metastability-and-nucleation-in-proto-neutron-stars)  
    标签：评分：6.0/10、query:pulsar-frb
-   evidence：发现蜘蛛毫秒脉冲星，扩充射电脉冲星种群
-3. [Trace-anomaly decomposition and universal dark matter scaling in compact stars](/202610/03/2610.01991v1-trace-anomaly-decomposition-and-universal-dark-matter-scaling-in-compact-stars)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：暗物质改变致密中子星物质相结构与迹异常
+   evidence：两族星场景下奇异夸克物质成核与中子星状态方程
 
 
 <div class="dpr-home-promo-card">
