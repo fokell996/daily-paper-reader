@@ -1,0 +1,190 @@
+Title: Robust Bayesian non-linear pulsar timing and noise analysis using a sequential data-tempered ensemble sampler
+
+URL Source: https://arxiv.org/pdf/2610.02737v1
+
+Published Time: Mon, 05 Oct 2026 00:40:25 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# Robust Bayesian non-linear pulsar timing and noise analysis using a sequential data-tempered ensemble sampler 
+
+Abhimanyu Susobhanan ∗
+
+School of Physics, Indian Institute of Science Education and Research Thiruvananthapuram, Maruthamala P.O., Thiruvananthapuram, Kerala 695551, India 
+
+(Dated: October 5, 2026) We develop a sequential ensemble MCMC scheme for Bayesian pulsar timing and noise analysis that uses data size as the tempering parameter. The method enables gradual and reliable con-vergence from potentially uninformed initial points by iteratively increasing the data size, thereby increasing sensitivity and progressively narrowing the target distribution until the posterior of the full dataset is reached. The initial iterations use sub-datasets that can be orders of magnitude smaller than the full dataset, substantially reducing computational cost, which is further lowered by employing approximate lower-rank models justified by the reduced sensitivity of these sub-datasets. Bayesian inference is performed using the final MCMC chain sampled from the true target dis-tribution after applying appropriate burn-in. We demonstrate the method using the NANOGrav 12.5-year data of PSR B1855+09, showing progressive convergence to the target posterior and that most of the computational time is spent sampling the true target distribution rather than in the preceding tempered iterations. 
+
+> Keywords: pulsars — data analysis
+
+I. INTRODUCTION 
+
+Pulsars are rotating neutron stars whose electromag-netic radiation appears as periodic pulses to a terres-trial observer [1]. Their high rotational stability enables us to use them as celestial clocks to probe a wide vari-ety of time-domain phenomena, from gravitational waves (GWs) [2] and neutron star equation of state [e.g. 3] to solar wind [e.g. 4]. The technique underlying these ap-plications is pulsar timing, which allows us to track the rotation of the pulsars by measuring the times of arrival (TOAs) of their pulses [5]. Pulsar Timing Arrays (PTAs) are experiments that detect GWs in the nanohertz fre-quency regime by monitoring ensembles of millisecond pulsars distributed across the sky, thereby synthesizing a Galaxy-sized GW detector via pulsar timing [6]. Re-cently, PTA experiments found evidence for a stochas-tic GW background, laying the foundations of nanohertz GW astronomy [2]. The measured TOAs of a pulsar are influenced by sev-eral astrophysical and instrumental processes, some of which are deterministic while the others are stochastic. A mathematical description of these deterministic pro-cesses is known as the pulsar timing model, and a descrip-tion of the stochastic processes is known as the pulsar noise model. The timing model parameters are usually estimated in a frequentist setting using packages such as 
+
+tempo2 [5, 7] and PINT [8, 9] assuming fixed noise param-eters, whereas the noise model parameters are estimated in a Bayesian setting using packages such as ENTERPRISE 
+
+[10] and DISCOVERY [11] using a linear approximation of the timing model. Bayesian inference using the full non-linear timing and noise model can be done using  
+
+> ∗abhimanyu@iisertvm.ac.in
+
+TEMPONEST [12] and Vela.jl [13, 14]. The linear approx-imation of the timing model enables the timing model parameters to be analytically marginalized [15] or Gibbs sampled [16]. Recently, Gundersen et al. [17] introduced a standardizing parameter transformation to improve the efficiency of Bayesian inference for the linearized timing and noise model. These methods significantly reduce the computational cost of Bayesian inference, and pul-sar noise analysis is usually done assuming the linearized timing model for this reason. However, the pulsar timing model is intrinsically non-linear and the linearized timing model does not always approximate it accurately. Further, some timing model parameters require prior distributions which are not con-ducive to analytic marginalization or Gibbs sampling. This is especially true for pulsar timing applications where the astrophysics of interest is encoded in the non-linear timing parameters, such as tests of theories of grav-ity [e.g. 18]. In such circumstances, it is necessary to perform Bayesian inference over the full non-linear tim-ing and noise model. We also note that in most cases it is not necessary to treat all parameters non-linearly; some parameters, such as the rotational frequency and its derivatives, can indeed be treated as linear parame-ters without loss of accuracy [14]. There are three major computational challenges in per-forming Bayesian inference using the non-linear timing and noise model. First, the non-linear timing model in-volves expensive mathematical operations, including nu-merical solution of coupled differential equations in some cases [e.g. 19]. Secondly, the timing and noise model can have a large number of parameters, up to hundreds in some cases, depending on the complexity of the model and the dataset. Finally, the pulsar timing posterior dis-tribution often features complex geometries which can impede the convergence of sampling algorithms. In this paper, we develop a new sequential data-arXiv:2610.02737v1 [astro-ph.IM] 2 Oct 2026 2tempered ensemble sampling algorithm to efficiently per-form non-linear pulsar timing and noise analysis, address-ing the above concerns. This paper is arranged as fol-lows. In Section II, we briefly describe the pulsar timing and noise model, the pulsar timing posterior distribu-tion, and its computational cost. We introduce the new sampling scheme in Section III, and demonstrate it using PSR B1855+09 in Section IV. Finally, we summarize our results in V. Please note that we restrict our discussions to the narrowband timing paradigm in this work, but the sampling method presented here is equally applicable to the wideband timing paradigm [20].  
+
+> II. THE PULSAR TIMING AND NOISE MODEL
+
+We begin by summarizing the pulsar timing and noise model, and the corresponding posterior distribution. In pulsar timing, the fundamental measurable quantity is the TOA ti of a pulse recorded at an observatory [21]. ti
+
+is related to the corresponding pulse emission time τi by the expression 
+
+ti = τi + ∆( ti) + NR , (1) where ∆( ti) is the sum of all astrophysical and instru-mental delays influencing the measured TOA, and NR is a stochastic process arising from the radiometer noise of the telescope. The rotational phase ϕi of the pulsar can be estimated from τi using the expression 
+
+ϕi = ϕ0+
+
+> NF
+
+X
+
+> j=0
+
+Fj (ti − t0)j+1 
+
+(j + 1)! +Φ( ti)+ ϕARN (ti)+ NJ , (2) where ϕ0 is an initial phase, Fn represent the rotational frequency of the pulsar and its derivatives, Φ( ti) repre-sents the various phase corrections, ϕARN (ti) represents the slow stochastic wandering of the apparent rotational frequency known as the achromatic red noise, and NJ is a stochastic term representing pulse jitter. Detailed de-scriptions of the various physical processes contributing to the delays and phase corrections mentioned above may be found in Hobbs et al. [5], Edwards et al. [7], Luo et al. 
+
+[8], Lentati et al. [12], Susobhanan [13], and references therein. The timing residual ri is given by 
+
+ri = ϕi − N [ϕi]¯Fi
+
+, (3) where N [ϕi] is the integer closest to ϕi and ¯Fi is the topocentric frequency of the pulsar. The pulsar timing log-likelihood function can be written in terms of ri as [12, 13] ln L[D|θ, M] = − 12 rT C−1r − 12 ln det[2 πC] , (4) where D is the dataset containing the TOA measure-ments, their uncertainties, and related metadata, M is the pulsar timing and noise model, r is a vector contain-ing the residuals ri, θ is the collection of model param-eters, and C is the TOA covariance matrix representing the various noise processes present in the data. C is usu-ally expressed in a reduced-rank form [22] 
+
+C = N + FΦF T , (5) where N is a block-diagonal matrix quantifying the ra-diometer noise and the pulse jitter, and F and Φ are re-spectively the reduced-rank basis matrix and the prior co-variance matrix representing the time-correlated stochas-tic processes such as spin noise and interstellar dispersion measure variations. Finally, the posterior distribution can be written using the Bayes theorem as ln P [θ|D, M] = L[D|θ, M] Π[ θ|M]
+
+Z[D|M] , (6) where Π[ θ|M] represents the prior distributions of the model parameters, and Z[D|M] is the Bayesian evidence. Bayesian parameter estimation of the pulsar timing and noise model involves drawing samples from P [θ|D, M], using Markov Chain Monte Carlo (MCMC) or nested sampling methods.  
+
+> 1. The computational cost of the pulsar timing and noise model
+
+Consider a dataset with n TOA measurements with a 
+
+p-rank covariance matrix such that p ≪ n. In this case, r
+
+is an n-dimensional vector, N is an n × n block-diagonal matrix, F is an n × p matrix, and Φ is a p × p matrix. Using the Woodbury identity, rT C−1r can be computed as follows: 
+
+rT C−1r = rT N−1r − bT b , (7) where 
+
+b = L−1y , (8a) 
+
+y = FT N−1r , (8b) 
+
+LL T = Σ−1 = Φ−1 + FT N−1F , (8c) where L is the lower-triangular Cholesky factor of Σ−1 .Similarly, using the matrix determinant lemma, we have ln det C = ln det N + ln det Φ + 2 ln det L . (9) Assuming a sufficiently large n and an appropriate block-diagonal structure for N [10], this computation is dominated by FT N−1F, which has a time complexity of 
+
+O(np 2). We also note that larger datasets require higher-rank representations of noise in practice, making p an increasing function of n. Therefore, the computational complexity of ln P [θ|D, M] scales super-linearly with n
+
+for real datasets. 3The computational challenge in performing Bayesian inference over P [θ|D, M] arises from three factors, as mentioned in the introduction. The first is of course the O(np 2) computational cost mentioned above, which grows larger for larger datasets 1. Secondly, large pulsar timing datasets often include TOAs obtained using mul-tiple observing systems with varying noise properties, re-quiring many noise and instrumental delay parameters. Further, larger datasets are sensitive to detect more num-ber of astrophysical parameters, which, together with the noise parameters, lead to large-dimensional parameter spaces. Finally, the posterior distribution usually fea-tures a sharply peaked global maximum occupying only a tiny portion within the prior volume, often accompa-nied by Neal’s funnel-like geometry [17, 23]. These fac-tors often lead to slow convergence while using MCMC and nested sampling, both in terms of time as well as the number of posterior evaluations.  
+
+> III. THE NEW SAMPLING METHOD
+
+Consider a proper subset of the data D′ ⊂ D. We expect the distribution P [θ|D′, M] to be (a) cheaper to compute than P [θ|D, M], and (b) broader than 
+
+P [θ|D, M] because less data leads to a less constrained posterior distribution. Further, since the dataset D′ is less sensitive than D, we can approximate M using a lower-ranked model M′, i.e., P [θ|D′, M′] ≈ P [θ|D′, M]. The computational cost of evaluating P [θ|D′, M′] is asymptotically O(n′p′2) < O(np 2), where n′ is the num-ber of TOAs in D′ and p′ is the rank of the correlated noise representation in the approximate model M′.We now define a sequence of progressively larger non-empty datasets 
+
+D1 ⊂ D 2 ⊂ ... ⊂ D S ≡ D ,
+
+and their corresponding approximate lower-rank models 
+
+M1 ⊂ M 2 ⊂ ... ⊂ M S ≡ M .
+
+We choose the data-subsets such that the number of TOAs ns ∼ ξsn, where ξ ∈ (0 , 1), and the approx-imate models Mi such that pi ∼ nip/n , while en-suring that each data-subset Ds contains a minimum number of TOAs for each observing system. Then, the computational cost of P [θ|Ds, Ms] is cheaper than 
+
+P [θ|Ds+1 , Ms+1 ] by a factor of ξ3 in the limiting case when n is large. i.e., P [θ|Ds, Ms], where s < S , is signif-icantly easier to sample from than P [θ|D, M] due to the reduced cost of its evaluation and its broader shape. Based on the above observations, we propose a sequen-tial data-tempered ensemble MCMC scheme as follows.        
+
+> 1This is assuming sufficiently large values of nand p. In practice, the computational cost may be dominated by the O(n) evalua-tion of rif the timing model is complex, especially when parts of the timing model are not tractable analytically.
+
+1. Given a set of W number of starting points θw0, the posterior distributions P [θ|Ds, Ms], burn-in fac-tors βs, and number of steps ls for each s,2. for s ∈ { 1, 2, ..., S }
+
+(a) Run ls number of ensemble MCMC steps on 
+
+P [θ|Ds, Ms] starting with θw0.(b) Replace θw0 by randomly drawing w unique 
+
+samples from the resulting ensemble MCMC chain after discarding the first βsls steps. 3. Return the final ( s = S) MCMC chain after dis-carding βS lS steps. Here, we implement the ensemble MCMC steps (2a) us-ing the emcee package [24], with a combination of the stretch move [25] and the differential evolution move [26]. Note that the computational cost of evaluating 
+
+P [θ|D1, M1] is negligible compared to P [θ|D, M], pro-vided ξ and S are chosen appropriately. This means that the first iteration of the ensemble MCMC, starting from an uninformative initial guess, can be run over a large number of steps ( l1) to ensure convergence within a rel-atively small amount of time. On the other hand, each subsequent iteration starts from an ensemble of points which resembles the target distribution of that iteration, and hence requires fewer number of steps ( ls) to converge. Of course, the final iteration, over the true target distri-bution P [θ|D, M], should be run over enough steps ( lS )to ensure reliable inference and visualization of the distri-bution. We stress here that only the final MCMC chain, obtained using the true target distribution P [θ|D, M], is used for inference, and the preceding iterations are per-formed only to aid convergence. Comments are in order on why we randomly draw sam-ples from the sth MCMC chain to use as starting points for the ( s + 1)th iteration (step 2b above), as opposed to starting the ( s + 1)th iteration from the end points of the 
+
+sth MCMC chain. Pulsar timing posterior distributions often contains regions which are difficult to sample effi-ciently, resulting in some of the MCMC chains getting stuck. If we start the ( s + 1)th iteration from the end points of the sth MCMC chain, then any stuck chains from the sth iteration will definitely be passed on to the (s + 1)th iteration. On the other hand, by mixing the chains as done in step 2b, we reduce the probability of the stuck chain being passed on to a number less than 1. Hence, as the number of iterations S becomes large, the probability of a stuck chain surviving tends to 0, assum-ing that the number of stuck chains remains a sufficiently small fraction of the total number of chains in the MCMC ensemble. Our scheme of tempering the posterior distribution by varying the data size is in contrast with the widely used likelihood tempering scheme [e.g. 10] where the interme-diate distributions are defined as 
+
+Pβ [θ|D , L] ∝ P [D| θ, M]β P [θ|M ] , (10) 4where β = [0 , 1] is an analogue of the inverse temperature in statistical physics. There are two practical differences between the two schemes: (a) β is a continuous param-eter whereas the data size is by definition discrete; and (b) the cost of evaluating equation 10 is independent of β
+
+unlike in the data-tempering scheme. The advantage of data size-tempering compared to β-tempering is the com-putational cost advantage, especially for large datasets. The disadvantages is that the sub-datasets are randomly selected and can have posterior features which are absent in the full data-posterior. An implementation of our method may be found in 
+
+https://github.com/abhisrkckl/vela-sdt . 
+
+> IV. DEMONSTRATION USING PSR B1855+09
+
+We now proceed to demonstrate our method using the NANOGrav 12.5-year data of PSR B1855+09 [27]. B1855+09 is a binary pulsar in a ∼ 12-day nearly circu-lar orbit with a 0.25 solar mass white dwarf companion [28]. The dataset consists of 6464 narrowband TOAs ob-tained using the Arecibo telescope during a time span of ∼ 12 .5 years (MJD 53358–57915). The data were recorded using four different receiver-backend combina-tions, denoted as ‘430 ASP’, ‘430 PUPPI’, ‘L-wide ASP’, and ‘L-wide PUPPI’. The pulsar rotation is characterized by the rotational frequency and its derivative, together with a Fourier-basis Gaussian process with power law spectrum (with 16 harmonics) to characterize stochastic variations in the apparent spin frequency (achromatic red noise). The solar system delays are parameterized by the ecliptic coordinates of the pulsar, proper motion, and paral-lax, and are computed using the DE436 solar system ephemeris. Dispersion measure variations (dispersion noise) are modeled using a truncated Taylor series up to the second derivative, along with a Fourier-basis Gaus-sian process with a power law spectrum (with 32 harmon-ics). The binary Rømer and Shapiro delays are modeled using the ELL1 model accurate up to cubic terms in ec-centricity [29, 30]. Instrumental delay between the ‘430’ and ‘L-wide’ receivers is represented as a phase jump. Radiometer noise and pulse jitter noise are parameter-ized by the EFAC, EQUAD, and ECORR parameters for each receiver-backend combination [31]. Finally, timing artifacts arising from frequency-dependent profile evolu-tion are removed by fitting three ‘FD’ parameters [31]. The Vela.jl package is used to evaluate the log-posterior distribution(s). The rotational frequency and its derivative, the sky coordinates, the dispersion mea-sure and its derivatives, the phase jump, the ‘FD’ pa-rameters, and an overall phase offset are analytically marginalized assuming uninformative flat priors since these parameters behave either approximately or exactly linearly [14]. The Fourier amplitudes of the achromatic red noise and the dispersion noise are also analytically marginalized assuming Gaussian priors determined by the noise spectrum [32]. The remaining timing and noise parameters together with their prior distributions are listed in Table 1. Note that the analytic marginalization of the corre-lated noise amplitudes and the approximately linear pa-rameters is necessary to avoid the Neal’s funnel-like ge-ometries which make the posterior intractable using most MCMC methods, in addition to reducing the dimension-ality of the parameter space. An alternative to analytic marginalization for this purpose is the standardizing pa-rameter transformation described in [17]. We perform Bayesian parameter estimation using the method described in section III, using the emcee package to run each ensemble sampling iteration. We use ξ = 0 .8, but ensure that for each sub-dataset, there are at least 32 TOAs per receiver-backend combination; this leads to 
+
+S = 23. We also ensure that each approximate model has at least 4 harmonics for both the achromatic red noise and the dispersion noise. For each iteration, we use a total of 130 MCMC chains (5 times the number of free parameters) in the sampler ensemble. The chain length for the first iteration is l1 = 10000, for the final iteration is lS = 3000, and for the intermediate iterations is ls = 1000. We choose the initial samples as 
+
+θw0 = 0 .7 θml + 0 .3 θprior,w ,
+
+where θml represent the maximum-likelihood values present in the pulsar ephemeris provided with the dataset and θprior,w are samples drawn from the prior distribu-tion. The data-subset sizes and the corresponding log-posterior evaluation times are plotted in Figure 1. We see that the plot is consistent with the expected O(n3)asymptotic behavior for large data sizes, but deviate significantly for smaller datasets. The full sequential MCMC run took 28 minutes on an AMD Ryzen 7 CPU, parallelized over 8 cores. Out of this, the final itera-tion took approximately two-thirds of the total execu-tion time; i.e., the preceding iterations aid the MCMC convergence without incurring too much computational cost. The concatenated MCMC chains for each parameter from all iterations is plotted in Figure 2. These plots illustrate how the parameters converge gradually as the iterations progress, as expected, indicating the robust-ness of the sampling scheme. Interestingly, these plots also indicate how the sensitivity of the experiment grows as more data is added, e.g., see the plot for the parallax (PX). Finally, a corner plot of the final posterior samples and the whitened post-fit residuals are shown in Figure 3. Figure 3 also lists the estimated value and uncer-tainty for each parameter. We see that all parameters are well-constrained, although some parameters have sig-nificant covariances (e.g., M2 and SINI). The whitened post-fit residuals do not show any un-modeled artifact, with a weighted root-mean-squared value of 0.6 μs. A5
+
+Parameter(s) Description and Unit Prior Distribution 
+
+PX Parallax, ϖ (mas) Π( ϖ) = 3 R−3max ϖ−4
+
+PMELONG Proper motion in ecliptic longitude, μλ (mas/yr) §
+
+PMELAT Proper motion in ecliptic latitude, μβ (mas/yr) §
+
+PB Binary orbital period, Pb (d) §
+
+A1 Projected semi-major axis of the pulsar orbit, a1 (lightsecond) §
+
+M2 Companion mass, m2 (solar mass) LogUniform[10 −9, 100] SINI Sine-inclination, sin ι Π(sin ι) = sin ι(1 − sin 2 ι)−1/2
+
+TASC Epoch of ascending node passage, T (MJD) Uniform[ − ˆPb/2, ˆPb/2] EPS1 First Laplace-Lagrange parameter, ϵ1 §
+
+EPS2 Second Laplace-Lagrange parameter, ϵ2 §
+
+TNDMAMP Spectral log-amplitude of the dispersion noise, log 10 ADMN Uniform[–18,–9] TNDMGAM Spectral index of the dispersion noise, γDMN Uniform[0,7] TNREDAMP Spectral log-amplitude of the achromatic red noise, log 10 AARN Uniform[–18,–9] TNREDGAM Spectral index of the achromatic red noise, γARN Uniform[0,7] EFAC TOA uncertainty multiplicative factor LogNormal[0, 0.25] EQUAD TOA error added in quadrature (us) LogUniform[0.001, 100] ECORR TOA observation-wise correlation parameter (us) LogUniform[0.001, 100] TABLE I. The list of explicitly sampled model parameters and their prior distributions. ‘ §’ denotes ‘cheat’ prior distributions, which are uniform distributions centered around the maximum-likelihood estimates with a width equal to 100 times the maximum-likelihood uncertainty (see Appendix B of [13]). TASC is measured from the center of the data span (MJD 55637). The PX prior assumes that the pulsar is uniformly distributed within a sphere of radius Rmax centered at the solar system barycenter (a uniform distribution is unphysical for this parameter). The SINI prior is defined such that the cos-inclination is uniformly distributed between 0 and 1. There are four sets of EFACs, EQUADs, and ECORRs, corresponding to each receiver-backend combination, with identical priors as listed above. The rotational frequency and its derivative (F0, F1), the sky coordinates (ELAT, ELONG), the dispersion measure and its derivatives (DM, DM1, DM2), the instrumental phase jump (JUMP1), the FD parameters (FD1, FD2, FD3), and the overall phase offset (PHOFF) are analytically marginalized assuming an irregular flat prior, and are not listed in this table. 
+
+Kolmogorov-Smirnov test of the whitened residuals for unit-Gaussianity reveals a p-value of 0.24, and suggests that our timing and noise model is adequate for this dataset. 
+
+FIG. 1. The execution time of the posterior distribution as a function of the number of TOAs ( n). The dotted line shows a function proportional to n3. We see that the smaller data-subsets deviate significantly from the asymptotic O(n3) be-havior. 
+
+V. SUMMARY AND DISCUSSION 
+
+We developed a sequential ensemble MCMC scheme for Bayesian non-linear pulsar timing and noise analysis where the data size is used as the tempering parameter. Our method provides gradual and reliable convergence of the MCMC chains by iteratively increasing the data size and hence its sensitivity, starting from a possibly un-informed set of initial points, and gradually narrowing the target distribution until the target posterior distribu-tion of the full dataset is reached. The initial iterations of our method are run using sub-datasets which can be orders of magnitude smaller than the full dataset, ensur-ing low computational cost. The computational cost is further reduced by using approzimate lower-rank mod-els derived from the target model, which is justified by the lower sensitivity of the sub-datasets. The Bayesian inference is done using the MCMC chain from the final iteration corresponding to the true target distribution af-ter applying appropriate burn-in. We demonstrated the efficacy of our method using the NANOGrav 12.5-year data of PSR B1855+09, and showed that the MCMC chains gradually converge to the true target distribution as the iterations progress. Further, we also demonstrated that the majority of the computational time is spent drawing samples from the true target distribution, rather than in the preceding it-erations. While we motivated and demonstrated this method in 6
+
+FIG. 2. The concatenated MCMC chains for each parameter for all iterations, thinned by a factor of 10. The first and third columns show the full concatenated chain while the second and fourth columns show the corresponding burned-in final chain. The vertical dotted lines demarcate different iterations. The indices 1 to 4 of the EFACs, EQUADs, and ECORRs correspond to the reciever-backend combinations ‘430 ASP’, ‘430 PUPPI’, ‘L-wide ASP’, and ‘L-wide PUPPI’ in that order. See Table I for a description of each parameter. 7
+
+FIG. 3. The corner plot of the target posterior distribution obtained from the final MCMC iteration. This plot corresponds to the final burned-in chain shown in the even columns of Figure 2. The prior distributions are plotted using blue lines. The median parameter values along with the corresponding 1 σ uncertainties are shown above the 1-dimensional marginal distributions. The inset shows the whitened post-fit residuals obtained using the median parameter values. The twelve white noise parameters (EFACs, EQUADs, and ECORRs) are not plotted due to space constraint. PEPOCH is the epoch at which the pulsar frequency and its derivatives are defined, chosen to be at the center of the data span (MJD 55637). TASC is measured from the PEPOCH. 
+
+this paper using the case of Bayesian single-pulsar timing and noise analysis, it can be easily adapted to linearized Bayesian single-pulsar noise analysis following the exact same recipe. On the other hand, a different strategy for creating data-subsets is required for applying our method to PTA gravitational wave background analysis, since the computational cost there is dominated by the evaluation of the Hellings-Downs correlations [33] and the matrix operations involving them. [10] showed that the compu-tational cost thereof varies approximately quadratically 8with the number of pulsars. Hence, an appropriate strat-egy for applying our method there would be to pick sub-sets of pulsars rather than subsets of TOAs. We may also envisage parallel-tempering MCMC as well as normalizing flow-based sequential MCMC or vari-ational inference methods where the data size is used as the tempering/annealing parameter rather than the inverse-temperature β. Such methods will of course have the advantage that the smaller dataset-posteriors are much cheaper to evaluate, leading to overall lesser com-putational cost. 
+
+DATA AVAILABILITY 
+
+The NANOGrav 12.5-year dataset is avail-able at https://nanograv.org/science/data/ 125-year-pulsar-timing-array-data-release .
+
+SOFTWARE 
+
+Vela.jl [13, 14], PINT [8, 9], emcee [24], corner [34], 
+
+numpy [35], matplotlib [36]. 
+
+ACKNOWLEDGMENTS 
+
+We thank Rutger van Haasteren and Churchil Dwivedi for their comments on this manuscript. During this work, we used ChatGPT for code review and minor grammatical and stylistic editing. All scien-tific analysis, interpretation, and conclusions were inde-pendently verified by the authors. 
+
+[1] D. R. Lorimer and M. Kramer, Handbook of Pulsar As-tronomy (Cambridge University Press, 2012). [2] G. Agazie, J. Antoniadis, A. Anumarlapudi, A. M. Archibald, P. Arumugam, et al. , Comparing Recent Pul-sar Timing Array Results on the Nanohertz Stochas-tic Gravitational-wave Background, The Astrophysi-cal Journal 966 , 105 (2024), arXiv:2309.00693 [astro-ph.HE]. [3] H. T. Cromartie, E. Fonseca, S. M. Ransom, P. B. De-morest, Z. Arzoumanian, et al. , Relativistic Shapiro delay measurements of an extremely massive millisecond pul-sar, Nature Astronomy 4, 72 (2020), arXiv:1904.06759 [astro-ph.HE]. [4] C. Tiburzi, G. M. Shaifullah, C. G. Bassa, P. Zucca, J. P. W. Verbiest, et al. , The impact of solar wind vari-ability on pulsar timing, Astronomy & Astrophysics 647 ,A84 (2021), arXiv:2012.11726 [astro-ph.HE]. [5] G. B. Hobbs, R. T. Edwards, and R. N. Manchester, TEMPO2, a new pulsar-timing package - I. An overview, Monthly Notices of the Royal Astronomical Society 369 ,655 (2006), arXiv:astro-ph/0603381 [astro-ph]. [6] R. S. Foster and D. C. Backer, Constructing a Pul-sar Timing Array, The Astrophysical Journal 361 , 300 (1990). [7] R. T. Edwards, G. B. Hobbs, and R. N. Manch-ester, tempo2, a new pulsar timing package – II. The timing model and precision estimates, Monthly Notices of the Royal Astronomical Society 372 ,1549 (2006), https://academic.oup.com/mnras/article-pdf/372/4/1549/4012423/mnras0372-1549.pdf. [8] J. Luo, S. Ransom, P. Demorest, P. S. Ray, A. Archibald, 
+
+et al. , PINT: A Modern Software Package for Pul-sar Timing, The Astrophysical Journal 911 , 45 (2021), arXiv:2012.00074 [astro-ph.IM]. [9] A. Susobhanan, D. L. Kaplan, A. M. Archibald, J. Luo, P. S. Ray, et al. , Pint: Maximum-likelihood estimation of pulsar timing noise parameters, The Astrophysical Jour-nal 971 , 150 (2024). [10] A. D. Johnson, P. M. Meyers, P. T. Baker, N. J. Cornish, J. S. Hazboun, et al. , NANOGrav 15-year gravitational-wave background methods, Physical Review D 109 ,103012 (2024), arXiv:2306.16223 [astro-ph.HE]. [11] M. Vallisneri, P. M. Meyers, D. Wright, A. D. Johnson, J. G. Baier, and R. van Haasteren, nanograv/discovery (2025). [12] L. Lentati, P. Alexander, M. P. Hobson, F. Feroz, R. van Haasteren, K. J. Lee, and R. M. Shannon, TEMPON-EST: a Bayesian approach to pulsar timing analysis, Monthly Notices of the Royal Astronomical Society 437 ,3004 (2014), arXiv:1310.2120 [astro-ph.IM]. [13] A. Susobhanan, Bayesian Pulsar Timing and Noise Anal-ysis with Vela.jl: An Overview, Astrophys. J. 980 , 165 (2025), arXiv:2412.15858 [astro-ph.IM]. [14] A. Susobhanan, Bayesian pulsar timing and noise analy-sis with Vela.jl: The wideband paradigm, Phys. Rev. D 
+
+112 , 063023 (2025), arXiv:2505.10141 [astro-ph.IM]. [15] R. van Haasteren and Y. Levin, Understanding and analysing time-correlated stochastic signals in pulsar tim-ing, Monthly Notices of the Royal Astronomical Society 
+
+428 , 1147 (2013), arXiv:1202.5932 [astro-ph.IM]. [16] N. Laal, W. G. Lamb, J. D. Romano, X. Siemens, S. R. Taylor, and R. van Haasteren, Exploring the capabilities of Gibbs sampling in pulsar timing arrays, Phys. Rev. D 
+
+108 , 063008 (2023), arXiv:2305.12285 [astro-ph.IM]. [17] A. Gundersen, R. van Haasteren, N. J. Cornish, M. Vallisneri, and P. M. Meyers, A new framework for lightning-fast gravitational wave analysis of pulsar timing data, arXiv e-prints , arXiv:2607.06834 (2026), arXiv:2607.06834 [gr-qc]. [18] M. Vaglio, A. Carleo, A. Susobhanan, E. Barausse, B. Ben Salem, A. Corongiu, P. C. C. Freire, and D. Per-rodin, Constraints on Einstein-aether gravity from the precision timing of PSR J1738+0333, arXiv e-prints , arXiv:2605.01436 (2026), arXiv:2605.01436 [gr-qc]. [19] A. M. Archibald, N. V. Gusinskaia, J. W. T. Hessels, A. T. Deller, D. L. Kaplan, D. R. Lorimer, R. S. Lynch, S. M. Ransom, and I. H. Stairs, Universality of free fall from the orbital motion of a pulsar in a stellar triple sys-tem, Nature (London) 559 , 73 (2018), arXiv:1807.02059 [astro-ph.HE]. [20] T. T. Pennucci, P. B. Demorest, and S. M. Ransom, Ele-mentary Wideband Timing of Radio Pulsars, The Astro-9
+
+physical Journal 790 , 93 (2014), arXiv:1402.1672 [astro-ph.IM]. [21] J. H. Taylor, Pulsar timing and relativistic gravity, Philo-sophical Transactions of the Royal Society of London. Series A: Physical and Engineering Sciences 341 , 117 (1992). [22] R. van Haasteren and M. Vallisneri, Low-rank ap-proximations for large stationary covariance matri-ces, as used in the Bayesian and generalized-least-squares analysis of pulsar-timing data, Monthly Notices of the Royal Astronomical Society 446 ,1170 (2014), https://academic.oup.com/mnras/article-pdf/446/2/1170/13767575/stu2157.pdf. [23] R. M. Neal, Slice sampling, The Annals of Statistics 31 ,705 (2003). [24] D. Foreman-Mackey, D. W. Hogg, D. Lang, and J. Good-man, emcee: The MCMC Hammer, Publications of the Astronomical Society of the Pacific 125 , 306 (2013), arXiv:1202.3665 [astro-ph.IM]. [25] J. Goodman and J. Weare, Ensemble samplers with affine invariance, Communications in Applied Mathematics and Computational Science 5, 65 (2010). [26] B. Nelson, E. B. Ford, and M. J. Payne, Run dmc: An efficient, parallel code for analyzing radial velocity obser-vations using n-body integrations and differential evolu-tion markov chain monte carlo, The Astrophysical Jour-nal Supplement Series 210 , 11 (2013). [27] M. F. Alam, Z. Arzoumanian, P. T. Baker, H. Blumer, K. E. Bohler, et al. , The NANOGrav 12.5 yr Data Set: Observations and Narrowband Timing of 47 Millisecond Pulsars, The Astrophysical Journal Supplement Series 
+
+252 , 4 (2021), arXiv:2005.06490 [astro-ph.HE]. [28] V. M. Kaspi, J. H. Taylor, and M. F. Ryba, High-Precision Timing of Millisecond Pulsars. III. Long-Term Monitoring of PSRs B1855+09 and B1937+21, Astro-phys. J. 428 , 713 (1994). [29] C. Lange, F. Camilo, N. Wex, M. Kramer, D. Backer, A. Lyne, and O. Doroshenko, Precision timing measurements of PSR J1012+5307, Monthly No-tices of the Royal Astronomical Society 326 , 274 (2001), https://academic.oup.com/mnras/article-pdf/326/1/274/3408096/326-1-274.pdf. [30] W. Fiore, L. Levin, M. A. McLaughlin, A. Anumarla-pudi, D. L. Kaplan, et al. , The green bank north celes-tial cap survey. viii. 21 new pulsar timing solutions, The Astrophysical Journal 956 , 40 (2023). [31] Z. Arzoumanian, A. Brazier, S. Burke-Spolaor, S. Cham-berlin, S. Chatterjee, et al. , The nanograv nine-year data set: Observations, arrival time measurements, and anal-ysis of 37 millisecond pulsars, The Astrophysical Journal 
+
+813 , 65 (2015). [32] L. Lentati, P. Alexander, M. P. Hobson, S. Taylor, J. Gair, S. T. Balan, and R. van Haasteren, Hyper-efficient model-independent Bayesian method for the analysis of pulsar timing data, Physical Review D 87 ,104021 (2013). [33] R. W. Hellings and G. S. Downs, Upper limits on the isotropic gravitational radiation background from pulsar timing analysis., The Astrophysical Journall 265 , L39 (1983). [34] D. Foreman-Mackey, corner.py: Scatterplot matrices in python, The Journal of Open Source Software 1, 24 (2016). [35] C. R. Harris, K. J. Millman, S. J. van der Walt, R. Gom-mers, P. Virtanen, D. Cournapeau, E. Wieser, J. Tay-lor, S. Berg, N. J. Smith, R. Kern, M. Picus, S. Hoyer, M. H. van Kerkwijk, M. Brett, A. Haldane, J. F. del R´ ıo, M. Wiebe, P. Peterson, P. G´ erard-Marchant, K. Shep-pard, T. Reddy, W. Weckesser, H. Abbasi, C. Gohlke, and T. E. Oliphant, Array programming with NumPy, Nature 585 , 357 (2020), arXiv:2006.10256 [cs.MS]. [36] J. D. Hunter, Matplotlib: A 2d graphics environment, Computing in Science & Engineering 9, 90 (2007).
