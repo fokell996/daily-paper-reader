@@ -1,0 +1,834 @@
+Title: Gravitational-wave background from supermassive black holes without merger trees: Tidally regulated mergers and direct inference from the NANOGrav 15 yr data
+
+URL Source: https://arxiv.org/pdf/2610.06220v1
+
+Published Time: Tue, 06 Oct 2026 02:54:06 GMT
+
+Number of Pages: 20
+
+Markdown Content:
+# Gravitational-wave background from supermassive black holes without merger trees: Tidally regulated mergers and direct inference from the NANOGrav 15 yr data 
+
+Shin’ichiro Ando 1, 2 
+
+> 1
+
+GRAPPA Institute, University of Amsterdam, 1098 XH Amsterdam, The Netherlands 
+
+> 2
+
+Kavli Institute for the Physics and Mathematics of the Universe (Kavli IPMU, WPI), University of Tokyo, Kashiwa, Chiba 277-8583, Japan 
+
+(Dated: October 6, 2026) We present a semi-analytic framework that computes the gravitational-wave background (GWB) from supermassive black hole (SMBH) binaries by direct integration of an N -body-recalibrated extended Press–Schechter accretion kernel, bypassing Monte Carlo merger trees entirely. The calcu-lation is resolution-free and fast enough to be sampled directly against pulsar-timing data with no emulator or precomputed model bank. Between halo accretion and black-hole binary formation, we couple the satellite’s simulation-calibrated tidal mass loss continuously to Chandrasekhar dynamical friction. Satellites below a sharp, nearly redshift-independent mass-ratio threshold, ξ ≃ 0.04, are stripped faster than they sink and stall: their drag collapses onto the stellar core, and at z = 0, 21% of accreted satellites still owe more than a Hubble time of sinking. Counting also those still in transit, 38% are unmerged by z = 0. This lowers the GWB amplitude by 11.2% relative to fixed-mass merger-time formulas, and gives a physical origin for wandering SMBHs whose predicted mass budget matches cosmological simulations, although their number in a Milky-Way-mass halo does not. Combining this population model with per-binary stellar-hardening turnovers and eccentric spectra, we sample the five-parameter posterior directly against the NANOGrav 15 yr Hellings– Downs-correlated free spectrum, excluding the 15 .8 nHz bin, whose excess power a subsequent chromatic-noise reanalysis attributes to pulsar noise. The data prefer a black-hole mass normal-ization +0 .31 +0 .20  
+
+> −0.23
+
+dex above the locally calibrated black-hole–bulge mass relation (+0 .42 +0 .23  
+
+> −0.24
+
+dex if that bin is retained), consistent with earlier indications that the nanohertz background is loud relative to local SMBH calibrations and robust to the delay model, merger kernel, local mass cali-bration, and its redshift evolution. The spectrum is compatible with, but does not require, eccentric binaries or dense stellar environments. 
+
+I. INTRODUCTION 
+
+Pulsar timing arrays (PTAs) have reported evidence for a stochastic gravitational-wave background (GWB) at nanohertz (nHz) frequencies, with the Hellings–Downs [1] angular correlation expected of gravitational waves: the NANOGrav 15 yr data set [2], the EPTA/InPTA second data release [3], the Parkes PTA [4], the Chinese PTA [5], and the MeerKAT PTA [6, 7]. Writing the characteristic strain of a fiducial gravitational-wave-driven binary pop-ulation as hc(f ) = Ayr (f /f yr )−2/3 with fyr = 1 yr −1,the measured amplitude is Ayr = 2 .1+0 .6 
+
+> −0.5
+
+× 10 −15 [8], a 12% downward revision of the originally reported 2.4+0 .7 
+
+> −0.6
+
+×10 −15 [2] brought by customized chromatic noise models [9]. In terms of the timing-residual spectral in-dex γ, defined by hc ∝ f (3 −γ)/2, a free power-law fit gives 
+
+γ = 3 .5+0 .7
+
+> −0.6
+
+, shallower than the gravitational-wave-driven 
+
+γ = 13 /3 but consistent with it inside the 95% region [8]. The original analysis gave the shallower γ = 3 .2 ± 0.6, and much of the motivation for invoking spectral modi-fication rested on it [2]. The leading astrophysical inter-pretation is the superposition of inspiraling supermas-sive black hole (SMBH) binaries formed in galaxy merg-ers, anticipated since the earliest PTA forecasts [10–14], although early-Universe sources remain statistically vi-able interpretations of the same data [15]. Extracting black-hole and galaxy-evolution physics from this sig-nal requires a population model connecting halo merg-ers, through galaxy pairing and binary formation, to the sub-pc hardening where nHz waves are emitted. Most existing predictions build this chain on merger trees: Monte Carlo realizations of extended Press– Schechter (EPS) branching [16–18], halo catalogs from 
+
+N -body simulations, or hydrodynamic volumes [13, 19– 21]. Trees are flexible but carry two structural costs. First, a mass resolution must be chosen, and the shot noise of discrete branchings propagates into the predicted spectrum. Pushing the resolution down to the progeni-tors that matter for seed-black-hole populations is ex-pensive. Second, and more consequentially for infer-ence, a tree-based pipeline is too slow to be called in-side a sampler. Posterior exploration must instead go through precomputed model banks or emulators. The NANOGrav astrophysical interpretation [14] samples a Gaussian-process emulator trained on a holodeck li-brary. At the opposite extreme, fully analytic EPS-based calculations [22, 23] evaluate the GWB as a direct inte-gral over the Lacey–Cole merger kernel [18] (hereafter LC93). This route is fast and resolution-free, but it is built on the raw EPS rate, whose known O(1) inaccu-racies against N -body merger rates [24] then propagate into the signal, and it reduces the halo-merger-to-binary delay to a constant merger probability. This paper develops a middle path with three ingredi-ents. 
+
+(i) A tree-free, N -body-calibrated merger integral. We use the subhalo accretion-rate distribution of Ref. [25] arXiv:2610.06220v1 [astro-ph.CO] 5 Oct 2026 2(hereafter Y11), the EPS branching statistics recali-brated against simulations, as implemented in the semi-analytic subhalo code sashimi 1 [26–29], and treat it as a continuous merger kernel. Multiplied by the Sheth– Tormen mass function [30] and integrated over host mass, accretion redshift, and satellite mass, this kernel counts every branch–branch crossing of the ensemble of merger trees exactly once, with no realization noise and no reso-lution floor (Sec. II). Against the Fakhouri–Ma–Boylan-Kolchin (F10) N -body rate [24], the calibrated kernel reproduces the GWB amplitude to 3.4%, whereas the raw LC93 kernel used in Refs. [22, 23] deviates by 14% (Sec. II C). The calibration buys a factor of 4 in kernel systematics at zero runtime cost. 
+
+(ii) Merger delays regulated by subhalo tidal evolution. 
+
+Between halo accretion and black-hole binary formation, the satellite must sink to the halo center by dynamical friction while tides strip its mass. The two compete, be-cause the friction force scales with the satellite’s surviving bound mass. Almost all PTA population models evaluate this stage at fixed (infall) satellite mass [14, 19, 31–33], or impose no delay at all [22, 34]. Reference [20] lets strip-ping set the starting radius of a subsequent fixed-mass phase, but the sinking mass is frozen once that hand-off occurs. Integrating the orbit while the satellite is stripped is, by contrast, routine in satellite dynamics, where the two are solved together against simulation-calibrated recipes [35, 36]. We bring that treatment into the nHz-background calculation, coupling sashimi ’s stripping law [26] continuously to Chandrasekhar dynam-ical friction [37] throughout the orbital decay (Sec. III), and ask what it changes for the background and for the black holes left behind. The competition then acquires a sharp, nearly redshift-independent critical mass ratio. Satellites with ξ ≲ 0.04 (where ξ is the satellite-to-host mass ratio) are stripped faster than they sink, their drag collapses onto the sur-viving stellar core, and the orbital decay all but halts: at z = 0, 21% of accreted satellites still owe more than a Hubble time of sinking. A fixed-mass timescale leaves such satellites behind too, but selects them by epoch as much as by mass ratio, and the two therefore disagree about which black holes are left wandering (Sec. III D). The amplitude effect is a reduction of 11.2%, well inside the current amplitude uncertainty, which is why fixed-mass formulas have served PTA predictions adequately. The prize lies elsewhere: the same calibrated dynam-ics predict, with no extra freedom, the black holes that have not arrived at their host’s center by z = 0, a pop-ulation tracked in cosmological simulations and in semi-analytic models [38–41]. Their wandering mass fraction in galaxy-scale halos is 10% under the tidally regulated delay, matching without tuning the ∼10% seen in cos-mological hydrodynamic simulations, whereas the fixed-mass delay strands only 5.6% (Sec. VI B). This census is  
+
+> 1https://github.com/shinichiroando/sashimi-c
+
+parameter-free and exactly independent of the fitted mass normalization, which makes it an electromagnetic test of the delay physics rather than a consequence of fitting the background. The independence matters, because the fit alone barely tests the delay: the sampled mass nor-malization absorbs the 11.2% offset, and the two delay models give nearly indistinguishable spectra (Sec. VI). Earlier work on the GWB imprint of stalling imposed the stalled fraction externally [42]. Here, it and its mass-ratio boundary are both outputs of the dynamics. 
+
+(iii) The whole chain inside the sampler. Because the integral framework is deterministic and nearly all of it is independent of the black-hole parameters, a full like-lihood evaluation (population, delays, per-binary envi-ronmental spectral turnover, and eccentric harmonics) costs milliseconds after caching (Sec. V B). We there-fore sample the five-parameter posterior directly against the NANOGrav 15 yr Hellings–Downs free-spectrum data [2, 43], calling the exact model inside the Markov chain Monte Carlo (MCMC) sampler with no emulator, no interpolation in parameter space, and no model bank (Sec. V). Emulator-free inference is itself established, and the way it is achieved is instructive. One route parametrizes the merger rate directly from observed galaxy statistics, bypassing halos entirely [33, 44, 45]. The other keeps halos but takes the raw analytic EPS rate and collapses the whole halo-merger-to-coalescence stage into a single constant efficiency [22, 46]. A third parametrizes an EPS black-hole population and confronts pulsar-timing with high-redshift data in one Bayesian fit, again carrying the delay as a fitted parameter [47]. Each buys its speed by simplifying the stage this pa-per is about. The calculation here keeps the halo ker-nel, calibrated against N -body rates, and integrates the delay from the stripping and sinking equations, while staying cheap enough to be the sampled model itself. The primary result of this direct inference is a black-hole mass normalization +0 .31 +0 .20  
+
+> −0.23
+
+dex above the locally calibrated relation, preferred by the gravitational-wave amplitude at 91% of the posterior and robust to the de-lay, kernel, and calibration systematics (Sec. VI). The fit excludes the one frequency bin whose excess power a later chromatic-noise reanalysis attributes to pulsar noise (Sec. V A); retaining it would give +0 .42 +0 .23  
+
+> −0.24
+
+dex. The paper is organized as follows. Section II presents the tree-free merger integral, the galaxy–black-hole painting, and the kernel comparison. Section III follows a pair from halo accretion to coalescence, through the tidally regulated sinking stage, its fixed-mass counter-part, and the residual hardening delay, and identifies the population that never arrives. Section IV turns the sur-viving population into an observed spectrum, with the loss-cone turnover and eccentricity. Section V defines the likelihood and priors, and Sec. VI presents posteriors un-der both the fixed-mass and tidal delay models, together with the delay model’s parameter-free stalled fractions and their predictions, falsifiable with wandering-black-hole demographics. We discuss systematics, the relation 3to previous work, and the extension to the LISA band in Sec. VII, and conclude in Sec. VIII. Throughout we adopt the Planck 2018 cosmology [48] used by sashimi .  
+
+> II. MERGER RATES WITHOUT MERGER TREES A. The master integral
+
+A Monte Carlo merger tree encodes two distinct pieces of information: the assembly history of individual ha-los, and the statistical rate at which branches of given masses join. For a population-level observable such as the GWB, only the latter is needed, and EPS theory provides it in closed form. Our starting point is the sub-halo accretion-rate distribution of Y11 (their Model III), as implemented and used to anchor the evolved subhalo population in sashimi [26]: the mean number of subhalos of mass ma accreted per logarithmic mass and per log-arithmic (1 + za) interval onto a host that reaches mass 
+
+M0 at z = 0, 
+
+Na(ma, z a | M0) ≡ d2Nd ln ma d ln(1 + za) . (1) This function is constructed from the same excursion-set branching statistics as a Monte Carlo tree, but with its normalization and shape recalibrated against cosmologi-cal simulations [25]. It is continuous in both arguments, and therefore carries no resolution floor and no realiza-tion scatter. Every merger in the ensemble of trees is an accre-tion event onto some main branch. We therefore weight Eq. (1) by the comoving abundance of main branches at each epoch. Writing M (za|M0) for the mean main-branch mass history [49] and changing variables from the 
+
+z = 0 mass M0 to the mass at accretion, the comoving density of halo–halo mergers per unit host mass, accre-tion redshift, and satellite mass is 
+
+d3nd ln M0 d ln(1 + za) d ln ma
+
+= dn d ln M∂ ln M∂ ln M0
+
+Na, (2) where dn/d ln M is the Sheth–Tormen mass function [30] evaluated at the main-branch mass M (za) and epoch za,applied at its native virial mass definition (Appendix B), and using the same σ(M ) as sashimi [50]. The choice of mass-function fit moves the amplitude by between −2.7% and −6.5%, quantified in Sec. VII A. Three approxima-tions are inherited: the mean mass history replaces the distribution of histories, correlations between successive accretions within one tree are neglected (irrelevant for one-point statistics such as hc), and satellite–satellite mergers inside a common host are not counted. Each pair is counted once: the Y11 kernel is defined up to its natural boundary ma ≤ M0/2, and the residual sensitiv-ity to how the major-merger edge is treated is contained in the end-to-end kernel comparison of Sec. II C. The triple integral of Eq. (2) is evaluated on a 36 ×
+
+48 × 64 logarithmic grid in ( M0, 1 + za, m a) spanning 
+
+M0 = 10 11 –10 15 .7 M⊙, za = 0 .02–6, and ma = 10 10 –10 15 .5 M⊙. Doubling every grid dimension changes the amplitude by 0 .1%.  
+
+> B. Galaxies and black holes
+
+Each side of a halo–halo merger is painted with a galaxy through the stellar-mass–halo-mass relation of Ref. [51]. The satellite is painted at its infall mass 
+
+ma. Once it enters the host, it is quenched and tidally stripped, and its black hole is held fixed thereafter. The host keeps accreting and merging until the galaxies coa-lesce. We therefore advance its main-branch mass from 
+
+M (za) to its value at the galaxy-merger epoch (Sec. III) before assigning its black hole, a co-evolution consis-tent with the delay physics, and hold the primary fixed through the subsequent binary hardening. Explicitly, 
+
+M⋆
+
+M = 2 N
+
+" MM1
+
+−β
+
++
+
+ MM1
+
+γM
+
+#−1
+
+, (3) with the best-fit parameters: log 10 (M1/M ⊙) = 11 .590 + 1.195 z/ (1 + z), N = 0 .0351 − 0.0247 z/ (1 + z), β =1.376 − 0.826 z/ (1 + z), and γM = 0 .608 + 0 .329 z/ (1 + 
+
+z) [51]. Stellar bulges are assigned black holes through the Kormendy–Ho relation [52], 
+
+MBH = 10 ∆KH 0.49 × 10 9 M⊙
+
+ M⋆
+
+10 11 M⊙
+
+1.16 
+
+, (4) where we take Mbulge ≃ M⋆ appropriate for the mas-sive systems that dominate the signal, and ∆ KH param-eterizes a log-normalization offset. Each black-hole mass carries an independent lognormal scatter of width σdex 
+
+at fixed halo, which enters the signal through the aver-age ⟨M 5/3 
+
+> c
+
+⟩ of the chirp mass Mc = ( m1m2)3/5/(m1 +
+
+m2)1/5. We evaluate this average with a 5 × 5 Gauss– Hermite quadrature. Both galaxies must exceed M⋆ >
+
+10 8 M⊙ for the pair to count. Because every massive galaxy is observed to host a cen-tral black hole (an assumption already embedded in the calibration of Eq. (4)), we set the occupation fraction to unity. Two clarifications guard against misreading this choice. First, any mass-dependent shape of the occu-pation function (a low-mass cutoff scale Mocc reflecting seeding physics) is invisible in the PTA band: the halos that dominate hc have M ≳ 10 12 M⊙, orders of magni-tude above any plausible occupation cutoff. The PTA signal therefore cannot constrain seeding, and that infor-mation lives in the LISA band (Sec. VII). Second, a global occupation deficit focc < 1 at the massive end would en-ter the signal only through the combination f 2occ ⟨M 5/3 
+
+> c
+
+⟩,exactly degenerate with a shift of ∆ KH . Our ∆ KH poste-rior should be read as constraining this combination. 4 
+
+> C. Kernel systematics: what the calibration buys
+
+The EPS merger rate has a known conceptual ambi-guity (it is asymmetric under exchanging progenitors) and O(1) normalization offsets against simulations. To quantify what the Y11 recalibration buys, we repeat the entire calculation (Fig. 1) with the kernel Na in Eq. (2) swapped for (i) the raw LC93 rate [18] [their Eq. (2.18), reduced to the per-host form in Appendix A], the kernel underlying the tree-free calculations of Refs. [22, 23], and (ii) the F10 fit to the Millennium simulations [24], which we treat as the N -body reference. Figure 1 shows the rates at a representative host mass and the GWB ampli-tudes obtained with each kernel under otherwise identical assumptions. The Y11 kernel tracks the N -body refer-ence to within ±(20–50)% pointwise over the mass ratios and redshifts that matter, and to 3.4% in the amplitude (the pointwise residuals average out in the triple inte-gral), while the raw EPS kernel is biased high by 14% in amplitude. Since hc ∝ √rate at fixed masses, kernel systematics at this level are subdominant to the delay and black-hole-mass uncertainties that we treat as free parameters below. We use F10 as the N -body reference but not as the fiducial kernel, for two reasons. The first is internal consistency: Y11 is the accretion distribution on which 
+
+sashimi ’s evolved subhalo population is built, and the tidal stripping law that regulates our delays (Sec. III A) is calibrated within that same framework. Pairing F10 rates with sashimi stripping would splice together two independent calibrations. The second is portability: F10 is a fitting formula tied to the Millennium simulations and their cosmology, valid over the mass ratios and red-shifts sampled there, whereas Y11 is analytic in σ(M )and therefore adopts our cosmology self-consistently and extends smoothly to the low masses and high redshifts of the seed regime, with no resolution floor. The 3.4% amplitude agreement between the two shows that this choice is not a limiting systematic in any case. The kernel counts accretion onto the main branch. Satellite–satellite sinking, which N -body measurements find can rival the central–satellite channel at low mass thresholds [53], is not included, and alternative routes to the same rate are set out in Refs. [54, 55].   
+
+> III. MERGER DELAYS: FROM HALO ACCRETION TO COALESCENCE A. Stripping coupled to sinking
+
+sashimi ’s evolved subhalo population is built on a tidal stripping law calibrated against cosmological simu-lations [26], 
+
+dm dt = −A(M, z ) mτdyn 
+
+ mM
+
+ζ(M,z )
+
+, (5) with A ∼ O (1) and ζ ≲ 0.02 weak functions of host mass and redshift. We couple Eq. (5) to the orbital decay of the same object under Chandrasekhar dynamical friction [37, 56] in a singular isothermal host with circular velocity Vc:
+
+r dr dt = −0.428 ln Λ G m eff (t)
+
+Vc
+
+,
+
+ln Λ = ln(1 + M/m eff ) . (6) The drag is proportional to the satellite’s surviving 
+
+bound mass. We take meff (t) = m(t) + m⋆: the dark matter remnant of Eq. (5) plus the satellite’s stellar mass, which acts as a floor because the tightly bound stellar core (and its black hole) survives the stripping that re-moves the outer halo. Because meff → m⋆ > 0, the drag never switches off: Eq. (6) keeps draining r2 at a fixed rate, and every satellite reaches the center eventually. Throughout this paper a “stalled” satellite is therefore one whose remaining sinking time at z = 0 exceeds a Hubble time, not one frozen forever. The competition between stripping and sinking is decided by how much orbital decay the satellite completes before its dark mat-ter envelope is gone. Treating the stellar core as un-strippable maximizes the residual drag, and the stalled fractions below are therefore lower bounds. Equations (5) and (6) integrate as a single vectorized march in redshift over the entire ( M0, z a, m a) grid, with no per-orbit ODE solves. The march costs a few sec-onds once per population model and, being independent of the sampled parameters, adds nothing to the cached per-likelihood cost (Sec. V B). Its numerical construction and convergence tests are collected in Appendix B. A satellite is deemed merged with the central galaxy when 
+
+r < f merge rvir (z) with fmerge = 0 .05. This threshold marks the assembly of the galaxy pair, not the onset of gravitational-wave emission, which occurs much later at sub-pc separations (Sec. IV). The result is insensitive to the threshold: at the canonical fmerge = 0 .05 the non-coalesced fraction is 39%, and varying fmerge over 0 .02– 0.10 moves it between 37.2% and 40.0% while shifting the GWB amplitude by only −0.4% to +1 .4% (Appendix B).  
+
+> B. The fixed-mass baseline
+
+The delay between halo accretion and the formation of a bound black-hole binary at the galaxy center is conventionally described by a dynamical-friction merger timescale evaluated at infall. The standard choice is the 
+
+N -body-calibrated formula of Ref. [32] (hereafter BK08), 
+
+τdf 
+
+τdyn 
+
+= 0 .216 (M/m a)1.3
+
+ln(1 + M/m a) e1.9η , τdyn =
+
+r r3vir 
+
+GM , (7) with η the orbital circularity (we use the population mean 
+
+η = 0 .5 [57]) and M ≡ M (za) the main-branch host mass at the accretion epoch. It is the comparison model against which the tidal delay is judged. 510 −3 10 −2 10 −1 10 0
+
+ξ = ma/M(z)
+
+> 0.0 0.5 1.0 1.5 2.0 2.5
+> a / F10
+> a
+
+(a) M0 = 10 13 M ⊙          
+
+> Y11 / F10, z= 0.5 raw LC93 / F10, z= 0.5 Y11 / F10, z= 2.0 raw LC93 / F10, z= 2.0
+> Y11 (SASHIMI) F10 (N-body fi t) raw LC93 (EPS) 0.0 0.5 1.0 1.5 2.0
+> Ayr  [10 −15 ] 1.45 1.50 1.71
+
+(b) 
+
+FIG. 1. (a) The three halo merger kernels Na [Eq. (1)] divided by that of the F10 N -body rate [24], as a function of mass ratio ξ, for a host with M0 = 10 13 M⊙ at z = 0 .5 (solid) and z = 2 (dashed): the N -body-recalibrated Y11 kernel [25] used here (blue) and the raw LC93 EPS kernel [18] used by Refs. [22, 23] (vermilion). (b) The resulting GWB amplitude Ayr at the fiducial configuration (tidal delay, τhard = 0 .5 Gyr, σdex = 0 .33), with only the kernel changed. 
+
+Equation (7) is a fit to simulations of live satellites sinking in live hosts, and tidal mass loss is folded into its coefficients on average . But the satellite mass ap-pearing in it is frozen at infall, and the formula therefore assigns a smooth, finite merger time to every mass ratio. That time diverges as ξ−1.3, and the fixed-mass model too leaves a tail of satellites unmerged by z = 0, some owing more than a further Hubble time. With the mass frozen, however, the delay carries no threshold: τdf varies smoothly with ξ and, through τdyn (za), with the epoch, and the boundary of its stalled set therefore runs diag-onally in ( ξ, z a) rather than vertically (Sec. III D). The tidal coupling of Sec. III A instead lengthens the sinking time selectively , for the low-mass-ratio satellites whose dark matter is stripped before they arrive. 
+
+C. The residual hardening delay 
+
+Reaching the halo center assembles the galaxy pair. The two black holes must still travel from kpc separa-tions to the sub-pc orbits where nHz waves are emitted, by dynamical friction inside the merged remnant [58] and through the final-parsec regime [59, 60]. We lump that journey into a single residual delay τhard , common to the population and sampled in the inference (Table I). A pair accreted at za therefore coalesces at the redshift 
+
+zm reached by advancing za first by the sinking time of Sec. III A, then by τhard .A single timescale does not exhaust this stage. The same hardening phase also reshapes the emitted spec-trum, through the time each binary spends per unit frequency, and that aspect is modeled separately in Sec. IV B. The two are complementary descriptions of one stage rather than a double count: τhard moves the coalescence epoch , and hence which pairs arrive by z = 0, while the loss-cone model moves where in frequency the emitted power lands. 
+
+D. The non-merging population 
+
+Figure 2 shows the delay surface, and it separates two physically distinct ways a satellite can fail to deliver its black hole by z = 0. Satellites below a critical mass ratio effectively stop sinking. Stripping removes their dark matter envelope, 
+
+meff collapses onto the stellar floor, and the residual drag cannot complete the decay: the sinking time still owed at z = 0 exceeds a Hubble time, and over the in-ner part of the region it exceeds many Hubble times. This is the tidal stall. Because the competition between stripping and sinking is set by the mass ratio and only weakly by the epoch, its boundary is a sharp, nearly redshift-independent threshold at ξ ≃ 0.04 (hatched re-gion of Fig. 2). Summed over the whole host population (weighted by merger rate and occupation, and not read off the 10 13 M⊙ panel, where the fractions are roughly twice as large), 21% of accreted satellites are stalled in this sense. Satellites accreted very recently have simply not had time to finish a normal, few-Gyr infall before z = 0, whatever their mass ratio (dotted region). This is not a stall. Their drag is intact, they are still sinking, and they would arrive within another Hubble time. A population like this exists in any delay model, the fixed-mass baseline included. It adds a further 17% of accreted satellites, on the same population-wide weighting, and it is what makes the non-merging region extend to large ξ as za →
+
+0. Together the two give the 38% of accreted satellites that have not delivered a black hole to the nucleus by 610 −3 10 −2 10 −1 10 0
+
+ξ = ma/M(za)   
+
+> 1.02 1.5 2346
+> 1 +  za
+> M0= 10 13 M⊙
+> tidal stall
+> not yet arrived
+> BK08 stall edge BK08 arrival edge
+> 0246810 12
+> tsink  − tacc  [Gyr]
+
+FIG. 2. Time from halo accretion to galaxy merger under the tidally regulated delay, for satellites accreted by a host with M0 = 10 13 M⊙ at redshift za with mass ratio ξ. This is a single host mass: the fractions quoted in the text are sums over the whole host population and are smaller than the areas here suggest, and Table II lists both. Two physi-cally distinct regions fail to deliver a black hole to the nucleus by z = 0. Hatched: the tidal stall proper, where stripping has collapsed the drag onto the stellar core and the sinking time still owed at z = 0 exceeds a Hubble time. Its boundary is a sharp, nearly redshift-independent mass-ratio threshold at 
+
+ξ ≃ 0.04. Dotted: satellites accreted too recently to complete a normal few-Gyr infall before z = 0. These are still sinking with their drag intact and would arrive within another Hub-ble time. Vermilion: the corresponding boundaries under the fixed-mass BK08 delay, Eq. (7), for the stall (dash-dotted) and for arrival by z = 0 (dashed), the region between them being its own not-yet-arrived population. Both sweep with accretion epoch instead of standing as a wall in mass ratio. 
+
+z = 0, which is the fraction the background actually sees. Neither fraction depends on any of the five sampled pa-rameters (Table I). Both are parameter-free predictions of the calibrated dynamics rather than outputs of the fit. The fixed-mass baseline strands satellites as well: ap-plying the same criterion to Eq. (7) leaves 13% of ac-creted satellites owing more than a Hubble time at z = 0. The two boundaries differ in shape. Stripping and sink-ing both scale with the host dynamical time, and their nearly epoch-independent ratio makes the tidal bound-ary a wall in mass ratio alone: fitting ξcrit ∝ (1 + za)s
+
+gives s = −0.20, against s = −1.44 for the fixed-mass delay, whose τdf and available time both move with za
+
+(dash-dotted curve in Fig. 2). The two therefore select different satellites, which a wandering-black-hole census can test (Sec. VI B). Adding the residual hardening delay τhard of Sec. III C, the fraction of pairs that have not coalesced by z = 0 is 39% at the fiducial τhard = 0 .5 Gyr, against 27% un-der the BK08 baseline. The GWB amplitude drops by 11.2%, from Ayr = 1 .64 × 10 −15 to 1 .45 × 10 −15 at fidu-cial parameters. A shift of that size sits well inside the current amplitude uncertainty, which explains why fixed-mass formulas have served PTA predictions adequately. In the full inference, it is absorbed almost entirely by ∆KH , and the fitted spectrum barely distinguishes the two delay models (Sec. VI). What does distinguish them is which satellites are left behind, a deterministic func-tion of ( M0, z a, ξ ) once the calibration is fixed. The model turns it into falsifiable predictions for kpc-scale stalled companions and wandering black holes with defi-nite mass and host-mass distributions [38, 39, 61], rather than absorbing the non-merging fraction into an opaque efficiency parameter. Radial orbits sink faster [the e1.9η of Eq. (7)], but are also stripped faster. Marginalizing both effects over the infall circularity distribution [57] changes the amplitude by ≤ 1.4%, and we therefore use the mean orbit through-out (Appendix B). 
+
+IV. THE EMITTED SPECTRUM 
+
+Sections II and III deliver the population of coalesc-ing binaries. We now assemble it into an observed spec-trum, adding the two per-binary effects that shape the nHz band: the stellar-hardening turnover and orbital ec-centricity. Both carry a sampled parameter, and we set them out in the detail that requires. 
+
+A. The gravitational-wave-driven baseline 
+
+For circular, purely gravitational-wave-driven binaries, the characteristic strain is given as [62] 
+
+h2 
+
+> c
+
+(f ) = 4G5/3
+
+3π1/3c2 f −4/3
+
+Z
+
+d3n M5/3
+
+> c
+
+Pmerge 
+
+(1 + zm)1/3 , (8) where the integral runs over the merger density of Eq. (2), 
+
+zm is the coalescence redshift built up in Sec. III C, and 
+
+Pmerge selects pairs that coalesce before z = 0 (for the tidal delay model, stalled cells have Pmerge = 0). Equa-tion (8) yields the familiar f −2/3 spectrum ( γ = 13 /3). At fiducial parameters the amplitude is Ayr = 1 .45 ×
+
+10 −15 (tidal delay), within the population spread of pub-lished models and just below the NANOGrav 15 yr mea-surement (Fig. 3). 
+
+B. Stellar hardening and the spectral turnover 
+
+This is the spectral face of the stage that Sec. III C lumped into τhard . At wide separations, a bound bi-nary hardens not by radiating gravitational waves but by ejecting stars: three-body slingshot encounters with stars on low-angular-momentum orbits (the binary’s “loss cone”) extract orbital energy and shrink the bi-nary semimajor axis a at the rate da/dt = −HGρ a 2/σ .72 3 5 10 20 30 
+
+f [nHz]    
+
+> 10 −15
+> 10 −14
+> 10 −13
+> hc(f)
+> BK08 delay SASHIMI tidal delay
+> f−2/3 ,Ayr = 1.45 × 10 −15
+> NG15 free spectrum excluded (15.8 nHz)
+
+FIG. 3. Characteristic strain at fiducial parameters (∆ KH =0, σdex = 0 .33, τhard = 0 .5 Gyr, circular binaries, fiducial nu-clear density) under the two delay models, compared with the NANOGrav 15 yr Hellings–Downs free-spectrum posteri-ors (points: medians with 68% and 95% intervals). The open point at 15 .8 nHz is plotted but excluded from the likelihood: a chromatic-noise reanalysis of the same data attributes that excursion to non-stationary transients in PSR J1713+0747 [8] (Sec. V A). The tidal delay removes stalled satellites and low-ers the amplitude by 11.2%. 
+
+Here, ρ is the stellar mass density and σ the stellar veloc-ity dispersion of the surrounding nucleus, and H ≃ 16 is the dimensionless hardening rate measured in three-body scattering experiments [63, 64]. Equating this rate to the Peters gravitational-wave hardening rate [65] defines, per binary, a transition separation and source-frame fre-quency 
+
+a5 
+
+> t
+
+= 64 5HG2m1m2(m1 + m2) σc5ρ ,ft = 1
+
+π
+
+s
+
+G(m1 + m2)
+
+a3
+
+> t
+
+, (9) where ft is the gravitational-wave frequency (twice the orbital frequency) at at. Below ft a binary spends less time per logarithmic frequency than gravitational waves alone would allow, suppressing its contribution by 
+
+S(f ) = [1+( ft/f r )10 /3]−1 with fr = (1+ zm)f the source-frame frequency. The prospect of constraining such envi-ronmentally induced turnovers with PTA spectra was es-tablished with parametrized models in Refs. [66, 67]. The stellar environment is assigned per binary by inverting the MBH –σ relation [52] and taking a singular isothermal density at the influence radius, ρinf = σ6/(2 πG 3M 2bin ), scaled by a free factor ρ× that absorbs the (substan-tial) uncertainty in nuclear densities and in H. Only the combination Hρ enters Eq. (9). Gas-driven hard-ening in gas-rich nuclei [68] is not modeled separately. To the extent that it accelerates the traversal of this phase, it acts like a larger effective ρ×. Stellar hardening alone moves the spectral slope only modestly: even with 
+
+ρ× = 10 the effective slope in the 2–30 nHz band goes from γeff ≃ 4.3 to 4 .1. Measured against the originally re-ported γ = 3 .2 ± 0.6 that was a clear shortfall. Measured against the revised γ = 3 .5+0 .7 
+
+> −0.6
+
+it is a ∼1σ difference, and stellar hardening on its own is no longer excluded. 
+
+C. Eccentricity 
+
+Eccentric binaries radiate in a comb of harmonics of the orbital frequency [69] and circularize as they shrink [65]. Both effects move power from low to high frequencies and flatten the spectrum in the PTA band [46, 70, 71]. We assign each binary an eccentricity et at its own transition frequency ft, the same per-binary ft of Eq. (9), hold it constant through the stellar-hardening phase, and evolve it along the Peters track above ft. A single et is there-fore shared by the population, but it is imposed at each binary’s own ft rather than at a common frequency, and above ft, it is not held fixed: the binary circularizes along the Peters track. et is thus the eccentricity at the end of the stellar-hardening phase, where gravitational-wave emission takes over. In reality, the transition eccentricity carries a distribution, set by the three-body scattering history that pumps eccentricity during hardening, and et
+
+should be read as an effective, population-typical value rather than a universal one. Modeling that spread would smooth the harmonic structure of Φ below, and we do not attempt it here. The population spectrum general-izes Eq. (8) by one extra per-binary factor Φ( fr /f t; et) in the integrand, replacing S(f ), with Φ( y; et) = X
+
+> n≥1
+
+ 2
+
+n
+
+2/3 g(n, e n)
+
+F (en) + x−10 /3
+
+> n
+
+, xn = 2yn , (10) where g(n, e ) is the Peters–Mathews harmonic power [69], 
+
+F (e) = P 
+
+> n
+
+g(n, e ) the enhancement factor, en = e(xn)the eccentricity on the circularization track, and the 
+
+x−10 /3 
+
+> n
+
+term carries the stellar-hardening suppression of Sec. IV B [at et = 0, Eq. (10) reduces exactly to S(f )]. Because Φ depends on the cell only through y = fr /f t,we tabulate it once per likelihood call and interpolate. That the eccentric, environmentally hardened spectrum of any binary collapses onto one reference curve under a frequency rescaling is the observation of Ref. [71], who introduced it, in analytic fitted form, for exactly this pur-pose. Using it keeps the eccentric model as cheap as the circular one, which is what allows et to be sampled rather than scanned. Reference [46] reaches the same end by a different semi-analytic route. The harmonic truncation is chosen adaptively to capture 99 .9% of F (et). Figure 4 shows the model family: increasing et simulta-neously flattens the PTA-band slope (reaching γeff ≈ 3.3at et ≃ 0.8 and overshooting to ≈ 3.0 by et = 0 .9) and 
+
+raises the amplitude at f = 1 yr −1 by ∼10%, both in the direction of the NANOGrav data. 82 3 5 10 20 30 
+
+f [nHz]                   
+
+> 10 −15
+> 10 −14
+> 10 −13
+> hc(f)
+> et= 0.0
+> et= 0.3
+> et= 0.6
+> et= 0.9
+> et= 0.9, ρ×= 10 NG15 free spectrum excluded (15.8 nHz)
+> FIG. 4. Spectral shapes for the tidal-delay population at fidu-cial parameters, varying the transition eccentricity etand (for one curve) the nuclear density factor ρ×. Eccentricity moves power across the band: the slope flattens toward the measured
+> γ= 3 .5+0 .7
+> −0.6while the amplitude near f= 1 yr −1increases. Data points as in Fig. 3.
+> V. INFERENCE FROM THE NANOGRAV 15 YR FREE SPECTRUM A. Likelihood
+
+We use the NANOGrav 15 yr Hellings–Downs-correlated free-spectrum posteriors in their official kernel-density-estimate (KDE) representation [43, 72], the same data product that underlies the ceffyl /PTArcade re-fitting frameworks [43, 73]. The free-spectrum analy-sis measures, at each frequency fi = i/T span (Tspan =16 .03 yr), the posterior of the excess-power amplitude ρi,related to the strain by 
+
+ρ2 
+
+> i
+
+= h2 
+
+> c
+
+(fi)12 π2f 3 
+
+> i
+
+Tspan 
+
+. (11) In the factorized-likelihood approximation, the bins are treated as independent (an approximation validated against the full hierarchical PTA likelihood in Ref. [43]), so that ln L(θ) = X
+
+> i∈I
+
+ln pi
+
+ log 10 ρi
+
+hc(fi; θ) , (12) where θ collects the five sampled population parameters listed in Table I and pi are the per-bin KDE densities. The index set I is the lowest 14 bins, matching the fre-quency range of the NANOGrav Hellings–Downs analy-ses [2], less the eighth, f8 = 15 .8 nHz. Higher bins are white-noise dominated. The exclusion is ours, and the reason needs stating pre-cisely. After the free spectrum used here was released, Ref. [8] re-analyzed the same data set with customized chromatic noise models [9] and reported reduced corre-lated power in several low-frequency modes, the largest reduction being at 15 .8 nHz. That bin had been flagged as an excursion from power-law behavior, and they find the excursion to be a noise-model-dependent effect, which they attribute to non-stationary chromatic transients in PSR J1713+0747. They do not discard the bin. They re-measure it, and the power there falls without vanishing. Those re-measured free-spectral densities have not been released, and the corrected value is therefore unavailable to us. We exclude the bin instead. This is a response to a datum known to be biased high by an amount we cannot determine, not an implementation of the reanalysis, and the bin matters here out of proportion to its number: it is the only one above the fourth whose 68% interval ex-cludes zero. In the published representation it alone sets the shape of the spectrum above 8 nHz. Our fiducial data set is therefore the published repre-sentation [72] with one bin removed. It is neither the published analysis nor the chromatic one, and two cor-rections of opposite sign separate it from the latter. The thirteen retained bins still carry the superseded ampli-tude normalization, which Ref. [8] finds 12% too high; since Ayr ∝ 10 5∆ KH /6, that residual is −0.07 dex on ∆ KH ,inside the posterior width of Sec. VI A. Running the other way, discarding the eighth bin removes more than the reanalysis does, because the corrected bin retains some power, and that loss pushes ∆ KH up rather than down. Neither term can be evaluated without the unreleased products. We therefore quote the fiducial number with-out claiming that it brackets a full chromatic-noise refit from either side. Fitting pure power laws through Eq. (12) with flat priors in (log 10 A, γ ) shows both that the implementa-tion is sound and how far the one-bin edit carries. Re-taining all 14 bins reproduces the published constraints: with γ = 13 /3 fixed we obtain Ayr = 2 .51 +0 .59  
+
+> −0.61
+
+× 10 −15 
+
+(median and 90% interval; published 2 .4+0 .7 
+
+> −0.6
+
+× 10 −15 )and a free power law gives γ = 3.07 +0 .63  
+
+> −0.56
+
+(published 3.2 ± 0.6) [2]. Excluding the eighth bin moves these to 
+
+Ayr = 2 .29 +0 .55  
+
+> −0.52
+
+×10 −15 and γ = 3 .31 +0 .73 
+
+> −0.64
+
+, that is, 72% of the amplitude reduction and 81% of the slope steepening that the full chromatic reanalysis reports (2 .1+0 .6 
+
+> −0.5
+
+×10 −15 
+
+and γ = 3 .5+0 .7
+
+> −0.6
+
+). The edit therefore moves the likelihood demonstrably toward the reanalysis, not somewhere else. Two remarks before the results. First, what the exclu-sion costs and what it leaves untouched is quantified in Sec. VII A, after the fit itself has been presented. Sec-ond, the critical mass ratio, the stalled fractions, and the wandering mass budget of Secs. III D and VI B are properties of the delay dynamics alone: they are com-puted before any likelihood is formed and are unaffected by this choice, or indeed by the normalization the data prefer. Independently of all this, the astrophysical read-ing adopted here is in better shape than when the signal was announced: γ has moved toward the 13 /3 of circu-lar, gravitational-wave-driven inspiral, and big-bang nu-cleosynthesis now excludes the loud end of the cosmolog-9                      
+
+> TABLE I. The five sampled parameters and their priors. All priors are flat over the quoted ranges. parameter meaning prior ∆KH MBH normalization offset [dex] (−1,1)
+> σdex lognormal MBH scatter [dex] (0 .02 ,0.8)
+> τhard residual hardening delay [Gyr] (0 ,6)
+> eteccentricity at ft(0 ,0.9) log 10 ρ×nuclear density factor (−1.5,1.5)
+
+ical interpretations [74].  
+
+> B. Parameters, priors, and sampling
+
+The model has five parameters, listed with their pri-ors in Table I. The first two set the black-hole masses (Sec. II B). The delay τhard is the residual hardening time introduced in Sec. III C: it advances the coalescence epoch of every pair that survives dynamical friction and removes those that fail to coalesce by z = 0, thereby lowering the amplitude, while et and ρ× reshape the low-frequency spectrum through the per-binary turnover (Secs. IV B and IV C). Everything else (the merger ker-nel, mass histories, stripping law, and the sinking rate) is fixed by its own calibration, not fit to the PTA data. The population weights, base black-hole masses, and galaxy-merger epochs are independent of θ and are therefore computed once and cached. A full likelihood evaluation then costs 43 ms on a single core of an Apple M1 Max, the machine on which all chains in this paper were run. We sample with an affine-invariant ensemble [75, 76] of 64 walkers for 12000 steps, discarding five autocorre-lation times as burn-in. Acceptance fractions are ≃ 0.3, and effective sample sizes are ∼2.3 × 10 3 for the prior-edge-truncated et and 3 .4–4 .2 × 10 3 for the remaining parameters, sufficient for the percentile-level statements quoted below. The robustness refits of Sec. VII A use 32 walkers for 6000 steps and exclude the same frequency bin as the fiducial. Identical runs are performed for the both BK08 and tidal delay models, the latter with the stall physics active.   
+
+> VI. RESULTS A. Population parameters
+
+Figure 5 shows the joint posteriors. The posterior-predictive spectra in Fig. 6 confirm that the model fam-ily reproduces both the amplitude and the shape of the measured spectrum. Marginalized constraints (median and 68% interval) are, for the tidal delay model, ∆KH = +0 .31 +0 .20  
+
+> −0.23
+
+dex , σdex = 0 .48 +0 .23  
+
+> −0.30
+
+dex ,τhard = 3 .1 ± 2.0 Gyr , et = 0 .67 +0 .16 
+
+> −0.35
+
+,
+
+log 10 ρ× = +0 .52 +0 .71 
+
+> −1.14
+
+, (13) with the BK08 delay giving statistically indistinguish-able values (∆ KH = +0 .25 +0 .20 
+
+> −0.24
+
+, et = 0 .64 +0 .18 
+
+> −0.36
+
+). Three features stand out. First, the black-hole mass normalization is pulled above the Kormendy–Ho value: ∆KH > 0 for 91% of the posterior mass (1.3 σ in one-sided Gaussian-equivalent terms). This is a preference, not a detection of a non-zero offset, and it is deliberately weaker than the pub-lished free spectrum would give: retaining the 15 .8 nHz bin excluded in Sec. V A raises the median to ∆ KH =+0 .42 +0 .23  
+
+> −0.24
+
+dex and the posterior mass above zero to 97%, a shift of +0 .11 dex produced by one frequency bin that the data provider now attributes to pulsar noise. We quote the smaller number. Recalling the exact degener-acy of Sec. II B, what is being measured is f 2occ ⟨M 5/3 
+
+> c
+
+⟩.Since focc ≤ 1, the data demand at least this much mass excess. This is the same tension (the nHz sky is loud relative to local black-hole calibrations) identified in Refs. [34, 77], anticipated by merger-driven assembly arguments [78], and visible in the holodeck posteri-ors [14]. Its size is under active revision: recent assess-ments place it at the 1–2 .5σ level or regard it as largely resolved [79, 80], and an evolving mass scatter reproduces the data at fixed normalization [81], whereas a selection-debiased local relation, lower by 0 .4–0 .6 dex [82], would enlarge the offset instead. We therefore quote ∆ KH as a consistency result rather than a detection. Here, it emerges from an independently calibrated merger rate, with delays and stalling treated physically, which closes the loophole that an underestimated merger-kernel nor-malization might mimic the effect (the remaining rate-level systematics are quantified in Sec. VII A). The excess can equally be read as a preference for larger scatter (the ∆KH –σdex degeneracy in Fig. 5): scatter raises ⟨M 5/3 
+
+> c
+
+⟩
+
+through the heavy tail, as emphasized by Ref. [77]. Second, the spectral shape drives a preference for ec-centric binaries and/or dense nuclear environments: the posteriors of et and ρ× both accumulate toward the upper ends of their prior ranges and are anticorrelated. Both parameters bend the low-frequency spectrum, and the free fit’s slope, γ = 3 .5+0 .7 
+
+> −0.6
+
+after the chromatic-noise re-vision, is accommodated by either of them. It no longer demands either, because 13 /3 now lies inside its 95% region. Because the et posterior is truncated by the prior bound et ≤ 0.9 (the validity limit we impose on the harmonic expansion, a numerical rather than physi-cal boundary), the constraint should be read as a lower bound on the transition eccentricity rather than a detec-tion of a peak. The reading is weaker still for ρ×. Its 68% interval contains log 10 ρ× = 0, that is, no density boost at all, both in the fiducial fit and with the ex-cluded bin retained; the data are compatible with dense 10 SASHIMI tidal delay BK08 delay             
+
+> 0.2 0.4 0.6
+> σdex
+> 12345
+> τhard  [Gyr]
+> 0.2 0.4 0.6 0.8
+> et
+> 0.0 0.5
+> ΔKH [dex]
+> −1.0 −0.5 0.0 0.5 1.0
+> log 10  ρ ×
+> 0.2 0.4 0.6
+> σdex
+> 24
+> τhard [Gyr]
+> 0.25 0.50 0.75
+> et
+> −1 01
+> log 10 ρ×
+
+FIG. 5. Posteriors of the five population parameters from the NANOGrav 15 yr free spectrum, under the sashimi tidal delay (vermilion, solid) and the fixed-mass BK08 delay (blue, dashed). Contours enclose 68% and 95%. The two delay models yield nearly identical constraints on the sampled parameters (the data cannot distinguish them spectrally) but imply different underlying populations (Sec. VI B). 
+
+nuclear environments but at no point require them. The honest summary of this feature is that the spectrum does not demand circular, gravitational-wave-driven binaries, rather than that it demands eccentricity or dense envi-ronments. This echoes the eccentricity preference found by Ref. [46] with a catalog-based method (their inferred eccentricity at binary formation is likewise large), and the same dead end is reached from observed stellar mass deficits [83]. Third, the hardening delay τhard is barely constrained: its 68% interval, 3 .1 ± 2.0 Gyr, spans most of the prior. It is often assumed that τhard trades directly against ∆KH , since longer delays remove high-redshift mergers and lower the amplitude, which extra black-hole mass can compensate. In our posterior, that trade is real but weak, with a correlation coefficient of only +0 .26. The degeneracy that actually limits ∆ KH is the one with the mass scatter σdex (−0.72), followed by et (+0 .41). The reason is that τhard moves only the coalescence epochs, and the pairs whose epochs it can push past z = 0 are the high-redshift, subdominant ones, whereas σdex rescales 
+
+⟨M 5/3 
+
+> c
+
+⟩ for every binary in the integral. A PTA ampli-tude measurement alone therefore constrains the black-hole mass scale up to the mass-scatter degeneracy, not 11 2 3 5 10 20 30 
+
+f [nHz] 
+
+> 10 −15
+> 10 −14
+> hc(f)
+> posterior median realization scatter (68%) NG15 free spectrum excluded (15.8 nHz)
+
+FIG. 6. Posterior-predictive characteristic strain for the tidal delay model (median, 68%, and 95% bands from 200 poste-rior draws) against the NANOGrav 15 yr free-spectrum pos-teriors. Dashed lines mark the 68% realization (finite-source) scatter of the model, computed at the posterior median in the circular limit (which maximizes the single-bin variance) and shown as a fractional envelope around the median spectrum (Sec. VII A). It is distinct from the parameter-uncertainty bands. Data points as in Fig. 3. 
+
+up to the delay. The statement is specific to amplitude-only inference; joint fits that add continuous-wave non-detections break the same degeneracy from outside [84]. 
+
+B. The stalled population 
+
+Because the two delay models fit the spectrum equally well, the PTA data alone do not (yet) distinguish a uni-verse in which small satellites merge promptly from one in which they linger far longer. The tidal and fixed-mass delays differ by 11.2% in amplitude, which ∆ KH absorbs (their posterior medians differ by 0 .06 dex). The spec-tral fit itself therefore barely tests the delay model. The two models do, however, differ in their electromagnetic predictions. Table II collects the census, and it is worth keeping its two blocks apart. The upper block counts satellites. Summed over all host masses, 38% of accreted satellites (with both galaxies above 10 8 M⊙) are not at the nucleus by z = 0 under the tidal delay, against 26% under the fixed-mass one. These are cosmological averages, domi-nated by the abundant low-mass hosts. A single massive host strands a far larger share: in the 10 13 M⊙ slice of Fig. 2 the tidal delay leaves 64% of accreted satellites away from the nucleus, 49% of them stalled outright, against 46% and 27% for the fixed-mass one. Each total divides into those still owing more than a Hubble time of sinking, the stall proper of Sec. III D, concentrated be-low ξ ≃ 0.04, and those merely still in transit. The lower block is a share of black-hole mass and varies strongly 
+
+TABLE II. Wandering-black-hole census under the two delay models. Every entry is a z = 0 quantity, and none depends on a sampled parameter. The upper block counts satellites ,first summed over all host masses and then for the single 10 13 M⊙ host drawn in Fig. 2; the lower block is a share of the black-hole mass budget. Every entry carries its own aperture, and entries from different blocks are not comparable with one another. tidal BK08 Accreted satellites not at the nucleus by z = 0 
+
+summed over all host masses 
+
+all 38% 26% stalled (still owing > t H ) 21% 13% merely still in transit 17% 13% 
+
+in one 10 13 M⊙ host (Fig. 2) all 64% 46% stalled (still owing > t H ) 49% 27% merely still in transit 15% 19% Wandering share of the black-hole mass galaxy scale, M200 c < 10 13 M⊙ 10% 5.6% in a 10 13 M⊙ host 29% 20% all hosts 21% 15% 
+
+with host mass, from 10% at galaxy scale to 29% in a 10 13 M⊙ host. One further number, which is not in the table, answers a different question again, and it is the one the conclu-sions carry. Weighting over the posterior and counting also the nuclear binaries whose galaxies have merged but whose hardening phase τhard is unfinished, 46 ± 6% of ac-creted satellites have not produced a coalesced black-hole binary by z = 0. It exceeds the 38% of Table II because it asks whether the black holes have merged , not where they sit. Hydrodynamic calibrations of the same stage report much shorter coalescence times [85], and PTA fits pre-fer short binary lifetimes [84], which appears to contra-dict these fractions. It does not. Those measurements condition on galaxy mergers that completed, and simu-lations that reposition black holes to galaxy centers at every step [86] exclude the stalled population from the denominator by construction. A related constraint runs the other way, since matching the background amplitude has also been argued to require central black holes in nearly all galaxies above 10 9 M⊙ [87]; our stalled satel-lites sit below that stellar mass, and the two statements are therefore compatible. These systems should appear as long-lived kpc-scale offset nuclei and wandering black holes [38–40, 61], with abundances and host-mass distri-butions that the framework predicts deterministically: a parameter-free, falsifiable prediction of the calibrated de-lay dynamics, independent of the GWB fit, rather than a free knob. Wandering black holes have been tracked before [38– 41]. Our prediction can be confronted with the 12 wandering-black-hole demographics of cosmological hy-drodynamic simulations (Fig. 7). Assigning each stalled satellite its infall black-hole mass and each host its z = 0 nuclear mass from the same scaling relation, the frame-work predicts that wandering black holes hold a fraction 10% of the total black-hole mass in galaxy-scale halos (M200 c ≲ 10 13 M⊙), rising to 21% once cluster hosts are included. Romulus finds ∼10% of the local budget wan-dering [39], which our 10% matches with no tuning. That measurement counts seed-mass black holes, which we do not paint, and our figure is therefore a lower limit on the same quantity. Reference [39] further reports that the number of wanderers grows roughly linearly with halo mass, and the like-for-like comparison is our number slope, Nwander ∝ M 1.0200 c over 10 12 –10 14 M⊙. The wander-ing mass grows a little faster, ∝ M 1.2200 c, which is why the mass share in Fig. 7 climbs with host mass instead of staying flat. The shaded band there marks the local measurement alone, drawn across the galaxy-scale decade where it was made. This agreement does not come from the GWB fit: none of the five sampled parameters enters the stall determina-tion, and the wandering mass fraction is exactly indepen-dent of ∆ KH (a uniform shift of the mass normalization cancels in the ratio). The comparison, therefore, tests the framework’s delay physics independently of the inference. It also mildly favors the tidal coupling. Every total in Ta-ble II is smaller under the fixed-mass delay: 26% against 38% by satellite number, and, in the mass budget, 5.6% against 10% at galaxy scale ( M200 c < 10 13 M⊙, the aper-ture of the Romulus comparison above) and 20% against 29% in a 10 13 M⊙ host. The fixed-mass delay lengthens the sinking time less for the low-mass-ratio satellites that dominate the wandering population. The separation is modest rather than qualitative, which is why its discrim-inating power has to be quantified. The model further predicts that cluster black-hole mass becomes wandering-dominated (62% at 10 14 M⊙), the crossover to a 10% budget occurring near M200 c ≃ 2×10 12 M⊙. The two de-lays diverge most, in relative terms, at galaxy and group scales (Fig. 7). A wandering-black-hole or offset-AGN census in that regime is therefore the sharpest near-term discriminant between them. Occupation measured in astrid now resolves this com-parison by seed model [88, 89], and a volumetric wan-dering density anchored to off-nuclear transients is avail-able [90]. Two biases act on the mass shares above in opposite directions, and we do not attempt to net them: not painting seed-mass black holes makes our share an underestimate, as noted above, while assigning wander-ers the same scaling relation as central black holes makes it an overestimate, since wanderers descend from stripped satellites and are undermassive for their hosts [86]. Among the massive black holes ( MBH ≳ 10 6 M⊙) asso-ciated with a M200 c ∼ 10 12 M⊙ host, the tidal coupling leaves a larger offset (wandering) fraction than the fixed-mass delay. Classifying the nuclear-versus-offset status of 
+
+∼140 such black holes separates the two at 3 σ (binomial), or ∼290 in a blind volume-limited sample. Raising the observability threshold to MBH ≳ 10 7 M⊙, safely above the seed floor, gives ∼160, leaving the forecast insensitive to the seed model. Individual offset black holes of ex-actly this kind are now being localized [91, 92], with com-plementary selection from off-nuclear transients [90] and from spatial offsets at high redshift [93]. In clusters, the two delays converge, and a wandering-dominated black-hole budget (hundreds of wanderers per halo) is a ro-bust, delay-model-independent prediction of the frame-work. The one demographic the framework does not 
+
+reproduce is the number of wanderers in a Milky-Way-mass halo: 0.5 above 10 6 M⊙, against ∼12 within the virial radius in Ref. [38]. The gap is a seeding difference rather than a dynamical one. Both counts apply the same mass cut, but the two models place 10 6 M⊙ black holes in very different galaxies. Romulus seeds them in objects far below our occupation floor, whereas paint-ing the Kormendy–Ho relation onto a satellite requires 
+
+M⋆ ≃ 5 × 10 8 M⊙ before it carries 10 6 M⊙ at all. Our census is therefore blind to precisely the seeding physics that the PTA band cannot constrain either (Sec. II B) and that the LISA band does. Above 10 6 M⊙ the model count is complete, while the count of all wanderers is the lower limit, marked as such in Fig. 7. The mass budget, set by the massive wanderers the painting does resolve, is the meaningful comparison, and it is the one that agrees.   
+
+> VII. DISCUSSION A. Systematics budget
+
+Table III collects the known systematics of the frame-work, each quantified by direct numerical experiment (Appendix B). The dominant modeling choices (the merger kernel and the growth of the primary black hole between infall and coalescence) shift the amplitude at the few-percent to ∼10% level, comfortably inside the current measurement uncertainty but relevant for the next data releases. Our fiducial model lets the primary black hole co-evolve with its host: because the host halo keeps accreting and merging after the satellite falls in, we grow its central black hole along the main branch to the galaxy-merger epoch, while the satellite (quenched and tidally stripped once it enters the host) retains its infall mass. Freezing both masses at infall instead low-ers the amplitude by 9.5% and would pull ∆ KH up by 
+
+∼0.05 dex. The excess is, therefore, robust to this mod-eling choice: the more conservative frozen assumption only makes it larger. As a direct end-to-end check of the kernel systematic at the inference level, re-running the entire MCMC with the raw LC93 kernel shifts the ∆ KH 
+
+median by −0.07 dex, small compared with its posterior width. The largest single entry in this budget, after the delay model, is not a modeling choice at all but the data: refit-ting with the 15 .8 nHz bin retained, as in the published 13 10 0
+
+10 1
+
+10 2
+
+> fwander  (BH mass) [%]
+> Ricarte+21 (local, ∼ 10%) tidal delay
+> fi xed-mass (BK08)
+
+10 11 10 12 10 13 10 14 10 15 
+
+M200 c [M ⊙ ]
+
+10 −2 
+
+10 −1 
+
+10 0
+
+10 1
+
+10 2
+
+10 3     
+
+> Nwander  per halo
+> lower limit (seeds not painted)
+> tidal (all) tidal ( MBH > 10 6M⊙)BK08 (all) Tremmel+18 ( < Rvir )Tremmel+18 ( < 10 kpc)
+
+FIG. 7. Wandering-black-hole census (satellites that do not reach the nucleus by z = 0) as a function of host halo mass, for the tidal (solid) and fixed-mass BK08 (dotted) delays. Top: the fraction of black-hole mass that is wandering, against the 
+
+∼10% local budget of the Romulus simulation [39], whose band is drawn only across the galaxy-scale decade at which it was measured. The two delays diverge most at galaxy and group scales (where the tidal coupling lifts the wandering bud-get by roughly half at group scale and more at galaxy scale) and converge in clusters, where both leave the black-hole mass wandering-dominated. Bottom: the number of wanderers per halo (tidal all, and above 10 6 M⊙; BK08 all), against the Milky-Way-mass counts of Ref. [38]. The upward arrow marks the “all” curve, which omits the seed population below the 
+
+M⋆ > 10 8 M⊙ occupation floor and can only rise. The count above 10 6 M⊙ carries no arrow: the Kormendy–Ho painting needs M⋆ ≃ 5×10 8 M⊙ to reach that mass, comfortably above the floor, leaving it complete within the model (Sec. VI B). The simulation values are measurements. 
+
+free spectrum, moves the ∆ KH median by +0 .11 dex, to +0 .42 +0 .23 
+
+> −0.24
+
+, and the eccentricity from 0 .67 +0 .16  
+
+> −0.35
+
+to 0.79 +0 .08 
+
+> −0.21
+
+. The hardening delay does not move at all and the mass scatter by 0 .1σ. That is the expected pattern: the excluded bin is the only informative one above 8 nHz, and it therefore constrains the high-frequency shape and the overall normalization and nothing else. Because the bin lifts both the amplitude and the required flattening, excluding it weakens two of this paper’s own claims at once, which is the direction that makes the choice de-
+
+TABLE III. Systematics of the framework, as fractional shifts of the GWB amplitude at fixed parameters. source ∆Ayr /A yr 
+
+merger kernel (Y11 vs F10 N -body) −3.4% raw LC93 kernel (for reference) +14% mass-fn. fit (Tinker08 [98] vs ST) −2.7% mass-fn. fit (Shirasaki+21 [99] vs ST) −6.5% mass-fn. definition (180 m vs ST virial) −1.9% frozen BH masses (vs fiducial co-evolution) −9.5% tidal vs fixed-mass delay (fiducial) −11 .2% galaxy-merger threshold fmerge ∈ (0 .02 , 0.1) +1 .4% 
+
+> −0.4%
+
+orbit-circularity marginalization ≤ 1.4% grid resolution (doubling all axes) 0.1% stripping integrator vs reference ODE 0.002% 
+
+fensible rather than convenient. How this fiducial relates to a full chromatic-noise refit is bounded but not signed: the superseded amplitude normalization carried by the retained bins biases ∆ KH up by ∼0.07 dex, while discard-ing the eighth bin outright, rather than at its corrected value, biases it down (Sec. V A). The choice of the local calibration itself is tested the same way: repeating the entire inference with the McConnell–Ma [94] and Marconi–Hunt [95] relations in place of Eq. (4) gives offsets ∆ MM13 KH = +0 .51 +0 .19  
+
+> −0.24
+
+and ∆MH03 KH = +0 .59 +0 .19 
+
+> −0.24
+
+. The excess is positive under all three calibrations, and the tension is therefore not an artifact of the Kormendy–Ho zero point. A constant offset is also not the only reading of the excess: a redshift-evolving normalization of the MBH –
+
+Mbulge relation has been proposed as an alternative res-olution of the same tension [96, 97], the latter finding that a relation growing as (1 + z)1.04 ±0.5 reproduces the measured amplitude. We, therefore, repeat the fit with ∆KH (z) = ∆ KH ,0 + ∆ KH ,1 z/ (1 + z) [the functional form of the Moster et al. redshift dependence, Eq. (3)], the host term evaluated at its painting epoch zgal and the satellite’s at infall, with a flat prior ∆ KH ,1 ∈ (−1.5, 1.5). The data return ∆ KH ,1 = −0.00 +0 .96 
+
+> −0.94
+
+, consistent with no evolution. Beyond these quantified items, five structural assump-tions deserve notice. (i) We identify bulge mass with total stellar mass. At the massive end this is a ≲ 0.1 dex effect degenerate with ∆ KH . A morphology-dependent slope at the high-mass end [100] and the cross-matching of black-hole catalogs [101] act on the shape of the calibration rather than on its normalization and are not captured by the three swaps below. Feedback prescriptions move pre-dicted amplitudes by factors of a few [102]; fitting ∆ KH 
+
+rather than importing a mass function insulates us from that. (ii) The mean main-branch history replaces the dis-tribution of histories. Assembly variance enters the signal only through the weak host-mass dependence of the strip-ping coefficients and the mass function, and ±10% shifts 14 of the assembly history move population-level rates at the tens-of-percent level only in the LISA-band extrap-olation, not in the PTA band. (iii) The Y11 kernel is calibrated on the same simulation suites as the mass his-tories. Kernel and history systematics are, therefore, not fully independent, and the F10 cross-check bounds their combined effect. (iv) Both the sinking march and the nu-clear density assignment idealize their hosts as singular isothermal spheres. A cored or NFW host would mainly rescale the sinking rate, and profile-dependent residuals in the stall boundary are not quantified here. The singu-lar isothermal sphere is cuspy and has no plateau in its distribution function, and the core stalling and buoyancy identified for cored hosts [103] are therefore absent by construction, while triaxiality leaves population medians essentially unchanged [104]. What we claim is accord-ingly the shape of the boundary, the tilt s, rather than its location. (v) Sequential mergers are not modeled: a later satellite can reach the nucleus while an earlier companion is still stalled, forming a triple system whose Kozai–Lidov cycles and chaotic exchanges drive a fraction of such pairs to coalescence [105, 106]. Part of the stalled population of Sec. VI B could be rescued through this channel. The quoted stalled fraction is therefore an upper limit on the surviving wandering population. Rescued pairs do coa-lesce, which raises the background rather than lowering it, and the effect works against the mass excess: a louder model needs less ∆ KH to match the same data. The size of that shift is bounded. Replacing the tidal delay by the fixed-mass one, which strands fewer satellites, raises Ayr 
+
+by +12 .6%, and additionally setting τhard = 0, so that every pair coalesces as early as the model permits, raises it by 15.0%. Since Ayr ∝ 10 5∆ KH /6, even that extreme limit would move ∆ KH down by only 0 .07 dex, under a third of its posterior width. Finally, the likelihood of Sec. V A compares the deter-ministic ensemble-mean spectrum to the measured per-bin posteriors, neglecting realization variance: the ob-served sky is a single Poisson draw of discrete bina-ries, and the loudest contributors are rare [77, 107]. To quantify this, we decompose the cached population into per-bin expected source counts and sky-averaged single-source strains (whose product reproduces the integrand of Eq. (8) exactly) and Poisson-sample the realized h2 
+
+> c
+
+in each of the 13 fitted bins at the posterior-median param-eters (Fig. 6). The sampling is performed in the circular limit: an eccentric binary spreads the same power over many harmonics, which can only decrease the single-bin variance. The quoted envelope is therefore conservative. The 68% realization scatter grows from 0.03 dex in the lowest bin to 0.18 dex in the highest, reflecting the de-creasing number of effective sources per bin, but never exceeds 0.50 of the corresponding bin’s 68% measure-ment half-width (the maximum occurs in bin 3). Added in quadrature, it would inflate the effective per-bin un-certainty by at most 12%. The statement is about scat-ter alone: windowing, inter-source interference, and the offset between the mean and the median spectrum are not modeled, and the moments require the low-redshift cutoff implicit in our grid [108, 109]. With that caveat, neglecting realization variance is safe at current preci-sion [110, 111], although the full non-Gaussian treatment will be needed for IPTA-class data [112–114].  
+
+> B. Relation to previous work
+
+The framework occupies a deliberate middle ground, and it is worth separating what is new here from what is inherited. Three routes to a PTA population model are already in use. Tree- and catalog-based pipelines [13, 14, 19– 21] carry individual merger histories and are too slow to sample, reaching the data through a model bank or a Gaussian-process emulator instead. A second route parametrizes the merger rate directly from observed galaxy statistics and bypasses halos entirely [33, 44, 45, 71], which is fast and has supported emulator-free in-ference for a decade. A third evaluates an analytic EPS halo rate but compresses the whole halo-merger-to-coalescence stage into one constant efficiency [22, 23, 46, 115, 116]. Several groups have since placed a binary population directly inside the PTA likelihood [113, 117– 119], in each case carrying the halo-to-coalescence delay as a fitted parameter. What is new here is not emulator-free sampling, which the second and third routes already achieve, but that the sampled chain starts at an N -body-calibrated halo kernel and carries an integrated, mass-ratio dependent delay: against the raw LC93 kernel the calibration removes a 14% amplitude bias, and the con-stant merger probability is replaced by delay physics that predicts the non-merging fraction rather than assuming it. The individual ingredients are largely borrowed, de-liberately. Coupling tidal stripping to dynamical fric-tion along the orbit is standard in satellite dynam-ics [35, 36], and simulation-calibrated merger-time pre-scriptions aimed at pulsar timing exist [85]; what is new is importing that treatment into a nHz-background cal-culation, calibrated against the same simulations that fix 
+
+sashimi ’s subhalo statistics. That the background am-plitude is far more sensitive to the hardening stage than to the outer delay is found independently in Ref. [120]. The collapse of the eccentric, environmentally hardened per-binary spectrum onto one rescaled reference curve is due to Ref. [71]. Wandering black holes have been pre-dicted before, both in hydrodynamic simulations [38, 39] and in semi-analytic models [40, 41]; what this census adds is that it is fixed by the same calibrated dynam-ics that set the background, with no free normaliza-tion. Among delay treatments the closest is Ref. [20], which sets a stripping-informed starting radius for a sub-sequent fixed-mass phase. Our eccentricity conclusions agree with Ref. [46]. 15  
+
+> C. Outlook: one framework from PTA to LISA
+
+Nothing in Secs. II–III is specific to the PTA band. Extending the mass grid downward and attaching a seed black-hole occupation function focc (M ) turns the same integral into a LISA-band merger-rate calculator [61, 121, 122], with the delay physics, including stalling (which matters more at the low masses where LISA sources live), carried over unchanged. Two consequences are worth stating. First, the oc-cupation parameters to which the PTA band is blind (Sec. II B) become the dominant observable at LISA, where the rate scales as f 2occ : LISA measures precisely the quantity that PTA data cannot. Second, the param-eters constrained here (∆ KH , σdex , τhard , and the delay physics) propagate directly into LISA-band predictions. Because ∆ KH and τhard enter both bands, and because a cached evaluation costs milliseconds in either, the two data sets can be sampled together , over shared param-eters, rather than one being conditioned on the other. Joint PTA–LISA population inference in this framework, together with individual-source and anisotropy statistics, will be presented elsewhere.  
+
+> VIII. CONCLUSIONS
+
+We have built and tested a population framework for the SMBH-binary GWB combining three properties that are not found together elsewhere, the second of which is the one that distinguishes it: it is merger-tree-free (a deterministic triple integral over an N -body-calibrated EPS accretion kernel, resolution-free by construction), its merger delays are regulated by subhalo tidal evolution coupled continuously to dynamical friction (predicting a stalled, wandering-black-hole population below a sharp critical mass ratio ξ ≃ 0.04), and it is fast enough (mil-liseconds per likelihood) to be sampled directly against PTA data without emulation. Direct sampling has since been achieved by several groups [113, 117–119]; what remains particular to this framework is that the delay is integrated from the stripping and sinking equations rather than fitted. Applied to the NANOGrav 15 yr Hellings–Downs free spectrum, excluding the one bin whose excess power the data provider has since attributed to pulsar noise, the fit yields a black-hole mass normal-ization ∆ KH = +0 .31 +0 .20  
+
+> −0.23
+
+dex above the Kormendy–Ho relation [52] (degenerate with occupation and scatter, and robust to the choice of delay model, merger ker-nel, local mass calibration, and its redshift evolution) and a spectrum compatible with, but not requiring, ec-centric binaries or dense stellar environments. Retain-ing the excluded bin would raise the normalization to +0 .42 +0 .23  
+
+> −0.24
+
+dex; we prefer the more conservative read-ing. Independently of the fit, the calibrated delay dy-namics predict a parameter-free stalled fraction of 38% of accreted satellites unmerged by z = 0 (the posterior-weighted non-coalesced fraction, adding still-hardening nuclear binaries, is 46 ±6%), whose wandering-black-hole mass budget matches cosmological simulations without tuning and exceeds that of a fixed-mass delay. This is an independent, electromagnetically testable prediction of the same framework. The identical machinery is de-signed to extend to the LISA band, where the occupation physics invisible to PTAs becomes the leading observable. The code implementing the framework, including the cached-likelihood evaluator and the analysis chains of this paper, will be made available with sashimi .
+
+> ACKNOWLEDGMENTS
+
+This work was supported by JSPS KAKENHI Grant Number 24K07039. This work made use of the NANOGrav 15 yr free-spectrum KDE data products (Zenodo, doi:10.5281/zenodo.10344086). 
+
+> Appendix A: The reduced LC93 kernel
+
+For the kernel comparison of Sec. II C, we need the raw EPS merger rate in the same per-host convention as Eq. (1). LC93 [18] gives, in its Eq. (2.18), the rate for a halo of mass M1 at cosmic time t to merge with a companion ∆ M , forming M2 = M1 + ∆ M :
+
+d2pd ln ∆ M dt =
+
+r 2
+
+π
+
+1
+
+t
+
+d ln δc
+
+d ln t
+
+∆MM2
+
+d ln σ2
+
+d ln M2
+
+× δc(t)
+
+σ2
+
+
+
+1 − σ22
+
+σ21
+
+−3/2
+
+× exp 
+
+
+
+− δ2 
+
+> c
+
+(t)2
+
+ σ−22 − σ−21
+
+
+
+, (A1) with σi = σ(Mi) the z = 0 rms fluctuation and δc(t) = 1.686 /D (t). Using (1 /t )|d ln δc/d ln t| = |dδ c/dt |/δ c and 
+
+|d ln σ2/d ln M2|/σ 2 = M2|dS 2/dM 2|/(2 S3/22 ) with S =
+
+σ2, the M2 and δc factors cancel and Eq. (A1) reduces to 
+
+d2pd ln ∆ M dt = 1
+
+√2π
+
+dδ c
+
+dt ∆M dS 2
+
+dM 2
+
+S−3/22
+
+×
+
+
+
+1 − S2
+
+S1
+
+−3/2
+
+exp 
+
+
+
+− δ2
+
+> c
+
+2
+
+ 1
+
+S2
+
+− 1
+
+S1
+
+ 
+
+.
+
+(A2) Dividing by H(z) converts the rate per cosmic time to the per-ln(1+ z) convention of Eq. (1). The identification 
+
+M1 = M (za), ∆ M = ma, truncated at ma ≤ M1, then makes Eq. (A2) a drop-in replacement for the Y11 kernel. Equation (A2) exhibits the well-known ∆ M −1/2 diver-gence for ∆ M ≪ M1 and the EPS progenitor-exchange asymmetry, both inherited by any calculation built on it. 16 
+
+Appendix B: Validation and convergence 
+
+We list the numerical validations behind the quoted systematics (Table III). All are reproducible from the public analysis scripts. 
+
+a. Grid convergence. Doubling all three grid dimen-sions (36 ×48 ×64 → 72 ×96 ×128) changes Ayr by 0 .14%. 
+
+b. Stripping integrator. In the variable u = r2 the right-hand side of Eq. (6) is independent of r. Equa-tions (5) and (6) therefore integrate as a single vector-ized march in redshift over the whole grid, with no per-orbit ODE solves. The march agrees with a reference stiff ODE integration of Eq. (5) to 0 .002% in the final bound mass, with second-order convergence in step num-ber (0 .07% amplitude shift from nstep = 250 to 1000 at the fiducial parameters, and we use 500). 
+
+c. Eccentric spectra. At et = 0 the harmonic sum Eq. (10) reproduces the circular suppression factor to 0.01%. The identity P 
+
+> n
+
+g(n, e ) = F (e) is satisfied to 10 −3 over the tabulated range, and the adaptive har-monic cut captures 99 .9% of F (et) everywhere inside the prior. 
+
+d. Fast evaluator. The cached likelihood model (Sec. V B) matches the direct per-cell harmonic calcu-lation to 0 .07% at all tested eccentricities. 
+
+e. Merger threshold. Recomputing the population for fmerge ∈ {0.02 , 0.035 , 0.05 , 0.07 , 0.10 } gives Ayr 
+
+shifts of {− 0.4, −0.2, +0 .0, +0 .6, +1 .4% } and non-coalesced fractions (at τhard = 0.5 Gyr, and there-fore larger than the galaxy-merger stall of Table II) of 
+
+{40 .0, 39 .6, 39 .1, 38 .3, 37 .2% }: the calibration absorbs the threshold arbitrariness because the r-independent sink-ing rate in u = r2 makes the final approach to any thresh-old fast. 
+
+f. Orbit circularity. Scaling both the sinking clock [∝ e−1.9( η−0.5) , following BK08] and the stripping clock [∝ e−κ(η−0.5) with κ ≃ 2–4 implied by the orbit de-pendence of bound-mass evolution in Refs. [123, 124]] and marginalizing over the infall circularity distribution 
+
+P (η) ∝ η1.22 (1 − η)1.22 [57] changes Ayr by at most 1.4% across κ ∈ {0, 1.9, 3.0, 3.8}: faster sinking and faster stripping on radial orbits nearly cancel. 
+
+g. Mass-function conversion. The alternative mass functions (Sec. II A) are calibrated on different halo mass definitions. Before evaluating each, we convert the pipeline’s M200 c to the fit’s native spherical overden-sity using the concentration of Ref. [125] and an exact Navarro–Frenk–White profile: for a target overdensity ∆c relative to the critical density we solve f (y)/y 3 =(∆ c/200) f (c)/c 3 with f (x) = ln(1 + x) − x/ (1 + x)and c = c200 c(M, z ), giving M∆/M 200 c = f (y)/f (c). The abundance carries the Jacobian d ln M∆/d ln M200 c.Against sashimi ’s own M200 c → Mvir fit this exact solve agrees to 0 .4%. The Tinker et al. overdensity, defined relative to the mean density, maps to M200 c exactly at ∆ = 200 /Ωm(z), and no profile conversion is needed there. 
+
+h. Power-law recovery. Fitting pure power laws through the free-spectrum likelihood recovers the pub-lished NANOGrav 15 yr constraints (Sec. V A). 
+
+i. Sampler. The affine-invariant implementation re-covers the mean of a correlated five-dimensional Gaussian to 0 .04 σ and its covariance to 3% in the whitened norm. On the physical posteriors, acceptance is ≃ 0.3; the two production chains run ≃ 40 autocorrelation times and the shorter robustness refits 16–22. 
+
+[1] R. W. Hellings and G. S. Downs, Upper limits on the isotropic gravitational radiation background from pul-sar timing analysis, Astrophys. J. Lett. 265 , L39 (1983). [2] G. Agazie et al. (NANOGrav), The NANOGrav 15 yr data set: Evidence for a gravitational-wave background, Astrophys. J. Lett. 951 , L8 (2023), arXiv:2306.16213. [3] J. Antoniadis et al. (EPTA, InPTA), The second data release from the European Pulsar Timing Array. III. Search for gravitational wave signals, Astron. Astro-phys. 678 , A50 (2023), arXiv:2306.16214. [4] D. J. Reardon et al. , Search for an isotropic gravitational-wave background with the Parkes Pul-sar Timing Array, Astrophys. J. Lett. 951 , L6 (2023), arXiv:2306.16215. [5] H. Xu et al. , Searching for the nano-hertz stochastic gravitational wave background with the Chinese Pulsar Timing Array Data Release I, Res. Astron. Astrophys. 
+
+23 , 075024 (2023), arXiv:2306.16216. [6] M. T. Miles et al. , The MeerKAT Pulsar Timing Ar-ray: the 4.5-yr data release and the noise and stochastic signals of the millisecond pulsar population, Mon. Not. Roy. Astron. Soc. 536 , 1467 (2025), arXiv:2412.01148 [astro-ph.HE]. [7] M. T. Miles et al. , The MeerKAT Pulsar Timing Ar-ray: the first search for gravitational waves with the MeerKAT radio telescope, Mon. Not. Roy. Astron. Soc. 
+
+536 , 1489 (2025), arXiv:2412.01153 [astro-ph.HE]. [8] N. Agarwal et al. , The NANOGrav 15 yr Data Set: Impacts of Customized Chromatic Noise Models on Gravitational Wave Analyses, (2026), arXiv:2606.28554 [astro-ph.CO]. [9] B. Larsen et al. , The NANOGrav 15 yr Data Set: Cus-tomized Chromatic Noise Models, Astrophys. J. 1005 ,29 (2026), arXiv:2606.28571 [astro-ph.HE]. [10] M. Rajagopal and R. W. Romani, Ultralow frequency gravitational radiation from massive black hole binaries, Astrophys. J. 446 , 543 (1995), arXiv:astro-ph/9412038. [11] A. H. Jaffe and D. C. Backer, Gravitational waves probe the coalescence rate of massive black hole binaries, As-trophys. J. 583 , 616 (2003), arXiv:astro-ph/0210148. [12] J. S. B. Wyithe and A. Loeb, Low - frequency gravita-tional waves from massive black hole binaries: Predic-tions for LISA and pulsar timing arrays, Astrophys. J. 
+
+590 , 691 (2003), arXiv:astro-ph/0211556. [13] A. Sesana, A. Vecchio, and C. N. Colacino, The stochas-tic gravitational-wave background from massive black 17 
+
+hole binary systems: implications for observations with pulsar timing arrays, Mon. Not. R. Astron. Soc. 390 ,192 (2008), arXiv:0804.4476. [14] G. Agazie et al. (NANOGrav), The NANOGrav 15 yr data set: Constraints on supermassive black hole bina-ries from the gravitational-wave background, Astrophys. J. Lett. 952 , L37 (2023), arXiv:2306.16220. [15] A. Afzal et al. (NANOGrav), The NANOGrav 15 yr Data Set: Search for Signals from New Physics, As-trophys. J. Lett. 951 , L11 (2023), [Erratum: Astro-phys.J.Lett. 971, L27 (2024)], arXiv:2306.16219 [astro-ph.HE]. [16] W. H. Press and P. Schechter, Formation of galaxies and clusters of galaxies by self-similar gravitational conden-sation, Astrophys. J. 187 , 425 (1974). [17] J. R. Bond, S. Cole, G. Efstathiou, and N. Kaiser, Ex-cursion set mass functions for hierarchical Gaussian fluc-tuations, Astrophys. J. 379 , 440 (1991). [18] C. Lacey and S. Cole, Merger rates in hierarchical mod-els of galaxy formation, Mon. Not. R. Astron. Soc. 262 ,627 (1993). [19] A. Sesana, Systematic investigation of the expected gravitational wave signal from supermassive black hole binaries in the pulsar timing band, Mon. Not. R. Astron. Soc. 433 , L1 (2013), arXiv:1211.5375. [20] D. Izquierdo-Villalba, A. Sesana, S. Bonoli, and M. Colpi, Massive black hole evolution models con-fronting the nHz amplitude of the stochastic gravita-tional wave background, Mon. Not. R. Astron. Soc. 509 ,3488 (2022), arXiv:2108.11671. [21] L. Z. Kelley, L. Blecha, L. Hernquist, A. Sesana, and S. R. Taylor, The gravitational wave background from massive black hole binaries in Illustris: spectral fea-tures and time to detection with pulsar timing ar-rays, Mon. Not. R. Astron. Soc. 471 , 4508 (2017), arXiv:1702.02180. [22] J. Ellis, M. Fairbairn, G. H¨ utsi, M. Raidal, J. Urru-tia, V. Vaskonen, and H. Veerm¨ ae, Prospects for fu-ture binary black hole gravitational wave studies in light of PTA measurements, Astron. Astrophys. 676 , A38 (2023), arXiv:2301.13854. [23] J. Ellis, M. Fairbairn, G. H¨ utsi, J. Raidal, J. Urru-tia, V. Vaskonen, and H. Veerm¨ ae, Gravitational waves from supermassive black hole binaries in light of the NANOGrav 15-year data, Phys. Rev. D 109 , L021302 (2024), arXiv:2306.17021. [24] O. Fakhouri, C.-P. Ma, and M. Boylan-Kolchin, The merger rates and mass assembly histories of dark matter haloes in the two millennium simulations, Mon. Not. R. Astron. Soc. 406 , 2267 (2010), arXiv:1001.2304. [25] X. Yang, H. J. Mo, Y. Zhang, and F. C. van den Bosch, An analytical model for the accretion of dark matter subhalos, Astrophys. J. 741 , 13 (2011), arXiv:1104.1757. [26] N. Hiroshima, S. Ando, and T. Ishiyama, Model-ing evolution of dark matter substructure and an-nihilation boost, Phys. Rev. D 97 , 123002 (2018), arXiv:1803.07691. [27] S. Ando, T. Ishiyama, and N. Hiroshima, Halo substruc-ture boosts to the signatures of dark matter annihila-tion, Galaxies 7, 68 (2019), arXiv:1903.11427. [28] A. Dekker, S. Ando, C. A. Correa, and K. C. Y. Ng, Warm dark matter constraints using Milky Way satel-lite observations and subhalo evolution modeling, Phys. Rev. D 106 , 123026 (2022), arXiv:2111.13137. [29] S. Ando, S. Horigome, E. O. Nadler, D. Yang, and H.-B. Yu, SASHIMI-SIDM: semi-analytical subhalo modelling for self-interacting dark matter at sub-galactic scales, JCAP 02 , 053, arXiv:2403.16633 [astro-ph.CO]. [30] R. K. Sheth and G. Tormen, Large scale bias and the peak background split, Mon. Not. R. Astron. Soc. 308 ,119 (1999), arXiv:astro-ph/9901122. [31] M. G. Kitzbichler and S. D. M. White, A calibration of galaxy merger timescales from the millennium sim-ulation, Mon. Not. R. Astron. Soc. 391 , 1489 (2008), arXiv:0804.1965. [32] M. Boylan-Kolchin, C.-P. Ma, and E. Quataert, Dynam-ical friction and galaxy merging timescales, Mon. Not. R. Astron. Soc. 383 , 93 (2008), arXiv:0707.2960. [33] S. Chen, A. Sesana, and C. J. Conselice, Constrain-ing astrophysical observables of galaxy and supermas-sive black hole binary mergers using pulsar timing arrays, Mon. Not. R. Astron. Soc. 488 , 401 (2019), arXiv:1810.04184. [34] J. Simon, Exploring proxies for the supermassive black hole mass function: Implications for pulsar timing arrays, Astrophys. J. Lett. 949 , L24 (2023), arXiv:2306.01832. [35] F. Jiang, A. Dekel, J. Freundlich, F. C. van den Bosch, S. B. Green, P. F. Hopkins, A. Benson, and X. Du, Satgen: a semi-analytical satellite galaxy generator – i. the model and its application to local-group satellite statistics, Mon. Not. R. Astron. Soc. 502 , 621 (2021), arXiv:2005.05974. [36] P. Boldrini, P. Di Matteo, D. Katz, L. Casamiquela, C. Laporte, M. Assuerus, M. Montuori, and G. van de Ven, CosmoDyn: a semi-analytic post-processing frame-work for the dynamical evolution of compact stellar systems and black holes in cosmological simulations, (2026), arXiv:2609.18821 [astro-ph.GA]. [37] S. Chandrasekhar, Dynamical friction. I. General con-siderations: the coefficient of dynamical friction, Astro-phys. J. 97 , 255 (1943). [38] M. Tremmel, F. Governato, M. Volonteri, A. Pontzen, and T. R. Quinn, Wandering supermassive black holes in milky-way-mass halos, Astrophys. J. Lett. 857 , L22 (2018), [Erratum: Astrophys. J. Lett. 909, L31 (2021)], arXiv:1802.06783 [astro-ph.GA]. [39] A. Ricarte, M. Tremmel, P. Natarajan, C. Zimmer, and T. Quinn, Origins and demographics of wandering black holes, Mon. Not. R. Astron. Soc. 503 , 6098 (2021), arXiv:2103.12124. [40] D. Izquierdo-Villalba, S. Bonoli, M. Dotti, A. Sesana, Y. Rosas-Guevara, and D. Spinoso, From galactic nuclei to the halo outskirts: tracing supermassive black holes across cosmic history and environments, Mon. Not. R. Astron. Soc. 495 , 4681 (2020), arXiv:2001.10548. [41] J. Untzaga, S. Bonoli, D. Izquierdo-Villalba, M. Mezcua, and D. Spinoso, A link to the past: characterizing wandering black holes in milky way-type galaxies, Mon. Not. R. Astron. Soc. 535 , 3293 (2024), arXiv:2404.12354. [42] I. Dvorkin and E. Barausse, The nightmare scenario: measuring the stochastic gravitational-wave background from stalling massive black-hole binaries with pulsar-timing arrays, Mon. Not. Roy. Astron. Soc. 470 , 4547 (2017), arXiv:1702.06964 [astro-ph.GA]. 18 
+
+[43] W. G. Lamb, S. R. Taylor, and R. van Haasteren, Rapid refitting techniques for Bayesian spectral characteriza-tion of the gravitational wave background using pul-sar timing arrays, Phys. Rev. D 108 , 103019 (2023), arXiv:2303.15442. [44] H. Middleton, W. Del Pozzo, W. M. Farr, A. Sesana, and A. Vecchio, Astrophysical constraints on massive black hole binary evolution from Pulsar Timing Ar-rays, Mon. Not. Roy. Astron. Soc. 455 , L72 (2016), arXiv:1507.00992 [astro-ph.CO]. [45] H. Middleton, A. Sesana, S. Chen, A. Vecchio, W. Del Pozzo, and P. A. Rosado, Massive black hole binary systems and the NANOGrav 12.5 yr re-sults, Mon. Not. Roy. Astron. Soc. 502 , L99 (2021), arXiv:2011.01246 [astro-ph.HE]. [46] J. Raidal, J. Urrutia, V. Vaskonen, and H. Veerm¨ ae, Ec-centricity effects on the supermassive black hole gravita-tional wave background, Astron. Astrophys. 691 , A212 (2024), arXiv:2406.05125. [47] A. Toubiana, L. Sberna, M. Volonteri, E. Barausse, S. Babak, R. Enficiaud, D. I. Villalba, J. R. Gair, J. E. Greene, and H. Quelquejay Leclere, Reconciling PTA and JWST, and preparing for LISA with POM-POCO: a Parametrisation Of the Massive black hole POpulation for Comparison to Observations, Astron. Astrophys. 700 , A135 (2025), arXiv:2410.17916 [astro-ph.GA]. [48] N. Aghanim et al. (Planck), Planck 2018 results. VI. Cosmological parameters, Astron. Astrophys. 641 , A6 (2020), [Erratum: Astron.Astrophys. 652, C4 (2021)], arXiv:1807.06209 [astro-ph.CO]. [49] C. A. Correa, J. S. B. Wyithe, J. Schaye, and A. R. Duffy, The accretion history of dark matter haloes – I. The physical origin of the universal function, Mon. Not. R. Astron. Soc. 450 , 1514 (2015), arXiv:1409.5228. [50] A. D. Ludlow, S. Bose, R. E. Angulo, L. Wang, W. A. Hellwing, J. F. Navarro, S. Cole, and C. S. Frenk, The mass-concentration-redshift relation of cold and warm dark matter haloes, Mon. Not. R. Astron. Soc. 460 ,1214 (2016), arXiv:1601.02624. [51] B. P. Moster, T. Naab, and S. D. M. White, Galactic star formation and accretion histories from matching galaxies to dark matter haloes, Mon. Not. R. Astron. Soc. 428 , 3121 (2013), arXiv:1205.5807. [52] J. Kormendy and L. C. Ho, Coevolution (or not) of su-permassive black holes and host galaxies, Ann. Rev. As-tron. Astrophys. 51 , 511 (2013), arXiv:1304.7762. [53] W. Jiang et al. , The Sinking Statistics of Dark Mat-ter Subhalos Across Hierarchical Levels, Sci. China Phys. Mech. Astron. 10.1007/s11433-026-3090-0 (2026), arXiv:2604.05580 [astro-ph.GA]. [54] E. Leonova, M. Volonteri, C. Laigle, S. Nissanke, P. A. Oesch, and Y. Dubois, One Merge to Rule Them All: From Galaxy Interactions to Black Hole Mergers Using Horizon-AGN, (2026), arXiv:2605.12599 [astro-ph.GA]. [55] P. R. Capelo, C. Moreno Martinez, N. Koren, T. Zana, E. Bortolas, M. Bonetti, J. Fluri, T. Hofmann, and L. Mayer, Emulating the complex galactic-scale orbital dynamics of LISA massive black hole pairs with normal-izing flows, (2026), arXiv:2607.26125 [astro-ph.GA]. [56] J. Binney and S. Tremaine, Galactic Dynamics: Second Edition (Princeton University Press, 2008). [57] A. R. Zentner, A. A. Berlind, J. S. Bullock, A. V. Kravtsov, and R. H. Wechsler, The physics of galaxy clustering. 1. A model for subhalo populations, Astro-phys. J. 624 , 505 (2005), arXiv:astro-ph/0411586. [58] F. Dosopoulou and F. Antonini, Dynamical friction and the evolution of supermassive black hole binaries: the final hundred-parsec problem, Astrophys. J. 840 , 31 (2017), arXiv:1611.06573. [59] M. C. Begelman, R. D. Blandford, and M. J. Rees, Mas-sive black hole binaries in active galactic nuclei, Nature 
+
+287 , 307 (1980). [60] M. Milosavljevi´ c and D. Merritt, The final parsec prob-lem, AIP Conf. Proc. 686 , 201 (2003), arXiv:astro-ph/0212270. [61] E. Barausse, I. Dvorkin, M. Tremmel, M. Volonteri, and M. Bonetti, Massive black hole merger rates: The effect of kiloparsec separation wandering and supernova feed-back, Astrophys. J. 904 , 16 (2020), arXiv:2006.03065. [62] E. S. Phinney, A practical theorem on gravitational wave backgrounds, (2001), arXiv:astro-ph/0108028. [63] G. D. Quinlan, The dynamical evolution of massive black hole binaries. 1. Hardening in a fixed stellar background, New Astron. 1, 35 (1996), arXiv:astro-ph/9601092. [64] A. Sesana and F. M. Khan, Scattering experiments meet N-body – I. A practical recipe for the evolution of mas-sive black hole binaries in stellar environments, Mon. Not. R. Astron. Soc. 454 , L66 (2015), arXiv:1505.02062. [65] P. C. Peters, Gravitational radiation and the motion of two point masses, Phys. Rev. 136 , B1224 (1964). [66] L. Sampson, N. J. Cornish, and S. T. McWilliams, Constraining the Solution to the Last Parsec Problem with Pulsar Timing, Phys. Rev. D 91 , 084055 (2015), arXiv:1503.02662 [gr-qc]. [67] S. R. Taylor, J. Simon, and L. Sampson, Constraints On The Dynamical Environments Of Supermassive Black-hole Binaries Using Pulsar-timing Arrays, Phys. Rev. Lett. 118 , 181102 (2017), arXiv:1612.02817 [astro-ph.GA]. [68] B. Kocsis and A. Sesana, Gas driven massive black hole binaries: signatures in the nHz gravitational wave back-ground, Mon. Not. Roy. Astron. Soc. 411 , 1467 (2011), arXiv:1002.0584 [astro-ph.CO]. [69] P. C. Peters and J. Mathews, Gravitational radiation from point masses in a keplerian orbit, Phys. Rev. 131 ,435 (1963). [70] M. Enoki and M. Nagashima, The effect of orbital eccen-tricity on gravitational wave background radiation from supermassive black hole binaries, Prog. Theor. Phys. 
+
+117 , 241 (2007), arXiv:astro-ph/0609377. [71] S. Chen, A. Sesana, and W. Del Pozzo, Efficient com-putation of the gravitational wave spectrum emitted by eccentric massive black hole binaries in stellar environ-ments, Mon. Not. R. Astron. Soc. 470 , 1738 (2017), arXiv:1612.00455. [72] W. G. Lamb, S. R. Taylor, and R. van Haasteren, KDE representations of the gravitational wave background free spectra present in the NANOGrav 15-year dataset (v1.1.0), Zenodo (2023), doi:10.5281/zenodo.10344086. [73] A. Mitridate, D. Wright, R. von Eckardstein, T. Schr¨ oder, J. Nay, K. Olum, K. Schmitz, and T. Trickle, PTArcade, (2023), arXiv:2306.16377. [74] F. Elahi, D. Fortini, Y. Gouttenoire, N. Leister, and P. Schwaller, Big Bang Nucleosynthesis Con-fronts Domain Walls and First-Order Phase Transi-tions as the Pulsar Timing Array Explanations, (2026), 19 
+
+arXiv:2609.25950 [hep-ph]. [75] J. Goodman and J. Weare, Ensemble samplers with affine invariance, Comm. App. Math. Comp. Sci. 5, 65 (2010). [76] D. Foreman-Mackey, D. W. Hogg, D. Lang, and J. Goodman, emcee: The MCMC hammer, Publ. As-tron. Soc. Pac. 125 , 306 (2013), arXiv:1202.3665. [77] G. Sato-Polito, M. Zaldarriaga, and E. Quataert, Where are the supermassive black holes measured by PTAs?, Phys. Rev. D 110 , 063020 (2024), arXiv:2312.06756. [78] S. T. McWilliams, J. P. Ostriker, and F. Pretorius, Gravitational waves and stalled satellites from massive galaxy mergers at z ≤ 1, Astrophys. J. 789 , 156 (2014), arXiv:1211.5377 [astro-ph.CO]. [79] S. Buttigieg, D. Sijacki, C. J. Moore, M. A. Bourne, and A. Sesana, Comparing gravitational wave back-ground predictions from cosmological simulations to pulsar timing observations, (2026), arXiv:2607.05208 [astro-ph.GA]. [80] C. M. F. Mingarelli et al. , Pulsar timing arrays: the emerging gravitational-wave landscape, (2026), arXiv:2603.13643 [astro-ph.HE]. [81] C. Matt et al. , Gravitational-wave Measurement of the MBH –M bulge Intrinsic Scatter at High Redshift, As-trophys. J. 1006 , 63 (2026), arXiv:2603.11167 [astro-ph.HE]. [82] F. Shankar, M. Bernardi, R. K. Sheth, L. Ferrarese, A. W. Graham, G. Savorgnan, V. Allevato, A. Mar-coni, R. L¨ asker, and A. Lapi, Selection bias in dynam-ically measured supermassive black hole samples: its consequences and the quest for the most fundamental relation, Mon. Not. Roy. Astron. Soc. 460 , 3119 (2016), arXiv:1603.01276 [astro-ph.GA]. [83] C. J. Harris, K. Gultekin, and L. Blecha, Core Scour-ing Dynamics and Gravitational Wave Consequences: Constraints on Supermassive Black Hole Binary Hard-ening, Astrophys. J. 1009 , 131 (2026), arXiv:2601.07762 [astro-ph.GA]. [84] E. C. Gardiner et al. , Constraints on Supermassive Black Hole Binaries from the Lack of Resolvable Sources in the NANOGrav 15-yr Dataset, (2026), arXiv:2609.32306 [astro-ph.HE]. [85] T. L. Francois et al. , Scaling Relations for Binary Black Hole Merger Times from Cosmological Initial Condi-tions, (2026), arXiv:2607.07813 [astro-ph.GA]. [86] E. J. Weller et al. , Tracing black hole and galaxy growth across environments since cosmic noon, Astrophys. J. 
+
+1008 , 70 (2026), arXiv:2607.07793 [astro-ph.GA]. [87] S. Bonoli, D. Izquierdo-Villalba, D. Spinoso, M. Colpi, A. Sesana, M. Polkas, and V. Springel, Constraints on the early growth of massive black holes from PTA and JWST with L-GalaxiesBH, (2025), arXiv:2509.12325 [astro-ph.GA]. [88] E. J. Weller et al. , The black hole occupation frac-tion as a fossil record of seeding, dynamics, and galaxy assembly, Astrophys. J. Lett. 1008 , L54 (2026), arXiv:2607.09853 [astro-ph.GA]. [89] A. K. Bhowmick et al. , Supermassive Black Hole As-sembly from Heavy Seeds with Dynamical Friction in the BRAHMA Simulations: Implications for JWST, LISA, and the Local Universe, (2026), arXiv:2606.12851 [astro-ph.GA]. [90] M. Guolo, Demographics of Wandering Black Holes Powering Off-Nuclear Tidal Disruption Events, (2026), arXiv:2602.12970 [astro-ph.GA]. [91] I. Sfaradi et al. , An Off-Nuclear Tidal Disruption Event Discovered At Late Times: The Case Of TDE 2023mfm, (2026), arXiv:2609.35998 [astro-ph.GA]. [92] X. Li et al. , A Wandering 35,000-Solar-Mass Black Hole Fed by a Gravitational Wake, (2026), arXiv:2608.10719 [astro-ph.GA]. [93] U. Thakurdesai et al. , Hunting Wandering 3 < z <
+
+8 Black Holes: Spatial Offsets in Ionization Ratio and Continuum Emission, (2026), arXiv:2606.30715 [astro-ph.GA]. [94] N. J. McConnell and C.-P. Ma, Revisiting the Scaling Relations of Black Hole Masses and Host Galaxy Prop-erties, Astrophys. J. 764 , 184 (2013), arXiv:1211.2816 [astro-ph.CO]. [95] A. Marconi and L. K. Hunt, The relation between black hole mass, bulge mass, and near-infrared lumi-nosity, Astrophys. J. Lett. 589 , L21 (2003), arXiv:astro-ph/0304274. [96] M. M. Kozhikkal, S. Chen, G. Theureau, M. Habouzit, and A. Sesana, Mass-redshift dependency of supermas-sive black hole binaries for the gravitational wave back-ground, Mon. Not. R. Astron. Soc. 531 , 1931 (2024), arXiv:2305.18293. [97] C. Matt et al. , Inferring M BH –M bulge Evolution from the Gravitational-wave Background, Astrophys. J. 997 ,188 (2026), arXiv:2508.18126 [astro-ph.HE]. [98] J. L. Tinker, A. V. Kravtsov, A. Klypin, K. Abazajian, M. S. Warren, G. Yepes, S. Gottl¨ ober, and D. E. Holz, Toward a halo mass function for precision cosmology: The limits of universality, Astrophys. J. 688 , 709 (2008), arXiv:0803.2706 [astro-ph]. [99] M. Shirasaki, T. Ishiyama, and S. Ando, Virial halo mass function in the Planck cosmology, Astrophys. J. 
+
+922 , 89 (2021), arXiv:2108.11038 [astro-ph.CO]. [100] A. W. Graham, Galaxy morphology dependent (black hole mass)-(velocity dispersion) relations: implications for gravitational wave forecasts and cosmological simu-lations, (2026), arXiv:2606.05808 [astro-ph.GA]. [101] G. Sato-Polito and M. Zaldarriaga, Uncertainties in the supermassive black hole abundance and implications for the GW background, Phys. Rev. D 114 , 063052 (2026), arXiv:2509.08041 [astro-ph.GA]. [102] M. T. Tillman, B. Burkhart, C. M. F. Mingarelli, J. A. Casey-Clyde, L. Hernquist, S. Bose, E. Reg˝ os, and C. Hern´ andez-Aguayo, Implications of the Nanohertz Gravitational-wave Background for Galactic Feedback and Massive Black Hole Growth, Astrophys. J. Lett. 
+
+1003 , L50 (2026), arXiv:2602.15938 [astro-ph.GA]. [103] S. Dattathri et al. , Not all cores are equal: Phase-space origins of dynamical friction, stalling and buoy-ancy, Open J. Astrophys. 10.33232/001c.169864 (2025), arXiv:2511.11804 [astro-ph.GA]. [104] B. T. Chiang, F. C. van den Bosch, and M. A. Keim, Scatter, bias, and chaos of satellite orbits in triaxial dark matter haloes, (2026), arXiv:2608.26249 [astro-ph.GA]. [105] M. Bonetti, A. Sesana, E. Barausse, and F. Haardt, Post-Newtonian evolution of massive black hole triplets in galactic nuclei – III. A robust lower limit to the nhz stochastic background of gravitational waves, Mon. Not. R. Astron. Soc. 477 , 2599 (2018), arXiv:1709.06095. [106] K. Li et al. , Set them free: extending RAMCOAL to model massive black hole triplets in hydrodynam-ical simulations of galaxies, (2026), arXiv:2607.04121 20 
+
+[astro-ph.GA]. [107] G. Sato-Polito and M. Zaldarriaga, Distribution of the gravitational-wave background from supermas-sive black holes, Phys. Rev. D 111 , 023043 (2025), arXiv:2406.17010 [astro-ph.CO]. [108] H. Hisamatsu and K. Kyutoku, Higher-order statistics of the stochastic gravitational wave background from supermassive black hole binaries, Phys. Rev. D 114 ,063041 (2026), arXiv:2605.17983 [astro-ph.HE]. [109] M. Zaldarriaga and G. Sato-Polito, Anisotropies in the PTA gravitational wave background: what can they teach us about supermassive black hole binaries?, (2026), arXiv:2608.22164 [astro-ph.CO]. [110] J. Raidal, J. Urrutia, V. Vaskonen, and H. Veerm¨ ae, Heavy tailed non-Gaussianity of the supermassive black hole gravitational wave background, Phys. Rev. D 114 ,043550 (2026), arXiv:2604.08506 [astro-ph.CO]. [111] M. Falxa, Approximating the statistics of a gravitational wave background, (2026), arXiv:2609.07686 [astro-ph.IM]. [112] W. G. Lamb, J. M. Wachter, A. Mitridate, S. C. Sarde-sai, B. B´ ecsy, E. L. Hagen, S. R. Taylor, and L. Z. Kelley, Finite populations and finite time: The non-Gaussianity of a gravitational wave background, Phys. Rev. D 113 ,123065 (2026), arXiv:2511.09659 [gr-qc]. [113] J. Yu, Z. Pan, X. Xue, and L. Dai, Population statis-tics of nanohertz gravitational wave sources, (2026), arXiv:2607.07477 [astro-ph.HE]. [114] M.-X. Lin, A. Lidz, and C.-P. Ma, Realization Vari-ance of Gravitational Wave Background Anisotropies from Shot Noise for Pulsar Timing Arrays, (2026), arXiv:2608.09929 [astro-ph.CO]. [115] J. Ellis, M. Fairbairn, J. Urrutia, and V. Vaskonen, Constraints on Dark Matter Models from Supermas-sive Black Hole Evolution, Phys. Rev. Lett. 136 , 131001 (2026), arXiv:2509.06955 [astro-ph.CO]. [116] J. Raidal, V. Vaskonen, J. Urrutia, and H. Veerm¨ ae, The Loud Tail of the Supermassive Black Hole Binary Population: Multimessenger Candidates and Prospects for SKAO, (2026), arXiv:2609.13363 [astro-ph.CO]. [117] B. Goncharov, G. Sato-Polito, X. Bi, and M. Zal-darriaga, A Joint Optimal Search for Gravitational Waves from Resolved and Unresolved Supermassive Bi-nary Black Holes with Pulsar Timing Arrays, (2026), arXiv:2606.18241 [astro-ph.HE]. [118] K. Iemoto, B. Goncharov, G. Sato-Polito, and X. Bi, Bridging the Population Synthesis of Supermassive Bi-nary Black Holes and the Gravitational Wave Back-ground, (2026), arXiv:2609.07703 [astro-ph.HE]. [119] S. M. Tomson, R. van Haasteren, and B. Goncharov, Hierarchical Inference of the Supermassive Black Hole Binary Merger Rates from Joint Searches using Pul-sar Timing Arrays, (2026), arXiv:2609.09086 [astro-ph.HE]. [120] L. Blecha, An ”inside-out” approach to modeling supermassive black hole binary inspiral, (2026), arXiv:2608.06269 [astro-ph.HE]. [121] A. Klein et al. , Science with the space-based interfer-ometer eLISA: Supermassive black hole binaries, Phys. Rev. D 93 , 024003 (2016), arXiv:1511.05581. [122] E. Barausse, The evolution of massive black holes and their spins in their galactic hosts, Mon. Not. R. Astron. Soc. 423 , 2533 (2012), arXiv:1201.5888. [123] G. Ogiya, F. C. van den Bosch, O. Hahn, S. B. Green, T. B. Miller, and A. Burkert, DASH: a library of dy-namical subhalo evolution, Mon. Not. R. Astron. Soc. 
+
+485 , 189 (2019), arXiv:1901.08601. [124] J. Pe˜ narrubia, A. J. Benson, M. G. Walker, G. Gilmore, A. W. McConnachie, and L. Mayer, The impact of dark matter cusps and cores on the satellite galaxy popula-tion around spiral galaxies, Mon. Not. R. Astron. Soc. 
+
+406 , 1290 (2010), arXiv:1002.3376. [125] C. A. Correa, J. S. B. Wyithe, J. Schaye, and A. R. Duffy, The accretion history of dark matter haloes – III. A physical model for the concentration–mass re-lation, Mon. Not. R. Astron. Soc. 452 , 1217 (2015), arXiv:1502.00391 [astro-ph.CO].

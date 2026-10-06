@@ -1,0 +1,586 @@
+Title: Not just a phase: detecting nanohertz gravitational waves from phase alone
+
+URL Source: https://arxiv.org/pdf/2610.06178v1
+
+Published Time: Tue, 06 Oct 2026 03:30:25 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+Astronomy & Astrophysics manuscript no. main ©ESO 2026 October 6, 2026 
+
+# Not just a phase: detecting nanohertz gravitational waves from phase alone 
+
+Kathrin Grunthal 1★, Eric Thrane 2, 3, Rutger van Haasteren 4, 5, David J. Champion 1, and Michael Kramer 1, 6 
+
+> 1
+
+Max-Planck-Institut für Radioastronomie, Auf dem Hügel 69, 53121 Bonn, Germany  
+
+> 2
+
+School of Physics and Astronomy, Monash University, Clayton, VIC 3800, Australia  
+
+> 3
+
+OzGrav: The ARC Centre of Excellence for Gravitational Wave Discovery, Clayton, VIC 3800, Australia  
+
+> 4
+
+Max-Planck-Institut für Gravitationsphysik (Albert-Einstein-Institut), Callinstraße 38, 30167 Hannover, Germany  
+
+> 5
+
+Leibniz Universität Hannover, 30167 Hannover, Germany  
+
+> 6
+
+Jodrell Bank Centre for Astrophysics, University of Manchester, Department of Physics and Astronomy, Alan-Turing Building, Oxford Street, Manchester M13 9PL, UK October 6, 2026 
+
+ABSTRACT 
+
+Context. Unambiguously detecting a gravitational-wave background in pulsar-timing data requires a robust detection statistic. The pulsar timing community currently relies heavily on the cross-correlation-based “optimal statistic.” Its design was motivated to avoid false-positive detections from unmodeled pulsar red noise, which, it was thought, can be mitigated by searching for signals that are coherent across multiple pulsars. However, recent work by van Haasteren (2025) suggests that the optimal statistic is not, in fact, optimal. Moreover, the optimal statistic is still susceptible to false positives from misspecified noise. To guard against this, analysts employ quasi-resampling methods such as phase shifts, in which complex phases are randomly assigned to each pulsar strain measurement, thereby destroying any gravitational-wave-induced correlations. The shifted data is then used to approximate the null distribution for the optimal statistic. 
+
+Aims. Inspired by the concept of phase shifts, we introduce a formalism in which the gravitational-wave background is measured entirely from phase measurements. We argue that this approach is robust against false positive detections without the need for ad hoc quasi-resampling methods. 
+
+Methods. We demonstrate the feasibility of this formalism by measuring the amplitude and spectral index of a simulated gravitational-wave background signal, injected to a simplified mock representation of a pulsar timing array data set. For this example, we use simulation-based-inference and model the phase-based likelihood using a neural circular spline flow. By comparing our results to ones obtained with the optimal statistic, we show how much resolving power comes from amplitude versus phase. 
+
+Results. We show that it is possible to adequately recover the spectral parameters of the gravitational wave background signal using the phase-based likelihood. By comparing our results to ones obtained with the optimal statistic, we show how much resolving power comes from amplitude versus phase. 
+
+Key words. gravitational waves - methods: data analysis - methods: statistical - pulsars: general - stars: black holes 
+
+1. Introduction 
+
+Pulsar timing arrays (PTAs) seek to detect nanohertz gravita-tional waves (GWs) by monitoring the highly regular pulsar ar-rival times of Galactic millisecond pulsars using radio telescopes. Such low-frequency GWs are expected to either originate from supermassive black hole binaries, formed in galaxy mergers (Ko-rmendy & Richstone 1995; Begelman et al. 1980), or more exotic processes such as phase transitions, collapsing cosmic strings etc. that might have happened during the early phases of the Universe (e.g., Hindmarsh & Kibble 1995; Hindmarsh et al. 2014; Caprini & Figueroa 2018; Domènech 2021). The most anticipated signal to be detected in the frequency range of PTAs is a stochastic gravitational wave background (GWB), formed by the incoher-ent superposition of a large number of individual nanohertz GWs (Rajagopal & Romani 1995). When the radio pulses are influ-enced by such a GW signal, the resulting fluctuations of the pulse arrival times are correlated between pairs of pulsars according  
+
+> ★
+
+kgrunthal@mpifr-bonn.mpg.de 
+
+to the Hellings-Downs (HD) correlation function (Hellings & Downs 1983). Multiple PTA collaborations (EPTA Collaboration and InPTA Collaboration: et al. 2023; Reardon et al. 2023; Agazie et al. 2023; Miles et al. 2025; Xu et al. 2023) have reported evi-dence for such an Hellings-Downs-correlated signal in their data set. However, as the reported false alarm probabilities (FAPs) for the presence of this signal range between 2-4 𝜎 , these results are for the time being short of the canonical 5 𝜎 threshold (Allen et al. 2023). In order to establish the significance of these sig-nals, the PTA community relies on the so-called “pair-correlation optimal statistic” (or “optimal statistic”) (Demorest et al. 2013; Chamberlin et al. 2015), which is an average of pairwise pulsar correlations, weighted by a filter which accounts for the noise properties of the data. We provide an overview of the optimal statistic in Appendix A. This resorting to pair-wise cross correlations (instead of in-corporating all available information from pulsar-timing mea-surements) lies in the community’s concern, that pulsar noise models are likely misspecified. If the PTA community trusted 
+
+Article number, page 1 of 11 arXiv:2610.06178v1 [astro-ph.IM] 5 Oct 2026 A&A proofs: manuscript no. main 
+
+the pulsar noise models, sufficiently large excess red noise could be considered a smoking-gun signal of gravitational waves. How-ever, it is seen as insufficient evidence to claim a gravitational-wave detection. As a result, the community insists that the detection statis-tic is a weighted sum of cross-correlation, which, in the weak-signal limit van Haasteren (2025), results in the optimal statistic as described in Appendix A. In other words, the community adopted the optimal statistic—which intentionally throws away some information—in order to guard against false positives from noise misspecification. Taking a closer look however, it is, by some measures, sub-optimal . Not only, because it does not account for all information from the observations, but also, because it is still sensitive to noise misspecification, in spite of this compromise. The “opti-mal signal-to-noise ratio” (S/N; see Appendix A) depends on the choice of pulsar noise models, which are fit with phenomenolog-ical models. The S/N is not taken at face value because misspec-ified noise can still lead to outliers from the null distribution. As a result, PTA analyses use quasi-resampling techniques such as sky scrambling (Cornish & Sampson 2016) and phase shifting (Taylor et al. 2017) in order to convert the optimal S/N into a frequentist 𝑝 -value (Di Marco et al. 2023; van Haasteren 2025). While significances estimates from quasi-resampling are proba-bly reliable for the purposes of detection Di Marco et al. (2024), this workflow leads to a disconnect where detection and infer-ence of astrophysical parameters are not carried out within a single unified framework. In this paper we ask the question: can we construct a formal-ism with the following properties? 1. It is safe from false positives even when pulsar noise is mis-specified. 2. It does not rely on quasi-resampling to assess significance. 3. It provides the most statistically powerful test possible with the information that we trust. For inspiration, we turn to phase scrambling, in which complex phases are randomly assigned to each pulsar strain measurement Taylor et al. (2017). Phase scrambles spoil the coherence of a gravitational-wave signal, while preserving the amplitude, allow-ing pulsar timers to estimate the null distribution of the optimal statistic in a way that is less affected by misspecified noise. Phase scrambles are based on the premise that the amplitude informa-tion is completely untrustworthy while the phase information is entirely reliable. We follow this logic to its natural conclusion and construct a likelihood that depends only the phase of pulsar-timing strain measurements. We show that one can measure the amplitude of the gravitational-wave background by looking for correlations between phases in pulsar strain measurements. We show that one can measure the spectral index of the background by measuring how these correlations change with frequency. We suggest that the resulting framework meets the three criteria listed above, avoiding false positives without the need for quasi-resampling methods. By comparing our results to those obtained with the optimal statistic, we assess the extent to which the optimal statistic uses the less trustworthy amplitude information. The remainder of this paper is organized as follows. In Sec. 2.1 we develop a formalism for the PTA phase likelihood. We then implement this approach using simulation-based inference with Monte Carlo data, as detailed in Sec. 3. Finally, we discuss and conclude our results in Sec. 4. 
+
+2. Pulsar timing array formalisms 
+
+A PTA data set consists of 𝑁 psr time series of 𝑁 ToA timing resid-uals. Under a Fourier transform, they become 𝑁 psr vectors of complex values ®𝑧 , with length 𝑁 bin , where 𝑁 bin is the number of frequencies used for the discrete Fourier transform. Under the assumption that any deterministic signal has been correctly modelled by the timing model, the residuals contain only contri-butions from stochastic signals. This includes the GWB signal, 
+
+®𝑠 GWB , but also any noise processes, ®𝑛 , such as instrumental white noise, or the plethora of uncorrelated red noises encountered in pulsar timing, such as timing noise, dispersion measure noise or scintillation noise (Lentati et al. 2013). 
+
+> 2.1. Fourier domain noise and signal models
+
+The basic assumption of all PTA signal modelling is, that all random signals can be modelled as Gaussian processes with zero mean and some noise-dependent covariance (Lentati et al. 2013). It is convenient to express the frequency-domain realisations of these signals in terms of their real and imaginary parts, 𝑢 𝑋 and 
+
+𝑣 𝑥 , respectively, as 
+
+®𝑧 = ®𝑠 GWB + ® 𝑛 (1) 
+
+≡ ® 𝑢 GWB + 𝑖 ®𝑣 GWB + ® 𝑢 n + 𝑖 ®𝑣 n. (2) The noise contribution of the 𝑎 th pulsar follows ®𝑢 n,𝑎 , ®𝑣 n,𝑎 ∼N ( 0, 𝜎 𝑎 ), with 
+
+𝜎 𝑎 =√︃ I2𝜎 2ToA + Q 2 2𝑁 bin + 1
+
+√2𝑁 bin 
+
+, (3) where I and Q denote the white noise parameters EFAC and EQUAD, respectively, and 𝜎 ToA is the ToA uncertainty. 1
+
+The factor 2𝑁 bin +1
+
+> √2𝑁 bin
+
+originates from the conversion of the time-domain definition of white noise to the frequency domain. The GWB contribution is modelled jointly across all pulsars, with 
+
+®𝑢 GWB , ®𝑣 GWB ∼ N ( 0, S), and covariances of the GWB and noise in Fourier domain are given as 
+
+𝑆 𝑎𝑏 = Γ 𝑎𝑏 
+
+12 𝑆 ( 𝑓 ) Δ 𝑓 , (4) with the Hellings-Downs coefficient (Hellings & Downs 1983), 
+
+Γ𝑎𝑏 , the frequency difference between two Fourier frequencies, 
+
+Δ 𝑓 , and the frequency-dependent GWB spectrum, 
+
+𝑆 GWB ( 𝑓 ) = 𝐴 2GWB 
+
+12 𝜋 2
+
+ 𝑓 𝑓 yr 
+
+ −𝛾 GWB 
+
+𝑓 3yr , (5) which is modelled as a powerlaw governed by its amplitude, 
+
+𝐴 GWB , and spectral index, 𝛾 GWB . The full concatenated complex residuals are denoted ®Z ≡ (® 𝑧 1, . . . , ®𝑧 𝑁 psr )𝑇 .At this point, we would like to stress, that this work concerns two different amplitudes with two different roles. Regarding the description of the data set using complex numbers written as 
+
+𝑧 = A𝑒 𝑖 𝜙 , we mention the amplitudes, A, of these complex numbers (for example, above, in describing the phase scram-bling). With respect to the GWB signal, we describe its power-law power spectral density in terms of its amplitude, 𝐴 GWB , and   
+
+> 1In our demonstration we assume that EFAC and EQUAD are known precisely, but in principle, one should marginalize over uncertainty in these parameters. We return to this approximation in Section 4. Article number, page 2 of 11 Kathrin Grunthal et al.: Not just a phase: detecting nanohertz gravitational waves from phase alone
+
+spectral index, 𝛾 GWB . Whenever the GWB amplitude is meant, it is clearly denoted by the subscript, and we aim to distinct the complex amplitude by resorting to a different font. 
+
+2.2. Timing-residual phase likelihood function 
+
+Assuming that the aforementioned noise models are appropri-ately representing the noise budget of the PTA data set, the like-lihood for the residuals reads 
+
+𝑝 ( ®Z| 𝐴 GWB , 𝛾 GWB ) = 1
+
+𝜋 2𝑁 √det Σ exp 
+
+h
+
+− ®Z†𝚺 −1 ®Z
+
+i
+
+, (6) where the covariance matrix 𝚺 is constructed from the noise models, and 𝑁 = 𝑁 psr · 𝑁 bin Assuming that the data sets only contains a powerlaw GWB signal and fixed white noise, it is block diagonal and reads 
+
+Σ𝑎𝑏,𝑘𝑘 ′ = 𝛿 𝑘𝑘 ′
+
+
+
+Γ𝑎𝑏 𝑆 GWB ( 𝑓 𝑘 ) Δ 𝑓 + 𝛿 𝑎𝑏 𝜎 2
+
+> 𝑎
+
+
+
+(7) If we rewrite the complex-valued residuals in terms of am-plitudes and phase, 
+
+𝑧 = A𝑒 𝑖 𝜙 , (8) the likelihood becomes a joint distribution of amplitudes and phase given the parameters 𝐴 GWB , 𝛾 GWB :
+
+L( ® A, ®𝜙 | 𝐴 GWB , 𝛾 GWB ). (9) The likelihood of ( 𝐴 GWB , 𝛾 GWB ) that solely depends on the phases, { ® 𝜙 }, is then obtained by marginalising Eq. 9 over the amplitudes, { ® A} . Defining 
+
+M( ® 𝜙 ) ≡ 𝑒 −𝑖 ®𝜙 𝚺 −1𝑒 𝑖 ®𝜙 , (10) the resulting phase-dependent likelihood reads 
+
+L( 𝐴 GWB , 𝛾 GWB | ® 𝜙 ) =
+
+1
+
+𝜋 2𝑁 √det Σ
+
+> ∞
+
+∫
+
+> 0
+
+dA
+
+Ö
+
+> i
+
+Ai
+
+!
+
+exp −A T M(𝜙 ) A  , (11) where the data enters via M( ® 𝜙 ).In the presence of a correlated signal, 𝚺 contains non-zero entries on the off-diagonal, which leads to correlations between phases. In turn, M( ® 𝜙 ) is similarly not diagonal, but contains non-zero off-diagonal elements, that depend on the differences between different phases, Δ ®𝜙 . The marginal distributions for each phase are still uniform, but the joint distribution of the phases is not uniform. 2
+
+For two pulsars and two frequency bins, with statistically independent noise, the empirical likelihood distribution is shown in Fig. 1. Focusing on panels corresponding to two phases in the same frequency bin, we observe two stripes at a 45 ◦ angle. The visibility of this pattern decreases with increasing frequency because the correlations stand out less above the noise. They are also more or less pronounced depending on the angular separation of the pulsars.   
+
+> 2Joint distributions with uniform marginal distributions that allow for covariance between parameters are known as copulas. Thus, the distri-bution of phases forms a high-dimensional copula. See Adamcewicz & Thrane (2022) for a discussion of copulas in the context of gravitational-wave astronomy
+> Fig. 1. The phase likelihood distribution of for three pulsars and two fre-quency bins. The data contain white noise and an isotropic gravitational-wave background.
+
+Yet, for a PTA, 𝚺 is neither diagonal nor block-diagonal. Therefore the integral in Eq. 11 only has an exact analytical solution for 𝑁 ≤ 2 pulsars. While the analysis of real PTA data sets requires 𝑁 ≫ 2, it is instructive to take a closer look at the 
+
+𝑁 = 2 scenario, as it allows to obtain some further insights about the likelihood behaviour. 
+
+2.2.1. For two pulsars 
+
+For simplicity, we focus on a single frequency bin. Letting ®A =
+
+(A 1, A2), Δ𝜙 = 𝜙 2 − 𝜙 1, the integral in Eq. 11 reads 
+
+𝑝 ( ® 𝜙 | 𝐴 GWB , 𝛾 GWB ) ∼ 
+
+> ∞
+
+∫
+
+> 0
+
+dA1dA2 A1A2
+
+exp Σ−111 A21 + Σ−122 A22 + 2Σ−112 A1A2 cos Δ𝜙  . (12) Upon using completion of the square and using standard error function identities, we arrive at 
+
+𝑝 ( ® 𝜙 | 𝐴 GWB , 𝛾 GWB ) = 𝑝 (Δ𝜙 | 𝐴 GWB , 𝛾 GWB ) ∼ 
+
+1 − 𝑟 cos (Δ𝜙 ) arccos [𝑟 cos (Δ𝜙 )] √︁ 
+
+1 − 𝑟 2 cos 2 (Δ𝜙 ) , (13) with 𝑟 = Σ −112 /√︃ Σ−111 Σ−122 .This shows that the presence of a correlated signal induces a cosine-modulated correlation between the phases of distinct pulsar pairs. This corresponds to the striped signature identified in Fig. 1. Furthermore, it shows that the correlation strength directly reflects the GWB S/N, as 
+
+𝑟 = Σ−112 √︃ 
+
+Σ−111 Σ−122 
+
+=
+
+ Γ12 𝑆 GWB ( 𝑓 )
+
+𝜎 1𝜎 2
+
+ −1
+
+. (14)  
+
+> Article number, page 3 of 11 A&A proofs: manuscript no. main
+
+Thus, the correlation pattern is the key to (i) identifying the pres-ence of a GWB signal and (ii) constraining its spectral parameters purely from the phases of the timing residuals, as overall S/N of the correlation between two pulsars depends on the Hellings-Downs coefficient, it scales with the GWB spectrum. Note that if the pulsar noise model is misspecified, then the phase likelihood becomes sub-optimal because the prominence of the stripes in the likelihood no longer match the actual distribu-tion of the data. This can introduce a bias in the inferred values of 
+
+𝐴 GWB , 𝛾 GWB . However, even in this case, the phase likelihood is still relatively conservative because 𝐴 GWB = 0 data always pro-duces a uniform phase distribution, which guards against false-positives inferences of 𝐴 GWB > 0.  
+
+> 2.2.2. For
+
+𝑁 > 2 pulsars 
+
+The general expression for the phase-based likelihood, Eq. 11, is a correlated Gaussian integrated over the positive orthant of the amplitude-space. The major complication in evaluating this integral arises from the pair-wise correlations between phases, introduced from the non-diagonal 𝚺 . Just as in the 𝑁 = 2-case, the likelihood is still a function of Δ𝜙 , however now, 
+
+Δ𝜙 ↦ −→ ®Δ𝜙 ≡ { 𝜙 1 − 𝜙 2, . . . , 𝜙 1 − 𝜙 𝑁 , . . . , 𝜙 𝑁 −1 − 𝜙 𝑁 }. These correlations cannot be resolved, meaning that there is no ana-lytic expression for the integral in more than two dimensions, so non-analytical approaches are required. Evaluating higher-dimensional positive-orthant integrals are a well known problem across many fields, such as probability theory (Genz & Bretz 2009, see), but also economics (Train 2009), stochastic programming (Prékopa 1973) etc.. For low-dimensional distribtutions, quasi-Monte-Carlo algorithms, e.g. introduced by Genz (1992), are numerically tractable, in moder-ate dimensions, the Geweke-Hajivassiliou-Keane (Geweke 1998; Hajivassiliou et al. 1996; Keane 1993) is usually applied. For a typical PTA data set (EPTA Collaboration and InPTA Collabo-ration: et al. 2023; Agazie et al. 2023; Reardon et al. 2023; Miles et al. 2025), with O( 30 ) pulsars and O( 10 ) relevant frequency bins, the integral is taken over O( 300 ) dimensions. In this regime, all mentioned methods become either numerically unstable or not feasible. While approaches such as sequential Monte-Carlo are proposed (Ridgway 2014) for these dimensions, evaluating Eq. 11 using sampling methods would require a nested approach, i.e. the integral has to be evaluated at each point of the parameter space. This comes at a high computational cost we aim to avoid in a simple demonstration setup. Another option is to numerically fit the phase likelihood using simulation-based inference (SBI). We explore this option Sec. 3. 
+
+> 2.3. Detection statistic
+
+Under the null hypothesis, H0, namely that no GWB signal is present 3, 𝚺 is (block-)diagonal, therefore M( ® 𝜙 ) is diagonal as well. The corresponding phase-based likelihood is uniform, 
+
+L(H 0 | ® 𝜙 ) = 1
+
+(2𝜋 )𝑁 . (15) The detection statistic used to test for the presence of a GWB signal (signal hypothesis, H1), is the likelihood ratio, which is  
+
+> 3For example, the pulsar noise and a CURN signal could be seen as the null-hypothesis.
+
+given as 
+
+Λ = L( 𝐴 GWB , 𝛾 GWB | ® 𝜙 )L(H 0 | ® 𝜙 ) (16) 
+
+= (2𝜋 )𝑁 · L( 𝐴 GWB , 𝛾 GWB | ® 𝜙 ). (17) The null distribution of the likelihood ratio is a fixed function of a uniform vector. It can be computed without touching the data, by drawing realisations of ®𝜙 0 ∼ Uniform ([− 𝜋, 𝜋 ]N) and evaluat-ing Λ0 = (2𝜋 )𝑁 · L( 𝐴 GWB , 𝛾 GWB | ® 𝜙 0). Therefore, the detection statistic satisfies criteria (1) and (2) listed in Sec. 1. The corre-sponding Bayes factor comparing signal and noise hypotheses is obtained by marginalising over the GWB parameters, 𝐴 GWB and 
+
+𝛾 GWB .Note that these considerations assume that the timing residu-als are not contaminated by monopolar or dipolar common noise, e.g. arising from clock noise or Solar system ephemeris noise. These noise processes would create a non-uniform null distribu-tion, since they would also lead to off-diagonal terms in 𝚺 .
+
+3. Demonstration 
+
+We create a mock PTA consisting of 𝑁 psr = 30 pulsars at ran-domly drawn sky positions. We assume that the pulsars have been regularly observed over 15 years, and that their residuals contain only white noise with 𝜎 ToA = 50 ns and EFAC = 1, and a GWB signal. We model the GWB over the first 12 frequency bins. Furthermore, we assume the white noise level to be known and fixed, such that in this mock example, the phase likelihood only depends on the amplitude and spectral index of the GWB. Since numerically evaluating the likelihood for 
+
+( 𝐴 GWB , 𝛾 GWB ) obtained from Eq. 11 in a Monte Carlo approach is challenging, we pursue simulation-based infer-ence for exploring the toy model. This means, that we use forward modelling and generate an empirical distribution of 
+
+L( 𝐴 GWB , 𝛾 GWB | ® 𝜙 ), which is then fitted using a conditional normalising flow. For readers unfamiliar with the concepts of normalising flows, we provide a brief overview in App. B. 
+
+> 3.1. Setup and training of the normalising flow
+
+The phases of complex numbers are circular over [− 𝜋, 𝜋 ), i.e., 
+
+L( 𝜙 = −𝜋 ) = L( 𝜙 = 𝜋 ). (18) In order to properly account for this characteristic, we choose to model the likelihood using a neural circular spline flow (NCSF) (Rezende et al. 2020). This special type of neural spline flow (Durkan et al. 2019) respects the circular nature of complex phases, by ensuring that the splines at {− 𝜋, 𝜋 } are continuous up to their first derivative. A spline flow uses monotonic quadratic-rational spline functions as the bijection. The parameters (widths, heights, and derivatives) of these splines at each data point are determined by a neural network, that is conditioned during the training process. This setup is especially suited to model PDFs with the numerical stability needed for reliable parameter infer-ence. We employ the implementation of such a flow provided in the Python package zuko. 4
+
+Since the distribution of phases depends on the gravitational-wave parameters 𝐴 GWB , 𝛾 GWB , we need to train a conditional flow describing the distribution of the phases conditioned on   
+
+> 4https://pypi.org/project/zuko/
+> Article number, page 4 of 11 Kathrin Grunthal et al.: Not just a phase: detecting nanohertz gravitational waves from phase alone
+
+these parameters. A conditional flow is trained not only on the phases, but also on the parameters these phases were generated with, such that it directly represents L( ® 𝜙 | 𝐴 GWB , 𝛾 GWB ). Flows are especially effective when the likelihood varies smoothly as function of the the input parameters. While for real PTA data sets the irregular sampling of the timing residuals leads to non-negligible correlations between fre-quency bins, due to the regular-sampling assumption made in the simulation, we can neglect these correlations for the test case. This decouples the likelihood in frequency, such that 
+
+Lapprox ( 𝐴 GWB , 𝛾 GWB | ® 𝜙 ) =
+
+> Nf
+
+Ö
+
+> 𝑘 =1
+
+L( 𝐴 GWB , 𝛾 GWB , 𝑓 𝑘 | ® 𝜙 ). (19) This decoupling allows us to reduce the complexity of the flow. Instead of modelling the full (𝑁 PSR × 𝑁 bin )-dimensional likeli-hood, we can fit each bin separately and then combine the flows. It may be possible to fit every frequency bin simultaneously, but we leave this for future work. We empirically find that a conditional NCSF with 15 layers, each consisting of an 8-bin spline and a multi-layer perceptron (Rumelhart et al. 1986) with two layers with [64 , 64 ] features, provides an adequate fit. We train this flow in multiple train-ing rounds. Per round, we draw 𝑁 vp pairs of (log 𝐴 GWB , 𝛾 GWB )
+
+according to a Sobol sequence, which ensures a more uniform coverage of the sample space than random sampling, leading to faster convergence and lower variance estimates while avoiding gridding artefacts in the flow training arising from regular pa-rameter spacing. We use a validation fraction of 0 .1, i.e., 10% of these points are randomly chosen to represent the validation data set, whereas the remaining 90% points make up the training data set. At each of these points, we draw 𝑁 sample phase samples. In a single round, the flow is then trained in multiple epochs us-ing the AdamW optimizer (Loshchilov & Hutter 2019) provided by the Python package PyTorch, with an initial learning rate, 
+
+𝜂 0 that is adapted for each round. Each round is finished, if the relative change in the validation NLL does not exceed a manu-ally set threshold for more than five epochs. The specific training parameters are summarised in Tab. 1. We verify that the flow adequately represents the phase distribution using a 𝑃 -𝑃 -plot, shown in App. C. Round 𝑁 vp 𝑁 sample 𝜂 0 rel. change 1 500 15360 1 × 10 −3 5 × 10 −3
+
+2 1000 15360 3 × 10 −4 1 × 10 −4
+
+3 1000 30720 1 × 10 −4 5 × 10 −5 
+
+> Table 1. Training parameters for the 30-dimensional conditional nor-malising flow. The flow is a neural circular spline flow with 15 layers.
+
+3.2. Evaluating amplitude and spectral index 
+
+We now demonstrate the capability of the phase likelihood to determine the presence of a gravitational-wave background with parameters, log 10 𝐴 GWB and 𝛾 GWB . To this end, we create simu-lated data with a gravitational-wave background signal described by parameters log 10 𝐴 inj GWB = −14 .0 and 𝛾 inj GWB = 13 /3 and draw a random realisation of complex residuals, ®Zinj . Then we ob-tain the phases of these residuals, and calculate the likelihood by evaluating the trained flow for these phase values across the 
+
+(log 10 𝐴 GWB , 𝛾 GWB )-plane according to Eq. 19. The resulting likelihood contour for a single realisation of phases is shown        
+
+> Fig. 2. The phase likelihood as fit with a neural circular spine flow. This example includes 30 pulsars and 12 frequency bins. The cross and the dashed lines indicate the injected GWB signal, with log 10 𝐴 inj GWB =−13 .5and 𝛾 inj GWB =13 /3.
+
+in Fig. 2. We find that the likelihood peak is consistent with the injected values of (log 10 𝐴 GWB , 𝛾 GWB ). Since the confidence interval excludes small values of 𝐴 GWB , we conclude that it is possible to detect and recover a GWB signal using purely the phase information of the timing residuals. It is useful to think about how log 10 𝐴 GWB , 𝛾 GWB are im-printed on the phase likelihood. The spectral index determines how the intensity of the stripes varies with frequency. When 𝛾 GWB 
+
+is large, the prominence of the stripes falls relatively faster as a function of frequency whereas small values values of 𝛾 GWB make it easier to see the stripes at higher frequencies. Increasing 𝐴 GWB 
+
+increases the visibility of the stripes in all frequency bins—at least up to a point. However, the two parameters are somewhat covariant. In the high-SNR limit (when the gravitational-wave background is large compared to the noise) the phases of two pulsars are still not perfectly correlated because the gravitational-wave background enters as a source of noise via the pulsar term. 
+
+3.3. Evaluating the statistical significance 
+
+As described in Sec. 2.3, the distribution of phase vectors un-der the null hypothesis, H0, for the 30-pulsar PTA evaluated in 12 frequency bins is given as ®𝜙 0 ∼ Uniform ([− 𝜋, 𝜋 ]30 ×12 ). We generate the distribution of null-hypothesis Bayes factors from 100000 samples of ®𝜙 0. For each sample, we calculate the corre-sponding Bayes factors by integrating the respective likelihood obtained from the trained neural circular spline flow over the log 10 𝐴 GWB -𝛾 GWB parameter space. Similarly, we calculate the Bayes factor of the phase vector obtained under the signal hy-pothesis, H1, which was used to obtain Fig. 2. The resulting                       
+
+> Article number, page 5 of 11 A&A proofs: manuscript no. main 0.0 0.5 1.0 1.5 2.0 2.5 3.0 3.5 4.0
+> log 10 (BF)
+> 0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75 2.00
+> p(log 10 BF)
+> BF( 0)
+> BF( 1)
+> Fig. 3. Distribution of Bayes factors in the absence of a GWB signal (null-hypothesis, H0), and the Bayes factor for the likelihood of the phases containing a GWB signal, with log 10 𝐴 inj GWB =−13 .5 and 𝛾 inj GWB =13 /3(signal hypothesis, H1),. The 𝑝 -value of the observed Bayes factor is 0.00047, corresponding to a statistical significance of 3 .3𝜎 .
+
+distribution of {log 10 BF (H 0)} and log 10 BF (H 1) are shown in Fig. 3. The Bayes factor observed from the phases containing the GWB signal, BF (H 1), has a 𝑝 -value of 0 .00047, which cor-responds to a statistical significance of 3 .3 𝜎 . This evaluation demonstrates the procedure of obtaining the statistical signifi-cance for the presence of a GWB signal without resampling a likelihood obtained from the observed data. 
+
+3.4. Caveats 
+
+This demonstration features a simplified representation of a PTA data set. Realistic timing residual time series are irregularly sampled, obtained at different observing frequencies and have different overall time spans. This leads to correlations between frequency bins that are not reflected in this simulation. In Ap-pendix D we attempt to overcome this by modelling the joint 
+
+(𝑁 psr × 𝑁 bin )-dimensional likelihood. Furthermore, as the number of dimensions increases (either from adding more frequency bins or more pulsars) modelling the likelihood using a normalising flow becomes increasingly challenging—at least when employing an off-the-shelf model such as the pre-implemented NCSF. Modelling the likelihood in order to constrain only the GWB amplitude proved to be less dependent on the specific flow archi-tecture, and once we found a suitable setup for a small number of pulsars, this was easily scalable, both in the construction of the flow as well as its training. However, determining a setup (flow + training) that is capable of modelling the dependencies of the likelihood conditioned on both the amplitude and spectral index proved to be hard, already for a fairly simple model. Information about the GWB is mostly encoded in subtle cor-relations between specific pairs of pulsars. It is difficult for the normalising flow to learn how this subtle structure varies with 
+
+𝐴 GWB , 𝛾 GWB . Thus, the setup needs to be fine-tuned to the par-ticular properties of the PTA data set; e.g., adding or removing five pulsars can require alterations to the flow architecture. 
+
+3.5. Comparison to the Optimal Statistic 
+
+We compare the performance of the phase-based detection statis-tic to the currently used detection statistic, the optimal statistic (OS), using the framework described in van Haasteren (2025). As shown in Appendix A, the OS is a quadratic function of the resid-uals, combined by a filter matrix, Q, which, in Fourier domain, is given as 
+
+𝐷 ( ®Z, 𝜃 ) = ®Z†Q ®Z, (20) as a function of the model parameters, 𝜃 . The filter matrix, 
+
+Q = N−1 (C − N)N−1
+
+Tr 
+
+h N−1 (C − N)2i1/2 , (21) is constructed from the covariance matrices of the timing resid-uals in the absence and presence of a GWB signal, 
+
+N = ⟨ ®Z ®Z†⟩𝐻 0 = diag (𝚺 ) (22) 
+
+C = ⟨ ®Z ®Z†⟩𝐻 𝑆 = 𝚺 . (23) We evaluate the likelihood for the GWB parameters, 𝜃 =
+
+(log 10 𝐴 GWB , 𝛾 GWB ), by generating the empirical distribution of 
+
+𝐷 ( ®Z, 𝜃 ) for different value pairs of 𝜃 , and evaluating these for a randomly drawn residual sample, ®Z0. The resulting parameter posteriors obtained from the WN+GWB-only, 30-pulsar PTA test case are shown in Fig. 4, together with the contours of the phase-based likelihood evaluation from Fig. 2. Fig. 4 solidifies that the phase-based likelihood can be used to detect GW signals. While it provides slightly wider 2D con-tours than the OS, it performs better in separating log 10 𝐴 GWB 
+
+and 𝛾 GWB . This narrower posterior from the OS corresponds to a tighter constraint on the GWB amplitude obtained from the OS, once the spectral index has been fixed, as shown in Fig. 5. However, this suggests, that the OS estimate likely includes some amplitude ( {A 𝑖 }) information, which the community has indi-cated to actually not trust. 
+
+4. Summary and outlook 
+
+In this work, we construct a likelihood function for the phases of the complex residuals of a pulsar timing array. A gravitational-wave signal appears in the phase data as correlations between the phases of different pulsars. We use this likelihood to create a formalism with the three properties laid out in the introduction: 1. It is safe from false positives when the pulsar noise model is misspecified. 2. It does not require quasi-resampling methods to assess sig-nificance. 3. It makes the optimal use of the (phase) information we trust in order to constrain the properties of the gravitational-wave background. Most importantly, we demonstrate that the null distribution of the phase-based likelihood does not depend on the choice of noise parameters. By comparing this framework to the traditional opti-mal statistic approach (which does depend on the choice of noise parameters), we show that the optimal statistic still uses some information about the pulsar amplitudes in order to resolve the presence of a gravitational-wave background—in spite of com-munity concerns about the reliability of pulsar noise modelling.             
+
+> Article number, page 6 of 11 Kathrin Grunthal et al.: Not just a phase: detecting nanohertz gravitational waves from phase alone
+> Fig. 4. Comparison between GWB parameter likelihood from evaluating the phase likelihood and the Optimal Statistic distribution from a single draw of timing residuals. The cross and the dashed lines indicate the injected GWB signal, with log 10 𝐴 inj GWB =−13 .5 and 𝛾 inj GWB =13 /3.
+> Fig. 5. One-dimensional slice of the two-dimensional posteriors shown in Fig. 4 for 𝛾 GWB =13 /3.
+
+That said, we view this work as a proof of concept; we have not produced a mature pipeline capable of analysing a complete PTA dataset with a large number of pulsars and frequency bins. In order to elevate this approach beyond a conceptual idea towards a framework, several hurdles have to be overcome. First, additional work is required to account for the covariance between different frequency bins. This goes hand-in-hand with an increase in the dimensionality of the likelihood, both by adding more frequency bins and/or more pulsars. So, second, it is probably necessary to employ a more sophisticated normalising flow architecture. Third, in order to take into account the uncertainty in our pulsar noise models in the parameter estimation, one should include random draws from pulsar noise parameters in our simulation-based inference. Another direction of development is the type of signal that is evaluated. At the time of writing, the phase likelihood can be used to assess the significance of the isotropic background signal with only phase information. As a result of future work, it can potentially be used to assess the phase-only significance of other signals such as continuous-wave signals. In the closing remarks to this work, we want to address the provocative question that is looming over any future work: should we fully turn to a phase likelihood for pulsar-timing inference? We have a nuanced answer to this question. If the choice is between an optimal statistic framework (built with cross-correlations) and a phase likelihood, we submit that the phase likelihood is prefer-able because it actually removes the amplitude information that the optimal statistic is meant to ignore (but does not). As a result, the community can avoid the need for quasi-resampling tests to measure significance; the Bayes factors obtained from the phase-based likelihood can be taken at face value. In the long term however, it might not make sense to completely throw out all amplitude information. As the field of PTAs moves toward what is likely to be a “post-detection” era, the conser-vatism to avoid a false-positive detection (in the intermediate signal-to-noise regime) may be relaxed. At that point, the idea of removing all amplitude information seems unnecessary, and other methods may become relevant 5. Overall, we see the field as eventually moving away from cross-correlation toward the use of pulsar amplitudes and phase. In this sense, we think the phase likelihood will become useful for determining where the infor-mation on a GW signal is coming from. Therefore, we envision the phase likelihood as providing a valuable tool for determin-ing the extent to which our inferences depend on less reliable amplitude measurements. 
+
+Acknowledgements 
+
+KG, DC and MK acknowledge continuing valuable support from the Max-Planck society. KG acknowledges support from the In-ternational Max Planck Research School (IMPRS) for Astronomy and Astrophysics at the Universities of Bonn and Cologne. ET ac-knowledges support from the Australian Research Council (ARC) Centres of Excellence CE230100016 and ARC DP230103088. MK acknowlegdes support by the CAS-MPG legacy Programme. This publication made use of open source python libraries in-cluding numpy (Harris et al. 2020), scipy (Virtanen et al. 2020), matplotlib (Hunter 2007), PyTorch (Paszke et al. 2019) and zuko ( https://pypi.org/project/zuko/ ). The authors ac-knowledge the use of the large-language-models ChatGPT and Claude to assist in code-writing. 
+
+References  
+
+> Adamcewicz, C. & Thrane, E. 2022, MNRAS, 517, 3928 Agazie, G., Anumarlapudi, A., Archibald, A. M., et al. 2023, Astrophys. J. Lett., 951, L8 Allen, B., Dhurandhar, S., Gupta, Y., et al. 2023, arXiv e-prints, arXiv:2304.04767 Begelman, M. C., Blandford, R. D., & Rees, M. J. 1980, Nature, 287, 307 Caprini, C. & Figueroa, D. G. 2018, Classical and Quantum Gravity, 35, 163001
+> 5This is comparable to the situation of terrestrial observatories like LIGO and Virgo. They also deal with misspecified noise, but they do not throw out information—they just do their best to model the noise (Romero-Shaw et al. 2022) Article number, page 7 of 11
+
+A&A proofs: manuscript no. main 
+
+Chamberlin, S. J., Creighton, J. D. E., Siemens, X., et al. 2015, Phys. Rev. D, 91, 044048 Cornish, N. J. & Sampson, L. 2016, Phys. Rev. D, 93, 104047 Demorest, P. B., Ferdman, R. D., Gonzalez, M. E., et al. 2013, Astrophys. J., 762, 94 Di Marco, V., Zic, A., Miles, M. T., et al. 2023, ApJ, 956, 14 Di Marco, V., Zic, A., Shannon, R. M., & Thrane, E. 2024, MNRAS, 532, 4026 Domènech, G. 2021, Universe, 7, 398 Durkan, C., Bekasov, A., Murray, I., & Papamakarios, G. 2019, in Advances in Neural Information Processing Systems, ed. H. Wallach, H. Larochelle, A. Beygelzimer, F. d 'Alché-Buc, E. Fox, & R. Garnett, Vol. 32 (Curran Asso-ciates, Inc.) EPTA Collaboration and InPTA Collaboration:, Antoniadis, J., Arumugam, P., et al. 2023, Astron. Astrophys., 678, A50 Genz, A. 1992, Journal of Computational and Graphical Statistics, 1, 141 Genz, A. & Bretz, F. 2009, Computation of Multivariate Normal and t Probabil-ities, 1st edn., Lecture Notes in Statistics (Springer Berlin, Heidelberg), VIII, 126 Geweke, J. 1998, Comput. Sci. Statist., 23 Hajivassiliou, V., McFadden, D., & Ruud, P. 1996, Journal of Econometrics, 72, 85 Harris, C. R., Millman, K. J., van der Walt, S. J., et al. 2020, Nature, 585, 357 Hellings, R. W. & Downs, G. S. 1983, ApJ, 265, L39 Hindmarsh, M., Huber, S. J., Rummukainen, K., & Weir, D. J. 2014, Phys. Rev. Lett., 112, 041301 Hindmarsh, M. B. & Kibble, T. W. B. 1995, Reports on Progress in Physics, 58, 477 Hunter, J. D. 2007, Computing in Science & Engineering, 9, 90 Keane, M. 1993, Simulation estimation for panel data models with limited depen-dent variables, MPRA Paper 53029, University Library of Munich, Germany Kormendy, J. & Richstone, D. 1995, ARA&A, 33, 581 Lamb, W. G., Taylor, S. R., & van Haasteren, R. 2023, Phys. Rev. D, 108, 103019 Lentati, L., Alexander, P., Hobson, M. P., et al. 2013, Phys. Rev. D, 87, 104021 Loshchilov, I. & Hutter, F. 2019, in International Conference on Learning Rep-resentations Miles, M. T., Shannon, R. M., Reardon, D. J., et al. 2025, Mon. Not. R. Ast. Soc., 536, 1489 Paszke, A., Gross, S., Massa, F., et al. 2019, PyTorch: an imperative style, high-performance deep learning library (Red Hook, NY, USA: Curran Associates Inc.) Prékopa, A. 1973, Mathematical Programming, 4, 202 Rajagopal, M. & Romani, R. W. 1995, ApJ, 446, 543 Reardon, D. J., Zic, A., Shannon, R. M., et al. 2023, Astrophys. J. Lett., 951, L6 Rezende, D. J., Papamakarios, G., Racaniere, S., et al. 2020, in Proceedings of Machine Learning Research, Vol. 119, Proceedings of the 37th International Conference on Machine Learning, ed. H. D. III & A. Singh (PMLR), 8083– 8092 Ridgway, J. 2014, Statistics and Computing, 26 Romero-Shaw, I. M., Thrane, E., & Lasky, P. D. 2022, PASA, 39, e025 Rumelhart, D. E., Hinton, G. E., & Williams, R. J. 1986, Nature, 323, 533 Taylor, S. R., Lentati, L., Babak, S., et al. 2017, Phys. Rev. D, 95, 042002 Train, K. E. 2009, Discrete Choice Methods with Simulation, 2nd edn. (Cam-bridge University Press) van Haasteren, R. 2025, Phys. Rev. D, 112, 103009 Virtanen, P., Gommers, R., Oliphant, T. E., et al. 2020, Nature Methods, 17, 261 Xu, H., Chen, S., Guo, Y., et al. 2023, Research in Astronomy and Astrophysics, 23, 075024 
+
+Article number, page 8 of 11 Kathrin Grunthal et al.: Not just a phase: detecting nanohertz gravitational waves from phase alone 
+
+Appendix A: Summary of the pair-correlation optimal statistic 
+
+The pair-correlation optimal statistic (OS) (Demorest et al. 2013; Chamberlin et al. 2015) is built from pulsar-pair cross-correlation estimators, 𝜌 𝑎𝑏 , where (𝑎, 𝑏 ) indicate distinct pulsars. These estimators, and their uncertainties, 𝜎 𝑎𝑏 , are obtained from the timing residuals, ®𝛿𝑡 , as 
+
+𝜌 𝑎𝑏 =
+
+®𝛿𝑡 𝑇 𝑎 C−1 
+
+> 𝑎
+
+ˆS𝑎𝑏 C−1 
+
+> 𝑏
+
+®𝛿𝑡 𝑏 
+
+Tr 
+
+
+
+𝐶 −1 
+
+> 𝑎
+
+ˆS𝑎𝑏 𝐶 −1 
+
+> 𝑏
+
+ˆS𝑏𝑎 
+
+ , (A.1) 
+
+𝜎 𝑎𝑏 =
+
+h
+
+Tr 
+
+
+
+𝐶 −1 
+
+> 𝑎
+
+ˆS𝑎𝑏 𝐶 −1 
+
+> 𝑏
+
+ˆS𝑏𝑎 
+
+i −1/2
+
+, (A.2) where 𝐶 𝑎 = ⟨ ® 𝛿𝑡 𝑎 ®𝛿𝑡 𝑇 𝑎 ⟩ refers to the autocorrelation matrix of the timing residuals, and 𝑆 𝑎𝑏 is the cross-correlation covariance as introduced in Eq. (4). With these quantities, the estimator for the GWB amplitude is given as ˆ𝐴 2GWB =
+
+Í𝑎<𝑏 𝜌 𝑎𝑏 Γ𝑎𝑏 /𝜎 2
+
+> 𝑎𝑏
+
+Í𝑎<𝑏 Γ2
+
+> 𝑎𝑏
+
+/𝜎 2
+
+> 𝑎𝑏
+
+, (A.3) and follows ⟨ ˆ𝐴 2⟩ = 𝐴 2GWB . The signal-to-noise of the amplitude estimator, ˆ𝜌 =
+
+Í𝑎<𝑏 𝜌 𝑎𝑏 Γ𝑎𝑏 /𝜎 2
+
+> 𝑎𝑏
+
+Í 𝑎<𝑏 Γ2
+
+> 𝑎𝑏
+
+/𝜎 2
+
+> 𝑎𝑏
+
+1/2 , (A.4) is the frequentist detection statistic, which is widely used in PTA GWB analyses (Agazie et al. 2023; EPTA Collaboration and InPTA Collaboration: et al. 2023; Reardon et al. 2023; Miles et al. 2025). 
+
+Appendix B: Basics of Normalising Flows 
+
+A normalising flow is a transformation built from a sequence of differentiable bijections, which converts a simple base probabil-ity distribution, e.g., a normal distribution, into a more complex target distribution. On the one hand, this allows to sample from the target distribution by transforming samples from the base dis-tribution. On the other hand, it enables an efficient evaluation of the density at a sample (meaning the likelihood) by transform-ing the sample to the probability space of the base distribution. Therefore, normalising flows are a popular tool for variational inference and density estimation. Assuming that the random variable, ®𝑋 ∈ R𝐷 with known probability density function 𝑝 ®𝑋 (® 𝑥 ) is related to another random variable ®𝑌 = ®𝑓 ( ® 𝑋 ) via the bijection 𝑔 , the probability density function of ®𝑌 , 𝑝 ®𝑌 ( ® 𝑦 ) can be obtained as 
+
+𝑝 ®𝑌 ( ® 𝑦 ) = 𝑝 ®𝑋 (® 𝑥 ) det 
+
+ 𝜕 ®𝑥 𝜕 ®𝑦 
+
+
+
+(B.1) 
+
+= 𝑝 ®𝑋 
+
+ ®𝑓 ( ® 𝑦 )
+
+
+
+det 
+
+"
+
+𝜕 ®𝑓 ( ® 𝑦 )
+
+𝜕 ®𝑦 
+
+#
+
+, (B.2) where ®𝑓 is the inverse of ®𝑔 , and 𝜕 ®𝑓 𝜕 ®𝑦 is the Jacobian of ®𝑓 , which accounts for the volume change of the probability space due to the transformation. The obtained density function 𝑝 ®𝑌 ( ® 𝑦 ) is referred to as the pushforward of 𝑝 ®𝑋 (® 𝑥 ).With regards to generative models, the function ®𝑔 pushes for-ward the simple base distribution to a more complicated density. This direction is called the ‘generative direction’, and ®𝑔 is the ‘generator’. The inverse function, ®𝑓 , moves, or ‘flows’, the more complicated density back to the base distribution. This is the ‘normalising direction’, as ®𝑓 ‘normalises’ the data distribution. This leads to the term ‘normalising flow’. In general, it is possible to construct arbitrarily complex (non-linear) bijections, such that any target distribution can be gener-ated from the base distribution in a single transformation. How-ever, in constructing normalising flows, it is desirable, that the bijection is sufficiently feasible to evaluate and invert, and that the determinant of its Jacobian can be calculated with moderate computational expense. To this end, Normalising Flows exploit that the composition of 𝑁 bijections, 
+
+®𝑔 = ®𝑔 𝑁 ◦ ® 𝑔 𝑁 −1 ◦ . . . ◦ ® 𝑔 1, (B.3) is bijective itself, with inverse 
+
+®𝑓 = ®𝑓 1 ◦ . . . ◦ ® 𝑓 𝑁 −1 ◦ ®𝑓 𝑁 . (B.4) Furthermore, the determinant of the Jacobian factorises as det 
+
+"
+
+𝜕 ®𝑓 ( ® 𝑦 )
+
+𝜕 ®𝑦 
+
+#
+
+=
+
+> 𝑁
+
+Ö
+
+> 𝑖 =1
+
+det 
+
+"
+
+𝜕 ®𝑓 𝑖 ( ® 𝑦 𝑖 )
+
+𝜕 ®𝑦 𝑖 
+
+#
+
+. (B.5) The individual bijections, or repeating groups of bijections are called the ‘layers’ of a normalising flow. The specific choice of the bijections and the number of layers are often referred to as the architecture of the flow. Initially, the free parameters of the bijections are arbitrarily chosen, and the pushforward of the base distribution does not model the actual target distribution. Thus, these parameters have to be adjusted by iteratively fitting the transformed base distribu-tion to a sufficiently large sample from he true target distribution. This process is known as ‘training’ the flow. The goal of the training is minimising the loss function, which defines how well the flow fits the actual target distribution. The primary loss func-tion used to train a flow is the negative log-likelihood (NLL) of samples from the true distribution, 
+
+LNF ( ® 𝑦 true ) ≡ − log 𝑝 ®𝑌 ( ® 𝑦 true ) (B.6) 
+
+= − log 
+
+
+
+𝑝 ®𝑋 
+
+
+
+( ® 𝑓 ( ® 𝑦 true )
+
+
+
+· det 𝜕 ®𝑓 𝜕 ®𝑦 ®𝑦 true 
+
+
+
+. (B.7) Minimising this likelihood enforces that the flow produces sam-ples that are distributed according to the original distribution. Therefore, a properly training the flow requires generating a rep-resentative sample data set from the target distribution. This data set has to be large enough such that it reflects the relevant features of the distribution. The following training of the flow is typically performed using an iterative optimisation scheme based on gradient descent. Gradient descent is an algorithm used to minimise a differentiable function, ℎ(® 𝑧 ), by moving from some point in the parameter space, ®𝑧 𝑛 , against the gradient of the function to the next point, 
+
+®𝑧 𝑛 +1, such that 
+
+®𝑧 𝑛 +1 = ®𝑧 𝑛 − 𝜂 ®∇ℎ(® 𝑧 𝑛 ). (B.8) The learning rate, 𝜂 , governs the step size. For suitably chosen values of 𝜂 , ℎ(® 𝑧 𝑛 +1) ≤ ℎ(® 𝑧 𝑛 ), and the minimum of ℎ(® 𝑧 ) can be found. One variation of this algorithm is the stochastic gradient       
+
+> Article number, page 9 of 11 A&A proofs: manuscript no. main
+> Fig. C.1. A𝑃 −𝑃 plot of the recovered log-amplitude (left) and spectral index (right) recovered from 1000 evaluations of the trained conditional neural circular spline flow with frequency dependence.
+
+descent (SGD), which is often applied in machine learning. It minimises the loss function by updating the model parameters using random subsets (‘batches’) of the data, instead of the full data set. This introduces noise fluctuations in the optimisation path, however, significantly speeds up the training of the flow for large data sets. The SGD itself does not provide a criterion to determine whether the normalising-flow parameters are sufficiently trained in order to properly model the target distribution. A commonly used method to evaluate the convergence behaviour is to split the sample data set into a (larger) training data set and a (smaller) validation data set. The percentage of sample points making up the latter is the ‘validation fraction’. The training data set is used during the SGD. After iterating batch-wise though all training samples, the average NLL across the validation dataset, ¯LNF ({ ® 𝑦 valid }) ≡ ¯Lvalid NF , is evaluated. Together, the cycle of SGD and calculation of ¯ Lvalid NF is then repeated, until the relative change of ¯Lvalid NF from one iteration to the next one is less than a suitably chosen threshold. Due to the NLL fluctuations appearing during an SGD, it is customary to introduce a latency period before it is assumed that the flow is trained, i.e. the relative change of ¯Lvalid NF has to be smaller than the imposed threshold for 𝑛 latency 
+
+sequential cycles. Overall, the performance of the normalising flow in mod-elling the target distribution is determined by the flow architec-ture, e.g., the choice of bijections and layers, but also the training setup, in detail, the choice of the sample size, the batch size, the validation fraction, the step size and the latency period. The more complicated or higher dimensional a problem, the more fine-tuning of these parameters is required. 
+
+Appendix C: Detailed cross-checks for the frequency-factorised normalising flow 
+
+We validate that the trained flow properly represents the empiri-cal likelihood by means of comparing the empirical cumulative density functions for both log 10 𝐴 GWB and 𝛾 GWB . The resulting 
+
+𝑃 − 𝑃 plots obtained from 1000 phase samples are displayed in Fig. C.1. In addition, we notice that different realisations of the ran-domly drawn complex residuals lead to substantial variations of the likelihood shape and position. In the extreme, certain real-isations lead to non-detections, or posteriors at the edge of the parameter plane. In order to evaluate this behaviour, we have        
+
+> Fig. C.2. Posteriors of the GWB parameters averaged across 100 phase draws, evaluated using the trained conditional neural circular spline flow with factorised frequency dependence for 30 pulsars and 12 frequency bins. The cross and the dashed lines indicate the injected GWB signal, with log 10 𝐴 inj GWB =−13 .5 and 𝛾 inj GWB =13 /3.
+
+averaged the posteriors of 100 phase samples. The result, shown in Fig. C.2 indicates that despite the variations, on average, the phase likelihood evaluation is capable of reliably constraining the presence of a GWB signal. 
+
+Appendix D: Frequency-resolved normalising flow 
+
+A more realistic PTA data set requires jointly modelling the phase PDF across all frequency bins. For the 30-pulsar-8-bin PTA test case, this requires training a 240-dimensional NCSF conditioned on (log 10 𝐴 GWB , 𝛾 GWB ). The dimensionality of this problem, the large fraction of the parameter space across which the phases are uncorrelated, as well as the dynamic range of the correlation S/N make it challenging to find a flow setup that is capable of modelling the PDF, while training over reasonable time scales on a GPU. Our most successful architecture is a NCSF with 12 layers, in which each spline is fit using a (32 , 32 )-featured perceptron. However, the p-p-plot shown in Fig. D.1 indicates that the flow is not properly representing the phase distribution. The deviations in the eCDF of the amplitude indicate that the mean of the flow distribution is shifted with respect to the mean of the actual phase PDF. The deviations in the eCDF of the spectral index indicate that the distribution is narrower than the actual PDF (Lamb et al. 2023). Nonetheless, the flow model is sufficient to recover injected GWB parameters from individual phase draws. The LLH con-tours of the GWB spectral parameters for a single realisation of phases is shown in Fig. D.2. Similarly to the frequency-factorised case, these posteriors strongly vary with different realisations of 
+
+> Article number, page 10 of 11
+
+Kathrin Grunthal et al.: Not just a phase: detecting nanohertz gravitational waves from phase alone 
+
+Fig. D.1. A 𝑃 − 𝑃 plot of the recovered log-amplitude (left) and spectral index (right) recovered from 1000 evaluations of a trained conditional neural circular spline flow that includes all frequency bins simultane-ously. 
+
+Fig. D.2. Exemplary evaluation of the empirical likelihood for using a randomly drawn set of phases using the trained conditional neural circular spline flow with simultaneous modelling of all frequency bins. The neural circular spline flow has a dimension of 240, corresponding to 30 pulsars and 8 frequency bins. The cross and the dashed lines indicate the injected GWB signal, with log 10 𝐴 inj GWB = −14 .0 and 𝛾 inj GWB = 13 /3. 
+
+the randomly drawn complex residuals. Therefore, the averaged posteriors of 2000 phase samples are shown in Fig. D.3 Both results demonstrate that the higher-dimensional model is gen-uinely capable of constraining the spectral parameters of a GWB signal present in the phase correlations. Furthermore, the clearer decrease of the averaged distribution towards higher values of log 10 𝐴 GWB and lower values of 𝛾 GWB indicates that jointly eval-uating the full phase distribution, i.e. explicitly modelling the frequency dependence, leads to better constrains on the GWB parameters. However, the averaged posterior reveals the impact of the mismatch between the true and modelled PDFs - the peak of the posterior is shifted towards a lower amplitude, yet steeper 
+
+Fig. D.3. Posteriors of the GWB parameters averaged across 2000 phase draws, trained conditional neural circular spline flow with simultaneous modelling of all frequency bins. The flow has a dimension of 240, corresponding to 30 pulsars and 8 frequency bins. The cross and the dashed lines indicate the injected GWB signal, with log 10 𝐴 inj GWB = −13 .5and 𝛾 inj GWB = 13 /3. 
+
+spectral index. Towards the analysis of realistic PTA data sets, these mis-modellings have to be overcome. 
+
+Article number, page 11 of 11

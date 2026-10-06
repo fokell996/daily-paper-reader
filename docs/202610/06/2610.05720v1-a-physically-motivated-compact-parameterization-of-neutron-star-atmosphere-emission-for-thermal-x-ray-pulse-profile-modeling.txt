@@ -1,0 +1,739 @@
+Title: A Physically Motivated Compact Parameterization of Neutron Star Atmosphere Emission for Thermal X-ray Pulse-Profile Modeling
+
+URL Source: https://arxiv.org/pdf/2610.05720v1
+
+Published Time: Tue, 06 Oct 2026 02:13:53 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+> DRAFT VERSION OCTOBER 6, 2026 Typeset using L ATEX twocolumn style in AASTeX63
+
+A Physically Motivated Compact Parameterization of Neutron Star Atmosphere Emission for Thermal X-ray Pulse-Profile Modeling     
+
+> TONG ZHAO 1AND RENXIN XU11School of Physics, Peking University, Beijing 100871, China
+
+ABSTRACT Thermal X-ray pulse-profile modeling depends on the angular and spectral properties of neutron star atmo-sphere emission. We construct a compact empirical approximation to the specific intensity using eight co-efficients for the angular dependence and five for a normalized spectral kernel. The angular prescription is motivated by the formal solution of the radiative-transfer equation, while the spectral normalization preserves a specified bolometric flux. We calibrate this family to numerical atmosphere tables, focusing on return-current-heated and fully ionized hydrogen atmospheres. When incorporated into a semi-analytic pulse-profile model, the approximation reproduces profiles normalized by their phase-averaged flux to within approximately 4% for antipodal hot spots and 5% for non-antipodal hot spots in the tested heated-atmosphere configurations. We also analyze synthetic eXTP observations using different beaming prescriptions to test the conclusion in our previous work based on a linear description of the angular dependence of the emission. The comparisons suggest that the angular dependence of the intensity cannot be simply characterized by a linear function of the cosine value of the emission angle, because its detailed shape and energy dependence will affect the parameter inference. This parameterization can significantly increase the efficiency for analytic and numerical models, and provide a compact framework for examining how atmosphere assumptions affect neutron star pulse profiles and the inferred stellar properties.  
+
+> 1.
+
+INTRODUCTION Measurements of neutron star masses and radii provide a means of constraining the equation of state of matter at densi-ties beyond those accessible in terrestrial experiments. Ther-mal X-ray pulse-profile modeling offers a particularly valu-able approach because the observed modulation carries infor-mation about both the stellar spacetime and the emitting sur-face. As localized hot regions rotate through the observer’s line of sight, gravitational light bending, gravitational red-shift, Doppler boosting, and aberration modify the amplitude, shape, and energy dependence of the pulse profile. These ef-fects depend on the stellar mass and radius, but also on the geometry of the emitting regions and the angular distribu-tion of the surface radiation. Extracting reliable constraints on neutron star structure therefore requires a consistent de-scription of both photon propagation and the local emission process (Beloborodov 2002; Poutanen & Beloborodov 2006; Watts et al. 2016). Observations with the Neutron Star Interior Composition Explorer (NICER) have demonstrated the potential of this technique for rotation-powered millisecond pulsars. Analy-ses of PSR J0030+0451 yielded joint constraints on its mass, radius, and surface hot-region geometry, establishing ther-mal pulse-profile modeling as a practical probe of neutron star structure(Miller et al. 2019; Riley et al. 2019). Subse-quent analyses of the massive pulsar PSR J0740+6620 ex-tended these measurements to a substantially different mass regime(Miller et al. 2021; Riley et al. 2021; Choudhury et al. 2024; Salmi et al. 2024a,b; Dittmann et al. 2024; Mauviard et al. 2025). These results motivate continued examination of the physical assumptions entering the forward model, par-ticularly those that can change the inferred stellar parameters without being independently constrained by the observations. An essential ingredient of the forward model is the spe-cific intensity emerging from the neutron star atmosphere. Unlike isotropic blackbody emission, atmospheric radiation generally has a coupled dependence on photon energy and emission angle. The angular emission pattern of the at-mosphere is consequently a physical component of the in-ferred pulse shape, rather than merely a spectrum correc-tion. In commonly adopted atmosphere models, this depen-dence is specified by the effective temperature, surface grav-ity and magnetic field, and assumed atmospheric composi-tion. Many NICER analyses have employed nonmagnetic, fully ionized hydrogen atmospheres in which the heat sup-plying the outgoing radiation is deposited beneath the lay-ers responsible for the emergent spectrum (Ho & Lai 2001; Haakonsen et al. 2012). For rotation-powered millisecond pulsars, however, the hot surface regions are thought to be sustained by the bombardment of charged particles return-ing from the magnetosphere. Whether a deep-heated atmo-sphere adequately describes this situation depends on where these particles deposit their energy. Bauböck et al. (2019) showed that the atmospheric structure and radiation pattern depend on the properties of the incident particles and their stopping depths. Salmi et al. (2020) subsequently calculated return-current-heated atmospheres including particle energy deposition and Compton scattering. Their models demon-strated that sufficiently energetic particles can produce emis-sion resembling the deep-heated limit, whereas shallower de-position can generate a hot surface layer and modify both the arXiv:2610.05720v1 [astro-ph.HE] 5 Oct 2026 2spectrum and its angular distribution. Depending on the heat-ing conditions and photon energy, the emerging radiation can depart substantially from the usual limb-darkened pattern and can exhibit limb brightening. The atmospheric angular emission pattern also enters mod-els of thermonuclear (Type I) X-ray bursts from accreting neutron stars. In burst-oscillation models, a rotating surface brightness asymmetry produces an energy-dependent wave-form whose amplitude and harmonic content depend on the local angular emission pattern, making the beaming prescrip-tion relevant to mass-radius inference (Lo et al. 2013; Miller & Lamb 2015). Hot burst atmospheres are often dominated by electron scattering, motivating the use of the correspond-ing limb-darkening law in waveform calculations. Numer-ical atmosphere models nevertheless show departures from this law that depend on photon energy and composition, par-ticularly away from the spectral peak and near absorption edges (Suleimanov et al. 2012). The angular emission pat-tern also matters when integrating the emission over a rapidly rotating, oblate star: the angular weighting of surface ele-ments affects the observed flux and spectral normalization, and thus enters extensions of the burst cooling-tail method that account for rotation (Suleimanov et al. 2020). However, the specific intensity is calculated using radiative-transfer equations and incorporated into pulse-profile calculations through precomputed tables. Repeated table lookup and interpolation can be computationally ex-pensive. This cost becomes particularly important in GPU-accelerated pulse-profile calculations that reduces a single likelihood evaluation from seconds minutes to millisecond, because the computation of intensity takes up the majority of the computation time (Zhou & Huang 2026). The widespread use of atmosphere models therefore motivates compact rep-resentations of the coupled angular and spectral intensity val-ues. In this work, we construct a physically motivated parame-terized representations of the emergent specific intensity and its angular dependence, which can be calibrated to differ-ent atmosphere models, especially for return-current-heated models with different physics parameters. We assess how ac-curately parameterized beaming functions can reproduce nu-merical atmosphere calculations and incorporate these func-tions into a semi-analytic pulse-profile model. We then gen-erate synthetic eXTP-SFA observations and analyze them un-der different assumptions about the surface emission. By comparing the recovered parameters with their injected val-ues, we examine how an incorrect beaming prescription af-fects neutron star compactness, viewing geometry, and hot-region properties, and assess the implications for mass-radius inference. This paper is organized as follows. Section 2 introduces our physically motivated parameterization of the angular and spectral dependence of the emergent intensity. Section 3 presents its calibration to numerical hydrogen atmosphere ta-bles and evaluates the approximation errors. Section 4 com-pares pulse profiles calculated using the parameterized inten-sities with those obtained from numerical tables. Section 5 uses synthetic eXTP-SFA observations to investigate how an incorrect beaming prescription affects the inferred stellar and hot-spot parameters. Section 6 summarizes our findings and discusses the limitations of the model. Additional calibra-tion results for helium and partially ionized hydrogen atmo-spheres are presented in the Appendix.  
+
+> 2.
+
+PHYSICALLY MOTIVATED EMPIRICAL BEAMING FUNCTIONS FOR X-RAY PULSE-PROFILE MODELING In our previous work, we used a parameterized function to describe the angular dependence of the emission from the atmosphere (Zhao et al. 2026), which is a very rough ap-proximation and is only used for synthetic data. Here, we try to find a physically motivated formula to describe the an-gular distribution of the emergent specific intensity and the spectrum with an analytic family whose coefficients can be calibrated to different atmosphere models. Throughout this section, the μ = cos α is evaluated in the local co-moving frame, where α is the angle between the outgoing ray and the surface normal. The effective temperature and local surface gravity are denoted by Teff and g, respectively. We fit both the intensity at the surface normal I(μ = 1) and the angular dependence to the numerical result respectively. To separate the angular dependence from the spectral amplitude, we de-fine the angular ratio as 
+
+RI (μ) ≡ Iν (μ)
+
+Iν (μ = 1) . (1) At fixed energy, the same ratio is obtained whether intensity is expressed per unit frequency or per unit photon energy. 2.1. The Angular Dependence of Intensity 
+
+For a plane-parallel, optically thick atmosphere with an ef-fective angle-independent source function, the emergent in-tensity has the formal solution 
+
+Iν (0 , μ ) = 1
+
+μ
+
+Z ∞
+
+> 0
+
+Sν (τν ) exp( −τν /μ ) dτν , μ > 0, (2) where τν is the extinction optical depth measured inward from the surface. The exponential kernel gives rays at smaller 
+
+μ greater sensitivity to shallower layers. Angular beaming therefore encodes the depth dependence of the source func-tion. We approximate this dependence over the layers con-tributing to the emergent radiation by 
+
+Sν (τν ) ≃ S0,ν + S1,ν τ p 
+
+> ν
+
+, S0,ν ≥ 0, S1,ν > 0, p > 0.
+
+(3) Substitution into Eq. (2) yields 
+
+Iν (0 , μ ) ≃ S0,ν + S1,ν Γ(p + 1) μp, (4) and hence 
+
+RI (μ) = K + μp
+
+1 + K , (5) with 
+
+K = S0,ν
+
+S1,ν Γ(p + 1) μp . (6) 3The exponent p describes the effective depth variation of the source contribution, while K measures the depth-independent contribution relative to it. These quantities need not have the same values at different energies or atmospheric parame-ters. Equation (5) includes the linear law RI (μ) = a + (1 − a)μ
+
+when p = 1, with a = K/(1 + K), but also allows both concave and convex angular profiles. This flexibility is motivated by the limited spectral range over which linear beaming is ade-quate: Salmi et al. (2020) find approximately linear angular dependence near the spectral peak, with departures at lower and higher energies. The source-function argument is an ef-fective description rather than an exact reduction of the at-mosphere calculation. In particular, scattering can make the source function angle dependent, and Compton redistribution couples different photon energies. We define three dimensionless quantities 
+
+x = EkBTeff 
+
+, Θ = kBTeff 
+
+mec2 , ℓ = κTσSB T 4eff 
+
+gc , (7) where κT = 0 .4 cm 2 g−1 is the fixed Thomson opacity normal-ization for the hydrogen models. The variable x measures photon energy relative to the effective thermal scale, whereas 
+
+Θ and ℓ provide dimensionless coordinates for temperature and gravity. A useful combination follows from the scaling of non-relativistic free-free absorption at fixed composition, 
+
+κff  
+
+> ν
+
+∝ ρT −1/2ν−3 
+
+1 − e−hν/(kBT )
+
+gff , (8) where T and ρ are the local temperature and density and gff 
+
+is the Gaunt factor. Introducing t = T /Teff and bP = κTPgas /g,the ideal-gas relation gives 
+
+κff 
+
+> ν
+
+κT
+
+∝ bPt −3/2
+
+ℓ√Θ x−3 
+
+1 − e−x/t 
+
+gff . (9) Constants independent of the atmospheric parameters are suppressed in this proportionality. This scaling motivates the coordinates 
+
+z = ℓℓ∗
+
+ ΘΘ∗
+
+1/2
+
+, G = gg∗
+
+=
+
+ ΘΘ∗
+
+4 ℓ∗
+
+ℓ . (10) Thus, z is proportional to the inverse of a global free-free opacity pre-factor; it is not itself the full scattering-to-absorption ratio. The local profiles and the Gaunt factor re-main in Eq. (9). We adopt the fixed reference scales: 
+
+Θ∗ = 2 ×10 −4, g∗ = 2 ×10 14 cm s −2, ℓ∗ = 7 .4839 ×10 −6,
+
+(11) where ℓ∗ is calculated from Θ∗ and g∗ using Eq. (7). Equiv-alently, 
+
+z =
+
+ kBTeff 
+
+0.10219979 keV 
+
+9/2  g
+
+2 × 10 14 cm s −2
+
+−1
+
+. (12) With these dimensionless quantities, we find a form of func-tion that can fit the numerical results of different atmosphere models well with only a few free coefficients: 
+
+RI (μ) = K + μp
+
+1 + K , (13) 
+
+K(x, z, G) = k1xk2 zk3 Gk4 , (14) 
+
+p(x, z) = p1xp2+p3 ln xzp4 . (15) This introduces eight coefficients to be fitted to numerical re-sults from the atmosphere models. Taking k1, p1 > 0 ensures positive K and p without restrictions on the other exponents. The explicit forms in Eqs. (14)–(15) are empirical approxi-mations motivated by the transfer and opacity scalings above. Their exponents do not follow uniquely from first principles. The factor Gk4 describes residual gravity dependence, since z
+
+already depends on g.2.2. A Compact Approximation to the Emergent Spectrum 
+
+To complement the normalized angular prescription, we construct a common analytic representation of the normal specific intensity. Our aim is to retain the main spectral de-pendence on photon energy, effective temperature, and sur-face gravity with few adjustable coefficients. We achieve this by describing a normalized flux spectrum and using the pre-viously calibrated beaming law to determine its conversion to normal intensity. All energies and intensities below refer to the local co-moving frame, and Iν and Fν are defined per unit frequency. We use the dimensionless coordinates x and z same as what we used in the angular fit. Collapsing the spectral depen-dence on temperature and gravity into z is an empirical sim-plification. It is not an exact reduction of the atmosphere equations. A color-corrected blackbody changes the charac-teristic energy and amplitude while retaining a fixed Planck shape. To allow departures from this restricted shape, we adopt the generalized kernel 
+
+S(x, z) = xn
+
+exp[ a(z)xβ(z)] − 1 , a > 0, β > 0. (16) The coefficient a sets the energy scale in the exponential, β
+
+allows its curvature to vary, and n modifies the spectral power index. The kernel contains the Planck shape when n = 3 and 
+
+β = 1. More generally, its exponential argument can be writ-ten as x/ feff , with feff = x1−β /a. This provides an effective energy-dependent color factor, allowing the spectrum to de-part from a single color temperature. These quantities char-acterize the emergent spectral shape. They are not identified with a measured temperature or temperature gradient within the atmosphere. Instead of fitting the amplitude of S independently, we normalize it analytically. With s = ( n + 1) /β , substitution of 
+
+t = ax β gives 
+
+Z ∞
+
+> 0
+
+S(x, z) dx = Γ(s)ζ(s)
+
+βas , s > 1, (17) 4where Γ and ζ are the Gamma and Riemann zeta functions. The normalized shape is consequently 
+
+Φ(x, z) = βas
+
+Γ(s)ζ(s)
+
+xn
+
+exp( ax β ) − 1 ,
+
+Z ∞
+
+> 0
+
+Φ(x, z) dx = 1 .
+
+(18) We adopt the reference flux F0 = σSB T 4eff as the normaliza-tion of the spectral approximation and write 
+
+Fν = F0
+
+hkBTeff 
+
+Φ(x, z). (19) The factor h/(kBTeff ) = dx /dν ensures that R Fν dν = F0. This normalization convention was held fixed during calibration. Its identification with the physical bolometric flux requires 
+
+Teff to be the total-flux effective temperature. 1
+
+To minimize the number of adjustable coefficients, we rep-resent the remaining atmospheric dependence by two power laws, 
+
+a(z) = a0zaz , β(z) = b0zbz . (20) The five spectral coefficients are thus a0, az, b0, bz, and n,with a0, b0 > 0. These power laws are empirical choices se-lected for their compactness and their performance on both grids. For n = 3, β = 1, and a = 1 / fc, the normalized spec-trum reduces to a diluted blackbody with color temperature 
+
+fcTeff and dilution factor f −4 
+
+> c
+
+. The additional shape freedom is retained to describe departures from that limit. The outward spectral flux then satisfies 
+
+Fν = 2 π
+
+Z 10
+
+Iν (μ)μ dμ
+
+= πIν (1) K + 2/(p + 2) 1 + K .
+
+(21) It follows that 
+
+Iν (1) = Fν
+
+π Q, Q = 1 + KK + 2/(p + 2) . (22) The factor Q is determined entirely by the existing angular coefficients. It retains the energy and atmospheric depen-dence of K(x, z, G) and p(x, z). Combining Eqs. (19) and (22) gives the normal-intensity approximation: 
+
+Iν (1) 
+
+T 3eff 
+
+= C π4
+
+15 QΦ(x, z), C = 2k3
+
+> B
+
+h2c2 . (23) The corresponding intensity at arbitrary emission angle is 
+
+Iν (μ) = CT 3eff 
+
+π4
+
+15 Φ(x, z) K + μp
+
+K + 2/(p + 2) . (24)    
+
+> 1In an externally heated atmosphere the emergent bolometric flux includes both intrinsic and deposited heating contributions. If a table instead labels its temperature by the heating contribution alone, F0is the heating flux scale, and the total-flux interpretation requires the intrinsic contribution to be included.
+
+Table 1. Domain of Parameters Parameters Range Effective Temperature 0.02 keV ≤ kBTeff ≤ 0.45 keV Photon Energy 0.1 keV ≤ E ≤ 3 keV x ≤ 30 Gravitational Acceleration 13 .7 cm s −2 ≤ log 10 g ≤ 14 .6 cm s −2
+
+Table 2. Coefficients of the common beaming family for the return-current-heated atmosphere and the NSX atmosphere. Parameter Heated atmosphere NSX 
+
+k1 6.12192783 × 10 −4 4.80592285 × 10 −4
+
+k2 1.91037621 2.05620112 
+
+k3 0.390481506 0.395265253 
+
+k4 0.0269532436 0.0478843034 
+
+p1 0.189587940 0.305522834 
+
+p2 0.798876627 0.443586021 
+
+p3 −0.0354961294 0.0312071340 
+
+p4 −0.00664998522 −0.000790744942 
+
+This construction introduces five new spectral coefficients in addition to the eight angular coefficients, for a total of thir-teen per atmosphere model. The angular integral and spec-tral normalization are exact identities for the adopted analytic functions. The choice of spectral kernel and the fitted de-pendence of its shape parameters remain phenomenological, rather than solutions of the full radiative-transfer problem. 
+
+3. CALIBRATION TO NUMERICAL ATMOSPHERE TABLES We calibrated this same functional family to five different atmosphere models given in Salmi et al. (2023). In this sec-tion, we show the results of the return-current-heated hydro-gen atmosphere with the particle energy distribution power-law index δ = 2, and the fully-ionized hydrogen atmosphere denoted as NSX (Salmi et al. 2023; Ho & Lai 2001). The heated model belongs to the class considered by Salmi et al. (2020). Other fit results are shown in the Appendix. We choose a proper domain of parameters suitable for neutron star thermal X-ray pulse profiles. The selected domain is listed in Table 1. These restrictions were applied jointly. The common grav-ity interval was used even though the NSX source table ex-tends to higher gravities. The retained heated and NSX tables contain 9,030 and 17,530 angular curves, respectively, with 11 and 67 directions per curve. The fit results for the heated atmosphere and the NSX table are shown in Table 2. 5Defining the relative reconstruction error by 
+
+ϵν (μ) = Rfit 
+
+ν (μ)
+
+Rtable 
+
+ν (μ) − 1 , (25) the point-wise maximum errors over all selected tabulated points with μ ≥ 0.2 are 9 .90% for the heated atmosphere ta-ble and 9 .90% for the NSX atmosphere table. The corre-sponding point-wise median errors are 0 .917% and 0 .506%. These medians depend on the different angular sampling of the two tables. Comparison of the analytic beaming approxi-mation with the numerical results of the NSX hydrogen at-mosphere and the heated hydrogen atmosphere are shown in Fig 1. The left panels show the curves containing the largest absolute relative errors among tabulated samples with 
+
+μ ≥ 0.2; the right panels show the curves containing the largest errors over the full sampled angular range. We can see that the larger discrepancies occur at grazing angles. Because for K, p > 0, Eq. (5) is monotonic in μ and cannot reproduce an angular upturn. This design is suitable for the thermal X-ray pulse-profile modeling because when the light from a hot spot is at the grazing angle, the observed flux is dominated by the contribution from the other hot spot, or the total flux is weak and leads to a small signal to noise ratio. The linear fit made by Salmi et al. (2020) followed the same trend, but even our worst fit result is better than the linear fit. For comparisons intended to isolate the angular distribu-tion, the quantity held fixed must also be specified. If the local angle-integrated flux Fν is held fixed, a flux-preserving construction is 
+
+Iν (μ) = Fν
+
+π
+
+K + μp
+
+K + 2/(p + 2) , (26) which satisfies 2 π R 10 Iν (μ)μ dμ = Fν . Equation (26) is an al-gebraic normalization of the adopted angular law, not an ad-ditional atmosphere-spectrum fit. The resulting local inten-sity can be supplied to the pulse-profile calculation, with the spectral prescription treated separately. We fitted the same spectral form to the heated hydrogen at-mosphere with δ = 2 and fixed incident-particle and intrinsic-flux parameters, and to the supplied hydrogen-atmosphere grid denoted NSX. The angular coefficients were kept at their previously calibrated values. The heated and NSX grids pro-vide 9,030 and 17,530 normalization intensities, respectively. Table 3 lists the fitted coefficients, and each set applies glob-ally across its atmosphere grid. We quantify normal-intensity reconstruction by 
+
+ϵν = Ifit 
+
+ν (1) 
+
+Itable 
+
+ν (1) − 1 , (27) Table 4 summarizes the errors over all retained normalization points. Relative errors of Iν and Iν /T 3eff are identical at fixed temperature. We also show the worst fit results of the spectrum in Fig 2. Larger discrepancies usually occur far from the spectrum peak, or at very large or small temperature. 0.00 0.25 0.50 0.75 1.00                                        
+
+> Iν(μ)/ Iν(1)
+> (a)
+> E= 1.6420 keV
+> kBTeff = 0.10849 keV log 10 [g/(cm s −2 )] = 13.7
+> NSX hydrogen: worst at μ≥ 0.2
+> Approximation Atmosphere table 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+> μ
+> −10 010
+> ΔR (%)
+> max|Δ R| = 9.90%
+> 10 −3
+> 10 −2
+> 10 −1
+> 10 0
+> Iν(μ)/ Iν(1)
+> (b)
+> E= 0.1036 keV
+> kBTeff = 0.02725 keV log 10 [g/(cm s −2 )] = 13.8
+> NSX hydrogen: worst over all μ
+> 10 −6 10 −4 10 −2 10 0
+> μ
+> −100 −50 050 100
+> ΔR (%)
+> max|Δ R| = 99.30% 0.00 0.25 0.50 0.75 1.00
+> Iν(μ)/ Iν(μref )
+> E= 1.8004 keV
+> kBTeff = 0.10849 keV log 10 [g/(cm s −2 )] = 13.8
+> Heated hydrogen: worst at μ≥ 0.2
+> Approximation Atmosphere table 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+> μ
+> −10 010
+> ΔR (%)
+> max|Δ R| = 9.90%
+> 10 −1
+> 10 0
+> Iν(μ)/ Iν(μref )
+> E= 0.1136 keV
+> kBTeff = 0.02165 keV log 10 [g/(cm s −2 )] = 14.6
+> Heated hydrogen: worst over all μ
+> 10 −1 10 0
+> μ
+> 050 100
+> ΔR (%)
+> max|Δ R| = 86.68% (c) (d)
+
+Figure 1. Comparison of the analytic beaming approximation with the NSX hydrogen atmosphere (top row) and heated hydrogen at-mosphere (bottom row). The left panels show the curves con-taining the largest absolute relative errors among tabulated sam-ples with μ ≥ 0.2; the right panels show the curves containing the largest errors over the full sampled angular range. The photon en-ergy, effective temperature, and surface gravity are indicated in each panel. Open circles represent the atmosphere tables, and solid or-ange curves represent the analytic approximation. The angular ratio is normalized at μ = 1. The lower portion of each panel shows the signed relative residual, ∆R = 100( Rfit /Rtab − 1), with dashed hor-izontal lines marking ±10%. The largest errors for μ ≥ 0.2 are approximately −9.90% for both models. Over all sampled angles, the largest errors are −99 .30% at μ = 10 −6 for NSX and +86 .68% at 
+
+μ = 0 .010886 for the heated atmosphere. Vertical dotted lines in the right-hand residual panels indicate μ = 0 .2, below which the fitting constraint was relaxed. Note the different axis scales between pan-els. 
+
+The relative-error maps of the analytic intensity approxi-mation evaluated across the retained grids is shown in Fig. 3. The bottom row shows the relative-error of the combined spectral and angular approximation. The maximum point-wise relative-error can reach 25% (labeled by stars), but it happens only at the edge of the retained grids region and at small μ. If we choose a narrow range of the data to do the fit, the maximum relative-error will decrease further. The advantage of our analytic presentation over a sim-ple interpolation formula is that some coefficients also have 6
+
+Table 3. Five spectral coefficients of the common normalized gen-eralized Planck form. The eight previously fitted angular coeffi-cients are held fixed. Values are rounded for presentation. Parameter Heated atmosphere NSX 
+
+a0 1.528042591 1.888249476 
+
+az −0.134679290 −0.103688833 
+
+b0 0.647876944 0.597660199 
+
+bz 0.0668454494 0.0528951391 
+
+n 2.705726540 2.905924750 
+
+Table 4. Normal-intensity reconstruction errors on the calibration grids. Percentiles are taken over individual energy–temperature– gravity points. Statistic Heated atmosphere NSX Median 4.220% 3.666% 90th percentile 9.181% 7.434% 99th percentile 12 .653% 10 .404% Maximum 14 .813% 11 .873% Points above 10% 647 /9030 282 /17530 10 1              
+
+> 10 2
+> 10 3
+> Iν(1) (erg s −1 cm −2 sr −1 Hz −1)
+> (a)
+> kBTeff = 0.10849 keV log 10 [g/(cm s −2)] = 13.7
+> NSX hydrogen
+> Approximation Atmosphere table 0.1 0.3 13
+> E(keV)
+> −10 010 20
+> ΔJ (%)
+> max| ΔJ| = 11.87%
+> 10 3
+> 10 4
+> 10 5
+> Iν(1) (erg s −1 cm −2 sr −1 Hz −1)
+> (b)
+> kBTeff = 0.43189 keV log 10 [g/(cm s −2)] = 13.7
+> Iν(1) ≃Iν(μref )
+> Heated hydrogen
+> Approximation Atmosphere table 0.1 0.3 13
+> E(keV)
+> −10 010 20
+> ΔJ (%)
+> max| ΔJ| = 14.81%
+
+Figure 2. Comparison of the analytic normal-intensity spectra with the NSX hydrogen atmosphere (a) and heated hydrogen atmosphere (b). For each model, the spectrum shown contains the largest ab-solute relative error across the retained calibration grid. Open cir-cles denote the tabulated specific intensity per unit frequency, Iν (1), and solid orange curves show the analytic approximation. The ef-fective temperatures are indicated in the panels; both spectra have 
+
+g = 5 .012 × 10 13 cm s −2. For the heated atmosphere, the tabulated intensity at μref = 0 .989114 is used as a proxy for Iν (1). The lower panels show the signed relative residuals, ∆J = 100[ Iν,fit /Iν,tab − 1], with horizontal dashed lines marking ±10%. Stars identify the largest absolute residuals: +11 .87% at E = 2 .988 keV for NSX and 
+
++14 .81% at E = 2 .373 keV for the heated atmosphere. These rela-tive residuals are unchanged when the intensities are divided by T 3eff .
+
+physical meaning. For example, for the NSX atmosphere, 
+
+n = 2 .9 while n = 2 .7 for the return-current-heated atmo-0.3 1 3 10 30                      
+
+> x=E/( kBTeff )
+> 0.02 0.05 0.1 0.2 0.4
+> kBTeff  (keV)
+> (a)
+> max = 11.87%
+> NSX hydrogen
+> 0.3 1310 30
+> x=E/( kBTeff )
+> (b)
+> max = 14.81%
+> Heated hydrogen
+> 036912 15
+> max
+> g |Δ J| (%) 0.3 1310 30
+> x=E/( kBTeff )
+> 0.02 0.05 0.1 0.2 0.4
+> kBTeff  (keV)
+> max = 22.95%
+> NSX hydrogen
+> 0.3 1310 30
+> x=E/( kBTeff )
+> max = 25.38%
+> Heated hydrogen
+> 0612 18 24 30
+> max
+> g, μ≥0.2  |Δ I| (%) (c) (d)
+
+Figure 3. Relative-error maps of the analytic intensity approxima-tion for the NSX hydrogen atmosphere (left column) and heated hydrogen atmosphere (right column), evaluated across the retained grids in x = E/(kBTeff ) and Teff . The top row shows max g |∆J |,where J = Iν (1) /T 3eff and ∆J = 100( Jfit /Jtab − 1). For the heated at-mosphere, the tabulated intensity at μref = 0 .989114 is used as a proxy for Iν (1). The bottom row shows max g, μ≥0.2 |∆I |, where 
+
+∆I = 100[ Iν,fit (μ)/Iν,tab (μ) − 1], for the combined spectral and an-gular approximation. The combined intensity uses an angular factor normalized at exactly μ = 1. Each colored cell represents a retained grid location, with maxima taken over the available gravities and, in the bottom row, the tabulated angles satisfying μ ≥ 0.2. White re-gions contain no retained data, and stars identify the global maxima. The maximum normal-intensity errors are 11 .87% and 14 .81% for NSX and the heated atmosphere, respectively; the corresponding combined-intensity maxima are 22 .95% and 25 .38%. The panels within each row share a color scale, while the scales differ between rows. These are reconstruction errors on the calibration grids. 
+
+sphere. This means the spectrum of the NSX atmosphere is closer to a blackbody spectrum with n = 3. This is reason-able because NSX atmosphere is equivalent to a deep-heated atmosphere where the local thermal dynamic equilibrium is satisfied. The larger k4 of the NSX shows that it is more sen-sitive to the gravity. 
+
+4. COMPARISON OF PULSE PROFILES GENERATED BY NUMERICAL INTENSITY TABLES AND THE FITTED APPROXIMATE BEAMING FUNCTIONS The point-wise relative-error map do not directly specify the error in an observed pulse profile. Each spot samples a phase-dependent range of emission angles and local photon energies, and its contribution is weighted by the projected area and relativistic transfer factors. Contributions from dif-ferent spots can also dilute or reinforce the intensity residu-als. We therefore compare pulse profiles obtained by insert-7ing the numerical intensities and the fitted intensity approxi-mation into the same flux calculation. We use the small-spot flux equation ofZhao et al. (2026), based on the Schwarzschild plus Doppler (S+D) approxima-tion and the analytic light-bending relation. This model as-sume that each spot is small, circular, emitting photons from its center and has a uniform temperature distribution. θ de-notes the observer inclination. For spot i, ζi is the spot colat-itude and Ti is the effective temperature. The ratio of the area of spot 2 to the area of spot 1 is defined as ar. The observed total flux is the sum of the two spot contributions, 
+
+FE∞ (ϕ) = FE∞,1(ϕ1) + FE∞,2(ϕ2). (28) Choosing the first spot to have zero longitude at ϕ = 0, we set ϕ1 = ϕ and ϕ2 = ϕ + π + ∆ϕ. Thus, ∆ϕ = 0 denotes a lon-gitudinal separation of 180 ◦. Thus antipodal spots require 
+
+ζ2 = π − ζ1, ∆ϕ = 0, ar = 1 and T1 = T2 = Te f f . We choose the return-current-heated atmosphere model for the intensity. In the approximate-intensity calculation, we use Equation (24) at ( E′ 
+
+> i
+
+, μ ′ 
+
+> i
+
+, Ti, gi). Since that expression gives intensity per unit frequency, it is converted to intensity per unit photon en-ergy using I′ 
+
+> E′
+
+= I′ 
+
+> ν′
+
+/h, with consistent energy units. In the table calculation, we interpolate the numerical intensity at the same local arguments. The geometry and transfer pre-scription are common to the two calculations. Both the spec-tral and angular approximations are therefore tested together. Propagation time delays and stellar oblateness are omitted. Because these choices are shared by both intensity prescrip-tions, their difference measures the effect of replacing the numerical atmosphere intensities within the approximate pa-rameterized functions. It does not measure the accuracy of the approximation of the pulse-profile model itself. The common settings inferred from the accompanying re-search code are the neutron star mass M = 1 .5Msolar , radius 
+
+R = 12 km, and the spin frequency f = 300 Hz. The displayed profiles are normalized separately at each observed energy by their own phase-averaged flux: 
+
+fE∞ (ϕ) = FE∞ (ϕ)
+
+⟨F E∞ ⟩ϕ
+
+. (29) Here the phase average is taken over a complete rotation. The signed residual in the lower panels is 
+
+∆prof (E∞, ϕ ) = 100 
+
+" f app  
+
+> E∞
+
+(ϕ)
+
+f tab  
+
+> E∞
+
+(ϕ) − 1
+
+#
+
+. (30) Figure 4 shows two antipodal spots viewed at θ = 70 ◦, with 
+
+ζ1 = 50 ◦, ζ2 = 130 ◦, and ∆ϕ = 0. The spots have equal areas and the same effective temperature: kBT1 = kBT2 = 0 .1 keV in panel (a) and 0 .2 keV in panel (b). We compare the pulse profiles at observed photon energies E∞ = 0 .325, 0 .525, and 1.025 keV. The displayed shape residuals remain within ap-proximately 4%. The residuals are phase dependent, with their larger positive excursions near the pulse minima at the two lower energies. Thus, the largest local intensity errors at grazing emission angles do not translate directly into errors                          
+
+> Table 5. Non-antipodal spot parameters for Figure 5. Parameter Set 1 Set 2
+> θ(deg) 60 80
+> ζ1(deg) 40 55
+> ζ2(deg) 135 115
+> kBT1(keV) 0.15 0.25
+> kBT2(keV) 0.20 0.15
+> ar=S′
+> 2/S′
+> 11.2 1.5
+> ∆ϕ(deg) +5−10
+
+of the same magnitude in these pulse profiles. Projected-area weighting suppresses emission close to the visibility bound-ary, and emission from the other spot can further reduce its fractional contribution. This suppression depends on the spot geometry and relative brightness. To examine more geometry configurations, we allow the two spots to have independent colatitudes, temperatures, and areas. We define ar = S′
+
+> 2
+
+/S′ 
+
+> 1
+
+and retain the phase-offset con-vention ϕ2 = ϕ + π + ∆ϕ. The two parameter sets used in Fig-ure 5 are listed in Table 5. Temperatures in the table are local effective temperatures and photon energies in the figure are measured at the observer. The asymmetric configurations produce different peak heights and energy dependences because the relative contri-bution of each spot changes with both energy and phase. The fitted intensities reproduce these features, with the displayed residuals remaining within approximately 5%.  
+
+> 5.
+
+IMPACT OF AN INCORRECT ANGULAR EMISSION MODEL In our previous works, we found that if the beaming func-tion can be simply approximated by a linear function of μ as suggested in Salmi et al. (2020), fitting a more isotropic emit-ter with a more strongly normal-peaked beaming law can un-derestimate compactness for two antipodal spots (Zhao et al. 2025). This behavior involves correlated changes in com-pactness and viewing geometry. Now, with our more general atmosphere approximation that can accurately reproduce a particular numerical table. In this section, we examine this limitation using the curved an-gular prescription calibrated to the return-current-heated and the deep-heated NSX atmosphere tables. In general, both at-mospheres have energy-dependent spectra and beaming, and their relative anisotropy can vary with temperature, gravity, and emission angle. To separate the angular effect from dif-ferences in the atmosphere spectra, we use the same black-body spectral flux in both the generating and fitted models. For atmosphere label m ∈ { heated , NSX }, the local intensity is 
+
+I′
+
+> E′,m
+
+(μ) = BE′ (Teff ) Km + μpm
+
+Km + 2/(pm + 2) , (31) with Km and pm evaluated at ( E′, Teff , g) using the coeffi-cients in Table 2. This expression is normalized by the angle-80.5 1.0 1.5 2.0 
+
+> Normalized flux,  F/⟨ F⟩ϕ (a)
+
+Teff = 0.1 keV 
+
+> 0.5 1.0 1.5 2.0
+> Normalized flux,  F/⟨ F⟩ϕ (b)
+
+Teff = 0.2 keV                     
+
+> 0π/2 π3π/2 2π
+> Phase angle, ϕ(rad)
+> −2 024
+> Residual (%)
+> 0π/2 π3π/2 2π
+> Phase angle, ϕ(rad)
+> −2 024
+> Residual (%)
+> 0.325 keV 0.525 keV 1.025 keV
+> Approximation Numerical
+> Figure 4. Comparison of normalized pulse profiles calculated with the fitted intensity approximation (solid curves) and the numerical return-current-heated hydrogen intensity table (dashed curves), for two equal-area antipodal spots. Both spots have kBTeff = 0 .1 keV in panel (a) and 0.2 keV in panel (b). Blue circles, orange squares, and purple triangles denote observed energies of 0 .325, 0 .525, and 1 .025 keV, respectively. Each curve is divided by its own phase-averaged flux. The lower panels show ∆prof from Equation (30), in percent.
+
+integrated spectral flux, 2π
+
+Z 10
+
+I′
+
+> E′,m
+
+(μ)μ dμ = πBE′ (Teff ). (32) Thus, changing m changes the angular distribution while re-taining the same local spectral-flux prescription at a given ef-fective temperature. This construction is a diagnostic emis-sion model. It does not include the different spectra of the two self-consistent atmospheres. In this section, we generate synthetic pulse profiles for a neutron star with antipodal hot spots. The stellar mass is fixed at 1.5 solar masses and we consider spin frequencies of 10 and 300 Hz to investigate the role of rotational Doppler effects. The proposed injections use two equal-area, equal-temperature antipodal spots and the return-current-heated at-mosphere with δ = 2. The return-current-heated atmosphere is used to generate the reference profiles. A fit with the same atmosphere provides a recovery check, and a fit with NSX intensities measures the effect of the atmosphere mismatch. Injected and best-fit parameter values are listed in Table 6. To avoid working with very small numerical values, we de-fine fiducial values for the spot area dS and distance D. They are dS 0 = 10 6 m2 and D0 = 1 .2 kpc. Then, we define a dimen-sionless factor A = ( dS /D2)/(dS 0/D20) as a free parameter in the model. The best-fit value is the point corresponding to the posterior maximum. For an eXTP-SFA realization, the unnormalized spectral energy flux, including interstellar absorption, is converted to a photon flux and folded through the eXTP instrumental response. The neutral-hydrogen column density is fixed at 
+
+NH = 1 .5 × 10 20 cm −2, and we assume an exposure time of 10 6 s. We consider photon energies between 0.3 and 1.5 keV. For computational efficiency, this range is divided into 24 energy bins of width 0.05 keV, while each rotational cycle is divided into 32 phase bins. With the resulting number of counts per energy-phase bin, the Poisson counting uncer-tainty can be well approximated by a Gaussian uncertainty. The instrumental background obtained from the eXTP simu-lation is added when constructing the synthetic data and sub-sequently subtracted in the fitting procedure (Qi et al. 2023). The likelihood is therefore written as 
+
+L(D|M , Θ) = exp( − 12 χ2) = exp [ − 12
+
+X
+
+> i
+
+(Mi − Di)2
+
+σ2
+
+> i
+
+], (33) where Mi and Di denote the model-predicted and synthetic photon counts, respectively, in the i-th energy-phase bin, and 
+
+σi is the corresponding uncertainty. The parameter inference has large uncertainties when the frequency is 10 Hz and the atmosphere model is the return-current-heated atmosphere. This is because the constrain on the radius arises from both rotational Doppler effects and the angular anisotropy of the emergent intensity. When the Doppler effect is negligible and the beaming is isotropic, the model has an intrinsic degeneracy that can lead to large uncertainties in the parameter inference (Zhao et al. 2026). 90.5 1.0 1.5 2.0 2.5 
+
+> Normalized flux,  F/⟨ F⟩ϕ
+
+(a) 
+
+Parameter Set 1 
+
+> 0.5 1.0 1.5 2.0 2.5
+> Normalized flux,  F/⟨ F⟩ϕ
+
+(b) 
+
+Parameter Set 2     
+
+> 0π/2 π3π/2 2π
+
+Phase angle, ϕ (rad)     
+
+> −5 05
+> Residual (%)
+> 0π/2 π3π/2 2π
+
+Phase angle, ϕ (rad) 
+
+> −5 05
+> Residual (%)
+
+0.325 keV 0.525 keV 1.025 keV 
+
+Approximation Numerical 
+
+Figure 5. Comparison of normalized pulse profiles for two non-antipodal spots using the numerical return-current-heated hydrogen intensities and the fitted approximation. Panels (a) and (b) correspond to parameter sets 1 and 2 in Table 5. The secondary spot longitude is ϕ + π + ∆ϕ,and ar is the secondary-to-primary area ratio. Colors, symbols, line styles, normalization, and residuals are the same as in Figure 4. The lower panels display shape discrepancies of up to approximately 5% for the selected examples. 
+
+Table 6. Injected values and fit results. Results are given as best-fit values with upper and lower uncertainties. NSX Return-current heated Parameter Injected 10 Hz 300 Hz 10 Hz 300 Hz 
+
+R (km) 12 11 .963 +1.185  
+
+> −0.663
+
+11 .317 +0.070  
+
+> −0.048
+
+13 .322 +1.271  
+
+> −1.342
+
+11 .927 +0.308 
+
+> −0.154
+
+θ (deg) 65 69 .026 +4.673  
+
+> −8.994
+
+58 .520 +2.888  
+
+> −3.218
+
+72 .627 +3.261  
+
+> −17 .669
+
+59 .867 +6.375 
+
+> −8.949
+
+ζ (deg) 50 43 .866 +11 .514  
+
+> −7.603
+
+57 .492 +3.110  
+
+> −3.078
+
+38 .434 +22 .236  
+
+> −5.875
+
+56 .023 +8.301 
+
+> −7.537
+
+Teff (keV) 0.2 0.201 +0.003  
+
+> −0.004
+
+0.204 +0.000  
+
+> −0.000
+
+0.196 +0.004  
+
+> −0.003
+
+0.200 +0.001 
+
+> −0.001
+
+A 1 1.024 +0.123  
+
+> −0.072
+
+0.951 +0.009  
+
+> −0.007
+
+1.127 +0.127  
+
+> −0.131
+
+0.991 +0.031 
+
+> −0.016
+
+The results also show that even if we consider only the an-gular dependence of the real atmosphere model, our con-clusion based on linear approximated angular dependence 
+
+RI = (1 + hμ)/(1 + h) does not capture the parameter biases produced by realistic atmosphere beaming. Thus, although the linear prescription adopted in Salmi et al. (2020); Zhao et al. (2025) may reproduce the angular dependence of the specific intensity with relatively small deviations, these de-viations can propagate non-trivially through the pulse-profile model and bias the inferred neutron-star parameters. 
+
+6. SUMMARY The proposed family separates a normalized angular dis-tribution from a compact spectral description. The formal transfer solution motivates the angular form, and the spectral kernel admits an analytic normalization. This makes the roles of angular beaming and spectral shape explicit with thirteen coefficients per atmosphere. The fitted exponents and their dependence on x, z, and G remain empirical. The construc-tion is therefore a calibrated representation of numerical in-tensities, rather than an independent atmosphere calculation. There are several physical limits to the present representa-tion. For K, p > 0, the angular law is monotonic and cannot describe limb brightening or an angular turnover. Grazing-angle errors can be large even when the contribution to a 10 particular pulse profile is small. That contribution must be checked for the actual emitting geometry, especially when only one spot dominates. In addition, the fits cover the re-tained table points rather than the full range of possible at-mosphere parameters. The larger residuals for partially ion-ized hydrogen in the Appendix show that the same compact family does not provide uniform accuracy across composi-tions and ionization states. Applications requiring smaller errors may need a restricted calibration domain, a more flex-ible functional form, or direct numerical intensities. Our final section demonstrates that the effect of the angular emission pattern on pulse-profile parameter inference is non-trivial. The effect cannot be characterized solely by the over-all strength of the angular anisotropy. It also depends on the detailed shape and energy dependence of the angular emis-sion pattern and on its correlations with the stellar and geo-metrical parameters. A more comprehensive assessment will therefore require exploration of a broader parameter space, including more complex spot geometries and additional at-mosphere models. APPENDIX We apply the same eight-coefficient angular prescription and five-coefficient spectral kernel to the supplied helium and partially ionized hydrogen atmosphere tables. Table 7 gives the resulting coefficients in the notation of Equations (14), (15), and (20). The dimensionless coordinates retain the reference scales in Equation (11) and the explicit definition of z in Equation (12). In particular, the opacity normalization used to define these coordinates is kept fixed when applying the helium coefficients. It should not be replaced by the physical helium Thomson opacity without transforming or refitting the coefficients. This fixed reference is a coordinate convention, not an assertion that hydrogen and helium have the same opacity.                                  
+
+> Table 7. Fitted coefficients for the helium and partially ionized hydrogen tables. Parameter Helium Partially ionized H
+> k12.03148532406 ×10 −46.83472531540 ×10 −4
+> k22.01355679500 1.70497650144
+> k30.457943538395 0.438772035924
+> k40.0507257417565 0.389133719806
+> p10.254473447497 0.121060072056
+> p20.657140848858 1.12004279746
+> p3−0.0192068059378 −0.0719254741514
+> p40.000516659318662 0.00599873454424
+> a01.58386913805 1.89199788982
+> az−0.113678215923 −0.145967898177
+> b00.613571180822 0.613348859502
+> bz0.0516908447097 0.0726672966091
+> n2.64164937488 2.92381659715
+
+Figure 6 separates the angular, normal-intensity, and combined-intensity reconstruction errors. Each map reports the largest point-wise error over the available gravities and, where relevant, the retained emission angles. The plotted domain is the inter-section of the selection in Table 1 with each source grid.             
+
+> Table 8. Maximum reconstruction errors in Figure 6. Angular and combined errors are restricted to μ≥0.2. Quantity Helium Partially ionized H Angular ratio 9.90% 26 .21% Normal intensity 12 .39% 20 .68% Combined intensity 20 .47% 52 .26%
+
+The helium fit has an accuracy comparable to the hydrogen fits in the main text, with a maximum angular error of 9 .90% and a maximum combined-intensity error of 20 .47%. The partially ionized hydrogen fit is less accurate: its maximum angular, normal-intensity, and combined errors are 26 .21%, 20 .68%, and 52 .26%, respectively. These values are summarized in Table 8. 11 0.02 0.05 0.1 0.2 0.4 
+
+> kBTeff  (keV)
+> (a) Helium
+> max = 9.90%
+
+Angular dependence 
+
+> (b) Helium
+> max = 12.39%
+
+Normal intensity 
+
+> (c) Helium
+> max = 20.47%
+
+Combined intensity     
+
+> 0.3 1310 30
+
+x = E/( kBTeff )       
+
+> 0.02 0.05 0.1 0.2 0.4
+> kBTeff  (keV)
+> (d) partial ionized Hydrogen
+> max = 26.21%
+> 010 20 30
+> Maximum absolute error (%)
+> 0.3 1310 30
+
+x = E/( kBTeff )         
+
+> (e) partial ionized Hydrogen
+> max = 20.68%
+> 0510 15 20 25
+> Maximum absolute error (%)
+> 0.3 1310 30
+
+x = E/( kBTeff )        
+
+> (f) partial ionized Hydrogen
+> max = 52.26%
+> 020 40 60
+> Maximum absolute error (%) Angular and combined maps: μ≥0.2 ; normal map: μ= 1
+
+Figure 6. Point-wise relative-error maps for the fitted helium atmosphere (top row) and partially ionized hydrogen atmosphere (bottom row). From left to right, the panels show the maximum absolute relative errors in the angular ratio, the normal intensity, and the combined intensity at each retained ( x, Teff ) location. Maxima are taken over the available gravities, and additionally over angles with μ ≥ 0.2 for the angular and combined maps. Stars identify the global maxima, whose values are printed in the panels and listed in Table 8. Each column shares a color scale between the two atmospheres. Blank regions contain no retained table points. 
+
+The broad residual structure in the partially ionized maps indicates a limitation of the adopted global functional form. The free-free scaling used to motivate the coordinates does not by itself describe the additional opacity and ionization dependence of this atmosphere. However, choosing a smaller domain within the numerical table can decrease the fitting error. Especially, our global functional form fails when fitted to the carbon atmosphere, because it has absorption edges and the beaming behavior is also completely different. We believe that our global functional can also fit well to different heated atmosphere models given in Salmi et al. (2020). However, the data is not available. Spectral and angular residuals can reinforce or partly cancel at a given point. Their separate global maxima need not occur at the same atmospheric parameters or emission angle, so they cannot simply be added to obtain the combined maximum. The errors reported here characterize reconstruction on the retained calibration grids. They do not establish the accuracy of helium or partially ionized hydrogen pulse profiles, which have not been tested in this work. REFERENCES 
+
+Bauböck, M., Psaltis, D., & Özel, F. 2019, ApJ, 872, 162 Beloborodov, A. M. 2002, ApJL, 566, L85 12 
+
+Choudhury, D., Salmi, T., Vinciguerra, S., et al. 2024, ApJL, 971, L20 Dittmann, A. J., Miller, M. C., Lamb, F. K., et al. 2024, ApJ, 974, 295 Haakonsen, C. B., Turner, M. L., Tacik, N. A., & Rutledge, R. E. 2012, ApJ, 749, 52 Ho, W. C. G., & Lai, D. 2001, MNRAS, 327, 1081 Lo, K. H., Miller, M. C., Bhattacharyya, S., & Lamb, F. K. 2013, ApJ, 776, 19 Mauviard, L., Guillot, S., Salmi, T., et al. 2025, ApJ, 995, 60 Miller, M. C., & Lamb, F. K. 2015, ApJ, 808, 31 Miller, M. C., Lamb, F. K., Dittmann, A. J., et al. 2019, ApJL, 887, L24 —. 2021, ApJL, 918, L28 Poutanen, J., & Beloborodov, A. M. 2006, MNRAS, 373, 836 Qi, L., Li, G., Xu, Y., et al. 2023, Experimental Astronomy, 56, 517 Riley, T. E., Watts, A. L., Bogdanov, S., et al. 2019, ApJL, 887, L21 Riley, T. E., Watts, A. L., Ray, P. S., et al. 2021, ApJL, 918, L27 Salmi, T., Suleimanov, V. F., Nättilä, J., & Poutanen, J. 2020, A&A, 641, A15 Salmi, T., Vinciguerra, S., Choudhury, D., et al. 2023, ApJ, 956, 138 Salmi, T., Deneva, J. S., Ray, P. S., et al. 2024a, ApJ, 976, 58 Salmi, T., Choudhury, D., Kini, Y., et al. 2024b, arXiv e-prints, arXiv:2406.14466 Suleimanov, V., Poutanen, J., & Werner, K. 2012, A&A, 545, A120 Suleimanov, V. F., Poutanen, J., & Werner, K. 2020, A&A, 639, A33 Watts, A. L., Andersson, N., Chakrabarty, D., et al. 2016, Reviews of Modern Physics, 88, 021001 Zhao, T., Psaltis, D., & Özel, F. 2025, ApJ, 982, 112 Zhao, T., Psaltis, D., Özel, F., & Beklen, E. 2026, ApJ, 1006, 34 Zhou, T., & Huang, C. 2026, A&A, 709, A111
