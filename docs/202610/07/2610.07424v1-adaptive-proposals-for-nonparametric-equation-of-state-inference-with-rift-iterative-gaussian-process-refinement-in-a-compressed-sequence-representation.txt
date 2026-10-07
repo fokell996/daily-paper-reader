@@ -1,0 +1,1201 @@
+Title: Adaptive proposals for nonparametric equation-of-state inference with RIFT: iterative Gaussian-process refinement in a compressed sequence representation
+
+URL Source: https://arxiv.org/pdf/2610.07424v1
+
+Published Time: Wed, 07 Oct 2026 00:28:00 GMT
+
+Number of Pages: 28
+
+Markdown Content:
+# Adaptive proposals for nonparametric equation-of-state inference with RIFT: iterative Gaussian-process refinement in a compressed sequence representation 
+
+R. O’Shaughnessy 1 and Z. Zhu 1
+
+> 1
+
+Rochester Institute of Technology 
+
+Nonparametric equation-of-state (EOS) inference evaluates the likelihood on a finite ensemble drawn from a prescribed functional prior. Reweighting that ensemble suffices for the binary neutron stars detected so far, and loses effective sample size only once the likelihood concentrates — which needs third-generation catalogues, or extra electromagnetic and nuclear-theory information folded into the same target. We develop and validate an adaptive-proposal procedure that leaves the base prior fixed: data-informed generations are combined by multiple importance sampling and, where that degenerates at large catalogue size, by a calibrated Gaussian projection. We implement it in two representations — a compressed principal-component parametrization of the neutron-star sequence, whose draws need no stellar-structure solve, and a sound-speed parametrization with a differentiable Tolman–Oppenheimer–Volkoff solver — both on a constrained low-density-to-pQCD bridge. Because that anchor, and not the bridge, fixes the low-density prior, we rebuild the ensemble with a crust-plus-chiral-EFT anchor in place of the wide nuclear metamodel: the maximum-mass prior is unmoved, the radius gains a hard prior ceiling at the measured NICER value. GW170817 with the specified NICER and radio factors gives the calibration-conditional 
+
+R(1 .4 M⊙) = 11 .7 ± 0.4 km; in a synthetic 1000-event catalogue it reproduces the mean fixed-prior Λ(1 .4 M⊙) to 0 .4%, 1 .5 times wider, as the fixed archive’s effective sample size falls from ∼ 470 to 22. 
+
+I. INTRODUCTION 
+
+The equation of state (EOS) of cold matter above nu-clear saturation density is a central open problem con-necting nuclear physics, gravitational-wave (GW) astron-omy, and X-ray timing. The binary-neutron-star inspi-rals GW170817 [1–3] and GW190425 [4, 5] provide GW information about the tidal deformability Λ. NICER X-ray pulse-profile modeling constrains the mass–radius re-lation for individual pulsars [6–10], while radio timing of massive pulsars [11, 12] provides lower bounds on the maximum mass. Early second-generation forecasts es-tablished how stacking binary-neutron-star observations can reconstruct the EOS [13]. More complete catalog treatments show, however, that the loudest events do not dominate EOS inference: numerous weaker detec-tions contribute critically, and the mass distribution con-trols which density ranges are resolved [14, 15]. Third-generation gravitational-wave observatories — Cosmic Explorer [16] and the Einstein Telescope [17, 18] — are expected to detect binary neutron stars in the hundreds of thousands. Forecasts using a range of Bayesian sam-plers and Fisher-matrix approximations project corre-spondingly sharp constraints on the equation of state [15, 19–21]. As they probe complementary density ranges and have distinct systematics, these high-precision astronom-ical probes will complement laboratory and theoretical programs on the same matter: parity-violating electron scattering measurements of the neutron skin [22, 23] and their implications for the symmetry energy [24], heavy-ion collisions and rare-isotope measurements [25, 26], and ab initio chiral-effective-field-theory calculations of neutron-rich matter [27, 28]. That said, combining these extremely heterogeneous constraints requires both a physical EOS model and a statistical representation of uncertainty over EOS functions. Joint GW–NICER EOS analyses have already established the importance of a common EOS, explicit prior choices, and consis-tent source-level likelihoods [29–33]. As these constraints tighten, the range of viable solutions narrows, posing a practical computational challenge: exploring the space of valid nuclear models efficiently enough that the surviving region is resolved rather than merely bracketed. Contemporary astronomical constraints are sufficiently uninformative that uniform prior draws have been a highly effective and widely adopted sampling strategy. However, a third-generation network is expected to de-tect binary neutron stars at rates orders of magnitude above the current one [19–21], and because the EOS like-lihood is a product over events, the variance of the log weight grows with catalogue size — so the effective sam-ple size of a fixed ensemble decays while the ensemble itself does not grow at all. Even with contemporary con-straints, drawing from a fixed prior becomes increasingly inefficient as NICER measurements and nuclear-theory information concentrate the viable EOS region. Two broad modeling strategies are widely used. Para-metric families, including piecewise polytropes [34] and spectral representations [35], are low-dimensional and tractable, but their restricted functional forms can produce representation-dependent inference systemat-ics [36–39]. Nonparametric constructions instead place a Gaussian-process (GP) prior over an auxiliary func-tion, commonly related to the sound speed c2
+
+> s
+
+(n) [40– 43]; recent work extends such priors from the crust to perturbative-QCD densities [44]. Complementary learned representations include normalizing-flow EOS emulators [45], physics-informed flow priors for compact-binary parameter estimation [46], direct mass–radius pri-ors [47], and neural EOS inference and stellar-structure arXiv:2610.07424v1 [astro-ph.HE] 5 Oct 2026 2emulators [48–51], and neural posterior models [52, 53]. Microscopic nuclear calculations are also beginning to use differentiable, correlated GP models [54]; unlike the sequence-space compression developed here, these regress microscopic matter predictions. These approaches differ in their physical coordinates and inductive assumptions, but all must resolve a posterior that can occupy a small fraction of the original functional ensemble. Existing EOS analyses generally specify the functional prior before conditioning on the data, as required for a well-defined Bayesian target. Richer choices — including microscopic model mixing [55], crust-to-pQCD construc-tions [44], and semiparametric model-trained GPs [56] — alter that target model, but do not by themselves solve a separate computational problem: a finite draw set from the chosen prior may poorly resolve a concentrated pos-terior. Loss of effective sample size is therefore a failure of the sampling proposal, not a reason to replace the sci-entific prior after inspecting the data. Iterative proposal and surrogate refinement are well developed for GW pa-rameter inference, including the RIFT pipeline [57, 58]. This motivates an analogous adaptive proposal in EOS function space, with an explicit correction back to the fixed base-prior posterior. While a previous study with RIFT performed iterative refinement for the EOS within the context of a fixed set of EOS prior draws, for single-event inference [59], this proposal did not re-sample EOS realizations from a common prior. In this paper, we adapt RIFT’s inference-driven re-finement strategy to EOS inference. First, we formu-late adaptive proposal refinement using multiple impor-tance sampling: draws from successive data-informed proposals are combined with balance-heuristic weights to target the posterior defined by a fixed base prior, provided the proposals retain support over that tar-get. Second, we implement the loop in two representa-tions — a compressed principal-component parametriza-tion of the neutron-star sequence {M, R, Λ}(hc) and a conventional sound-speed parametrization with a differ-entiable Tolman–Oppenheimer–Volkoff (TOV) forward map. Third, we construct the base prior with the con-strained bridge of Ref. [60], but supply our own low-density anchor: where that work fixes a crust below 0.34 nsat and draws the anchor from a chiral-effective-field-theory ensemble, we resample a nuclear meta-model [61]. That choice is deliberate. A prior that al-ready encodes every available constraint is a poor test bed for a method whose subject is what data do to a prior: with the crust fixed, the symmetry sector pinned and the maximum mass implicitly bounded, the poste-rior sits almost on top of the prior and there is nothing to see. We instead take a low-density model broad enough to carry real crust and symmetry-sector uncertainty, and correspondingly uninformative in Mmax , so that ordinary measurements — radio masses of massive pulsars above all — visibly move it. The cost is a sub-saturation band wider than any honest crust model, and we measure that cost by rebuilding the ensemble both ways. Fourth, we validate the estimator on GW170817 and apply the fixed-data workflow to the specified NICER and radio-pulsar data. For synthetic catalogues of up to 1000 events, we calibrate the sequential Gaussian-projection approxima-tion against a large fixed-prior reference. The synthetic study separates posterior contraction caused by addi-tional data from the sampling-efficiency gain and projec-tion error introduced by proposal adaptation. This paper is organized as follows. In Section II we develop the meth-ods: neutron-star structure and the nonparametric prior (Sec. II A 1–II A 2), the EOS evidence supplied by GW and electromagnetic observations (Sec. II B), the two rep-resentations and the adaptive refinement loop (Sec. II C), and the real and synthetic data sets (Secs. II E–II F). In Section III we validate the solver, the compressed repre-sentation, and the prior construction. In Section IV we apply the loop to GW170817, NICER, and radio-pulsar data, demonstrate adaptive proposal refinement for the maximum-mass constraint, and present the large-catalog forecast and its symmetry-energy translation. Finally, in Section V we summarize and place this work in context.    
+
+> II. METHODS A. Nuclear matter and neutron stars
+> 1. Neutron-star structure and tides
+
+For a given cold, β-equilibrated EOS we obtain the neutron-star sequence by integrating the Tolman– Oppenheimer–Volkoff (TOV) equations in the pseudo-enthalpy variable h [62]. Specifically, with ( r, m ) the areal radius and the enclosed gravitational mass, we solve 
+
+dr dh = − r(r − 2m)
+
+m + 4 πr 3p , dm dh = 4 πr 2ϵ dr dh , (1) integrated alongside the standard ℓ = 2 tidal equation, which returns the Love number k2 and hence the dimen-sionless tidal deformability Λ = 23 k2C−5 at compactness 
+
+C = M/R [63–65]. While our internal representation characterizes NS by their central enthalpy hc, enabling multiple stable branches, in this work we emphasize a single stable branch given the limitations of downstream tools described later. The solver is implemented in JAX [66], integrat-ing Eq. (1) and the tidal system with an adaptive Dormand–Prince scheme and PID step control from 
+
+diffrax [67]. Forward-mode automatic differentiation propagates through the discretized integration and yields 
+
+∂{M, R, Λ}/∂θ without finite differencing, which we use for fixed-mass derivatives via the implicit-function the-orem. We calibrate the implementation against an in-dependent radius-domain integrator, the LALSuite [68] routines used by the downstream RIFT consumer, and RePrimAnd [69]. Appendix A gives the tidal system, the treatment of first-order transitions and of the stellar surface, the EOS interpolation, and the validation itself. 3 
+
+> 2. Nonparametric EOS modeling
+
+The EOS at β-equilibrium p(ϵ) is poorly known above nuclear saturation density nsat . Several nonparametric strategies have been proposed to flexibly extend the EOS above its low-density and high-density targets (hence-forth abbreviated as anchors). Different approaches achieve different levels of success at satisfying thermody-namic consistency, causality, and capability of matching the two anchors. The foundational construction of Landry & Essick [40] builds a Gaussian process (GP) model starting with the primitive variable 
+
+φ(x) = ln 
+
+
+
+c2 dϵ dp − 1
+
+
+
+, x = log p, (2) so that the sound speed is recovered through the sigmoid map 
+
+c2 
+
+> s
+
+= c2
+
+1 + eφ , (3) which enforces 0 < c 2 
+
+> s
+
+< c 2 for any real φ. A GP prior is placed on φ(x) with a squared-exponential kernel 
+
+K(x, x ′) = σ2 exp 
+
+
+
+− (x − x′)2
+
+2ℓ2
+
+
+
++ σ2 
+
+> n
+
+δ(x − x′), (4) (σ the marginal scale, ℓ the correlation length, σn
+
+a white-noise term). A draw φ(log p) is integrated through dϵ = (1 + eφ) dp to give ϵ(p), with a fixed low-density crust attached. Legred et al. [43] use the same construction (hereafter the LCEHL prior; data re-lease Zenodo 6502467), which we adopt as the fixed-prior baseline; related work enriches the kernel or train-ing [41, 42, 44, 55, 56, 70]. A complementary, purely diffusive construction was given by Gorda, Komoltsev, Kurkela & Sunde (GKKS) [60], working with the chemical potential μ and baryon density n so that 
+
+c2 
+
+> s
+
+= d ln μd ln n . (5) Smoothness is imposed by evolving μ under a heat equa-tion in a fictitious time τ , run from τ = 0 to τ = 1, 
+
+∂τ μ = ∂n[D(n) ∂nμ] , D(n) = A n 2, (6) where the single free coefficient A = ℓ2/4 fixes the smoothing scale and ℓ ≡ σ/n is the resulting sound-speed correlation length, constant in ln n. The choice 
+
+D ∝ n2 saturates the causality-preserving condition 
+
+D′′ − D′/n ≤ 0. Our implementation evolves the same physics in loga-rithmic variables, and it is worth writing down because everything we say later about causality rests on it. With 
+
+x = ln n and υ = ln μ we diffuse at constant coefficient, 
+
+∂τ υ = ∂x[A ∂ xυ] = A ∂ 2
+
+> x
+
+υ, (7) with υ held fixed (Dirichlet) at both anchors. Because the sound speed is itself the x-derivative of the evolved field, c2 
+
+> s
+
+= ∂xυ [Eq. (5)], differentiating Eq. (7) shows that c2 
+
+> s
+
+satisfies the same equation, ∂τ c2 
+
+> s
+
+= A ∂ 2
+
+> x
+
+c2
+
+> s
+
+. The maximum principle for the heat equation then applies to the sound speed directly: c2 
+
+> s
+
+can never leave the range it started in, so a draw that is causal and stable be-fore smoothing is causal and stable after it, exactly and not merely to discretization accuracy. Dirichlet ends also conserve R c2 
+
+> s
+
+dx = ln( μH /μ L) identically. Equations (6) and (7) share the correlation length ℓ but are not the same operator; the companion paper [71] compares the two schemes and shows where the difference shows up. The anchors are our nuclear metamodel band at 2 nsat 
+
+and the pQCD endpoint at μ = 2 .6 GeV. The high-density anchor is the perturbative-QCD (pQCD) constraint of Komoltsev & Kurkela [72]. Given a pQCD endpoint at μH ≃ 2.6 GeV [73], thermodynamic stability ( dn/dμ ≥ 0), causality (( μ/n ) dn/dμ ≥ 1), and the integral constraint 
+
+Z μH
+
+> μL
+
+n dμ = pH − pL (8) confine the EOS to a calculable allowed region in the (μ, n, p ) plane; the existence of an interpolant connecting low- and high-density endpoints reduces to an inequality among the boundary data [72, 74]. We use the resulting density and pressure envelopes as a hard prior cut. The bridge interpolates between two anchors and car-ries no low-density physics of its own: the prior below 
+
+nL is whatever is supplied there. GKKS supply a tightly constrained low-density sector — a fixed BPS crust [75] up to 0 .34 nsat , and above it the chiral-effective-field-theory ( χEFT) calculations of Drischler et al. [27] sam-pled within their theory band out to nL = 2 nsat , where the anchor triplet ( μL, n L, p L) is drawn. We deliberately do something different, and it is the substantive prior choice in this paper. We implement the bridge with two deliberate choices. The low-density anchor is our own nuclear metamodel band [61], evaluated at 2 nsat with the nuclear empirical parameters resampled per draw and continued downward through the crust, making the prior self-contained in the backend’s nuclear physics rather than conditioned on one many-body calculation; and the diffusive smoothing is carried out in (ln μ, ln n) as above, with the high-density endpoint the partial-N3LO pQCD result at μ = 2 .6 GeV. The cost of that choice is breadth: a metamodel evalu-ated far below the densities its empirical expansion is cal-ibrated at produces a low-density band much wider than any crust model’s genuine uncertainty, and the width near saturation is what sets the attainable radius. Sec-tion III A rebuilds the ensemble with the GKKS prescrip-tion in place of ours, with everything above nL held fixed, and reports what the difference is worth. The bridge stage places every draw inside the Komoltsev–Kurkela volume by construction, and the ensemble is causal. The diffusive smoothing that follows preserves R c2 
+
+> s
+
+but not 411.0 11.5 12.0 12.5 13.0 13.5 14.0 14.5 15.0 15.5 
+
+log 10 ( / g cm 3)
+
+> 28 30 32 34 36
+> log 10  (p / dyn cm  2)
+> this work (prior 90%) LCEHL posterior 90% cEFT (Drischler et al.) GW170817 (LVK) 90% SLy
+
+FIG. 1. The prior we infer with, against the equations of state it has to be able to contain. Grey band and black line: the 90% interval and the median of our bridge ensemble, from crust to core; vertical dashed lines mark nsat and the matching density 2 nsat . Overlaid for scale: SLy (dotted), the Drischler et al. χEFT pure-neutron-matter band (green), and two published posteriors — the LVK GW170817 p(ρ) result (orange) and the LCEHL nonparametric result (dashed). The posteriors are drawn to check that the prior covers them; they are not inputs to it, and nothing in this paper conditions on them. 
+
+the pressure integral of Eq. (8), so the smoothed curve no longer lands exactly on the pQCD endpoint it was built to hit; the companion paper [71] quantifies that drift and its correction. Quantitative coverage checks are reported in Appendix A. Figure 1 shows the bridge ensemble’s pressure–density band from crust to core, overlaid with reference EOS: the SLy crust/EOS [68], the chiral-effective-field-theory (χEFT) pure-neutron-matter band of Drischler et al. [27], the LVK GW170817 p(ρ) posterior [3], and the LCEHL nonparametric posterior (Legred et al. [43]). The con-struction enforces causality and the Komoltsev–Kurkela endpoint constraints; the numerical checks and sampled sound-speed extrema are reported in Appendix A. The constrained bridge only operates above the matching den-sity nL = 2 nsat ; below it each draw is the nuclear meta-model with its empirical parameters (symmetry energy and its slope, incompressibility) resampled per draw, con-tinued through a polytropic crust. The metamodel band plays the role that a χEFT band plays in GKKS or a fixed SLy crust plays in the LVK analyses [3], and the near-saturation width of that band strongly controls the attainable radius. We selected a broad symmetry-sector calibration whose envelope covers the published LCEHL and GW170817 posterior bands shown in Fig. 1. This is a coverage design choice, not an update by those data, so every inference below is conditional on it; that is why we carry out the prior-sensitivity study of Sec. III A rather than defer it. 
+
+B. EOS evidence from observations 
+
+Each EOS θ maps to a one-parameter sequence 
+
+{M (hc), R (hc), Λ( hc)}, and in particular to the functions Λθ (m) and Rθ (m) along the stable branch. Independent observations contribute multiplicatively, so the EOS evi-dence is the product [14] 
+
+L(d | θ) = Y
+
+> e
+
+Le(de | θ), p(θ | d) ∝ L (d | θ) π(θ), (9) with π(θ) the EOS prior of Secs. II A 2. The per-observation factors take three forms. Equation (9) is a posterior identity when every factor is a likelihood. Our NICER implementation instead uses the published-posterior overlap defined below, so products containing that factor are operational multimessenger scores rather than prior-independent posteriors. For a gravitational-wave (GW) event the per-EOS likelihood marginalizes the event likelihood over the binary parameters with the tidal deformabilities fixed to the EOS, 
+
+LGW (θ) = 
+
+Z
+
+dm 1 dm 2 dχ 1 dχ 2 Le
+
+ de | m1, m 2, χ 1, χ 2, Λθ (m1), Λθ (m2) πpop (m1, m 2, χ 1, χ 2). (10) The population prior πpop over masses and spins enters every EOS evidence and is not optional: it weights the mass range over which the EOS Λ– m relation is sampled. A NICER mass–radius data product contributes the posterior-overlap factor 
+
+SNICER (θ) = 
+
+Z
+
+dm p pub 
+
+ Rθ (m), m  ω(m), (11) the published two-dimensional ( R, m ) posterior density integrated along the EOS mass–radius curve. Our line measure ω(m) is uniform over the EOS-supported range, 
+
+ω(m) ∝
+
+(
+
+1, mlo ≤ m ≤ min  mhi , M max (θ),
+
+0, otherwise , (12) with ( mlo , m hi ) = (0 .4, 2.1) M⊙; it is not the astrophysi-cal population model of Eq. (23), which enters only the 5gravitational-wave evidences. Because the released pos-terior densities are not divided by the source analyses’ sampling priors, Eq. (11) is not a prior-independent like-lihood: it inherits those “hidden priors” and should be in-terpreted as a posterior-overlap score [14]. The multimes-senger result below carries this limitation. A population-consistent analysis would instead reconstruct each source likelihood and apply a common mass model; we defer that extension to Sec. V. Radio timing of massive pulsars enters as support con-straints on the maximum mass. Each measurement ¯ mj ±
+
+σj requires Mmax (θ) ≥ ¯mj , contributing a cumulative-distribution factor Φ  (Mmax − ¯mj )/σ j
+
+, with Φ the stan-dard normal CDF. The analyses reported here do not apply a remnant-derived upper bound on Mmax .The same product admits optional laboratory con-straints on the symmetry energy, which act on the nuclear empirical parameters carried by each draw rather than on its stellar observables. Three encodings are available, covering the forms in which nuclear experiments report: a one-dimensional Gaussian on the symmetry energy Esym 
+
+at saturation; a correlated two-dimensional Gaussian on (Esym , L sym ); and a Gaussian on the metamodel symme-try pressure 
+
+Psym (n) = n2
+
+3nsat 
+
+
+
+Lsym + Ksym 
+
+n − nsat 
+
+3nsat 
+
+
+
+,
+
+tagged at a stated density and reducing to Psym (nsat ) = 
+
+nsat Lsym /3 at saturation. The last is admitted only for 
+
+n ≤ nL = 2 nsat : above the matching density the non-parametric bridge, not the empirical expansion, deter-mines the draw, so a metamodel symmetry pressure eval-uated there would not describe the equation of state ac-tually used. All three terms are disabled throughout this paper except in the robustness variant of Sec. IV B.  
+
+> C. Representations of the equation of state
+
+The adaptive scheme is deliberately agnostic to how the equation of state is represented. It requires only (i) a generative family of candidate EOS controlled by a finite parameter vector c with a tractable density q(c); (ii) a forward map from c to the neutron-star observables that enter the likelihood (Sec. II B); and (iii) the importance-reweight-and-refit of q(c) described in Sec. II D. Noth-ing in the loop privileges a particular function being parametrized. Two natural choices trade computational cost against directness — one in the space of stellar ob-servables , one in the space of the microphysical EOS — and our pipeline supports both behind a single accessor that returns Λ( m), R(m) and Mmax per draw; the refine-ment loop is identical for each. Before describing the two implementations, we make precise how they are related.  
+
+> 1. Linear response and the duality of representations
+
+The two representations describe the same physics through different coordinates, connected by the stellar-structure map F : a sound-speed function (or any fi-nite EOS parametrization ceos ) determines the sequence 
+
+{M, R, log Λ }(hc), and, restricted to stable branches, the correspondence is one-to-one [62]. Had we kept every de-gree of freedom, the two parametrizations would simply be coordinate charts on one manifold of physical EOS. Their relationship is characterized by the response of the observables to an EOS perturbation, 
+
+δf obs = J δc eos , J ≡ ∂F ∂c eos 
+
+, (13) where J is the (functional) Jacobian of the forward map. Because our TOV solver is algorithmically differentiable end-to-end (Sec. II C 3), automatic differentiation evalu-ates derivatives of the discretized solver at a chosen point in EOS space without a finite-differencing step or a surro-gate; their accuracy is assessed with the solver validation in Appendix A. The two compressed representations are aligned when their basis functions are related linearly: writing {ψk} for the EOS-side basis and {ϕk} for the sequence-side basis, alignment means Jψ k lies (approximately) in the span of {ϕk}, so that coefficients transform as cobs ≈ J ceos 
+
+with a finite matrix J, and a local Gaussian in EOS space pushes forward to a Gaussian in observable space. About a reference point c⋆,
+
+μobs = F (c⋆) + J (μeos − c⋆), Σobs = J Σeos J⊤. (14) The approximation is controlled by basis truncation and the curvature of F over the distribution’s sup-port. Its primary use is therefore the linear limit :once data localize the posterior, excursions δc are small, the first-order relation Eq. (13) evaluated at the pos-terior mean is testable, and translating means and co-variances between the two representations reduces to the linear algebra of Eq. (14). The fixed-target impor-tance estimator below does not require a linear F , but we exploit the linear limit repeatedly: the automatic-differentiation symmetry-energy forecast of Sec. IV D is precisely Eq. (13) propagated through a measurement co-variance, and the local relationship also motivates future inverse lifts from a sampled sequence back to c2
+
+> s
+
+(n). The duality also helps explain why sound-speed–space priors can look more complex than observable-space ones — posterior draws in the c2
+
+> s
+
+(n)-GP program [40, 43] carry rich small-scale structure, while eight sequence compo-nents suffice here. Two effects are at work. The first is prior choice: those constructions mix kernels down to short correlation lengths, populating many c2 
+
+> s
+
+modes by fiat, whereas our diffusive bridge sets a long correlation length. The second is the map itself: F integrates ther-modynamic information on the way to {M, R, Λ} and therefore smooths some fine-scale c2 
+
+> s
+
+structure. Sequence 6compression can therefore be accurate without resolving every EOS-space mode; we measure how much c2 
+
+> s
+
+struc-ture the map actually discards in Sec. III. The same linearization also allows us to estimate the local (linear) space that nearby physical EOS can reach – a particularly valuable self-consistency diagnostic for inference for high-precision measurements. Specifically, if cobs ,⋆ denotes the observable coefficients of the TOV-solved reference sequence F (ceos ,⋆ ), and let δc obs = cobs −
+
+cobs ,⋆ describe a proposed or measured change in those coefficients, then at linear order and using the physically normalized metric W defined below, the nearest physical change and its residual follow from the weighted projec-tion 
+
+PJ = J(J⊤WJ )+J⊤W, (15) 
+
+r⊥ = ( I − PJ ) δc obs , D2 
+
+> ⊥
+
+= r⊤⊥Wr⊥. (16) Here + denotes a pseudoinverse, retaining only directions to which the chosen observables are sensitive. The resid-ual r⊥ is the part of the proposed change that no nearby EOS perturbation in the chosen basis can produce; D⊥
+
+measures its size relative to the expected uncertainty.  
+
+> 2. Observable-space representation (compressed sequences)
+
+The first choice parametrizes the neutron-star sequence 
+
+directly: the curve {M, R, log Λ }(hc) traced as central en-thalpy hc varies. We map hc to a normalized coordinate 
+
+u ∈ [0 , 1] affinely in each EOS’s own enthalpy range, 
+
+hc(u) = flo +( fhi −flo ) u hmax  
+
+> c
+
+, (flo , f hi ) = (0 .04 , 0.95) ,
+
+(17) with hmax  
+
+> c
+
+the maximum tabulated pseudo-enthalpy of that EOS, sampled at 80 equally spaced u values (the map is monotone, so it is single-valued and branch-explicit; per-EOS normalization aligns corresponding structural features — low-mass stars, the turning point — at similar u across the ensemble, which is what makes a shared PCA basis efficient). Collecting an ensemble of sequences, we compress each channel with principal-component analysis (PCA): 
+
+{M, R, log Λ }e(u) ≈ ¯f (u) + X
+
+> k
+
+ce,k ϕk(u), (18) with a shared mean ¯f , basis {ϕk}, and per-EOS coeffi-cients ce. A Gaussian over the coefficient vector, 
+
+c ∼ N (μc, Σc), (19) defines a finite-rank functional GP over sequence space, with mean ¯f + P
+
+> k
+
+(μc)kϕk and a kernel set by Σc in the 
+
+{ϕk} basis. In the observable-space calculations this fit-ted Gaussian is the parent base density π0; conditioning it on the structural validity set defines the operational physical prior πA 
+
+> 0
+
+of Appendix C 1. The physical bridge ensemble calibrates the Gaussian’s mean, covariance, and basis. The stored bridge curves are therefore a finite cal-ibration approximation to πA 
+
+> 0
+
+, not a separate continu-ous density. Exact multiple-importance use of Eq. (21) requires fresh generation-0 draws from qA 
+
+> 0
+
+= πA 
+
+> 0
+
+(or a tractable density for the original bridge generator); anal-yses that reuse the calibration archive inherit this finite-ensemble approximation. Figure 2 quantifies the recon-struction error for the eight-component basis used here. Refinement either keeps the basis { ¯f , ϕ k} frozen and up-dates only the moments ( μc, Σc) (the lazy moment refit used throughout this work), or additionally re-fits the basis from the evidence-weighted sequences (an in-span rotation plus mean shift); span expansion via fresh ex-ternal curves is a future step. Because the parameters describe the observables them-selves, evaluating a proposal draw needs no new stellar-structure solve: Λ( m), R(m) and Mmax are reconstructed from Eq. (18). This is why the multi-event and large-catalogue studies below use this representation. The price is the inverse problem: recovering the microscopic 
+
+p(ρ) (or c2
+
+> s
+
+(n)) from a sampled sequence is not immediate. Under the assumptions of the inverse stellar-structure problem, a complete stable M (R) relation determines the EOS [62]. In this paper, however, we do not perform such an inverse reconstruction: we report observable-space quantities directly and, where a microphysical p(ρ)band is shown (Fig. 1), read it from the forward EOS tables of the generating draws. 
+
+Validity in the linear limit The metric in Eq. (15) should compare physical quantities, not raw PCA coef-ficients: a Euclidean norm would change if radius were quoted in metres rather than kilometres. We therefore evaluate a sequence only through the combinations used by the likelihood, such as eΛ( m1, m 2) for a binary, the correlated ( M, R ) constraints for a pulsar, or Mmax . If these quantities are zα and their measurement covariance is Cmeas  
+
+> αβ
+
+, the corresponding metric on the observable co-efficients is 
+
+Wab = ∂z α
+
+∂c obs ,a 
+
+ Cmeas + CTOV +
+
+> αβ
+
+∂z β
+
+∂c obs ,b 
+
+, (20) with repeated indices summed. Here CTOV is not a covariance over the full 3 × 80 enthalpy grid. It is the much smaller covariance of the held-out residuals 
+
+δz α − (∂z α/∂c obs ,a )Jai δc eos ,i , and accounts for local lin-earization and basis error in the measured quantities themselves. Equation (20) therefore includes the exper-imental scales and correlations; the resulting distance is unchanged by a change of units. In a forecast, Cmeas 
+
+must instead be a stated design covariance at represen-tative masses; the result is then specific to that experi-ment. The test concerns only combinations that the obser-vations resolve, not unmeasured structure along the full stellar sequence. Its threshold is calibrated from held-out TOV residuals together with the assumed measurement errors, at a declared false-rejection rate. Moreover, it is local: small D⊥ establishes compatibility with nearby 7TOV solutions, not the existence of a global inverse EOS. If the local EOS map spans every measured direction, the linear test has no power and physical restrictions enter only through curvature, inequalities, or an explicit TOV solve. 
+
+Physical consistency and stability. A Gaussian over sequence coefficients is not guaranteed to generate physi-cally realizable stars: the three channels are drawn jointly with only the empirical cross-covariance tying them to-gether, so a fresh draw far from the training manifold can pair an R(m) with a Λ( m) that no causal EOS pro-duces, and its M (hc) may lack the turning-point struc-ture of a genuine TOV family. Two structural safeguards limit the exposure. First, all observables enter the like-lihood only through the stable rising branch: turning points are located from the sign of dM/dh c along each reconstructed sequence, quantities are interpolated on that branch alone, and draws without a nontrivial rising branch are rejected at the sampling stage together with non-finite or negative curves. Second, the generation-0 ensemble consists of TOV-solved training sequences; the coefficient Gaussian, conditioned on the same valid-ity filter, supplies the operational base density used by the importance correction in Eq. (21). Fresh coefficient-Gaussian draws are used only as proposals, and must pass the same branch and validity filters. These are the only per-draw rejection criteria used here. No compactness–Love relation enters this acceptance rule. We retain Λ( m) as an independent channel be-cause the GW likelihood measures it directly; imposing an empirical relation to C = GM/Rc 2 would instead in-troduce an unintended prior. Appendix C 2 reports an exploratory compactness–Love stress test and explains why we do not use it for sampling. For a posterior localized around one EOS, the linear distance D⊥ of Eq. (16) provides a more direct optional consistency test. It asks whether the measured combina-tions of M , R, and Λ can be produced by a nearby TOV solution, using their actual uncertainties rather than a selected universal relation. We do not apply it to the broad prior used here, for which no single tangent space is adequate. In a localized analysis it should first be reported as a diagnostic, with the Jacobian updated as the posterior moves; promoting it to an acceptance rule would also require the truncation normalization of Ap-pendix C 1. When physicality by construction is required, the EOS-space representation below remains the appro-priate proposal family.  
+
+> 3. Equation-of-state-space representation (sound speed)
+
+If instead one uses a generative model in EOS space — for instance a Gaussian process in the sound speed 
+
+c2
+
+> s
+
+(n) under a logit-type transformation, as in the non-parametric program of Landry, Essick & Legred [40, 43] — the same fixed-target importance construction applies: 
+
+c now parametrizes c2
+
+> s
+
+(n), and the forward map is a TOV solve per draw. This pays a stellar-structure integration that the observable-space scheme avoids, and it returns the microscopic EOS directly , with no inverse to solve. The JESTER framework similarly uses differentiable pro-gramming through the TOV equations for EOS inference and inversion [76]. Our TOV solver is written in jax ,so the entire map from EOS (or nuclear) parameters to observables is algorithmically differentiable end-to-end: sensitivities such as ∂Λ( m)/∂L sym are available for the discretized calculation by automatic differentiation. We exploit this in Sec. IV D to forecast the symmetry-energy reach. Because it retains a physical EOS representation, this is the natural choice whenever EOS-space or nuclear-parameter posteriors — p(ρ), Lsym , Ksym — are them-selves the target, rather than the stellar observables. 
+
+Resolution and data-driven basis growth. A fixed-size basis — eight principal components here — has a fixed expressive power, and as a catalogue approaches n ∼ 10 3
+
+the posterior can in principle demand finer structure in 
+
+c2
+
+> s
+
+(n) than that basis resolves. The diffusive GKKS con-struction makes this concrete: its correlation length ℓ
+
+in (ln μ, ln n) [Eq. (6)] is the smallest sound-speed fea-ture the prior supports — in effect an ultraviolet cutoff on the wavevector content of c2
+
+> s
+
+(n). Inferring the EOS is a deconvolution of c2
+
+> s
+
+(n) from the data, and resolving progressively finer features requires extending the basis to higher wavevectors, but only over the density interval the data actually constrain: a catalogue piled up at a single mass — hence one central density — buys little extra resolution, the same coverage limitation that caps the symmetry-energy reach in Sec. IV D. A principled re-finement is therefore to grow the basis adaptively in step with the ESS-driven redraws, admitting modes up to the wavevector warranted by the data’s density coverage and bounded below the ℓ-set cutoff — the spectral counter-part of the span expansion noted above. We leave this data-driven basis growth to future work; over the regime studied here the eight-component basis is validated as adequate (Fig. 2).  
+
+> D. Adaptive refinement
+
+The adaptive loop uses RIFT’s iterative refinement logic to construct an EOS proposal ; the scientific prior remains the fixed physical base density πA 
+
+> 0
+
+[57, 58, 77]. One round: (i) draw n coefficient vectors from the cur-rent Gaussian proposal over c, reconstructing n new, smooth, never-seen sequences; (ii) evaluate a per-EOS marginal evidence ln Ze for each draw — in produc-tion, the RIFT tabular per-event evidence (CIP), ac-cessed through a backend-agnostic evidence fn seam so the same loop drives synthetic demonstrations and the real pipeline; (iii) refine the proposal. Refinement has two stages. Stage 1 (default) importance-reweights the draws, we ∝ exp[ β(ln Ze −max e ln Ze)], and re-fits the co-efficient Gaussian to the weighted mean and covariance, optionally tempered ( β < 1) and shrunk toward the pre-8vious round for stability — a moment refit of the func-tional GP. Stage 2 (opt-in) re-fits the PCA basis itself from the evidence-weighted sequences, an in-span rota-tion plus mean shift that re-allocates resolution where the posterior concentrates (kernel adaptation); span expan-sion , which would require injecting fresh external train-ing curves, is an explicit future step. For a fixed data set, successive proposal rounds can be combined as batches of a single multiple-importance-sampling integral. Pooling the draws of all rounds g (pro-posal qAg , Ng draws each), every draw θ is reweighted to the common target πA 
+
+> 0
+
+(θ) Z(θ) — the fixed physical coefficient-space density πA 
+
+> 0
+
+, whose parent Gaussian π0
+
+[Eq. (19)] is calibrated to the bridge ensemble of Eqs. (3)– (8), times the observational evidence Z(θ) [Eq. (9)] — by the balance-heuristic mixture weight 
+
+w(θ) ∝ Z(θ) πA 
+
+> 0
+
+(θ)
+
+qA
+
+> mix
+
+(θ) , qA
+
+> mix
+
+(θ) = X
+
+> g
+
+Ng
+
+P 
+
+> g′
+
+Ng′
+
+qAg (θ),
+
+(21) with the actual generating proposal densities and the physical base prior evaluated in the shared coefficient basis of Eq. (19). The correction is valid only where the proposal mixture has support over the target and the stated densities are the actual generating densities; covariance regularization and support checks are there-fore part of each redraw. In practice draws are validity-filtered (Sec. II C 2), so qAg is the parent Gaussian qg
+
+divided by its acceptance fraction Pg on the accepted set. Since Pg varies between generations these factors do not cancel, and we measure and include them as de-rived in Appendix C 1. In the GW170817 combination they happen to be nearly equal ( Pg = 0 .249 and 0 .254), so omitting them shifts nothing at the quoted precision — but that is a property of this analysis, not a general one. The remaining departure from the ideal is that the generation-0 “proposal” is the TOV-solved archive itself, whose density we represent by the fitted Gaussian πA 
+
+> 0
+
+;this is a modelling approximation that no normalization removes. The estimator is therefore exact with respect to the stated conditioned Gaussian densities, and our fixed-target statements should be read in that sense. With those qualifications, this is adding two batches of draws from one Monte Carlo integral: a single round is the spe-cial case qA 
+
+> mix
+
+= qA 
+
+> 0
+
+= πA 
+
+> 0
+
+, w ∝ Z; later rounds enter on the same footing once divided by the mixture density that actually generated them. The quality of any such weighted ensemble is summa-rized by its effective sample size (ESS), 
+
+Neff =
+
+  P  
+
+> e
+
+we
+
+2
+
+P 
+
+> e
+
+w2
+
+> e
+
+, (22) which runs from 1 (a single draw dominates) to the num-ber of draws (uniform weights): it summarizes weight concentration, although it is not a count of independent posterior samples. A redraw is triggered when Neff of the current set falls below a threshold, and the com-bination (21) makes the pooled Neff accumulate across rounds rather than reset. For the fixed-data estimator, the threshold and ensemble size affect efficiency rather than the target, provided the support and density con-ditions above hold; Appendix C discusses how to choose them. The paper uses two related workflows, which we keep distinct. The fixed-data GW170817 and multi-messenger analyses use Eq. (21) and retain the base-density correction across proposal generations, subject to the generation-0 calibration approximation stated af-ter Eq. (19). (i) Start from the generation-0 ensemble: the 972 TOV-solved draws of the bridge prior, with the coefficient Gaussian of Eq. (19) as its density. (ii) Com-pute a per-EOS log-weight for the chosen data set: the GW170817 marginal evidence ln Z from per-EOS RIFT CIP runs [Eq. (10)], the NICER mass–radius integrals [Eq. (11)], and the radio maximum-mass support factors — the electromagnetic terms are post-processing on each draw’s precomputed M –R curve, so only the GW evi-dence requires per-event inference. (iii) Obtain the fixed-target weighted distribution by importance reweighting [Eq. (21)], monitoring Neff [Eq. (22)]. (iv) If (and only if) Neff starves, refine: refit the coefficient Gaussian to the weighted draws, sample a fresh generation, evaluate its evidences, and pool all generations with the balance-heuristic weights. The large synthetic catalogues instead use a sequential moment-projection experiment: after as-similating a block of events, the weighted Gaussian fit is treated as an approximation to the current posterior pro-posal and only subsequent event factors are accumulated until the next refit. That experiment diagnoses proposal starvation and forecast scaling, but, because it does not retain the full π0/q g correction after every projection, it is not the fixed-target multiple-importance estimator of Eq. (21).  
+
+> E. Astrophysical observations
+
+The real data that inform the EOS are heteroge-neous. Gravitational-wave tidal measurements come from the binary-neutron-star inspirals GW170817 [1– 3] and GW190425 [4], which constrain Λ through Eq. (10); no additional confirmed BNS detections have been reported through the O4b catalog release [5]. For GW170817 this work reuses the archived RIFT intrinsic-likelihood grid constructed for the joint GW– electromagnetic analysis of Risti´ c et al. [78], rather than reprocessing detector strain. That grid used open GWOSC O2 data [79], the GWTC-1 power spectral densities, the IMRPhenomPv2 NRTidalv2 waveform from 23 to 1700 Hz, and the electromagnetically deter-mined sky position and luminosity distance. NICER X-ray timing yields two-dimensional mass–radius posteri-ors, which enter through Eq. (11). We use the current headline analysis for each source: for PSR J0030+0451 the six-year reanalysis [6], whose preferred PDT-U mode (R = 12 .7+1 .3 
+
+> −1.0
+
+km) supersedes the original measure-9ment [80] and largely resolves the mode ambiguity of the intermediate reanalysis [81]; for the massive pul-sar J0740+6620 the joint NICER–XMM result of Salmi et al. [7], concordant with the independent pipeline of Dittmann et al. [8]; for the nearby J0437–4715 the base-line analysis of Choudhury et al. [9], noting that a recent independent treatment including a modulated nonther-mal component finds a radius roughly 2 km larger [82] — an unresolved cross-group systematic we carry as a caveat rather than an input; and for the compact source J0614– 3329 the discovery analysis [10]. We omit J1231–1411, whose inference converges only under a restrictive, EOS-informed radius prior [83] and would be circular here. J0030 enters through a kernel-density estimate of the published posterior samples [6], which carry the strong positive ( R, M ) correlation ( ρ ≃ 0.8) of a compactness-pinned source with no radio mass prior; the remaining three sources, whose masses are radio-pinned and whose (R, M ) correlations are correspondingly small, enter as two-dimensional Gaussians with symmetrized 68% inter-vals and zero correlation. Radio timing of massive pulsars sets lower bounds on Mmax through the support factors of Sec. II B: J0740+6620 (2 .08 ± 0.07 M⊙ [11]) and J1614– 2230 (1 .908 ± 0.016 M⊙ [12]). We retain J0348+0432 with the revised CHIME mass 1 .806 ± 0.037 M⊙ [84], which supersedes the earlier 2 .01 ± 0.04 M⊙ [85]; at the revised value it no longer functions as an independent two-solar-mass anchor. Black-widow candidates such as J0952–0607 (2 .35 ± 0.11 M⊙ [86]) are excluded, following standard practice, because their masses rest on optical light-curve modeling rather than clean orbital dynamics.  
+
+> F. Synthetic observations
+
+For the multi-event demonstration we generate syn-thetic catalogues with a deliberately simple model, with two components. First, the error model : at the simplest level each synthetic event carries an an-alytic Gaussian likelihood in the tidal observable; the more detailed demonstrations upgrade this to a gw-fish Fisher-matrix covariance in ( M, q, ˜Λ) — chirp mass, mass ratio, and binary tidal deformability — com-puted from the frequency-domain tidal waveform IM-RPhenomD NRTidalv2 (reduced-order surrogates are avoided because their derivatives are insufficiently sta-ble for Fisher estimates) [87]. The injected neutron stars are non-spinning, while aligned spins are included in the Fisher matrix with a low-spin prior and marginalized from the reported ( M, q, ˜Λ) covariance. The Fisher cal-culation uses the LIGO Hanford–LIGO Livingston–Virgo (HLV) geometry and the same bilby aLIGO O4 high noise curve at all three sites over 8–1024 Hz [88–90]. Thus Virgo contributes its site geometry and arm length but is not assigned a Virgo-specific O4 sensitivity; KAGRA is intentionally omitted [91]. These catalogues are con-trolled method tests, not projections for a specific LVK observing scenario. We also hold the waveform model 1 2 3 4 5 6 7 8           
+
+> number of PCA components k
+> 10 0
+> 10 1
+> 10 2
+> (m) relative error over  1--2 M [%]
+> 1%
+> Compressed representation: full-curve reliability
+> L2(RMS) median
+> L290th
+> L(max) median
+> L90th
+> FIG. 2. Compressed-representation reliability across the full Λ( m) curve (1–2 M⊙): relative-error L2(RMS) and L∞
+> (max) norms versus the number of PCA components (median and 90th percentile over the bridge ensemble). The vertical marker identifies the eight-component production setting.
+
+fixed, so the known propagation of waveform systemat-ics into joint population–EOS inference is outside this test [92]. Second, the population model , which enters every per-EOS evidence through πpop in Eq. (10). We adopt the skew-normal binary neutron-star mass distri-bution of Anik, Steiner & O’Shaughnessy [93], 
+
+p(M ) = 2
+
+σ ϕ
+
+ M − μσ
+
+
+
+Φ
+
+
+
+α M − μσ
+
+
+
+, (23) with ϕ and Φ the standard normal density and CDF, location μ ≃ 1.35 M⊙, scale σ ≃ 0.14 M⊙, skewness α,and mass support [1 M⊙, M max ]. We accept the known tension that GW190425’s high inferred masses sit in the tail of this distribution.  
+
+> III. VALIDATION AND TESTING
+
+We test the compressed representation, the coverage of the prior ensemble, and the consistency of proposal draws. These are internal diagnostics of the adopted en-semble and representation. The independent-code check of the structure solver is in Appendix A. 
+
+Compressed representation. Figure 2 tests the PCA representation across the full tidal sequence Λ( m) over 1–2 M⊙. It summarizes each EOS by the L2 (RMS) and 
+
+L∞ (maximum) relative errors over the bridge ensemble. The median and upper-tail errors decrease monotonically through the eight-component production setting. This test measures truncation error within the calibration en-semble, not the accuracy of proposal draws far outside it. 10 
+
+Sound-speed information retained by the observable map. Figure 3 compares each draw’s central sound-speed curve c2 
+
+> s
+
+with its best linear prediction from the cor-responding observable-space coefficients. For the three examples in panel (a), the reconstruction captures the overall shape, including the step at which the stellar cen-tre crosses the matching density nL, but not the finer structure. Panel (b) quantifies this comparison mode by mode. The two leading modes account for 77% of the ensemble variance and are recovered with R2 = 0 .92 and 
+
+R2 = 0 .82. The eighth mode is not recovered ( R2 = 0 .06 in sample and negative in held-out tests). After weighting by mode variance, 19 .5% of the screened archive’s sound-speed variation is inaccessible to a linear reconstruction from the observables. This compression is consistent with the linear argument of Sec. II C 1. This diagnostic applies only to the adopted prior en-semble, forward map, and linear reconstruction. It is not a posterior constraint on sound-speed modes; identifia-bility under a particular likelihood is a separate ques-tion [15]. Appendix B describes the construction, held-out validation, and a near-degenerate draw. 
+
+Prior realizations. Figure 4(a–c) shows individual draws in p(ϵ), c2
+
+> s
+
+(n), and mass–radius space, coloured by 
+
+R(1 .4 M⊙). Individual sound-speed curves span most of the causal interval and contain substantially more struc-ture than the observable map can recover, although the ensemble median remains near the conformal value. The pressure at the matching density explains 11% of the variance in R(1 .4 M⊙), increasing to 78% when bridge pressures above it are included. The low-density anchor primarily determines the boundary of the radius support, as examined in Sec. III A. 
+
+Observable-space proposal checks. Fresh draws from a coefficient Gaussian need not represent a realizable EOS. We therefore apply the branch and validity filters of Sec. II C 2. For the broad fitted Gaussian, 75% of attempted draws fail that structural filter (non-finite or non-positive curves, or no nontrivial rising mass branch). The high rejection fraction is therefore a cost of drawing from a broad Gaussian whose support extends beyond the valid sequence set, not the action of a universal-relation veto. Its proposal normalization is treated in Appendix C 1. The companion quantity is the prior on the maxi-mum mass (Fig. 5). It is set by the high-density bridge rather than the sub-saturation symmetry sector and is deliberately broad, with median 1 .99 M⊙ and 90% range [1 .2, 2.8] M⊙. We impose no maximum-mass cut: ra-dio timing factors downweight EOS that do not support the precisely measured massive pulsars during inference (Sec. IV).  
+
+> A. Sensitivity to the low-density anchor
+
+To isolate this dependence, we replace the sector below 
+
+nL = 2 nsat and rebuild the ensemble while leaving the bridge unchanged (Sec. II A 2). Following the released GKKS construction, we use a fixed crust to 0 .34 nsat and the chiral-effective-field-theory calculation of Drischler et al. [27] above it, continued to β equilibrium and sampled across its theory band to nL. The fractal refinement, hi-erarchical correlation length, pQCD endpoint, truncation density, and random seed remain at their production set-tings. Two implementation differences are required: lal-suite provides no BPS table, so we use the SLy crust [68]; and because GKKS do not specify sampling within the chiral-EFT band, we interpolate with one scalar per draw and use the standard order-by-order truncation estimate, 
+
+|EN3LO − EN2LO | per cutoff. We also test the min–max envelope of the four (order, cutoff) curves, which is half as wide in E/A at the anchor. The two low-density priors differ substantially [Fig. 4(d)]. At 0 .5nsat , the metamodel spans 2 .21 decades in pressure, compared with 0 .10 for the crust-plus-χEFT prior, a factor 21 .2. The corresponding width ratio is 12 .3 at saturation. At the anchor, the widths are 0 .63 and 0 .16 decades, a factor 4 .0. Because the metamodel is an expansion about saturation, extrapolation to 0 .06 nsat 
+
+produces a 1 .96-decade spread that corresponds to a very conservative uncertainty on the EOS at crust densities. The high-density quantities are insensitive to this re-placement. The sound-speed priors above 3 nsat are sta-tistically consistent [Fig. 4(e)], and the maximum-mass medians are 1 .99 M⊙ and 2 .07 M⊙ for the metamodel and crust-plus-χEFT anchors, respectively. This agreement is expected because the bridge determines Mmax and is unchanged. The compressed-sequence and sound-speed coefficients used by the adaptive proposal are likewise insensitive to the anchor choice. The radius distribution is sensitive primarily through its upper support boundary [Fig. 4(f)]. The crust-plus-
+
+χEFT support ends at 12 .8 km, with 0% of draws above 13 km, compared with 14 .2 km and 10% for the meta-model. The 90% interval changes from [8 .4, 13 .4] to [8 .8, 12 .7] km. The median increases by 0 .5 km, while the interval contracts to 0 .79 of the metamodel width because the bridge retains the soft tail whose maximum masses barely exceed 1 .4 M⊙. Within either ensemble, the pressure at nL accounts for at most 11% of the vari-ance in R(1 .4 M⊙), compared with 78% after including the bridge pressures. Nevertheless, changing the anchor shifts the support boundary by more than a kilometre. This ceiling is insensitive to the chiral-EFT band pre-scription: the narrower envelope run ends at 12 .76 km, differing by only 0 .00 km because it narrows the soft edge while leaving the stiff edge unchanged. The radius result in Sec. IV is therefore sensitive to the low-density prior. The NICER J0030 constraint is 12 .7+1 .3 
+
+> −1.0
+
+km (Sec. II E), whereas the crust-plus-χEFT prior ends near its central value and assigns no support to much of the upper credible region. The broader meta-model avoids this upper truncation, but the reported 
+
+R(1 .4 M⊙) = 11 .7 ± 0.4 km (Sec. IV) is conditional on a low-density prior much wider than a realistic crust 11 0.0 0.2 0.4 0.6 0.8 1.0 
+
+u (normalized central enthalpy)         
+
+> 010101
+> c2
+> s at the stellar centre (offset)  drawn c2
+> s
+> linear readout of the observables
+> (a)
+> 010 20 30 40 50 60
+> share of  c2
+> s variance [\%]
+> 12345678
+
+c2 
+
+> s
+
+principal mode 
+
+> 0.2
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> fraction recovered,  R2
+> in-sample held out (10-fold)
+> (b)
+
+FIG. 3. Linear reconstruction of central sound speed c2 
+
+> s
+
+from observable-space coefficients. (a) Three draws versus normalized central enthalpy u [Eq. (17)], offset vertically: solid curves show the draws and dashed curves their reconstructions. The reconstruction retains the overall shape and the step at the matching density nL, but smooths finer structure. (b) Mode-by-mode comparison. Grey bars (right axis) show the fraction of ensemble variance in each sound-speed mode; points (left axis) show its in-sample and 10-fold cross-validated recovery. Their agreement follows the leverage screening described in Appendix B. 
+
+model. Neither anchor is therefore suitable for a pre-cision radius measurement. Such an analysis requires a low-density sector calibrated to nuclear theory and crust physics, with its prior width reported alongside the in-ferred radius. 
+
+IV. RESULTS AND FORECAST DEMONSTRATIONS 
+
+This section separates fixed-data weighted estimates from sequential catalogue experiments. The GW170817 and nested multimessenger calculations reweight the generation-0 archive; the two-generation GW170817 cal-culation additionally uses the multiple-importance cor-rection of Eq. (21). The synthetic catalogues instead use sequential Gaussian moment projection after weight starvation. We compare that approximation with finite-archive brute-force reweighting where the latter remains informative. 
+
+A. GW170817: a two-proposal fixed-target check 
+
+We first analyse GW170817 alone. Figure 6 shows the distribution of Λ(1 .4) for three scenarios. The leftmost interval is the range of Λ(1 .4) implied by the uninformed EOS prior of Sec. III (the prior whose coverage is shown in Fig. 1), Λ(1 .4) = 336 ± 226. The next interval is the posterior obtained by comparing each of our EOS realiza-tions against GW170817, computing a per-EOS evidence 
+
+Z(θ) from the tidal likelihood LGW via Eq. (9) with the RIFT tabular pipeline; reweighting this first generation of draws (gen-0) by w ∝ Z gives Λ(1 .4) = 242 ± 138 at effective sample size Neff = 544 of 845 usable draws. To illustrate adaptive proposal construction in this single-event case, we refit the coefficient-space Gaus-sian process to the gen-0 posterior and draw a fresh generation-1 ensemble, creating a new functional pro-posal q1. Although q1 is adapted to this event, we can use it and its draws exactly as in any adaptive Monte Carlo: we evaluate fresh evidences to refine the posterior esti-mate, and combine those evidences with the draws accu-mulated in earlier iterations to obtain a posterior whose effective sample size accounts for both batches. The com-bination is the multiple-importance estimate of Eq. (21): each draw, from whichever generation, is weighted by 
+
+w ∝ Z π 0/q mix to the common fixed-prior target π0 Z
+
+— the same way RIFT merges successive iterations of a single Monte Carlo integral. The rightmost interval shows this combined posterior, Λ(1 .4) = 229 ± 141 at 
+
+Neff = 1023. Its mean and width are consistent with the gen-0 estimate at the resolution of these finite ensembles, while the weight concentration is reduced [Eq. (22)]. This is evidence for a sampling gain rather than a changed target, subject to the fitted-Gaussian approximation to the generation-0 archive described in Sec. II C 2. On this likelihood GW170817 alone is weakly informative — its effective tidal width is comparable to the prior — moti-vating the multimessenger combination below. 12 10 0 10 1 10 2 10 3
+
+[MeV fm 3]  
+
+> 10 2
+> 10 1
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> p [MeV fm  3]
+> nL
+
+(a)     
+
+> metamodel anchor (this work)
+> 246810
+
+n/nsat 
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> c2
+> s
+
+(b) causal limit conformal    
+
+> 810 12 14
+
+R [km] 
+
+> 0.8 1.0 1.2 1.4 1.6 1.8 2.0 2.2 2.4 2.6
+> M [M ]
+
+(c)     
+
+> 910 11 12 13
+> R(1.4  M ) [km] 11 12 13 14 15
+
+log 10 ( [g cm 3]) 
+
+> 28 29 30 31 32 33 34 35 36 37
+> log 10  (p [dyn cm  2])
+
+(d)      
+
+> metamodel anchor (this work) crust + cEFT anchor Drischler EFT (PNM)
+> SLy
+> 246810
+
+n/nsat 
+
+> 0.0 0.2 0.4 0.6 0.8 1.0
+> c2
+> s
+
+(e)    
+
+> 810 12 14
+
+R(1.4 M ) [km] 
+
+> 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4
+> prior density
+> NICER J0030
+
+(f) 
+
+FIG. 4. Bridge-prior realizations and sensitivity to the low-density anchor. Top row : (a) pressure versus energy density, (b) sound speed versus baryon density above nL = 2 nsat , and (c) mass–radius relations. Thin curves are 180 production-ensemble draws, coloured by R(1 .4 M⊙) (grey curves do not reach 1 .4 M⊙); heavy lines and bands show the median and 90% interval. Bottom row (Sec. III A): ensembles with the same bridge but either the resampled nuclear metamodel (orange) or a GKKS-style fixed crust and chiral-EFT anchor (green). (d) Pressure–density relations, with the Drischler et al. χEFT pure-neutron-matter band (hatched), SLy crust (dotted), and nsat and 2 nsat (vertical lines). (e) Sound-speed distributions above the anchor, which are statistically consistent. (f) Prior-predictive radii: the χEFT anchor ends at 12 .8 km, near the NICER J0030 central value (dashed; shaded 68% interval), whereas the metamodel prior extends to 14 .2 km. 
+
+B. Nested PSR / PSR+GW / PSR+GW+NICER weights 
+
+NICER mass–radius posterior-overlap scores and ra-dio maximum-mass factors enter as per-EOS weights on the same generation-0 draws, following the workflow that opens this section; each is cheap post-processing on the precomputed sequence. Because the ensemble never starves here, no redraw is triggered: this nested anal-ysis is the finite-archive (“brute-force”) reference used for the fixed-data comparisons. The NICER-weighted distribution is not a prior-independent posterior because the published source posteriors have not been divided by their sampling priors (Sec. II B). weighted bands con-tracting through the nested data sets. The radius at 1.4 M⊙ tightens from R(1 .4) = 11 .5 ± 1.4 km (prior) to 11 .7 ± 0.4 km (PSR+GW+NICER), with Λ(1 .4) = 309 ± 90 and Mmax = 2 .4 ± 0.2 M⊙; the contraction is driven by the NICER overlap scores and radio fac-tors rather than the comparatively weak GW170817 tidal likelihood. The quoted summaries are conditional on the bridge calibration, finite generation-0 archive, Gaussian approximations for three NICER sources, and inherited NICER sampling priors. The low-density sector of the prior is a controlling radius systematic. An earlier, narrower sub-saturation metamodel band supported only R(1 .4) ≤ 12 .8 km and so down-weighted the upper J0030 region a priori, leaving 
+
+R(1 .4) partly prior-bounded at its upper edge. Widen-ing the near-saturation nuclear empirical parameters (the 13 1.00 1.25 1.50 1.75 2.00 2.25 2.50 2.75 3.00 
+
+Mmax [M ]
+
+> 0.0 0.2 0.4 0.6 0.8
+> prior density
+> J0740 J0348
+> Maximum-mass prior (median 1.99, 90% [1.22, 2.75])
+> prior
+
+FIG. 5. Maximum-mass prior of the (filtered) bridge ensem-ble: broad by construction (median 1 .99 M⊙; 90% [1 .2, 2.8]). The radio maximum-mass factors, rather than a hard prior cut, downweight the soft tail (Sec. IV). prior gen-0 (w Z)      
+
+> combined (wZ0/qmix )
+> 100 200 300 400 500 600
+> (1.4)
+> Neff = 845
+> Neff = 544 Neff = 1023
+> GW170817: refine, then combine batches of draws
+
+FIG. 6. GW170817 with the adaptive loop. Λ(1 .4) for the uninformed prior (left), the gen-0 posterior obtained by reweighting the prior draws with the GW170817 evidences [w ∝ Z, Eq. (9)], and the two-generation multiple-importance combine [ w ∝ Z π 0/q mix , Eq. (21)]. The combine repro-duces the gen-0 constraint within the finite-ensemble reso-lution while increasing Neff (annotated; Eq. (22)). 
+
+1–2 nsat symmetry sector, which Fig. 1 showed was nar-rower than the data-driven posteriors there) extends the prior support to R(1 .4) ≃ 14 km — now covering the full J0030 credible region — so the quoted R(1 .4) = 11 .7 ± 0.4 km is not visibly truncated by that partic-ular boundary. Because robust radius inference is not the objective of this proof-of-concept analysis, we treat this value as an illustrative output conditional on the widened calibration. The prior-sensitivity analysis this 10 11 12 13 14 
+
+R [km] 
+
+> 1.0 1.2 1.4 1.6 1.8 2.0 2.2
+> M [M ]
+> J0030 J0740 J0437 J0614
+
+Nested EOS mass--radius posterior 
+
+median + 90% 
+
+> PRIOR PSR PSR+GW PSR+GW+NICER
+
+FIG. 7. Mass–radius weighted bands (median +90%) under nested data sets (prior / PSR / PSR+GW / PSR+GW+NICER), with NICER credible ellipses (J0030, J0740, J0437) overlaid. Radius at 1 .4 M⊙ tightens ∼ 4× from prior to the full data set. 
+
+calls for — rebuilding the ensemble on an explicit χEFT pressure band — is carried out in Sec. III A; its outcome is what licenses or withholds a robust radius statement, and we defer the verdict to there. We stress that this widening is a deliberate change of prior , so the posterior legitimately moves between the two choices — it is not a tightening of error bars at fixed assumptions. This is conceptually distinct from the adaptive refinement in the multi-event demonstration below, where the prior is held fixed and successive GP redraws reweight only the new data so as to reproduce the same fixed-prior reference approximately (Fig. 10a); there the interval narrows as synthetic data are added, while projection error must be assessed against the reference. The macroscopic posterior is, by contrast, insensitive to the laboratory constraint on the symmetry energy tested here. Reweighting the same PSR+GW+NICER draws by the one-dimensional term of Sec. II B, with the saturation symmetry energy Esym = 32 ± 2 MeV [94] adopted in Ref. [70], changes Esym = 32 .8 ± 3.0 to 31 .9 ± 1.9 MeV, but leaves the stellar observables nearly unchanged: Λ(1 .4) = 309 ± 90 becomes 310 ± 90, and 
+
+R(1 .4) = 11 .7 ± 0.4 km becomes 11 .8 ± 0.4 km, with 
+
+Neff = 179 → 118. This weak coupling is consistent with the forecast of Sec. IV D: Esym is a weak lever on Λ( m), whereas Lsym carries most of the symmetry-sector sen-sitivity. Table I tests the latter with illustrative labora-tory prior widths; incorporating measured heavy-ion con-straints through the correlated ( Esym , L sym ) or density-tagged Psym (n) likelihoods is left to future work. 14 1.0 1.5 2.0 2.5 3.0   
+
+> Mmax [M]
+> 0.00 0.25 0.50 0.75 1.00 1.25 1.50 1.75
+> density
+> J0740
+> (a) revised prior reproduces the PSR posterior
+> base prior PSR posterior (reweighted) revised prior (fresh draws)
+> base prior revised prior 020 40 60 80 100
+> ESS under PSR [%]
+> 47% 456/972 95% 4755/5000
+> (b) efficiency
+
+FIG. 8. Refinement on the real maximum-mass constraint. (a) The base prior (grey) is broad in Mmax ; the radio like-lihood (J0740/J0348/J1614) concentrates it (PSR posterior, orange). A single refit of the coefficient-GP gives a revised functional prior whose fresh draws (dashed) reproduce that posterior. (b) Effective sample size under the PSR likelihood: fresh draws from the revised prior are 95% efficient, versus 47% for the base prior — the soft tail that the data discards is precisely what the refinement recovers. 
+
+Choosing a broad prior has a corollary that is also where refinement most clearly earns its keep. Our base prior is uninformative in the maximum mass: its Mmax 
+
+90% range is [1 .2, 2.8] M⊙ with median 1 .99, so roughly half the draws lie below the heaviest precisely measured pulsars and are excluded once the radio max-mass like-lihood is applied. We deliberately impose no maximum-mass cut — letting the data remove soft equations of state is the correct Bayesian procedure — but this costs sampling efficiency: under the PSR (radio) likelihood the base prior retains an effective sample size of only 
+
+Neff = 456 of 972 draws. This is exactly the regime the adaptive prior is built for. Refitting the coefficient-space Gaussian process to the PSR-reweighted draws (Eq. (21) with a single proposal) yields a revised functional prior whose unweighted Mmax distribution, [2 .1, 2.4, 2.8] M⊙
+
+(5 /50 /95th percentiles), already coincides with the PSR posterior, [2 .1, 2.5, 2.8] M⊙ (Fig. 8a). Fresh draws from this revised prior are then 95% efficient under the same likelihood ( Neff = 4755 of 5000), against 47% for the base prior (Fig. 8b). A production analysis would there-fore refine on the maximum-mass constraint at the very first iteration and, given the soft tail, start from a larger initial ensemble (here 5 ×), so that essentially all sub-sequent draws fall in the data-supported region — the single-event fixed-point logic of Fig. 6 applied to a real constraint. 
+
+C. Multi-event refinement: what it is, and what it is not 
+
+The adaptive loop answers two distinct questions, and we separate them because they can look superficially alike. 
+
+First: does refining the proposal change the answer for fixed data? It must not, and the two estimators we use differ in how exactly they enforce that. Refitting the coefficient-space Gaussian to the current weighted draws and sampling a fresh EOS set changes the proposal, not the model. Write pr = π0L1: r for the posterior accumu-lated when the refit occurs and qr for the Gaussian fitted to it. Targeting π0L1: n from draws out of qr requires the weight 
+
+w ∝ π0 L1: n
+
+qr
+
+= pr
+
+qr
+
+Lr+1: n. (24) The fixed-data analyses of Sec. IV evaluate Eq. (24) in full, through the mixture form Eq. (21), and therefore implement the fixed-target correction within the oper-ational Gaussian-density and finite-archive approxima-tions. The multi-event demonstrations below instead re-tain only the Lr+1: n factor, which is exact if and only if 
+
+qr = pr ; because qr is a moment-matched (and shrunk) Gaussian fit to a finite weighted sample, these runs in effect replace the accumulated posterior by its Gaussian projection at each redraw. We adopt this ansatz deliber-ately. The exact single-proposal weight is numerically un-usable with the tested Gaussian proposal family: the 24-dimensional correction pr /q r has sufficiently heavy tails that its effective sample size collapses to O(10) among several thousand draws. We therefore use the projection as a practical approximation in these demonstrations and quantify its error below; more expressive proposals or se-quential Monte Carlo updates could change this trade-off. The cost of the projection is measurable, and the mea-surement is affordable because proposal draws are free in the observable-space representation (a draw is a recon-struction, not a stellar-structure solve). We therefore brute-force the fixed-prior posterior directly, with 10 5
+
+draws from π0 — 10 minutes with parallel evaluation — obtaining a numerically converged reference at the largest catalogue we consider: Λ(1 .4) = 393 ±11 .2 at Neff = 790; its mean and standard deviation stabilize across the stored convergence trace. In the displayed three-refit run, the Gaussian projection differs from this reference by 0 .4% in the mean and has a standard deviation larger by a factor 1 .5. A separate, higher-cadence projection di-agnostic preserves the sub-percent mean agreement and reduces the width discrepancy. Thus, for this catalogue and these schedules, projection broadens the inferred dis-tribution without appreciably shifting its centre; this di-rection of the error is an empirical calibration, not a guarantee of the ansatz. The reference also shows why the archive-sized (972-draw) reweighting cannot arbitrate the final width: with Neff ≈ 22, its estimated standard deviation is lower than the converged value by a factor 0.79 in this realization. At smaller catalogues, where the archive reweighting remains well sampled, adaptive and brute-force tracks agree directly: the Fisher demonstra-tion below matches to within ∆Λ(1 .4) <
+
+∼ 22 at every n,well inside the ∼ 44 posterior width (Fig. 10a). The con-15 150 200 250 300 350 400 450 500 550          
+
+> (1.4)
+> Multi-event refinement: 44 170817-like events, 2 redraws
+> posterior ±1
+> posterior mean truth 010 20 30 40
+> number of events n
+> 1000 2000 3000
+> ESS
+> redraw threshold
+> FIG. 9. Evidence evolution with analytic likelihoods. Top: Λ(1 .4) posterior (mean ±1σ) vs number of GW170817-like events n, converging to the injected truth (dashed); dotted lines mark GP redraws. Bottom: effective sample size, which starves the fixed draw set and is restored at each redraw — why refinement is required as measurements accumulate.
+
+traction of the band is information from the data, not an artifact of redrawing; a naive loop that re-applied the full likelihood after each redraw would instead double-count and report spuriously tight intervals. 
+
+Second: how does the constraint evolve as detections accumulate? Here the refinement earns its keep. Treat-ing each detection as a new measurement, the Λ(1 .4) posterior contracts as n grows while the effective sam-ple size of any fixed draw set collapses; when the ESS crosses a threshold we refit the GP, draw a fresh EOS set, and continue. We first illustrate this with analytic Gaussian tidal likelihoods (Fig. 9): out to n = 44 the loop triggers 2 redraws and the posterior width shrinks 
+
+≈ 5× (from σΛ ≈ 131 to 28) while remaining well sampled — behaviour unattainable with a fixed prior of fixed size. Replacing the analytic likelihood with a mass-marginalized Fisher model leaves this picture intact (Fig. 10). We draw a binary-neutron-star population from the skew-normal mass distribution of Sec. II F and, for each event, compute a GWFish Fisher ma-trix for the illustrative HLV network with the frequency-domain IMRPhenomD NRTidalv2 waveform, includ-ing the aligned spins; the effective spin is then marginal-ized, leaving the covariance in ( M, q, ˜Λ). Crucially the per-event evidence is not a point estimate of ˜Λ: follow-ing Eq. (10) we integrate the event likelihood over the binary masses — chirp mass and mass ratio, the latter the dominant degenerate direction (here σq up to ∼ 1with a q–˜Λ correlation ∼ 0.7) — with the tidal relation pinned to each EOS, ˜Λ = ˜Λθ (M, q ), weighted by the pop-ulation prior. The catalogue spans representative widths (σ˜Λ ∼ 75–800 over SNR 8–65). The projected loop again matches the finite-archive reference within its resolution (final Λ(1 .4) = 343 ± 37 vs 345 ± 44; truth 400), and the posterior EOS sequence visibly sharpens as detec-tions accumulate: the 90% credible bands of M (R) and Λ( M ) contract from the first redraw to the final state (Fig. 10b,c). This is the information gain made con-crete — in the observable sequence space the GP actually parametrizes, {M, R, log Λ }, so no p(ρ) band is shown.  
+
+> D. A large-catalogue forecast, and the limits of translating to nuclear parameters
+
+We finally push the synthetic demonstration to asecond-generation HLV catalogue of 1000 binary neutron stars (SNR ≥ 8). We adopt a deliberately lazy cosmol-ogy — luminosity distance uniform in comoving volume to 300 Mpc with no mass-redshift, and no selection be-yond the SNR cut — which is adequate for a forecast; this is well below third-generation event rates but an order of magnitude beyond the coming decade, and it shows how the method behaves as information accumulates. Two messages emerge (Figs. 11, 12). First, the EOS measurement sharpens as expected, and the fixed 972-draw archive becomes under-resolved. Af-ter 3 refinement rounds the adaptive posterior on Λ(1 .4) contracts to a ±16 ( ∼ 4%) interval consistent with the in-jected truth (400) within its uncertainty, and the Λ( M )90% band tightens onto the truth across the sampled mass range (Fig. 11a,c). The final width should be com-pared against the Fisher expectation, and the compari-son only makes sense if the forecast resolves the Λ( M )shape. Following the approach of Ref. [15], we accumu-late the per-event Fisher information in the sequence-coefficient space — derivatives ∂ ln ˜Λ/∂c about the truth, the linear limit of Sec. II C 1, accumulated over all 1000 catalogue events — and project the resulting posterior covariance onto ln Λ( M ). The accumulation costs sec-onds, so no subsampling is used; estimating the same quantity from 100-event subsamples instead scatters it by 9%, which would dominate the comparison below. This shape-resolved forecast predicts σΛ(1 .4) ≈ 11 .6, and its mass-resolved band tracks the posterior’s, widening off the sampled masses in the same way (Fig. 11c). Com-pared against the converged reference of Sec. IV — ±11 .2from 10 5 fixed-prior draws, the appropriate yardstick be-cause the archive-sized reweighting is starved — their standard deviations differ by 4%. The Fisher matrix uses every catalogue event, so this figure carries no subsam-pling noise; it remains a statement about this catalogue and this injected EOS rather than a general validation. A rigid-shape stack, treating ln Λ( M ) as shifting uniformly, fares distinctly worse: it predicts σΛ(1 .4) ≈ 8.4, low by a factor 0 .75, with no mass dependence at all. Resolv-ing the shape is what makes the forecast useful: for this catalogue, the linearized calculation and the fixed-prior 16 0 20 40 
+
+number of events n
+
+> 200 250 300 350 400 450 500 550
+> (1.4)
+
+(a) evidence evolution    
+
+> brute force ±1
+> brute force (fixed prior) adaptive (redraw) truth ESS (right axis)
+> 11 12 13
+
+R [km] 
+
+> 1.0 1.2 1.4 1.6 1.8 2.0 2.2
+> M [M ]
+
+(b) M--R (90% CI)         
+
+> n= 1 (redraw)
+> n= 40 (final)
+> 1.00 1.25 1.50 1.75 2.00
+
+M [M ]
+
+> 10 2
+> 10 3
+> (M)
+
+(c) (M) (90% CI)     
+
+> n= 1 (redraw)
+> n= 40 (final)
+> 500 1000 1500 2000 2500 3000
+
+FIG. 10. Illustrative multi-event refinement (Anik et al. BNS population; GWFish Fisher per-event ( M, q, ˜Λ) covariances). (a) Λ(1 .4) vs event count n: the adaptive redraw loop (orange) overlies a brute-force reweighting of the full 972-draw raw prior (grey) — the two agree within the resolution of the archive reference, rather than the projection giving a tighter answer; the twin axis shows the ESS sawtooth that triggers each redraw (dotted). (b) M –R and (c) Λ( M ) 90% credible bands of the posterior sequence just after each redraw and at the end, showing the information gained as detections accumulate. 
+
+nonparametric calculation give consistent widths. Over the same catalogue the effective sample size of the fixed 972-draw archive falls from ∼ 470 to Neff ≈ 22 (Fig. 11b): an archive of that size no longer resolves the posterior, while redrawing restores the effective sample size at each refinement (the sawtooth). The much larger fixed-prior reference is feasible here because observable-space draws are inexpensive; proposal adaptation instead provides a controlled estimate at a fixed per-round draw budget. Second — and more cautionary — the precise EOS measurement translates only weakly into the nuclear symmetry energy. Symmetric matter is comparatively well known, so a neutron-star measurement is nominally a measurement of the symmetry sector; but the map from the tidal observables to the symmetry parameters is loose. Conditioning the prior’s nuclear empirical pa-rameters on the measured Λ( m) (a linear-Gaussian con-ditioning that uses all prior draws, so it does not suf-fer importance-sampling starvation), the slope improves only from σLsym = 29 to 21 MeV and the curvature barely at all ( σKsym : 114 → 114 MeV), even though Λ(1 .4) is by then measured to a few percent (Fig. 12). The joint 
+
+Lsym –Ksym region contracts mostly along a degeneracy direction and the marginals saturate well before the EOS does. This makes quantitative the difficulty emphasised by Zhu & O’Shaughnessy [15]: inspiral tidal measure-ments, however numerous, constrain the EOS only over the narrow density range set by the observed masses and are degenerate among the nuclear parameters, so terres-trial experiments and low-mass or post-merger informa-tion remain necessary to pin the symmetry energy. The adaptive prior quantifies this limitation rather than re-moving it. We cross-check this forecast independently with the differentiable forward map of Sec. II C 3, exercising the automatic-differentiation capability of our solver. The Jacobian ∂ log Λ( m)/∂ NEP of the discretized jax 
+
+metamodel-plus-TOV map identifies Lsym as the domi-nant lever — its gradient several times that of any other parameter — with Esym and Ksat negligible and Ksym 
+
+both weak and degenerate with Lsym in its effect on Λ. Propagating a 3% Λ(1 .4) measurement through this Ja-cobian (a linearized Fisher forecast) gives σLsym ≈ 20 MeV with Esym and Ksat unmoved from their priors — in close agreement with the sample-based σLsym = 21 MeV. Ksym 
+
+remains poorly constrained in both, improving more un-der the rigid metamodel extrapolation than under our nonparametric high-density bridge; that very spread is a further instance of the model dependence Ref. [15] warns of. The agreement supports the interpretation that the loose translation is driven by the narrow observed mass range and symmetry-sector degeneracies within the tested models, rather than solely by the empirical prior covariance. It also demonstrates the end-to-end sensi-tivities available in the EOS-space representation; their numerical accuracy is assessed through the solver valida-tion rather than inferred from automatic differentiation itself. Because the limitation is one of density coverage , het-erogeneous measurements help where more of the same 17 do not. Repeating the conditioning while varying which masses are measured makes this quantitative: a single Λ(1 .4) barely moves Lsym (29 → 27 MeV), the binary-neutron-star pair near 1 .2–1 .4 M⊙ reaches 21 MeV, and adding a low-mass, crust-dominated probe near 1 .0 M⊙
+
+— which samples a lower density — sharpens it to 17 MeV, or 13 MeV for a measurement spanning 1 .0– 1.6 M⊙. The gain is the longer lever arm in density, not the number of events; Ksym stays at its prior width (≈ 114 MeV) throughout. Low-mass neutron stars there-fore help the symmetry slope a little and its curvature 
+
+not at all — consistent with the modest returns antici-pated by Ref. [15]; a dedicated multi-messenger, multi-mass study is left to follow-up work. Rare-isotope and heavy-ion experiments probe the same symmetry sector directly and at densities not cov-ered by the observed neutron-star mass range [95– 97]. We therefore repeated the sample-based and Ja-cobian calculations after replacing selected symmetry-sector marginal prior widths with the illustrative labo-ratory scenarios in Table I. Both calculations give the same pattern: the laboratory scenarios constrain Esym ,which the GW catalogue leaves unchanged, and reduce the Lsym width from 21 .2 to 13 .5 MeV. They move Ksym 
+
+only when its width is imposed directly and leave Ksat 
+
+unchanged. The two calculations agree on Lsym to within a MeV when no curvature width is assumed. These scenario widths are our choices, not published program commitments, and they idealize laboratory in-formation as marginal widths on expansion coefficients. A physical measurement instead constrains neutron-rich pressure over a density range and should enter as a density-tagged likelihood, as in Refs. [25, 26]. The adap-tive target supports that form below the matching den-sity n ≤ 2nsat (Secs. II B and IV B); extending it across the full experimental density range is left to future work. The robust conclusion from the present scenarios is the complementarity: laboratory information acts on the symmetry-sector directions that the GW catalogue does not resolve. 18 10 0 10 1 10 2 10 3
+
+number of events n
+
+> 150 200 250 300 350 400 450 500 550
+> (1.4)
+
+(a) EOS measurement converges     
+
+> posterior ±1
+> truth
+> 10 010 110 210 3
+
+number of events n
+
+> 10 2
+> 10 3
+> 10 4
+> effective sample size
+
+(b) fixed prior fails; refinement holds     
+
+> fixed prior (brute force) adaptive (redraw)
+> 1.00 1.25 1.50 1.75 2.00
+
+M [M ]
+
+> 0.3
+> 0.2
+> 0.1
+> 0.0 0.1 0.2 0.3
+> ln[  (M)/  true (M)]
+
+(c) final band vs Fisher forecast   
+
+> n= 1000 (90% CI) Fisher forecast (90%, shape-resolved) rigid-shape stack
+
+FIG. 11. Large-catalogue method test (1000 second-generation HLV BNS, lazy cosmology). (a) Λ(1 .4) vs event count n: the adaptive posterior ( ±1σ) contracts to the injected truth (dashed; dotted verticals mark refinements). (b) effective sample size: the fixed -prior brute force (grey) collapses by ∼ 20 × while the adaptive draw set (teal) is restored at each redraw. (c) the final ( n = 1000) Λ( M ) 90% band relative to the truth, against the shape-resolved Fisher forecast (shaded; coefficient-space information accumulated over all events, cf. Ref. [15]), whose mass dependence tracks the posterior’s and gives a width consistent with the converged fixed-prior calculation for this catalogue; the rigid-shape stack (dotted) is low by 0 .75. The adaptive band shown is conservative in this calibration, with a standard deviation larger than that reference by 1 .5 (text). TABLE I. Symmetry-sector widths (MeV, 1 σ) for the 1000-event catalogue combined with laboratory scenario priors: sample-based linear-Gaussian conditioning of the nuclear empirical parameters, with the linearized Jacobian forecast of Sec. IV D in parentheses. Each scenario replaces the marginal prior width of the listed parameters — σLsym = 22, σEsym = 2 for FRIB-2028; 15 and 1 .5 for FRIB400; + Ksym adds σKsym = 80 — and leaves the others at their prior values. These widths are assumed scenario values chosen to span the reach of the rare-isotope and heavy-ion programs [26, 95–97]; they are not published commitments, and no projection of that form exists. The GW-only column reproduces the widths of Sec. IV D. Prior GW-only +FRIB-2028 +FRIB400 +FRIB400+ Ksym 
+
+σLsym 28 .8 21 .2 (20 .4) 18 .0 (17 .5) 13 .5 (13 .3) 13 .5 (12 .2) 
+
+σKsym 114 .4 114 .3 (84 .1) 114 .0 (74 .1) 113 .7 (60 .2) 79 .8 (53 .0) 
+
+σEsym 2.9 2.9 (2 .9) 2.0 (2 .0) 1.5 (1 .5) 1.5 (1 .5) 
+
+σKsat 23 .2 23 .1 (22 .8) 23 .1 (22 .7) 23 .1 (22 .6) 23 .1 (22 .3) 19 10 0 10 1 10 2 10 3
+
+# number of events n
+
+10 1
+
+10 0
+
+> uncertainty / prior
+
+## (a) EOS sharpens; symmetry energy saturates 
+
+(1.4) 
+
+Lsym 
+
+Ksym 
+
+1/ n
+
+40 60 80 
+
+# Lsym [MeV] 
+
+200 
+
+150 
+
+100 
+
+50 
+
+0
+
+> Ksym  [MeV]
+
+## (b) Lsym --Ksym (1 )
+
+prior 
+
+n = 1000 posterior 
+
+FIG. 12. The EOS sharpens but the symmetry energy does not. (a) Fractional uncertainty vs n: Λ(1 .4) shrinks ∼ n−1/2 while 
+
+σLsym and σKsym (NEPs conditioned on the measured Λ( m)) flatten to a degeneracy floor. (b) Lsym –Ksym 1σ region, prior vs the 1000-event posterior: contraction is mostly along the degeneracy, the marginals barely improve — cf. Ref. [15]. The jaggedness of the Λ(1 .4) trace in (a) is Monte Carlo noise in the weighted-variance estimate at finite effective sample size — largest just before each redraw, where the ESS is smallest, and reset when a fresh ensemble is drawn; the underlying posterior width decreases monotonically with n and the upward excursions are sampling artifacts, not real broadening. 20  
+
+> V. CONCLUSIONS
+
+We have introduced an adaptive-proposal procedure for nonparametric neutron-star equation-of-state infer-ence that leaves the scientific prior fixed while con-centrating new draws in the region supported by the data. We implemented the procedure both in acompressed principal-component representation of the neutron-star sequence, whose draws require no stellar-structure solve, and in a sound-speed representation with a jax -differentiable TOV solver. For fixed data, multi-ple importance sampling combined successive proposal generations into an estimate of the base-prior posterior, subject to the proposal-density and finite-archive qual-ifications of Sec. II D. For long catalogues, where those weights became degenerate in the 24-dimensional coeffi-cient space, we instead used a sequential Gaussian mo-ment projection and calibrated it against a 10 5-draw fixed-prior reference. For the catalogue and schedule tested here, the projection reproduced the mean to 0 .4% and broadened the standard deviation by a factor 1 .5. A fixed ensemble remains adequate for the binary neutron stars observed so far [1, 4]; adaptive proposals become useful when a large catalogue or additional electromag-netic and nuclear information concentrates the posterior relative to the prior. As a proof-of-concept application to GW170817, four NICER sources, and radio maximum-mass measure-ments, our nested posterior-overlap calculation gave 
+
+R(1 .4) = 11 .7 ± 0.4 km, Λ(1 .4) = 309 ± 90, and Mmax =2.4 ± 0.2 M⊙. These summaries are conditional on the deliberately broad, QCD-consistent prior [60], its bridge calibration and finite archive, and the approximations and inherited sampling priors used for the NICER likeli-hoods; they are not a robust radius determination. In the synthetic 1000-event HLV catalogue, the effective sam-ple size of the fixed 972-draw archive fell from ∼ 470 to 
+
+Neff ≃ 22, while proposal refinement kept the calcula-tion resolved. The resulting percent-level measurement of Λ(1 .4) nevertheless reduced the uncertainty in Lsym 
+
+only from 29 to 21 MeV and left Ksym essentially un-changed. Extending the measured mass range helped more than adding events over the same range, while the illustrative laboratory priors sharpened the symmetry-sector parameters that the catalogue did not constrain (Table I). These results support a simple interpretation: at fixed experimental precision, the observable map sets the num-ber of EOS or nuclear-parameter combinations that the data can resolve. Repeated measurements over the same mass range narrow the combinations already visible; a broader mass lever arm, laboratory information, or a new observable is needed to expose additional direc-tions. This conclusion applies to the smooth, cold, beta-equilibrated stellar sequences studied here. Strong first-order transitions can introduce moving features and dis-connected stable branches for which the present smooth basis, single-branch representation, and local lineariza-tion are not faithful [70, 98, 99]. Natural next steps are therefore to develop transition-aware representations, use the differentiable solver for gradient-informed refine-ment and adaptive basis growth, and combine the EOS proposal with a jointly inferred neutron-star mass pop-ulation. The companion paper [71] separately examines how much resolved structure is induced by the bridge prior rather than by the data. 
+
+> ACKNOWLEDGMENTS
+
+The authors are grateful for computational resources provided by the LIGO Laboratory and supported by National Science Foundation Grants PHY-0757058 and PHY-0823459. This material is based upon work sup-ported by NSF’s LIGO Laboratory which is a major fa-cility fully funded by the National Science Foundation. 
+
+> Appendix A: Numerical details and solver validation
+
+The tidal system. Writing the auxiliary tidal variable as y ≡ rH ′/H with H the metric perturbation [64], and defining 
+
+F (r) = 1 − 4πr 2(ϵ − p)1 − 2m/r , (A1) 
+
+Q(r) = 4π
+
+1 − 2m/r 
+
+
+
+5ϵ + 9 p + ϵ + pc2
+
+> s
+
+− 64πr 2
+
+
+
+−
+
+ 2( m + 4 πr 3p)
+
+r2(1 − 2m/r )
+
+2
+
+, (A2) the tidal variable obeys the Riccati equation 
+
+r dy dr + y2 + y F (r) + r2Q(r) = 0 . (A3) The term ( ϵ+p)/c 2 
+
+> s
+
+in Eq. (A2) enters because the fluid’s response to the external tidal field is governed by dϵ/dp =1/c 2
+
+> s
+
+. At the surface the Love number k2(y, C ) follows from y and the compactness C = M/R via the standard expression [63–65]. 
+
+Branches, transitions, and the surface. Near a strong first-order phase transition c2 
+
+> s
+
+→ 0 and the integrand stiffens. A first-order jump occupies a single enthalpy, joined by the density-discontinuity condition 
+
+yout = yin − 4πr 3 
+
+> d
+
+(ϵout − ϵin )
+
+md + 4 πr 3
+
+> d
+
+pt
+
+, (A4) evaluated at the discontinuity radius rd, enclosed mass 
+
+md, and transition pressure pt. A dedicated hybrid solver applies Eq. (A4) for a single transition; the default adap-tive solver does not yet handle strong transitions and is validated against RePrimAnd in the smooth regime. Na-tive twin-star (multi-branch) sequences await a planned enthalpy-path-integral extension. At the stellar surface 21 we optionally append a single-polytrope continuation as a convention for the bare metamodel, used only for cross-code comparison; the solver hardcodes no low-density approximation, and realistic crust models extending to normal-matter densities can and should be supplied di-rectly. The TOV integrand requires ( ϵ, p, c 2
+
+> s
+
+) as functions of 
+
+h. We evaluate them with a thermodynamically con-sistent cubic-Hermite interpolation of p(h) whose node slopes are set to the exact first law dp/dh = ϵ + p; the energy density is then derived as ϵ = dp/dh − p rather than interpolated independently, so the table is ther-modynamically consistent by construction. Relative to independent log-linear interpolation at equal table res-olution this improves Λ accuracy by roughly 25 ×. Ta-bles truncated near neutron drip underestimate R by 
+
+∼ 100–200 m purely through the integration-stop con-vention; the optional single-polytrope surface continua-tion derived from the cold first law (Sec. II A 1) closes this gap for cross-code comparisons but represents a con-vention, not physics. The prior ensemble passes the QCD-consistency checks of Sec. II A 2, with one qualification about where in the pipeline each check applies. Before the diffusive smooth-ing, 0 /2000 draws fall outside the Komoltsev–Kurkela volume, as the bridge construction guarantees; after it, the pressure integral of Eq. (8) is no longer preserved and the endpoint drifts off its pQCD target by a few percent at production settings, as characterized in the companion paper [71]. Causality does survive the smoothing: across the 1000 production draws the bridge sound speed at-tains 0 .99997 at most, with 0 superluminal draws. It is not, however, held well away from the causal limit. The median per-draw maximum is 0 .72, but the ensem-ble spans c2 
+
+> s
+
+∈ [5 ×10 −6, 0.99997] over the bridge segment and 7 .3% of draws carry a sound speed above 0 .95 some-where in it, so near-causal support is a real feature of this prior rather than something the smoothing removes. Separately, μ and p are monotone with dϵ/dn = μ to machine precision, and the resulting stars are physical (Mmax ≈ 1.5–1 .9 M⊙, R(1 .4) ≈ 11–12 km, prior only). In the compressed representation, eight PCA components reconstruct the full Λ( m) curve to ≈ 2.1% ( L2) and 3 .8% (L∞) across the bridge ensemble (Fig. 2; sub-percent for smooth single-family sub-sets), giving roughly 12 × com-pression at 10 4 draws. Solver systematics are calibrated against three inde-pendent references, since EOS inference at current and next-generation [19–21] sensitivities demands they sit well below statistical errors. (i) An in-repository, delib-erately distinct radius-domain integrator (SciPy RK45, (H, β ) tidal system) is a regression target; the differen-tiable solver agrees with it to M < 0.05%, R < 0.02%, and Λ < 0.1%. Figure 13 shows that comparison for a metamodel EOS: the mass–radius sequences over-lie, and the fractional residuals along the stable branch stay below the production tolerance. (ii) Named tabu-lated EOS are cross-checked against the LALSuite [68] 10.8 11.0 11.2 11.4 11.6 11.8 
+
+R [km] 
+
+> 0.50 0.75 1.00 1.25 1.50 1.75 2.00
+> M [M ]
+
+TOV solver validation (metamodel EOS)        
+
+> differentiable (diffrax) radius-domain ref. 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0
+
+M [M ]            
+
+> 10 4
+> 10 3
+> frac. residual
+> |M|/ M|R|/ R||/
+> FIG. 13. TOV solver validation for a metamodel EOS. Top:
+> M(R) from the differentiable ( diffrax ) solver and the inde-pendent radius-domain reference. Bottom: fractional residu-als in M,R, and Λ along the stable branch; the dotted line marks the validation tolerance.
+
+TOV routines used by the downstream RIFT consumer. (iii) Against RePrimAnd [69], the thermodynamically consistent surface continuation reduces the radius resid-ual from ∼ 200 m to ∼ 3–10 m; a complete RePri-mAnd systematics suite is in progress. The implicit-function fixed-mass sensitivities (Sec. II A 1) were vali-dated against a re-rooted fixed-mass finite difference (the central enthalpy Newton-polished onto the target mass for every perturbed EOS): dΛ/dc 2 
+
+> s, tail
+
+to 0 .0%, dΛ/dL sym 
+
+to 2 .5%, dR to ∼ 0.3%, and dM max to ∼ 0.1%. A naive derivative of an interpolated Λ( mtarget ) over a family is instead dominated by the central-density reparameteri-zation and can be catastrophically wrong (we observed a sign flip in dΛ/dc 2
+
+> s, tail
+
+); the residual lay in the differenti-ation path, not the integration tangent, so tightening the ODE tolerance does not fix it. 
+
+> Appendix B: Sound-speed modes and the linear span of the observables
+
+This appendix gives the construction behind Fig. 3 and asks whether its conclusion survives prediction on EOS draws that were not used in the fit. The distinction mat-ters: the number quoted in the main text is first mea-sured on the same ensemble used to construct the linear map, whereas a held-out test asks whether that map ap-22 plies to another draw from the prior. For each EOS draw i, we decompose its central sound-speed curve c2
+
+> s,i
+
+(u) into principal patterns and denote the amplitude of pattern k by aik . Here u is the nor-malized central-enthalpy coordinate of Eq. (17); it is not a new thermodynamic variable. The predictors are the draw’s 24 observable-space coefficients: eight coefficients for each of M , R, and log Λ. We fit each sound-speed amplitude as a linear function of those coefficients. Let 
+
+R2 
+
+> k
+
+denote the fraction of the draw-to-draw variance in 
+
+aik explained by this fit, and let fk denote the fraction of the total sound-speed variance carried by pattern k.Then 
+
+U = X
+
+> k
+
+fk(1 − R2
+
+> k
+
+) (B1) is the variance-weighted fraction that the observables fail to recover. This is the quantity quoted in Sec. II C 1. The initial value uses all NEOS = 972 draws both to fit and to evaluate the map, so by itself it is descriptive of this archive rather than a prediction test. To explain why the held-out test is delicate, let X be the regression matrix: one row per EOS draw, 24 observ-able coefficients plus a constant column. Least squares projects any list of measured mode amplitudes onto the linear combinations allowed by these columns. The cor-responding projection matrix is 
+
+PX = X(XT X)−1XT . (B2) In regression terminology PX is the “hat matrix,” be-cause it maps the measured amplitudes to their fitted values. Its diagonal element ℓi = ( PX )ii is the leverage 
+
+of draw i. Leverage is a purely geometric property of the observable coefficients; it does not use the sound-speed amplitudes. A value near zero means that neighboring draws support the fit there, while ℓi ≃ 1 means that the fit can reproduce that draw largely because the draw itself is present. Removing such a point forces an extrap-olation rather than an ordinary interpolation. There are Nfit = 25 fitted columns, including the con-stant, so the mean leverage is Nfit /N EOS ≃ 0.026. One draw instead has ℓi = 0 .9999. When that draw lands in the test subset, the remaining draws provide almost no local support for its prediction. As a result, ordi-nary ten-fold cross-validation — repeatedly fitting on 90% of the archive and predicting the other 10% — changes by more than an order of magnitude when the random division into folds is changed. This behavior is not cured by changing units or standardizing the coef-ficient columns: such rescalings leave the least-squares projection unchanged, and we recover the same cross-validation result to machine precision. We therefore apply a response-blind geometric screen before cross-validation. We remove the draw with the largest ℓi, recompute the leverages of the remaining en-semble, and repeat until max i ℓi < 0.5. Because this rule never examines aik , it cannot preferentially remove sound-speed curves that are hard to predict. It removes 9 of 972 draws; the held-out unrecovered fraction then becomes stable and agrees with the in-sample value, at 20 .8%. For the production archive, this geometric diagnosis has a direct physical counterpart. All nine removed draws have 1 .08 < M max /M ⊙ < 1.70, and seven do not support a 1 .4 M⊙ star, so even Λ(1 .4) is undefined. Al-though the prior imposes no hard maximum-mass cut, these configurations receive negligible weight from the measured massive-pulsar likelihood used in the inference (Sec. IV). Thus the screen used to validate Fig. 3 removes no production draw that would retain appreciable sup-port after the most elementary astrophysical information is applied. It is not an additional rejection in the infer-ence pipeline. The agreement is strong but not an identity, which is why we retain both arguments. Across the production archive and the three independently generated ensem-bles below, 29 of the 31 leverage-screened draws have 
+
+Mmax < 1.9 M⊙; the other two have Mmax = 2 .20 and 2.35 M⊙. Leverage should therefore not be interpreted as a physical criterion. It ensures that held-out predic-tion is interpolation among supported coefficient vectors, while the separate Mmax audit shows that the production result is not stabilized by hiding otherwise viable EOS. The statistical answer is also insensitive to reasonable choices of cutoff: 0 .8, 0 .5, 0 .3, and 0 .2 remove between 0.2% and 3 .0% of the draws and give 20 .5–21 .4%. More aggressive rules, tested at 0 .1 and at twice the mean lever-age, are self-defeating. Every removed row raises the av-erage leverage to Nfit /N keep , where Nkeep is the number of surviving draws; the fixed cutoff can therefore become impossible to satisfy. We next test whether this conclusion depends on the particular finite archive. Splitting it into 20 half-samples — 10 independent random 50 /50 divisions, retaining both halves — and drawing 20 bootstrap replicas (same-size samples drawn with replacement) gives held-out un-recovered fractions of 21 .5 ± 0.8% and 21 .3 ± 0.4%, re-spectively. Each resample is screened independently, and the quoted spread is the variation among resamples, not an uncertainty on their mean. Resampling one archive cannot reveal a feature shared by every realization of the prior, so we also generated and TOV-solved three new 1000-draw ensembles with inde-pendent random seeds. They give 21 .7–23 .0%; across all 4 ensembles the held-out result is 22 .1 ± 0.9%. Each new ensemble again contains geometrically isolated draws: the same screen removes 3–14 draws. We conclude only that such isolated points recur in the bridge construction. Because a separate principal-component basis is fitted to each ensemble, this test does not show that the same direction in coefficient space is responsible every time. In one ensemble the 0 .5 cutoff leaves noticeable variation among cross-validation folds ( ±2.3%); tightening the cut-off to ℓi < 0.3 removes the remaining isolated draw with-out shifting the central values. The four-ensemble result 23 is then 21 .7±0.8%, with at most ±0.1% fold-to-fold vari-ation in any ensemble. The direction of this regression should not be confused with the consistency projector of Eq. (16). Here we fit an inverse reader, from observable coefficients to sound-speed amplitudes, to quantify how much EOS informa-tion the observables retain. A physical-image test in-stead starts from the forward derivative J of a specified EOS model and examines the component of an observable draw orthogonal to its local image. The former motivates a compact basis; only the latter can diagnose EOS con-sistency of the chosen observable modes at linear order. 
+
+> Appendix C: Choosing the operating points
+
+The loop of Sec. II D contains several apparently ad-hoc parameters: the redraw threshold, the per-generation ensemble size ndraw , and the refit regularizers (tempering 
+
+β, shrinkage). In the synthetic headline run, N min eff = 10 3,
+
+ndraw = 10 4, and refits occur after events 1, 74, and 690. This configuration is specific to that run. Under the full mixture weight Eq. (21) none of them touches the target: that estimator is consistent for any refit schedule and proposal sequence, so the operating points are a cost– variance trade-off, not modeling assumptions. Under the Gaussian-projection ansatz of Sec. IV the schedule does enter the target, through the sequence of projections, and the reported Neff measures sampling of the projected dis-tribution rather than of π0L1: n. A large Neff therefore certifies that the Monte Carlo noise is small; it does not 
+
+by itself bound the projection error, which must be cal-ibrated externally — against the converged reference of Sec. IV, or against a well-sampled archive reweighting at smaller catalogues. Both diagnostics are cheap, and we report both; the brute-force cross-checks, not Neff , are the acceptance test.  
+
+> 1. Validity truncation and proposal normalization
+
+The rejection step is part of the definition of the observable-space model, not an approximation to an in-tended prior that assigns weight to unphysical curves. Let A(c) be one when the reconstructed sequence is finite, has positive mass and radius, and contains a nontrivial rising-mass branch, and zero otherwise. The operational base prior is therefore the Gaussian conditioned on this valid set, 
+
+πA 
+
+> 0
+
+(c) = π0(c)A(c)
+
+P0
+
+, P0 =
+
+Z
+
+dc π 0(c)A(c). (C1) The compactness–Love proposal of Appendix C 2 is delib-erately absent from A: it is a population diagnostic and never an acceptance criterion. Thus truncation changes the prior statistics relative to the parent Gaussian, but only by declaring the invalid region to be outside the model’s physical support.                       
+
+> TABLE II. Checks on validity truncation. The last row bounds the combined error of the sequential Gaussian pro-jection, including truncation; it does not attribute that error to rejection alone. Check Outcome Accepted support Finite positive Mand Rand a non-trivial rising branch; no Λ( C) veto. GW170817 pro-posals
+> Pg= 0 .249 and 0 .254. Corrected fixed target Λ(1 .4) = 229 ±141, Neff = 1023. Normalization ab-lation Omitting Pgleaves the mean and width unchanged at the quoted pre-cision. Sequential projec-tion Against the converged fixed-prior ref-erence, the mean differs by 0 .4% and the standard deviation is 1 .5 times larger.
+
+Rejection sampling from proposal qg produces the den-sity qAg (c) = qg (c)A(c)/P g , where Pg = R dc q g (c)A(c) is its acceptance probability. Consequently the proposal mixture that actually generated the pooled sample is 
+
+qA
+
+> mix
+
+(c) = X
+
+> g
+
+αg
+
+qg (c)A(c)
+
+Pg
+
+, αg = Ng
+
+P 
+
+> g′
+
+Ng′
+
+, (C2) and, on the accepted set, the fixed-target weight is equiv-alently 
+
+w(c) ∝ L (c) π0(c)
+
+P 
+
+> g
+
+αg qg (c)/P g
+
+. (C3) For a single proposal Pg is a common factor and can-cels from self-normalized posterior moments. It also can-cels across a mixture when all Pg are equal; otherwise each generation’s normalization must be retained as in Eq. (C3). The target normalization P0 likewise cancels from posterior moments, although it would be required for an absolute evidence under the conditioned prior. For the fixed-target estimator, validity rejection there-fore increases the raw proposal cost by roughly 1 /P g but does not bias convergence when the acceptance normal-izations and support condition are included. The sequen-tial catalogue calculation is different: after each refit it replaces the accumulated posterior by a Gaussian mo-ment projection and then conditions that Gaussian on A.Its large-N limit is consequently a sequence of truncated Gaussian projections rather than an exact representa-tion of πA 
+
+> 0
+
+L1: n. Increasing the number of draws reduces Monte Carlo noise but not this projection error; the con-verged fixed-prior comparison in Table II is the relevant empirical bound. The redraw threshold controls the Monte Carlo error carried by quoted results. An importance estimate of a posterior moment carries relative error ∼ N −1/2eff , and 24 the estimate of a posterior standard deviation — the quantity we quote everywhere — fluctuates at relative order [2( Neff − 1)] −1/2. The threshold should therefore be set by the precision demanded of the error bar itself: 
+
+N min eff = 100 keeps the quoted widths good to ∼ 7%, com-fortably below the level at which anyone acts on an error bar’s own error, while N min eff = 10 3 would buy 2% at ten times the refit cadence’s cost. The cost side is forgiv-ing: because each event multiplies the weights, Neff de-cays roughly geometrically in accumulated information, so refits recur roughly uniformly in its logarithm — the large-catalogue run refitted after events 1 , 74 , and 690 — and the total number of refits depends only logarithmi-cally on the threshold. Any choice within an order of magnitude of ours changes the total evidence-evaluation budget by tens of percent, not factors. The ensemble size has two floors. The refit must esti-mate the coefficient mean and covariance — k(k + 3) /2moments for k coefficients — so the ESS at refit time should exceed a few times k (here 3 ×8 = 24 coefficients), with the shrinkage regularizer absorbing the remainder; and the fresh generation must start with enough head-room above the threshold, ndraw >
+
+∼ few × N min eff /f keep ,where fkeep is the sampler’s validity-acceptance fraction (Sec. II C 2). Our ndraw = 200–400 against a threshold of 100 satisfies both with fkeep ≃ 0.4–0 .9 as observed. When the base prior wastes support — the soft maximum-mass tail of Sec. IV, where the radio likelihood discards half the draws — the same arithmetic argues for enlarging the 
+
+initial ensemble (we used 5 ×) rather than tightening the prior. Finally, the refit regularizers guard the small-Neff 
+
+corner: shrinkage of order k/N eff toward the previous generation stabilizes the covariance refit (we fix 0 .1), and tempering β < 1 serves the same role when a single ev-idence dominates. In every case the check is the same: the operating points were varied only to restore Neff , and the answers are anchored by the fixed-prior brute force against which they are calibrated. It is worth prototyping the high-accuracy operat-ing point explicitly, because the common requirement is stronger than stable moments: one wants the 90% credible-interval endpoints reliably estimated. A quan-tile at probability p carries Monte Carlo error ∼pp(1 − p)/N eff /f (xp) in probability mass, so endpoint stability at the few-percent level needs Neff >
+
+∼ 10 3, and visually noise-free bands ∼ 10 4. The recipe is mechani-cal: raise N min eff to the target and scale ndraw to roughly ten times it. The cost is modest because the per-event evidence is vectorized over draws: on a single current-generation core our per-event evaluation costs ≈ 0.35 s against 400 draws and only ≈ 0.5 s against 10 4 (roughly 0.33 s + 0 .05 s per thousand draws), so the full 10 3-event catalogue runs in ≈ 25 minutes at the N min eff = 10 2 oper-ating point, about an hour at 10 3, and a few hours (or tens of minutes parallelized over events) at 10 4 — hours, not weeks, and negligible against the cadence at which such analyses are actually performed. For the real-data pipeline the driver is instead the per-EOS RIFT evidence (∼ 40 s per EOS on a cluster node), so a 10 4-draw gen-eration costs ≈ 10 2 CPU-hours — an afternoon on a condor pool. Accordingly, the synthetic headline figures in this paper are produced at the N min eff = 10 3 operating point; the 10 2 results they replaced agree within their (larger) Monte Carlo scatter, as the schedule-invariance above guarantees.  
+
+> 2. Other rejection proposals considered
+
+We considered whether a compactness–Love relation could provide an additional rejection rule for observable-space draws. As an exploratory stress test, a cubic 
+
+P3(log C) was fitted to the TOV-solved archive over 1 .1 ≤
+
+m/M ⊙ ≤ 1.9 in steps of 0 .1, and a sampled mass point was labeled an outlier when | log Λ −P3(log C)| > 3σtrain .Among structurally valid draws, the outlier fractions are 1.2% for the broad Gaussian and 0 .3% after the pulsar-conditioned refit, compared with 0 .2% in the training archive. We did not adopt this proposal. The training fit it-self has rms scatter 0 .315 in ln Λ, so it detects only a conspicuous added tail. More fundamentally, the poly-nomial, mass grid, and cutoff are archive choices, and agreement is neither necessary nor sufficient for the exis-tence of a common EOS; quasi-universal relations retain EOS-dependent residuals [21, 100–102]. The calculation is therefore retained only as a stress test of the fitted cross-channel covariance. It never rejects or reweights a draw and is not used to validate the inference.                                            
+
+> [1] B. P. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), GW170817: Observation of Gravitational Waves from a Binary Neutron Star In-spiral, Physical Review Letters 119 ,161101 (2017), arXiv:1710.05832 [gr-qc]. [2] B. P. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), Properties of the Binary Neutron Star Merger GW170817, Physical Review X 9, 011001 (2019), arXiv:1805.11579 [gr-qc]. [3] B. P. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), GW170817: Measurements of neutron star radii and equation of state, Phys. Rev. Lett. 121 , 161101 (2018), arXiv:1805.11581 [gr-qc]. [4] B. P. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), GW190425: Observation of aCompact Binary Coalescence with Total Mass ∼3.4 M⊙, ApJL 892 , L3 (2020), arXiv:2001.01761 [astro-ph.HE]. [5] A. G. Abac et al. (LIGO Scientific Collaboration, Virgo Collaboration, KAGRA Collaboration), GWTC-
+
+25 
+
+5.0: Observations from the Second Part of the Fourth LIGO-Virgo-KAGRA Observing Run and Updates to the Gravitational-Wave Transient Catalog, arXiv e-prints , arXiv:2605.27225 (2026), arXiv:2605.27225 [gr-qc]. [6] Y. Kini, L. Mauviard, T. Salmi, A. L. Watts, S. Guil-lot, B. Dorsman, D. Choudhury, D. Gonz´ alez-Caniulef, M. Hoogkamer, D. Huppenkothen, C. Kazantsev, M. Kerr, S. Nissanke, P. S. Ray, P. Stammler, and S. Vinciguerra, A NICER view of PSR J0030+0451: Updated constraints from 6 yr of NICER observations, Astrophys. J. 1005 , 201 (2026), arXiv:2602.23743. [7] T. Salmi et al. , The radius of the high-mass pulsar PSR J0740+6620 with 3.6 yr of NICER data, Astrophys. J. 
+
+974 , 294 (2024), arXiv:2406.14466. [8] A. J. Dittmann et al. , A more precise measurement of the radius of PSR J0740+6620 using updated NICER data, Astrophys. J. 974 , 295 (2024), arXiv:2406.14467. [9] D. Choudhury et al. , A NICER view of the nearest and brightest millisecond pulsar: PSR J0437-4715, Astro-phys. J. 971 , L20 (2024), arXiv:2407.06789. [10] L. Mauviard et al. , A NICER view of the 1.4 M⊙
+
+edge-on pulsar PSR J0614-3329, Astrophys. J. 995 , 60 (2025), arXiv:2506.14883. [11] E. Fonseca et al. , Refined mass and geometric measure-ments of the high-mass PSR J0740+6620, Astrophys. J. Lett. 915 , L12 (2021). [12] Z. Arzoumanian et al. , The NANOGrav 11-year Data Set: High-precision Timing of 45 Millisecond Pulsars, ApJS 235 , 37 (2018), 1801.01837. [13] B. D. Lackey and L. Wade, Reconstructing the neutron-star equation of state with gravitational-wave detectors from a realistic population of inspiralling binary neutron stars, Phys. Rev. D 91 , 043002 (2015), arXiv:1410.8866 [gr-qc]. [14] A. Kedia, R. O’Shaughnessy, L. Wade, and A. Yelikar, Astrophysical assumptions and equation of state framework have larger impact on equation of state inference than individual neutron star observa-tions, arXiv e-prints 10.48550/arXiv.2405.17326 (2024), arXiv:2405.17326. [15] Z. Zhu and R. O’Shaughnessy, Limitations in constrain-ing neutron star radii and nuclear properties from in-spiral gravitational wave detections, Phys. Rev. D 113 ,103037 (2026), arXiv:2508.11875 [astro-ph.HE]. [16] M. Evans et al. , A horizon study for Cosmic Explorer: Science, observatories, and community, arXiv e-prints 10.48550/arXiv.2109.09882 (2021), arXiv:2109.09882. [17] M. Punturo et al. , The Einstein Telescope: a third-generation gravitational wave observatory, Class. Quan-tum Grav. 27 , 194002 (2010). [18] M. Maggiore et al. , Science case for the Einstein tele-scope, JCAP 2020 , 050 (2020). [19] K. Walker, R. Smith, E. Thrane, and D. J. Rear-don, Precision constraints on the neutron star equa-tion of state with third-generation gravitational-wave observatories, Phys. Rev. D 110 , 043013 (2024), arXiv:2401.02604. [20] A. Bandopadhyay, K. Kacanja, R. Somasundaram, A. H. Nitz, and D. A. Brown, Measuring neutron star radius with second and third generation gravitational wave detector networks, Class. Quantum Grav. 41 ,225003 (2024), arXiv:2402.05056. [21] N. Williams, A. Puecher, G. Grams, C. V. Flores, and T. Dietrich, Investigating the impact of quasiu-niversal relations on neutron star constraints in third-generation detectors, Phys. Rev. D 114 , 024063 (2026), arXiv:2602.14659. [22] D. Adhikari, others, and PREX Collaboration, Accurate determination of the neutron skin thickness of 208 pb through parity-violation in electron scattering, Phys. Rev. Lett. 126 , 172502 (2021), arXiv:2102.10767. [23] D. Adhikari, others, and CREX Collaboration, Preci-sion determination of the neutral weak form factor of 
+
+> 48
+
+ca, Phys. Rev. Lett. 129 , 042501 (2022). [24] B. T. Reed, F. J. Fattoyev, C. J. Horowitz, and J. Piekarewicz, Implications of PREX-2 on the equa-tion of state of neutron-rich matter, Phys. Rev. Lett. 
+
+126 , 172503 (2021). [25] S. Huth, P. T. H. Pang, I. Tews, T. Dietrich, A. Le F` evre, A. Schwenk, W. Trautmann, K. Agarwal, M. Bulla, M. W. Coughlin, and C. Van Den Broeck, Constraining neutron-star matter with microscopic and macroscopic collisions, Nature (London) 606 , 276 (2022). [26] C. Y. Tsang, M. B. Tsang, W. G. Lynch, R. Kumar, and C. J. Horowitz, Determination of the equation of state from nuclear experiments and neutron star observations, Nature Astronomy 8, 328 (2024). [27] C. Drischler, K. Hebeler, and A. Schwenk, Chiral inter-actions up to next-to-next-to-next-to-leading order and nuclear saturation, Phys. Rev. Lett. 122 , 042501 (2019), cEFT pure-neutron-matter band; data via BUQEYE collaboration, arXiv:1710.08220. [28] C. Drischler, J. W. Holt, and C. Wellenhofer, Chiral effective field theory and the high-density nuclear equa-tion of state, Annual Review of Nuclear and Particle Science 71 , 403 (2021). [29] M. Al-Mamun, A. W. Steiner, J. N¨ attil¨ a, J. Lange, R. O’Shaughnessy, I. Tews, S. Gandolfi, C. Heinke, and S. Han, Combining Electromagnetic and Gravitational-Wave Constraints on Neutron-Star Masses and Radii, Phys. Rev. Lett. 126 , 061101 (2021), arXiv:2008.12817 [astro-ph.HE]. [30] G. Raaijmakers, S. K. Greif, T. E. Riley, T. Hinderer, K. Hebeler, A. Schwenk, A. L. Watts, S. Nissanke, S. Guillot, J. M. Lattimer, and R. M. Ludlam, Con-straining the dense matter equation of state with joint analysis of NICER and LIGO/Virgo measurements, As-trophys. J. Lett. 893 , L21 (2020), arXiv:1912.11031. [31] G. Raaijmakers, S. K. Greif, K. Hebeler, T. Hinderer, S. Nissanke, A. Schwenk, T. E. Riley, A. L. Watts, J. M. Lattimer, and W. C. G. Ho, Constraints on the dense matter equation of state and neutron star properties from NICER’s mass–radius estimate of PSR J0740+6620 and multimessenger observations, Astro-phys. J. Lett. 918 , L29 (2021), arXiv:2105.06981. [32] P. T. H. Pang, I. Tews, M. W. Coughlin, M. Bulla, C. Van Den Broeck, and T. Dietrich, Nuclear physics multimessenger astrophysics constraints on the neu-tron star equation of state: Adding NICER’s PSR J0740+6620 measurement, Astrophys. J. 922 , 14 (2021), arXiv:2105.08688. [33] N. Rutherford, M. Mendes, I. Svensson, A. Schwenk, A. L. Watts, K. Hebeler, J. Keller, C. Prescod-Weinstein, D. Choudhury, G. Raaijmakers, T. Salmi, P. Timmerman, S. Vinciguerra, S. Guillot, and J. M. Lattimer, Constraining the dense matter equation of 26 
+
+state with new NICER mass–radius measurements and new chiral effective field theory inputs, Astrophys. J. Lett. 971 , L19 (2024), arXiv:2407.06790. [34] J. S. Read, B. D. Lackey, B. J. Owen, and J. L. Friedman, Constraints on a phenomenologically parametrized neutron-star equation of state, Phys. Rev. D 79 , 124032 (2009). [35] L. Lindblom, Spectral representations of neutron-star equations of state, Phys. Rev. D 82 , 103011 (2010). [36] M. F. Carney, L. E. Wade, and B. S. Irwin, Comparing two models for measuring the neutron star equation of state from gravitational-wave signals, Phys. Rev. D 98 ,063004 (2018), arXiv:1805.11217. [37] R. Gamba, J. S. Read, and L. E. Wade, The im-pact of the crust equation of state on the analysis of GW170817, Class. Quantum Grav. 37 , 025008 (2020), arXiv:1902.04616. [38] I. Legred, K. Chatziioannou, R. Essick, and P. Landry, Implicit correlations within phenomenological paramet-ric models of the neutron star equation of state, Phys. Rev. D 105 , 043016 (2022), arXiv:2201.06791. [39] B. Biswas, Equation of State Extrapolation Systemat-ics: Parametric vs. Nonparametric Inference of Neu-tron Star Structure, Phys. Rev. D 113 , 123032 (2026), 2509.06145. [40] P. Landry and R. Essick, Nonparametric inference of the neutron star equation of state from gravitational wave observations, Phys. Rev. D 99 , 084049 (2019), arXiv:1811.12529. [41] R. Essick, P. Landry, and D. E. Holz, Nonparametric inference of neutron star composition, equation of state, and maximum mass with GW170817, Phys. Rev. D 101 ,063007 (2020). [42] P. Landry, R. Essick, and K. Chatziioannou, Non-parametric constraints on neutron star matter with existing and upcoming gravitational wave and pul-sar observations, Phys. Rev. D 101 , 123007 (2020), arXiv:2003.04880. [43] I. Legred, K. Chatziioannou, R. Essick, S. Han, and P. Landry, Impact of the PSR J0740+6620 radius con-straint on the properties of high-density matter, Phys. Rev. D 104 , 063003 (2021), data release: Zenodo 6502467, arXiv:2106.05313. [44] E. Finch, P. Landry, R. Essick, I. Legred, K. Chatzi-ioannou, and S. Han, Unified nonparametric equation-of-state inference from the neutron-star crust to perturbative-QCD densities, Phys. Rev. D 112 , 103023 (2025), arXiv:2505.13691. [45] J. McGinn, B. Irwin, S. Mukherjee, D. Williams, C. Messenger, and I. S. Heng, Rapid neutron star equa-tion of state inference with normalising flows, arXiv e-prints , arXiv:2403.17462 (2024), arXiv:2403.17462. [46] T. Wouters, P. T. H. Pang, T. Dietrich, and C. Van Den Broeck, Incorporating neutron star physics into gravitational wave inference with physics-informed pri-ors using normalizing flows, Phys. Rev. D 114 , 043005 (2026), arXiv:2511.22987. [47] B. Sun, T. Zhao, and J. M. Lattimer, A new bayesian framework with natural priors to constrain the neutron star equation of state, arXiv e-prints , arXiv:2601.04294 (2026), arXiv:2601.04294. [48] Y. Fujimoto, K. Fukushima, and K. Murase, Method-ology study of machine learning for the neutron star equation of state, Phys. Rev. D 98 , 023019 (2018), arXiv:1711.06748 [nucl-th]. [49] B. T. Reed, R. Somasundaram, S. De, C. L. Armstrong, P. Giuliani, C. Capano, D. A. Brown, and I. Tews, Toward accelerated nuclear-physics parameter estima-tion from binary neutron star mergers: Emulators for the tolman–oppenheimer–volkoff equations, Astrophys. J. 974 , 285 (2024), arXiv:2405.20558 [astro-ph.HE]. [50] P. Tiwari and A. Pai, Deep TOV to characterize neu-tron stars, arXiv e-prints , arXiv:2405.08163 (2024), arXiv:2405.08163 [astro-ph.HE]. [51] Kaushikk V. N., B. Biswas, and S. Rosswog, Fast and accurate prediction of neutron star structure with deep neural networks, arXiv e-prints , arXiv:2608.07698 (2026), arXiv:2608.07698. [52] V. Carvalho, M. Ferreira, M. Bejger, and C. Providˆ encia, Neural Posterior Estimation of Neutron Star Equations of State, Phys. Rev. D 112 ,083044 (2025), 2507.23506. [53] P. Thakur and T. Malik, Amortized Simulation-Based Inference of Relativistic Mean-Field Couplings for Neutron-Star Equations of State, arXiv e-prints ,arXiv:2606.25446 (2026), 2606.25446. [54] Y. G. Lee, J. Kim, T. Zhao, and C. Drischler, A Gaus-sian process framework for constraining the nuclear equation of state from microscopic calculations with cor-related uncertainties, arXiv e-prints , arXiv:2608.09678 (2026), arXiv:2608.09678. [55] A. C. Semposki, C. Drischler, R. J. Furnstahl, and D. R. Phillips, Microscopic constraints for the equation of state and structure of neutron stars: A Bayesian model mixing framework, Phys. Rev. C 113 , 015808 (2026), arXiv:2505.18921. [56] S. Ng, I. Legred, L. Suleiman, P. Landry, L. Tray-lor, and J. Read, Inferring the neutron star equation of state with nuclear-physics informed semiparamet-ric models, Class. Quantum Grav. 42 , 205008 (2025), arXiv:2507.03232. [57] J. Lange, R. O’Shaughnessy, and M. Rizzo, Rapid and accurate parameter inference for coalescing, precess-ing compact binaries, arXiv e-prints , arXiv:1805.10457 (2018), arXiv:1805.10457. [58] J. Wofford, A. B. Yelikar, H. Gallagher, E. Cham-pion, D. Wysocki, V. Delfavero, J. Lange, C. Rose, V. Valsan, S. Morisaki, J. Read, C. Henshaw, and R. O’Shaughnessy, Improving performance for gravitational-wave parameter inference with an efficient and highly-parallelized algorithm, Phys. Rev. D 107 ,024040 (2023). [59] A. Vilkha, A. Yelikar, R. O’Shaughnessy, and J. Read, Inference on neutron star parameters and the nuclear equation of state with RIFT, using prior EOS in-formation, arXiv e-prints , arXiv:2407.15753 (2024), arXiv:2407.15753 [gr-qc]. [60] T. Gorda, O. Komoltsev, A. Kurkela, and E. Sunde, Constrained Gaussian-process-bridge prior for neutron-star equation-of-state inference, Astrophys. J. 1002 , 40 (2026), arXiv:2512.18044. [61] J. Margueron, R. Hoffmann Casali, and F. Gulminelli, Equation of state for dense nucleonic matter from meta-modeling. i. foundational aspects, Phys. Rev. C 97 ,025805 (2018). [62] L. Lindblom, Determining the nuclear equation of state from neutron-star masses and radii, Astrophys. J. 398 ,569 (1992). 27 
+
+[63] T. Hinderer, Tidal love numbers of neutron stars, As-trophys. J. 677 , 1216 (2008). [64] S. Postnikov, M. Prakash, and J. M. Lattimer, Tidal love numbers of neutron and self-bound quark stars, Phys. Rev. D 82 , 024016 (2010). [65] T. Damour and A. Nagar, Relativistic tidal properties of neutron stars, Phys. Rev. D 80 , 084035 (2009). [66] J. Bradbury, R. Frostig, P. Hawkins, M. J. Johnson, C. Leary, D. Maclaurin, G. Necula, A. Paszke, J. Van-derPlas, S. Wanderman-Milne, and Q. Zhang, JAX: Autograd and XLA, https://github.com/jax-ml/jax 
+
+(2021). [67] P. Kidger, On neural differential equations, arXiv e-prints , arXiv:2202.02435 (2022), dPhil the-sis, University of Oxford (2021); diffrax library, arXiv:2202.02435. [68] LIGO Scientific Collaboration, LALSuite: LIGO scien-tific collaboration algorithm library suite (2020). [69] W. Kastaun, J. V. Kalinani, and R. Ciolfi, Robust re-covery of primitive variables in relativistic ideal mag-netohydrodynamics, Phys. Rev. D 103 , 023018 (2021), rePrimAnd library. [70] D. Mroczek, M. C. Miller, J. Noronha-Hostler, and N. Yunes, Nontrivial features in the speed of sound in-side neutron stars, Phys. Rev. D 110 , 123009 (2024), arXiv:2309.02345. [71] R. O’Shaughnessy and Z. Zhu, Assessing the impact of smoothing priors on nonparametric inference of the nu-clear equation of state, in preparation (2026), compan-ion paper. [72] O. Komoltsev and A. Kurkela, How perturbative QCD constrains the equation of state at neutron-star densities, Phys. Rev. Lett. 128 , 202701 (2022), arXiv:2111.05350. [73] T. Gorda, A. Kurkela, R. Paatelainen, S. S¨ appi, and A. Vuorinen, Soft interactions in cold quark matter, Phys. Rev. Lett. 127 , 162003 (2021). [74] T. Gorda, O. Komoltsev, and A. Kurkela, Ab-initio QCD calculations impact the inference of the neutron-star-matter equation of state, Astrophys. J. 950 , 107 (2023), arXiv:2204.11877. [75] G. Baym, C. Pethick, and P. Sutherland, The ground state of matter at high densities: Equation of state and stellar models, Astrophys. J. 170 , 299 (1971), outer-crust EOS; the fixed low-density sector of GKKS2025bridge. [76] T. Wouters, P. T. H. Pang, H. Koehn, H. Rose, R. Soma-sundaram, I. Tews, T. Dietrich, and C. Van Den Broeck, Leveraging differentiable programming in the inverse problem of neutron stars, Phys. Rev. D 112 , 043037 (2025), arXiv:2504.15893 [astro-ph.HE]. [77] C. Pankow, P. Brady, E. Ochsner, and R. O’Shaughnessy, Novel scheme for rapid paral-lel parameter estimation of gravitational waves from compact binary coalescences, Phys. Rev. D 92 , 023002 (2015), arXiv:1502.04370 [gr-qc]. [78] M. Risti´ c, R. O’Shaughnessy, K. Wagner, C. J. Fontes, C. L. Fryer, O. Korobkin, M. R. Mumpower, and R. T. Wollaeger, Joint electromagnetic and gravitational wave inference of binary neutron star merger GW170817 using forward-modeling ejecta predictions, Physical Review Research 8, 023117 (2026), arXiv:2503.12320 [astro-ph.HE]. [79] R. Abbott, T. D. Abbott, S. Abraham, F. Acernese, K. Ackley, C. Adams, R. X. Adhikari, V. B. Adya, C. Affeldt, M. Agathos, and et al., Open data from the first and second observing runs of Advanced LIGO and Advanced Virgo, SoftwareX 13 , 100658 (2021), arXiv:1912.11716 [gr-qc]. [80] M. C. Miller et al. , PSR J0030+0451 Mass and Ra-dius from NICER Data and Implications for the Prop-erties of Neutron Star Matter, ApJL 887 , L24 (2019), 1912.05705. [81] S. Vinciguerra et al. , An Updated Mass-Radius Analysis of the 2017-2018 NICER Data Set of PSR J0030+0451, Astrophys. J. 961 , 62 (2024), 2308.09469. [82] M. C. Miller et al. , The Radius of PSR J0437-4715 from NICER Data, ApJL 1000 , L48 (2026), 2512.08790. [83] T. Salmi et al. , A NICER View of PSR J1231-1411: A Complex Case, Astrophys. J. (2024), 2409.14923. [84] A. Saffer, E. Fonseca, S. Ransom, I. Stairs, R. Lynch, D. Good, K. W. Masui, J. W. McKee, B. W. Meyers, S. S. Patil, and C. M. Tan, A Lower Mass Estimate for PSR J0348+0432 Based on CHIME/Pulsar Precision Timing, ApJL 983 , L20 (2025), 2412.02850. [85] J. Antoniadis et al. , A massive pulsar in a compact rel-ativistic binary, Science 340 , 1233232 (2013). [86] R. W. Romani, M. Beleznay, A. V. Filippenko, T. G. Brink, and W. Zheng, PSR J0952-0607: Tightening a Record-high Neutron Star Mass, Astrophys. J. 996 , 101 (2026), 2512.05099. [87] T. Dietrich, A. Samajdar, S. Khan, N. K. Johnson-McDaniel, R. Dudi, and W. Tichy, Improving the NR-Tidal model for binary neutron star systems, Phys. Rev. D 100 , 044003 (2019), arXiv:1905.06011. [88] J. Aasi et al. (LIGO Scientific Collaboration), Ad-vanced LIGO, Class. Quantum Grav. 32 , 074001 (2015), arXiv:1411.4547 [gr-qc]. [89] F. Acernese et al. (Virgo Collaboration), Advanced Virgo: a second-generation interferometric gravitational wave detector, Classical and Quantum Gravity 32 ,024001 (2015), arXiv:1408.3978 [gr-qc]. [90] G. Ashton, M. H¨ ubner, P. D. Lasky, C. Talbot, K. Ack-ley, S. Biscoveanu, Q. Chu, A. Divakarla, P. J. Easter, B. Goncharov, F. Hernandez Vivanco, J. Harms, M. E. Lower, G. D. Meadors, D. Melchor, E. Payne, M. D. Pitkin, J. Powell, N. Sarin, R. J. E. Smith, and E. Thrane, BILBY: A User-friendly Bayesian Inference Library for Gravitational-wave Astronomy, ApJS 241 ,27 (2019), arXiv:1811.02042 [astro-ph.IM]. [91] T. Akutsu, M. Ando, K. Arai, Y. Arai, S. Araki, A. Araya, N. Aritomi, H. Asada, Y. Aso, S. Bae, Y. Bae, L. Baiotti, R. Bajpai, M. A. Barton, K. Cannon, Z. Cao, E. Capocasa, M. Chan, C. Chen, K. Chen, Y. Chen, C.-Y. Chiang, H. Chu, Y.-K. Chu, S. Eguchi, Y. Enomoto, R. Flaminio, Y. Fujii, F. Fujikawa, M. Fukunaga, M. Fukushima, D. Gao, G. Ge, S. Ha, A. Hagi-wara, S. Haino, W.-B. Han, K. Hasegawa, K. Hat-tori, H. Hayakawa, K. Hayama, Y. Himemoto, Y. Hi-ranuma, N. Hirata, E. Hirose, Z. Hong, B. H. Hsieh, C.-Z. Huang, H.-Y. Huang, P. Huang, Y. Huang, Y.-C. Huang, D. C. Y. Hui, S. Ide, B. Ikenoue, S. Imam, K. Inayoshi, Y. Inoue, K. Ioka, K. Ito, Y. Itoh, K. Izumi, C. Jeon, H.-B. Jin, K. Jung, P. Jung, K. Kaihotsu, T. Kajita, M. Kakizaki, M. Kamiizumi, N. Kanda, G. Kang, K. Kashiyama, K. Kawaguchi, N. Kawai, T. Kawasaki, C. Kim, J. Kim, J. C. Kim, W. S. Kim, Y.-M. Kim, N. Kimura, N. Kita, H. Kitazawa, 28 
+
+Y. Kojima, K. Kokeyama, K. Komori, A. K. H. Kong, K. Kotake, C. Kozakai, R. Kozu, R. Kumar, J. Kume, C. Kuo, H.-S. Kuo, Y. Kuromiya, S. Kuroyanagi, K. Kusayanagi, K. Kwak, H. K. Lee, H. W. Lee, R. Lee, M. Leonardi, K. L. Li, T. G. F. Li, C.-Y. Lin, F.-K. Lin, F.-L. Lin, H. L. Lin, L. C.-C. Lin, G. C. Liu, L.-W. Luo, E. Majorana, M. Marchio, Y. Michimura, N. Mio, O. Miyakawa, A. Miyamoto, Y. Miyazaki, K. Miyo, S. Miyoki, Y. Mori, S. Morisaki, Y. Mori-waki, K. Nagano, S. Nagano, K. Nakamura, H. Nakano, M. Nakano, R. Nakashima, Y. Nakayama, T. Narikawa, L. Naticchioni, R. Negishi, L. Nguyen Quynh, W.-T. Ni, A. Nishizawa, S. Nozaki, Y. Obuchi, W. Ogaki, J. J. Oh, K. Oh, S. H. Oh, M. Ohashi, N. Ohishi, M. Ohkawa, H. Ohta, Y. Okutani, K. Okutomi, K. Oohara, C. P. Ooi, S. Oshino, S. Otabe, K. Pan, H. Pang, A. Parisi, J. Park, F. E. Pe na Arellano, I. Pinto, N. Sago, S. Saito, Y. Saito, K. Sakai, Y. Sakai, Y. Sakuno, S. Sato, T. Sato, T. Sawada, T. Sekiguchi, Y. Sekiguchi, L. Shao, S. Shibagaki, R. Shimizu, T. Shimoda, K. Shimode, H. Shinkai, T. Shishido, A. Shoda, K. Somiya, E. J. Son, H. Sotani, R. Sugimoto, J. Suresh, T. Suzuki, T. Suzuki, H. Tagoshi, H. Takahashi, R. Takahashi, A. Takamori, S. Takano, H. Takeda, M. Takeda, H. Tanaka, K. Tanaka, K. Tanaka, T. Tanaka, T. Tanaka, S. Tan-ioka, E. N. Tapia San Martin, and S. Telada, Overview of KAGRA: KAGRA science, Progress of Theoreti-cal and Experimental Physics 2021 , 05A103 (2021), arXiv:2008.02921 [gr-qc]. [92] A. B. Yelikar, R. O’Shaughnessy, D. Wysocki, and L. Wade, Effects of waveform systematics on infer-ences of neutron star population properties and the nuclear equation of state, Submitted to PRD; avail-able as arxiv:2410.14674 , arXiv:2410.14674 (2024), arXiv:2410.14674 [gr-qc]. [93] M. H. Anik, A. W. Steiner, and R. O’Shaughnessy, Inference of Neutron Star Mass Distributions and the Dense Matter Equation of State from Multimessen-ger Observations, Astrophys. J. 1005 , 148 (2026), arXiv:2512.12130 [astro-ph.HE]. [94] M. B. Tsang, J. R. Stone, F. Camera, P. Danielewicz, S. Gandolfi, K. Hebeler, C. J. Horowitz, J. Lee, W. G. Lynch, Z. Kohley, R. Lemmon, P. M¨ oller, T. Murakami, S. Riordan, X. Roca-Maza, F. Sammarruca, A. W. Steiner, I. Vida˜ na, and S. J. Yennello, Constraints on the symmetry energy and neutron skins from exper-iments and theory, Phys. Rev. C 86 , 015803 (2012), arXiv:1204.0466. [95] A. Sorensen, K. Agarwal, K. W. Brown, Z. Chajecki, P. Danielewicz, C. Drischler, S. Gandolfi, J. W. Holt, M. Kaminski, C.-M. Ko, et al. , Dense nuclear matter equation of state from heavy-ion collisions, Progress in Particle and Nuclear Physics 134 , 104080 (2024), arXiv:2301.13253. [96] B. A. Brown, A. Gade, S. R. Stroberg, J. Escher, K. Fossez, P. Giuliani, C. R. Hoffman, W. Nazarewicz, C.-Y. Seng, A. Sorensen, et al. , Motivations for early high-profile FRIB experiments, Journal of Physics G: Nuclear and Particle Physics 52 , 050501 (2025), arXiv:2410.06144. [97] A. Le F` evre, Nuclear equation-of-state at high density and multi-messenger astronomy: contribution of heavy-ion collisions, arXiv e-prints , arXiv:2606.29588 (2026), arXiv:2606.29588. [98] R. Essick, I. Legred, K. Chatziioannou, S. Han, and P. Landry, Phase transition phenomenology with non-parametric representations of the neutron star equa-tion of state, Phys. Rev. D 108 , 043013 (2023), arXiv:2305.07411. [99] L. Lindblom, Parametric representations of neutron-star equations of state with phase transitions, arXiv e-prints , arXiv:2407.16078 (2024), arXiv:2407.16078. [100] K. Yagi and N. Yunes, I-Love-Q relations in neutron stars and their applications to astrophysics, gravita-tional waves, and fundamental physics, Phys. Rev. D 
+
+88 , 023009 (2013), 1303.1528. [101] L. Suleiman and J. S. Read, Quasiuniversal relations in the context of future neutron star detections, Phys. Rev. D 109 , 103029 (2024), arXiv:2402.01948. [102] I. Legred, B. O. Sy-Garcia, K. Chatziioannou, and R. Essick, Assessing equation of state-independent re-lations for neutron stars with nonparametric models, Phys. Rev. D 109 , 023020 (2024), arXiv:2310.10854.

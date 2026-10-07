@@ -1,0 +1,476 @@
+Title: Scalable and sequential inference of the neutron star equation of state with the Einstein Telescope
+
+URL Source: https://arxiv.org/pdf/2610.07975v1
+
+Published Time: Wed, 07 Oct 2026 01:07:27 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# Scalable and sequential inference of the neutron star equation of state with the Einstein Telescope 
+
+Thibeau Wouters ,1, 2, ∗ Thomas C. K. Ng ,2, 1 Hauke Koehn ,3 Fabian Gittins ,1, 2 
+
+Peter T. H. Pang ,2, 1 Tim Dietrich ,3, 4 and Chris Van Den Broeck 1, 2 
+
+> 1
+
+Institute for Gravitational and Subatomic Physics (GRASP), Utrecht University, Princetonplein 1, 3584 CC Utrecht, The Netherlands 
+
+> 2
+
+Nikhef, Science Park 105, 1098 XG Amsterdam, The Netherlands 
+
+> 3
+
+University of Potsdam, Institute of Physics and Astronomy, Karl-Liebknecht-Str. 24/25, 14476 Potsdam, Germany 
+
+> 4
+
+Max Planck Institute for Gravitational Physics (Albert Einstein Institute), Am Mühlenberg 1, 14476 Potsdam, Germany 
+
+(Dated: October 7, 2026) Future gravitational-wave observatories such as the Einstein Telescope will detect tens of thousands of binary neutron star mergers per year, making gravitational waves a dominant probe of the neutron-star equation of state in the coming decades. However, extracting this information requires hierarchical inference across a rapidly growing catalog of events, and existing methods must restart from scratch whenever a new event arrives, making them impractical at this scale. In this Letter, we introduce a hybrid sequential Monte Carlo algorithm that combines data and likelihood tempering to adaptively update the equation-of-state posterior in batches, reusing previous inference results instead of restarting from a wide prior. Accelerated by GPU hardware, our method infers the equation of state from a simulated month of around 1500 binary neutron star mergers in a few hours on a single GPU, and we project that a full year of detections could be processed in a few days on current hardware. This establishes sequential Monte Carlo as a practical route for real-time hierarchical inference with future gravitational-wave detectors. 
+
+Introduction — Neutron stars (NSs) are unique laboratories to study cold, strongly interacting matter [1–4], and observing their properties can constrain the equation of state (EOS) of matter at supranuclear densities [5]. Besides radio timing [6, 7] and X-ray pulse profile modeling [8–10], gravitational waves (GWs) emitted by binary neutron star (BNS) mergers reveal the properties of this matter through an imprint left by the tidal deformations of the two NSs [11–13], as demonstrated for the first time by GW170817 [14–18]. The next generation of ground-based GW observatories, the Einstein Telescope (ET) [19, 20] and Cosmic Explorer [21–23], will provide a leap forward for this science case, detecting up to tens of thousands of BNS mergers per year [24, 25], several orders of magnitude more than the currently operational Advanced LIGO [26], Advanced Virgo [27] and KAGRA [28]. This unprecedented volume of detections strains the current data analysis methods in the GW community in two ways. First, analyzing all GW signals from separate mergers incurs a significant computational cost [29, 30]. Second (and the focus of this Letter) is the challenge presented by hierarchical infer-ence [31, 32], where the information from individual sources is combined to distill insights into properties of the popula-tion. This is a crucial step to understand the mass distributions of compact objects [33], study cosmology [34], test general relativity [35], and, as we focus on in this work, determine the NS EOS [36, 37]. It is as yet unclear how hierarchical in-ference will be performed with next-generation GW data, and developing these methods early is essential to enable extensive projection studies [38–40]. To solve this data analysis problem, the community requires hierarchical inference methods that are both scalable and se-quential. Scalability addresses the cost of hierarchical infer-ence, which grows as more events are added to the catalog. Recent works have shown the potential of GPU accelerators to achieve scalable hierarchical inference for populations [41– 47], the NS EOS [48], cosmology [49, 50], or a combination of those [51–55]. Besides scalability, it is also crucial to use a sequential approach that reuses previous inference results and updates posteriors as soon as we acquire new data. However, so far, only a few works have formulated full Bayesian hierar-chical inference algorithms that can sequentially process new data in ‘real time’, without having to restart from a wide prior distribution [51, 56, 57] (although recent developments suc-cessfully achieved it for single-event GW analyses [58–60]). Moreover, none have demonstrated the applicability of such an approach to the inference of the EOS from NS mergers in the context of future detectors like ET. In this work, we provide a recipe for scalable, sequential hierarchical inference, and use it to constrain the EOS with BNS mergers observed by ET. Our approach combines a sequential Monte Carlo algorithm that adaptively processes the observations in batches, with fast inference delivered by GPU accelerators. We demonstrate that, with current hardware, we can run the hierarchical inference process on one month of ET observations of BNS mergers in a matter of hours, and we project that one year of observations would take a few days. 
+
+Scalable, sequential hierarchical inference — After the in-dividual BNS mergers have been detected and analyzed, our hierarchical inference constrains the EOS from the posterior distributions of the component masses and tidal deformabili-ties. In this work, we do this by directly sampling the EOS parametrization from Ref. [5], combining a nucleonic meta-model and an agnostic speed-of-sound extension scheme. Fur-ther details are given in the Supplemental Material. This sampling problem is notoriously computationally ex-pensive, largely because it requires repeatedly solving the Tolman-Oppenheimer-Volkoff (TOV) equations [61, 62] to predict the NS macroscopic properties for each EOS draw. Therefore, many previous works have resorted to machine-learning surrogates to reduce inference cost (e.g., [63–68]), arXiv:2610.07975v1 [astro-ph.HE] 6 Oct 2026 2although this adds training costs and reduces flexibility in the choice of prior and EOS parametrization. Rather than approximating the solutions for the TOV equa-tions, our method uses GPU hardware acceleration [69, 70]. Beyond a GPU-native TOV solver [48, 71], two further aspects of our software exploit GPU parallelism. First, we use normal-izing flows [72, 73], a type of neural density estimator, to turn single-event posterior samples into tractable hyperlikelihoods that can be evaluated at arbitrary points in their parameter space [74, 75]. These flows enable high throughput on GPUs, especially when evaluated at single precision, even for over a thousand events. Second, we sample the posterior using se-quential Monte Carlo (SMC) [76–79], which bridges from the prior to the posterior through a sequence of intermediate den-sities. At each iteration 𝑡 , a set of particles approximating the current density is propagated to the next one by reweighting, resampling, and moving the particles with a Markov chain Monte Carlo (MCMC) kernel. Each of these operations is highly parallel and therefore benefits from GPU acceleration. One version of SMC uses likelihood tempering to construct the intermediate densities, by raising the likelihood to an in-verse temperature 𝛽 𝑡 . This artificial temperature can be set adaptively by requiring that each iteration preserves a certain effective sample size (ESS) [80], which measures the diversity in a set of weighted samples. This choice has recently gained popularity in the GW community for analyzing individual GW events [81–86], and we recently used it for hierarchical infer-ence on multi-messenger BNS signals observed by ET [55]. More importantly, SMC is naturally suited for sequential hi-erarchical inference, where data points are added ‘in real time’ and previous posteriors are reused, rather than rerunning the inference from scratch. For this, we take the intermediate den-sities in SMC to be the partial posteriors, i.e., the intermediate density at iteration 𝑡 is the posterior conditioned on the first 
+
+𝑡 data points [78]. A transition between densities is therefore realized by adding an extra data point to the likelihood, and this version of SMC is known as data tempering [87]. Whereas likelihood tempering gradually introduces the full likelihood through an artificial temperature parameter, data tempering does so by gradually introducing individual data points. However, a naive implementation of data tempering, where a transition adds one data point at a time, has a significant drawback. At first, reweighting particles with a highly infor-mative data point can significantly reduce the ESS, leading to low diversity, poor exploration of the parameter space, and ultimately biased posteriors. In this case, it would be better to perform additional substeps within a single iteration of data tempering. However, at later stages, new observations might have little impact on the posterior when many events have al-ready been incorporated, and such an update step may waste computational resources. Taken together, we require a method to adaptively update posteriors with batches of new data points, where the batch size is determined based on the history of past events and the properties of new sources. Therefore, we implement a hybrid algorithm that combines data and likelihood tempering, illustrated in Fig. 1. We provide            
+
+> FIG. 1. Illustration of our algorithm processing a growing catalog. Each iteration maintains a set of particles distributed according to the partial posterior conditioned on the 𝑛 events observed so far ( upper left ). Observations that are not informative enough to significantly affect the posterior are collected in a queue (data tempering, upper right ). If, after accumulating 𝑞 events, the batch of new events is suf-ficiently informative, we update the partial posterior using likelihood tempering ( lower ). Afterwards, we update our current posterior to be informed by 𝑛 +𝑞 events, and continue the loop.
+
+mathematical details and pseudocode in the Supplemental Ma-terial. At each iteration, we maintain a particle set distributed according to the partial posterior obtained from the first 𝑛 
+
+events. When a new data point is considered, we reweight the particles with the corresponding single-event likelihood, and compute the ESS of the weighted particle set. If the ESS remains above a user-defined threshold 𝛼 , the event does not significantly impact the posterior and an update step is not warranted. In this case, we simply add the event to a queue of events. However, if the batch gets sufficiently informative after 𝑞 events (i.e., the ESS drops below the threshold 𝛼 ), we update the posterior: we run SMC with likelihood tempering to bridge from the partial posterior conditioned on 𝑛 events to the partial posterior conditioned on all 𝑛 +𝑞 events observed so far. After sampling terminates, we update our set of particles, clear the queue, and are prepared to add new events. 
+
+Inferring one month of data —To demonstrate our algorithm, we simulate one month of BNS mergers observed by ET in a 2L-misaligned configuration [39], with one detector in the Meuse-Rhine euregion and the other in Sardinia, assuming a local merger rate of 106 .6 Gpc −3 yr −1 (falling within current constraints [33], and evolved over redshift [88]) and Gaus-sian detector noise. We draw NS masses uniformly between 
+
+[1, 2] M⊙ and assign tidal deformabilities based on a fidu-cial EOS, which we determine using existing constraints from the mass measurement of PSR J0740+6620 [89], NS mass-radius measurements of pulsars observed by NICER [8–10] (in particular, taking posterior samples from Refs. [90–95]), and GW170817 [14–18]: the Supplemental Material gives more details. From this set, we consider a source confidently detected if its network signal-to-noise ratio (SNR) is above 12 [96], yield-30.00.51.0      
+
+> ESS /N
+> 0250 500 750 1000 1250 1500
+
+Number of events          
+
+> 0.51.01.5
+> Wall time [h]
+> 1357911 13 15 17 19
+
+Batch number     
+
+> FIG. 2. Diagnostic plots of our SMC sampler. Top panel : Sampling efficiency when reweighting the current set of posterior samples with respect to the new events. The inverted triangles show iterations where the ESS falls below the 50% threshold (dashed line), and we update the partial posterior with likelihood tempering. Bottom panel :Cumulative wall time as a function of the number of events.
+
+ing 1 579 sources, of which 1 555 are retained after removing a few events whose parameter estimation did not converge. Their source parameters are determined with nested sampling [97– 102]. However, since realistic settings for single-event analy-sis would make this step computationally infeasible, we adopt simplified settings. In particular, we use a lower frequency cutoff of 20 Hz, analyze signals with the faster but less real-istic TaylorF2 waveform model [103, 104], and only sample masses and tidal deformabilities. Further details are given in the Supplemental Material. Nevertheless, the hierarchical in-ference step makes no simplifications in how the single-event posteriors are incorporated. We then use this catalog to infer the EOS by running our proposed SMC algorithm. We start from an initial EOS pos-terior that is informed solely by the mass measurement of PSR J0740+6620 [89]. The ESS threshold to trigger an up-date step is set to 50% of the total particle number, which is fixed at 2000. Figure 2 shows how the sampler processes events in batches, indicated by the color gradient. The top panel shows the sampling efficiency (ESS divided by total number of samples) after reweighting with each new event, while the bottom panel shows the cumulative wall time recorded after each update step (all analyses in this paper run on a single NVIDIA H100 GPU). Initially, we have little information on the EOS and the first few events cause the ESS to drop quickly below the threshold value, despite most of these events having a moderate SNR (our events are not ordered by SNR, but instead based on their arrival times on Earth). Moreover, different signals have sources at different masses, so that one detection in a previously unseen mass regime will be highly informative. After about 100 events, the posterior starts to stabilize, and updates occur less often. At later stages, several hundred events can be added to the queue before an update step is triggered. In total, we require less than 2 hours to process all events sequentially. In the Supplemental Material, we show that the same set of sources without noise in the detector leads to fewer update steps, showing that data quality can impact the runtime of our algorithm. Figure 3 shows the constraints on the EOS (top panel, with density in units of nuclear saturation density 𝑛 sat ≡ 0.16 fm −3)and the mass–tidal-deformability relationship (bottom panel) after each SMC step. The bulk of the posterior underestimates the pressure at lower densities, and overestimates it at interme-diate densities. While the injected EOS lies outside the 95% credible band, this discrepancy reduces for a catalog without detector noise, as we show in the Supplemental Material. The recovery at the highest densities is less accurate, which is ex-pected since our mock catalog is limited to NSs lighter than 2 M ⊙ . Despite these features, the fiducial tidal deformability curve is within the 95% credible band for all batches, since the tidal deformability is an integral quantity over the EOS and the observable that actually enters the likelihood. In the final batch, we obtain constraints on the order of 1% on the tidal deformability across the masses probed by our catalog. While the median slightly overestimates the tidal deformabil-ity at intermediate masses, this is again largely resolved when considering injections without detector noise. These observations reinforce that the EOS has degeneracies which are hard to resolve from mass–tidal-deformability mea-surements alone [48, 105–108], and independent constraints are needed to break them. This problem is worsened because our injection EOS has a feature resembling a phase transition around 2 .5 𝑛 sat [109, 110]. 
+
+Extrapolating to one year —To assess how well our algo-rithm scales with the number of events, we fit the runtime, recorded at each update step, as a function of the number of events, and extrapolate the fit. We find that the cost for each individual step is essentially flat up to 𝑛 ∼ 400 events, after which our calculations become memory-bound and the wall time increases roughly linearly with the number of events. Therefore, we derive a power-law fit by only using data points with 𝑛 > 400. We use this fit to predict the wall time required to ana-lyze one month of more realistic BNS detections made with ET, in particular, starting the analysis from 5 Hz and using the IMRPhenomXAS_NRTidalv3 waveform [111, 112]. With these settings, we find that one month yields 2 559 sources, and hence expect around 30 000 detections after one year of observation. These numbers should be taken as rough esti-mates, as they depend on, e.g., detector performance [113], the actual mass distributions of NSs [114], and uncertainties in the merger rate [33]. The fit predicts that our hierarchical inference algorithm will take 2 .4 hours (2 .2 days) to process one month (one year) of such more realistic observations on a single NVIDIA H100 GPU. 
+
+Discussion and conclusion —In this work, we present a scal-able Bayesian hierarchical inference algorithm that can handle 41 2 3 4 5
+
+Density [ nsat ]     
+
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> Pressure [MeV fm −3]
+> Injection 95% CI 1.01.21.41.61.82.0
+
+Mass [ M ]         
+
+> 0.80.91.01.11.2
+> Λ/Λinj
+> 1357911 13 15 17 19
+
+Batch number             
+
+> FIG. 3. Constraints on the EOS (top panel) and tidal deformability (bottom panel) after processing each batch, shown as 95% credible bands. The injected EOS is shown with a black dashed line, while the median of the posterior in the final batch (i.e., with all events processed) is shown in white. The median is taken at each value for the density or NS mass. 10 210 310 4
+> Number of events
+> 10 0
+> 10 1
+> 10 2
+> Wall time [h]
+> ET-2L, fmin =5 Hz 1 month 1 year
+> FIG. 4. Extrapolation of the cumulative wall time as a function of the number of events. The markers show the runtimes recorded at the batches shown in Fig. 2, while the curve shows a fit based on the data points from 𝑛 > 400 onwards (solid line). The vertical lines show the expected number of detections for a catalog starting from a lower fre-quency of 5 Hz, and analyzed with the IMRPhenomXAS_NRTidalv3
+> waveform.
+
+the large volume of detections enabled by future GW instru-ments, such as ET. Specifically, we use normalizing flows to stack single-event posteriors, accelerate likelihoods on GPUs, and parallelize sampling with SMC samplers. We also showed that SMC is a natural framework to sequentially posteriors ‘in real time’, by reusing past inference results and avoid-ing restarting analyses from scratch. Our method determines adaptively when a batch of new events is sufficiently distinct from the current posterior and an update is warranted. This allows us to rapidly analyze a growing catalog of events during observing runs as expected with ET, where tens to hundreds of detections will be made every single day. We demonstrated the performance of this algorithm by in-ferring the EOS from one month of mock BNS events within a few hours on a single GPU. Furthermore, we project that our SMC sampler can infer the EOS from a realistic full year of BNS mergers within a few days. The method presented here can be directly extended to perform joint inference on the EOS, the NS mass distribution, and cosmology, following our recent work [55], although this would require careful application of selection effects [32, 115, 116]. Moreover, we believe our workflow to apply to other hierarchical inference problems as well, such as population studies of black holes, where sequen-tial inference is already becoming crucial in current observing runs [56]. In the future, we will apply our algorithm to more realis-tic mock datasets, considering the full duration of the signal and using more recent waveform models. Moreover, vari-ous effects can impact the EOS inference, such as waveform systematics [59, 117–121], unmodeled physics in the wave-form [122–124], overlapping signals [125–127], or potential noise artifacts [128, 129]. With our scalable framework, we can investigate the robustness of EOS inference under such influences using large catalogs. Future work could also con-strain the EOS from neutron star-black hole mergers detected by future GW observatories [130, 131]. Our algorithm could be optimized further in the following way. We can reduce the cost of the likelihood evaluation by approximating intermediate posteriors from already assimi-lated events with a normalizing flow, following Refs. [56, 85]. This flow would act as a surrogate density for previous partial posteriors, replacing the hyperlikelihood evaluation of already assimilated events, which otherwise dominates its cost. More-over, this would naturally allow us to perform model tempering ,where these posterior distributions can be reused in the analy-sis of an extended model, for instance, when adding parameters to account for NS anisotropy [132] or beyond-GR theories of gravity [133]. This idea has already proven to be successful in the GW community for single-event analysis [85]. 
+
+Data availability —Our inference code, jester, is publicly available at [134]. Our data products and scripts to run the jester inference are available on Zenodo [135]. 
+
+Software used —This work made use of the open-source software packages dynesty [99, 100], bilby [101, 102], gw-mock [136], jax [69, 70], diffrax [71], flowjax [137], blackjax [79], and jester [134]. 
+
+Acknowledgments —T.W. thanks Michael Williams for in-troducing him to SMC samplers, and Vasudev Dubey, Sanika Khadkikar, and Praveer Tiwari for internal review of jester for the LIGO-Virgo-KAGRA collaboration. We thank Matthew Mould for valuable feedback during the internal LVK re-view of the paper. T.W. and T.C.K.N. thank James Alvey, Metha Prathaban, and David Yallup for discussions regarding blackjax samplers. T.W. and T.D. thank János Takátsy for discussions regarding figures. T.W. and C.V.D.B. are sup-5ported by the research program of the Netherlands Organi-zation for Scientific Research (NWO) under grant number OCENW.XL21.XL21.038. P.T.H.P. is supported by the re-search program of the Netherlands Organization for Scientific Research (NWO) under grant number VI.Veni.232.021. We thank SURF (www.surf.nl) for support in using the National Supercomputer Snellius under project numbers EINF-14622 and EINF-19565. This material is based upon work supported by NSF’s LIGO Laboratory which is a major facility fully funded by the National Science Foundation.  
+
+> ∗
+
+t.r.i.wouters@uu.nl [1] J. M. Lattimer and M. Prakash, The physics of neutron stars, Science 304 , 536 (2004), arXiv:astro-ph/0405262. [2] F. Özel and P. Freire, Masses, Radii, and the Equation of State of Neutron Stars, Ann. Rev. Astron. Astrophys. 54 , 401 (2016), arXiv:1603.02698 [astro-ph.HE]. [3] G. F. Burgio, H. J. Schulze, I. Vidana, and J. B. Wei, Neutron stars and the nuclear equation of state, Prog. Part. Nucl. Phys. 
+
+120 , 103879 (2021), arXiv:2105.03747 [nucl-th]. [4] K. Chatziioannou, H. T. Cromartie, S. Gandolfi, I. Tews, D. Radice, A. W. Steiner, and A. L. Watts, Neutron stars and the dense matter equation of state, Rev. Mod. Phys. 97 , 045007 (2025), arXiv:2407.11153 [nucl-th]. [5] H. Koehn et al. , From existing and new nuclear and astrophys-ical constraints to stringent limits on the equation of state of neutron-rich dense matter, Phys. Rev. X 15 , 021014 (2025), arXiv:2402.04172 [astro-ph.HE]. [6] G. Hobbs, R. Edwards, and R. Manchester, Tempo2, a new pulsar timing package. 1. overview, Mon. Not. Roy. Astron. Soc. 369 , 655 (2006), arXiv:astro-ph/0603381. [7] P. Demorest, T. Pennucci, S. Ransom, M. Roberts, and J. Hes-sels, Shapiro Delay Measurement of A Two Solar Mass Neu-tron Star, Nature 467 , 1081 (2010), arXiv:1010.5788 [astro-ph.HE]. [8] K. C. Gendreau, Z. Arzoumanian, P. W. Adkins, C. L. Albert, J. F. Anders, A. T. Aylward, C. L. Baker, E. R. Balsamo, W. A. Bamford, S. S. Benegalrao, et al. , The neutron star interior composition explorer (nicer): design and development, in Space telescopes and instrumentation 2016: Ultraviolet to gamma ray , Vol. 9905 (2016) pp. 420–435. [9] S. Bogdanov et al. , Constraining the Neutron Star Mass-Radius Relation and Dense Matter Equation of State with NICER. III. Model Description and Verification of Parameter Estimation Codes, Astrophys. J. Lett. 914 , L15 (2021), arXiv:2104.06928 [astro-ph.HE]. [10] A. L. Watts, Constraining the neutron star equation of state using Pulse Profile Modeling, AIP Conf. Proc. 2127 , 020008 (2019), arXiv:1904.07012 [astro-ph.HE]. [11] T. Hinderer, B. D. Lackey, R. N. Lang, and J. S. Read, Tidal deformability of neutron stars with realistic equations of state and their gravitational wave signatures in binary inspiral, Phys. Rev. D 81 , 123016 (2010), arXiv:0911.3535 [astro-ph.HE]. [12] T. Damour and A. Nagar, Relativistic tidal properties of neutron stars, Phys. Rev. D 80 , 084035 (2009), arXiv:0906.0096 [gr-qc]. [13] T. Damour, A. Nagar, and L. Villain, Measurability of the tidal polarizability of neutron stars in late-inspiral gravitational-wave signals, Phys. Rev. D 85 , 123007 (2012), arXiv:1203.4352 [gr-qc]. [14] B. P. Abbott et al. (LIGO Scientific, Virgo), GW170817: Observation of Gravitational Waves from a Binary Neu-tron Star Inspiral, Phys. Rev. Lett. 119 , 161101 (2017), arXiv:1710.05832 [gr-qc]. [15] B. P. Abbott et al. (LIGO Scientific, Virgo, Fermi GBM, IN-TEGRAL, IceCube, AstroSat Cadmium Zinc Telluride Imager Team, IPN, Insight-Hxmt, ANTARES, Swift, AGILE Team, 1M2H Team, Dark Energy Camera GW-EM, DES, DLT40, GRAWITA, Fermi-LAT, ATCA, ASKAP, Las Cumbres Ob-servatory Group, OzGrav, DWF (Deeper Wider Faster Pro-gram), AST3, CAASTRO, VINROUGE, MASTER, J-GEM, GROWTH, JAGWAR, CaltechNRAO, TTU-NRAO, NuSTAR, Pan-STARRS, MAXI Team, TZAC Consortium, KU, Nordic Optical Telescope, ePESSTO, GROND, Texas Tech University, SALT Group, TOROS, BOOTES, MWA, CALET, IKI-GW Follow-up, H.E.S.S., LOFAR, LWA, HAWC, Pierre Auger, ALMA, Euro VLBI Team, Pi of Sky, Chandra Team at McGill University, DFN, ATLAS Telescopes, High Time Resolution Universe Survey, RIMAS, RATIR, SKA South Africa/MeerKAT), Multi-messenger Observations of a Binary Neutron Star Merger, Astrophys. J. Lett. 848 , L12 (2017), arXiv:1710.05833 [astro-ph.HE]. [16] B. P. Abbott et al. (LIGO Scientific, Virgo, Fermi-GBM, IN-TEGRAL), Gravitational Waves and Gamma-rays from a Bi-nary Neutron Star Merger: GW170817 and GRB 170817A, Astrophys. J. Lett. 848 , L13 (2017), arXiv:1710.05834 [astro-ph.HE]. [17] B. P. Abbott et al. (LIGO Scientific, Virgo), GW170817: Mea-surements of neutron star radii and equation of state, Phys. Rev. Lett. 121 , 161101 (2018), arXiv:1805.11581 [gr-qc]. [18] B. P. Abbott et al. (LIGO Scientific, Virgo), Model comparison from LIGO–Virgo data on GW170817’s binary components and consequences for the merger remnant, Class. Quant. Grav. 
+
+37 , 045006 (2020), arXiv:1908.01012 [gr-qc]. [19] M. Punturo et al. , The Einstein Telescope: A third-generation gravitational wave observatory, Class. Quant. Grav. 27 , 194002 (2010). [20] S. Hild et al. , Sensitivity Studies for Third-Generation Gravi-tational Wave Observatories, Class. Quant. Grav. 28 , 094013 (2011), arXiv:1012.0908 [gr-qc]. [21] D. Reitze et al. , Cosmic Explorer: The U.S. Contribution to Gravitational-Wave Astronomy beyond LIGO, Bull. Am. As-tron. Soc. 51 , 035 (2019), arXiv:1907.04833 [astro-ph.IM]. [22] M. Evans et al. , A Horizon Study for Cosmic Ex-plorer: Science, Observatories, and Community, (2021), arXiv:2109.09882 [astro-ph.IM]. [23] M. Evans et al. , Cosmic Explorer: A Submission to the NSF MPSAC ngGW Subcommittee, (2023), arXiv:2306.13745 [astro-ph.IM]. [24] M. Maggiore et al. (ET), Science Case for the Einstein Tele-scope, JCAP 03 , 050, arXiv:1912.02622 [astro-ph.CO]. [25] A. Abac et al. (ET), The Science of the Einstein Telescope, JCAP 03 , 081, arXiv:2503.12263 [gr-qc]. [26] J. Aasi et al. (LIGO Scientific), Advanced LIGO, Class. Quant. Grav. 32 , 074001 (2015), arXiv:1411.4547 [gr-qc]. [27] F. Acernese et al. (VIRGO), Advanced Virgo: a second-generation interferometric gravitational wave detector, Class. Quant. Grav. 32 , 024001 (2015), arXiv:1408.3978 [gr-qc]. [28] T. Akutsu et al. (KAGRA), Overview of KAGRA: Detector design and construction history, PTEP 2021 , 05A101 (2021), arXiv:2005.05574 [physics.ins-det]. [29] P. Couvares et al. , Gravitational Wave Data Analysis: Com-puting Challenges in the 3G Era, (2021), arXiv:2111.06987 6
+
+[gr-qc]. [30] Q. Hu and J. Veitch, Costs of Bayesian parameter estimation in third-generation gravitational wave detectors: An assessment of current acceleration methods, Phys. Rev. D 112 , 084039 (2025), arXiv:2412.02651 [gr-qc]. [31] E. Thrane and C. Talbot, An introduction to Bayesian inference in gravitational-wave astronomy: parameter estimation, model selection, and hierarchical models, Publ. Astron. Soc. Austral. 
+
+36 , e010 (2019), [Erratum: Publ.Astron.Soc.Austral. 37, e036 (2020)], arXiv:1809.02293 [astro-ph.IM]. [32] I. Mandel, W. M. Farr, and J. R. Gair, Extracting distribution parameters from multiple uncertain observations with selec-tion biases, Mon. Not. Roy. Astron. Soc. 486 , 1086 (2019), arXiv:1809.02063 [physics.data-an]. [33] A. G. Abac et al. (LIGO Scientific, VIRGO, KAGRA), GWTC-5.0: Population Properties of Merging Compact Binaries, (2026), arXiv:2605.27226 [astro-ph.HE]. [34] A. G. Abac et al. (LIGO Scientific, VIRGO, KAGRA), GWTC-5.0: Methods for Identifying and Characterizing Gravitational-wave Transients, (2026), arXiv:2605.27224 [gr-qc]. [35] A. G. Abac et al. (LIGO Scientific, VIRGO, KAGRA), GWTC-5.0: Tests of General Relativity, (2026), arXiv:2607.19293 [gr-qc]. [36] W. Del Pozzo, T. G. F. Li, M. Agathos, C. Van Den Broeck, and S. Vitale, Demonstrating the feasibility of probing the neutron star equation of state with second-generation gravi-tational wave detectors, Phys. Rev. Lett. 111 , 071101 (2013), arXiv:1307.8338 [gr-qc]. [37] M. Agathos, J. Meidam, W. Del Pozzo, T. G. F. Li, M. Tompi-tak, J. Veitch, S. Vitale, and C. Van Den Broeck, Constraining the neutron star equation of state with gravitational wave sig-nals from coalescing binary neutron stars, Phys. Rev. D 92 ,023012 (2015), arXiv:1503.05405 [gr-qc]. [38] T. Regimbau et al. , A Mock Data Challenge for the Ein-stein Gravitational-Wave Telescope, Phys. Rev. D 86 , 122001 (2012), arXiv:1201.3563 [gr-qc]. [39] M. Branchesi et al. , Science with the Einstein Tele-scope: a comparison of different designs, JCAP 07 , 068, arXiv:2303.15923 [gr-qc]. [40] R. Tania and J. Suresh, Mock data challenge for next-generation detectors, Phys. Rev. D 113 , 063028 (2026), arXiv:2506.12237 [gr-qc]. [41] C. Talbot, R. Smith, E. Thrane, and G. B. Poole, Parallelized Inference for Gravitational-Wave Astronomy, Phys. Rev. D 100 ,043030 (2019), arXiv:1904.02863 [astro-ph.IM]. [42] B. Edelman, B. Farr, and Z. Doctor, Cover Your Ba-sis: Comprehensive Data-driven Characterization of the Bi-nary Black Hole Population, Astrophys. J. 946 , 16 (2023), arXiv:2210.12834 [astro-ph.HE]. [43] C. Talbot, A. Farah, S. Galaudage, J. Golomb, and H. Tong, GWPopulation: Hardware agnostic population inference for compact binaries and beyond, J. Open Source Softw. 10 , 7753 (2025), arXiv:2409.14143 [astro-ph.IM]. [44] M. Qazalbash, M. Zeeshan, and R. O’Shaughnessy, Imple-mentation to identify the properties of multiple populations of gravitational wave sources, Phys. Rev. D 113 , 103003 (2026), arXiv:2509.13638 [gr-qc]. [45] M. Mancarella and D. Gerosa, Sampling the full hierarchi-cal population posterior distribution in gravitational-wave as-tronomy, Phys. Rev. D 111 , 103012 (2025), arXiv:2502.12156 [gr-qc]. [46] M. Mould, N. E. Wolfe, and S. Vitale, Rapid inference and comparison of gravitational-wave population models with neu-ral variational posteriors, Phys. Rev. D 111 , 123049 (2025), arXiv:2504.07197 [astro-ph.IM]. [47] K. Leyde, S. R. Green, M. Dax, M. Mould, C. M. Fabbri, and J. Gair, End-to-End Population Inference from Gravitational-Wave Strain using Transformers, (2026), arXiv:2605.11274 [gr-qc]. [48] T. Wouters, P. T. H. Pang, H. Koehn, H. Rose, R. Somasun-daram, I. Tews, T. Dietrich, and C. Van Den Broeck, Leveraging differentiable programming in the inverse problem of neutron stars, Phys. Rev. D 112 , 043037 (2025), arXiv:2504.15893 [astro-ph.HE]. [49] A. Papadopoulos, C. E. A. Chapman-Bird, R. Gray, C. Mes-senger, and T. Bertheas, Scalable Dark Siren Cosmology with gwcosmo: GPU Acceleration, Validation and Systematics, (2026), arXiv:2605.23538 [astro-ph.CO]. [50] K. Leyde and E. Colangeli, CosmoPyro: Gradients for Gravitational-Wave Cosmology, (2026), arXiv:2608.18281 [astro-ph.CO]. [51] K. Leyde, S. R. Green, A. Toubiana, and J. Gair, Gravitational wave populations and cosmology with neural posterior esti-mation, Phys. Rev. D 109 , 064056 (2024), arXiv:2311.12093 [gr-qc]. [52] S. Mastrogiovanni, D. Laghi, R. Gray, G. C. Santoro, A. Ghosh, C. Karathanasis, K. Leyde, D. A. Steer, S. Perries, and G. Pierra, Joint population and cosmological properties in-ference with gravitational waves standard sirens and galaxy surveys, Phys. Rev. D 108 , 042002 (2023), arXiv:2305.10488 [astro-ph.CO]. [53] S. Mastrogiovanni, G. Pierra, S. Perriès, D. Laghi, G. Caneva Santoro, A. Ghosh, R. Gray, C. Karathanasis, and K. Leyde, ICAROGW: A python package for inference of astro-physical population properties of noisy, heterogeneous, and in-complete observations, Astron. Astrophys. 682 , A167 (2024), arXiv:2305.17973 [astro-ph.CO]. [54] M. Tagliazucchi, M. Moresco, N. Borghi, and M. Fiebig, Ac-celerating the standard siren method: Improved constraints on modified gravitational-wave propagation with future data, As-tron. Astrophys. 702 , A244 (2025), arXiv:2504.02034 [astro-ph.CO]. [55] H. Koehn, T. Wouters, G. Sadeh, P. T. H. Pang, M. Bulla, C. Van Den Broeck, M. W. Coughlin, and T. Dietrich, Bi-nary neutron stars in the next-generation era: Multi-messenger detection prospects and constraints on the equation of state, mass distribution, and cosmology, (2026), arXiv:2607.28438 [astro-ph.HE]. [56] N. E. Wolfe, M. Mould, J. Veitch, and S. Vitale, Neural Bayesian updates to populations with growing gravitational-wave catalogs, (2026), arXiv:2602.20277 [astro-ph.IM]. [57] G. Demasi and W. Del Pozzo, Massively parallel transdimen-sional sampling with data assimilation: an application to LISA galactic binaries, (2026), arXiv:2609.17674 [gr-qc]. [58] M. Prathaban, H. Bevins, and W. Handley, Accelerated nested sampling with posterior repartitioning and 𝛽 -flows for gravi-tational waves, Mon. Not. Roy. Astron. Soc. 541 , 200 (2025), arXiv:2411.17663 [astro-ph.IM]. [59] N. Williams, A. Puecher, G. Grams, C. V. Flores, and T. Diet-rich, Investigating the impact of quasiuniversal relations on neutron star constraints in third-generation detectors, Phys. Rev. D 114 , 024063 (2026), arXiv:2602.14659 [gr-qc]. [60] M. Prathaban, C. Hoy, and M. J. Williams, Leveraging rapid pa-rameter estimates for efficient gravitational-wave Bayesian in-ference via posterior repartitioning, (2026), arXiv:2601.21630 [gr-qc]. [61] R. C. Tolman, Static solutions of Einstein’s field equations for spheres of fluid, Phys. Rev. 55 , 364 (1939). 7
+
+[62] J. R. Oppenheimer and G. M. Volkoff, On massive neutron cores, Phys. Rev. 55 , 374 (1939). [63] M. á. Ferreira and C. Providência, Unveiling the nuclear matter EoS from neutron star properties: a supervised machine learn-ing approach, JCAP 07 , 011, arXiv:1910.05554 [nucl-th]. [64] A. Thete, K. Banerjee, and T. Malik, Realizing the potential of deep neural network for analyzing neutron star observables and dense matter equation of state, Phys. Rev. D 108 , 063028 (2023), arXiv:2208.13163 [nucl-th]. [65] B. T. Reed, R. Somasundaram, S. De, C. L. Armstrong, P. Giuliani, C. Capano, D. A. Brown, and I. Tews, To-ward Accelerated Nuclear-physics Parameter Estimation from Binary Neutron Star Mergers: Emulators for the Tol-man–Oppenheimer–Volkoff Equations, Astrophys. J. 974 , 285 (2024), arXiv:2405.20558 [astro-ph.HE]. [66] R. Somasundaram, I. Svensson, S. De, A. E. Deneris, Y. Di-etz, P. Landry, A. Schwenk, and I. Tews, Inferring three-nucleon couplings from multi-messenger neutron-star obser-vations, Nature Commun. 16 , 9819 (2025), arXiv:2410.00247 [nucl-th]. [67] F. Di Clemente, M. Scialpi, and M. Bejger, Explainable au-toencoder for neutron star dense matter parameter estimation, Mach. Learn. Sci. Tech. 6, 025044 (2025), arXiv:2501.15222 [physics.comp-ph]. [68] H. Rose, H. Koehn, T. Wouters, P. T. H. Pang, M. Bulla, M. W. Coughlin, and T. Dietrich, nmma: An extended Bayesian framework for Nuclear Multimessenger Astronomy in the Era of Next-Generation Detectors, (2026), arXiv:2607.03045 [astro-ph.IM]. [69] J. Bradbury, R. Frostig, P. Hawkins, M. J. Johnson, Y. Katariya, C. Leary, D. Maclaurin, G. Necula, A. Paszke, J. VanderPlas, S. Wanderman-Milne, and Q. Zhang, JAX: composable trans-formations of Python+NumPy programs (2018). [70] R. Frostig, M. J. Johnson, and C. Leary, Compiling machine learning programs via high-level tracing, Systems for Machine Learning 4 (2018). [71] P. Kidger, On Neural Differential Equations , Ph.D. thesis, Uni-versity of Oxford (2021). [72] I. Kobyzev, S. J. D. Prince, and M. A. Brubaker, Normaliz-ing Flows: An Introduction and Review of Current Methods, IEEE Trans. Pattern Anal. Machine Intell. 43 , 3964 (2021), arXiv:1908.09257 [stat.ML]. [73] G. Papamakarios, E. Nalisnick, D. J. Rezende, S. Mohamed, and B. Lakshminarayanan, Normalizing Flows for Probabilistic Modeling and Inference, J. Machine Learning Res. 22 , 2617 (2021), arXiv:1912.02762 [stat.ML]. [74] D. Ruhe, K. Wong, M. Cranmer, and P. Forré, Normalizing Flows for Hierarchical Bayesian Analysis: A Gravitational Wave Population Study, (2022), arXiv:2211.09008 [astro-ph.IM]. [75] C. Adamcewicz, H. McDougall, P. D. Lasky, and E. Thrane, Fortifying gravitational-wave population inference with normalizing flows, Phys. Rev. D 114 , 043057 (2026), arXiv:2606.14229 [astro-ph.HE]. [76] P. Del Moral, A. Doucet, and A. Jasra, Sequential monte carlo samplers, Journal of the Royal Statistical Society Series B: Statistical Methodology 68 , 411 (2006). [77] N. Chopin and O. Papaspiliopoulos, An Introduction to Se-quential Monte Carlo , Springer Series in Statistics (Springer Cham, 2020). [78] C. Dai, J. Heng, P. E. Jacob, and N. Whiteley, An invitation to sequential monte carlo samplers, Journal of the American Statistical Association 117 , 1587 (2022). [79] A. Cabezas, A. Corenflos, J. Lao, and R. Louf, Blackjax: Com-posable Bayesian inference in JAX (2024), arXiv:2402.10797 [cs.MS]. [80] H. Wiegand, Kish, l.: Survey sampling. john wiley &sons, inc., new york, london 1965, ix + 643 s., 31 abb., 56 tab., preis 83 s., Biometrische Zeitschrift 10 , 88 (1968), https://onlinelibrary.wiley.com/doi/pdf/10.1002/bimj.19680100122. [81] M. Karamanis, F. Beutler, J. A. Peacock, D. Nabergoj, and U. Seljak, Accelerating astronomical and cosmological infer-ence with preconditioned Monte Carlo, Mon. Not. Roy. Astron. Soc. 516 , 1644 (2022), arXiv:2207.05652 [astro-ph.IM]. [82] M. Karamanis, D. Nabergoj, F. Beutler, J. A. Peacock, and U. Seljak, pocoMC: A Python package for accelerated Bayesian inference in astronomy and cosmology, J. Open Source Softw. 
+
+7, 4634 (2022), arXiv:2207.05660 [astro-ph.IM]. [83] M. Karamanis and U. Seljak, Persistent sampling: Enhancing the efficiency of sequential monte carlo, Statistics and comput-ing 35 , 144 (2025). [84] M. J. Williams, M. Karamanis, Y. Luo, and U. Seljak, Val-idating sequential Monte Carlo for gravitational-wave in-ference, Mon. Not. Roy. Astron. Soc. 543 , 1479 (2025), arXiv:2506.18977 [astro-ph.IM]. [85] M. J. Williams, Accelerated Sequential Posterior Inference via Reuse for Gravitational-Wave Analyses, Phys. Rev. Lett. 137 ,021410 (2026), arXiv:2511.04218 [hep-ex]. [86] G. Demasi et al. , The Sequential Monte Carlo goes NUTS: boosting gravitational-wave inference, Eur. Phys. J. C 86 , 686 (2026), arXiv:2601.02336 [gr-qc]. [87] N. Chopin, A sequential particle filter method for static models, Biometrika 89 , 539 (2002). [88] P. Madau and M. Dickinson, Cosmic Star Formation History, Ann. Rev. Astron. Astrophys. 52 , 415 (2014), arXiv:1403.0007 [astro-ph.CO]. [89] E. Fonseca et al. , Refined Mass and Geometric Measurements of the High-mass PSR J0740+6620, Astrophys. J. Lett. 915 ,L12 (2021), arXiv:2104.00880 [astro-ph.HE]. [90] T. E. Riley et al. , A 𝑁 𝐼𝐶𝐸 𝑅 View of PSR J0030+0451: Mil-lisecond Pulsar Parameter Estimation, Astrophys. J. Lett. 887 ,L21 (2019), arXiv:1912.05702 [astro-ph.HE]. [91] M. C. Miller et al. , PSR J0030+0451 Mass and Radius from 𝑁 𝐼𝐶𝐸 𝑅 Data and Implications for the Properties of Neutron Star Matter, Astrophys. J. Lett. 887 , L24 (2019), arXiv:1912.05705 [astro-ph.HE]. [92] M. C. Miller et al. , The Radius of PSR J0740+6620 from NICER and XMM-Newton Data, Astrophys. J. Lett. 918 , L28 (2021), arXiv:2105.06979 [astro-ph.HE]. [93] T. Salmi et al. , The Radius of the High-mass Pulsar PSR J0740+6620 with 3.6 yr of NICER Data, Astrophys. J. 974 ,294 (2024), arXiv:2406.14466 [astro-ph.HE]. [94] D. Choudhury et al. , A NICER View of the Nearest and Bright-est Millisecond Pulsar: PSR J0437–4715, Astrophys. J. Lett. 
+
+971 , L20 (2024), arXiv:2407.06789 [astro-ph.HE]. [95] L. Mauviard et al. , A NICER View of the 1.4 M ⊙ Edge-on Pulsar PSR J0614-3329, Astrophys. J. 995 , 60 (2025), arXiv:2506.14883 [astro-ph.HE]. [96] B. P. Abbott et al. (KAGRA, LIGO Scientific, Virgo), Prospects for observing and localizing gravitational-wave transients with Advanced LIGO, Advanced Virgo and KAGRA, Living Rev. Rel. 19 , 1 (2016), arXiv:1304.0670 [gr-qc]. [97] J. Skilling, Nested Sampling, AIP Conf. Proc. 735 , 395 (2004). [98] J. Skilling, Nested sampling for general Bayesian computation, Bayesian Analysis 1, 833 (2006). [99] J. S. Speagle, dynesty: a dynamic nested sampling package for estimating Bayesian posteriors and evidences, Mon. Not. Roy. Astron. Soc. 493 , 3132 (2020), arXiv:1904.02180 [astro-8
+
+ph.IM]. [100] S. Koposov, J. Speagle, K. Barbary, G. Ashton, E. Bennett, J. Buchner, C. Scheffler, C. Talbot, B. Cook, J. Guillochon, P. Cubillos, A. A. Ramos, M. Dartiailh, Ilya, E. Tollerud, D. Lang, B. Johnson, jtmendel, E. Higson, T. Vandal, T. Day-lan, R. Angus, ruskin23, P. Cargile, P. Sheehan, M. Pitkin, M. Kirk, L. Xu, J. Leja, and joezuntz, joshspeagle/dynesty: v3.1.0 (2026). [101] G. Ashton et al. , BILBY: A user-friendly Bayesian inference library for gravitational-wave astronomy, Astrophys. J. Suppl. 
+
+241 , 27 (2019), arXiv:1811.02042 [astro-ph.IM]. [102] I. M. Romero-Shaw et al. , Bayesian inference for compact bi-nary coalescences with bilby: validation and application to the first LIGO–Virgo gravitational-wave transient catalogue, Mon. Not. Roy. Astron. Soc. 499 , 3295 (2020), arXiv:2006.00714 [astro-ph.IM]. [103] A. Buonanno, B. Iyer, E. Ochsner, Y. Pan, and B. S. Sathyaprakash, Comparison of post-Newtonian templates for compact binary inspiral signals in gravitational-wave detectors, Phys. Rev. D 80 , 084043 (2009), arXiv:0907.0700 [gr-qc]. [104] L. Blanchet, Gravitational Radiation from Post-Newtonian Sources and Inspiralling Compact Binaries, Living Rev. Rel. 
+
+17 , 2 (2014), arXiv:1310.1528 [gr-qc]. [105] P. G. Krastev and B.-A. Li, Imprints of the nuclear symmetry energy on the tidal deformability of neutron stars, J. Phys. G 
+
+46 , 074001 (2019), arXiv:1801.04620 [nucl-th]. [106] C. Mondal and F. Gulminelli, Can we decipher the composition of the core of a neutron star?, Phys. Rev. D 105 , 083016 (2022), arXiv:2111.04520 [nucl-th]. [107] F. Iacovelli, M. Mancarella, C. Mondal, A. Puecher, T. Di-etrich, F. Gulminelli, M. Maggiore, and M. Oertel, Nuclear physics constraints from binary neutron star mergers in the Einstein Telescope era, Phys. Rev. D 108 , 122006 (2023), arXiv:2308.12378 [gr-qc]. [108] Z. Zhu and R. O’Shaughnessy, Limitations in constraining neutron star radii and nuclear properties from inspiral grav-itational wave detections, Phys. Rev. D 113 , 103037 (2026), arXiv:2508.11875 [astro-ph.HE]. [109] C. A. Raithel and E. R. Most, Degeneracy in the Inference of Phase Transitions in the Neutron Star Equation of State from Gravitational Wave Data, Phys. Rev. Lett. 130 , 201403 (2023), arXiv:2208.04294 [astro-ph.HE]. [110] C. A. Raithel and E. R. Most, Tidal deformability doppel-gänger: Implications of a low-density phase transition in the neutron star equation of state, Phys. Rev. D 108 , 023010 (2023), arXiv:2208.04295 [astro-ph.HE]. [111] G. Pratten, S. Husa, C. Garcia-Quiros, M. Colleoni, A. Ramos-Buades, H. Estelles, and R. Jaume, Setting the cornerstone for a family of models for gravitational waves from com-pact binaries: The dominant harmonic for nonprecessing quasicircular black holes, Phys. Rev. D 102 , 064001 (2020), arXiv:2001.11412 [gr-qc]. [112] A. Abac, T. Dietrich, A. Buonanno, J. Steinhoff, and M. Ujevic, New and robust gravitational-waveform model for high-mass-ratio binary neutron star systems with dynamical tidal effects, Phys. Rev. D 109 , 024062 (2024), arXiv:2311.07456 [gr-qc]. [113] L. Negr et al. , Impact of the Einstein Telescope’s duty cycle on the estimation of binary black holes parameters, (2026), arXiv:2606.19201 [gr-qc]. [114] P. Landry and J. S. Read, The Mass Distribution of Neutron Stars in Gravitational-wave Binaries, Astrophys. J. Lett. 921 ,L25 (2021), arXiv:2107.04559 [astro-ph.HE]. [115] J. Golomb and C. Talbot, Hierarchical Inference of Binary Neu-tron Star Mass Distribution and Equation of State with Gravita-tional Waves, Astrophys. J. 926 , 79 (2022), arXiv:2106.15745 [astro-ph.HE]. [116] J. Golomb, I. Legred, K. Chatziioannou, and P. Landry, In-terplay of astrophysics and nuclear physics in determining the properties of neutron stars, Phys. Rev. D 111 , 023029 (2025), arXiv:2410.14597 [astro-ph.HE]. [117] R. Gamba, M. Breschi, S. Bernuzzi, M. Agathos, and A. Nagar, Waveform systematics in the gravitational-wave inference of tidal parameters and equation of state from binary neutron star signals, Phys. Rev. D 103 , 124015 (2021), arXiv:2009.08467 [gr-qc]. [118] N. Kunert, P. T. H. Pang, I. Tews, M. W. Coughlin, and T. Di-etrich, Quantifying modeling uncertainties when combining multiple gravitational-wave detections from binary neutron star sources, Phys. Rev. D 105 , L061301 (2022), arXiv:2110.11835 [astro-ph.HE]. [119] K. Chatziioannou, Uncertainty limits on neutron star radius measurements with gravitational waves, Phys. Rev. D 105 ,084021 (2022), arXiv:2108.12368 [gr-qc]. [120] A. B. Yelikar, R. O. Shaughnessy, J. Lange, and A. Z. Jan, Waveform systematics in gravitational-wave inference of sig-nals from binary neutron star merger models incorporating higher-order modes information, Phys. Rev. D 110 , 064024 (2024), arXiv:2404.16599 [gr-qc]. [121] A. B. Yelikar, R. O’Shaughnessy, D. Wysocki, and L. Wade, Effects of waveform systematics on inferences of neutron star population properties and the nuclear equation of state, (2024), arXiv:2410.14674 [gr-qc]. [122] G. Pratten, P. Schmidt, and N. Williams, Impact of Dynamical Tides on the Reconstruction of the Neutron Star Equation of State, Phys. Rev. Lett. 129 , 081102 (2022), arXiv:2109.07566 [astro-ph.HE]. [123] S. Ghosh, S. Mukherjee, S. Bose, and D. Chatterjee, Tidal dis-sipation in binary neutron star inspirals from hyperon bulk vis-cosity: phase modelling and parameter estimation bias, Mon. Not. Roy. Astron. Soc. 543 , 2987 (2025), arXiv:2503.14606 [gr-qc]. [124] F. Gittins, H. Narola, T. Wouters, P. T. H. Pang, T. Hinderer, and C. Van Den Broeck, Detecting Tidal Resonances in Binary Neutron Stars, (2026), arXiv:2606.06376 [gr-qc]. [125] A. Samajdar, J. Janquart, C. Van Den Broeck, and T. Dietrich, Biases in parameter estimation from overlapping gravitational-wave signals in the third-generation detector era, Phys. Rev. D 
+
+104 , 044003 (2021), arXiv:2102.07544 [gr-qc]. [126] A. Antonelli, O. Burke, and J. R. Gair, Noisy neighbours: infer-ence biases from overlapping gravitational-wave signals, Mon. Not. Roy. Astron. Soc. 507 , 5069 (2021), arXiv:2104.01897 [gr-qc]. [127] J. Janquart, T. Baka, A. Samajdar, T. Dietrich, and C. Van Den Broeck, Analyses of overlapping gravitational wave sig-nals using hierarchical subtraction and joint parameter es-timation, Mon. Not. Roy. Astron. Soc. 523 , 1699 (2023), arXiv:2211.01304 [gr-qc]. [128] C. Pankow et al. , Mitigation of the instrumental noise transient in gravitational-wave data surrounding GW170817, Phys. Rev. D 98 , 084016 (2018), arXiv:1808.03619 [gr-qc]. [129] T. Narikawa, N. Uchikata, K. Kawaguchi, K. Kiuchi, K. Kyu-toku, M. Shibata, and H. Tagoshi, Discrepancy in tidal deformability of GW170817 between the Advanced LIGO twin detectors, Phys. Rev. Research. 1, 033055 (2019), arXiv:1812.06100 [astro-ph.HE]. [130] N. Sarin, H. V. Peiris, D. J. Mortlock, J. Alsing, S. M. Nissanke, and S. M. Feeney, Measuring the nuclear equation of state with neutron star-black hole mergers, Phys. Rev. D 110 , 024076 9
+
+(2024), arXiv:2311.05689 [gr-qc]. [131] V. Dubey, R. Kashyap, and Y. Bhoge, Constraining equation of state of neutron star using neutron star-black hole mergers, (2026), arXiv:2608.30995 [gr-qc]. [132] P. T. H. Pang, S. M. Brown, T. Wouters, and C. Van Den Broeck, Revealing tensions in neutron star observations with pressure anisotropy, Phys. Rev. D 113 , 063047 (2026), arXiv:2507.13039 [astro-ph.HE]. [133] S. M. Brown, B. Krishnan, R. Somasundaram, and I. Tews, Can Neutron Star Tidal Effects Obscure Deviations from General Relativity?, Astrophys. J. 982 , 133 (2025), arXiv:2411.19129 [gr-qc]. [134] T. Wouters and P. T. H. Pang, JESTER: JAX-based EoS and TOV solvER. [135] T. Wouters, Dataproducts for scalable and sequential inference of the neutron star equation of state with the einstein telescope, 10.5281/zenodo.22300363 (2026). [136] I. C. F. Wong, F. Cireddu, S. Kumar, L. Negri, and H. Narola, gwmock: A python package for generating mock data chal-lenge datasets for the gravitational-wave community. (2026). [137] D. Ward, Flowjax: Distributions and normalizing flows in jax (2026). [138] P. Landry and R. Essick, Nonparametric inference of the neu-tron star equation of state from gravitational wave observations, Phys. Rev. D 99 , 084049 (2019), arXiv:1811.12529 [gr-qc]. [139] R. Essick, P. Landry, and D. E. Holz, Nonparametric Infer-ence of Neutron Star Composition, Equation of State, and Maximum Mass with GW170817, Phys. Rev. D 101 , 063007 (2020), arXiv:1910.09740 [astro-ph.HE]. [140] P. Landry, R. Essick, and K. Chatziioannou, Nonparametric constraints on neutron star matter with existing and upcoming gravitational wave and pulsar observations, Phys. Rev. D 101 ,123007 (2020), arXiv:2003.04880 [astro-ph.HE]. [141] I. Legred, K. Chatziioannou, R. Essick, and P. Landry, Implicit correlations within phenomenological parametric models of the neutron star equation of state, Phys. Rev. D 105 , 043016 (2022), arXiv:2201.06791 [astro-ph.HE]. [142] R. Essick, I. Legred, K. Chatziioannou, S. Han, and P. Landry, Phase transition phenomenology with nonparametric represen-tations of the neutron star equation of state, Phys. Rev. D 108 ,043013 (2023), arXiv:2305.07411 [astro-ph.HE]. [143] E. Finch, I. Legred, K. Chatziioannou, R. Essick, S. Han, and P. Landry, Unified nonparametric equation-of-state infer-ence from the neutron-star crust to perturbative-QCD densities, Phys. Rev. D 112 , 103023 (2025), arXiv:2505.13691 [nucl-th]. [144] A. Boudon, H. Qi, J.-F. Coupechoux, P. Landry, and V. Sor-dini, A Realistic Projection for Constraining the Neutron Star Equation of State with the LIGO–Virgo–KAGRA Detector Network in the A+ Era, Astrophys. J. 1002 , 141 (2026), arXiv:2501.11585 [gr-qc]. [145] S. Ng, I. Legred, L. Suleiman, P. Landry, L. Traylor, and J. Read, Inferring the neutron star equation of state with nuclear-physics informed semiparametric models, Class. Quant. Grav. 42 , 205008 (2025), arXiv:2507.03232 [astro-ph.HE]. [146] L. Suleiman, A. F. Fantina, F. Gulminelli, and J. Read, Nuclear parameter inference with semi-agnostic priors 10.1051/0004-6361/202558416 (2025), arXiv:2512.05315 [astro-ph.HE]. [147] D. Wysocki, R. O’Shaughnessy, L. Wade, and J. Lange, Inferring the neutron star equation of state simultaneously with the population of merging neutron stars, (2020), arXiv:2001.01747 [gr-qc]. [148] S. Vitale, D. Gerosa, W. M. Farr, and S. R. Taylor, Inferring the properties of a population of compact binaries in presence of selection effects 10.1007/978-981-15-4702-7_45-1 (2020), arXiv:2007.05579 [astro-ph.IM]. [149] R. Essick and M. Fishbach, Ensuring Consistency between Noise and Detection in Hierarchical Bayesian Inference, As-trophys. J. 962 , 169 (2024), arXiv:2310.02017 [gr-qc]. [150] A. Kedia, R. O’Shaughnessy, L. Wade, and A. Yelikar, As-trophysical assumptions and equation of state framework have larger impact on equation of state inference than individual neutron star observations, (2024), arXiv:2405.17326 [astro-ph.HE]. [151] T. Ghosh, B. Biswas, S. Bose, and S. J. Kapadia, Joint Infer-ence of Population, Cosmology, and Neutron Star Equation of State from Gravitational Waves of Dark Binary Neutron Stars, Astrophys. J. Suppl. 281 , 11 (2025), arXiv:2407.16669 [gr-qc]. [152] A. Toubiana et al. , Comparing astrophysical models to gravitational-wave data in the observable space, Phys. Rev. D 113 , 083006 (2026), arXiv:2507.13249 [gr-qc]. [153] F. Douchin and P. Haensel, A unified equation of state of dense matter and neutron star structure, Astron. Astrophys. 380 , 151 (2001), arXiv:astro-ph/0111092. [154] J. Margueron, R. Hoffmann Casali, and F. Gulminelli, Equa-tion of state for dense nucleonic matter from metamodeling. I. Foundational aspects, Phys. Rev. C 97 , 025805 (2018), arXiv:1708.06894 [nucl-th]. [155] J. Margueron, R. Hoffmann Casali, and F. Gulminelli, Equation of state for dense nucleonic matter from metamodeling. II. Predictions for neutron star properties, Phys. Rev. C 97 , 025806 (2018), arXiv:1708.06895 [nucl-th]. [156] I. Tews, J. Margueron, and S. Reddy, Critical examination of constraints on the equation of state of dense matter ob-tained from GW170817, Phys. Rev. C 98 , 045804 (2018), arXiv:1804.02783 [nucl-th]. [157] R. Somasundaram, I. Tews, and J. Margueron, Investigating signatures of phase transitions in neutron-star cores, Phys. Rev. C 107 , 025801 (2023), arXiv:2112.08157 [nucl-th]. [158] P. Neal and G. Roberts, Optimal scaling of random walk metropolis algorithms with non-gaussian proposals, Method-ology and Computing in Applied Probability 13 , 583 (2011). [159] M. C. Miller et al. , The Radius of PSR J0437–4715 from NICER Data, Astrophys. J. Lett. 1000 , L48 (2026), arXiv:2512.08790 [astro-ph.HE]. [160] Y. Kini et al. , A NICER View of PSR J0030+0451: Updated Constraints from 6 yr of NICER Observations, Astrophys. J. 
+
+1005 , 201 (2026), arXiv:2602.23743 [astro-ph.HE]. [161] M. C. Miller et al. , The Radius of the Neutron Star PSR J0614-3329 from NICER Data, (2026), arXiv:2609.00965 [astro-ph.HE]. [162] L. Mauviard et al. , A NICER view of PSR J1614 −2230: a massive and compact millisecond pulsar, (2026), arXiv:2609.00172 [astro-ph.HE]. [163] D. González-Caniulef et al. , A NICER view of the millisecond pulsar PSR J2124 −3358: evidence for a helium atmosphere, (2026), arXiv:2607.03721 [astro-ph.HE]. [164] T. Wouters, P. T. H. Pang, T. Dietrich, and C. Van Den Broeck, Incorporating neutron star physics into gravitational wave in-ference with physics-informed priors using normalizing flows, Phys. Rev. D 114 , 043005 (2026), arXiv:2511.22987 [astro-ph.HE]. [165] C. García-Quirós, S. Husa, M. Mateu-Lucena, and A. Borchers, Accelerating the evaluation of inspiral–merger–ringdown waveforms with adapted grids, Class. Quant. Grav. 38 , 015006 (2021), arXiv:2001.10897 [gr-qc]. [166] S. Morisaki, Accelerating parameter estimation of gravita-tional waves from compact binary coalescence using adap-10 
+
+tive frequency resolutions, Phys. Rev. D 104 , 044062 (2021), arXiv:2104.07813 [gr-qc]. [167] G. Papamakarios, T. Pavlakou, and I. Murray, Masked Autoregressive Flow for Density Estimation, (2017), arXiv:1705.07057 [stat.ML]. [168] C. Durkan, A. Bekasov, I. Murray, and G. Papamakarios, Neu-ral Spline Flows (2019) arXiv:1906.04032 [stat.ML]. [169] R. Smith et al. , Bayesian Inference for Gravitational Waves from Binary Neutron Star Mergers in Third Genera-tion Observatories, Phys. Rev. Lett. 127 , 081102 (2021), arXiv:2103.12274 [gr-qc]. [170] M. Dax, S. R. Green, J. Gair, N. Gupte, M. Pürrer, V. Raymond, J. Wildberger, J. H. Macke, A. Buonanno, and B. Schölkopf, Real-time inference for binary neutron star mergers using ma-chine learning, Nature 639 , 49 (2025), arXiv:2407.09602 [gr-qc]. [171] Q. Hu, J. Irwin, Q. Sun, C. Messenger, L. Suleiman, I. S. Heng, and J. Veitch, Decoding Long-duration Gravitational Waves from Binary Neutron Stars with Machine Learning: Parameter Estimation and Equations of State, Astrophys. J. Lett. 987 , L17 (2025), arXiv:2412.03454 [gr-qc]. [172] R. Tenorio and D. Gerosa, Scalable data-analysis framework for long-duration gravitational waves from compact binaries using short Fourier transforms, Phys. Rev. D 111 , 104044 (2025), arXiv:2502.11823 [gr-qc]. [173] D. Yallup, M. Prathaban, J. Alvey, T. C. K. Ng, T. Wouters, N. Sarin, and W. Handley, Ab Initio Real-Time Gravitational-Wave Parameter Estimation, (2026), arXiv:2607.28265 [gr-qc]. [174] N. Guttman, A. M. Baker, P. D. Lasky, and E. Thrane, Li-cence to Bin: Accurate and Scalable Inference for Binary Neu-tron Stars in Next-Generation Gravitational-Wave Detectors, (2026), arXiv:2606.14197 [astro-ph.HE]. [175] A. S. Sengupta, Fast Bayesian Inference for Long-Duration Gravitational-Wave Signals in 3G detectors, (2026), arXiv:2609.05375 [gr-qc]. [176] R. O’Shaughnessy, A. Jan, J. Lange, and R. Mechum, Scaling RIFT 1: Extending RIFT to third-generation gravitational-wave analyses, (2026), arXiv:2609.37393 [gr-qc]. [177] A. Virtuoso and E. Milotti, Beyond the long wavelength approximation: Next-generation gravitational-wave detectors and frequency-dependent antenna patterns, Phys. Rev. D 111 ,064058 (2025), arXiv:2412.01693 [gr-qc]. [178] P. Baral, S. Morisaki, I. Gupta, and J. Creighton, Parameter esti-mation of gravitational-wave signals with frequency-dependent antenna responses and higher modes, Class. Quant. Grav. 42 ,215007 (2025), arXiv:2503.09627 [astro-ph.IM]. 
+
+SUPPLEMENTAL MATERIAL HIERARCHICAL BAYESIAN INFERENCE OF THE EQUATION OF STATE 
+
+The matter inside all neutron stars is assumed to follow a single, universal EOS. One option to model it is through non-parametric methods, such as Gaussian processes [138–146]. Here, we focus instead on sampling a flexible EOS parametrization 
+
+𝜃 EOS (described in more detail below). The hyperparameters 𝜃 EOS are constrained by a collection of 𝑁 observations of BNS mergers D = {𝑑 1, . . . , 𝑑 𝑁 } through Bayes’ theorem: 
+
+P ( 𝜃 EOS |D) = L(D| 𝜃 EOS )𝜋 (𝜃 EOS )Z , (1) where P ( 𝜃 EOS |D) is the hyperposterior, L(D| 𝜃 EOS ) the hyperlikelihood, 𝜋 (𝜃 EOS ) the prior and Z the Bayesian evidence. When the observations are independent, the hyperlikelihood is given by [31, 32] 
+
+L(D| 𝜃 EOS ) = 𝑝 det (𝜃 EOS )− 𝑁 𝑁 Ö
+
+> 𝑖 =1
+
+∫
+
+L ( 𝑑 𝑖 |𝜃 𝑖 ) 𝑝 (𝜃 𝑖 |𝜃 EOS ) d𝜃 𝑖 , (2) where 𝑝 det (𝜃 EOS ) encodes selection effects, and L ( 𝑑 𝑖 |𝜃 𝑖 ) is the single-event likelihood. In this study, our observed catalog is based on an SNR threshold. Since varying the EOS mainly impacts the tidal deformabilities, which have a negligible effect on SNR, we neglect selection effects in this study. In practice, we first analyze individual events separately with Bayesian inference using an agnostic prior 𝜋 (𝜃 𝑖 ), giving single-event posteriors 𝑝 (𝜃 𝑖 |𝑑 𝑖 ). Hence, we can write 
+
+L(D| 𝜃 EOS ) ∝ 
+
+> 𝑁
+
+Ö
+
+> 𝑖 =1
+
+∫ 𝑝 (𝜃 𝑖 |𝑑 𝑖 )
+
+𝜋 (𝜃 𝑖 ) 𝑝 (𝜃 𝑖 |𝜃 EOS ) d𝜃 𝑖 . (3) Only the source-frame component masses 𝑚 1,2 and tidal deformabilities Λ1,2 depend on 𝜃 EOS , so the above expression becomes 
+
+L(D| 𝜃 EOS ) ∝ 
+
+> 𝑁
+
+Ö
+
+> 𝑖 =1
+
+∫ 𝑝 (𝑚 1, 𝑚 2, Λ1, Λ2 |𝑑 𝑖 )
+
+𝜋 (𝑚 1, 𝑚 2, Λ1, Λ2) 𝑝 (𝑚 1, 𝑚 2, Λ1, Λ2 |𝜃 EOS ) d𝑚 1 d𝑚 2 dΛ1 dΛ2 . (4) We use independent priors between 𝑚 𝑖 and Λ𝑖 , and uniform priors on Λ𝑖 . Moreover, since a sample 𝜃 EOS corresponds to a deterministic function ΛEOS (𝑚 ), we find 
+
+𝑝 (Λ1, Λ2 |𝑚 1, 𝑚 2, 𝜃 EOS ) = 𝛿 (Λ1 − ΛEOS (𝑚 1)) 𝛿 (Λ2 − ΛEOS (𝑚 2)) . (5) 11 Assuming a fixed uniform mass distribution, we then find 
+
+L(D| 𝜃 EOS ) ∝ 
+
+> 𝑁
+
+Ö
+
+> 𝑖 =1
+
+∫ 𝑝 (𝑚 1, 𝑚 2, ΛEOS (𝑚 1), ΛEOS (𝑚 2)| 𝑑 𝑖 )
+
+𝜋 (𝑚 1, 𝑚 2) d𝑚 1 d𝑚 2 . (6) The remaining integrals are approximated with Monte Carlo integration, using a normalizing flow (NF) 𝑞 𝑖 to approximate the conditional posterior density 
+
+𝑞 𝑖 ≈ 𝑝 (Λ1, Λ2 |𝑚 1, 𝑚 2, 𝑑 𝑖 ) . (7) Moreover, since the priors on the component masses do not vary significantly across the posterior samples, we approximate the hyperlikelihood by 
+
+L(D| 𝜃 EOS ) ∝ 
+
+> 𝑁
+
+Ö
+
+> 𝑖 =1
+> 𝑀
+
+∑︁ 
+
+> 𝑘 =1
+
+𝑞 𝑖 (ΛEOS (𝑚 𝑘  
+
+> 1
+
+), ΛEOS (𝑚 𝑘  
+
+> 2
+
+)| 𝑚 𝑘  
+
+> 1
+
+, 𝑚 𝑘  
+
+> 2
+
+) , 𝑚 𝑘  
+
+> 1
+
+, 𝑚 𝑘  
+
+> 2
+
+∼ 𝑝 (𝑚 1, 𝑚 2 |𝑑 𝑖 ) . (8) The flows are trained with flowjax [137] and are evaluated in single precision to reduce their computational cost. We use 
+
+𝑀 = 200 samples per Monte Carlo integration. In the future, we will more accurately incorporate the priors on the masses and selection effects, building on our recent work in Ref. [55]. This is necessary to avoid biases when considering non-trivial populations and cosmology [115, 116, 147–152]. For the EOS parametrization, we use the model from Ref. [5], consisting of three parts. First, at the lowest densities up to 0.5 𝑛 sat , we fix the EOS to the crust from Ref. [153]. At higher densities, we employ an EOS of nucleonic matter in 𝛽 -equilibrium parametrized by the metamodel (MM) [154, 155], which expands the energy per nucleon as a Taylor series. Here, we truncate the series at fourth order. However, since the above description might not hold throughout the entire sequence of NS solutions, we switch to an agnostic speed-of-sound parametrization [156] at densities above 𝑛 break (sampled in the range [1, 2] 𝑛 sat ). That is, we place 8 grid points in the speed-of-sound plane 𝑐 2 
+
+> 𝑠
+
+(𝑛 ), and linearly interpolate between them to obtain the speed-of-sound profile, which can be integrated to yield the EOS [157]. In total, our EOS parametrization has 𝐷 = 26 dimensions. The priors are identical to those used in Ref. [48]. 
+
+> SEQUENTIAL MONTE CARLO
+
+We sample the above hyperposterior using SMC, a method that samples from the posterior and estimates the Bayesian evidence simultaneously. The sampling iteratively transforms a set of particles through a sequence of distributions 𝑝 1, . . . , 𝑝 𝑇 [76–78]. Each 𝑝 𝑡 is normalized and we write 𝑝 𝑡 = 𝛾 𝑡 /Z 𝑡 for 𝑡 = 1, . . . , 𝑇 . For Bayesian inference, one typically starts from the prior 
+
+𝑝 1 = 𝜋 and terminates at the posterior 𝑝 𝑇 = P. Let us first review the generic idea behind SMC, after which we will discuss the two specific versions used in this work. At iteration 𝑡 , a set of 𝑁 particles 𝜃 𝑖 𝑡 −1, distributed according to 𝑝 𝑡 −1, is pushed to the next density 𝑝 𝑡 by the following operations. First, the particles get assigned an importance weight 
+
+𝑊 𝑖 𝑡 = 𝑝 𝑡 (𝜃 𝑖 𝑡 −1)
+
+𝑝 𝑡 −1 (𝜃 𝑖 𝑡 −1) = Z𝑡 −1
+
+Z𝑡 
+
+𝑤 𝑖 𝑡 , (9) where the unnormalized weights are given by 
+
+𝑤 𝑖 𝑡 = 𝛾 𝑡 (𝜃 𝑖 𝑡 −1)
+
+𝛾 𝑡 −1 (𝜃 𝑖 𝑡 −1) . (10) If there is sufficient overlap between the two densities, we can assume the weighted set of particles is distributed according to 𝑝 𝑡 ,and we can estimate the unknown ratio of evidences as 
+
+Z𝑡 
+
+Z𝑡 −1
+
+≈ 1
+
+𝑁 
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+𝑤 𝑖 𝑡 , (11) which allows us to estimate the Bayesian evidence if we start from a proper prior. Second, the particles are resampled according to their importance weights, giving a set of 𝑁 unweighted particles possibly containing duplicates. Finally, to avoid weight collapse after subsequent reweightings, we diversify the particles by moving them through an MCMC kernel K𝑡 , having 𝑝 𝑡 as its invariant density. This step is often called the rejuvenation step. This generic procedure of SMC does not specify the sequence of distributions that should be traversed. Below, we discuss two paths, referred to as likelihood tempering and data tempering. 12 
+
+Likelihood tempering 
+
+One option, called likelihood tempering, constructs a geometric sequence, raising the likelihood to an inverse temperature parameter 𝛽 𝑡 :
+
+𝑝 𝑡 (𝜃 ) = L( 𝜃 )𝛽 𝑡 𝜋 (𝜃 )Z𝑡 
+
+, (12) where 𝛽 𝑡 ∈ [ 0, 1] goes from the prior ( 𝛽 1 = 0) to the posterior ( 𝛽 𝑇 = 1). With this choice, the reweighting function in Eq. (10) takes the form 
+
+𝑤 𝑖 𝑡 = L( 𝜃 𝑖 𝑡 −1)𝛽 𝑡 −𝛽 𝑡 −1 . (13) The temperature ladder can be set adaptively by requiring that the reweighting step preserves a certain ESS [80], which can be computed from the unnormalized weights with ESS 𝑡 = (Í𝑖 𝑤 𝑖 𝑡 )2
+
+Í𝑖 
+
+ 𝑤 𝑖 𝑡 
+
+2 . (14) By requiring that the next reweighting step maintains at least 𝛼𝑁 effective samples, with 𝛼 ∈ [ 0, 1] a hyperparameter set by the user, the temperature can be determined by solving 
+
+𝛽 𝑡 = sup    
+
+> 𝛽 𝑡 ∈ [ 𝛽 𝑡 −1,1]
+
+{ESS 𝑡 ≥ 𝛼𝑁 } , (15) using, e.g., the bisection algorithm. The pseudocode for this version of SMC, adapted from Ref. [83], is given in Algorithm 1. The output of the algorithm is a set of particles {𝜃 𝑖 𝑇 }𝑁 𝑖 =1 distributed according to the posterior, and an estimate ˆZ𝑇 of the Bayesian evidence. Since we will use likelihood tempering as a substep in the next subsection, we will denote it by 
+
+{𝜃 𝑖 𝑇 }𝑁 𝑖 =1, ˆZ𝑇 = SMC LT (𝜋, L) , (16) where we suppress the dependence on the hyperparameters and Markov kernels for simplicity. We run SMC with likelihood tempering as implemented in blackjax, setting 𝑁 = 2000 and 𝛼 = 0.9. We use a Gaussian random walk kernel for the rejuvenation step, with the covariance matrix tuned on the fly using the empirical covariance of the particles to target an optimal Metropolis-Hastings acceptance rate of 0 .234 [158], taking 20 MCMC steps and retaining only the particles from the last iteration. 
+
+Algorithm 1: SMC with adaptive likelihood tempering 
+
+Data: Prior 𝜋 (𝜃 ), likelihood L( 𝜃 ), number of particles 𝑁 , target ESS fraction 𝛼 , Markov kernels K𝑡 
+
+Result: Samples {𝜃 𝑖 𝑇 }𝑁 𝑖 =1 approximating the posterior P ( 𝜃 ), and evidence estimate ˆZ𝑇 
+
+𝑡 ← 1, 𝛽 1 ← 0, ˆZ1 ← 1; 
+
+for 𝑖 ← 1 to 𝑁 do 
+
+𝜃 𝑖  
+
+> 1
+
+∼ 𝜋 (𝜃 ) ; /* Sample from the prior */ 
+
+while 𝛽 𝑡 < 1 do 
+
+𝑡 ← 𝑡 + 1; 
+
+𝛽 𝑡 ← sup 𝛽 𝑡 ∈ [ 𝛽 𝑡 −1 ,1] {ESS 𝑡 ≥ 𝛼𝑁 } ; /* Compute next temperature */ 
+
+for 𝑖 ← 1 to 𝑁 do 
+
+𝑤 𝑖 𝑡 ← L( 𝜃 𝑖 𝑡 −1)𝛽 𝑡 −𝛽 𝑡 −1 ; /* Reweight */ 
+
+𝑊 𝑖 𝑡 ← 𝑤 𝑖 𝑡 
+
+ Í 𝑁 𝑗 =1 𝑤 𝑗 𝑡 ;ˆZ𝑡 ← ˆZ𝑡 −1 × 𝑁 −1 Í𝑁 𝑖 =1 𝑤 𝑖 𝑡 ; /* Update evidence estimate */ 
+
+{ ˜𝜃 𝑖 𝑡 }𝑁 𝑖 =1 ∼ resample 
+
+
+
+{𝜃 𝑖 𝑡 −1 }𝑁 𝑖 =1, {𝑊 𝑖 𝑡 }𝑁 𝑖 =1
+
+
+
+; /* Resample */ 
+
+for 𝑖 ← 1 to 𝑁 do 
+
+𝜃 𝑖 𝑡 ← K 𝑡 ( ˜𝜃 𝑖 𝑡 ) ; /* MCMC move */ 13 
+
+> Data tempering
+
+While likelihood tempering can be used for any Bayesian inference problem tackled by SMC, here we also consider another choice for the sequence of distributions for hierarchical inference with growing datasets. In this scenario, one such choice for SMC is to perform data tempering, also known as iterated batch importance sampling (IBIS) [77, 87]. Let us first consider the naive case where one data point is added in each iteration, such that the timestep 𝑡 coincides exactly with the data point 𝑑 𝑡 and we have a dataset {𝑑 1, . . . , 𝑑 𝑇 }. In this case, one can consider the path of partial posteriors [78], i.e., where the intermediate density at iteration 𝑡 is given by 
+
+P𝑡 ≡ L( 𝑑 1: 𝑡 |𝜃 )𝜋 (𝜃 )Z𝑡 
+
+, (17) where we introduced the shorthand 𝑑 𝑎 :𝑏 = {𝑑 𝑎 , . . . , 𝑑 𝑏 }. In that case, the importance weight from Eq. (10) takes the form 
+
+𝑤 𝑖 𝑡 = L𝑡 (𝜃 𝑖 𝑡 −1) , (18) where L𝑡 (𝜃 ) = L( 𝑑 𝑡 |𝜃 ) is the single-event likelihood. This procedure results in a fixed path traversing the 𝑇 partial posteriors. In practice, however, it is not guaranteed that P𝑡 −1 and 
+
+P𝑡 are sufficiently similar, a requirement that is enforced by design in adaptive likelihood tempering. As a result, adding a single informative data point (e.g., a high-SNR GW event) might cause a sudden drop in the ESS when transitioning between densities. Therefore, better performance can be achieved by a hybrid version of IBIS that includes likelihood tempering to bridge between two partial posteriors [77]. We refer to this as an ‘update step’, which updates the set of particles that approximate our current posterior with new information. However, triggering this update step for each data point can become wasteful. For instance, when confronting a set of particles already conditioned on a large history of loud events, a quiet GW source barely changes the posterior, so the particles stay sufficiently diverse and no update is needed. In short, we need an adaptive version of IBIS that automatically determines when to run the update step. Therefore, we generalize the above to process, at once, a batch of several data points at iteration 𝑡 , rather than a single data point. We denote the index of the last data point of the batch by 𝑏 𝑡 and introduce the notation 
+
+L𝑎 :𝑏 (𝜃 ) =
+
+> 𝑏
+
+Ö
+
+> 𝑖 =𝑎 +1
+
+L𝑖 (𝜃 ) , (19) to refer to the batched likelihood for {𝑑 𝑎 +1, . . . , 𝑑 𝑏 }. With this notation, the weight function for the batch becomes 
+
+𝑤 𝑖 𝑡 (𝜃 𝑖 𝑡 −1) = L1: 𝑏 𝑡 (𝜃 𝑖 𝑡 −1)L1: 𝑏 𝑡 −1 (𝜃 𝑖 𝑡 −1) = L𝑏 𝑡 −1:𝑏 𝑡 (𝜃 𝑖 𝑡 −1) . (20) The ESS 𝑡 of this weighted set again allows us to adaptively determine the updating schedule. Similar to Eq. (15), we set 
+
+𝑏 𝑡 = sup     
+
+> 𝑏 𝑡 ∈ [ 𝑏 𝑡 −1,𝑇 ]
+
+{ESS 𝑡 ≥ ˜𝛼𝑁 } , (21) where ˜ 𝛼 ∈ [ 0, 1] is another hyperparameter. (Note that the main text calls this 𝛼 for simplicity, and it should not be confused with the threshold 𝛼 used in likelihood tempering, although they play similar roles.) To turn the above into an algorithm, it is more natural to write 𝑏 𝑡 −1 = 𝑛 and 𝑏 𝑡 = 𝑛 + 𝑞 , following the visualization from Fig. 1 (i.e., the particles 𝜃 𝑖 𝑡 −1 at time 𝑡 are distributed according to the partial posterior conditioned on the first 𝑛 events). When processing a new event, if ESS 𝑡 remains above the threshold ˜ 𝛼𝑁 , the event is simply added to a ‘queue’, and we proceed to the next iteration. When, after 𝑞 events, the batch likelihood is sufficiently informative and ESS 𝑡 drops below the threshold, we update the posterior using SMC with likelihood tempering. We can then interpret the partial posterior of iteration 𝑡 − 1 as the prior, while we anneal in the batch likelihood L𝑛 :𝑛 +𝑞 toward the partial posterior conditioned on all 𝑛 + 𝑞 events observed so far. Indeed, note that 
+
+P𝑛 +𝑞 (𝜃 ) = 1
+
+Z𝑛 +𝑞 
+
+𝜋 (𝜃 )
+
+> 𝑛 +𝑞
+
+Ö
+
+> 𝑖 =1
+
+L𝑖 (𝜃 ) = Z𝑛 
+
+Z𝑛 +𝑞 
+
+P𝑛 (𝜃 )L 𝑛 :𝑛 +𝑞 (𝜃 ) , (22) and therefore we can think of P𝑛 (𝜃 ) as the prior, and L𝑛 :𝑛 +𝑞 (𝜃 ) as the likelihood to anneal in during SMC likelihood tempering. Although P𝑛 is not tractable, we only require a set of samples and its normalization constant to initialize Algorithm 1, both of which are provided by recursively applying the above data tempering algorithm. Therefore, the initialization step in Algorithm 1 14 is skipped, and instead the initial samples are set to the SMC particles obtained from the previous update step, which are already distributed according to the ‘prior’ P𝑛 .The pseudocode of this hybrid data tempering algorithm is given in Algorithm 2. We keep the same hyperparameters for the inner SMC likelihood tempering step, and set ˜ 𝛼 = 0.5. Note that, since the likelihoods factorize, the weights in Eq. (20) can be updated iteratively, only requiring a cheap reweighting operation at a cost of mere seconds per event. Similarly, we can also cheaply resample the particles to obtain samples from the partial posterior P𝑡 and compute the evidence after each single event, with minimal extra cost. However, for simplicity, here we only save the partial posteriors after update steps as intermediate results. 
+
+Algorithm 2: SMC with adaptive data tempering                                                                                                   
+
+> Data: Prior 𝜋 (𝜃 ), single-event likelihoods L𝑡 (𝜃 ), number of particles 𝑁 , ESS thresholds 𝛼, ˜𝛼 ∈ [ 0,1], Markov kernels K𝑡
+> Result: Samples {𝜃 𝑖 𝑡 }𝑁 𝑖 =1approximating the partial posterior P𝑡 (𝜃 ), and evidence estimates ˆZ𝑡
+> 𝑡 ←0, 𝑛 ←0, 𝑞 ←0, ˆZ0←1;
+> for 𝑖 ←1to 𝑁 do
+> 𝜃 𝑖
+> 0∼𝜋 (𝜃 );/* Sample from the prior */
+> 𝑤 𝑖
+> 0←1/𝑁 ;/* Initialize weights */
+> while 𝑡 < 𝑇 do
+> 𝑡 ←𝑡 +1, 𝑞 ←𝑞 +1;
+> for 𝑖 ←1to 𝑁 do
+> 𝑤 𝑖 𝑡 ←𝑤 𝑖 𝑡 −1× L 𝑡 (𝜃 𝑖 𝑛 );/* Reweight with data point t */
+> if ESS 𝑡 <˜𝛼𝑁 or 𝑡 =𝑇 then
+> {𝜃 𝑖 𝑡 }𝑁 𝑖 =1,ˆZ𝑛 :𝑛 +𝑞 ←SMC LT
+>  P𝑛 ,L𝑛 :𝑛 +𝑞
+> ;/* Alg. 1 */
+> ˆZ𝑡 ←ˆZ𝑛 ×ˆZ𝑛 :𝑛 +𝑞 ;/* Update evidence estimate */
+> 𝑛 ←𝑛 +𝑞 ;/* Update event count */
+> 𝑞 ←0 ; /* Clear queue */
+> 𝑤 𝑖 𝑡 ←1/𝑁 ;/* Reset weights */
+> MOCK EINSTEIN TELESCOPE DATASET Determining the fiducial EOS
+
+To compute the tidal deformabilities of the injections, we determine a fiducial EOS using the following NS observations. First, we use the mass measurement of PSR J0740+6620 of (2.08 ± 0.07 ) M⊙ [89]. Second, we use the NICER mass-radius measurements of PSR J0030+0451 [90, 91], PSR J0740+6620 [92, 93], PSR J0437–4715 [94], and PSR J0614–3329 [95]. The latest data releases of PSR J0437–4715 [159], PSR J0030+0451 [160], PSR J0614–3329 [161], PSR J1614–2230 [162], and PSR J2124–3358 [163] were not available at the start of this project and are not used. Finally, we use the posterior samples of GW170817 analyzed with the IMRPhenomXP_NRTidalv3 waveform model available from Ref. [164]. The data are analyzed with jester, using the SMC sampler with likelihood tempering. We take the posterior sample with the maximum-likelihood value as our EOS for simulating the injections. Figure 5 shows the mass-radius relation and sound-speed profile of this EOS, together with the NS data in the mass-radius plane. To be consistent with lower radii at intermediate masses as well as to support NSs with masses above 2 M ⊙ , the maximum-likelihood EOS remains at a low 𝑐 2 
+
+> 𝑠
+
+and suddenly stiffens around 2 .5 𝑛 sat , after which it gradually decreases. However, most samples in the posterior do not show a similar behavior, as demonstrated by the 95% credible band. 
+
+> Single-event parameter estimation
+
+Having chosen our injection EOS, we generate a mock dataset of one month of BNSs observed with ET using gwmock [136]. We consider the 2L configuration, with one L placed in the Meuse-Rhine euregion and the other in Sardinia, with the sensitivity curves taken from Ref. [39]. We assume a local merger rate of 106 .6 Gpc −3 yr −1, draw source-frame masses uniformly between 
+
+[1, 2] M⊙ and aligned spins uniformly with dimensionless magnitude up to 0 .05. Unfortunately, a complete Bayesian analysis of long-duration and loud signals observed with ET still presents a significant computational bottleneck today [29, 30]. To reduce computational cost as much as possible in the single-event parameter 15 8 10 12 14 16 Radius [km] 1.01.21.41.61.82.02.22.4Mass [ M ]        
+
+> NICER GW170817 Max. likelihood EOS J0030+0451 J0437-4715 J0614-3329 J0740+6620
+> 123456
+> n[nsat ]0.00.20.40.60.81.0
+> c2
+> s [c2]
+> nbreak
+> FIG. 5. Left : Constraints from NICER (blue) and GW170817 (orange) used to determine the maximum likelihood sample (green). Right :Sound-speed profile of the maximum likelihood EOS sample compared to the 95% credible band of the posterior (pink).
+
+estimation, we use the TaylorF2 waveform model [103, 104] and analyze the signals from a lower frequency cutoff of 
+
+𝑓 min = 20 Hz. However, we note that ET is expected to be sensitive down to 5 Hz [25], which would increase the SNR of the signals considered and lead to more detections (we provide the number of detected sources from 𝑓 min = 5 Hz in the main text). Such a low 𝑓 min increases the duration of the signal and makes Bayesian inference for a catalog this large infeasible with currently available methods. In the end, our catalog contains 1579 detected sources, applying an SNR cutoff of 12 [96]. A few long-duration events do not converge within the imposed time limits and are removed from our catalog, leaving 1555 events. We perform parameter estimation on the signals using nested sampling [97, 98], in particular with the dynesty sampler [99, 100] with 2000 live points and otherwise identical settings to its implementation in bilby [101, 102]. To further reduce computational costs, we use the multibanding likelihood [165, 166] and only sample the subspace of intrinsic parameters that is relevant for our EOS inference, namely the detector-frame chirp mass M𝑐 , mass ratio 𝑞 , and component tidal deformabilities Λ1,2, with uniform priors. Spins and extrinsic parameters are fixed to their injected values during the recovery. Of the fixed parameters, fixing the luminosity distance 
+
+𝑑 𝐿 can impact the EOS inference, as it removes the uncertainty in the redshift, which is needed to transform detector-frame masses to source-frame masses. In the current setup, the redshift is fixed by using the Planck2018 cosmology to convert distance into redshift. On the other hand, our mass posteriors are broader since we analyze signals from 20 Hz instead of 5 Hz. With this setup, we achieve a median sampling runtime of around 10 minutes per signal on 128 CPUs, making the analysis of many signals manageable. We analyze the signals both in stationary, Gaussian detector noise, as used for the results in the main text, and in zero noise, for which the EOS recovery is shown in Fig. 6 below. As defined in Eq. (7), the single-event posteriors enter the hierarchical likelihood through an NF that approximates the conditional posterior density 𝑝 (Λ1, Λ2 |𝑚 1, 𝑚 2, 𝑑 𝑖 ). This flow is trained at the end of each bilby run using flowjax [137]. We use the masked autoregressive flow architecture with rational quadratic spline transforms [167, 168]. The training (performed on CPUs) finishes within 2 minutes and therefore does not present a bottleneck in the analysis. With a median runtime of about 12 minutes for each of the 1555 bilby runs (including flow training), the wall time is currently dominated by the analysis of individual events, not by the hierarchical EOS inference, especially considering our simplified settings for the bilby runs. In the future, we can therefore explore the use of recent advances in parameter estimation of long-duration signals [169–176] to sample more parameters, extend the analysis to lower frequencies, make the mock dataset more realistic, and include effects from Earth rotation [177, 178] and overlapping signals [125–127]. 
+
+> ZERO-NOISE INJECTIONS
+
+With the setup described in the main text, we create two mock datasets: one in which Gaussian noise is added to the data, and one in which the signals are analyzed with zero noise. The injections with noise are presented as the main results in the 16 0.00.51.0
+
+> ESS /N
+
+0 250 500 750 1000 1250 1500 
+
+Number of events 
+
+0.51.0
+
+> Wall time [h]
+
+1 2 3 4 5 6 7 8 9 10 
+
+Batch number 1 2 3 4 5
+
+Density [ nsat ]     
+
+> 10 0
+> 10 1
+> 10 2
+> 10 3
+> Pressure [MeV fm −3]
+> Injection 95% CI 1.01.21.41.61.82.0
+
+Mass [ M ]         
+
+> 0.80.91.01.11.2
+> Λ/Λinj
+> 12345678910
+
+Batch number  
+
+> FIG. 6. Results for the SMC diagnostics ( left panels ) and the EOS constraints ( right panels ) when analyzing the catalog of one month of BNS sources, simulated without detector noise. The ESS decreases more smoothly, and the slight bias in the recovered mass–tidal-deformability curve observed in Fig. 3 is removed.
+
+main text. Figure 6 shows the results of our SMC sampler on the noiseless injections. Without noise, the sampling efficiency decays gradually and monotonically as more events are added, rather than showing the erratic behavior observed when analyzing the noisy injections (Fig. 2). As a result, only half as many batches are needed to process the events, and the total wall time is roughly halved as well. Regarding the derived constraints, we notice that the median tidal deformability curve coincides much more closely with the true injected value than in the noisy injections. Therefore, we conclude that the presence of noise, even when analyzing many events, can cause the recovered tidal deformability to deviate from the injected value.

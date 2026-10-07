@@ -1,0 +1,847 @@
+Title: Assessing transitional pulsar candidates through a quantitative estimation of their light-curve similarity
+
+URL Source: https://arxiv.org/pdf/2610.08531v1
+
+Published Time: Wed, 07 Oct 2026 01:59:23 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+MNRAS 000 , 1– ?? (2026) Preprint 7 October 2026 Compiled using MNRAS L ATEX style file v3.3 
+
+# Assessing transitional pulsar candidates through a quantitative estimation of their light-curve similarity 
+
+## D. F. Torres 1,2,3★, C. R. García 1,2,4†, F. Coti Zelati 1,2, D. de Martino 5, G. Illiano 1,2,6, A. Papitto 7,A. Patruno 1,2, & M. C. Baglio 6 
+
+> 1
+
+Institute of Space Sciences (ICE, CSIC), Campus UAB, Carrer de Can Magrans s/n, Barcelona 08193, Spain  
+
+> 2
+
+Institut d’Estudis Espacials de Catalunya (IEEC), Barcelona 08860, Spain  
+
+> 3
+
+Institució Catalana de Recerca i Estudis Avançats (ICREA), Barcelona, Spain  
+
+> 4
+
+Institute for Research in Technology (IIT), Universidad Pontificia Comillas, Madrid, Spain  
+
+> 5
+
+INAF-Osservatorio Astronomico di Capodimonte, Salita Moiariello 16, I-80131, Naples, Italy  
+
+> 6
+
+INAF-Osservatorio Astronomico di Brera, Via Bianchi 46, I-23807 Merate (LC), Italy  
+
+> 7
+
+INAF-Osservatorio Astronomico di Roma, via di Frascati 33, I-00078, Monteporzio Catone, Roma, Italy 
+
+Accepted XXX. Received YYY; in original form ZZZ 
+
+ABSTRACT 
+
+Transitional millisecond pulsars are often identified through X-ray light-curve morphology, especially by visual comparison with the prototype PSR J1023+0038. Such classifications remain qualitative and lack a calibrated notion of how much variability is already present within the prototype itself. We introduce a Dynamic Time Warping (DTW) framework that compares light curves through moving-window similarity distributions and calibrates candidate-prototype distances against the internal heterogeneity of PSR J1023+0038. In this formulation, a source is not simply asked to resemble one prototype observation, but to remain compatible with the range of morphologies exhibited by the prototype across observations. We apply the method to confirmed and candidate tMSPs and to a control sample of non-tMSP systems. The resulting similarity measure provides a reproducible ranking for tMSP-like behaviour and is therefore useful for candidate triage and archival searches. At the same time, the control sample shows that short-timescale accretion variability can partly mimic tMSP-like morphology, demonstrating that light-curve shape alone is a screening diagnostic rather than a definitive class identifier. 
+
+Key words: X-rays: binaries, Stars: neutron, (Stars:) pulsars: general, Methods: data analysis 
+
+1 INTRODUCTION 
+
+Transitional millisecond pulsars (tMSPs) are compact neutron-star binaries that alternate between an accretion-powered state and a rotation-powered radio-pulsar state, thereby providing a direct ob-servational link between low-mass X-ray binaries and recycled pul-sars (see, e.g., Archibald et al. 2009; Papitto et al. 2013; Papitto & de Martino 2022). In the sub-luminous accreting regime, their X-ray emission exhibits a distinctive combination of (i) pronounced stochastic variability on seconds-to-minutes timescales and (ii) re-current switching between quasi-stable luminosity modes, commonly labelled high, low, and flaring modes (see, e.g., Linares 2014; Bog-danov et al. 2015a). Prototypical systems such as PSR J1023+0038 have established this mode-switching phenomenology as the practi-cal signature for identifying possible members of the class. Candidate selection, however, still rests on qualitative pattern recog-nition: light curves are commonly deemed “tMSP-like” by visual comparison with prototypical sources. This approach is effective for choosing targets for additional observations, but it is intrinsically subjective and does not provide a quantitative measure of resem-blance, nor an explicit calibration against the internal heterogene- 
+
+> ★
+
+dtorres@ice.csic.es 
+
+† crodriguez@ice.csic.es 
+
+ity of the prototype itself. In addition, differences in observation length, cadence, and stochastic variability can bias purely qualita-tive judgments. The issue is therefore not only one of formalizing visual resemblance, but of enabling reproducible candidate ranking across heterogeneous observations, so that morphology can be used as an operational first-pass criterion in source selection and archive searches. Here we address these limitations by introducing a quantitative, morphology-based comparison of X-ray light curves using Dynamic Time Warping (DTW, see, e.g., Berndt & Clifford 1994). The DTW approach is broadly utilized across various fields, from speech recog-nition to analyze market trends. DTW has also been recently used in astrophysics. Examples include the similarity between light curves of gamma-ray bursts (Zhang et al. 2016), the reconstruction of gravi-tational wave signals from core-collapse supernovae (Suvorova et al. 2019), and the assessment of solar wind time series (Samara et al. 2022). Vohl et al. (2024) have employed an unsupervised method involving DTW to categorize radio pulsars by profile shape simi-larity using graph theory. In García & Torres (2025), we use DTW to analyze the population of gamma-ray-emitting pulsars detected by Fermi-LAT 3PC, quantitatively showing that pulsars with similar light curves can have different physical and spectral properties. 
+
+© 2026 The Authors arXiv:2610.08531v1 [astro-ph.HE] 6 Oct 2026 2 D. F. Torres et al. 
+
+2 SOURCE SELECTION AND THEIR X-RAY LIGHT CURVES 
+
+The light curves analyzed here include confirmed and candidate tM-SPs: PSR J1023+0038 (also referred to as the prototypical source or J1023), XSS J12270-4859, IGR J18245-2452, and the candi-dates 1RXS J154439.4-112820, CXOU J110926.4-650224. To assess the methodology’s discriminative power, we also include a control sample of systems (formed by accreting millisecond pulsars (AM-SPs) and cataclysmic variables (CVs)) consisting of: PBC J0801.2-4625, IGR J12123-5802, SWIFT J0746-1611, IGR J17511-3057, and SAX J1808.4-3658. Each system is briefly introduced in Ap-pendix A together with details regarding the observations used to characterize them. The preparation of the X-ray light curves for the application of the methodology is described in Appendix B. The two more relevant steps are the identification of temporal discontinuities and the re-moval of flares. We extract light curve segments with a minimum temporal length of 1h (3600 s, or 120 bins of 30 s, in which all light curves are shown). The size of the temporal bin and the minimum duration to be considered a light curve segment can be chosen ac-cording to data. The aim of these choices is to avoid comparisons with too short light curves which may be inappropriate to define the systems’ mode; and to define a duration of a bin that can be equally used in all systems to be compared. Since the aim of the present method is to compare the recurrent mode-switching morphology of the sub-luminous disc state, we exclude flaring intervals before applying DTW. Otherwise their sporadic oc-currence, broad amplitude range, and source-to-source variability would dominate any distance. When existing, flares of confirmed and candidate tMSPs are identified and removed using the count-rate distribution. A threshold is set at three standard deviations above the peak of the highest-count distribution. This threshold is estimated as-suming an approximate Gaussian distribution of the high mode. Bins with counts exceeding this threshold are classified as flaring modes and are excluded. After flare removal, we require that the remain-ing light curve segments meet the minimum duration requirement of 3600 s. Each resulting light curve is normalized using the min-max scaler (see Appendix B, Eq. B1). This ensures that each light curve is eval-uated mainly based on its morphology, regardless of flux variations, and that its values are adjusted between 0 and 1. Note that to prevent distorting the light curve shapes, the min-max scaler is applied col-lectively to all those segments originating from the same observation. Table B1 shows the number of observational campaigns available for each system, along with the resulting number of light curve segments obtained. Appendix B shows all the light curves used in this study. 
+
+3 QUANTIFYING LIGHT CURVE SIMILARITY 3.1 Basics of dynamic time warping 
+
+DTW finds the optimal alignment between two-time series by allow-ing flexible comparisons while preserving their structural integrity. Consider two time series 𝑋 LC and 𝑌 LC of length 𝑛 and 𝑚 :
+
+𝑋 LC = [𝑥 1, 𝑥 2, . . . , 𝑥 𝑖 , . . . , 𝑥 𝑛 ]
+
+𝑌 LC = [𝑦 1, 𝑦 2, . . . , 𝑦 𝑗 , . . . , 𝑦 𝑚 ] . (1) The indices (𝑖, 𝑗 ) in Eq. (1) run along the elements of each time series, respectively ( 𝑖 = 1, . . . , 𝑛 , 𝑗 = 1, . . . , 𝑚 ). To be considered a warping path, i.e., a set of connected pairs of points (𝑥 𝑖 , 𝑦 𝑗 ) covering all the elements of both series in Eq. (1), we shall require the warping path conditions (see, e.g., Berndt & Clifford 1994): the usual boundary (𝑖 1 = 1, 𝑗 1 = 1, and 𝑖 𝑘 = 𝑛 , 𝑗 𝑘 = 𝑚 ), monotonicity ( 𝑖 𝑘 −1 ≤ 𝑖 𝑘 
+
+and 𝑗 𝑘 −1 ≤ 𝑗 𝑘 ), and continuity ( 𝑖 𝑘 − 𝑖 𝑘 −1 ≤ 1 and 𝑗 𝑘 − 𝑗 𝑘 −1 ≤
+
+1) conditions. Taking these conditions into account, the DTW is computed 1. as (see, e.g., Shokoohi-Yekta et al. 2014): DTW (𝑋 LC , 𝑌 LC ) = min    
+
+> 𝑊 (𝑋 LC ,𝑌 LC ) ∈ A
+
+∑︁  
+
+> (𝑖, 𝑗 ) ∈ 𝑊
+
+𝑑 (𝑥 𝑖 , 𝑦 𝑗 )2  12 , (2) where 𝑊 represents an explored warping path that pertains to the set A of all paths fulfilling the warping path conditions. The DTW value from Eq. (2) is the cost of the optimal warping path ( 𝑊 o), that is, it is the minimum value obtained after adding the distance 
+
+𝑑 between all pairs (𝑖, 𝑗 ) of 𝑊 o. Besides the warping path condi-tions, we can also impose a global constraint. Two typical global constraints are the Sakoe-Chiba band (Sakoe & Chiba 1978) and the Itakura parallelogram (Itakura 1975); see, e.g., Geler et al. (2019) for a discussion. A comparison of these constraints, together with other alternatives and the moving-window process adopted here, is discussed in Appendix D. Here we adopt a Sakoe-Chiba band with a warping window max-imum size ( 𝑤 𝑤 ). The parameter 𝑤 𝑤 limits pathological warpings in which few elements of 𝑋 LC are aligned with many elements of 
+
+𝑌 LC to minimize the cost. Larger values of 𝑤 𝑤 allow more flexible and potentially degenerate alignments, which can artificially increase similarity, while smaller values enforce stricter correspondences. See additional discussion in Appendix E. 
+
+3.2 Moving window sets 
+
+We apply a moving window to divide each light curve into smaller, partially overlapping segments. We call these segments, windows (𝑤 ). Appendix C gives an example. We express the size of each light curve ( 𝑁 ) in bins (length 𝑛 or 𝑚 in Eq. (1)); therefore, the implementation depends on the window size ( 𝑤 𝑠 ) and the window step size ( 𝑠 𝑠 ), both also measured in bins. See Appendix E for further discussion. The total number of windows ( 𝑁 𝑤 ) for a given light curve is calculated as 2:
+
+𝑁 𝑤 =
+
+ 𝑁 − 𝑤 𝑠 
+
+𝑠 𝑠 
+
+
+
++ 1. (3) After applying Eq. (3), any ignored portion of the light curve has less than 𝑤 𝑠 bins. Therefore, the times series provided in Eq. (1), can be represented using the moving windows as 
+
+𝑋 LC = {𝑤 1, 𝑤 2, . . . , 𝑤 𝑖 , . . . , 𝑤 𝑁 𝑤 (𝑛 ) }
+
+𝑌 LC = {𝑤 1, 𝑤 2, . . . , 𝑤 𝑗 , . . . , 𝑤 𝑁 𝑤 (𝑚 ) } . (4) 
+
+3.3 Similarity comparison methodology based on DTW 
+
+We apply DTW using Eq. (2) for each pair of windows 𝑤 in Eq. (4). This generates a set of values 𝑑 𝑖 𝑗 = DTW (𝑤 𝑖 , 𝑤 𝑗 ). Examples of such matches are given in Appendix F. For each 𝑤 𝑖 ∈ 𝑋 LC , we only keep the minimum DTW value calculated (i.e., that corresponding to the most similar window) among all comparisons with windows 
+
+𝑤 𝑗 ∈ 𝑌 LC , referred to as 𝑑 𝑋 LC →𝑌 LC  
+
+> 𝑖
+
+= min 1≤ 𝑗 ≤ 𝑁 𝑤 (𝑛 ) 𝑑 𝑖 𝑗 . Similarly, for each 𝑤 𝑗 ∈ 𝑌 LC , we only keep the minimum DTW value calculated         
+
+> 1The computation follows the implementation in the dtaidistance Python package (Meert et al. 2020)
+> 2The ⌊·⌋ operation, called floor division, guarantees that the result is a whole number, in this case, by rounding down to the nearest one. MNRAS 000 , 1– ?? (2026)
+
+## DTW qualification of transitional pulsar candidates 3
+
+among all comparisons with 𝑤 𝑖 ∈ 𝑋 LC , referred to as 𝑑 𝑌 LC →𝑋 LC  
+
+> 𝑗
+
+=
+
+min 1≤𝑖 ≤ 𝑁 𝑤 (𝑚 ) 𝑑 𝑖 𝑗 . We then define the pooled set of these minimal distances as 3:
+
+D𝑋𝑌 = {𝑑 𝑋 LC →𝑌 LC  
+
+> 𝑖
+
+}𝑁 𝑤 (𝑛 )
+
+> 𝑖 =1
+
+Ú
+
+{𝑑 𝑌 LC →𝑋 LC  
+
+> 𝑗
+
+}𝑁 𝑤 (𝑚 ) 
+
+> 𝑗 =1
+
+. (5) We shall consider a measure of similarity based on the inverse of Eq. (2), 𝑠 = DTW −1. Thus, more similar comparisons will produce higher values of 𝑠 . Next we treat the values in D using Eq. (5) as an empirical cumulative distribution function (ECDF). The ECDF of the set of minimum DTW between two light curves will be denoted as b𝐹 𝑋𝑌 (𝑠 ).
+
+3.4 Similarity based on ECDFs of the minimum DTW values 
+
+The similarity of a system 𝑍 to the prototype system (J1023) is to be characterised by an ECDF, which we shall refer to as b𝐹 𝑍 (𝑠 ). This ECDF is constructed from the pooled set of DTW-derived values obtained by comparing the light curves of 𝑍 with each available prototype light curve of J1023, following Eq. (5). Let 𝐷 𝑍 = {𝑑 1, . . . , 𝑑 𝐾 } denote the pooled sample of DTW distances used to construct b𝐹 𝑍 (𝑠 ). Explicitly, if D𝑍 𝑗 𝑋 𝑖 denotes the collection of window-window minimal DTW distances obtained from the com-parison between the 𝑗 -th light curve of 𝑍 and the 𝑖 -th prototype light curve of J1023, then 𝐷 𝑍 = Ò 𝑗,𝑖 D𝑍 𝑗 𝑋 𝑖 , according to Eq. (5). Here, 𝐾 is the total number of comparisons arising from all pairs of light curves of 𝑍 and J1023, i.e. 𝐾 = Í 𝑗,𝑖 
+
+ 𝑁 𝑤 (𝑍 𝑗 ) + 𝑁 𝑤 (𝑋 𝑖 ),where 𝑍 𝑗 and 𝑋 𝑖 index each of the light curves of 𝑍 and J1023, re-spectively. Note that although the DTW comparisons are performed separately for each prototype light curve and, when applicable, for the light curves of the system 𝑍 , all resulting DTW similarity values are pooled together to form a single ECDF, b𝐹 𝑍 (𝑠 ).The first application of this method is to characterize the intrinsic variability of the prototype source itself. To do this, we define a functional ensemble with the ECDFs obtained from all prototype-prototype comparisons { b𝐹 𝑋 𝑖 𝑋 𝑗 (𝑠 )} 𝑖< 𝑗 . The top left-panel in Fig. 1 shows these ECDFs as grey shaded curves. The median ECDF (𝐺 𝑓 (𝑠 ); dotted red curve) appears as a central reference. While this ensemble represents the whole range of heterogeneity expected from self-comparisons of the prototype system, not all ECDFs contribute equally to this variability. In particular, some ECDFs show pairwise comparisons where the similarity distributions differ greatly from the ensemble’s typical behavior, represented by the median 𝐺 𝑓 (𝑠 ),artificially broadening the functional range and making the prototype more difficult to characterize accurately. To identify these ECDFs we quantify the deviation of each one from 
+
+𝐺 𝑓 (𝑠 ) considering the scalar discrepancy statistic 𝑊 1 defined as (see Vallender (1974)): 
+
+𝐷 𝑖 𝑗 := 𝑊 1 ( b𝐹 𝑋 𝑖 𝑋 𝑗 , 𝐺 𝑓 ) =
+
+∫ +∞ −∞ 
+
+b𝐹 𝑋 𝑖 𝑋 𝑗 − 𝐺 𝑓 (𝑠 ) d𝑠 , (6) where 𝑊 1 denotes the first-order Wasserstein distance (see, e.g, Wasserstein 1969; Dobrushin 1970) between the b𝐹 𝑋 𝑖 𝑋 𝑗 and 𝐺 𝑓 (𝑠 ).This corresponds to the area between the two ECDFs, providing a global measure of their discrepancy. Large values of 𝐷 𝑖 𝑗 indicate poorer agreement of the particular light curve with the median be-havior of the system. No parametric model, generative assumption, or hypothesis-testing framework is assumed. The set of distances {𝐷 𝑖 𝑗 } computed in Eq. (6) provides a quantitative    
+
+> 3The Òoperator denotes the multiset union, which preserves the multiplicity of all elements rather than removing duplicate values.
+
+distribution for how typical it is to find the prototype in a given observation behaving as it does on average. We identify outliers in this distribution using a criterion based on the median absolute deviation (MAD). Denoting by med (𝐷 ) and MAD (𝐷 ) = med (| 𝐷 𝑖 𝑗 −
+
+med (𝐷 )|) the median and MAD of {𝐷 𝑖 𝑗 }, respectively, we define outliers ECDFs as those satisfying: 
+
+𝐷 𝑖 𝑗 > med (𝐷 ) + 𝑘 × MAD (𝐷 ) , (7) with 𝑘 = 1 chosen to isolate the core of the ensemble. Let 𝑁 prot ,f denote the number of ECDFs in the full functional ensem-ble. This number is 703, and results from 𝑁 prot ,f = 𝑁 𝑋 𝑖 × ( 𝑁 𝑋 𝑖 −1)/ 2, where 𝑁 𝑋 𝑖 = 38 is the number of prototype light curves used to con-struct the ensemble, see Table B1. After applying Eq. (6) for each one of 703 ECDFs, and filter them via Eq. (7), the number of ECDFs composing the resulting functional ensemble is 𝑁 prot =496. The top right-panel of Fig. 1 shows these ECDFs. The median ECDF ( 𝐺 (𝑠 );solid black curve) appears as a reference curve. It can be seen that 
+
+𝐺 (𝑠 ) is indistinguishable from the median obtained from the reduced set of light curves selected to characterize the typical J1023 behavior. 
+
+3.5 Confidence bands for DTW similarity 
+
+From the ensemble of ECDFs representing the typical be-havior of the prototype as computed in §3.4 a non-parametric pointwise (1 − 𝛼 ) confidence band can be con-structed at each fixed 𝑠 value as the region [𝐿 𝛼 (𝑠 ), 𝑈 𝛼 (𝑠 )] =
+
+[quantile 𝛼 /2
+
+n b𝐹 𝑋 𝑖 𝑋 𝑗 (𝑠 )
+
+o
+
+, quantile 1− 𝛼 /2
+
+n b𝐹 𝑋 𝑖 𝑋 𝑗 (𝑠 )
+
+o
+
+]. It provides a reference against which to compare the ECDF b𝐹 𝑍 (𝑠 ) of any source 
+
+𝑍 , indicating whether the similarity distribution of system 𝑍 aligns with the intrinsic variability observed within the prototype. In this work, we adopt 𝛼 = 0.1, corresponding to a 90% confidence band, shown as the dark-grey shaded region in Fig. 1. 
+
+3.6 Quantifying similarity in a Gaussian-equivalent compatibility scale 
+
+The departure of any system from the prototype-like behaviour can also be assessed using the scalar discrepancy statistics that measures deviations from 𝐺 (𝑠 ) (see §3.5): 
+
+𝑇 𝑍 := 𝑊 1
+
+ b𝐹 𝑍 , 𝐺 
+
+
+
+=
+
+∫ +∞ −∞ 
+
+b𝐹 𝑍 (𝑠 ) − 𝐺 (𝑠 ) d𝑠 . (8) Large values of 𝑇 𝑍 indicate poorer agreement with the prototype class. To interpret 𝑇 𝑍 probabilistically, these values will be calibrated against the range of deviations exhibited by the non-outlier prototype self-comparisons themselves; i.e., against the typical heterogeneity of J1023. For the set of ECDFs selected in §3.4 we compute: 
+
+𝑇 𝑋 𝑖 𝑋 𝑗 := 𝑊 1
+
+ b𝐹 𝑋 𝑖 𝑋 𝑗 , 𝐺 (𝑠 )
+
+
+
+(𝑖 < 𝑗 ) . (9) The collection {𝑇 𝑋 𝑖 𝑋 𝑗 }𝑖< 𝑗 , with a length of 𝑁 prot , provides a finite reference distribution against which the deviation 𝑇 𝑍 can be inter-preted. For a given system 𝑍 , we define a reference tail value as: 
+
+𝑟 𝑍 = #{𝑇 𝑋 𝑖 𝑋 𝑗 ≥ 𝑇 𝑍 } + 1
+
+𝑁 prot + 1 , (10) which quantifies the relative position of 𝑇 𝑍 within the reference distribution. In Eq. (10), the numerator counts how many of the light curves of the prototype produce a discrepancy as large as the   
+
+> MNRAS 000 , 1– ?? (2026)
+
+## 4 D. F. Torres et al. 0 1 2 3 4 5 6 70.00.20.40.60.81.0 
+
+> ECDF
+> Gf(s)
+
+0 1 2 3 4 5 6 70.00.20.40.60.81.0  
+
+> G(s)
+> Gf(s)
+> TGG f= 0.012
+
+0 1 2 3 4 5 6 7
+
+s
+
+0.00.20.40.60.81.0      
+
+> ECDF
+> 90% Confidence band
+> G(s)J1023 ?(σeq = 0 .005 )XSS J12270-4859 ( σeq = 0 .519 )CXOU J110926.4-650224 ( σeq = 0 .563 )1RXS J154439.4-112820 ( σeq = 1 .245 )IGR J18245-2452 ( σeq = 3 .088 )
+
+0 1 2 3 4 5 6 7
+
+s
+
+0.00.20.40.60.81.0     
+
+> 90% Confidence band
+> G(s)
+> IGR J12123-5802 ( σeq = 0 .440 )PBC J0801.2-4625 ( σeq = 3 .088 )SWIFT J0746-1611 ( σeq = 3 .088 )IGR J17511-3057 ( σeq = 3 .088 )SAX J1808.4-3658 ( σeq = 3 .088 )
+
+Figure 1. Top left: All ECDFs coming from J1023’s light curves self-comparisons. Their median, 𝐺 f (𝑠 ), is displayed as a dotted red curve. Top right: The ECDFs filtered using Eq. (7) are shown. The central tendency of the set of ECDFs from the left panel, 𝐺 f (𝑠 ), is shown as a dotted red curve, and the one of the filtered ECDFs, 𝐺 (𝑠 ), as a solid black curve. They are indistinguishable at this scale. The discrepancy between the medians, 𝑇 𝐺𝐺 f , computed using Eq. (8), is small, consistent with the visual match. Bottom: ECDFs for the comparison of different systems, 𝑍 , with the prototype of the class, J1023. The left (right) panel corresponds to the candidate (control) systems. The dark-shaded region represents the 90% confidence band summarizing the heterogeneity among the prototype self-comparisons considering Eq. (7). The colored ECDFs are constructed from the pooled set of DTW-derived similarity values obtained by independently comparing the light curves of 𝑍 with each available prototype light curve of J1023 denoted by b𝐹 𝑍 (𝑠 ). The solid black curve is the median of the prototype-prototype ECDFs, 𝐺 (𝑠 ).
+
+one observed for 𝑍 . This 𝑟 𝑍 -value may then be converted into a Gaussian-equivalent compatibility scale via: 
+
+𝜎 eq = Φ −1 
+
+1 − 𝑟 𝑍 
+
+2
+
+
+
+, (11) where Φ−1 denotes the inverse cumulative distribution function of the standard normal distribution. Equation (11) is purely monotonic and serves only to express relative extremeness on familiar statis-tical units. The quantity 𝜎 eq therefore provides a continuous scale of the compatibility between system 𝑍 and the prototype behaviour. It complements the confidence-band analysis by providing a scalar summary of how the similarity distribution of systems relates to the intrinsic variability shown by the prototype source. Lower val-ues indicate greater morphological compatibility, whereas higher values indicate increasingly atypical morphology relative to the pro-totype. These values should be understood strictly as measures of compatibility based on a reference, not as mathematical probabili-ties, hypothesis tests, or rejection criteria. In particular, a value such as 𝜎 eq = 3 should not be interpreted as a conventional 3 𝜎 rejec-tion threshold. The finite extent of the 𝜎 eq scale reflects the finite size of the reference distribution and sets the maximum discrimi-nating power achievable with the available prototype observations. For a given system 𝑍 , the quantity # {𝑇 𝑋 𝑖 𝑋 𝑗 ≥ 𝑇 𝑍 } in Eq. (10) can only take integer values, and therefore the resolution of 𝑟 𝑍 scales as 1/𝑁 prot . In our case, where 𝑁 prot = 496 (see §3.4), the maximum value, 𝜎 eq = 3.088, is obtained when # {𝑇 𝑋 𝑖 𝑋 𝑗 ≥ 𝑇 𝑍 } = 0. This corresponds to the case in which all prototype self-comparisons are closer to the median 𝐺 (𝑠 ) than the system 𝑍 itself. The next pos-sible value occurs for # {𝑇 𝑋 𝑖 𝑋 𝑗 ≥ 𝑇 𝑍 } = 1, yielding 𝜎 eq = 2.876. In this case, at least one ECDF within the representative prototype ensemble is as discrepant from 𝐺 (𝑠 ) as, or more discrepant than, the system under consideration. More generally, increasing values of # {𝑇 𝑋 𝑖 𝑋 𝑗 ≥ 𝑇 𝑍 } indicate that a larger fraction of the prototype self-comparisons show deviations from 𝐺 (𝑠 ) at least as large as that of the system 𝑍 . Values approaching the upper end of the observed range therefore indicate morphology more discrepant than nearly all prototype self-comparisons, rather than a formal statistical rejection of prototype-like behaviour. 
+
+MNRAS 000 , 1– ?? (2026) DTW qualification of transitional pulsar candidates 5
+
+4 RESULTS 
+
+The moving-window process was carried out with 𝑤 𝑠 = 40 bins and 𝑠 𝑠 = 1 bin, ensuring maximum overlap between consecutive segments, and the largest possible number of windows. The DTW alignment was computed using a Sakoe-Chiba band with 𝑤 𝑤 = 4bins. Throughout the analysis, the hyperparameters introduced in § 3.1 and § 3.2 were held constant, see Appendix E. Figure 1 shows the results obtained. Among the lowest values of 𝜎 eq , and in particular, in the second low-est, we find XSS J12270-4859, CXOU J110926.4-650224, 1RXS J154439.4-112820; the former is a confirmed tMSP, while the latter two are well-established candidates. A known tMSP, IGR J18245-2452 appears with a high score. This is the result of it having a less structured light curve (showing a bin-by-bin step-like appearance), which, even qualitatively, does not resemble those of the prototype. Because the source is in a low-count regime, each 30 s time bin con-tains only a small integer number of detected photons. As a result, the background-subtracted count rate takes on discrete values rather than varying smoothly, producing a step-like appearance. Consequently, applying DTW to this Chandra light curve is less straightforward than to the smoother XMM-Newton data, and the results should be interpreted with caution. We retain the comparison with IGR J18245-2452 here because it is a bona fide tMSP, while noticing that, a priori, we do not expect a close behavioral matching. See Appendix A for references and details of the light curves used. One source, IGR J12123-5802, a nova-like CV appears with a low 
+
+𝜎 eq , providing an interesting handle regarding what the methodology is sensitive to (see Appendix B and especially Fig. B6 for the system’s light curve). Generic accretion-driven flickering can mimic switching on short timescales. In CVs, variable absorption from structures in the disk, stream, or a disc rim can produce repeated dips or intervals of lower count rate. When binned at 30 s and viewed in segments, this can resemble alternating high/low intervals. Also, as we keep for each window only the best DTW match in the other light curve, a source can score well if it contains a non-trivial subset of windows that resemble some J1023 windows, even if the global behaviour is different. Thus, there is no contradiction in a nova-like CV achieving moderate similarity to a tMSP prototype under a morphology-only metric with best-window pooling. Rather it is a warning that the method can also capture generic accretion variability patterns that are not unique to tMSPs. In fact, two of the prototypical tMSPs, PSR J1023+0038 and XSS J12270–4859, were initially classified as CVs (Bond et al. 2002; de Martino et al. 2010). 
+
+5 CONCLUDING REMARKS 
+
+We introduce a quantitative, morphology-based framework to com-pare X-ray light curves of transitional millisecond pulsar candidates against a prototype source, using DTW and ECDFs to summarize the resulting similarity distributions. The aim is to replace purely visual classification with a reproducible and calibrated comparison scheme. Our conclusions are: 
+
+• The intrinsic heterogeneity of the prototype, PSR J1023+0038, can be characterized through the ensemble of prototype-prototype ECDFs, whose median 𝐺 (𝑠 ) provides a natural central reference and whose spread defines the expected level of variability compatible with the class. 
+
+• The methodology succeeds in separating, at the ensemble level, confirmed or candidate tMSPs from the control sample in a statisti-cally interpretable way, even though the classification is based only on light-curve morphology and does not use source labels or physical priors. 
+
+• The only clear exception is that of a known tMSP, IGR J18245-2452, which appears with a high score. This was expected, as the light curve used shows a bin-by-bin step-like appearance. 
+
+• Restricting the prototype band to the ECDFs closest to the me-dian makes the compatibility criterion more stringent, but does not substantially shift the median reference curve itself. The resulting fil-tered ensemble therefore characterizes the representative, internally consistent behaviour of the prototype against which the compatibility of other systems is assessed. Thus, the main effect of narrowing the heterogeneity band is a stricter statistical calibration, not a qualitative redefinition of the typical prototype behaviour. 
+
+• The method is sensitive to morphology, not directly to source class. Accordingly, a non-tMSP system can achieve moderate similar-ity to the prototype if it contains a non-negligible subset of light curve segments that resemble some of the J1023 windows, even when its overall behaviour is different. In particular, different accretion-driven states in systems that are not tMSP candidates can individually pro-duce ECDFs that lie close to the prototype median. This does not imply that such systems are physically akin to tMSPs as a whole; rather, it shows that some short-timescale accretion patterns are not unique to transitional pulsars and can mimic isolated pieces of their phenomenology under a morphology-only metric. 
+
+• For that reason, the most meaningful discriminator is not the existence of a single ECDF close to 𝐺 (𝑠 ), but the aggregate be-haviour of the full comparison ensemble associated with a source, as represented by 𝐹 𝑍 or, similarly, by the median of that ensemble. 
+
+• As a particular case, IGR J12123-5802 is informative rather than contradictory: it highlights that the method can capture generic accretion variability patterns that overlap morphologically with parts of the tMSP phenomenology, and thus clarifies both the scope and the present limitation of the approach. Overall, the analysis supports the use of DTW-based ECDF compar-isons as a useful quantitative screening tool for tMSP-like behaviour, while also showing that morphology alone is not fully specific. The method is informative even in cases when it does not uniquely iden-tify class membership: it quantifies how far morphology alone can take the inference, and therefore where additional diagnostics become necessary. The method is therefore best interpreted as a first-stage similarity filter, certainly beyond a visual comparison. A practical use of the method is candidate triage: when several sources show qualitatively suggestive variability, the DTW-based score provides a reproducible way to prioritize those most compatible with established tMSP phe-nomenology for deeper observational campaigns. Because the pro-cedure is automatic once light curves are prepared, it can be applied systematically to archival datasets to search for previously unrecog-nized tMSP-like variability patterns. While here used for assessing individual candidates to tMSPs, it does not preclude additional phys-ical or observational diagnostics. It may play a role in automatic catalog searches for candidates presenting a particular light curve behavior, beyond that of tMSPs. 
+
+ACKNOWLEDGEMENTS 
+
+This work has been supported by the grant PID2024-155316NB-I00 funded by MICIU /AEI /10.13039/501100011033 / FEDER, UE and CSIC PIE 202350E189. This work was also supported by the Span-ish program Unidad de Excelencia María de Maeztu financed by   
+
+> MNRAS 000 , 1– ?? (2026)
+
+## 6 D. F. Torres et al. 
+
+MCIN/AEI/10.13039/501100011033, and by the MaX-CSIC Excel-lence Award MaX4-SOMMA-ICE. F.C.Z. is supported by a Ramon y Cajal fellowship (grant agreement RYC2021-030888-I) and by the Spanish grant ID2023-153099NA-I00. GI is supported by a Juan de La Cierva fellowship (JDC2024-053550-I). A.P., D.dM. acknowl-edges support by INAF (Research Grant FANS and PULSE-X, PI: Papitto), the Italian Ministry of University and Research (PRIN MUR 2020, Grant 2020BRP57Z, GEMS, PI: Astone), and Fondazione Cariplo/Cassa Depositi e Prestiti (Grant 2023-2560, PI: Papitto). M.C.B. acknowledges support from the INAF Fundamental Research Grant XBOOM. We thank two anonymous referees for constructive interactions. 
+
+DATA AVAILABILITY 
+
+The data underlying this article will be shared on reasonable request to the corresponding author. 
+
+CONFLICTS OF INTEREST 
+
+Authors declare no conflict of interest. 
+
+REFERENCES 
+
+Archibald A. M., Stairs I. H., Ransom S. M., et al., 2009, Science, 324, 1411 Archibald A. M., Bogdanov S., Patruno A., Hessels J. W. T., et al., 2015, ApJ, 807, 62 Baglio M. C., Coti Zelati F., Campana S., Busquet G., et al., 2023, A&A, 677, A30 Ballocco C., et al., 2026, A&A, 707, A42 Bassa C. G., Patruno A., Hessels J. W. T., Keane E. F., Monard B., et al., 2014, MNRAS, 441, 1825 Bernardini F., et al., 2013, MNRAS, 435, 2822 Bernardini F., de Martino D., Mukai K., Russell D. M., Falanga M., Masetti N., Ferrigno C., Israel G., 2017, MNRAS, 470, 4815 Bernardini F., de Martino D., Mukai K., Falanga M., 2019, MNRAS, 484, 101 Berndt D. J., Clifford J., 1994, in KDD Workshop. https://api. semanticscholar.org/CorpusID:929893 
+
+Bogdanov S., 2016, ApJ, 826, 28 Bogdanov S., Halpern J. P., 2015, ApJ, 803, L27 Bogdanov S., Archibald A. M., Bassa C., Deller A. T., et al., 2015b, ApJ, 806, 148 Bogdanov S., Archibald A. M., Bassa C., et al., 2015a, The Astrophysical Journal, 806, 148 Bond H. E., White R. L., Becker R. H., O’Brien M. S., 2002, PASP, 114, 1359 Bult P., et al., 2019, The Astrophysical Journal Letters, 885, L1 Campana S., Coti Zelati F., Papitto A., Rea N., et al., 2016, A&A, 594, A31 Coti Zelati F., Campana S., Braito V., Baglio M. C., et al., 2018, A&A, 611, A14 Coti Zelati F., Papitto A., de Martino D., Buckley D. A. H., et al., 2019, A&A, 622, A211 Coti Zelati F., Hugo B., Torres D. F., de Martino D., Papitto A., et al., 2021, A&A, 655, A52 Coti Zelati F., de Martino D., Dhillon V. S., Marsh T. R., et al., 2024, A&A, 690, A220 Dobrushin R. L., 1970, Theory of Probability & Its Applications, 15, 458 Ferrigno C., Bozzo E., Papitto A., Rea N., Pavan L., et al., 2014, A&A, 567, A77 Fruscione A., et al., 2006, in Observatory Operations: Strategies, Processes, and Systems. p. 62701V, doi:10.1117/12.671760 Gabriel C., et al., 2004, in Ochsenbein F., Allen M. G., Egret D., eds, ASP Conference Series Vol. 314, Astronomical Data Analysis Software and Systems XIII. ASP, San Francisco, CA, pp 759–763 García C. R., Torres D. F., 2025, ApJ, 982, L51 Geler Z., Kurbalija V., Ivanovic M., Radovanovic M., Dai W., 2019, in 2019 IEEE International Symposium on INnovations in Intelligent SysTems and Applications (INISTA). pp 1–6, doi:10.1109/INISTA.2019.8778300 Gusinskaia N. V., Jaodand A. D., Hessels J. W. T., Bogdanov S., Deller A. T., et al., 2025, MNRAS, 536, 99 Halpern J. P., Thorstensen J. R., Cho P., Collver G., Motsoaledi M., Breyten-bach H., Buckley D. A. H., Woudt P. A., 2018, AJ, 155, 247 Illiano G., et al., 2025, A&A, 699, A81 Illiano G., et al., 2026, A&A, 706, A52 Irving Z., Altamirano D., Scaringi S., Veresvarska M., Knigge C., Castro Se-gura N., De Martino D., Iłkiewicz K., 2024, Monthly Notices of the Royal Astronomical Society, 530, 3974 Itakura F., 1975, IEEE Transactions on Acoustics, Speech, and Signal Pro-cessing, 23, 67 Jaodand A., Archibald A. M., Hessels J. W. T., Bogdanov S., et al., 2016, ApJ, 830, 122 Linares M., 2014, ApJ, 795, 72 Linares M., Bahramian A., Heinke C., Wijnands R., Patruno A., et al., 2014, MNRAS, 438, 251 Manca A., Coti Zelati F., Li J., Torres D. F., Ballet J., et al., 2025, A&A, 695, A187 Meert W., Hendrickx K., Van Craenendonck T., Robberechts P., Blockeel H., Davis J., 2020, DTAIDistance, doi:10.5281/zenodo.7158824, https: //doi.org/10.5281/zenodo.7158824 
+
+Miraval Zanon A., Ambrosino F., Coti Zelati F., Campana S., et al., 2022, A&A, 660, A63 Muller M., 2007, Dynamic Time Warping. Springer Berlin Heidelberg, Berlin, Heidelberg, pp 69–84, doi:10.1007/978-3-540-74048-3_4, https:// doi.org/10.1007/978-3-540-74048-3_4 
+
+Papitto A., de Martino D., 2022, in Bhattacharyya S., Papitto A., Bhat-tacharya D., eds, Astrophysics and Space Science Library Vol. 465, Astro-physics and Space Science Library. pp 157–200 ( arXiv:2010.09060 ), doi:10.1007/978-3-030-85198-9_6 Papitto A., Ferrigno C., Bozzo E., et al., 2013, Nature, 501, 517 Papitto A., de Martino D., Belloni T. M., Burgay M., Pellizzoni A., et al., 2015, MNRAS, 449, L26 Papitto A., Ambrosino F., Stella L., Torres D., et al., 2019, ApJ, 882, 104 Patruno A., et al., 2014, ApJ, 781, L3 Ratanamahatana C. A., Keogh E., , Making Time-series Classi-fication More Accurate Using Learned Constraints. pp 11– 22 (https://epubs.siam.org/doi/pdf/10.1137/1.9781611972740.2), doi:10.1137/1.9781611972740.2, https://epubs.siam.org/doi/ abs/10.1137/1.9781611972740.2 
+
+Roy J., Ray P. S., Bhattacharyya B., Stappers B. W., Chengalur J. N., et al., 2015, ApJ, 800, L12 Sakoe H., Chiba S., 1978, IEEE Transactions on Acoustics, Speech, and Signal Processing, 26, 43 Samara E., Laperre B., Kieokaew R., Temmer M., Verbeke C., Rodriguez L., Magdalenić J., Poedts S., 2022, ApJ, 927, 187 Selçuk Candan K., Rossini R., Sapino M. L., Wang X., 2012, arXiv e-prints, p. arXiv:1208.0275 Shokoohi-Yekta M., Hu B., Jin H., Wang J., Keogh E. J., 2014. https: //api.semanticscholar.org/CorpusID:14584950 
+
+Stappers B. W., Archibald A. M., Hessels J. W. T., Bassa C. G., Bogdanov S., et al., 2014, ApJ, 790, 39 Suvorova S., Powell J., Melatos A., 2019, Phys. Rev. D, 99, 123012 Vallender S. S., 1974, Theory of Probability & Its Applications, 18, 784 Vohl D., van Leeuwen J., Maan Y., 2024, A&A, 687, A113 Wasserstein L. N., 1969, Probl. Pered. Inform, 5, 64 Zhang B.-B., Zhang B., Castro-Tirado A. J., 2016, ApJ, 820, L32 Zhang Z., Tavenard R., Bailly A., Tang X., Tang P., Corpetti T., 2017, Infor-mation Sciences, 393, 91 de Martino D., et al., 2010, A&A, 515, A25 de Martino D., et al., 2013, A&A, 550, A89 MNRAS 000 , 1– ?? (2026) DTW qualification of transitional pulsar candidates 7
+
+APPENDIX A: SOURCE SAMPLE & OBSERVATIONAL DETAILS 
+
+This appendix summarizes the nature of the sources included in our comparison sample and the observational material used for each of them. The emphasis here is put on the literature most relevant to the accreting or sub-luminous states from which the light curves analyzed in this work were extracted. 
+
+• PSR J1023+0038 (J1023). J1023 is the prototype and best-studied confirmed tMSP. It was first recognized as an unusual CV candidate, then identified as a radio MSP with evidence of a pre-vious accretion disc, and it re-entered an accretion-dominated sub-luminous state in 2013, remaining the benchmark source for tMSP mode-switching phenomenology (Bond et al. 2002; Archibald et al. 2009; Stappers et al. 2014; Patruno et al. 2014; Bogdanov et al. 2015b; Archibald et al. 2015). In this work we use 17 XMM-Newton/EPIC observations obtained during this current active state, since they define the prototype ensemble against which the rest of the sam-ple is compared. These observations encompass the canonical rapid switches among high, low, and flaring modes. Later campaigns show that the same phenomenology persists across the subsequent moni-toring of the source (Campana et al. 2016; Coti Zelati et al. 2018; Papitto et al. 2019; Miraval Zanon et al. 2022; Baglio et al. 2023). 
+
+• XSS J12270-4859 / PSR J1227-4853 (J12270). XSS J12270-4859 is a confirmed tMSP that spent years in a sub-luminous disc state before transitioning in late 2012 to a radio-pulsar state (de Martino et al. 2010, 2013; Bassa et al. 2014; Roy et al. 2015). The source is especially relevant here because its pre-transition X-ray be-haviour closely matches the tMSP phenomenology defined by J1023, and coherent X-ray pulsations were later detected in the 2011 sub-luminous-state data (Papitto et al. 2015). We consider two observa-tions overall; the two key disc-state XMM-Newton observations are those performed in 2009 and 2011. For these, we use the summed EPIC- MOS1+MOS2 light curves. 
+
+• IGR J18245-2452 / PSR J1824-2452I (J1824, M28I). IGR J18245-2452 is the first system directly observed to swing between accretion-powered and rotation-powered states, providing the clear-est proof of the recycling link between LMXBs and radio MSPs (Papitto et al. 2013; Linares et al. 2014; Ferrigno et al. 2014). Un-like J1023 and J12270, its transitional behaviour was caught during a bright X-ray outburst in the globular cluster M28 in 2013, in-cluding extreme “hiccup” accretion and order-of-magnitude intensity changes on short time-scales (Ferrigno et al. 2014). In our sample, we consider a Chandra light curve in which the source is observed in a subluminous state. 
+
+• 1RXS J154439.4-112820 / 3FGL J1544.6-1125 (J1544). 
+
+J1544 is one of the strongest tMSP candidates identified among previ-ously unassociated Fermi-LAT sources (Bogdanov & Halpern 2015; Bogdanov 2016). Its optical spectrum shows an accretion disc, while the X-ray light curve displays the same rapid high/low-mode switch-ing that characterizes confirmed tMSPs (Bogdanov & Halpern 2015; Bogdanov 2016). Recent simultaneous radio/X-ray observations fur-ther strengthen the tMSP interpretation by showing behaviour con-sistent with the radio/X-ray phenomenology already seen in J1023 (Gusinskaia et al. 2025). A recent dedicated multi-band study by Illiano et al. (2025) further probed the source’s mode switching and broad-band variability, reinforcing its standing as one of the best cur-rent tMSP candidates. In this work we consider three XMM-Newton observations. 
+
+• CXOU J110926.4-650224 (J1109). J1109 is a strong tMSP can-didate that has remained in a prolonged sub-luminous disc state since its recognition as the X-ray counterpart of an INTEGRAL hard-X-ray source (Coti Zelati et al. 2019, 2021). Multiwavelength follow-up has shown the rapid bimodal variability, broad-band spectral prop-erties, and variable radio emission expected for the class, while the latest Fermi-LAT analysis now supports its association with a GeV counterpart (Coti Zelati et al. 2024; Manca et al. 2025). We consider two XMM-Newton observations for this source. Regarding the sources that are not tMSPs or candidates, 
+
+• PBC J0801.2-4625. It is a magnetic CV of the Intermediate Polar type with a spin period of 22min (see Bernardini et al. 2017; Halpern et al. 2018; Irving et al. 2024). 
+
+• IGR J12123-5802. It is supposed to be a magnetic CV, but no fast periodicity is found. It is classified as a nova-like CV (see Bernardini et al. 2013). 
+
+• SWIFT J0746-1611. It is a magnetic CV of the IP type that, when in a lower state, did not show fast periodicity and was suggested to be possibly a LMXB. However, when found a few years later in a high state, a spin of 38min was found (see again Bernardini et al. 2017 and Bernardini et al. 2019). For this source, the light curve is in a low state, which could be helpful to compare with the tMSP light curves. 
+
+• IGR J17511-3057. The EPIC light curve, binned at 30 s, from the XMM-Newton observation of the AMSP was obtained during the late stages of its recent outburst (Illiano et al. 2026). At that point, the X-ray luminosity had decreased below 7e33 erg/s, consistent with levels observed in tMSPs in the sub-luminous state. Even at this level, we would expect to be in the propeller regime, but we detected coherent X-ray pulsations. This behavior was also observed in another AMSP using NICER (Bult et al. 2019). 
+
+• SAX J1808.4-3658. Light curve of the AMSP during the final stage of its 2022 outburst, observed with EPIC pn and binned at 30 s (see Ballocco et al. 2026). The observation was performed during the so-called reflaring state. All XMM-Newton observations listed in Table A1 were processed following standard procedures with the XMM-Newton Science Anal-ysis System (SAS; Gabriel et al. 2004). After screening out intervals affected by enhanced particle background, source products were ex-tracted from circular regions centered on the target for imaging-mode observations, with background regions selected away from the source but on the same CCD. For timing-mode observations, source and background events were instead extracted from strip-shaped re-gions centered on, and offset from, the source columns, respectively. Background-subtracted light curves in the 0.3–10 keV band were then produced with epiclccorr , which applies the standard expo-sure and instrumental corrections. Whenever more than one EPIC detector contributed simultaneous good-time intervals, the corre-sponding light curves were combined over the strictly overlapping intervals. The final light curves were binned at 30 s, which provides a practical compromise between signal-to-noise in individual bins and sensitivity to short low-mode intervals. The Chandra data for J1824 were reprocessed with chandra_repro 
+
+in CIAO 4.18 using CALDB 4.12.3 (Fruscione et al. 2006). We extracted source events from a circular aperture of radius 1 .5′′ cen-tered on the source position. The background was estimated from an annulus with inner and outer radii of 6 ′′ and 16 ′′ , after masking neighboring point sources detected in the same field. Background-subtracted light curves were then produced in the 0.5–8.0 keV band with dmextract , which applies the standard exposure correction on a bin-by-bin basis, using 30 s time bins.   
+
+> MNRAS 000 , 1– ?? (2026)
+
+## 8 D. F. Torres et al.  
+
+> Table A1. Observational log for the sources used in this work. Columns list the source name, instrument, observation identifier, observation date, and reference. Light curves are binned with 30 s steps .
+
+Source Instrument Obs. ID Date Duration (ks) Reference J1023 XMM-Newton/EPIC 0720030101 2013-11-10 138.1 (Bogdanov et al. 2015b; Archibald et al. 2015) J1023 XMM-Newton/EPIC 0742610101 2014-06-10 131.1 (Bogdanov et al. 2015b; Archibald et al. 2015) J1023 XMM-Newton/EPIC 0748390101 2014-11-21 35.7 (Campana et al. 2016; Jaodand et al. 2016) J1023 XMM-Newton/EPIC 0748390501 2014-11-23 36.2 (Campana et al. 2016; Jaodand et al. 2016) J1023 XMM-Newton/EPIC 0748390601 2014-11-28 22.0 (Campana et al. 2016; Jaodand et al. 2016) J1023 XMM-Newton/EPIC 0748390701 2014-12-17 35.8 (Campana et al. 2016; Jaodand et al. 2016) J1023 XMM-Newton/EPIC 0770581001 2015-11-11 32.4 (Campana et al. 2016; Jaodand et al. 2016) J1023 XMM-Newton/EPIC 0770581101 2015-11-13 24.0 (Campana et al. 2016; Jaodand et al. 2016) J1023 XMM-Newton/EPIC 0783330301 2015-12-09 27.7 (Campana et al. 2016; Jaodand et al. 2016) J1023 XMM-Newton/EPIC 0784700201 2016-05-08 127.9 (Coti Zelati et al. 2018) J1023 XMM-Newton/EPIC 0794580801 2017-05-23 26.0 (Papitto et al. 2019) J1023 XMM-Newton/EPIC 0794580901 2017-05-24 24.5 (Papitto et al. 2019) J1023 XMM-Newton/EPIC 0803620201 2017-05-08 25.3 –J1023 XMM-Newton/EPIC 0803620301 2017-05-10 29.0 –J1023 XMM-Newton/EPIC 0803620401 2017-05-16 24.0 –J1023 XMM-Newton/EPIC 0803620501 2017-06-13 24.0 (Miraval Zanon et al. 2022) J1023 XMM-Newton/EPIC 0864010101 2021-06-03 64.5 (Baglio et al. 2023) J1109 XMM-Newton/EPIC 0764344301 2018-06-20 68.0 (Coti Zelati et al. 2019) J1109 XMM-Newton/EPIC 0864190201 2022-03-02 24.0 (Coti Zelati et al. 2024) J1544 XMM-Newton/EPIC-pn 0800280101 2018-01-28 133 (Illiano et al. 2025) J1544 XMM-Newton/EPIC-pn 0923466201 2024-02-08 60 (Illiano et al. 2025) J1544 XMM-Newton/EPIC 0724080101 2014-02-16 42.2 (Bogdanov & Halpern 2015) J12270 XMM-Newton/EPIC-MOS 0551430401 2009-01-05 31.49 (de Martino et al. 2010) J12270 XMM-Newton/EPIC-MOS 0656780901 2011-01-01 31.02 (de Martino et al. 2013) J1824 Chandra/ACIS-S 9132 2008-08-07 142.26 (Papitto et al. 2013; Linares et al. 2014) PBC J0801.2-4625 XMM-Newton/EPIC-pn 761120301 2015-12-04 30 (Bernardini et al. 2017) SWIFT J0746-1611 XMM-Newton/EPIC-pn 761120401 2016-04-01 34.5 (Bernardini et al. 2017) IGR J12123-5802 XMM-Newton/EPIC-pn 671850601 2012-01-07 38.2 (Bernardini et al. 2013) IGR J17511-3057 XMM-Newton/EPIC 0954191401 2025-03-03 20 (Illiano et al. 2026) SAX J1808.4-3658 XMM-Newton/EPIC 0884700801 2022-09-09 113.3 (Ballocco et al. 2026) 
+
+APPENDIX B: PREPROCESSING LIGHT CURVES 
+
+The preparation of the light curves for application of the developed methodology consists of three main steps: treatment of negative count rate values, identification of temporal discontinuities, and removal of flaring modes. Negative count rate values are set to zero, under the assumption that they arise from statistical fluctuations around a null signal and do not represent physical emission. Temporal discontinu-ities are identified as gaps in which no count value is recorded. Since the light curves are binned consecutively in time with a resolution of 30 s, any time difference between two adjacent bins exceeding 30 s (corresponding to 1 bin) is interpreted as a temporal jump. In such cases, the light curve is split into independent segments (resulting in different light curves). Only segments with a minimum temporal length of 3600 s (1 hr) are retained for further analysis. The removal of flaring modes is carried out using the count-rate distribution, as explained in the main text. Each resulting light curve is normalized using the min-max scaler: 
+
+𝑋 † = 𝑥 𝑖 − 𝑥 min 
+
+𝑥 max − 𝑥 min 
+
+, (B1) where 𝑥 𝑖 denotes the flux value at 𝑖 -bin-index, and 𝑥 min and 𝑥 max are the minimum and maximum flux values of the corresponding light curve. Equation (B1) ensures that each light curve is evaluated mainly based on its morphology, regardless of flux variations, adjusting its values between 0 and 1. Table B1 shows the number of resulting light curves for each source. Figures B1, B2, and B3 show the light curves for the prototype                        
+
+> Table B1. Summary of the preprocessed sample. The number of observational campaigns used for each system is shown, along with the resulting number of light curves (LCs) obtained after the preprocessing steps described in §2. Systems classified in the literature as confirmed and candidate tMSPs are shown in boldface.
+> System Campaigns Resulting LCs J1023 17 38
+> CXOU J110926.4-650224 23
+> XSS J12270-4859 22
+> 1RXS J154439.4-112820 39
+> IGR J18245-2452 11PBC J0801.2-4625 11SWIFT J0746-1611 11IGR J12123-5802 11IGR J17511-3057 11SAX J1808.4-3658 12
+
+transitional pulsar source J1023. Each panel represents a different observation. The removed bins (due to them pertaining to a flare according to the definition, or because of a short duration of con-secutive bins) are shown in black (labelled as rem). Different colors explicitly mark the light curve segments retained for further analysis. Figures B4, B5, and B6 show the considered light curves for the tran-sitional pulsar candidates and the other sources in the comparison, respectively.   
+
+> MNRAS 000 , 1– ?? (2026)
+
+## DTW qualification of transitional pulsar candidates 90 2000 4000 6000 8000 10000 12000 14000 16000 0510 
+
+> Counts
+
+Obs ID: 0748390601 (1) 
+
+0 2500 5000 7500 10000 12500 15000 17500 20000 010 20 30 
+
+> Counts
+
+Obs ID: 0803620201 (rem) Obs ID: 0803620201 (1) 
+
+0 20000 40000 60000 80000 100000 020 40 
+
+> Counts
+
+Obs ID: 0784700201 (rem) Obs ID: 0784700201 (1) Obs ID: 0784700201 (2) Obs ID: 0784700201 (3) 
+
+0 2500 5000 7500 10000 12500 15000 17500 20000 010 20 30 
+
+> Counts
+
+Obs ID: 0770581101 (rem) Obs ID: 0770581101 (1) Obs ID: 0770581101 (2) 
+
+0 10000 20000 30000 40000 50000 050 100 
+
+> Counts
+
+Obs ID: 0864010101 (rem) Obs ID: 0864010101 (1) Obs ID: 0864010101 (2) Obs ID: 0864010101 (3) 
+
+0 2500 5000 7500 10000 12500 15000 17500 20000 
+
+## Time (s) 
+
+0510 15 
+
+> Counts
+
+Obs ID: 0803620401 (rem) Obs ID: 0803620401 (1) Obs ID: 0803620401 (2) 
+
+Figure B1. Example of the light curve treatment using the prototype transitional pulsar source J1023. See text for details. MNRAS 000 , 1– ?? (2026) 10 D. F. Torres et al. 0 2500 5000 7500 10000 12500 15000 17500 20000 010 20 30 
+
+> Counts
+
+Obs ID: 0794580901 (rem) Obs ID: 0794580901 (1) Obs ID: 0794580901 (2) 
+
+0 20000 40000 60000 80000 100000 120000 010 20 30 
+
+> Counts
+
+Obs ID: 0720030101 (rem) Obs ID: 0720030101 (1) Obs ID: 0720030101 (2) Obs ID: 0720030101 (3) Obs ID: 0720030101 (4) Obs ID: 0720030101 (5) Obs ID: 0720030101 (6) 
+
+0 5000 10000 15000 20000 25000 30000 0510 
+
+> Counts
+
+Obs ID: 0748390701 (1) 
+
+0 2000 4000 6000 8000 10000 010 20 
+
+> Counts
+
+Obs ID: 0742610101 (rem) Obs ID: 0742610101 (1) Obs ID: 0742610101 (2) 
+
+0 5000 10000 15000 20000 25000 010 20 
+
+> Counts
+
+Obs ID: 0803620301 (rem) Obs ID: 0803620301 (1) Obs ID: 0803620301 (2) Obs ID: 0803620301 (3) Obs ID: 0803620301 (4) 
+
+0 5000 10000 15000 20000 25000 30000 
+
+## Time (s) 
+
+05
+
+> Counts
+
+Obs ID: 0748390501 (1) 
+
+Figure B2. Continued. Example of the light curve treatment using the prototype transitional pulsar source J1023. See text for details. MNRAS 000 , 1– ?? (2026) DTW qualification of transitional pulsar candidates 11 0 5000 10000 15000 20000 25000 010 20 
+
+> Counts
+> Obs ID: 0770581001 (rem) Obs ID: 0770581001 (1) Obs ID: 0770581001 (2) Obs ID: 0770581001 (3)
+
+0 2500 5000 7500 10000 12500 15000 17500 20000 010 20 30 
+
+> Counts
+> Obs ID: 0803620501 (rem) Obs ID: 0803620501 (1)
+
+0 5000 10000 15000 20000 25000 30000 010 20 30 
+
+> Counts
+> Obs ID: 0748390101 (rem) Obs ID: 0748390101 (1) Obs ID: 0748390101 (2)
+
+0 5000 10000 15000 20000 010 20 
+
+> Counts
+> Obs ID: 0783330301 (rem) Obs ID: 0783330301 (1) Obs ID: 0783330301 (2)
+
+0 5000 10000 15000 20000 
+
+## Time (s) 
+
+010 20 30 
+
+> Counts
+> Obs ID: 0794580801 (rem) Obs ID: 0794580801 (1) Obs ID: 0794580801 (2)
+
+Figure B3. Continued. Example of the light curve treatment using the prototype transitional pulsar source J1023. See text for details. 
+
+APPENDIX C: EXAMPLES OF MOVING WINDOW PROCESS 
+
+Figure C1 shows an example of the moving window technique. The process in Eq. (3) starts by setting the first window at the beginning of the light curve (i.e., the first bin index, or 0-bin-index; the additional 
+
++1 in Eq. (3) accounts for this), using 𝑤 𝑠 . The second window starts at the 𝑠 𝑠 -bin-index, the third at the 2 × 𝑠 𝑠 -bin-index, and so on. 
+
+APPENDIX D: ALTERNATIVE DTW CONSTRAINTS 
+
+The Sakoe-Chiba band and the Itakura parallelogram impose dif-ferent restrictions on the admissible DTW warping path. However, it is useful to clarify two aspects of the present methodology and the motivation for adopting the Sakoe-Chiba constraint. First, the moving-window process used in our work and the DTW warping constraint operate at different stages of the analysis (see Appendix C 
+
+MNRAS 000 , 1– ?? (2026) 12 D. F. Torres et al. 4000 6000 8000 10000 12000 14000 024
+
+> Counts
+
+XSS J12270-4859 ? (1) 
+
+0 5000 10000 15000 20000 25000 30000 024
+
+> Counts
+
+XSS J12270-4859 ?? (rem) XSS J12270-4859 ?? (1) 
+
+0 5000 10000 15000 20000 25000 30000 024
+
+> Counts
+
+XSS J12270-4859 ??? (rem) XSS J12270-4859 ??? (1) 
+
+4000 6000 8000 10000 12000 14000 024
+
+> Counts
+
+1RXS J154439.4-112820 ? (1) 
+
+0 20000 40000 60000 80000 100000 120000 05
+
+> Counts
+
+1RXS J154439.4-112820 ?? (rem) 1RXS J154439.4-112820 ?? (1) 1RXS J154439.4-112820 ?? (2) 1RXS J154439.4-112820 ?? (3) 1RXS J154439.4-112820 ?? (4) 1RXS J154439.4-112820 ?? (5) 1RXS J154439.4-112820 ?? (6) 1RXS J154439.4-112820 ?? (7) 
+
+0 10000 20000 30000 40000 50000 60000 
+
+## Time (s) 
+
+0123
+
+> Counts
+
+1RXS J154439.4-112820 ??? (1) 
+
+Figure B4. Candidates light curves used in the comparison. MNRAS 000 , 1– ?? (2026) DTW qualification of transitional pulsar candidates 13 4000 6000 8000 10000 12000 14000 012 
+
+> Counts
+> CXOU J110926.4-650224 ?(1)
+
+0 10000 20000 30000 40000 50000 60000 024   
+
+> Counts
+> CXOU J110926.4-650224 ?? (rem) CXOU J110926.4-650224 ?? (1) CXOU J110926.4-650224 ?? (2)
+
+0 2500 5000 7500 10000 12500 15000 17500 20000 012 
+
+> Counts
+> CXOU J110926.4-650224 ??? (1)
+
+4000 6000 8000 10000 12000 14000 05  
+
+> Counts
+> J1023 ?(rem) J1023 ?(1)
+
+4000 6000 8000 10000 12000 14000 
+
+## Time (s) 
+
+024
+
+> Counts
+> IGR J1824-24525 (1)
+
+Figure B5. Continued. Candidates light curves used in the comparison. 
+
+for more details). The moving window defines the local light-curve segments that we compare, whereas the Sakoe-Chiba or Itakura con-straints determine which alignments are allowed within each pair of segments. They are therefore not alternative approaches. In our implementation, 1200 s windows are shifted by one 30-s bin at a time. Consequently, although an individual window may intersect the boundary of a high or low mode, structures shorter than the win-dow duration are sampled repeatedly at different positions and, except near the boundaries of a light-curve segment, are fully contained in multiple windows. The method therefore does not rely on a single arbitrary segmentation of the mode-switching behavior. Second, the Sakoe-Chiba constraint, for equal-length windows, imposes a uni-form maximum temporal displacement around the diagonal of the accumulated cost matrix throughout the comparison (Muller 2007), 
+
+MNRAS 000 , 1– ?? (2026) 14 D. F. Torres et al. 0 5000 10000 15000 20000 25000 30000 0.02.55.07.5
+
+> Counts
+> PBC J0801.2-4625 (1)
+
+0 5000 10000 15000 20000 25000 30000 0.00.51.01.5
+
+> Counts
+> SWIFT J0746-1611 (1)
+
+0 5000 10000 15000 20000 25000 30000 35000 012
+
+> Counts
+> IGR J12123-5802 (rem) IGR J12123-5802 (1)
+
+0 2500 5000 7500 10000 12500 15000 17500 0.00.51.0
+
+> Counts
+> IGR J17511-3057 (1)
+
+20000 40000 60000 80000 100000 
+
+## Time (s) 
+
+050 100 
+
+> Counts
+> SAX J1808.4-3658 (rem) SAX J1808.4-3658 (1) SAX J1808.4-3658 (2)
+
+Figure B6. Light curves for other sources, not classified as tMSPs or candidates. 
+
+while leaving the DTW algorithm free to select the minimum-cost path within the admissible region. In contrast, the Itakura parallelo-gram imposes a position-dependent admissible region and additional slope restrictions. Both approaches can limit pathological warping, but they do so differently. We do not think the Itakura constraint is inherently more appropriate for the present physical problem. In particular, because the positions of our moving windows are not tied to physical mode boundaries, the same high-to-low or low-to-high transition may occur near the beginning, center, or end of different overlapping windows. We have no physical reason to allow greater temporal deformation when a given feature lies near the center of a window than when the same feature occurs closer to its boundaries. We also explicitly examined the degree of warping permitted by the Sakoe-Chiba constraint. As described in Appendix E, we explored 
+
+MNRAS 000 , 1– ?? (2026) DTW qualification of transitional pulsar candidates 15 7000 8000 9000 10000 11000 12000 13000 14000 
+
+Time (s) 
+
+0123  
+
+> Counts
+> J1023 ?
+> (6118 −9088)s
+
+7000 8000 9000 
+
+Time (s) 
+
+0123
+
+> Counts
+> J1023 ?
+> w1
+
+7000 8000 9000 
+
+Time (s) 
+
+> J1023 ?
+> w2
+
+7000 8000 9000 
+
+Time (s)              
+
+> J1023 ?
+> w3
+> Figure C1. First row: Excerpt of a light curve for 1RXS J154439.4-112820 ★, with the time interval 2472-5442 s indicating the range selected for detailed analysis using the moving-window process shown in the second row. Second row: Zoom of the light blue region in the first row, with representative windows highlighted. Each panel shows a different window 𝑤 from the moving-window process, with 𝑤 𝑠 =40 bins and a step size of 𝑠 𝑠 =20 bins. The shaded region indicates the temporal extent of the selected 𝑤 (see Eq. (4)). The 𝑠 𝑠 is chosen to be sufficiently large to maximize visibility.
+
+𝑤 𝑤 = 1, 2, 4, 8, and 20, as well as the unconstrained case. Interme-diate values produced stable similarity results, whereas larger values permitted increasingly high-multiplicity alignments in which indi-vidual bins could be matched to many bins in the other light curve. We adopted 𝑤 𝑤 = 4 as a compromise that allows moderate tempo-ral deformation while retaining physically interpretable alignments. Thus, we do not apply the Sakoe-Chiba constraint by default; we select it after examining how its allowed warping range affects the results. Existing alternatives include “dynamic windowing,” where the gen-eral idea is to use a DTW constraint that becomes more flexible around rapid transitions and more restrictive during stable intervals. Adaptive DTW constraints of various forms have indeed been pro-posed in the literature (see, e.g., R-K Band in Ratanamahatana & Keogh (Ratanamahatana & Keogh), sDTW in Selçuk Candan et al. (2012), or LDTW in Zhang et al. (2017)). However, “dynamic win-dowing” does not, by itself, define a unique DTW prescription. Our purpose here is instead to compare the complete morphology of each local light-curve segment without assigning a priori greater weight or greater temporal flexibility to the transitions than to the high- and low-state intervals themselves. The durations of these states may also be part of the morphology we intend to retain, or at least modify as little as possible. A smaller DTW cost obtained by compressing a long plateau onto a much shorter one would therefore not necessarily represent a physically preferable match. For these reasons, we retain the symmetric Sakoe-Chiba constraint in the present analysis. 
+
+APPENDIX E: MODEL HYPERPARAMETERS 
+
+This methodology involves three user-defined hyperparameters, 𝑤 𝑠 ,
+
+𝑠 𝑠 , and 𝑤 𝑤 , which act at different levels of the analysis. The window size 𝑤 𝑠 defines the characteristic timescale over which the light curves are compared and constitutes the method’s primary scale. Its choice is constrained by the total length of the light curves, as it determines both the temporal resolution and the number of seg-ments (windows) that can be extracted according to Eq. (3), together with 𝑠 𝑠 . Increasing 𝑤 𝑠 reduces the number of available windows while emphasizing larger-scale structures. Given the minimum light curve duration of 3600 s (see § 2), we set 
+
+𝑤 𝑠 = 40 bins, equivalent to 1200 s, corresponding to one third of the minimum allowed light curve length. This choice balances the need to capture global features while retaining a sufficient number of windows for statistical characterization. The step size 𝑠 𝑠 determines how these windows are sampled. In this work, we adopt 𝑠 𝑠 = 1. This choice includes all possible window positions and maximizes the sampling of the light curve. This leads to strongly overlapping windows. In contrast, setting 𝑠 𝑠 = 𝑤 𝑠 suppresses the moving window process. Once the windows are defined, the parameter 𝑤 𝑤 regulates the DTW alignment within each window, as introduced in § 3.1. The Sakoe-Chiba constraint follows the implementation in the 
+
+dtaidistance Python package (Meert et al. 2020) and limits the number of bins in one light curve that can be matched to a single bin in another, thereby controlling the degree of temporal compression. This Sakoe-Chiba band-type constraint requires that the indices in the two time series satisfy |𝑖 − 𝑗 | < 2𝑤 𝑤 + | 𝑛 − 𝑚 |, thereby restricting the admissible region of 𝑊 ∈ A . For time series of equal length ( 𝑛 = 𝑚 ), this reduces to |𝑖 − 𝑗 | < 2𝑤 𝑤 . This implicitly limits the number of times a single bin in one light curve can be connected to different bins   
+
+> MNRAS 000 , 1– ?? (2026)
+
+## 16 D. F. Torres et al. 
+
+in the other light curve (also defined as multiplicity). Indeed, still for the case of 𝑛 = 𝑚 , for a fixed index 𝑗 , the constraint restricts the admissible indices 𝑖 to the interval [ 𝑗 − 2𝑤 𝑤 + 1, 𝑗 + 2𝑤 𝑤 − 1], which contains at most 4 𝑤 𝑤 − 1 values. Since each pair (𝑖, 𝑗 ) can appear at most once in the warping path due to the monotonicity condition, and the band constraint restricts the admissible indices, a given bin can be aligned no more than 4 𝑤 𝑤 −1 times. We explored 𝑤 𝑤 = 1, 2, 4, 8, 20, as well as the unconstrained case, in order to assess the impact of alignment flexibility on the resulting similarity distributions. Note that 𝑤 𝑤 = 1 is equivalent to the Euclidean distance case, where the alignment between light curves is strictly one-to-one (no warping). As 𝑤 𝑤 increases, the alignment becomes more flexible. For interme-diate values (e.g., 𝑤 𝑤 = 4, 8), the results remain stable, improving the separation in 𝜎 eq between the candidates and control cases (see Fig. 1) while allowing moderate temporal distortions. For larger values, such as 𝑤 𝑤 = 20 or in the unconstrained case, the alignment becomes excessively flexible. Although the resulting 𝜎 eq 
+
+values remain consistent, the multiplicities become very large, im-plying that single bins may be matched to many bins simultaneously. In this regime, the DTW distance is artificially reduced by highly degenerate alignments, compromising the physical interpretability of the comparison. From a physical perspective, large multiplicities are not meaning-ful, as they imply that a single temporal feature may correspond to multiple independent features in the other light curve. Also, very small multiplicities (towards the Euclidean distance) would imply that large similarities would require strict correlation, which is phys-ically implausible across different systems. Therefore, the choice of 𝑤 𝑤 must balance alignment flexibility with a physically plausible mapping between time bins. Given this trade-off, we adopt 𝑤 𝑤 = 4. This choice preserves the separation between can-didate and control cases, as shown in Fig. 1, while keeping multiplic-ities moderate, with a maximum value of 7 seen across all analyzed window alignments, thereby maintaining physical interpretability. 
+
+APPENDIX F: EXAMPLES OF WINDOW DTW MATCHING 
+
+We illustrate the DTW alignment behavior at the window level (Eq. 2), presenting a set of examples corresponding to the lowest DTW values across different sources. These examples highlight pairs of windows exhibiting strong morphological similarity despite orig-inating from independent observations of different systems. See Fig. F1.   
+
+> MNRAS 000 , 1– ?? (2026)
+
+## DTW qualification of transitional pulsar candidates 17 35000 40000 45000 50000 55000 60000 
+
+Time (s) 
+
+01234
+
+> Counts
+
+CXOU J110926.4-650224 ?? (2) 
+
+(34710 − 35880)s 
+
+34800 35000 35200 35400 35600 35800 
+
+Time (s) 
+
+0.00.10.20.30.40.5
+
+> Counts †
+
+CXOU J110926.4-650224 ?? (2) 
+
+0 2000 4000 6000 8000 
+
+Time (s) 
+
+0246810 12 14 16 
+
+> Counts
+
+Obs ID: 0794580901 (1) 
+
+(8010 − 9180)s 
+
+8000 8200 8400 8600 8800 9000 
+
+Time (s) 
+
+0.00.10.20.30.40.5
+
+> Counts †
+
+Obs ID: 0794580901 (1) 0 5000 10000 15000 20000 25000 
+
+Time (s) 
+
+0.00.51.01.52.02.53.0
+
+> Counts
+
+XSS J12270-4859 ??? (1) 
+
+(15360 − 16530)s 
+
+15400 15600 15800 16000 16200 16400 
+
+Time (s) 
+
+0.00.10.20.30.40.50.6
+
+> Counts †
+
+XSS J12270-4859 ??? (1) 
+
+20000 30000 40000 50000 60000 
+
+Time (s) 
+
+0246810 12 14 
+
+> Counts
+
+Obs ID: 0784700201 (2) 
+
+(36840 − 38010)s 
+
+37000 37200 37400 37600 37800 38000 
+
+Time (s) 
+
+0.00.10.20.30.40.50.6
+
+> Counts †
+
+Obs ID: 0784700201 (2) 95000 100000 105000 110000 115000 
+
+Time (s) 
+
+0.00.51.01.52.02.53.0
+
+> Counts
+
+1RXS J154439.4-112820 ?? (6) 
+
+(104040 − 105210)s 
+
+104200 104400 104600 104800 105000 105200 
+
+Time (s) 
+
+0.40.50.60.70.8
+
+> Counts †
+
+1RXS J154439.4-112820 ?? (6) 
+
+108000 110000 112000 114000 116000 118000 120000 122000 
+
+Time (s) 
+
+0246810 12 
+
+> Counts
+
+Obs ID: 0720030101 (6) 
+
+(115650 − 116820)s 
+
+115800 116000 116200 116400 116600 116800 
+
+Time (s) 
+
+0.40 0.45 0.50 0.55 0.60 0.65 0.70 0.75 
+
+> Counts †
+
+Obs ID: 0720030101 (6) 0 5000 10000 15000 20000 25000 30000 
+
+Time (s) 
+
+0.00.51.01.52.02.5
+
+> Counts
+
+IGR J12123-5802 (1) 
+
+(8730 − 9900)s 
+
+8800 9000 9200 9400 9600 9800 
+
+Time (s) 
+
+0.10.20.30.40.50.6
+
+> Counts †
+
+IGR J12123-5802 (1) 
+
+0 5000 10000 15000 20000 25000 30000 
+
+Time (s) 
+
+0246810 12 14 
+
+> Counts
+
+Obs ID: 0748390701 (1) 
+
+(21420 − 22590)s 
+
+21600 21800 22000 22200 22400 22600 
+
+Time (s) 
+
+0.00.10.20.30.40.5
+
+> Counts †
+
+Obs ID: 0748390701 (1) 
+
+Figure F1. Examples of optimal DTW matches for windows corresponding to light curves of different systems. J1023 appears in red, while the systems it is compared to appear in green. The specific observations are given in the legend. The shaded region indicates the selected bins, accounting for the bin width (30 s) and corresponding to a total temporal coverage of 1200 s (40 bins). The orange lines show the DTW alignment between bins, as given by Eq. (2). MNRAS 000 , 1– ?? (2026)
