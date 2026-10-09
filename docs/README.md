@@ -6,41 +6,35 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-10-07
-- 运行时间：2026-10-07 23:49:53 UTC
+- 最新运行日期：2026-10-09
+- 运行时间：2026-10-09 00:33:37 UTC
 - 运行状态：成功
-- 本次总论文数：7
+- 本次总论文数：5
 - 精读区：2
-- 速读区：5
+- 速读区：3
 
 ### 今日简报（AI）
-今日精读2篇、速读5篇，共7篇前沿论文，聚焦快速射电暴宿主星系与中子星状态方程推断。最值得看的是用积分场光谱解析快速射电暴宿主金属丰度（8.0分），以及RIFT框架下非参数状态方程的自适应推断新方法（8.0分）。普通读者可先从中子星状态方程与爱因斯坦望远镜的速读文章入手，感受引力波如何“称量”致密物质。
-- 详情：[/202610/07/README](/202610/07/README)
+2026-10-09 日报精选5篇脉冲星与引力波研究，精读2篇、速读3篇。最值得看的是吸积毫秒脉冲星 SAX J1808.4-3658 在 X 射线爆发与 I 型 X 射线暴期间的偏振 X 射线辐射，以及 NANOGrav 15 年数据集对脉冲星计时模型轮廓演化时延的改进函数形式。普通读者可从脉冲星计时与引力波背景的科普解读入手，理解这些观测如何帮助探测纳赫兹引力波。
+- 详情：[/202610/09/README](/202610/09/README)
 
 ### 精读区论文标签
-1. [A spatially resolved view of Fast Radio Burst host metallicities with Integral-field Spectroscopy](/202610/07/2610.07325v1-a-spatially-resolved-view-of-fast-radio-burst-host-metallicities-with-integral-field-spectroscopy)  
+1. [Polarised X-ray emission from the accreting millisecond pulsar SAX J1808.4-3658 during an X-ray outburst and a type-I X-ray burst](/202610/09/2610.09477v1-polarised-x-ray-emission-from-the-accreting-millisecond-pulsar-sax-j18084-3658-during-an-x-ray-outburst-and-a-type-i-x-ray-burst)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：通过FRB宿主星系金属丰度探究磁星前身
-2. [Adaptive proposals for nonparametric equation-of-state inference with RIFT: iterative Gaussian-process refinement in a compressed sequence representation](/202610/07/2610.07424v1-adaptive-proposals-for-nonparametric-equation-of-state-inference-with-rift-iterative-gaussian-process-refinement-in-a-compressed-sequence-representation)  
+   evidence：吸积毫秒脉冲星偏振X射线约束中子星质量半径
+2. [The NANOGrav 15 yr Dataset: Modified Functional Forms for Profile-Evolution Time Delays in Pulsar Timing Models](/202610/09/2610.10431v1-the-nanograv-15-yr-dataset-modified-functional-forms-for-profile-evolution-time-delays-in-pulsar-timing-models)  
    标签：评分：8.0/10、query:pulsar-frb
-   evidence：非参数中子星状态方程推断
+   evidence：NANOGrav脉冲星测时模型中轮廓演化时延的新函数形式
 
 ### 速读区论文标签
-1. [Radial Modes of Hot Neutrino-Trapped Hybrid Stars](/202610/07/2610.07241v1-radial-modes-of-hot-neutrino-trapped-hybrid-stars)  
+1. [LeoNet: A Machine Learning Method for Binary Pulsar Classification](/202610/09/2610.00908v1-leonet-a-machine-learning-method-for-binary-pulsar-classification)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：有限温度状态方程与中子星内部结构
-2. [Scalable and sequential inference of the neutron star equation of state with the Einstein Telescope](/202610/07/2610.07975v1-scalable-and-sequential-inference-of-the-neutron-star-equation-of-state-with-the-einstein-telescope)  
+   evidence：双星脉冲星信号的机器学习分类
+2. [Modeling the nanohertz gravitational wave background with the t-process: Improved frequentist analysis of gravitational-wave power](/202610/09/2610.08906v1-modeling-the-nanohertz-gravitational-wave-background-with-the-t-process-improved-frequentist-analysis-of-gravitational-wave-power)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：由引力波对中子星状态方程的序贯蒙特卡洛推断
-3. [Probing turbulence in the ionized interstellar medium using young pulsars. I. Dispersion measure variations](/202610/07/2610.08318v1-probing-turbulence-in-the-ionized-interstellar-medium-using-young-pulsars-i-dispersion-measure-variations)  
+   evidence：脉冲星计时阵分析纳赫兹引力波背景
+3. [Composition $g$-modes and $f$-modes of neutron stars with gravitationally coupled dark matter: degeneracy with the symmetry energy](/202610/09/2610.10007v1-composition-g-modes-and-f-modes-of-neutron-stars-with-gravitationally-coupled-dark-matter-degeneracy-with-the-symmetry-energy)  
    标签：评分：7.0/10、query:pulsar-frb
-   evidence：脉冲星计时色散量变化探测星际介质湍流
-4. [Assessing transitional pulsar candidates through a quantitative estimation of their light-curve similarity](/202610/07/2610.08531v1-assessing-transitional-pulsar-candidates-through-a-quantitative-estimation-of-their-light-curve-similarity)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：过渡毫秒脉冲星候选体与光变曲线相似度分类
-5. [Universal Relations Meet Causality: Bounding the Dynamical Love Number of Neutron Stars](/202610/07/2610.08546v1-universal-relations-meet-causality-bounding-the-dynamical-love-number-of-neutron-stars)  
-   标签：评分：6.0/10、query:pulsar-frb
-   evidence：因果性对中子星动态潮汐响应与状态方程的约束
+   evidence：利用NICER与GW170817数据约束中子星状态方程
 
 
 <div class="dpr-home-promo-card">
